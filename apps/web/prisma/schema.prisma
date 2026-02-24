@@ -1,0 +1,124 @@
+// Threely — Prisma Schema
+// Database: PostgreSQL via Supabase
+// Run `npx prisma generate` to regenerate client, `npx prisma db push` to sync
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ─── User ────────────────────────────────────────────────────────────────────
+model User {
+  id                 String       @id @default(uuid())
+  email              String       @unique
+  createdAt          DateTime     @default(now()) @map("created_at")
+  stripeCustomerId   String?      @map("stripe_customer_id")
+  subscriptionId     String?      @map("subscription_id")
+  subscriptionStatus String?      @map("subscription_status")
+  trialClaimedAt     DateTime?    @map("trial_claimed_at")
+  trialDeviceId      String?      @map("trial_device_id")
+  goals              Goal[]
+  dailyTasks         DailyTask[]
+  dailyFocus         DailyFocus[]
+  profile            UserProfile?
+
+  @@map("users")
+}
+
+// ─── UserProfile ─────────────────────────────────────────────────────────────
+model UserProfile {
+  id               String   @id @default(cuid())
+  userId           String   @unique @map("user_id")
+  dailyTimeMinutes Int      @default(60) @map("daily_time_minutes")
+  intensityLevel   Int      @default(2) @map("intensity_level")
+  theme            String   @default("light") @map("theme")
+  coachingContext  Json?    @map("coaching_context")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+// ─── Goal ────────────────────────────────────────────────────────────────────
+model Goal {
+  id                String      @id @default(cuid())
+  userId            String      @map("user_id")
+  title             String
+  description       String?
+  rawInput          String      @default("") @map("raw_input")
+  structuredSummary String?     @map("structured_summary")
+  category          String?
+  deadline          DateTime?
+  dailyTimeMinutes  Int?        @map("daily_time_minutes")
+  intensityLevel    Int?        @map("intensity_level")
+  isActive          Boolean     @default(true) @map("is_active")
+  isPaused          Boolean     @default(false) @map("is_paused")
+  createdAt         DateTime    @default(now()) @map("created_at")
+  updatedAt         DateTime    @updatedAt @map("updated_at")
+
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  dailyTasks        DailyTask[]
+
+  @@index([userId])
+  @@map("goals")
+}
+
+// ─── DailyTask ───────────────────────────────────────────────────────────────
+// TaskItem shape: { id, task, description, estimated_minutes, goal_id, why, isCompleted, isSkipped? }
+model DailyTask {
+  id          String       @id @default(cuid())
+  userId      String       @map("user_id")
+  goalId      String       @map("goal_id")
+  date        DateTime     @db.Date
+  tasks       Json
+  isCompleted Boolean      @default(false) @map("is_completed")
+  completedAt DateTime?    @map("completed_at")
+  generatedAt DateTime     @default(now()) @map("generated_at")
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  goal        Goal         @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  review      DailyReview?
+
+  @@unique([goalId, date])
+  @@index([userId, date])
+  @@map("daily_tasks")
+}
+
+// ─── DailyFocus ──────────────────────────────────────────────────────────────
+model DailyFocus {
+  id              String   @id @default(cuid())
+  userId          String   @map("user_id")
+  date            DateTime @db.Date
+  focusGoalId     String   @map("focus_goal_id")
+  shuffleTaskIds  Json?    @map("shuffle_task_ids")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("daily_focus")
+}
+
+// ─── DailyReview ─────────────────────────────────────────────────────────────
+model DailyReview {
+  id               String    @id @default(cuid())
+  dailyTaskId      String    @unique @map("daily_task_id")
+  userId           String    @map("user_id")
+  difficultyRating String    @map("difficulty_rating")
+  completionStatus String    @map("completion_status")
+  userNote         String?   @map("user_note")
+  insight          String?
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  dailyTask        DailyTask @relation(fields: [dailyTaskId], references: [id], onDelete: Cascade)
+
+  @@map("daily_reviews")
+}

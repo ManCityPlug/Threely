@@ -1,0 +1,39 @@
+# Dependencies
+node_modules
+.pnpm-store
+
+# Build outputs
+.next
+dist
+.expo
+*.tsbuildinfo
+
+# Turbo cache
+.turbo
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Prisma
+packages/database/prisma/migrations
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode
+.idea
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Expo
+apps/mobile/.expo
+apps/mobile/web-build

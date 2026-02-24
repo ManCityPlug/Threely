@@ -1,0 +1,63 @@
+{
+  "expo": {
+    "name": "Threely",
+    "slug": "threely",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "threely",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#f6f9fc"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.threely.app",
+      "appleTeamId": "Y3U56GWWBJ",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#f6f9fc"
+      },
+      "package": "com.threely.app"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#635BFF",
+          "sounds": []
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "af6f7b2a-7755-4aa1-b8a8-15421c34cbe1"
+      }
+    },
+    "owner": "web9800",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/af6f7b2a-7755-4aa1-b8a8-15421c34cbe1"
+    }
+  }
+}

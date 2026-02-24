@@ -1,0 +1,74 @@
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { getUserFromRequest } from "@/lib/supabase";
+import { refineTask } from "@/lib/claude";
+
+type Params = { params: Promise<{ id: string }> };
+
+interface TaskItem {
+  id: string;
+  task: string;
+  description: string;
+  estimated_minutes: number;
+  goal_id: string;
+  why: string;
+  isCompleted: boolean;
+  isSkipped?: boolean;
+  isRescheduled?: boolean;
+}
+
+// POST /api/tasks/:id/refine
+// Body: { taskItemId: string, userRequest: string }
+// Refines a single task item using AI based on user feedback.
+export async function POST(request: NextRequest, { params }: Params) {
+  try {
+    const user = await getUserFromRequest(request);
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { id } = await params;
+    const body = await request.json();
+    const { taskItemId, userRequest } = body as {
+      taskItemId: string;
+      userRequest: string;
+    };
+
+    if (!taskItemId || !userRequest?.trim()) {
+      return NextResponse.json({ error: "taskItemId and userRequest are required" }, { status: 400 });
+    }
+
+    const dailyTask = await prisma.dailyTask.findFirst({
+      where: { id, userId: user.id },
+      include: { goal: true },
+    });
+    if (!dailyTask) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    const tasks = dailyTask.tasks as unknown as TaskItem[];
+    const targetTask = tasks.find((t) => t.id === taskItemId);
+    if (!targetTask) return NextResponse.json({ error: "Task item not found" }, { status: 404 });
+
+    const refined = await refineTask({
+      task: targetTask.task,
+      description: targetTask.description,
+      why: targetTask.why,
+      goalTitle: dailyTask.goal.title,
+      goalCategory: dailyTask.goal.category,
+      userRequest: userRequest.trim(),
+    });
+
+    const updatedTasks = tasks.map((t) =>
+      t.id === taskItemId
+        ? { ...t, task: refined.task, description: refined.description, why: refined.why }
+        : t
+    );
+
+    const updated = await prisma.dailyTask.update({
+      where: { id },
+      data: { tasks: updatedTasks as never },
+    });
+
+    return NextResponse.json({ dailyTask: updated });
+  } catch (e) {
+    console.error("[POST /api/tasks/:id/refine]", e);
+    return NextResponse.json({ error: "Failed to refine task" }, { status: 500 });
+  }
+}
