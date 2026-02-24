@@ -17,7 +17,8 @@
       "bundleIdentifier": "com.threely.app",
       "appleTeamId": "Y3U56GWWBJ",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Threely needs access to your camera to update your profile photo."
       }
     },
     "android": {
