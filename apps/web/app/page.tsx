@@ -229,7 +229,7 @@ export default function LandingPage() {
             Threely learns your goals, your schedule, and your progress — then generates three personalized tasks every day that actually move you forward. Your AI-powered daily planner that adapts to you.
           </p>
 
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
             <span style={{
               display: "inline-flex", alignItems: "center", gap: 6,
               padding: "5px 14px",
@@ -286,7 +286,7 @@ export default function LandingPage() {
 
           {/* Social proof */}
           <div style={{
-            marginTop: "2rem",
+            marginTop: 24,
             display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
           }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
