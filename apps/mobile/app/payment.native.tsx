@@ -110,19 +110,14 @@ export default function PaymentScreen() {
           </View>
         </View>
 
-        {/* Dev notice banner */}
-        <View style={styles.devBanner}>
-          <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
-          <Text style={styles.devBannerText}>
-            Payment processing requires the full release build. Running in Expo Go preview mode.
-          </Text>
-        </View>
-
-        {/* CTA — disabled in Expo Go */}
+        {/* CTA */}
         <TouchableOpacity
-          style={[styles.ctaBtn, { opacity: 0.5 }]}
-          disabled
+          style={styles.ctaBtn}
           activeOpacity={0.85}
+          onPress={async () => {
+            await AsyncStorage.setItem("@threely_paywall_skipped", "true");
+            router.replace("/(tabs)");
+          }}
         >
           <Text style={styles.ctaBtnText}>Start Free Trial</Text>
         </TouchableOpacity>
