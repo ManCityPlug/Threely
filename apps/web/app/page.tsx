@@ -298,7 +298,7 @@ export default function LandingPage() {
             </a>
           </div>
 
-          {/* App Store badges */}
+          {/* Social proof + App Store badges */}
           <div style={{
             marginTop: "2.5rem",
             display: "flex", flexDirection: "column", alignItems: "center", gap: 20,
@@ -364,19 +364,14 @@ export default function LandingPage() {
                 </span>
               </Link>
             </div>
-          </div>
-
-          {/* Social proof */}
-          <div style={{
-            marginTop: "2rem",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-          }}>
-            <div style={{ color: "#f5a623", fontSize: "1.1rem", letterSpacing: 2 }}>
-              ★★★★★
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+              <div style={{ color: "#f5a623", fontSize: "1.1rem", letterSpacing: 2 }}>
+                ★★★★★
+              </div>
+              <p style={{ fontSize: "0.85rem", color: "#8898aa", fontWeight: 500 }}>
+                Join 2,000+ people hitting their goals every day
+              </p>
             </div>
-            <p style={{ fontSize: "0.85rem", color: "#8898aa", fontWeight: 500 }}>
-              Join 2,000+ people hitting their goals every day
-            </p>
           </div>
         </div>
       </section>
