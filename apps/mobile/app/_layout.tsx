@@ -33,6 +33,13 @@ function isAccessGranted(status: string | null): boolean {
 // ── Paywall skip: persisted flag so the "Skip" button actually sticks ─────────
 const PAYWALL_SKIP_KEY = "@threely_paywall_skipped";
 
+// In-memory flag set by the payment screen before navigating, so the layout
+// effect sees it synchronously and doesn't race with AsyncStorage reads.
+let _paywallSkippedGlobal = false;
+export function markPaywallSkipped() {
+  _paywallSkippedGlobal = true;
+}
+
 function AppContent() {
   const router = useRouter();
   const segments = useSegments();
@@ -40,6 +47,7 @@ function AppContent() {
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [ready, setReady] = useState(false);
   const paywallTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const paywallSkippedRef = useRef(false);
 
   // Listen for notification responses (deep links)
   useEffect(() => {
@@ -113,8 +121,17 @@ function AppContent() {
       // Onboarded — check subscription gate
 
       // 1. Check if user pressed "Skip" on the paywall (persists across restarts)
+      //    Also check the in-memory ref to avoid race conditions when navigating
+      //    away from the payment screen (segments change triggers this effect again
+      //    before AsyncStorage read resolves).
+      if (paywallSkippedRef.current || _paywallSkippedGlobal || __DEV__) {
+        if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
+        setReady(true);
+        return;
+      }
       const skipped = await AsyncStorage.getItem(PAYWALL_SKIP_KEY);
-      if (skipped || __DEV__) {
+      if (skipped) {
+        paywallSkippedRef.current = true;
         if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
         setReady(true);
         return;

@@ -20,6 +20,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "@/lib/theme";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
+import { markPaywallSkipped } from "./_layout";
 
 // ─── Features list ────────────────────────────────────────────────────────────
 const FEATURES = [
@@ -115,6 +116,7 @@ export default function PaymentScreen() {
           style={styles.ctaBtn}
           activeOpacity={0.85}
           onPress={async () => {
+            markPaywallSkipped();
             await AsyncStorage.setItem("@threely_paywall_skipped", "true");
             router.replace("/(tabs)");
           }}
@@ -143,6 +145,7 @@ export default function PaymentScreen() {
           </Text>
           <TouchableOpacity
             onPress={async () => {
+              markPaywallSkipped();
               await AsyncStorage.setItem("@threely_paywall_skipped", "true");
               router.replace("/(tabs)");
             }}
