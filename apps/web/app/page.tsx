@@ -300,21 +300,32 @@ export default function LandingPage() {
 
           {/* App Store badges */}
           <div style={{
-            marginTop: "1.5rem",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 10,
+            marginTop: "2.5rem",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 20,
           }}>
-            <span className="new-banner-shimmer" style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              padding: "5px 14px",
-              background: "linear-gradient(135deg, #635bff 0%, #7c74ff 100%)",
+            <div className="new-banner-shimmer" style={{
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "8px 20px",
+              background: "linear-gradient(135deg, #0a2540 0%, #1a3a5c 100%)",
               color: "#fff",
-              borderRadius: 20,
-              fontSize: "0.72rem",
+              borderRadius: 24,
+              fontSize: "0.8rem",
               fontWeight: 700,
-              letterSpacing: "0.04em",
+              letterSpacing: "0.03em",
+              boxShadow: "0 4px 20px rgba(10,37,64,0.25), 0 0 0 1px rgba(99,91,255,0.15)",
             }}>
+              <span style={{ fontSize: "1rem" }}>📱</span>
               Now available on mobile
-            </span>
+              <span style={{
+                background: "#635bff",
+                color: "#fff",
+                fontSize: "0.6rem",
+                fontWeight: 800,
+                padding: "2px 7px",
+                borderRadius: 6,
+                letterSpacing: "0.06em",
+              }}>NEW</span>
+            </div>
             <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
               <Link href="/" style={{
                 display: "inline-flex", alignItems: "center", gap: 12,

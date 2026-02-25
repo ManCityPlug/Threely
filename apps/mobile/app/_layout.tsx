@@ -30,8 +30,8 @@ function isAccessGranted(status: string | null): boolean {
   return status === "trialing" || status === "active";
 }
 
-// ── DEV BYPASS: set to true to skip paywall in Expo Go ────────────────────────
-const DEV_BYPASS_PAYWALL = __DEV__;
+// ── Paywall skip: persisted flag so the "Skip" button actually sticks ─────────
+const PAYWALL_SKIP_KEY = "@threely_paywall_skipped";
 
 function AppContent() {
   const router = useRouter();
@@ -111,22 +111,25 @@ function AppContent() {
       }
 
       // Onboarded — check subscription gate
-      if (DEV_BYPASS_PAYWALL) {
+
+      // 1. Check if user pressed "Skip" on the paywall (persists across restarts)
+      const skipped = await AsyncStorage.getItem(PAYWALL_SKIP_KEY);
+      if (skipped || __DEV__) {
         if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
         setReady(true);
         return;
       }
 
+      // 2. Check cached subscription status
       const cachedStatus = await AsyncStorage.getItem("@threely_subscription_status");
 
       if (isAccessGranted(cachedStatus)) {
-        // Already verified — go to tabs
         if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
         setReady(true);
         return;
       }
 
-      // Re-check with backend (catches trial expiry, cancellation, etc.)
+      // 3. Re-check with backend (catches trial expiry, cancellation, etc.)
       try {
         const { status } = await subscriptionApi.status();
 

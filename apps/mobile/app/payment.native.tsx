@@ -16,6 +16,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useTheme } from "@/lib/theme";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
@@ -145,7 +146,13 @@ export default function PaymentScreen() {
             </Text>
             . Subscription renews automatically.
           </Text>
-          <TouchableOpacity onPress={() => router.replace("/(tabs)")} style={styles.restoreBtn}>
+          <TouchableOpacity
+            onPress={async () => {
+              await AsyncStorage.setItem("@threely_paywall_skipped", "true");
+              router.replace("/(tabs)");
+            }}
+            style={styles.restoreBtn}
+          >
             <Text style={styles.restoreText}>Skip for now (dev only)</Text>
           </TouchableOpacity>
         </View>
