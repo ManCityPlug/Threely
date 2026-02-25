@@ -147,7 +147,7 @@ export default function MobileAppPrompt() {
               left: 0,
               right: 0,
               height: "40%",
-              background: "linear-gradient(135deg, #f6f9fc 0%, #ede9ff 100%)",
+              background: "linear-gradient(180deg, #ffffff 0%, #f6f9fc 50%, #ede9ff 100%)",
               zIndex: 0,
             }}
           />
@@ -295,7 +295,7 @@ export default function MobileAppPrompt() {
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 10,
-                  padding: "14px 28px 14px 18px",
+                  padding: "12px 16px",
                   background: "#0a2540",
                   color: "#fff",
                   borderRadius: 12,
@@ -306,7 +306,7 @@ export default function MobileAppPrompt() {
                   border: "1.5px solid rgba(99,91,255,0.15)",
                 }}
               >
-                <span className="new-badge" style={{ position: "absolute", top: -8, right: -8 }}>New</span>
+                <span style={{ position: "absolute", top: -7, right: -7, background: "#635bff", color: "#fff", fontSize: "0.55rem", fontWeight: 800, padding: "2px 6px", borderRadius: 6, letterSpacing: "0.04em" }}>NEW</span>
                 <AppleIcon />
                 <span
                   style={{
@@ -330,7 +330,7 @@ export default function MobileAppPrompt() {
                   alignItems: "center",
                   justifyContent: "center",
                   gap: 10,
-                  padding: "14px 28px 14px 18px",
+                  padding: "12px 16px",
                   background: "#0a2540",
                   color: "#fff",
                   borderRadius: 12,
@@ -341,7 +341,7 @@ export default function MobileAppPrompt() {
                   border: "1.5px solid rgba(99,91,255,0.15)",
                 }}
               >
-                <span className="new-badge" style={{ position: "absolute", top: -8, right: -8 }}>New</span>
+                <span style={{ position: "absolute", top: -7, right: -7, background: "#635bff", color: "#fff", fontSize: "0.55rem", fontWeight: 800, padding: "2px 6px", borderRadius: 6, letterSpacing: "0.04em" }}>NEW</span>
                 <PlayIcon />
                 <span
                   style={{

@@ -232,7 +232,7 @@ export default function LandingPage() {
 
       {/* ─── Hero ──────────────────────────────────────────────────────────────── */}
       <section style={{
-        background: "linear-gradient(135deg, #f6f9fc 0%, #ede9ff 100%)",
+        background: "linear-gradient(180deg, #ffffff 0%, #f6f9fc 50%, #ede9ff 100%)",
         padding: "5rem 1.5rem 3.5rem",
         textAlign: "center",
       }}>

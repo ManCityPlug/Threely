@@ -443,3 +443,15 @@ input, textarea, select {
   background: var(--primary);
   color: #fff;
 }
+
+/* ─── Marketing nav: mobile responsive ──────────────────────────────────────── */
+@media (max-width: 768px) {
+  .marketing-nav-links { display: none !important; }
+  .mobile-menu-btn { display: flex !important; }
+  .footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+@media (min-width: 769px) {
+  .mobile-menu-btn { display: none !important; }
+}
