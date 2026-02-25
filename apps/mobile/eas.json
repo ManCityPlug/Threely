@@ -25,7 +25,8 @@
     "production": {
       "ios": {
         "appleId": "erik.mitev37@gmail.com",
-        "appleTeamId": "Y3U56GWWBJ"
+        "appleTeamId": "Y3U56GWWBJ",
+        "ascAppId": "6759625661"
       }
     }
   }
