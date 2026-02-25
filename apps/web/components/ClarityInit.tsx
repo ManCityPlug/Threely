@@ -3,13 +3,9 @@
 import { useEffect } from "react";
 import Clarity from "@microsoft/clarity";
 
-const CLARITY_PROJECT_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID;
-
 export default function ClarityInit() {
   useEffect(() => {
-    if (CLARITY_PROJECT_ID) {
-      Clarity.init(CLARITY_PROJECT_ID);
-    }
+    Clarity.init("vm4n4qax20");
   }, []);
 
   return null;
