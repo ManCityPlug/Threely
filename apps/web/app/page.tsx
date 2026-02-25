@@ -187,20 +187,20 @@ export default function LandingPage() {
           </Link>
           {/* App store buttons with NEW badge */}
           <div style={{ height: 1, background: "#e3e8ef", margin: "6px 0" }} />
-          <div style={{ display: "flex", gap: 12, marginTop: 4 }}>
+          <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
             <Link href="/" onClick={() => setMenuOpen(false)} style={{
               flex: 1,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              padding: "14px 28px 14px 18px",
+              padding: "12px 16px",
               background: "#0a2540",
               color: "#fff",
-              borderRadius: 12,
-              fontSize: "0.85rem",
+              borderRadius: 10,
+              fontSize: "0.8rem",
               fontWeight: 600,
               position: "relative",
               border: "1.5px solid rgba(99,91,255,0.15)",
             }}>
-              <span className="new-badge" style={{ position: "absolute", top: -7, right: -6 }}>New</span>
+              <span style={{ position: "absolute", top: -7, right: -6, background: "#635bff", color: "#fff", fontSize: "0.55rem", fontWeight: 800, padding: "2px 6px", borderRadius: 6, letterSpacing: "0.04em" }}>NEW</span>
               <AppleIcon />
               <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
                 <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
@@ -210,16 +210,16 @@ export default function LandingPage() {
             <Link href="/" onClick={() => setMenuOpen(false)} style={{
               flex: 1,
               display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              padding: "14px 28px 14px 18px",
+              padding: "12px 16px",
               background: "#0a2540",
               color: "#fff",
-              borderRadius: 12,
-              fontSize: "0.85rem",
+              borderRadius: 10,
+              fontSize: "0.8rem",
               fontWeight: 600,
               position: "relative",
               border: "1.5px solid rgba(99,91,255,0.15)",
             }}>
-              <span className="new-badge" style={{ position: "absolute", top: -7, right: -6 }}>New</span>
+              <span style={{ position: "absolute", top: -7, right: -6, background: "#635bff", color: "#fff", fontSize: "0.55rem", fontWeight: 800, padding: "2px 6px", borderRadius: 6, letterSpacing: "0.04em" }}>NEW</span>
               <PlayIcon />
               <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
                 <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
@@ -302,70 +302,71 @@ export default function LandingPage() {
           <div style={{
             marginTop: "2.5rem",
             display: "flex", flexDirection: "column", alignItems: "center",
+            gap: 24,
           }}>
-            <div className="new-banner-shimmer" style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "8px 20px",
-              background: "linear-gradient(135deg, #0a2540 0%, #1a3a5c 100%)",
+            <span style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "5px 14px",
+              background: "linear-gradient(135deg, #635bff 0%, #7c74ff 100%)",
               color: "#fff",
-              borderRadius: 24,
-              fontSize: "0.8rem",
+              borderRadius: 20,
+              fontSize: "0.72rem",
               fontWeight: 700,
-              letterSpacing: "0.03em",
-              boxShadow: "0 4px 20px rgba(10,37,64,0.25), 0 0 0 1px rgba(99,91,255,0.15)",
-              marginBottom: 36,
+              letterSpacing: "0.04em",
             }}>
-              <span style={{ fontSize: "1rem" }}>📱</span>
               Now available on mobile
-              <span style={{
-                background: "#635bff",
-                color: "#fff",
-                fontSize: "0.6rem",
-                fontWeight: 800,
-                padding: "2px 7px",
-                borderRadius: 6,
-                letterSpacing: "0.06em",
-              }}>NEW</span>
-            </div>
-            <div style={{ display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" }}>
+            </span>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               <Link href="/" style={{
-                display: "inline-flex", alignItems: "center", gap: 12,
-                padding: "16px 48px 16px 28px",
+                display: "inline-flex", alignItems: "center", gap: 10,
+                padding: "12px 20px",
                 background: "#0a2540",
                 color: "#fff",
-                borderRadius: 12,
-                fontSize: "0.9rem",
+                borderRadius: 10,
+                fontSize: "0.8rem",
                 fontWeight: 600,
                 position: "relative",
                 border: "1.5px solid rgba(99,91,255,0.2)",
               }}>
-                <span className="new-badge" style={{ position: "absolute", top: -8, right: -8 }}>New</span>
+                <span style={{
+                  position: "absolute", top: -7, right: -7,
+                  background: "#635bff", color: "#fff",
+                  fontSize: "0.55rem", fontWeight: 800,
+                  padding: "2px 6px", borderRadius: 6,
+                  letterSpacing: "0.04em",
+                }}>NEW</span>
                 <AppleIcon />
                 <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                  <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
+                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
                   <span>App Store</span>
                 </span>
               </Link>
               <Link href="/" style={{
-                display: "inline-flex", alignItems: "center", gap: 12,
-                padding: "16px 48px 16px 28px",
+                display: "inline-flex", alignItems: "center", gap: 10,
+                padding: "12px 20px",
                 background: "#0a2540",
                 color: "#fff",
-                borderRadius: 12,
-                fontSize: "0.9rem",
+                borderRadius: 10,
+                fontSize: "0.8rem",
                 fontWeight: 600,
                 position: "relative",
                 border: "1.5px solid rgba(99,91,255,0.2)",
               }}>
-                <span className="new-badge" style={{ position: "absolute", top: -8, right: -8 }}>New</span>
+                <span style={{
+                  position: "absolute", top: -7, right: -7,
+                  background: "#635bff", color: "#fff",
+                  fontSize: "0.55rem", fontWeight: 800,
+                  padding: "2px 6px", borderRadius: 6,
+                  letterSpacing: "0.04em",
+                }}>NEW</span>
                 <PlayIcon />
                 <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                  <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
+                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
                   <span>Google Play</span>
                 </span>
               </Link>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, marginTop: 36 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
               <div style={{ color: "#f5a623", fontSize: "1.1rem", letterSpacing: 2 }}>
                 ★★★★★
               </div>
@@ -830,41 +831,41 @@ export default function LandingPage() {
           {/* App store badges in CTA */}
           <div style={{
             marginTop: "1.5rem",
-            display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap",
+            display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap",
           }}>
             <Link href="/" style={{
-              display: "inline-flex", alignItems: "center", gap: 12,
-              padding: "16px 48px 16px 28px",
+              display: "inline-flex", alignItems: "center", gap: 10,
+              padding: "12px 20px",
               background: "rgba(255,255,255,0.12)",
               color: "#fff",
-              borderRadius: 12,
-              fontSize: "0.9rem",
+              borderRadius: 10,
+              fontSize: "0.8rem",
               fontWeight: 600,
               border: "1.5px solid rgba(255,255,255,0.25)",
               position: "relative",
             }}>
-              <span className="new-badge" style={{ position: "absolute", top: -8, right: -8 }}>New</span>
+              <span style={{ position: "absolute", top: -7, right: -7, background: "#635bff", color: "#fff", fontSize: "0.55rem", fontWeight: 800, padding: "2px 6px", borderRadius: 6, letterSpacing: "0.04em" }}>NEW</span>
               <AppleIcon />
               <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
+                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
                 <span>App Store</span>
               </span>
             </Link>
             <Link href="/" style={{
-              display: "inline-flex", alignItems: "center", gap: 12,
-              padding: "16px 48px 16px 28px",
+              display: "inline-flex", alignItems: "center", gap: 10,
+              padding: "12px 20px",
               background: "rgba(255,255,255,0.12)",
               color: "#fff",
-              borderRadius: 12,
-              fontSize: "0.9rem",
+              borderRadius: 10,
+              fontSize: "0.8rem",
               fontWeight: 600,
               border: "1.5px solid rgba(255,255,255,0.25)",
               position: "relative",
             }}>
-              <span className="new-badge" style={{ position: "absolute", top: -8, right: -8 }}>New</span>
+              <span style={{ position: "absolute", top: -7, right: -7, background: "#635bff", color: "#fff", fontSize: "0.55rem", fontWeight: 800, padding: "2px 6px", borderRadius: 6, letterSpacing: "0.04em" }}>NEW</span>
               <PlayIcon />
               <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
+                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
                 <span>Google Play</span>
               </span>
             </Link>
