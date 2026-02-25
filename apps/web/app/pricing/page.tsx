@@ -51,28 +51,29 @@ export default function PricingPage() {
       {/* Pricing cards */}
       <section style={{ padding: "3.5rem 1.5rem", background: "#fff" }}>
         <div style={{
-          maxWidth: 840,
+          maxWidth: 640,
           margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
           gap: "1.5rem",
           alignItems: "start",
         }}>
-          {/* Free trial */}
+          {/* Monthly */}
           <div style={{
             padding: "2rem 1.5rem",
             borderRadius: 16,
             border: "1px solid #e3e8ef",
             background: "#fff",
           }}>
-            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#8898aa", textTransform: "uppercase", marginBottom: 8 }}>
-              FREE TRIAL
+            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#635bff", textTransform: "uppercase", marginBottom: 8 }}>
+              MONTHLY
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$0</span>
+              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$9.99</span>
+              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/month</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              7 days of full access. No credit card required.
+              Full AI coaching. Cancel anytime.
             </p>
             <Link href="/register" style={{
               display: "block",
@@ -90,7 +91,7 @@ export default function PricingPage() {
             </Link>
           </div>
 
-          {/* Monthly */}
+          {/* Yearly */}
           <div style={{
             padding: "2rem 1.5rem",
             borderRadius: 16,
@@ -107,15 +108,15 @@ export default function PricingPage() {
             }}>
               MOST POPULAR
             </div>
-            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#635bff", textTransform: "uppercase", marginBottom: 8 }}>
-              MONTHLY
+            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#3ecf8e", textTransform: "uppercase", marginBottom: 8 }}>
+              YEARLY &mdash; SAVE 42%
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$6.99</span>
-              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/month</span>
+              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$70</span>
+              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/year</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              Full AI coaching. Cancel anytime.
+              Best value. That&apos;s $5.83/month.
             </p>
             <Link href="/register" style={{
               display: "block",
@@ -129,40 +130,7 @@ export default function PricingPage() {
               textDecoration: "none",
               boxShadow: "0 4px 14px rgba(99,91,255,0.3)",
             }}>
-              Get started
-            </Link>
-          </div>
-
-          {/* Yearly */}
-          <div style={{
-            padding: "2rem 1.5rem",
-            borderRadius: 16,
-            border: "1px solid #e3e8ef",
-            background: "#fff",
-          }}>
-            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#3ecf8e", textTransform: "uppercase", marginBottom: 8 }}>
-              YEARLY — SAVE 40%
-            </div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$49.99</span>
-              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/year</span>
-            </div>
-            <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              Best value. That&apos;s $4.17/month.
-            </p>
-            <Link href="/register" style={{
-              display: "block",
-              textAlign: "center",
-              padding: "0.75rem 1.5rem",
-              background: "#fff",
-              color: "#635bff",
-              border: "1.5px solid #635bff",
-              borderRadius: 10,
-              fontWeight: 700,
-              fontSize: "0.95rem",
-              textDecoration: "none",
-            }}>
-              Get started
+              Start free trial
             </Link>
           </div>
         </div>
