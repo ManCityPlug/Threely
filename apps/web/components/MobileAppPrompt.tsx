@@ -394,7 +394,7 @@ export default function MobileAppPrompt() {
             zIndex: 9998,
             background: "#fff",
             borderTop: "1px solid #e3e8ef",
-            padding: "10px 12px",
+            padding: "10px 12px calc(10px + env(safe-area-inset-bottom, 0px)) 12px",
             display: "flex",
             alignItems: "center",
             gap: 10,
