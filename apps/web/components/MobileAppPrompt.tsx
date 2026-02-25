@@ -407,6 +407,24 @@ export default function MobileAppPrompt() {
             animation: "mobilePromptBannerIn 0.35s ease both",
           }}
         >
+          {/* Close X */}
+          <button
+            onClick={dismissBanner}
+            aria-label="Close banner"
+            style={{
+              background: "none",
+              border: "none",
+              color: "#8898aa",
+              fontSize: 16,
+              cursor: "pointer",
+              padding: "4px 2px",
+              lineHeight: 1,
+              flexShrink: 0,
+            }}
+          >
+            ✕
+          </button>
+
           {/* App icon */}
           <div
             style={{
@@ -450,24 +468,6 @@ export default function MobileAppPrompt() {
               Better on the app
             </div>
           </div>
-
-          {/* Close X */}
-          <button
-            onClick={dismissBanner}
-            aria-label="Close banner"
-            style={{
-              background: "none",
-              border: "none",
-              color: "#8898aa",
-              fontSize: 18,
-              cursor: "pointer",
-              padding: 4,
-              lineHeight: 1,
-              flexShrink: 0,
-            }}
-          >
-            ✕
-          </button>
 
           {/* Open button */}
           <a
