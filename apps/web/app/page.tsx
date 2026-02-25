@@ -301,7 +301,7 @@ export default function LandingPage() {
           {/* Social proof + App Store badges */}
           <div style={{
             marginTop: "2.5rem",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 20,
+            display: "flex", flexDirection: "column", alignItems: "center",
           }}>
             <div className="new-banner-shimmer" style={{
               display: "inline-flex", alignItems: "center", gap: 8,
@@ -313,6 +313,7 @@ export default function LandingPage() {
               fontWeight: 700,
               letterSpacing: "0.03em",
               boxShadow: "0 4px 20px rgba(10,37,64,0.25), 0 0 0 1px rgba(99,91,255,0.15)",
+              marginBottom: 28,
             }}>
               <span style={{ fontSize: "1rem" }}>📱</span>
               Now available on mobile
@@ -364,7 +365,7 @@ export default function LandingPage() {
                 </span>
               </Link>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, marginTop: 28 }}>
               <div style={{ color: "#f5a623", fontSize: "1.1rem", letterSpacing: 2 }}>
                 ★★★★★
               </div>
