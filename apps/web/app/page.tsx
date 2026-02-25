@@ -185,48 +185,6 @@ export default function LandingPage() {
           }}>
             Get started
           </Link>
-          {/* App store buttons with NEW badge */}
-          <div style={{ height: 1, background: "#e3e8ef", margin: "6px 0" }} />
-          <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
-            <Link href="/" onClick={() => setMenuOpen(false)} style={{
-              flex: 1,
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              padding: "12px 16px",
-              background: "#0a2540",
-              color: "#fff",
-              borderRadius: 10,
-              fontSize: "0.8rem",
-              fontWeight: 600,
-              position: "relative",
-              border: "1.5px solid rgba(99,91,255,0.15)",
-            }}>
-              <span style={{ position: "absolute", top: -7, right: -6, background: "#635bff", color: "#fff", fontSize: "0.55rem", fontWeight: 800, padding: "2px 6px", borderRadius: 6, letterSpacing: "0.04em" }}>NEW</span>
-              <AppleIcon />
-              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
-                <span>App Store</span>
-              </span>
-            </Link>
-            <Link href="/" onClick={() => setMenuOpen(false)} style={{
-              flex: 1,
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              padding: "12px 16px",
-              background: "#0a2540",
-              color: "#fff",
-              borderRadius: 10,
-              fontSize: "0.8rem",
-              fontWeight: 600,
-              position: "relative",
-              border: "1.5px solid rgba(99,91,255,0.15)",
-            }}>
-              <span style={{ position: "absolute", top: -7, right: -6, background: "#635bff", color: "#fff", fontSize: "0.55rem", fontWeight: 800, padding: "2px 6px", borderRadius: 6, letterSpacing: "0.04em" }}>NEW</span>
-              <PlayIcon />
-              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
-                <span>Google Play</span>
-              </span>
-            </Link>
-          </div>
         </div>
       )}
 
@@ -272,100 +230,51 @@ export default function LandingPage() {
           </p>
 
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <Link href="/register" onClick={handleMobileCTA} style={{
-              padding: "0.875rem 2rem",
-              fontSize: "1rem",
-              fontWeight: 700,
+            <Link href="/" style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+              padding: "14px 28px 14px 18px",
+              background: "#0a2540",
               color: "#fff",
-              background: "#635bff",
-              borderRadius: 10,
-              display: "inline-block",
-              boxShadow: "0 4px 14px rgba(99,91,255,0.3)",
-            }}>
-              Start for free →
-            </Link>
-            <a href="#how-it-works" style={{
-              padding: "0.875rem 2rem",
-              fontSize: "1rem",
+              borderRadius: 12,
+              fontSize: "0.85rem",
               fontWeight: 600,
-              color: "#635bff",
-              background: "#fff",
-              border: "1.5px solid #e3e8ef",
-              borderRadius: 10,
-              display: "inline-block",
+              textDecoration: "none",
+              position: "relative" as const,
+              border: "1.5px solid rgba(99,91,255,0.15)",
             }}>
-              Learn more
-            </a>
+              <span style={{ position: "absolute", top: -7, right: -6, background: "#635bff", color: "#fff", fontSize: "0.55rem", fontWeight: 800, padding: "2px 6px", borderRadius: 6, letterSpacing: "0.04em" }}>NEW</span>
+              <AppleIcon />
+              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
+                <span>App Store</span>
+              </span>
+            </Link>
+            <Link href="/" style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+              padding: "14px 28px 14px 18px",
+              background: "#0a2540",
+              color: "#fff",
+              borderRadius: 12,
+              fontSize: "0.85rem",
+              fontWeight: 600,
+              textDecoration: "none",
+              position: "relative" as const,
+              border: "1.5px solid rgba(99,91,255,0.15)",
+            }}>
+              <span style={{ position: "absolute", top: -7, right: -6, background: "#635bff", color: "#fff", fontSize: "0.55rem", fontWeight: 800, padding: "2px 6px", borderRadius: 6, letterSpacing: "0.04em" }}>NEW</span>
+              <PlayIcon />
+              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
+                <span>Google Play</span>
+              </span>
+            </Link>
           </div>
 
-          {/* Social proof + App Store badges */}
+          {/* Social proof */}
           <div style={{
-            marginTop: "2.5rem",
-            display: "flex", flexDirection: "column", alignItems: "center",
-            gap: 24,
+            marginTop: "2rem",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
           }}>
-            <span style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              padding: "5px 14px",
-              background: "linear-gradient(135deg, #635bff 0%, #7c74ff 100%)",
-              color: "#fff",
-              borderRadius: 20,
-              fontSize: "0.72rem",
-              fontWeight: 700,
-              letterSpacing: "0.04em",
-            }}>
-              Now available on mobile
-            </span>
-            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <Link href="/" style={{
-                display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "12px 20px",
-                background: "#0a2540",
-                color: "#fff",
-                borderRadius: 10,
-                fontSize: "0.8rem",
-                fontWeight: 600,
-                position: "relative",
-                border: "1.5px solid rgba(99,91,255,0.2)",
-              }}>
-                <span style={{
-                  position: "absolute", top: -7, right: -7,
-                  background: "#635bff", color: "#fff",
-                  fontSize: "0.55rem", fontWeight: 800,
-                  padding: "2px 6px", borderRadius: 6,
-                  letterSpacing: "0.04em",
-                }}>NEW</span>
-                <AppleIcon />
-                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
-                  <span>App Store</span>
-                </span>
-              </Link>
-              <Link href="/" style={{
-                display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "12px 20px",
-                background: "#0a2540",
-                color: "#fff",
-                borderRadius: 10,
-                fontSize: "0.8rem",
-                fontWeight: 600,
-                position: "relative",
-                border: "1.5px solid rgba(99,91,255,0.2)",
-              }}>
-                <span style={{
-                  position: "absolute", top: -7, right: -7,
-                  background: "#635bff", color: "#fff",
-                  fontSize: "0.55rem", fontWeight: 800,
-                  padding: "2px 6px", borderRadius: 6,
-                  letterSpacing: "0.04em",
-                }}>NEW</span>
-                <PlayIcon />
-                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
-                  <span>Google Play</span>
-                </span>
-              </Link>
-            </div>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
               <div style={{ color: "#f5a623", fontSize: "1.1rem", letterSpacing: 2 }}>
                 ★★★★★
