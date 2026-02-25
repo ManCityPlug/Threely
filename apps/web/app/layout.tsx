@@ -4,7 +4,6 @@ import { AuthProvider } from "@/lib/auth-context";
 import { ThemeProvider } from "@/lib/theme-context";
 import MobileAppPrompt from "@/components/MobileAppPrompt";
 import ClarityInit from "@/components/ClarityInit";
-import ClarityInit from "@/components/ClarityInit";
 
 export const metadata: Metadata = {
   title: "Threely — Your AI coach",
@@ -30,7 +29,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <AuthProvider>
             {children}
             <MobileAppPrompt />
-            <ClarityInit />
           </AuthProvider>
         </ThemeProvider>
       </body>
