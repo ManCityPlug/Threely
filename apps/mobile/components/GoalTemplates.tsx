@@ -106,7 +106,7 @@ function createStyles(c: Colors) {
       marginBottom: spacing.lg,
     },
     gridContent: {
-      paddingBottom: spacing.xxl + spacing.xl,
+      paddingBottom: spacing.xxl + spacing.xxl,
     },
     grid: {
       flexDirection: "row",
@@ -141,7 +141,7 @@ function createStyles(c: Colors) {
     },
     otherBtn: {
       marginTop: spacing.md,
-      marginBottom: spacing.lg,
+      marginBottom: spacing.xxl,
       paddingVertical: spacing.md,
       paddingHorizontal: spacing.lg,
       borderRadius: radius.md,

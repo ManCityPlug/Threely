@@ -75,15 +75,14 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
     barAnims.forEach((v) => v.setValue(0));
 
     const animations = barAnims.map((animVal) =>
-      Animated.spring(animVal, {
+      Animated.timing(animVal, {
         toValue: 1,
+        duration: 600,
         useNativeDriver: false, // height can't use native driver
-        tension: 60,
-        friction: 10,
       })
     );
 
-    Animated.stagger(60, animations).start();
+    Animated.stagger(50, animations).start();
   }, [data]);
 
   return (
@@ -125,6 +124,7 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
 
               {/* Bar */}
               <View style={styles.barTrack}>
+                <View style={[styles.barBg, { backgroundColor: colors.border + "44" }]} />
                 <Animated.View
                   style={[
                     styles.barFill,
@@ -200,10 +200,19 @@ function createStyles(c: Colors) {
       marginBottom: 4,
     },
     barTrack: {
+      flex: 1,
       width: "100%",
       maxWidth: 36,
       justifyContent: "flex-end",
       alignItems: "stretch",
+    },
+    barBg: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      borderRadius: 6,
     },
     barFill: {
       borderRadius: 6,

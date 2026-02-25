@@ -1378,7 +1378,7 @@ function createStyles(c: Colors) {
       marginBottom: spacing.xl,
     },
     generateBtn: { width: "100%" },
-    nextSection: { alignItems: "center", marginTop: spacing.xs, gap: spacing.sm },
+    nextSection: { alignItems: "center", marginTop: 4, gap: spacing.xs },
     // Give me more (unlocked)
     giveMeMoreBtn: {
       flexDirection: "row",
