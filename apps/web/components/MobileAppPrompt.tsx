@@ -78,9 +78,8 @@ export default function MobileAppPrompt() {
     window.__openThreelyAppPrompt = openInterstitial;
 
     // Show interstitial on every mobile page load
-    const t = setTimeout(() => setView("interstitial"), 600);
+    setView("interstitial");
     return () => {
-      clearTimeout(t);
       delete window.__openThreelyAppPrompt;
     };
   }, [openInterstitial]);
