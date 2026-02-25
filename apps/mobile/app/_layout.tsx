@@ -37,6 +37,20 @@ function AppContent() {
   const [ready, setReady] = useState(false);
   const paywallTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Listen for notification responses (deep links)
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data as Record<string, unknown> | undefined;
+      if (data?.action === "weekly-summary") {
+        AsyncStorage.setItem("@threely_open_weekly_summary", "1").then(() => {
+          router.push("/(tabs)/profile" as never);
+        });
+      }
+    });
+    return () => sub.remove();
+  }, []);
+
   useEffect(() => {
     // Recover existing session — catch invalid/expired refresh tokens
     supabase.auth.getSession().then(({ data: { session: s }, error }) => {

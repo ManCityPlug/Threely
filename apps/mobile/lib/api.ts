@@ -17,6 +17,7 @@ export interface Goal {
   intensityLevel: number | null;
   isActive: boolean;
   isPaused: boolean;
+  focusDays: string | null; // JSON array e.g. '["monday","wednesday"]'
   createdAt: string;
   updatedAt: string;
 }
@@ -192,6 +193,7 @@ export const goalsApi = {
       deadline?: string;
       dailyTimeMinutes?: number;
       intensityLevel?: number;
+      focusDays?: string[];
     }
   ) =>
     apiFetch<{ goal: Goal }>("/api/goals", {
@@ -199,7 +201,7 @@ export const goalsApi = {
       body: JSON.stringify({ title, ...options }),
     }),
 
-  update: (id: string, data: Partial<Pick<Goal, "title" | "description" | "isActive" | "rawInput" | "structuredSummary" | "category" | "deadline" | "dailyTimeMinutes" | "intensityLevel">>) =>
+  update: (id: string, data: Partial<Pick<Goal, "title" | "description" | "isActive" | "rawInput" | "structuredSummary" | "category" | "deadline" | "dailyTimeMinutes" | "intensityLevel" | "focusDays">> & { focusDays?: string[] | null }) =>
     apiFetch<{ goal: Goal }>(`/api/goals/${id}`, {
       method: "PATCH",
       body: JSON.stringify(data),

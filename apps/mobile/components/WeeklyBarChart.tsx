@@ -67,20 +67,19 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
   const weekCompleted = weekData.reduce((s, d) => s + d.completed, 0);
   const weekTotal = weekData.reduce((s, d) => s + d.total, 0);
 
-  // Entrance animation for bars
-  const barAnims = useRef(weekData.map(() => new Animated.Value(0))).current;
+  // Entrance animation for bars — always length 7
+  const barAnims = useRef(Array.from({ length: 7 }, () => new Animated.Value(0))).current;
 
   useEffect(() => {
     // Reset
     barAnims.forEach((v) => v.setValue(0));
 
-    const animations = barAnims.map((animVal, i) =>
+    const animations = barAnims.map((animVal) =>
       Animated.spring(animVal, {
         toValue: 1,
         useNativeDriver: false, // height can't use native driver
         tension: 60,
         friction: 10,
-        delay: i * 60,
       })
     );
 
@@ -152,17 +151,6 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
         })}
       </View>
 
-      {/* Legend */}
-      <View style={styles.legendRow}>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: "rgba(99,91,255,0.4)" }]} />
-          <Text style={styles.legendText}>Partial</Text>
-        </View>
-        <View style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
-          <Text style={styles.legendText}>All 3 done</Text>
-        </View>
-      </View>
     </View>
   );
 }
@@ -226,27 +214,6 @@ function createStyles(c: Colors) {
       fontWeight: typography.medium,
       color: c.textTertiary,
       marginTop: spacing.xs,
-    },
-    legendRow: {
-      flexDirection: "row",
-      justifyContent: "center",
-      alignItems: "center",
-      gap: spacing.md,
-      marginTop: spacing.sm,
-    },
-    legendItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-    },
-    legendDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 2,
-    },
-    legendText: {
-      fontSize: typography.xs - 1,
-      color: c.textTertiary,
     },
   });
 }

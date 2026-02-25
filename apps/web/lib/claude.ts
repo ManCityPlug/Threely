@@ -342,18 +342,21 @@ export async function goalChat(messages: GoalChatMessage[]): Promise<GoalChatRes
 CRITICAL — The final goal MUST include ALL of these details (ask about any you're missing):
 1. A SPECIFIC measurable outcome (not vague like "explore" or "improve" — e.g. "land 3 freelance clients" or "run a 5K in under 30 minutes")
 2. Their current starting point / experience level (e.g. "complete beginner", "have 2 years experience", "already have a website")
-3. How much time per day they can dedicate (e.g. "1 hour a day", "30 minutes daily")
-4. A timeline or deadline (e.g. "in 3 months", "by June 2026")
-5. Key constraints, tools, or context (e.g. "while working full-time", "budget of $500", "using Python")
+3. Their motivation — why this matters to them RIGHT NOW (e.g. "want financial freedom", "doctor recommended it", "career change")
+4. Previous attempts and what went wrong (e.g. "tried before but lost motivation after 2 weeks", "never attempted this", "got halfway then life got busy")
+5. How much time per day they can dedicate (e.g. "1 hour a day", "30 minutes daily")
+6. A timeline or deadline (e.g. "in 3 months", "by June 2026")
+7. Key constraints, tools, or resources available (e.g. "while working full-time", "budget of $500", "have a gym membership", "using Python")
 
 RULES:
 - Ask ONE question at a time with 3-4 multiple-choice options
 - Keep questions short and conversational (1-2 sentences max)
-- Ask 4-5 questions to cover all 5 areas above, then wrap up
+- Ask 5-7 questions to cover the areas above, then wrap up
 - Make options SPECIFIC and concrete — never vague like "Something creative" or "Other areas"
-- If the user provides a custom answer, roll with it naturally
+- If the user provides a custom answer, roll with it naturally and adapt your next question
+- Show genuine interest — briefly acknowledge their answer before asking the next question
 ${shouldWrapUp ? "- IMPORTANT: You have asked enough questions. You MUST wrap up NOW and produce the final goal_text." : ""}
-- Do NOT wrap up until you have specifics for at least areas 1-4 above
+- Do NOT wrap up until you have specifics for at least areas 1-6 above
 
 RESPONSE FORMAT — respond with ONLY valid JSON, no markdown:
 {
@@ -368,7 +371,7 @@ When wrapping up (done: true):
   "message": "A short encouraging summary",
   "options": [],
   "done": true,
-  "goal_text": "A detailed 3-5 sentence goal description in first person. MUST include: the specific measurable outcome, where they're starting from, how much daily time they have, their target timeline, and any constraints or context discussed. Example quality: 'I want to launch my freelance web design business and land my first 3 paying clients within the next 3 months. I have 2 years of hobby experience with HTML/CSS and can dedicate about 1 hour per day while working my full-time job. I'll focus on building a portfolio site, reaching out to local small businesses, and pricing my services competitively with a budget of $200 for tools and hosting.'"
+  "goal_text": "A detailed 4-6 sentence goal description in first person. MUST include: the specific measurable outcome, where they're starting from, their motivation, what they've tried before, how much daily time they have, their target timeline, and any constraints or resources. Example quality: 'I want to launch my freelance web design business and land my first 3 paying clients within the next 3 months. I have 2 years of hobby experience with HTML/CSS but have never freelanced before — I tried once last year but got overwhelmed by the business side. This matters to me because I want to build financial independence and eventually leave my 9-to-5. I can dedicate about 1 hour per day while working my full-time job, and I have a budget of $200 for tools and hosting. I'll focus on building a portfolio site, reaching out to local small businesses, and pricing my services competitively.'"
 }`;
 
   // If messages is empty, inject a seed to start the conversation
