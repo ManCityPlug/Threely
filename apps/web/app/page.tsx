@@ -229,11 +229,24 @@ export default function LandingPage() {
             Threely learns your goals, your schedule, and your progress — then generates three personalized tasks every day that actually move you forward. Your AI-powered daily planner that adapts to you.
           </p>
 
-          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <Link href="/" style={{
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              padding: "14px 28px 14px 18px",
-              background: "#0a2540",
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+            <span style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "5px 14px",
+              background: "linear-gradient(135deg, #635bff 0%, #7c74ff 100%)",
+              color: "#fff",
+              borderRadius: 20,
+              fontSize: "0.72rem",
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+            }}>
+              Now available on mobile
+            </span>
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <Link href="/" style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                padding: "14px 28px 14px 18px",
+                background: "#0a2540",
               color: "#fff",
               borderRadius: 12,
               fontSize: "0.85rem",
@@ -268,6 +281,7 @@ export default function LandingPage() {
                 <span>Google Play</span>
               </span>
             </Link>
+            </div>
           </div>
 
           {/* Social proof */}
