@@ -64,7 +64,7 @@ export default function MobileAppPrompt() {
 
   const dismissBanner = useCallback(() => {
     setView("none");
-    try { localStorage.setItem("threely_banner_dismissed", "1"); } catch {}
+    
   }, []);
 
   const openInterstitial = useCallback(() => {
@@ -77,10 +77,7 @@ export default function MobileAppPrompt() {
     // Expose global trigger for landing page CTAs
     window.__openThreelyAppPrompt = openInterstitial;
 
-    // Check if user previously dismissed — don't show again
-    try {
-      if (localStorage.getItem("threely_banner_dismissed")) return;
-    } catch {}
+    // Show interstitial on every mobile page load
     const t = setTimeout(() => setView("interstitial"), 600);
     return () => {
       clearTimeout(t);
