@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth, isOnboarded, markOnboarded, getNickname } from "@/lib/auth-context";
@@ -59,6 +59,23 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const nickname = getNickname() || user.email?.split("@")[0] || "You";
   const initials = nickname[0]?.toUpperCase() ?? "?";
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [menuOpen]);
+
+  // Close menu on route change
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   async function handleSignOut() {
     await signOut();
@@ -68,6 +85,96 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ToastProvider>
     <div className="app-shell">
+      {/* ── Mobile top bar ──────────────────────────────────────────────────── */}
+      <div className="mobile-topbar" ref={menuRef}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{
+            width: 32, height: 32, borderRadius: 8,
+            background: "var(--primary)", color: "#fff",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontSize: 16, fontWeight: 700, flexShrink: 0,
+          }}>3</div>
+          <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.02em", color: "var(--text)" }}>
+            Threely
+          </span>
+        </div>
+        <button
+          onClick={() => setMenuOpen(o => !o)}
+          style={{
+            background: "none", border: "none", cursor: "pointer",
+            padding: 6, display: "flex", flexDirection: "column", gap: 4,
+          }}
+          aria-label="Menu"
+        >
+          {menuOpen ? (
+            <span style={{ fontSize: 20, color: "var(--text)", lineHeight: 1 }}>&#x2715;</span>
+          ) : (
+            <>
+              <span style={{ width: 20, height: 2, background: "var(--text)", borderRadius: 1, display: "block" }} />
+              <span style={{ width: 20, height: 2, background: "var(--text)", borderRadius: 1, display: "block" }} />
+              <span style={{ width: 20, height: 2, background: "var(--text)", borderRadius: 1, display: "block" }} />
+            </>
+          )}
+        </button>
+
+        {/* Dropdown */}
+        {menuOpen && (
+          <div style={{
+            position: "absolute", top: "100%", left: 0, right: 0,
+            background: "var(--card)", borderBottom: "1px solid var(--border)",
+            boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+            padding: "0.5rem 1rem",
+            zIndex: 101,
+          }}>
+            {NAV.map(item => {
+              const active = pathname === item.href || (item.href === "/dashboard" && pathname === "/");
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 10,
+                    padding: "0.7rem 0.5rem",
+                    borderBottom: "1px solid var(--border)",
+                    color: active ? "var(--primary)" : "var(--text)",
+                    fontWeight: active ? 600 : 500,
+                    fontSize: "0.9rem",
+                    textDecoration: "none",
+                  }}
+                >
+                  <span style={{ fontSize: 16 }}>{item.icon}</span>
+                  {item.label}
+                </Link>
+              );
+            })}
+            <div style={{
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "0.75rem 0.5rem 0.5rem",
+            }}>
+              <div style={{
+                width: 30, height: 30, borderRadius: "50%",
+                background: "var(--primary-light)", color: "var(--primary)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontWeight: 700, fontSize: "0.8rem", flexShrink: 0,
+              }}>{initials}</div>
+              <span style={{ fontSize: "0.85rem", fontWeight: 500, color: "var(--text)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                {nickname}
+              </span>
+              <button
+                onClick={handleSignOut}
+                style={{
+                  fontSize: "0.8rem", fontWeight: 600, color: "var(--danger)",
+                  background: "none", border: "none", cursor: "pointer",
+                  padding: "0.3rem 0.5rem",
+                }}
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* ── Sidebar (desktop) ──────────────────────────────────────────────── */}
       <aside className="sidebar">
         {/* Logo */}
