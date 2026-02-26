@@ -151,8 +151,6 @@ export default function LandingPage() {
             { label: "FAQ", href: "/faq" },
             { label: "Pricing", href: "/pricing" },
             { label: "About", href: "/about" },
-            { label: "Privacy Policy", href: "/privacy" },
-            { label: "Terms of Service", href: "/terms" },
           ].map(item => (
             <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{
               padding: "0.6rem 0",
@@ -246,14 +244,14 @@ export default function LandingPage() {
 
           {/* Now available on mobile banner */}
           <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            padding: "6px 16px",
+            display: "inline-flex", alignItems: "center", gap: 10,
+            padding: isMobile ? "8px 20px" : "10px 24px",
             background: "#ede9ff",
-            borderRadius: 20,
-            marginBottom: isMobile ? "0.75rem" : "1rem",
+            borderRadius: 24,
+            marginBottom: isMobile ? "1rem" : "1.25rem",
           }}>
-            <span style={{ fontSize: "0.8rem" }}>📱</span>
-            <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
+            <span style={{ fontSize: isMobile ? "0.95rem" : "1.05rem" }}>📱</span>
+            <span style={{ fontSize: isMobile ? "0.9rem" : "0.95rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
           </div>
 
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -261,6 +259,7 @@ export default function LandingPage() {
               <Link href="/" style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 padding: "14px 28px 14px 18px",
+                minWidth: 190,
                 background: "#0a2540",
                 color: "#fff",
                 borderRadius: 12,
@@ -282,6 +281,7 @@ export default function LandingPage() {
               <Link href="/" style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 padding: "14px 28px 14px 18px",
+                minWidth: 190,
                 background: "#0a2540",
                 color: "#fff",
                 borderRadius: 12,
@@ -355,10 +355,10 @@ export default function LandingPage() {
             textAlign: "center",
             marginBottom: "0.5rem",
           }}>
-            From goal to done in three steps.
+            Turn any goal into a real plan — in 3 steps.
           </h2>
           <p style={{ color: "#425466", textAlign: "center", marginBottom: "3rem", fontSize: "0.95rem" }}>
-            You bring the ambition. We bring the daily plan.
+            You bring the ambition. We bring the plan.
           </p>
 
           <div style={{

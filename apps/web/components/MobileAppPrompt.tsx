@@ -174,15 +174,15 @@ export default function MobileAppPrompt() {
             {/* App icon — bounces in */}
             <div
               style={{
-                width: 80,
-                height: 80,
-                borderRadius: 20,
+                width: 96,
+                height: 96,
+                borderRadius: 22,
                 background: "#635bff",
                 color: "#fff",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: 40,
+                fontSize: 48,
                 fontWeight: 800,
                 boxShadow: "0 12px 32px rgba(99,91,255,0.3)",
                 marginBottom: "1.5rem",
@@ -237,7 +237,9 @@ export default function MobileAppPrompt() {
                 animation: "mobilePromptSlideUp 0.5s ease 0.35s both",
               }}
             >
-              Tell us what you want to achieve. We&apos;ll map out the path.
+              Tell us what you want to achieve.
+              <br />
+              We&apos;ll map out the path.
             </p>
 
             {/* Benefits — staggered slide up */}
@@ -306,7 +308,8 @@ export default function MobileAppPrompt() {
                 display: "flex",
                 justifyContent: "center",
                 width: "100%",
-                marginBottom: "0.75rem",
+                marginTop: "0.5rem",
+                marginBottom: "1rem",
                 animation: "mobilePromptSlideUp 0.45s ease 0.65s both",
               }}
             >
@@ -314,12 +317,12 @@ export default function MobileAppPrompt() {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 8,
-                padding: "6px 16px",
+                padding: "8px 20px",
                 background: "#ede9ff",
                 borderRadius: 20,
               }}>
-                <span style={{ fontSize: "0.8rem" }}>📱</span>
-                <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
+                <span style={{ fontSize: "0.95rem" }}>📱</span>
+                <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
               </div>
             </div>
 
