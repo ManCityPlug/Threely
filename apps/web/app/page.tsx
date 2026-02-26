@@ -80,7 +80,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", overflowX: "hidden", background: "#fff", paddingBottom: isMobile ? 70 : 0 }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", overflowX: "hidden", background: "#fff" }}>
       {/* Nav */}
       <nav style={{
         position: "sticky", top: 0, zIndex: 100,
@@ -798,7 +798,7 @@ export default function LandingPage() {
       <footer style={{
         background: "#0a2540",
         color: "rgba(255,255,255,0.5)",
-        padding: "2.5rem 1.5rem",
+        padding: isMobile ? "2.5rem 1.5rem 5rem" : "2.5rem 1.5rem",
         textAlign: "center",
         fontSize: "0.825rem",
       }}>
