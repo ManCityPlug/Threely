@@ -18,9 +18,10 @@ interface GoalTemplatesProps {
   onSelect: (category: GoalCategory) => void;
   onClose: () => void;
   onOther?: () => void;
+  closeLabel?: string;
 }
 
-export function GoalTemplates({ onSelect, onClose, onOther }: GoalTemplatesProps) {
+export function GoalTemplates({ onSelect, onClose, onOther, closeLabel = "Back" }: GoalTemplatesProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -28,9 +29,9 @@ export function GoalTemplates({ onSelect, onClose, onOther }: GoalTemplatesProps
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.headerRow}>
-        <Text style={styles.title}>What area of your life?</Text>
+        <Text style={styles.title}>What is your goal?</Text>
         <TouchableOpacity onPress={onClose} hitSlop={12}>
-          <Text style={styles.closeBtn}>Back</Text>
+          <Text style={styles.closeBtn}>{closeLabel}</Text>
         </TouchableOpacity>
       </View>
       <Text style={styles.subtitle}>
@@ -58,20 +59,22 @@ export function GoalTemplates({ onSelect, onClose, onOther }: GoalTemplatesProps
               </Text>
             </TouchableOpacity>
           ))}
-        </View>
 
-        {/* Other option */}
-        {onOther && (
-          <TouchableOpacity
-            style={styles.otherBtn}
-            onPress={onOther}
-            activeOpacity={0.75}
-          >
-            <Text style={styles.otherText}>
-              Something else — let me describe it
-            </Text>
-          </TouchableOpacity>
-        )}
+          {/* "Something else" as a grid card */}
+          {onOther && (
+            <TouchableOpacity
+              style={[styles.categoryCard, styles.otherCard]}
+              onPress={onOther}
+              activeOpacity={0.75}
+            >
+              <Text style={styles.categoryEmoji}>✏️</Text>
+              <Text style={styles.categoryLabel}>Something else</Text>
+              <Text style={styles.categoryDesc} numberOfLines={2}>
+                Let me describe my own goal
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </ScrollView>
     </View>
   );
@@ -139,20 +142,8 @@ function createStyles(c: Colors) {
       textAlign: "center",
       lineHeight: 16,
     },
-    otherBtn: {
-      marginTop: spacing.md,
-      paddingVertical: spacing.md,
-      paddingHorizontal: spacing.lg,
-      borderRadius: radius.md,
-      borderWidth: 1.5,
+    otherCard: {
       borderStyle: "dashed",
-      borderColor: c.border,
-      alignItems: "center",
-    },
-    otherText: {
-      fontSize: typography.sm,
-      fontWeight: "500",
-      color: c.textSecondary,
     },
   });
 }

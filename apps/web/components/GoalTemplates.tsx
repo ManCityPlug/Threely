@@ -29,7 +29,7 @@ export default function GoalTemplates({
             letterSpacing: "-0.02em",
           }}
         >
-          What area of your life?
+          What is your goal?
         </h3>
         <button
           onClick={onClose}

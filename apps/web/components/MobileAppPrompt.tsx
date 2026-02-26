@@ -260,8 +260,8 @@ export default function MobileAppPrompt() {
                 },
                 {
                   icon: "\u2705",
-                  title: "Simple enough to actually do",
-                  desc: "Bite-sized steps you can finish in minutes",
+                  title: "A real path to get there",
+                  desc: "Structured daily steps that actually move you forward",
                 },
                 {
                   icon: "\u{1F9E0}",
