@@ -18,6 +18,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [checkingOnboarding, setCheckingOnboarding] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (loading) return;
@@ -59,8 +61,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const nickname = getNickname() || user.email?.split("@")[0] || "You";
   const initials = nickname[0]?.toUpperCase() ?? "?";
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu on outside click
   useEffect(() => {

@@ -100,7 +100,7 @@ export default function LandingPage() {
           <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em" }}>Threely</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Link href="/login" style={{
+          <Link href="/login" className="desktop-only" style={{
             padding: "0.4rem 0.875rem",
             fontSize: "0.875rem",
             fontWeight: 600,
@@ -109,7 +109,7 @@ export default function LandingPage() {
           }}>
             Sign in
           </Link>
-          <Link href="/register" onClick={handleMobileCTA} style={{
+          <Link href="/register" onClick={handleMobileCTA} className="desktop-only" style={{
             padding: "0.4rem 1rem",
             fontSize: "0.875rem",
             fontWeight: 600,
