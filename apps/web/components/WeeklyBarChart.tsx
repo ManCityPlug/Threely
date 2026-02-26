@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { HeatmapDay } from "@/lib/api-client";
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const BAR_MAX = 3;
 const BAR_HEIGHT = 120;
 
 function getWeekDates(): string[] {
@@ -25,6 +24,8 @@ function getWeekDates(): string[] {
 }
 
 export default function WeeklyBarChart({ data }: { data: HeatmapDay[] }) {
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+
   const todayStr = useMemo(() => {
     const n = new Date();
     return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
@@ -55,9 +56,12 @@ export default function WeeklyBarChart({ data }: { data: HeatmapDay[] }) {
     });
   }, [weekDates, dateMap, todayStr]);
 
-  // Calculate the week's summary
+  // Weekly totals — denominator rounds up to next batch of 3
   const weekCompleted = weekData.reduce((s, d) => s + d.completed, 0);
   const weekDisplayTotal = weekCompleted === 0 ? 3 : Math.ceil(weekCompleted / 3) * 3;
+
+  // Find the max total for any single day this week (for bar scaling)
+  const maxDayTotal = Math.max(...weekData.map(d => d.total), 3);
 
   return (
     <div>
@@ -84,10 +88,12 @@ export default function WeeklyBarChart({ data }: { data: HeatmapDay[] }) {
         height: BAR_HEIGHT,
         marginBottom: 8,
       }}>
-        {weekData.map((day) => {
-          const fillRatio = day.isFuture ? 0 : Math.min(day.completed / BAR_MAX, 1);
+        {weekData.map((day, i) => {
+          const dayMax = day.total > 0 ? day.total : maxDayTotal;
+          const fillRatio = day.isFuture ? 0 : Math.min(day.completed / dayMax, 1);
           const fillHeight = Math.max(fillRatio * BAR_HEIGHT, fillRatio > 0 ? 8 : 0);
           const emptyHeight = BAR_HEIGHT - fillHeight;
+          const isSelected = selectedDay === i;
 
           return (
             <div
@@ -100,10 +106,34 @@ export default function WeeklyBarChart({ data }: { data: HeatmapDay[] }) {
                 alignItems: "center",
                 justifyContent: "flex-end",
                 position: "relative",
+                cursor: day.isFuture ? "default" : "pointer",
+              }}
+              onClick={() => {
+                if (day.isFuture) return;
+                setSelectedDay(isSelected ? null : i);
               }}
             >
+              {/* Tooltip when clicked */}
+              {isSelected && !day.isFuture && (
+                <div style={{
+                  position: "absolute",
+                  top: Math.max(emptyHeight - 28, 0),
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  color: "var(--primary)",
+                  background: "var(--card)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 6,
+                  padding: "2px 6px",
+                  whiteSpace: "nowrap",
+                  zIndex: 10,
+                }}>
+                  {day.completed}/{day.total} done
+                </div>
+              )}
+
               {/* Count label above bar */}
-              {!day.isFuture && day.completed > 0 && (
+              {!day.isFuture && day.completed > 0 && !isSelected && (
                 <div style={{
                   fontSize: "0.7rem",
                   fontWeight: 700,
@@ -126,13 +156,12 @@ export default function WeeklyBarChart({ data }: { data: HeatmapDay[] }) {
                   ? "var(--border)"
                   : day.completed === 0
                     ? "var(--border)"
-                    : day.isToday
+                    : day.completed >= day.total && day.total > 0
                       ? "var(--primary)"
-                      : day.completed >= BAR_MAX
-                        ? "var(--primary)"
-                        : "rgba(99,91,255,0.4)",
+                      : "rgba(99,91,255,0.4)",
                 transition: "height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
                 opacity: day.isFuture ? 0.3 : 1,
+                border: day.isToday || isSelected ? "1.5px solid var(--primary)" : "none",
               }} />
             </div>
           );
@@ -144,15 +173,15 @@ export default function WeeklyBarChart({ data }: { data: HeatmapDay[] }) {
         display: "flex",
         gap: 6,
       }}>
-        {weekData.map((day) => (
+        {weekData.map((day, i) => (
           <div
             key={day.dateStr}
             style={{
               flex: 1,
               textAlign: "center",
               fontSize: "0.7rem",
-              fontWeight: day.isToday ? 700 : 500,
-              color: day.isToday ? "var(--primary)" : "var(--muted)",
+              fontWeight: day.isToday || selectedDay === i ? 700 : 500,
+              color: day.isToday || selectedDay === i ? "var(--primary)" : "var(--muted)",
             }}
           >
             {day.label}
@@ -176,7 +205,7 @@ export default function WeeklyBarChart({ data }: { data: HeatmapDay[] }) {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           <div style={{ width: 8, height: 8, borderRadius: 2, background: "var(--primary)" }} />
-          <span>All 3 done</span>
+          <span>All done</span>
         </div>
       </div>
     </div>
