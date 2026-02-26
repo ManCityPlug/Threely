@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Session } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
+import * as Clarity from "@microsoft/react-native-clarity";
 import { supabase } from "@/lib/supabase";
 import { subscriptionApi, profileApi } from "@/lib/api";
 import { ThemeProvider, useTheme } from "@/lib/theme";
@@ -20,6 +21,8 @@ if (Platform.OS !== "web") {
     }),
   });
 
+  // Microsoft Clarity — session replay & heatmap analytics
+  Clarity.initialize("vm4n4qax20");
 }
 
 // ── Valid subscription statuses that allow app access ─────────────────────────
