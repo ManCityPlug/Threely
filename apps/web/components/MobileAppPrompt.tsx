@@ -13,6 +13,14 @@ function isMobileDevice(): boolean {
   );
 }
 
+function getMobilePlatform(): "ios" | "android" | "other" {
+  if (typeof navigator === "undefined") return "other";
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
+  if (/Android/i.test(ua)) return "android";
+  return "other";
+}
+
 declare global {
   interface Window {
     __openThreelyAppPrompt?: () => void;
@@ -292,7 +300,7 @@ export default function MobileAppPrompt() {
               ))}
             </div>
 
-            {/* Store buttons — slide up */}
+            {/* Store button — platform-specific */}
             <div
               style={{
                 display: "flex",
@@ -302,70 +310,74 @@ export default function MobileAppPrompt() {
                 animation: "mobilePromptSlideUp 0.45s ease 0.7s both",
               }}
             >
-              <a
-                href={APP_STORE_URL}
-                style={{
-                  flex: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                  padding: "12px 16px",
-                  background: "#0a2540",
-                  color: "#fff",
-                  borderRadius: 10,
-                  fontSize: "0.8rem",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                }}
-              >
-                <AppleIcon />
-                <span
+              {getMobilePlatform() !== "android" && (
+                <a
+                  href={APP_STORE_URL}
                   style={{
+                    flex: 1,
                     display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    lineHeight: 1.2,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    padding: "12px 16px",
+                    background: "#0a2540",
+                    color: "#fff",
+                    borderRadius: 10,
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    textDecoration: "none",
                   }}
                 >
-                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>
-                    Download on the
+                  <AppleIcon />
+                  <span
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>
+                      Download on the
+                    </span>
+                    <span>App Store</span>
                   </span>
-                  <span>App Store</span>
-                </span>
-              </a>
-              <a
-                href={PLAY_STORE_URL}
-                style={{
-                  flex: 1,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 8,
-                  padding: "12px 16px",
-                  background: "#0a2540",
-                  color: "#fff",
-                  borderRadius: 10,
-                  fontSize: "0.8rem",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                }}
-              >
-                <PlayIcon />
-                <span
+                </a>
+              )}
+              {getMobilePlatform() !== "ios" && (
+                <a
+                  href={PLAY_STORE_URL}
                   style={{
+                    flex: 1,
                     display: "flex",
-                    flexDirection: "column",
-                    alignItems: "flex-start",
-                    lineHeight: 1.2,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 8,
+                    padding: "12px 16px",
+                    background: "#0a2540",
+                    color: "#fff",
+                    borderRadius: 10,
+                    fontSize: "0.8rem",
+                    fontWeight: 600,
+                    textDecoration: "none",
                   }}
                 >
-                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>
-                    Get it on
+                  <PlayIcon />
+                  <span
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "flex-start",
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>
+                      Get it on
+                    </span>
+                    <span>Google Play</span>
                   </span>
-                  <span>Google Play</span>
-                </span>
-              </a>
+                </a>
+              )}
             </div>
 
             {/* Continue to website — fade in */}
@@ -452,7 +464,7 @@ export default function MobileAppPrompt() {
 
           {/* Open button */}
           <a
-            href={APP_STORE_URL}
+            href={getMobilePlatform() === "android" ? PLAY_STORE_URL : APP_STORE_URL}
             style={{
               padding: "7px 16px",
               background: "#635bff",

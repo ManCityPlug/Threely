@@ -57,11 +57,17 @@ function PlayIcon() {
 export default function LandingPage() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
+  const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
 
   useEffect(() => {
-    setIsMobile(
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    );
+    const ua = navigator.userAgent;
+    const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    setIsMobile(mobile);
+    if (/iPhone|iPad|iPod/i.test(ua)) {
+      setPlatform("ios");
+    } else if (/Android/i.test(ua)) {
+      setPlatform("android");
+    }
   }, []);
 
   function handleMobileCTA(e: React.MouseEvent) {
@@ -165,44 +171,48 @@ export default function LandingPage() {
           </p>
 
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <Link href="/" style={{
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              padding: "14px 28px 14px 18px",
-              background: "#0a2540",
-              color: "#fff",
-              borderRadius: 12,
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              textDecoration: "none",
-              position: "relative" as const,
-              border: "1.5px solid rgba(99,91,255,0.15)",
-            }}>
-              <span className="new-badge" style={{ position: "absolute" as const, top: -7, right: -6 }}>New</span>
-              <AppleIcon />
-              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
-                <span>App Store</span>
-              </span>
-            </Link>
-            <Link href="/" style={{
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-              padding: "14px 28px 14px 18px",
-              background: "#0a2540",
-              color: "#fff",
-              borderRadius: 12,
-              fontSize: "0.85rem",
-              fontWeight: 600,
-              textDecoration: "none",
-              position: "relative" as const,
-              border: "1.5px solid rgba(99,91,255,0.15)",
-            }}>
-              <span className="new-badge" style={{ position: "absolute" as const, top: -7, right: -6 }}>New</span>
-              <PlayIcon />
-              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
-                <span>Google Play</span>
-              </span>
-            </Link>
+            {platform !== "android" && (
+              <Link href="/" style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                padding: "14px 28px 14px 18px",
+                background: "#0a2540",
+                color: "#fff",
+                borderRadius: 12,
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                textDecoration: "none",
+                position: "relative" as const,
+                border: "1.5px solid rgba(99,91,255,0.15)",
+              }}>
+                <span className="new-badge" style={{ position: "absolute" as const, top: -7, right: -6 }}>New</span>
+                <AppleIcon />
+                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
+                  <span>App Store</span>
+                </span>
+              </Link>
+            )}
+            {platform !== "ios" && (
+              <Link href="/" style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                padding: "14px 28px 14px 18px",
+                background: "#0a2540",
+                color: "#fff",
+                borderRadius: 12,
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                textDecoration: "none",
+                position: "relative" as const,
+                border: "1.5px solid rgba(99,91,255,0.15)",
+              }}>
+                <span className="new-badge" style={{ position: "absolute" as const, top: -7, right: -6 }}>New</span>
+                <PlayIcon />
+                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
+                  <span>Google Play</span>
+                </span>
+              </Link>
+            )}
           </div>
 
           {/* Social proof */}
@@ -658,38 +668,42 @@ export default function LandingPage() {
             marginTop: "1.5rem",
             display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap",
           }}>
-            <Link href="/" style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "8px 16px",
-              background: "rgba(255,255,255,0.15)",
-              color: "#fff",
-              borderRadius: 8,
-              fontSize: "0.8rem",
-              fontWeight: 600,
-              border: "1px solid rgba(255,255,255,0.25)",
-            }}>
-              <AppleIcon />
-              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
-                <span>App Store</span>
-              </span>
-            </Link>
-            <Link href="/" style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "8px 16px",
-              background: "rgba(255,255,255,0.15)",
-              color: "#fff",
-              borderRadius: 8,
-              fontSize: "0.8rem",
-              fontWeight: 600,
-              border: "1px solid rgba(255,255,255,0.25)",
-            }}>
-              <PlayIcon />
-              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
-                <span>Google Play</span>
-              </span>
-            </Link>
+            {platform !== "android" && (
+              <Link href="/" style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "8px 16px",
+                background: "rgba(255,255,255,0.15)",
+                color: "#fff",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                border: "1px solid rgba(255,255,255,0.25)",
+              }}>
+                <AppleIcon />
+                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
+                  <span>App Store</span>
+                </span>
+              </Link>
+            )}
+            {platform !== "ios" && (
+              <Link href="/" style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "8px 16px",
+                background: "rgba(255,255,255,0.15)",
+                color: "#fff",
+                borderRadius: 8,
+                fontSize: "0.8rem",
+                fontWeight: 600,
+                border: "1px solid rgba(255,255,255,0.25)",
+              }}>
+                <PlayIcon />
+                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
+                  <span>Google Play</span>
+                </span>
+              </Link>
+            )}
           </div>
         </div>
       </section>
