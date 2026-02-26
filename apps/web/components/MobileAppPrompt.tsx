@@ -357,14 +357,14 @@ export default function MobileAppPrompt() {
                 >
                   <span style={{
                     position: "absolute",
-                    top: -7,
-                    right: -6,
+                    top: -9,
+                    right: -10,
                     background: "#635bff",
                     color: "#fff",
-                    fontSize: "0.55rem",
+                    fontSize: "0.65rem",
                     fontWeight: 700,
-                    padding: "2px 6px",
-                    borderRadius: 6,
+                    padding: "4px 10px",
+                    borderRadius: 10,
                     letterSpacing: "0.03em",
                   }}>New</span>
                   <AppleIcon />
@@ -404,14 +404,14 @@ export default function MobileAppPrompt() {
                 >
                   <span style={{
                     position: "absolute",
-                    top: -7,
-                    right: -6,
+                    top: -9,
+                    right: -10,
                     background: "#635bff",
                     color: "#fff",
-                    fontSize: "0.55rem",
+                    fontSize: "0.65rem",
                     fontWeight: 700,
-                    padding: "2px 6px",
-                    borderRadius: 6,
+                    padding: "4px 10px",
+                    borderRadius: 10,
                     letterSpacing: "0.03em",
                   }}>New</span>
                   <PlayIcon />

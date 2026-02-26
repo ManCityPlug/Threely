@@ -239,7 +239,7 @@ export default function LandingPage() {
             maxWidth: 540,
             margin: isMobile ? "0 auto 1.5rem" : "0 auto 2.5rem",
           }}>
-            Stop overthinking where to start. Threely turns your ambitions into a simple daily plan — real next steps based on where you are today. Not generic advice. A path built just for you.
+            Not sure where to start? Don't have a plan? That's the whole point. Tell us your goal — Threely figures out your next steps and gives you a clear path forward, every single day.
           </p>
 
           {/* Now available on mobile banner */}
@@ -269,7 +269,7 @@ export default function LandingPage() {
                 position: "relative" as const,
                 border: "1.5px solid rgba(99,91,255,0.15)",
               }}>
-                <span className="new-badge" style={{ position: "absolute" as const, top: -7, right: -6 }}>New</span>
+                <span className="new-badge" style={{ position: "absolute" as const, top: -9, right: -10 }}>New</span>
                 <AppleIcon />
                 <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
                   <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
@@ -291,7 +291,7 @@ export default function LandingPage() {
                 position: "relative" as const,
                 border: "1.5px solid rgba(99,91,255,0.15)",
               }}>
-                <span className="new-badge" style={{ position: "absolute" as const, top: -7, right: -6 }}>New</span>
+                <span className="new-badge" style={{ position: "absolute" as const, top: -9, right: -10 }}>New</span>
                 <PlayIcon />
                 <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
                   <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
