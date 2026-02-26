@@ -840,7 +840,27 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Has goals but no tasks yet */}
+      {/* Has goals but no selection yet — auto-open picker */}
+      {goals.length > 0 && selectedGoalId === null && !goalPickerOpen && dailyTasks.length === 0 && (
+        <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
+          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"🎯"}</div>
+          <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
+            What do you want to work on today?
+          </h2>
+          <p style={{ color: "var(--subtext)", marginBottom: "1.5rem", lineHeight: 1.6 }}>
+            Pick a goal to focus on and we{"'"}ll generate your tasks.
+          </p>
+          <button
+            className="btn btn-primary"
+            onClick={() => setGoalPickerOpen(true)}
+            style={{ fontSize: "1rem", padding: "0.75rem 2rem" }}
+          >
+            Choose a goal
+          </button>
+        </div>
+      )}
+
+      {/* Has goals and selected goal but no tasks yet */}
       {goals.length > 0 && selectedGoalId !== null && displayedTasks.length === 0 && displayedOverdue.length === 0 && (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
           <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"✨"}</div>
@@ -861,7 +881,7 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {goals.length > 0 && (dailyTasks.length > 0 || overdueTasks.length > 0) && (selectedGoalId !== null || goalPickerOpen) && (
+      {goals.length > 0 && (dailyTasks.length > 0 || overdueTasks.length > 0) && selectedGoalId !== null && (
         <>
           {/* Goal selector + progress */}
           <div className="card" style={{ padding: "1.25rem", marginBottom: "1.25rem" }}>
