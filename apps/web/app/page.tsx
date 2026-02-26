@@ -355,7 +355,7 @@ export default function LandingPage() {
             textAlign: "center",
             marginBottom: "0.5rem",
           }}>
-            Turn any goal into a real plan — in 3 steps.
+            Turn any goal into a real plan.
           </h2>
           <p style={{ color: "#425466", textAlign: "center", marginBottom: "3rem", fontSize: "0.95rem" }}>
             You bring the ambition. We bring the plan.
