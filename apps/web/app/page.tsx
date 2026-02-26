@@ -80,7 +80,7 @@ export default function LandingPage() {
   }
 
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", overflowX: "hidden", background: "#fff" }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", overflowX: "hidden", background: "#fff", paddingBottom: isMobile ? 70 : 0 }}>
       {/* Nav */}
       <nav style={{
         position: "sticky", top: 0, zIndex: 100,
@@ -198,17 +198,17 @@ export default function LandingPage() {
       {/* ─── Hero ──────────────────────────────────────────────────────────────── */}
       <section style={{
         background: "linear-gradient(135deg, #f6f9fc 0%, #ede9ff 100%)",
-        padding: "5rem 1.5rem 3.5rem",
+        padding: isMobile ? "3rem 1.5rem 2.5rem" : "5rem 1.5rem 3.5rem",
         textAlign: "center",
       }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           {/* Logo mark */}
           <div style={{
-            width: 64, height: 64, borderRadius: 16,
+            width: isMobile ? 56 : 64, height: isMobile ? 56 : 64, borderRadius: isMobile ? 14 : 16,
             background: "#635bff", color: "#fff",
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 32, fontWeight: 800,
-            margin: "0 auto 1.5rem",
+            fontSize: isMobile ? 28 : 32, fontWeight: 800,
+            margin: isMobile ? "0 auto 1rem" : "0 auto 1.5rem",
             boxShadow: "0 8px 24px rgba(99,91,255,0.25)",
           }}>3</div>
 
@@ -218,7 +218,7 @@ export default function LandingPage() {
             letterSpacing: "0.08em",
             color: "#635bff",
             textTransform: "uppercase" as const,
-            marginBottom: "0.75rem",
+            marginBottom: isMobile ? "0.5rem" : "0.75rem",
           }}>
             Do Less. Achieve More.
           </p>
@@ -228,10 +228,10 @@ export default function LandingPage() {
             fontWeight: 800,
             letterSpacing: "-0.04em",
             lineHeight: 1.05,
-            marginBottom: "1.25rem",
+            marginBottom: isMobile ? "1rem" : "1.25rem",
           }}>
             Tell us your goal.<br />
-            <span style={{ color: "#635bff" }}>AI gives you 3 tasks a day.</span>
+            <span style={{ color: "#635bff" }}>Wake up knowing exactly what to do.</span>
           </h1>
 
           <p style={{
@@ -239,9 +239,9 @@ export default function LandingPage() {
             color: "#425466",
             lineHeight: 1.7,
             maxWidth: 540,
-            margin: "0 auto 2.5rem",
+            margin: isMobile ? "0 auto 1.5rem" : "0 auto 2.5rem",
           }}>
-            Describe any goal — learn guitar, launch a business, get in shape. Every morning, our AI creates 3 specific tasks that fit your schedule. Not generic advice. Real next steps based on where you are today.
+            Stop overthinking where to start. Threely turns your ambitions into a simple daily plan — real next steps based on where you are today. Not generic advice. A path built just for you.
           </p>
 
           {/* Now available on mobile banner */}
@@ -250,7 +250,7 @@ export default function LandingPage() {
             padding: "6px 16px",
             background: "#ede9ff",
             borderRadius: 20,
-            marginBottom: "1rem",
+            marginBottom: isMobile ? "0.75rem" : "1rem",
           }}>
             <span style={{ fontSize: "0.8rem" }}>📱</span>
             <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
@@ -303,7 +303,7 @@ export default function LandingPage() {
 
           {/* Social proof */}
           <div style={{
-            marginTop: "2rem",
+            marginTop: isMobile ? "1.25rem" : "2rem",
             display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
           }}>
             <div style={{ color: "#f5a623", fontSize: "1.1rem", letterSpacing: 2 }}>
@@ -614,7 +614,7 @@ export default function LandingPage() {
             },
             {
               num: "2",
-              title: "Wake up to 3 specific tasks",
+              title: "Wake up knowing exactly what to do",
               desc: "Not 'work on marketing' — you'll get things like 'Write 3 cold outreach emails using pain points from your user interviews.' Sized to your schedule. Built on what you did yesterday. Ready to go.",
             },
             {

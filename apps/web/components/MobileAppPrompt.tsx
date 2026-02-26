@@ -223,7 +223,7 @@ export default function MobileAppPrompt() {
             >
               Your goal.
               <br />
-              3 AI tasks. Every day.
+              Your plan. Every day.
             </h1>
 
             {/* Subtitle — slides up */}
@@ -237,7 +237,7 @@ export default function MobileAppPrompt() {
                 animation: "mobilePromptSlideUp 0.5s ease 0.35s both",
               }}
             >
-              Tell us what you want to achieve. We create the daily plan.
+              Tell us what you want to achieve. We&apos;ll map out the path.
             </p>
 
             {/* Benefits — staggered slide up */}
@@ -253,18 +253,18 @@ export default function MobileAppPrompt() {
               {[
                 {
                   icon: "\u{1F3AF}",
-                  title: "3 specific tasks every morning",
-                  desc: "Real steps, not generic advice",
+                  title: "Know exactly what to do today",
+                  desc: "A personalized plan that fits your schedule",
                 },
                 {
                   icon: "\u2705",
-                  title: "Check them off anywhere",
-                  desc: "Complete your daily 3 in seconds",
+                  title: "Simple enough to actually do",
+                  desc: "Bite-sized steps you can finish in minutes",
                 },
                 {
                   icon: "\u{1F9E0}",
-                  title: "AI adapts to your progress",
-                  desc: "Yesterday's work shapes today's plan",
+                  title: "Your plan gets smarter over time",
+                  desc: "It adapts based on your real progress",
                 },
               ].map((b, i) => (
                 <div
