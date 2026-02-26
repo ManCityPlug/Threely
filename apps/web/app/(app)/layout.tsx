@@ -48,20 +48,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     });
   }, [user, loading, router]);
 
-  if (loading || !user || checkingOnboarding) {
-    return (
-      <div style={{
-        minHeight: "100vh", display: "flex",
-        alignItems: "center", justifyContent: "center",
-      }}>
-        <span className="spinner spinner-dark" style={{ width: 28, height: 28 }} />
-      </div>
-    );
-  }
-
-  const nickname = getNickname() || user.email?.split("@")[0] || "You";
-  const initials = nickname[0]?.toUpperCase() ?? "?";
-
   // Close menu on outside click
   useEffect(() => {
     if (!menuOpen) return;
@@ -76,6 +62,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // Close menu on route change
   useEffect(() => { setMenuOpen(false); }, [pathname]);
+
+  if (loading || !user || checkingOnboarding) {
+    return (
+      <div style={{
+        minHeight: "100vh", display: "flex",
+        alignItems: "center", justifyContent: "center",
+      }}>
+        <span className="spinner spinner-dark" style={{ width: 28, height: 28 }} />
+      </div>
+    );
+  }
+
+  const nickname = getNickname() || user.email?.split("@")[0] || "You";
+  const initials = nickname[0]?.toUpperCase() ?? "?";
 
   async function handleSignOut() {
     await signOut();
