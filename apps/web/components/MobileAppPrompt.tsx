@@ -300,6 +300,29 @@ export default function MobileAppPrompt() {
               ))}
             </div>
 
+            {/* Now available on mobile banner */}
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                width: "100%",
+                marginBottom: "0.75rem",
+                animation: "mobilePromptSlideUp 0.45s ease 0.65s both",
+              }}
+            >
+              <div style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "6px 16px",
+                background: "#ede9ff",
+                borderRadius: 20,
+              }}>
+                <span style={{ fontSize: "0.8rem" }}>📱</span>
+                <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
+              </div>
+            </div>
+
             {/* Store button — platform-specific */}
             <div
               style={{
@@ -318,12 +341,12 @@ export default function MobileAppPrompt() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: 8,
-                    padding: "12px 16px",
+                    gap: 10,
+                    padding: "14px 20px",
                     background: "#0a2540",
                     color: "#fff",
-                    borderRadius: 10,
-                    fontSize: "0.8rem",
+                    borderRadius: 12,
+                    fontSize: "0.95rem",
                     fontWeight: 600,
                     textDecoration: "none",
                     position: "relative",
@@ -350,10 +373,10 @@ export default function MobileAppPrompt() {
                       lineHeight: 1.2,
                     }}
                   >
-                    <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>
                       Download on the
                     </span>
-                    <span>App Store</span>
+                    <span style={{ fontSize: "1.05rem", fontWeight: 700 }}>App Store</span>
                   </span>
                 </a>
               )}
@@ -365,12 +388,12 @@ export default function MobileAppPrompt() {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    gap: 8,
-                    padding: "12px 16px",
+                    gap: 10,
+                    padding: "14px 20px",
                     background: "#0a2540",
                     color: "#fff",
-                    borderRadius: 10,
-                    fontSize: "0.8rem",
+                    borderRadius: 12,
+                    fontSize: "0.95rem",
                     fontWeight: 600,
                     textDecoration: "none",
                     position: "relative",
@@ -397,10 +420,10 @@ export default function MobileAppPrompt() {
                       lineHeight: 1.2,
                     }}
                   >
-                    <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>
                       Get it on
                     </span>
-                    <span>Google Play</span>
+                    <span style={{ fontSize: "1.05rem", fontWeight: 700 }}>Google Play</span>
                   </span>
                 </a>
               )}

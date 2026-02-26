@@ -58,6 +58,7 @@ export default function LandingPage() {
   const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const ua = navigator.userAgent;
@@ -85,7 +86,7 @@ export default function LandingPage() {
         position: "sticky", top: 0, zIndex: 100,
         background: "rgba(255,255,255,0.9)", backdropFilter: "blur(12px)",
         borderBottom: "1px solid #e3e8ef",
-        padding: "0 2rem",
+        padding: "0 1.25rem",
         height: 60,
         display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
@@ -118,8 +119,55 @@ export default function LandingPage() {
           }}>
             Get started
           </Link>
+          {/* Hamburger */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              padding: 6, display: "flex", flexDirection: "column", gap: 4,
+              marginLeft: 4,
+            }}
+            aria-label="Menu"
+          >
+            <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
+            <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
+            <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
+          </button>
         </div>
       </nav>
+
+      {/* Mobile dropdown menu */}
+      {menuOpen && (
+        <div style={{
+          position: "sticky", top: 60, zIndex: 99,
+          background: "#fff",
+          borderBottom: "1px solid #e3e8ef",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
+          padding: "0.75rem 1.5rem",
+          display: "flex", flexDirection: "column", gap: 4,
+        }}>
+          {[
+            { label: "How It Works", href: "#how-it-works" },
+            { label: "FAQ", href: "/faq" },
+            { label: "Pricing", href: "/pricing" },
+            { label: "About", href: "/about" },
+            { label: "Privacy Policy", href: "/privacy" },
+            { label: "Terms of Service", href: "/terms" },
+          ].map(item => (
+            <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{
+              padding: "0.6rem 0",
+              fontSize: "0.9rem",
+              fontWeight: 600,
+              color: "#0a2540",
+              borderBottom: "1px solid #f0f0f0",
+              textDecoration: "none",
+              display: "block",
+            }}>
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      )}
 
       {/* ─── Hero ──────────────────────────────────────────────────────────────── */}
       <section style={{
@@ -170,6 +218,18 @@ export default function LandingPage() {
             Describe any goal — learn guitar, launch a business, get in shape. Every morning, our AI creates 3 specific tasks that fit your schedule. Not generic advice. Real next steps based on where you are today.
           </p>
 
+          {/* Now available on mobile banner */}
+          <div style={{
+            display: "inline-flex", alignItems: "center", gap: 8,
+            padding: "6px 16px",
+            background: "#ede9ff",
+            borderRadius: 20,
+            marginBottom: "1rem",
+          }}>
+            <span style={{ fontSize: "0.8rem" }}>📱</span>
+            <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
+          </div>
+
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
             {platform !== "android" && (
               <Link href="/" style={{
@@ -178,7 +238,7 @@ export default function LandingPage() {
                 background: "#0a2540",
                 color: "#fff",
                 borderRadius: 12,
-                fontSize: "0.85rem",
+                fontSize: "0.95rem",
                 fontWeight: 600,
                 textDecoration: "none",
                 position: "relative" as const,
@@ -187,8 +247,8 @@ export default function LandingPage() {
                 <span className="new-badge" style={{ position: "absolute" as const, top: -7, right: -6 }}>New</span>
                 <AppleIcon />
                 <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
-                  <span>App Store</span>
+                  <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
+                  <span style={{ fontSize: "1.05rem" }}>App Store</span>
                 </span>
               </Link>
             )}
@@ -199,7 +259,7 @@ export default function LandingPage() {
                 background: "#0a2540",
                 color: "#fff",
                 borderRadius: 12,
-                fontSize: "0.85rem",
+                fontSize: "0.95rem",
                 fontWeight: 600,
                 textDecoration: "none",
                 position: "relative" as const,
@@ -208,8 +268,8 @@ export default function LandingPage() {
                 <span className="new-badge" style={{ position: "absolute" as const, top: -7, right: -6 }}>New</span>
                 <PlayIcon />
                 <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
-                  <span>Google Play</span>
+                  <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
+                  <span style={{ fontSize: "1.05rem" }}>Google Play</span>
                 </span>
               </Link>
             )}
@@ -725,12 +785,29 @@ export default function LandingPage() {
           }}>3</div>
           <span style={{ color: "#fff", fontWeight: 600 }}>Threely</span>
         </div>
-        <div style={{ display: "flex", justifyContent: "center", gap: 24, marginBottom: 16 }}>
+        <div style={{ display: "flex", justifyContent: "center", gap: 20, flexWrap: "wrap", marginBottom: 16 }}>
           <Link href="/login" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Sign in
           </Link>
           <Link href="/register" onClick={handleMobileCTA} style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Get started
+          </Link>
+          <Link href="/faq" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
+            FAQ
+          </Link>
+          <Link href="/pricing" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
+            Pricing
+          </Link>
+          <Link href="/about" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
+            About
+          </Link>
+        </div>
+        <div style={{ display: "flex", justifyContent: "center", gap: 20, flexWrap: "wrap", marginBottom: 16 }}>
+          <Link href="/privacy" style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.775rem" }}>
+            Privacy Policy
+          </Link>
+          <Link href="/terms" style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.775rem" }}>
+            Terms of Service
           </Link>
         </div>
         <p style={{ marginBottom: 8 }}>
