@@ -1144,17 +1144,24 @@ export default function DashboardScreen() {
                   onPress={() => selectGoal(goal.id)}
                   activeOpacity={0.7}
                 >
-                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                     <Text
                       style={[styles.menuItemText, isSelected && styles.menuItemTextSelected, { flex: 1 }]}
-                      numberOfLines={1}
+                      numberOfLines={2}
                       ellipsizeMode="tail"
                     >
                       {goal.title}
                     </Text>
-                    {isSelected && <Text style={styles.menuCheck}>✓</Text>}
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                      {goalTime ? (
+                        <View style={styles.menuTimeBadge}>
+                          <Text style={styles.menuTimeBadgeText}>~{formatMinutes(goalTime)}/day</Text>
+                        </View>
+                      ) : null}
+                      {isSelected && <Text style={styles.menuCheck}>✓</Text>}
+                    </View>
                   </View>
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4, flexWrap: "wrap" }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
                     <Text style={[styles.menuStaleness, { color: staleColor, marginTop: 0 }]}>
                       {stalenessLabel(days)}
                     </Text>
@@ -1163,11 +1170,6 @@ export default function DashboardScreen() {
                         <Text style={styles.menuOverdueBadgeText}>{stat.overdueCount} overdue</Text>
                       </View>
                     )}
-                    {goalTime ? (
-                      <View style={styles.menuTimeBadge}>
-                        <Text style={styles.menuTimeBadgeText}>~{formatMinutes(goalTime)}/day</Text>
-                      </View>
-                    ) : null}
                   </View>
                 </TouchableOpacity>
               );
@@ -1539,7 +1541,9 @@ function createStyles(c: Colors) {
       flexDirection: "row",
       alignItems: "center",
       paddingHorizontal: spacing.md,
-      paddingVertical: 14,
+      paddingVertical: 16,
+      borderRadius: radius.md,
+      marginBottom: 4,
     },
     menuItemSelected: { backgroundColor: c.primaryLight },
     menuItemText: {

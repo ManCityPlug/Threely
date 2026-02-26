@@ -418,7 +418,7 @@ export default function DashboardPage() {
       setGoals(goalsRes.goals);
       setGoalStats(statsRes.goalStats ?? []);
 
-      // Restore saved focus or auto-select
+      // Restore saved focus or prompt user to pick
       const todayKey = `threely_focus_${new Date().toISOString().slice(0, 10)}`;
       const saved = sessionStorage.getItem(todayKey);
       if (saved) {
@@ -428,10 +428,9 @@ export default function DashboardPage() {
         setSelectedGoalId(onlyGoalId);
         sessionStorage.setItem(todayKey, onlyGoalId);
       } else if (goalsRes.goals.length > 1) {
-        // Auto-select first goal so the dashboard always shows something actionable
-        const firstGoalId = goalsRes.goals[0].id;
-        setSelectedGoalId(firstGoalId);
-        sessionStorage.setItem(todayKey, firstGoalId);
+        // Multiple goals, no saved pick — prompt user to choose
+        setSelectedGoalId(null);
+        setGoalPickerOpen(true);
       }
 
       // Restore overdue banner dismissal
@@ -1070,7 +1069,7 @@ export default function DashboardPage() {
 
       {/* Goal picker modal (with metadata) */}
       {goalPickerOpen && (
-        <div className="modal-overlay" onClick={() => setGoalPickerOpen(false)}>
+        <div className="modal-overlay" onClick={() => { if (selectedGoalId !== null) setGoalPickerOpen(false); }}>
           <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 460 }}>
             <h2 style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>
               What are you working on today?
