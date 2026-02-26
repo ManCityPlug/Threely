@@ -238,7 +238,7 @@ export default function DashboardScreen() {
   }, [dailyTasks, selectedGoal]);
 
   const visibleTasks: DailyTask[] =
-    selectedGoal === "shuffle"
+    selectedGoal === "shuffle" || selectedGoal === "overdue"
       ? []
       : dailyTasks.filter((dt) => dt.goalId === selectedGoal);
 
@@ -257,33 +257,19 @@ export default function DashboardScreen() {
       ? mixItems.map((m) => m.task)
       : displayVisibleTasks.flatMap((dt) => (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []));
 
-  const allDone = newTaskItems.length > 0 && newTaskItems.every((t) => t.isCompleted);
-  const completedCount = newTaskItems.filter((t) => t.isCompleted).length;
-  const totalCount = newTaskItems.length;
-
-  const totalEstimatedMinutes = (() => {
-    // Use only the displayed/sliced tasks, not all accumulated tasks
-    const displayed = selectedGoal === "shuffle"
-      ? mixItems.map(m => m.task)
-      : displayVisibleTasks.flatMap(dt => Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []);
-    return displayed
-      .filter(t => !t.isCompleted)
-      .reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
-  })();
-
   const selectedLabel =
     selectedGoal === "shuffle"
       ? "Mix all goals"
+      : selectedGoal === "overdue"
+      ? "Overdue tasks"
       : goals.find((g) => g.id === selectedGoal)?.title ?? "Select goal";
 
   const hasAnyTasks = goals.length > 0;
-  const hasVisibleTasks =
-    selectedGoal === "shuffle" ? mixItems.length > 0 : visibleTasks.length > 0;
 
   // Overdue tasks for current goal
   const displayedOverdue = useMemo(() => {
     const tasks: { dailyTaskId: string; goalTitle: string; task: TaskItem }[] = [];
-    const relevantOverdue = selectedGoal === "shuffle"
+    const relevantOverdue = selectedGoal === "shuffle" || selectedGoal === "overdue"
       ? overdueTasks
       : overdueTasks.filter(dt => dt.goalId === selectedGoal);
     for (const dt of relevantOverdue) {
@@ -298,7 +284,7 @@ export default function DashboardScreen() {
 
   // Overdue count on OTHER goals (for banner)
   const otherGoalsOverdueCount = useMemo(() => {
-    if (selectedGoal === "shuffle") return 0;
+    if (selectedGoal === "shuffle" || selectedGoal === "overdue") return 0;
     return overdueTasks
       .filter(dt => dt.goalId !== selectedGoal)
       .reduce((sum, dt) => {
@@ -306,6 +292,33 @@ export default function DashboardScreen() {
         return sum + items.filter(t => !t.isCompleted && !t.isSkipped).length;
       }, 0);
   }, [overdueTasks, selectedGoal]);
+
+  const hasVisibleTasks =
+    selectedGoal === "shuffle" ? mixItems.length > 0
+    : selectedGoal === "overdue" ? displayedOverdue.length > 0
+    : visibleTasks.length > 0;
+
+  // Progress counter includes both today's tasks and displayed overdue tasks
+  const displayedOverdueItems = displayedOverdue.slice(0, 3).map(x => x.task);
+  const allDisplayedItems = [...displayedOverdueItems, ...newTaskItems];
+  const allDone = allDisplayedItems.length > 0 && allDisplayedItems.every((t) => t.isCompleted);
+  const completedCount = allDisplayedItems.filter((t) => t.isCompleted).length;
+  const totalCount = allDisplayedItems.length;
+
+  const totalOverdueCount = overdueTasks.reduce((sum, dt) => {
+    const items = Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : [];
+    return sum + items.filter(t => !t.isCompleted && !t.isSkipped).length;
+  }, 0);
+
+  const totalEstimatedMinutes = (() => {
+    // Use only the displayed/sliced tasks, not all accumulated tasks
+    const displayed = selectedGoal === "shuffle"
+      ? mixItems.map(m => m.task)
+      : displayVisibleTasks.flatMap(dt => Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []);
+    return [...displayedOverdueItems, ...displayed]
+      .filter(t => !t.isCompleted)
+      .reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
+  })();
 
   // Build notification context from current state
   const buildNotifContext = useCallback((): NotifContext => {
@@ -728,7 +741,7 @@ export default function DashboardScreen() {
             </View>
             {displayedOverdue.map(({ dailyTaskId, goalTitle, task }) => (
               <View key={task.id} style={styles.overdueItem}>
-                {goalTitle && selectedGoal === "shuffle" ? (
+                {goalTitle && (selectedGoal === "shuffle" || selectedGoal === "overdue") ? (
                   <Text style={styles.overdueGoalChip}>{goalTitle}</Text>
                 ) : null}
                 <View style={styles.overdueCard}>
@@ -1076,6 +1089,36 @@ export default function DashboardScreen() {
                 </TouchableOpacity>
               );
             })}
+            {totalOverdueCount > 0 && (
+              <>
+                <View style={styles.menuDivider} />
+                <TouchableOpacity
+                  style={[
+                    styles.menuItem,
+                    selectedGoal === "overdue" && { backgroundColor: colors.warningLight },
+                  ]}
+                  onPress={() => selectGoal("overdue")}
+                  activeOpacity={0.7}
+                >
+                  <Text
+                    style={[
+                      styles.menuItemText,
+                      selectedGoal === "overdue" && { color: colors.warning, fontWeight: typography.semibold },
+                    ]}
+                  >
+                    Overdue tasks
+                  </Text>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                    <View style={styles.menuOverdueBadge}>
+                      <Text style={styles.menuOverdueBadgeText}>{totalOverdueCount}</Text>
+                    </View>
+                    {selectedGoal === "overdue" && (
+                      <Text style={[styles.menuCheck, { color: colors.warning }]}>✓</Text>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              </>
+            )}
             {goals.length > 1 && (
               <>
                 <View style={styles.menuDivider} />

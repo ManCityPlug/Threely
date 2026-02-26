@@ -464,6 +464,7 @@ export default function DashboardPage() {
 
   const displayedTasks = (() => {
     if (selectedGoalId === null) return [];
+    if (selectedGoalId === "overdue") return [];
     if (selectedGoalId === "all") {
       const result: { dt: DailyTask; task: TaskItem }[] = [];
       let round = 0;
@@ -491,7 +492,7 @@ export default function DashboardPage() {
   const displayedOverdue = (() => {
     if (selectedGoalId === null) return [];
     const tasks: { dt: DailyTask; task: TaskItem }[] = [];
-    const relevantOverdue = selectedGoalId === "all"
+    const relevantOverdue = selectedGoalId === "all" || selectedGoalId === "overdue"
       ? overdueTasks
       : overdueTasks.filter(dt => dt.goalId === selectedGoalId);
     for (const dt of relevantOverdue) {
@@ -506,7 +507,7 @@ export default function DashboardPage() {
 
   // Overdue count on OTHER goals (for banner)
   const otherGoalsOverdueCount = (() => {
-    if (selectedGoalId === "all") return 0;
+    if (selectedGoalId === "all" || selectedGoalId === "overdue") return 0;
     return overdueTasks
       .filter(dt => dt.goalId !== selectedGoalId)
       .reduce((sum, dt) => {
@@ -515,13 +516,19 @@ export default function DashboardPage() {
   })();
 
   const displayedItems = displayedTasks.map(x => x.task);
-  const completedCount = displayedItems.filter(t => t.isCompleted).length;
-  const totalCount = displayedItems.length;
+  const displayedOverdueItems = displayedOverdue.slice(0, 3).map(x => x.task);
+  const allDisplayedItems = [...displayedOverdueItems, ...displayedItems];
+  const completedCount = allDisplayedItems.filter(t => t.isCompleted).length;
+  const totalCount = allDisplayedItems.length;
   const allDone = totalCount > 0 && completedCount === totalCount;
   const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-  const totalEstimatedMinutes = displayedItems
+  const totalEstimatedMinutes = allDisplayedItems
     .filter(t => !t.isCompleted)
     .reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
+
+  const totalOverdueCount = overdueTasks.reduce((sum, dt) => {
+    return sum + dt.tasks.filter(t => !t.isCompleted && !t.isSkipped).length;
+  }, 0);
 
   function pickGoal(val: "all" | string) {
     setSelectedGoalId(val);
@@ -696,7 +703,7 @@ export default function DashboardPage() {
   }
 
   function handleGiveMore() {
-    const dt = selectedGoalId !== "all"
+    const dt = selectedGoalId !== "all" && selectedGoalId !== "overdue"
       ? dailyTasks.find(d => d.goalId === selectedGoalId)
       : dailyTasks[0];
     if (dt) {
@@ -711,7 +718,7 @@ export default function DashboardPage() {
 
     setGenerating(true);
     try {
-      const goalId = selectedGoalId && selectedGoalId !== "all" ? selectedGoalId : undefined;
+      const goalId = selectedGoalId && selectedGoalId !== "all" && selectedGoalId !== "overdue" ? selectedGoalId : undefined;
       const res = await tasksApi.generate({ postReview: true, goalId });
       setDailyTasks(res.dailyTasks);
 
@@ -853,14 +860,14 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {goals.length > 0 && dailyTasks.length > 0 && (selectedGoalId !== null || goalPickerOpen) && (
+      {goals.length > 0 && (dailyTasks.length > 0 || overdueTasks.length > 0) && (selectedGoalId !== null || goalPickerOpen) && (
         <>
           {/* Goal selector + progress */}
           <div className="card" style={{ padding: "1.25rem", marginBottom: "1.25rem" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem", marginBottom: "0.875rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>
-                  {selectedGoalId === null ? "Select a goal" : selectedGoalId === "all" ? "Mix all goals" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
+                  {selectedGoalId === null ? "Select a goal" : selectedGoalId === "overdue" ? "Overdue tasks" : selectedGoalId === "all" ? "Mix all goals" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
                 </span>
                 <button
                   onClick={() => setGoalPickerOpen(true)}
@@ -1120,6 +1127,32 @@ export default function DashboardPage() {
                   </button>
                 );
               })}
+              {totalOverdueCount > 0 && (
+                <button
+                  onClick={() => pickGoal("overdue")}
+                  style={{
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                    padding: "0.875rem 1rem", borderRadius: "var(--radius)",
+                    border: `2px solid ${selectedGoalId === "overdue" ? "var(--warning)" : "var(--border)"}`,
+                    background: selectedGoalId === "overdue" ? "var(--warning-light)" : "var(--card)",
+                    cursor: "pointer", textAlign: "left", marginTop: 4,
+                  }}
+                >
+                  <span style={{ fontWeight: 500, color: selectedGoalId === "overdue" ? "var(--warning)" : "var(--text)", fontSize: "0.95rem" }}>
+                    Overdue tasks
+                  </span>
+                  <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{
+                      fontSize: "0.7rem", fontWeight: 600,
+                      color: "var(--warning)", background: "var(--warning-light)",
+                      borderRadius: 20, padding: "2px 8px",
+                    }}>
+                      {totalOverdueCount}
+                    </span>
+                    {selectedGoalId === "overdue" && <span style={{ color: "var(--warning)", fontWeight: 700 }}>{"✓"}</span>}
+                  </span>
+                </button>
+              )}
               {goals.length > 1 && (
                 <button
                   onClick={() => pickGoal("all")}
