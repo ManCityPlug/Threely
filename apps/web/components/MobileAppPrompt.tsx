@@ -355,6 +355,7 @@ export default function MobileAppPrompt() {
             <div
               style={{
                 display: "flex",
+                justifyContent: "center",
                 gap: 10,
                 width: "100%",
                 marginBottom: "0.75rem",
@@ -365,12 +366,12 @@ export default function MobileAppPrompt() {
                 <a
                   href={APP_STORE_URL}
                   style={{
-                    flex: 1,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: 10,
-                    padding: "14px 20px",
+                    padding: "14px 28px 14px 18px",
+                    minWidth: 190,
                     background: "#0a2540",
                     color: "#fff",
                     borderRadius: 12,
@@ -412,12 +413,12 @@ export default function MobileAppPrompt() {
                 <a
                   href={PLAY_STORE_URL}
                   style={{
-                    flex: 1,
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: 10,
-                    padding: "14px 20px",
+                    padding: "14px 28px 14px 18px",
+                    minWidth: 190,
                     background: "#0a2540",
                     color: "#fff",
                     borderRadius: 12,
