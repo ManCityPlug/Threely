@@ -233,7 +233,7 @@ export default function MobileAppPrompt() {
                 color: "#425466",
                 textAlign: "center",
                 lineHeight: 1.6,
-                marginBottom: "2rem",
+                marginBottom: "1.5rem",
                 animation: "mobilePromptSlideUp 0.5s ease 0.35s both",
               }}
             >
@@ -249,7 +249,7 @@ export default function MobileAppPrompt() {
                 flexDirection: "column",
                 gap: 14,
                 width: "100%",
-                marginBottom: "2rem",
+                marginBottom: "1.5rem",
               }}
             >
               {[
@@ -308,8 +308,8 @@ export default function MobileAppPrompt() {
                 display: "flex",
                 justifyContent: "center",
                 width: "100%",
-                marginTop: "0.5rem",
-                marginBottom: "1rem",
+                marginTop: "0.25rem",
+                marginBottom: "1.25rem",
                 animation: "mobilePromptSlideUp 0.45s ease 0.65s both",
               }}
             >
