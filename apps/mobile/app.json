@@ -41,13 +41,6 @@
           "color": "#635BFF",
           "sounds": []
         }
-      ],
-      [
-        "@stripe/stripe-react-native",
-        {
-          "merchantIdentifier": "merchant.com.threely.app",
-          "enableGooglePay": false
-        }
       ]
     ],
     "experiments": {
