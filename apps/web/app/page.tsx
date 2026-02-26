@@ -166,6 +166,32 @@ export default function LandingPage() {
               {item.label}
             </Link>
           ))}
+
+          {/* Auth buttons */}
+          <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
+            <Link href="/login" onClick={() => setMenuOpen(false)} style={{
+              flex: 1, textAlign: "center",
+              padding: "0.6rem 0",
+              fontSize: "0.875rem", fontWeight: 600,
+              color: "#425466",
+              border: "1.5px solid #e3e8ef",
+              borderRadius: 8,
+              textDecoration: "none",
+            }}>
+              Sign in
+            </Link>
+            <Link href="/register" onClick={(e) => { setMenuOpen(false); handleMobileCTA(e); }} style={{
+              flex: 1, textAlign: "center",
+              padding: "0.6rem 0",
+              fontSize: "0.875rem", fontWeight: 600,
+              color: "#fff",
+              background: "#635bff",
+              borderRadius: 8,
+              textDecoration: "none",
+            }}>
+              Get started
+            </Link>
+          </div>
         </div>
       )}
 
