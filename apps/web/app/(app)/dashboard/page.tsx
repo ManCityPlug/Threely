@@ -418,7 +418,7 @@ export default function DashboardPage() {
       setGoals(goalsRes.goals);
       setGoalStats(statsRes.goalStats ?? []);
 
-      // Restore saved focus or show picker
+      // Restore saved focus or auto-select
       const todayKey = `threely_focus_${new Date().toISOString().slice(0, 10)}`;
       const saved = sessionStorage.getItem(todayKey);
       if (saved) {
@@ -427,9 +427,11 @@ export default function DashboardPage() {
         const onlyGoalId = goalsRes.goals[0].id;
         setSelectedGoalId(onlyGoalId);
         sessionStorage.setItem(todayKey, onlyGoalId);
-      } else if (goalsRes.goals.length > 1 && tasksRes.dailyTasks.length > 0) {
-        setSelectedGoalId(null);
-        setGoalPickerOpen(true);
+      } else if (goalsRes.goals.length > 1) {
+        // Auto-select first goal so the dashboard always shows something actionable
+        const firstGoalId = goalsRes.goals[0].id;
+        setSelectedGoalId(firstGoalId);
+        sessionStorage.setItem(todayKey, firstGoalId);
       }
 
       // Restore overdue banner dismissal
