@@ -48,6 +48,14 @@ import { spacing, typography, radius, shadow } from "@/constants/theme";
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
+const COMPLETION_MESSAGES = [
+  "Crushed it today",
+  "All done. Nice work.",
+  "3 for 3. You're on fire.",
+  "That's a wrap for today",
+  "Nailed it.",
+];
+
 function formatDate(d: Date) {
   return `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`;
 }
@@ -155,6 +163,17 @@ export default function DashboardScreen() {
   // ─── Confetti state ─────────────────────────────────────────────────────────
   const [confettiActive, setConfettiActive] = useState(false);
 
+  // ─── Completion message state ────────────────────────────────────────────────
+  const [completionMessage, setCompletionMessage] = useState("");
+  const [showCompletionBanner, setShowCompletionBanner] = useState(false);
+
+  // ─── Overdue paging state ────────────────────────────────────────────────────
+  const [overduePageSize, setOverduePageSize] = useState(3);
+
+  // ─── Focus lock state ────────────────────────────────────────────────────────
+  const [tasksCompletedSinceGenerate, setTasksCompletedSinceGenerate] = useState(false);
+  const [hasGeneratedMore, setHasGeneratedMore] = useState(false);
+
   const hasLoadedOnce = useRef(false);
   const reviewShownForDate = useRef<string>("");
 
@@ -193,8 +212,12 @@ export default function DashboardScreen() {
           await AsyncStorage.setItem(todayKey, serverFocus);
         }
       } else if (goalsRes.goals.length > 0) {
-        // Default to first goal instead of "Mix all goals"
+        // No focus set today — auto-open the focus picker on first visit
         setSelectedGoal(goalsRes.goals[0].id);
+        if (!hasLoadedOnce.current) {
+          // Will be shown after loading finishes (via effect below)
+          setGoalPickerShownToday(false);
+        }
       }
     } catch (e) {
       console.error("loadData error", e);
@@ -223,6 +246,13 @@ export default function DashboardScreen() {
   useMemo(() => {
     if (goals.length >= 1 && !selectedGoal) setSelectedGoal(goals[0].id);
   }, [goals.length]);
+
+  // Auto-open focus picker on first visit of the day if no focus was set
+  useEffect(() => {
+    if (!loading && goals.length > 1 && !goalPickerShownToday) {
+      setGoalPickerVisible(true);
+    }
+  }, [loading, goals.length, goalPickerShownToday]);
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -298,8 +328,13 @@ export default function DashboardScreen() {
     : selectedGoal === "overdue" ? displayedOverdue.length > 0
     : visibleTasks.length > 0;
 
+  // Paged overdue: show only up to overduePageSize at a time
+  const pagedOverdue = displayedOverdue.slice(0, overduePageSize);
+  const hasMoreOverdue = displayedOverdue.length > overduePageSize;
+  const remainingOverdueCount = displayedOverdue.length - overduePageSize;
+
   // Progress counter includes both today's tasks and displayed overdue tasks
-  const displayedOverdueItems = displayedOverdue.slice(0, 3).map(x => x.task);
+  const displayedOverdueItems = pagedOverdue.map(x => x.task);
   const allDisplayedItems = [...displayedOverdueItems, ...newTaskItems];
   const allDone = allDisplayedItems.length > 0 && allDisplayedItems.every((t) => t.isCompleted);
   const completedCount = allDisplayedItems.filter((t) => t.isCompleted).length;
@@ -344,13 +379,26 @@ export default function DashboardScreen() {
     }
   }, [loading, buildNotifContext, goals.length]);
 
-  // Trigger confetti when all tasks become done
+  // Trigger confetti + completion message when all tasks become done
   const prevAllDone = useRef(false);
   useEffect(() => {
     if (allDone && !prevAllDone.current && newTaskItems.length > 0) {
       setConfettiActive(true);
       celebrationHaptic();
+      // Pick a random completion message
+      const isOverdueMode = selectedGoal === "overdue";
+      const noMoreOverdue = displayedOverdue.length === 0 || (pagedOverdue.length === displayedOverdue.length && displayedOverdueItems.every(t => t.isCompleted));
+      if (isOverdueMode && noMoreOverdue) {
+        setCompletionMessage("You're all caught up");
+      } else {
+        const msg = COMPLETION_MESSAGES[Math.floor(Math.random() * COMPLETION_MESSAGES.length)];
+        setCompletionMessage(msg);
+      }
+      setShowCompletionBanner(true);
       setTimeout(() => setConfettiActive(false), 2500);
+      setTimeout(() => setShowCompletionBanner(false), 4000);
+      // Mark tasks as completed for focus lock
+      setTasksCompletedSinceGenerate(true);
     }
     prevAllDone.current = allDone;
   }, [allDone, newTaskItems.length]);
@@ -376,13 +424,19 @@ export default function DashboardScreen() {
 
   function selectGoal(val: GoalSelection) {
     if (goalPickerShownToday) {
-      // Already set a focus today — confirm before switching
+      // Focus lock: if they completed 3/3 and haven't generated more, allow free switch
+      const canSwitchFreely = tasksCompletedSinceGenerate && !hasGeneratedMore;
+      if (canSwitchFreely) {
+        persistFocus(val);
+        return;
+      }
+      // Otherwise confirm before switching
       Alert.alert(
         "Change focus?",
-        "Switching your daily focus will update how today's progress is tracked.",
+        "This will reset today's progress. Are you sure?",
         [
           { text: "Cancel", style: "cancel", onPress: () => setGoalPickerVisible(false) },
-          { text: "Change", onPress: () => persistFocus(val) },
+          { text: "Change", style: "destructive", onPress: () => persistFocus(val) },
         ]
       );
     } else {
@@ -526,11 +580,15 @@ export default function DashboardScreen() {
           );
         }
       }
-      // Trigger confetti and haptic
+      // Trigger confetti and completion banner
       setConfettiActive(true);
       celebrationHaptic();
-      showToast("All tasks completed!", "success");
+      const msg = COMPLETION_MESSAGES[Math.floor(Math.random() * COMPLETION_MESSAGES.length)];
+      setCompletionMessage(msg);
+      setShowCompletionBanner(true);
+      setTasksCompletedSinceGenerate(true);
       setTimeout(() => setConfettiActive(false), 2500);
+      setTimeout(() => setShowCompletionBanner(false), 4000);
     } catch {
       showToast("Couldn't complete all tasks. Try again.", "error");
     }
@@ -594,6 +652,9 @@ export default function DashboardScreen() {
           }
           return updated;
         });
+        // Re-lock focus after generating more tasks
+        setHasGeneratedMore(true);
+        setTasksCompletedSinceGenerate(false);
       } catch {
         // silently fail — insight is still shown
       } finally {
@@ -730,6 +791,13 @@ export default function DashboardScreen() {
           </TouchableOpacity>
         )}
 
+        {/* Completion banner */}
+        {showCompletionBanner && (
+          <View style={styles.completionBanner}>
+            <Text style={styles.completionBannerText}>{completionMessage}</Text>
+          </View>
+        )}
+
         {/* Overdue tasks section */}
         {displayedOverdue.length > 0 && (
           <View style={styles.overdueSection}>
@@ -739,7 +807,7 @@ export default function DashboardScreen() {
                 <Text style={styles.overdueBadgeText}>{displayedOverdue.length}</Text>
               </View>
             </View>
-            {displayedOverdue.map(({ dailyTaskId, goalTitle, task }) => (
+            {pagedOverdue.map(({ dailyTaskId, goalTitle, task }) => (
               <View key={task.id} style={styles.overdueItem}>
                 {goalTitle && (selectedGoal === "shuffle" || selectedGoal === "overdue") ? (
                   <Text style={styles.overdueGoalChip}>{goalTitle}</Text>
@@ -774,6 +842,19 @@ export default function DashboardScreen() {
                 </View>
               </View>
             ))}
+            {/* Catch up on more button */}
+            {hasMoreOverdue && (
+              <TouchableOpacity
+                style={styles.catchUpBtn}
+                onPress={() => setOverduePageSize(prev => prev + 3)}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.catchUpIcon}>📋</Text>
+                <Text style={styles.catchUpText}>
+                  Catch up on more ({remainingOverdueCount > 3 ? 3 : remainingOverdueCount} more)
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 
@@ -897,39 +978,41 @@ export default function DashboardScreen() {
             )}
 
             {/* Action buttons when all done */}
-            <View style={styles.nextSection}>
-              {allDone ? (
-                <TouchableOpacity
-                  style={styles.giveMeMoreBtn}
-                  onPress={handleGiveMoreTasks}
-                  disabled={generating}
-                  activeOpacity={0.85}
-                >
-                  {generating ? (
-                    <ActivityIndicator color={colors.primaryText} size="small" />
-                  ) : (
-                    <>
-                      <Text style={styles.giveMeMoreIcon}>🚀</Text>
-                      <Text style={styles.giveMeMoreText}>Give me more</Text>
-                    </>
-                  )}
-                </TouchableOpacity>
-              ) : (
-                <>
+            {selectedGoal !== "overdue" && (
+              <View style={styles.nextSection}>
+                {allDone ? (
                   <TouchableOpacity
-                    style={styles.nextButtonLocked}
-                    disabled
-                    activeOpacity={1}
+                    style={styles.giveMeMoreBtn}
+                    onPress={handleGiveMoreTasks}
+                    disabled={generating}
+                    activeOpacity={0.85}
                   >
-                    <Text style={styles.lockIcon}>🔒</Text>
-                    <Text style={styles.nextButtonTextLocked}>Give me more</Text>
+                    {generating ? (
+                      <ActivityIndicator color={colors.primaryText} size="small" />
+                    ) : (
+                      <>
+                        <Text style={styles.giveMeMoreIcon}>🚀</Text>
+                        <Text style={styles.giveMeMoreText}>Give me more</Text>
+                      </>
+                    )}
                   </TouchableOpacity>
-                  <Text style={styles.lockHint}>
-                    Complete all {newTaskItems.length} tasks to unlock
-                  </Text>
-                </>
-              )}
-            </View>
+                ) : (
+                  <>
+                    <TouchableOpacity
+                      style={styles.nextButtonLocked}
+                      disabled
+                      activeOpacity={1}
+                    >
+                      <Text style={styles.lockIcon}>🔒</Text>
+                      <Text style={styles.nextButtonTextLocked}>Give me more</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.lockHint}>
+                      Complete all {newTaskItems.length} tasks to unlock
+                    </Text>
+                  </>
+                )}
+              </View>
+            )}
           </>
         )}
       </ScrollView>
@@ -997,7 +1080,7 @@ export default function DashboardScreen() {
 
             {reviewStep === 2 && (
               <>
-                <Text style={styles.reviewQuestion}>Anything Threely Intelligence should know for tomorrow?</Text>
+                <Text style={styles.reviewQuestion}>Anything we should know for tomorrow?</Text>
                 <TextInput
                   style={styles.reviewNoteInput}
                   placeholder="Optional — obstacles, wins, changes in your life…"
@@ -1642,6 +1725,43 @@ function createStyles(c: Colors) {
       fontSize: 18,
       fontWeight: typography.bold,
       color: c.textTertiary,
+    },
+    // ── Catch up on more button ─────────────────────────────────────────────
+    catchUpBtn: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: spacing.sm,
+      width: "100%",
+      height: 44,
+      borderRadius: radius.md,
+      borderWidth: 1.5,
+      borderColor: c.warning,
+      backgroundColor: c.warningLight,
+      marginTop: spacing.xs,
+    },
+    catchUpIcon: { fontSize: 14 },
+    catchUpText: {
+      fontSize: typography.sm,
+      fontWeight: typography.semibold,
+      color: c.warning,
+      letterSpacing: -0.2,
+    },
+    // ── Completion banner ───────────────────────────────────────────────────
+    completionBanner: {
+      backgroundColor: c.success,
+      borderRadius: radius.lg,
+      paddingVertical: 14,
+      paddingHorizontal: spacing.lg,
+      alignItems: "center",
+      justifyContent: "center",
+      marginBottom: spacing.lg,
+    },
+    completionBannerText: {
+      fontSize: typography.lg,
+      fontWeight: typography.bold,
+      color: "#fff",
+      letterSpacing: -0.3,
     },
     // ── Review sheet ─────────────────────────────────────────────────────────
     historyOverlay: {
