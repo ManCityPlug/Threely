@@ -836,7 +836,7 @@ export default function LandingPage() {
             Terms of Service
           </Link>
         </div>
-        <p style={{ marginBottom: 8 }}>
+        <p style={{ margin: 0 }}>
           © {new Date().getFullYear()} Threely. All rights reserved.
         </p>
       </footer>
