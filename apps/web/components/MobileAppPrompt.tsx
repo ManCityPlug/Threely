@@ -145,11 +145,8 @@ export default function MobileAppPrompt() {
             animation: animatingOut ? undefined : "mobilePromptFadeIn 0.4s ease both",
             opacity: animatingOut ? 0 : undefined,
             transition: animatingOut ? "opacity 0.35s ease" : undefined,
-            overflowY: "auto",
-            WebkitOverflowScrolling: "touch" as any,
-            overscrollBehavior: "contain" as any,
+            overflow: "hidden",
           }}
-          onTouchMove={(e) => e.stopPropagation()}
         >
           {/* Close X button */}
           <button
@@ -162,7 +159,7 @@ export default function MobileAppPrompt() {
               background: "none",
               border: "none",
               color: "#8898aa",
-              fontSize: 22,
+              fontSize: 28,
               cursor: "pointer",
               padding: 8,
               lineHeight: 1,
@@ -360,7 +357,7 @@ export default function MobileAppPrompt() {
                 display: "flex",
                 gap: 10,
                 width: "100%",
-                marginBottom: "1.5rem",
+                marginBottom: "0.75rem",
                 animation: "mobilePromptSlideUp 0.45s ease 0.7s both",
               }}
             >
