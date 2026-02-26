@@ -260,14 +260,14 @@ export default function LandingPage() {
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 padding: "14px 28px 14px 18px",
                 minWidth: 190,
-                background: "#0a2540",
+                background: "#635bff",
                 color: "#fff",
                 borderRadius: 12,
                 fontSize: "0.95rem",
                 fontWeight: 600,
                 textDecoration: "none",
                 position: "relative" as const,
-                border: "1.5px solid rgba(99,91,255,0.15)",
+                border: "1.5px solid rgba(99,91,255,0.25)",
               }}>
                 <span className="new-badge" style={{ position: "absolute" as const, top: -9, right: -10 }}>New</span>
                 <AppleIcon />
@@ -282,14 +282,14 @@ export default function LandingPage() {
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 padding: "14px 28px 14px 18px",
                 minWidth: 190,
-                background: "#0a2540",
+                background: "#635bff",
                 color: "#fff",
                 borderRadius: 12,
                 fontSize: "0.95rem",
                 fontWeight: 600,
                 textDecoration: "none",
                 position: "relative" as const,
-                border: "1.5px solid rgba(99,91,255,0.15)",
+                border: "1.5px solid rgba(99,91,255,0.25)",
               }}>
                 <span className="new-badge" style={{ position: "absolute" as const, top: -9, right: -10 }}>New</span>
                 <PlayIcon />

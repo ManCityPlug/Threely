@@ -306,8 +306,9 @@ input, textarea, select {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  background: var(--primary);
-  color: #fff;
+  background: #fff;
+  color: #635bff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   z-index: 1;
 }
 

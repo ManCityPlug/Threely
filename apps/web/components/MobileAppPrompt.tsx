@@ -372,7 +372,7 @@ export default function MobileAppPrompt() {
                     gap: 10,
                     padding: "14px 28px 14px 18px",
                     minWidth: 190,
-                    background: "#0a2540",
+                    background: "#635bff",
                     color: "#fff",
                     borderRadius: 12,
                     fontSize: "0.95rem",
@@ -385,13 +385,14 @@ export default function MobileAppPrompt() {
                     position: "absolute",
                     top: -9,
                     right: -10,
-                    background: "#635bff",
-                    color: "#fff",
+                    background: "#fff",
+                    color: "#635bff",
                     fontSize: "0.65rem",
                     fontWeight: 700,
                     padding: "4px 10px",
                     borderRadius: 10,
                     letterSpacing: "0.03em",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                   }}>New</span>
                   <AppleIcon />
                   <span
@@ -419,7 +420,7 @@ export default function MobileAppPrompt() {
                     gap: 10,
                     padding: "14px 28px 14px 18px",
                     minWidth: 190,
-                    background: "#0a2540",
+                    background: "#635bff",
                     color: "#fff",
                     borderRadius: 12,
                     fontSize: "0.95rem",
@@ -432,13 +433,14 @@ export default function MobileAppPrompt() {
                     position: "absolute",
                     top: -9,
                     right: -10,
-                    background: "#635bff",
-                    color: "#fff",
+                    background: "#fff",
+                    color: "#635bff",
                     fontSize: "0.65rem",
                     fontWeight: 700,
                     padding: "4px 10px",
                     borderRadius: 10,
                     letterSpacing: "0.03em",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
                   }}>New</span>
                   <PlayIcon />
                   <span

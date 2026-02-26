@@ -125,7 +125,7 @@ export default function RegisterPage() {
             style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               padding: "10px 18px",
-              background: "#0a2540", color: "#fff",
+              background: "#635bff", color: "#fff",
               borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
               textDecoration: "none",
               position: "relative",
@@ -143,7 +143,7 @@ export default function RegisterPage() {
             style={{
               display: "inline-flex", alignItems: "center", gap: 8,
               padding: "10px 18px",
-              background: "#0a2540", color: "#fff",
+              background: "#635bff", color: "#fff",
               borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
               textDecoration: "none",
               position: "relative",
