@@ -326,8 +326,21 @@ export default function MobileAppPrompt() {
                     fontSize: "0.8rem",
                     fontWeight: 600,
                     textDecoration: "none",
+                    position: "relative",
                   }}
                 >
+                  <span style={{
+                    position: "absolute",
+                    top: -7,
+                    right: -6,
+                    background: "#635bff",
+                    color: "#fff",
+                    fontSize: "0.55rem",
+                    fontWeight: 700,
+                    padding: "2px 6px",
+                    borderRadius: 6,
+                    letterSpacing: "0.03em",
+                  }}>New</span>
                   <AppleIcon />
                   <span
                     style={{
@@ -360,8 +373,21 @@ export default function MobileAppPrompt() {
                     fontSize: "0.8rem",
                     fontWeight: 600,
                     textDecoration: "none",
+                    position: "relative",
                   }}
                 >
+                  <span style={{
+                    position: "absolute",
+                    top: -7,
+                    right: -6,
+                    background: "#635bff",
+                    color: "#fff",
+                    fontSize: "0.55rem",
+                    fontWeight: 700,
+                    padding: "2px 6px",
+                    borderRadius: 6,
+                    letterSpacing: "0.03em",
+                  }}>New</span>
                   <PlayIcon />
                   <span
                     style={{
