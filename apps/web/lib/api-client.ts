@@ -205,6 +205,18 @@ export const tasksApi = {
       body: JSON.stringify({ taskItemId, action: "reschedule" }),
     }),
 
+  editItem: (dailyTaskId: string, taskItemId: string, editData: { task?: string; description?: string }) =>
+    apiFetch<{ dailyTask: DailyTask }>(`/api/tasks/${dailyTaskId}`, {
+      method: "PATCH",
+      body: JSON.stringify({ taskItemId, action: "edit", editData }),
+    }),
+
+  refineItem: (dailyTaskId: string, taskItemId: string, userRequest: string) =>
+    apiFetch<{ dailyTask: DailyTask }>(`/api/tasks/${dailyTaskId}/refine`, {
+      method: "POST",
+      body: JSON.stringify({ taskItemId, userRequest }),
+    }),
+
   history: (days = 30, cursor?: string, limit?: number) => {
     const params = new URLSearchParams();
     if (cursor) {

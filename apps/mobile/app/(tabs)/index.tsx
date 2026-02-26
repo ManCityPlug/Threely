@@ -209,13 +209,6 @@ export default function DashboardScreen() {
       } else {
         loadData();
       }
-      // Check if profile "Change focus" flag was set
-      AsyncStorage.getItem("@threely_open_goal_picker").then(val => {
-        if (val) {
-          AsyncStorage.removeItem("@threely_open_goal_picker");
-          setGoalPickerVisible(true);
-        }
-      });
     }, [loadData])
   );
 
@@ -366,22 +359,6 @@ export default function DashboardScreen() {
       ? computeMixItems(dailyTasks).map(m => m.task.id)
       : undefined;
     focusApi.save(val, shuffleIds).catch(() => {});
-
-    // Auto-generate tasks if new goal has none for today
-    if (val !== "shuffle") {
-      const hasTasks = dailyTasks.some(dt => dt.goalId === val);
-      if (!hasTasks) {
-        setGenerating(true);
-        try {
-          const res = await tasksApi.generate(val, { focusShifted: true });
-          setDailyTasks(prev => [...prev, ...res.dailyTasks]);
-        } catch {
-          // silently fail
-        } finally {
-          setGenerating(false);
-        }
-      }
-    }
   }
 
   function selectGoal(val: GoalSelection) {
@@ -768,22 +745,19 @@ export default function DashboardScreen() {
                       <Text style={styles.overdueTaskDesc} numberOfLines={1}>{task.description}</Text>
                     ) : null}
                   </View>
-                  <View style={styles.overdueActions}>
-                    <TouchableOpacity
-                      style={styles.overdueRescheduleBtn}
-                      onPress={() => handleRescheduleTask(dailyTaskId, task.id)}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.overdueRescheduleText}>Tomorrow</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.overdueDismissBtn}
-                      onPress={() => handleSkipTask(dailyTaskId, task.id)}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.overdueDismissText}>{"\u2715"}</Text>
-                    </TouchableOpacity>
-                  </View>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Alert.alert("Overdue Task", task.task, [
+                        { text: "Move to Tomorrow", onPress: () => handleRescheduleTask(dailyTaskId, task.id) },
+                        { text: "Remove Task", style: "destructive", onPress: () => handleSkipTask(dailyTaskId, task.id) },
+                        { text: "Cancel", style: "cancel" },
+                      ]);
+                    }}
+                    activeOpacity={0.7}
+                    style={styles.overdueMenuBtn}
+                  >
+                    <Text style={styles.overdueMenuIcon}>{"\u22EF"}</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             ))}
@@ -872,7 +846,7 @@ export default function DashboardScreen() {
                       onToggle={(isCompleted) =>
                         handleToggleTask(dailyTaskId, task.id, isCompleted)
                       }
-
+                      onEdit={(editData) => handleEditTask(dailyTaskId, task.id, editData)}
                       onRefine={(userRequest) => handleRefineTask(dailyTaskId, task.id, userRequest)}
                     />
                   </Animated.View>
@@ -898,7 +872,7 @@ export default function DashboardScreen() {
                             onToggle={(isCompleted) =>
                               handleToggleTask(dt.id, task.id, isCompleted)
                             }
-
+                            onEdit={(editData) => handleEditTask(dt.id, task.id, editData)}
                             onRefine={(userRequest) => handleRefineTask(dt.id, task.id, userRequest)}
                           />
                         </Animated.View>
@@ -1058,81 +1032,50 @@ export default function DashboardScreen() {
           <Pressable style={styles.pickerCard} onPress={() => {}}>
             <Text style={styles.pickerTitle}>What are you working on today?</Text>
             <Text style={styles.pickerSubtitle}>Pick a goal to focus on</Text>
-
-            {/* Overdue section — show goals with overdue tasks first */}
-            {(() => {
-              const overdueGoalIds = new Set(
-                overdueTasks.map(dt => dt.goalId).filter(id => goals.some(g => g.id === id))
-              );
-              const overdueGoals = goals.filter(g => overdueGoalIds.has(g.id));
-              const regularGoals = goals.filter(g => !overdueGoalIds.has(g.id));
-
-              const renderGoalRow = (goal: Goal) => {
-                const isSelected = selectedGoal === goal.id;
-                const goalTime = goal.dailyTimeMinutes;
-                const stat = goalStats.find(s => s.goalId === goal.id);
-                const days = daysSince(stat?.lastWorkedAt ?? null);
-                const staleColor = days === null ? colors.textTertiary
-                  : days < 7 ? colors.success
-                  : days < 14 ? colors.warning
-                  : colors.danger;
-                return (
-                  <TouchableOpacity
-                    key={goal.id}
-                    style={[styles.menuItem, isSelected && styles.menuItemSelected]}
-                    onPress={() => selectGoal(goal.id)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={{ flex: 1 }}>
-                      <Text
-                        style={[styles.menuItemTextLarge, isSelected && styles.menuItemTextSelected]}
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                      >
-                        {goal.title}
-                      </Text>
-                      <Text style={[styles.menuStaleness, { color: staleColor }]}>
-                        {stalenessLabel(days)}
-                      </Text>
-                    </View>
-                    <View style={styles.menuItemRight}>
-                      {stat && stat.overdueCount > 0 && (
-                        <View style={styles.menuOverdueBadge}>
-                          <Text style={styles.menuOverdueBadgeText}>{stat.overdueCount} overdue</Text>
-                        </View>
-                      )}
-                      {goalTime ? (
-                        <View style={styles.menuTimeBadge}>
-                          <Text style={styles.menuTimeBadgeText}>~{formatMinutes(goalTime)}/day</Text>
-                        </View>
-                      ) : null}
-                      <View style={[styles.radioOuter, isSelected && styles.radioOuterSelected]}>
-                        {isSelected && <View style={styles.radioInner} />}
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                );
-              };
-
+            {goals.map((goal) => {
+              const isSelected = selectedGoal === goal.id;
+              const goalTime = goal.dailyTimeMinutes;
+              const stat = goalStats.find(s => s.goalId === goal.id);
+              const days = daysSince(stat?.lastWorkedAt ?? null);
+              const staleColor = days === null ? colors.textTertiary
+                : days < 7 ? colors.success
+                : days < 14 ? colors.warning
+                : colors.danger;
               return (
-                <>
-                  {overdueGoals.length > 0 && (
-                    <>
-                      <Text style={styles.pickerSectionHeader}>OVERDUE</Text>
-                      {overdueGoals.map(renderGoalRow)}
-                      {regularGoals.length > 0 && <View style={styles.menuDivider} />}
-                    </>
-                  )}
-                  {goals.length > 0 && (
-                    <>
-                      <Text style={styles.pickerSectionHeader}>YOUR GOALS</Text>
-                      {(overdueGoals.length > 0 ? regularGoals : goals).map(renderGoalRow)}
-                    </>
-                  )}
-                </>
+                <TouchableOpacity
+                  key={goal.id}
+                  style={[styles.menuItem, isSelected && styles.menuItemSelected]}
+                  onPress={() => selectGoal(goal.id)}
+                  activeOpacity={0.7}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={[styles.menuItemText, isSelected && styles.menuItemTextSelected]}
+                      numberOfLines={1}
+                      ellipsizeMode="tail"
+                    >
+                      {goal.title}
+                    </Text>
+                    <Text style={[styles.menuStaleness, { color: staleColor }]}>
+                      {stalenessLabel(days)}
+                    </Text>
+                  </View>
+                  <View style={styles.menuItemRight}>
+                    {stat && stat.overdueCount > 0 && (
+                      <View style={styles.menuOverdueBadge}>
+                        <Text style={styles.menuOverdueBadgeText}>{stat.overdueCount} overdue</Text>
+                      </View>
+                    )}
+                    {goalTime ? (
+                      <View style={styles.menuTimeBadge}>
+                        <Text style={styles.menuTimeBadgeText}>~{formatMinutes(goalTime)}/day</Text>
+                      </View>
+                    ) : null}
+                    {isSelected && <Text style={styles.menuCheck}>✓</Text>}
+                  </View>
+                </TouchableOpacity>
               );
-            })()}
-
+            })}
             {goals.length > 1 && (
               <>
                 <View style={styles.menuDivider} />
@@ -1146,15 +1089,15 @@ export default function DashboardScreen() {
                 >
                   <Text
                     style={[
-                      styles.menuItemTextLarge,
+                      styles.menuItemText,
                       selectedGoal === "shuffle" && styles.menuItemTextSelected,
                     ]}
                   >
                     ✦ Mix all goals
                   </Text>
-                  <View style={[styles.radioOuter, selectedGoal === "shuffle" && styles.radioOuterSelected]}>
-                    {selectedGoal === "shuffle" && <View style={styles.radioInner} />}
-                  </View>
+                  {selectedGoal === "shuffle" && (
+                    <Text style={styles.menuCheck}>✓</Text>
+                  )}
                 </TouchableOpacity>
               </>
             )}
@@ -1350,7 +1293,7 @@ function createStyles(c: Colors) {
       fontWeight: typography.bold,
       color: c.primaryText,
     },
-    section: { marginBottom: spacing.sm },
+    section: { marginBottom: spacing.xl },
     mixItem: { marginBottom: spacing.xs },
     mixGoalChip: {
       fontSize: typography.xs,
@@ -1378,7 +1321,7 @@ function createStyles(c: Colors) {
       marginBottom: spacing.xl,
     },
     generateBtn: { width: "100%" },
-    nextSection: { alignItems: "center", marginTop: 4, gap: spacing.xs },
+    nextSection: { alignItems: "center", marginTop: spacing.sm, gap: spacing.sm },
     // Give me more (unlocked)
     giveMeMoreBtn: {
       flexDirection: "row",
@@ -1479,23 +1422,7 @@ function createStyles(c: Colors) {
       fontWeight: typography.medium,
       color: c.text,
     },
-    menuItemTextLarge: {
-      flex: 1,
-      fontSize: typography.lg,
-      fontWeight: typography.semibold,
-      color: c.text,
-    },
     menuItemTextSelected: { color: c.primary, fontWeight: typography.semibold },
-    pickerSectionHeader: {
-      fontSize: typography.xs,
-      fontWeight: typography.bold,
-      color: c.textTertiary,
-      textTransform: "uppercase",
-      letterSpacing: 0.8,
-      paddingHorizontal: spacing.md,
-      paddingTop: spacing.sm,
-      paddingBottom: spacing.xs,
-    },
     menuItemRight: { flexDirection: "row", alignItems: "center", gap: spacing.xs, flexShrink: 0 },
     menuNoTasksBadge: {
       fontSize: typography.xs,
@@ -1518,24 +1445,7 @@ function createStyles(c: Colors) {
       fontWeight: typography.semibold,
       color: c.primary,
     },
-    radioOuter: {
-      width: 22,
-      height: 22,
-      borderRadius: 11,
-      borderWidth: 2,
-      borderColor: c.border,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    radioOuterSelected: {
-      borderColor: c.primary,
-    },
-    radioInner: {
-      width: 12,
-      height: 12,
-      borderRadius: 6,
-      backgroundColor: c.primary,
-    },
+    menuCheck: { fontSize: typography.base, color: c.primary, fontWeight: typography.bold },
     menuStaleness: {
       fontSize: typography.xs,
       fontWeight: typography.medium,
@@ -1676,6 +1586,18 @@ function createStyles(c: Colors) {
     },
     overdueDismissText: {
       fontSize: 16,
+      color: c.textTertiary,
+    },
+    overdueMenuBtn: {
+      width: 32,
+      height: 32,
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: 0,
+    },
+    overdueMenuIcon: {
+      fontSize: 18,
+      fontWeight: typography.bold,
       color: c.textTertiary,
     },
     // ── Review sheet ─────────────────────────────────────────────────────────

@@ -20,7 +20,6 @@ export interface NotifContext {
   incompleteCount: number;
   allDone: boolean;
   staleGoals: { name: string; daysSince: number }[];
-  focusDays?: string[] | null; // e.g. ["monday","wednesday"] — if set, skip notifications on off-days
 }
 
 // ─── Notification identifiers ─────────────────────────────────────────────────
@@ -111,23 +110,6 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
 
   const goalName = ctx.focusGoalName ?? "your goals";
 
-  // Check if today is a focus day for this goal
-  if (ctx.focusDays && ctx.focusDays.length > 0) {
-    const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-    const today = dayNames[new Date().getDay()];
-    if (!ctx.focusDays.includes(today)) {
-      // Not a focus day — cancel contextual notifications and skip
-      await Promise.all([
-        cancelById(ID_MORNING),
-        cancelById(ID_MIDDAY),
-        cancelById(ID_EVENING),
-      ]);
-      // Still schedule weekly summary
-      await scheduleWeeklySummaryNotification();
-      return;
-    }
-  }
-
   // Cancel existing contextual notifications first
   await Promise.all([
     cancelById(ID_MORNING),
@@ -198,9 +180,6 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
     });
   }
 
-  // Weekly summary notification (Sunday 9 PM)
-  await scheduleWeeklySummaryNotification();
-
   // 6d. Weekly stale goal nudge — one-time per stale goal per week
   for (const stale of ctx.staleGoals) {
     if (stale.daysSince < 7) continue;
@@ -259,49 +238,6 @@ export async function onTaskCompleted(ctx: NotifContext): Promise<void> {
       },
     });
   }
-}
-
-// ─── Weekly summary notification ──────────────────────────────────────────────
-
-const ID_WEEKLY_SUMMARY = "threely-weekly-summary";
-
-/**
- * Schedule a notification for Sunday 9 PM to alert user their weekly summary is ready.
- * Call this on app open / after scheduling contextual notifications.
- */
-export async function scheduleWeeklySummaryNotification(): Promise<void> {
-  if (Platform.OS === "web") return;
-  const granted = await requestNotificationPermissions();
-  if (!granted) return;
-
-  await cancelById(ID_WEEKLY_SUMMARY);
-
-  const now = new Date();
-  // Find next Sunday 9 PM
-  const dayOfWeek = now.getDay(); // 0=Sun
-  const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek;
-  const sunday9pm = new Date(now);
-  sunday9pm.setDate(now.getDate() + daysUntilSunday);
-  sunday9pm.setHours(21, 0, 0, 0);
-
-  // If it's already past Sunday 9 PM this week, schedule for next Sunday
-  if (sunday9pm <= now) {
-    sunday9pm.setDate(sunday9pm.getDate() + 7);
-  }
-
-  await Notifications.scheduleNotificationAsync({
-    identifier: ID_WEEKLY_SUMMARY,
-    content: {
-      title: "Your weekly summary is ready!",
-      body: "See how you did this week — stats, streaks, and AI insights await.",
-      sound: true,
-      data: { action: "weekly-summary" },
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DATE,
-      date: sunday9pm,
-    },
-  });
 }
 
 function formatMin(min: number): string {

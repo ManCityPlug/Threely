@@ -10,7 +10,7 @@ const PLAY_STORE_URL = "#";
 
 function AppleIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
       <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
     </svg>
   );
@@ -92,12 +92,11 @@ export default function RegisterPage() {
         {/* App icon */}
         <div style={{
           width: 64, height: 64, borderRadius: 16,
-          background: "linear-gradient(145deg, #7c74ff 0%, #635bff 50%, #5144e8 100%)", color: "#fff",
+          background: "var(--primary)", color: "#fff",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 32, fontWeight: 800,
           margin: "0 auto 1.25rem",
-          boxShadow: "0 8px 24px rgba(99,91,255,0.35), inset 0 2px 4px rgba(255,255,255,0.25)",
-          textShadow: "0 2px 4px rgba(0,0,0,0.15)",
+          boxShadow: "0 8px 24px rgba(99,91,255,0.25)",
         }}>3</div>
 
         <h1 style={{
@@ -118,22 +117,21 @@ export default function RegisterPage() {
 
         {/* Store buttons */}
         <div style={{
-          display: "flex", gap: 14,
+          display: "flex", gap: 10,
           justifyContent: "center", marginBottom: "1.5rem",
         }}>
           <a
             href={APP_STORE_URL}
             style={{
-              display: "inline-flex", alignItems: "center", gap: 10,
-              padding: "14px 28px 14px 18px",
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "10px 18px",
               background: "#0a2540", color: "#fff",
-              borderRadius: 12, fontSize: "0.85rem", fontWeight: 600,
+              borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
               textDecoration: "none",
               position: "relative",
-              border: "1.5px solid rgba(99,91,255,0.15)",
             }}
           >
-            <span className="new-badge" style={{ position: "absolute", top: -8, right: -8 }}>New</span>
+            <span className="new-badge" style={{ position: "absolute", top: -7, right: -6 }}>New</span>
             <AppleIcon />
             <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
               <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
@@ -143,16 +141,15 @@ export default function RegisterPage() {
           <a
             href={PLAY_STORE_URL}
             style={{
-              display: "inline-flex", alignItems: "center", gap: 10,
-              padding: "14px 28px 14px 18px",
+              display: "inline-flex", alignItems: "center", gap: 8,
+              padding: "10px 18px",
               background: "#0a2540", color: "#fff",
-              borderRadius: 12, fontSize: "0.85rem", fontWeight: 600,
+              borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
               textDecoration: "none",
               position: "relative",
-              border: "1.5px solid rgba(99,91,255,0.15)",
             }}
           >
-            <span className="new-badge" style={{ position: "absolute", top: -8, right: -8 }}>New</span>
+            <span className="new-badge" style={{ position: "absolute", top: -7, right: -6 }}>New</span>
             <PlayIcon />
             <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
               <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
@@ -176,11 +173,9 @@ export default function RegisterPage() {
       <div style={{ textAlign: "center", marginBottom: "2rem" }}>
         <div style={{
           width: 52, height: 52, borderRadius: 14,
-          background: "linear-gradient(145deg, #7c74ff 0%, #635bff 50%, #5144e8 100%)", color: "#fff",
+          background: "var(--primary)", color: "#fff",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 24, fontWeight: 700, margin: "0 auto 1rem",
-          boxShadow: "0 6px 18px rgba(99,91,255,0.3), inset 0 1px 2px rgba(255,255,255,0.25)",
-          textShadow: "0 2px 4px rgba(0,0,0,0.15)",
         }}>3</div>
         <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 4 }}>
           Create account

@@ -137,9 +137,8 @@ export default function GoalsScreen() {
   const scrollHoursRef = useRef<ScrollView>(null);
   const scrollMinutesRef = useRef<ScrollView>(null);
 
-  // Step 5 — Intensity + Focus Days
+  // Step 5 — Intensity
   const [goalIntensityLevel, setGoalIntensityLevel] = useState<1 | 2 | 3 | null>(null);
-  const [goalFocusDays, setGoalFocusDays] = useState<string[]>([]);
 
   // Step 6 — Building
   const [buildError, setBuildError] = useState("");
@@ -225,7 +224,6 @@ export default function GoalsScreen() {
     setTimeMinutes(null);
     setShowCustomTime(false);
     setGoalIntensityLevel(null);
-    setGoalFocusDays([]);
     setBuildError("");
     setBuiltTasks([]);
     setCoachNote("");
@@ -257,11 +255,6 @@ export default function GoalsScreen() {
     setTimeMinutes(goal.dailyTimeMinutes);
     setShowCustomTime(false);
     setGoalIntensityLevel(goal.intensityLevel as 1 | 2 | 3 | null);
-    try {
-      setGoalFocusDays(goal.focusDays ? JSON.parse(goal.focusDays) : []);
-    } catch {
-      setGoalFocusDays([]);
-    }
     advanceAddStep(1);
   }
 
@@ -470,7 +463,6 @@ export default function GoalsScreen() {
           deadline: deadline ?? null,
           dailyTimeMinutes: timeMinutes ?? undefined,
           intensityLevel: goalIntensityLevel ?? undefined,
-          focusDays: goalFocusDays.length > 0 ? goalFocusDays : null,
         });
         setGoals((prev) => prev.map((g) => g.id === editingGoalId ? goalResult.goal : g));
         goalId = editingGoalId;
@@ -482,7 +474,6 @@ export default function GoalsScreen() {
           deadline,
           dailyTimeMinutes: timeMinutes ?? undefined,
           intensityLevel: goalIntensityLevel ?? undefined,
-          focusDays: goalFocusDays.length > 0 ? goalFocusDays : undefined,
         });
         setGoals((prev) => [goalResult.goal, ...prev]);
         goalId = goalResult.goal.id;
@@ -603,13 +594,74 @@ export default function GoalsScreen() {
   function renderAddStep1() {
     return (
       <View style={{ flex: 1 }}>
-        <GoalTemplates
-          onSelect={handleCategorySelect}
-          onClose={closeAddFlow}
-          onOther={() => {
-            startAiChatWithMessage("Help me define my goal.");
-          }}
-        />
+        <ScrollView
+          contentContainerStyle={styles.stepScroll}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <Text style={styles.stepTitle}>What are you working toward?</Text>
+          <Text style={styles.stepSubtitle}>
+            Describe your goal and where you're at. More context means a better plan from Threely Intelligence.
+          </Text>
+
+          <TextInput
+            style={[styles.goalInput, parsing && styles.goalInputDisabled]}
+            placeholder="e.g. I want to grow my YouTube channel to 10k subscribers starting from 200"
+            placeholderTextColor={colors.textTertiary}
+            value={rawGoalInput}
+            onChangeText={setRawGoalInput}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+            editable={!parsing}
+            autoFocus
+          />
+
+          {/* Or divider + template / AI Plan — below text input so keyboard doesn't block */}
+          <View style={styles.orDivider}>
+            <View style={styles.orLine} />
+            <Text style={styles.orText}>or</Text>
+            <View style={styles.orLine} />
+          </View>
+
+          <TouchableOpacity
+            style={styles.aiPlanBtn}
+            onPress={() => setShowTemplates(true)}
+            activeOpacity={0.75}
+            disabled={parsing}
+          >
+            <Text style={styles.aiPlanIcon}>✦</Text>
+            <Text style={styles.aiPlanText}>AI Plan — let Threely guide you</Text>
+          </TouchableOpacity>
+
+          {parseError ? <Text style={styles.errorText}>{parseError}</Text> : null}
+          {parsedGoal?.needs_more_context && parsedGoal.recommendations && addStep === 1 ? (
+            <View style={styles.hintCard}>
+              <Text style={styles.hintCardTitle}>Things that would strengthen your plan</Text>
+              <Text style={styles.hintCardBody}>{parsedGoal.recommendations}</Text>
+            </View>
+          ) : null}
+        </ScrollView>
+
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={[styles.continueBtn, (!rawGoalInput.trim() || parsing) && styles.continueBtnDisabled]}
+            onPress={handleParseGoal}
+            activeOpacity={rawGoalInput.trim() && !parsing ? 0.85 : 1}
+            disabled={parsing}
+          >
+            {parsing ? (
+              <>
+                <ActivityIndicator color="#fff" size="small" />
+                <Text style={styles.continueBtnText}>Analyzing your goal…</Text>
+              </>
+            ) : (
+              <Text style={[styles.continueBtnText, !rawGoalInput.trim() && styles.continueBtnTextDisabled]}>
+                Analyze my goal →
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
     );
   }
@@ -966,37 +1018,6 @@ export default function GoalsScreen() {
               );
             })}
           </View>
-
-          {/* Focus days picker */}
-          <Text style={[styles.stepTitle, { fontSize: typography.lg, marginTop: spacing.xl }]}>
-            Which days do you want to work on this?
-          </Text>
-          <Text style={styles.stepSubtitle}>
-            Leave empty for every day, or pick specific days.
-          </Text>
-          <View style={styles.focusDaysRow}>
-            {(["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"] as const).map((day) => {
-              const isActive = goalFocusDays.includes(day);
-              const label = day.charAt(0).toUpperCase() + day.slice(1, 3);
-              return (
-                <TouchableOpacity
-                  key={day}
-                  style={[styles.focusDayChip, isActive && styles.focusDayChipActive]}
-                  onPress={() => {
-                    if (Platform.OS !== "web") Haptics.selectionAsync();
-                    setGoalFocusDays((prev) =>
-                      isActive ? prev.filter((d) => d !== day) : [...prev, day]
-                    );
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={[styles.focusDayText, isActive && styles.focusDayTextActive]}>
-                    {label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
         </ScrollView>
 
         <View style={styles.footer}>
@@ -1118,6 +1139,25 @@ export default function GoalsScreen() {
         {addStep === 5 && renderAddStep5()}
         {addStep === 6 && renderAddStep6()}
 
+        {/* ── Goal Templates Modal ── */}
+        <Modal
+          visible={showTemplates}
+          animationType="slide"
+          presentationStyle="pageSheet"
+          onRequestClose={() => setShowTemplates(false)}
+        >
+          <SafeAreaView style={[styles.chatModal, { padding: spacing.lg }]}>
+            <GoalTemplates
+              onSelect={handleCategorySelect}
+              onClose={() => setShowTemplates(false)}
+              onOther={() => {
+                setShowTemplates(false);
+                startAiChatWithMessage("Help me define my goal.");
+              }}
+            />
+          </SafeAreaView>
+        </Modal>
+
         {/* ── AI Plan Chat Modal ── */}
         <Modal
           visible={showAiChat}
@@ -1200,6 +1240,7 @@ export default function GoalsScreen() {
                               </TouchableOpacity>
                             ))}
                           </View>
+                          <Text style={{ fontSize: typography.sm, color: colors.textTertiary, textAlign: "center", marginTop: spacing.sm }}>or type your own below</Text>
                         </>
                       )}
                     </View>
@@ -1236,7 +1277,7 @@ export default function GoalsScreen() {
                   <View style={styles.chatInputRow}>
                     <TextInput
                       style={[styles.chatInput, !chatDone && chatHistory.length > 0 && (chatHistory[chatHistory.length - 1] as { options?: string[] }).options?.length ? { borderColor: colors.primary + "55" } : undefined]}
-                      placeholder="Type your answer here..."
+                      placeholder="Type your own answer…"
                       placeholderTextColor={colors.textTertiary}
                       value={customInput}
                       onChangeText={setCustomInput}
@@ -1728,36 +1769,6 @@ function createStyles(c: Colors) {
       fontWeight: typography.bold,
     },
 
-    // ── Focus days ──────────────────────────────────────────────────────────────
-    focusDaysRow: {
-      flexDirection: "row",
-      gap: spacing.xs,
-      marginTop: spacing.sm,
-      flexWrap: "wrap",
-    },
-    focusDayChip: {
-      width: 44,
-      height: 44,
-      borderRadius: radius.full,
-      borderWidth: 1.5,
-      borderColor: c.border,
-      backgroundColor: c.card,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    focusDayChipActive: {
-      borderColor: c.primary,
-      backgroundColor: c.primaryLight,
-    },
-    focusDayText: {
-      fontSize: typography.sm,
-      fontWeight: typography.semibold,
-      color: c.textSecondary,
-    },
-    focusDayTextActive: {
-      color: c.primary,
-    },
-
     // ── Build step ──────────────────────────────────────────────────────────────
     buildingCenter: { flex: 1, alignItems: "center", justifyContent: "center", paddingHorizontal: spacing.xl },
     buildIcon: { fontSize: 40, color: c.primary, marginBottom: spacing.md },
@@ -1906,7 +1917,7 @@ function createStyles(c: Colors) {
       paddingVertical: spacing.md,
       borderTopWidth: 1,
       borderTopColor: c.border,
-      backgroundColor: c.bg,
+      backgroundColor: c.card,
     },
     chatInputRow: {
       flexDirection: "row",
@@ -1914,20 +1925,20 @@ function createStyles(c: Colors) {
     },
     chatInput: {
       flex: 1,
-      height: 48,
-      backgroundColor: c.card,
-      borderWidth: 1.5,
-      borderColor: `rgba(99,91,255,0.3)`,
-      borderRadius: radius.lg,
+      height: 44,
+      backgroundColor: c.bg,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderRadius: radius.md,
       paddingHorizontal: spacing.md,
       fontSize: typography.base,
       color: c.text,
     },
     chatSendBtn: {
-      height: 48,
+      height: 44,
       paddingHorizontal: spacing.md,
       backgroundColor: c.primary,
-      borderRadius: radius.lg,
+      borderRadius: radius.md,
       alignItems: "center",
       justifyContent: "center",
     },

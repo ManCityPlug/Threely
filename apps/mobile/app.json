@@ -10,15 +10,14 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#635BFF"
+      "backgroundColor": "#f6f9fc"
     },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.threely.app",
       "appleTeamId": "Y3U56GWWBJ",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false,
-        "NSCameraUsageDescription": "Threely needs access to your camera to update your profile photo."
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {

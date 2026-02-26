@@ -55,11 +55,9 @@ export default function LoginPage() {
       <div style={{ textAlign: "center", marginBottom: "2rem" }}>
         <div style={{
           width: 52, height: 52, borderRadius: 14,
-          background: "linear-gradient(145deg, #7c74ff 0%, #635bff 50%, #5144e8 100%)", color: "#fff",
+          background: "var(--primary)", color: "#fff",
           display: "flex", alignItems: "center", justifyContent: "center",
           fontSize: 24, fontWeight: 700, margin: "0 auto 1rem",
-          boxShadow: "0 6px 18px rgba(99,91,255,0.3), inset 0 1px 2px rgba(255,255,255,0.25)",
-          textShadow: "0 2px 4px rgba(0,0,0,0.15)",
         }}>3</div>
         <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 4 }}>
           Welcome back

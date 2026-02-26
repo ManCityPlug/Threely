@@ -28,7 +28,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await request.json();
-  const { title, description, isActive, isPaused, rawInput, structuredSummary, category, deadline, dailyTimeMinutes, intensityLevel, focusDays } = body as {
+  const { title, description, isActive, isPaused, rawInput, structuredSummary, category, deadline, dailyTimeMinutes, intensityLevel } = body as {
     title?: string;
     description?: string;
     isActive?: boolean;
@@ -39,7 +39,6 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     deadline?: string | null;
     dailyTimeMinutes?: number | null;
     intensityLevel?: number | null;
-    focusDays?: string[] | null;
   };
 
   const goal = await prisma.goal.update({
@@ -55,7 +54,6 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       ...(deadline !== undefined && { deadline: deadline ? new Date(deadline) : null }),
       ...(dailyTimeMinutes !== undefined && { dailyTimeMinutes }),
       ...(intensityLevel !== undefined && { intensityLevel }),
-      ...(focusDays !== undefined && { focusDays: focusDays ? JSON.stringify(focusDays) : null }),
     },
   });
 

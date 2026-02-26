@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import {
   tasksApi, goalsApi, reviewsApi, insightsApi, statsApi,
@@ -60,15 +60,66 @@ const DIFFICULTY_OPTIONS = [
 // ─── Task Card ────────────────────────────────────────────────────────────────
 
 function TaskCard({
-  task, onToggle, onSkip, onReschedule, readonly = false, overdue = false,
+  task, onToggle, onSkip, onReschedule, onEdit, onRefine, readonly = false, overdue = false,
 }: {
   task: TaskItem;
   onToggle?: (id: string, done: boolean) => void;
   onSkip?: (id: string) => void;
   onReschedule?: (id: string) => void;
+  onEdit?: (id: string, data: { task?: string; description?: string }) => void;
+  onRefine?: (id: string, userRequest: string) => void;
   readonly?: boolean;
   overdue?: boolean;
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [refineMode, setRefineMode] = useState(false);
+  const [editName, setEditName] = useState(task.task);
+  const [editDesc, setEditDesc] = useState(task.description);
+  const [refineInput, setRefineInput] = useState("");
+  const [refining, setRefining] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!menuOpen) return;
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [menuOpen]);
+
+  function handleStartEdit() {
+    setMenuOpen(false);
+    setEditName(task.task);
+    setEditDesc(task.description);
+    setEditMode(true);
+  }
+
+  function handleSaveEdit() {
+    onEdit?.(task.id, { task: editName, description: editDesc });
+    setEditMode(false);
+  }
+
+  function handleStartRefine() {
+    setMenuOpen(false);
+    setRefineInput("");
+    setRefineMode(true);
+  }
+
+  async function handleSubmitRefine() {
+    if (!refineInput.trim()) return;
+    setRefining(true);
+    onRefine?.(task.id, refineInput.trim());
+    setRefining(false);
+    setRefineMode(false);
+  }
+
+  const showMenu = !readonly && !task.isCompleted && !task.isSkipped;
+
   return (
     <div
       className="card"
@@ -92,63 +143,141 @@ function TaskCard({
         </button>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{
-          fontWeight: 600,
-          fontSize: "0.95rem",
-          color: task.isCompleted ? "var(--muted)" : "var(--text)",
-          textDecoration: task.isCompleted ? "line-through" : "none",
-          marginBottom: 4,
-        }}>
-          {task.task}
-        </div>
-        <div style={{ fontSize: "0.85rem", color: "var(--subtext)", marginBottom: 6, lineHeight: 1.5 }}>
-          {task.description}
-        </div>
-        <div style={{ fontSize: "0.8rem", color: "var(--primary)", fontStyle: "italic", marginBottom: 6 }}>
-          {task.why}
-        </div>
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: 4,
-          fontSize: "0.75rem", color: "var(--muted)",
-          background: "var(--bg)", borderRadius: 20,
-          padding: "2px 8px",
-        }}>
-          {"⏱"} {task.estimated_minutes} min
-        </div>
+        {editMode ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <input
+              className="field-input"
+              value={editName}
+              onChange={e => setEditName(e.target.value)}
+              placeholder="Task name"
+              style={{ fontSize: "0.9rem", padding: "6px 10px" }}
+            />
+            <input
+              className="field-input"
+              value={editDesc}
+              onChange={e => setEditDesc(e.target.value)}
+              placeholder="Description"
+              style={{ fontSize: "0.85rem", padding: "6px 10px" }}
+            />
+            <div style={{ display: "flex", gap: 6 }}>
+              <button className="btn btn-primary" onClick={handleSaveEdit} style={{ fontSize: "0.8rem", padding: "4px 12px" }}>
+                Save
+              </button>
+              <button className="btn btn-outline" onClick={() => setEditMode(false)} style={{ fontSize: "0.8rem", padding: "4px 12px" }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : refineMode ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <p style={{ fontSize: "0.8rem", color: "var(--subtext)", margin: 0 }}>
+              Tell AI how to adjust this task:
+            </p>
+            <input
+              className="field-input"
+              value={refineInput}
+              onChange={e => setRefineInput(e.target.value)}
+              placeholder="e.g. make it shorter, focus on X..."
+              onKeyDown={e => e.key === "Enter" && handleSubmitRefine()}
+              style={{ fontSize: "0.85rem", padding: "6px 10px" }}
+              autoFocus
+            />
+            <div style={{ display: "flex", gap: 6 }}>
+              <button
+                className="btn btn-primary"
+                onClick={handleSubmitRefine}
+                disabled={refining || !refineInput.trim()}
+                style={{ fontSize: "0.8rem", padding: "4px 12px" }}
+              >
+                {refining ? <><span className="spinner" style={{ width: 14, height: 14 }} /> Refining...</> : "Refine"}
+              </button>
+              <button className="btn btn-outline" onClick={() => setRefineMode(false)} style={{ fontSize: "0.8rem", padding: "4px 12px" }}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div style={{
+              fontWeight: 600,
+              fontSize: "0.95rem",
+              color: task.isCompleted ? "var(--muted)" : "var(--text)",
+              textDecoration: task.isCompleted ? "line-through" : "none",
+              marginBottom: 4,
+            }}>
+              {task.task}
+            </div>
+            <div style={{ fontSize: "0.85rem", color: "var(--subtext)", marginBottom: 6, lineHeight: 1.5 }}>
+              {task.description}
+            </div>
+            <div style={{ fontSize: "0.8rem", color: "var(--primary)", fontStyle: "italic", marginBottom: 6 }}>
+              {task.why}
+            </div>
+            <div style={{
+              display: "inline-flex", alignItems: "center", gap: 4,
+              fontSize: "0.75rem", color: "var(--muted)",
+              background: "var(--bg)", borderRadius: 20,
+              padding: "2px 8px",
+            }}>
+              {"⏱"} {task.estimated_minutes} min
+            </div>
+          </>
+        )}
       </div>
-      {overdue && !task.isCompleted && !task.isSkipped && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 4, flexShrink: 0, marginTop: 2 }}>
-          {onReschedule && (
-            <button
-              onClick={() => onReschedule(task.id)}
-              title="Move to tomorrow"
-              style={{
-                fontSize: "0.7rem", fontWeight: 600,
-                color: "var(--primary)", background: "var(--primary-light)",
-                border: "none", borderRadius: 20, padding: "3px 8px",
-                cursor: "pointer", whiteSpace: "nowrap",
-              }}
-            >
-              {"\u2192"} Tomorrow
-            </button>
-          )}
-          {onSkip && (
-            <button
-              onClick={() => onSkip(task.id)}
-              title="Dismiss"
-              style={{
-                fontSize: "1.1rem", color: "var(--muted)", padding: "2px 6px",
-                lineHeight: 1, borderRadius: 4,
-              }}
-            >
-              {"\u2715"}
-            </button>
+      {showMenu && (
+        <div ref={menuRef} style={{ position: "relative", flexShrink: 0 }}>
+          <button
+            onClick={() => setMenuOpen(o => !o)}
+            style={{
+              fontSize: "1.25rem", lineHeight: 1, padding: "2px 6px",
+              color: "var(--muted)", cursor: "pointer",
+              borderRadius: 4, border: "none", background: "transparent",
+            }}
+          >
+            {"\u22EF"}
+          </button>
+          {menuOpen && (
+            <div style={{
+              position: "absolute", right: 0, top: "100%", zIndex: 50,
+              background: "var(--card)", border: "1px solid var(--border)",
+              borderRadius: "var(--radius)", boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+              minWidth: 180, overflow: "hidden",
+            }}>
+              {onEdit && (
+                <button onClick={handleStartEdit} style={menuItemStyle}>
+                  Edit task
+                </button>
+              )}
+              {onRefine && (
+                <button onClick={handleStartRefine} style={menuItemStyle}>
+                  Ask AI to refine
+                </button>
+              )}
+              {onReschedule && (
+                <button onClick={() => { setMenuOpen(false); onReschedule(task.id); }} style={menuItemStyle}>
+                  Move to tomorrow
+                </button>
+              )}
+              {onSkip && (
+                <button onClick={() => { setMenuOpen(false); onSkip(task.id); }} style={{ ...menuItemStyle, color: "var(--danger)" }}>
+                  Remove task
+                </button>
+              )}
+            </div>
           )}
         </div>
       )}
     </div>
   );
 }
+
+const menuItemStyle: React.CSSProperties = {
+  display: "block", width: "100%", padding: "10px 14px",
+  fontSize: "0.85rem", fontWeight: 500, textAlign: "left",
+  color: "var(--text)", background: "transparent",
+  border: "none", cursor: "pointer",
+  borderBottom: "1px solid var(--border)",
+};
 
 // ─── Review Modal (simplified: 2 steps) ──────────────────────────────────────
 
@@ -264,7 +393,7 @@ export default function DashboardPage() {
   const [overdueTasks, setOverdueTasks] = useState<DailyTask[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [goalStats, setGoalStats] = useState<GoalStat[]>([]);
-  const [selectedGoalId, setSelectedGoalId] = useState<"all" | string>("all");
+  const [selectedGoalId, setSelectedGoalId] = useState<"all" | string | null>(null);
   const [goalPickerOpen, setGoalPickerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -294,7 +423,12 @@ export default function DashboardPage() {
       const saved = sessionStorage.getItem(todayKey);
       if (saved) {
         setSelectedGoalId(saved as "all" | string);
+      } else if (goalsRes.goals.length === 1) {
+        const onlyGoalId = goalsRes.goals[0].id;
+        setSelectedGoalId(onlyGoalId);
+        sessionStorage.setItem(todayKey, onlyGoalId);
       } else if (goalsRes.goals.length > 1 && tasksRes.dailyTasks.length > 0) {
+        setSelectedGoalId(null);
         setGoalPickerOpen(true);
       }
 
@@ -329,6 +463,7 @@ export default function DashboardPage() {
   // ── Derived data ─────────────────────────────────────────────────────────────
 
   const displayedTasks = (() => {
+    if (selectedGoalId === null) return [];
     if (selectedGoalId === "all") {
       const result: { dt: DailyTask; task: TaskItem }[] = [];
       let round = 0;
@@ -354,6 +489,7 @@ export default function DashboardPage() {
 
   // Overdue tasks for current goal
   const displayedOverdue = (() => {
+    if (selectedGoalId === null) return [];
     const tasks: { dt: DailyTask; task: TaskItem }[] = [];
     const relevantOverdue = selectedGoalId === "all"
       ? overdueTasks
@@ -390,8 +526,7 @@ export default function DashboardPage() {
   function pickGoal(val: "all" | string) {
     setSelectedGoalId(val);
     setGoalPickerOpen(false);
-    const todayKey = `threely_focus_${new Date().toISOString().slice(0, 10)}`;
-    sessionStorage.setItem(todayKey, val);
+    sessionStorage.setItem(`threely_focus_${new Date().toISOString().slice(0, 10)}`, val);
   }
 
   function dismissOverdueBanner() {
@@ -428,6 +563,7 @@ export default function DashboardPage() {
       // Check if all displayed tasks are now complete to trigger confetti
       if (isCompleted) {
         const currentDisplayed = (() => {
+          if (selectedGoalId === null) return [];
           if (selectedGoalId === "all") {
             const result: TaskItem[] = [];
             let round = 0;
@@ -483,6 +619,60 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleEditTask(dailyTaskId: string, taskItemId: string, editData: { task?: string; description?: string }) {
+    try {
+      const res = await tasksApi.editItem(dailyTaskId, taskItemId, editData);
+      setDailyTasks(prev =>
+        prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt)
+      );
+      setOverdueTasks(prev =>
+        prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt)
+      );
+      showToast("Task updated", "success");
+    } catch {
+      showToast("Failed to edit task", "error");
+    }
+  }
+
+  async function handleRefineTask(dailyTaskId: string, taskItemId: string, userRequest: string) {
+    try {
+      const res = await tasksApi.refineItem(dailyTaskId, taskItemId, userRequest);
+      setDailyTasks(prev =>
+        prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt)
+      );
+      setOverdueTasks(prev =>
+        prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt)
+      );
+      showToast("Task refined by AI", "success");
+    } catch {
+      showToast("Failed to refine task", "error");
+    }
+  }
+
+  async function handleSkipToday(dailyTaskId: string, taskItemId: string) {
+    try {
+      const res = await tasksApi.skip(dailyTaskId, taskItemId);
+      setDailyTasks(prev =>
+        prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt)
+      );
+      showToast("Task removed", "success");
+    } catch {
+      showToast("Failed to remove task", "error");
+    }
+  }
+
+  async function handleRescheduleToday(dailyTaskId: string, taskItemId: string) {
+    try {
+      const res = await tasksApi.reschedule(dailyTaskId, taskItemId);
+      setDailyTasks(prev =>
+        prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt)
+      );
+      showToast("Task moved to tomorrow", "success");
+    } catch {
+      showToast("Failed to reschedule task", "error");
+    }
+  }
+
   async function handleCompleteAll() {
     const incomplete = displayedTasks.filter(x => !x.task.isCompleted && !x.task.isSkipped);
     if (incomplete.length < 2) return;
@@ -521,7 +711,7 @@ export default function DashboardPage() {
 
     setGenerating(true);
     try {
-      const goalId = selectedGoalId !== "all" ? selectedGoalId : undefined;
+      const goalId = selectedGoalId && selectedGoalId !== "all" ? selectedGoalId : undefined;
       const res = await tasksApi.generate({ postReview: true, goalId });
       setDailyTasks(res.dailyTasks);
 
@@ -545,8 +735,8 @@ export default function DashboardPage() {
           <div className="skeleton" style={{ width: 220, height: 28, borderRadius: "var(--radius-sm)" }} />
         </div>
         <div style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+          display: "flex",
+          flexDirection: "column",
           gap: "0.875rem",
         }}>
           <SkeletonCard />
@@ -643,7 +833,7 @@ export default function DashboardPage() {
       )}
 
       {/* Has goals but no tasks yet */}
-      {goals.length > 0 && displayedTasks.length === 0 && displayedOverdue.length === 0 && (
+      {goals.length > 0 && selectedGoalId !== null && displayedTasks.length === 0 && displayedOverdue.length === 0 && (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
           <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"✨"}</div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
@@ -663,14 +853,14 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {goals.length > 0 && (displayedTasks.length > 0 || displayedOverdue.length > 0) && (
+      {goals.length > 0 && dailyTasks.length > 0 && (selectedGoalId !== null || goalPickerOpen) && (
         <>
           {/* Goal selector + progress */}
           <div className="card" style={{ padding: "1.25rem", marginBottom: "1.25rem" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem", marginBottom: "0.875rem" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>
-                  {selectedGoalId === "all" ? "Mix all goals" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
+                  {selectedGoalId === null ? "Select a goal" : selectedGoalId === "all" ? "Mix all goals" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
                 </span>
                 <button
                   onClick={() => setGoalPickerOpen(true)}
@@ -730,7 +920,7 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Overdue tasks section */}
+          {/* Overdue tasks section (paginated, 3 at a time) */}
           {displayedOverdue.length > 0 && (
             <div style={{ marginBottom: "1.25rem" }}>
               <div style={{
@@ -752,11 +942,11 @@ export default function DashboardPage() {
                 </span>
               </div>
               <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+                display: "flex",
+                flexDirection: "column",
                 gap: "0.875rem",
               }}>
-                {displayedOverdue.map(({ dt, task }, i) => (
+                {displayedOverdue.slice(0, 3).map(({ dt, task }, i) => (
                   <div key={task.id} className="slide-up" style={{ animationDelay: `${i * 0.08}s` }}>
                     <TaskCard
                       task={task}
@@ -770,17 +960,28 @@ export default function DashboardPage() {
                       onReschedule={(taskItemId) =>
                         handleReschedule(dt.id, taskItemId)
                       }
+                      onEdit={(taskItemId, data) =>
+                        handleEditTask(dt.id, taskItemId, data)
+                      }
+                      onRefine={(taskItemId, userRequest) =>
+                        handleRefineTask(dt.id, taskItemId, userRequest)
+                      }
                     />
                   </div>
                 ))}
               </div>
+              {displayedOverdue.length > 3 && (
+                <p style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 8, textAlign: "center" }}>
+                  +{displayedOverdue.length - 3} more overdue &mdash; handle these to see the rest
+                </p>
+              )}
             </div>
           )}
 
           {/* Today's tasks */}
           <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+            display: "flex",
+            flexDirection: "column",
             gap: "0.875rem",
             marginBottom: "1.25rem",
           }}>
@@ -790,6 +991,18 @@ export default function DashboardPage() {
                   task={task}
                   onToggle={(taskItemId, isCompleted) =>
                     handleToggle(dt.id, taskItemId, isCompleted)
+                  }
+                  onSkip={(taskItemId) =>
+                    handleSkipToday(dt.id, taskItemId)
+                  }
+                  onReschedule={(taskItemId) =>
+                    handleRescheduleToday(dt.id, taskItemId)
+                  }
+                  onEdit={(taskItemId, data) =>
+                    handleEditTask(dt.id, taskItemId, data)
+                  }
+                  onRefine={(taskItemId, userRequest) =>
+                    handleRefineTask(dt.id, taskItemId, userRequest)
                   }
                 />
               </div>

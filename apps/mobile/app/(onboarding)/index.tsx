@@ -21,8 +21,6 @@ import * as Haptics from "expo-haptics";
 import { goalsApi, profileApi, tasksApi, type TaskItem, type ParsedGoal, type GoalChatMessage, type GoalChatResult } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { colors, spacing, typography, radius, shadow } from "@/constants/theme";
-import { GoalTemplates } from "@/components/GoalTemplates";
-import { type GoalCategory } from "@/constants/goal-templates";
 
 const TOTAL_STEPS = 5; // name, goal, deadline, time, intensity
 
@@ -231,10 +229,6 @@ export default function OnboardingScreen() {
 
   async function startAiChat() {
     startAiChatWithMessage("Help me define my goal.");
-  }
-
-  function handleCategorySelect(category: GoalCategory) {
-    startAiChatWithMessage(category.starterMessage);
   }
 
   async function startAiChatWithMessage(initialMessage: string) {
@@ -490,13 +484,155 @@ export default function OnboardingScreen() {
   function renderStep2() {
     return (
       <View style={{ flex: 1 }}>
-        <GoalTemplates
-          onSelect={handleCategorySelect}
-          onClose={() => advanceStep(1)}
-          onOther={() => {
-            startAiChatWithMessage("Help me define my goal.");
-          }}
-        />
+        <ScrollView
+          contentContainerStyle={styles.stepScroll}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.stepTitle}>What are you working toward?</Text>
+          <Text style={styles.stepSubtitle}>
+            Describe your goal and where you're at. More context means a better plan from Threely Intelligence.
+          </Text>
+
+          {!showConfirmation ? (
+            <>
+              <TextInput
+                style={[styles.goalInput, parsing && styles.goalInputDisabled]}
+                placeholder={
+                  "e.g. I want to launch my freelance design business and land my first 3 clients"
+                }
+                placeholderTextColor={colors.textTertiary}
+                value={rawGoalInput}
+                onChangeText={setRawGoalInput}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+                editable={!parsing}
+              />
+
+              {parseError ? (
+                <Text style={styles.errorText}>{parseError}</Text>
+              ) : null}
+
+              {parsedGoal?.needs_more_context && parsedGoal.recommendations ? (
+                <View style={styles.hintCard}>
+                  <Text style={styles.hintCardTitle}>Things that would strengthen your plan</Text>
+                  <Text style={styles.hintCardBody}>{parsedGoal.recommendations}</Text>
+                </View>
+              ) : null}
+            </>
+          ) : (
+            <View style={styles.confirmCard}>
+              <View style={styles.confirmHeader}>
+                <Text style={styles.confirmIcon}>✦</Text>
+                <Text style={styles.confirmTitle}>Threely Intelligence read your goal</Text>
+              </View>
+
+              {parsedGoal?.category ? (
+                <View style={styles.categoryChip}>
+                  <Text style={styles.categoryText}>{parsedGoal.category}</Text>
+                </View>
+              ) : null}
+
+              <Text style={styles.confirmSummary}>{parsedGoal?.structured_summary}</Text>
+
+              {parsedGoal?.deadline_detected ? (
+                <Text style={styles.confirmDeadline}>
+                  📅 Deadline: {new Date(parsedGoal.deadline_detected + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+                </Text>
+              ) : null}
+
+              {parsedGoal?.needs_more_context && parsedGoal.recommendations ? (
+                <View style={styles.warningCard}>
+                  <Text style={styles.warningTitle}>⚠ Your plan could be more personalized</Text>
+                  <Text style={styles.warningBody}>{parsedGoal.recommendations}</Text>
+                </View>
+              ) : null}
+
+            </View>
+          )}
+        </ScrollView>
+
+        <View style={styles.footer}>
+          {!showConfirmation ? (
+            <>
+              <TouchableOpacity
+                style={[
+                  styles.continueBtn,
+                  (!rawGoalInput.trim() || parsing) && styles.continueBtnDisabled,
+                ]}
+                onPress={handleParseGoal}
+                activeOpacity={rawGoalInput.trim() && !parsing ? 0.85 : 1}
+                disabled={parsing}
+              >
+                {parsing ? (
+                  <>
+                    <ActivityIndicator color={colors.primaryText} size="small" />
+                    <Text style={styles.continueBtnText}>Analyzing your goal…</Text>
+                  </>
+                ) : (
+                  <Text
+                    style={[
+                      styles.continueBtnText,
+                      !rawGoalInput.trim() && styles.continueBtnTextDisabled,
+                    ]}
+                  >
+                    Analyze my goal →
+                  </Text>
+                )}
+              </TouchableOpacity>
+
+              {/* Or divider */}
+              <View style={styles.orDivider}>
+                <View style={styles.orLine} />
+                <Text style={styles.orText}>or</Text>
+                <View style={styles.orLine} />
+              </View>
+
+              {/* AI Plan button */}
+              <TouchableOpacity
+                style={styles.aiPlanBtn}
+                onPress={startAiChat}
+                activeOpacity={0.75}
+                disabled={parsing}
+              >
+                <Text style={styles.aiPlanIcon}>✦</Text>
+                <Text style={styles.aiPlanText}>AI Plan — let Threely guide you</Text>
+              </TouchableOpacity>
+            </>
+          ) : parsedGoal?.needs_more_context ? (
+            <View style={styles.footerStack}>
+              <TouchableOpacity
+                style={styles.continueBtn}
+                onPress={handleAddMoreDetail}
+                activeOpacity={0.85}
+              >
+                <Text style={styles.continueBtnText}>Add more detail →</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.continueBtn, { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.primary + "40" }]}
+                onPress={() => startAiChatWithMessage(rawGoalInput.trim())}
+                activeOpacity={0.85}
+              >
+                <Text style={[styles.continueBtnText, { color: colors.primary }]}>✦ Use AI instead</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.skipWarningBtn}
+                onPress={() => advanceStep(3)}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.skipWarningText}>Continue anyway</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.continueBtn}
+              onPress={() => advanceStep(3)}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.continueBtnText}>Looks good →</Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     );
   }
@@ -1037,6 +1173,7 @@ export default function OnboardingScreen() {
                             </TouchableOpacity>
                           ))}
                         </View>
+                        <Text style={{ fontSize: typography.sm, color: colors.textTertiary, textAlign: "center", marginTop: spacing.sm }}>or type your own below</Text>
                       </>
                     )}
                   </View>
@@ -1069,7 +1206,7 @@ export default function OnboardingScreen() {
                 <View style={styles.chatInputRow}>
                   <TextInput
                     style={styles.chatInput}
-                    placeholder="Type your answer here..."
+                    placeholder="Type your own answer…"
                     placeholderTextColor={colors.textTertiary}
                     value={customInput}
                     onChangeText={setCustomInput}
@@ -1734,7 +1871,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderTopWidth: 1,
     borderTopColor: colors.border,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.card,
   },
   chatInputRow: {
     flexDirection: "row",
@@ -1742,20 +1879,20 @@ const styles = StyleSheet.create({
   },
   chatInput: {
     flex: 1,
-    height: 48,
-    backgroundColor: colors.card,
-    borderWidth: 1.5,
-    borderColor: `rgba(99,91,255,0.3)`,
-    borderRadius: radius.lg,
+    height: 44,
+    backgroundColor: colors.bg,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     fontSize: typography.base,
     color: colors.text,
   },
   chatSendBtn: {
-    height: 48,
+    height: 44,
     paddingHorizontal: spacing.md,
     backgroundColor: colors.primary,
-    borderRadius: radius.lg,
+    borderRadius: radius.md,
     alignItems: "center",
     justifyContent: "center",
   },

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -174,51 +174,6 @@ export default function ProfileScreen() {
 
   // Weekly summary
   const [weeklySummaryOpen, setWeeklySummaryOpen] = useState(false);
-  const [weeklyCountdown, setWeeklyCountdown] = useState("");
-  const [weeklyUnlocked, setWeeklyUnlocked] = useState(false);
-
-  // Compute weekly summary countdown
-  useEffect(() => {
-    function update() {
-      const now = new Date();
-      const day = now.getDay(); // 0=Sun
-      // Unlock after Sunday 12:00 PM (noon)
-      if (day === 0 && now.getHours() >= 12) {
-        setWeeklyUnlocked(true);
-        setWeeklyCountdown("");
-        return;
-      }
-      setWeeklyUnlocked(false);
-      // Calculate time until Sunday 12:00 PM
-      const daysUntilSunday = day === 0 ? 7 : 7 - day;
-      const sunday = new Date(now);
-      sunday.setDate(now.getDate() + daysUntilSunday);
-      sunday.setHours(12, 0, 0, 0);
-      const diff = sunday.getTime() - now.getTime();
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      if (days > 0) {
-        setWeeklyCountdown(`${days}d ${hours}h`);
-      } else {
-        setWeeklyCountdown(`${hours}h`);
-      }
-    }
-    update();
-    const interval = setInterval(update, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Deep link from weekly summary notification
-  useFocusEffect(
-    useCallback(() => {
-      AsyncStorage.getItem("@threely_open_weekly_summary").then((val) => {
-        if (val) {
-          AsyncStorage.removeItem("@threely_open_weekly_summary");
-          setWeeklySummaryOpen(true);
-        }
-      });
-    }, [])
-  );
 
   // History
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -388,37 +343,6 @@ export default function ProfileScreen() {
           <Text style={styles.memberSince}>Member since {memberSince}</Text>
         </View>
 
-        {/* Weekly Summary Card */}
-        <TouchableOpacity
-          style={[
-            styles.weeklySummaryCard,
-            !weeklyUnlocked && styles.weeklySummaryCardLocked,
-          ]}
-          onPress={() => {
-            if (weeklyUnlocked) setWeeklySummaryOpen(true);
-          }}
-          activeOpacity={weeklyUnlocked ? 0.75 : 1}
-        >
-          <View style={styles.weeklySummaryIcon}>
-            <Ionicons
-              name={weeklyUnlocked ? "bar-chart" : "lock-closed"}
-              size={20}
-              color={weeklyUnlocked ? colors.primary : colors.textTertiary}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={styles.weeklySummaryTitle}>Weekly Summary</Text>
-            <Text style={styles.weeklySummarySubtitle}>
-              {weeklyUnlocked
-                ? "Tap to view your stats + AI insight"
-                : `Unlocks in ${weeklyCountdown}`}
-            </Text>
-          </View>
-          {weeklyUnlocked && (
-            <Ionicons name="chevron-forward" size={18} color={colors.primary} />
-          )}
-        </TouchableOpacity>
-
         {/* Stats */}
         <Text style={styles.sectionLabel}>Your stats</Text>
         {statsLoading ? (
@@ -492,6 +416,24 @@ export default function ProfileScreen() {
         {/* Settings */}
         <Text style={styles.sectionLabel}>Settings</Text>
         <View style={styles.menuCard}>
+          {/* Weekly Summary */}
+          <TouchableOpacity
+            style={styles.menuRow}
+            onPress={() => setWeeklySummaryOpen(true)}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
+              <Ionicons name="bar-chart-outline" size={18} color={colors.primary} />
+            </View>
+            <View style={styles.menuText}>
+              <Text style={styles.menuLabel}>Weekly summary</Text>
+              <Text style={styles.menuValue}>Stats + AI insight</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
           {/* History */}
           <TouchableOpacity
             style={styles.menuRow}
@@ -532,7 +474,8 @@ export default function ProfileScreen() {
           <TouchableOpacity
             style={styles.menuRow}
             onPress={async () => {
-              await AsyncStorage.setItem("@threely_open_goal_picker", "1");
+              const today = new Date().toISOString().slice(0, 10);
+              await AsyncStorage.removeItem(`@threely_focus_${today}`);
               router.push("/(tabs)" as never);
             }}
             activeOpacity={0.7}
@@ -869,40 +812,6 @@ function createStyles(c: Colors) {
       letterSpacing: 0.8,
       marginBottom: spacing.sm,
       marginTop: spacing.xs,
-    },
-    weeklySummaryCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: spacing.md,
-      backgroundColor: c.primaryLight,
-      borderRadius: radius.lg,
-      borderWidth: 1.5,
-      borderColor: c.primary + "44",
-      padding: spacing.md,
-      marginBottom: spacing.lg,
-      ...shadow.sm,
-    },
-    weeklySummaryCardLocked: {
-      backgroundColor: c.card,
-      borderColor: c.border,
-    },
-    weeklySummaryIcon: {
-      width: 40,
-      height: 40,
-      borderRadius: radius.md,
-      backgroundColor: c.bg,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    weeklySummaryTitle: {
-      fontSize: typography.base,
-      fontWeight: typography.semibold,
-      color: c.text,
-      marginBottom: 2,
-    },
-    weeklySummarySubtitle: {
-      fontSize: typography.sm,
-      color: c.textSecondary,
     },
     statsRow: {
       flexDirection: "row",

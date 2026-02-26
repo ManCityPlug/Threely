@@ -65,24 +65,26 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
   }, [weekDates, dateMap, todayStr]);
 
   const weekCompleted = weekData.reduce((s, d) => s + d.completed, 0);
-  const weekTotal = weekData.reduce((s, d) => s + d.total, 0);
+  const weekDisplayTotal = weekCompleted === 0 ? 3 : Math.ceil(weekCompleted / 3) * 3;
 
-  // Entrance animation for bars — always length 7
-  const barAnims = useRef(Array.from({ length: 7 }, () => new Animated.Value(0))).current;
+  // Entrance animation for bars
+  const barAnims = useRef(weekData.map(() => new Animated.Value(0))).current;
 
   useEffect(() => {
     // Reset
     barAnims.forEach((v) => v.setValue(0));
 
-    const animations = barAnims.map((animVal) =>
-      Animated.timing(animVal, {
+    const animations = barAnims.map((animVal, i) =>
+      Animated.spring(animVal, {
         toValue: 1,
-        duration: 600,
         useNativeDriver: false, // height can't use native driver
+        tension: 60,
+        friction: 10,
+        delay: i * 60,
       })
     );
 
-    Animated.stagger(50, animations).start();
+    Animated.stagger(60, animations).start();
   }, [data]);
 
   return (
@@ -90,7 +92,7 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
       {/* Week summary */}
       <View style={styles.headerRow}>
         <Text style={styles.headerLabel}>This week</Text>
-        <Text style={styles.headerValue}>{weekCompleted}/{weekTotal} tasks</Text>
+        <Text style={styles.headerValue}>{weekCompleted}/{weekDisplayTotal} tasks</Text>
       </View>
 
       {/* Bars */}
@@ -124,7 +126,6 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
 
               {/* Bar */}
               <View style={styles.barTrack}>
-                <View style={[styles.barBg, { backgroundColor: colors.border + "44" }]} />
                 <Animated.View
                   style={[
                     styles.barFill,
@@ -151,6 +152,17 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
         })}
       </View>
 
+      {/* Legend */}
+      <View style={styles.legendRow}>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendDot, { backgroundColor: "rgba(99,91,255,0.4)" }]} />
+          <Text style={styles.legendText}>Partial</Text>
+        </View>
+        <View style={styles.legendItem}>
+          <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
+          <Text style={styles.legendText}>All 3 done</Text>
+        </View>
+      </View>
     </View>
   );
 }
@@ -200,19 +212,10 @@ function createStyles(c: Colors) {
       marginBottom: 4,
     },
     barTrack: {
-      flex: 1,
       width: "100%",
       maxWidth: 36,
       justifyContent: "flex-end",
       alignItems: "stretch",
-    },
-    barBg: {
-      position: "absolute",
-      left: 0,
-      right: 0,
-      top: 0,
-      bottom: 0,
-      borderRadius: 6,
     },
     barFill: {
       borderRadius: 6,
@@ -223,6 +226,27 @@ function createStyles(c: Colors) {
       fontWeight: typography.medium,
       color: c.textTertiary,
       marginTop: spacing.xs,
+    },
+    legendRow: {
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: spacing.md,
+      marginTop: spacing.sm,
+    },
+    legendItem: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    legendDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 2,
+    },
+    legendText: {
+      fontSize: typography.xs - 1,
+      color: c.textTertiary,
     },
   });
 }

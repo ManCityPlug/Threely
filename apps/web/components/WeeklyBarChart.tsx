@@ -57,7 +57,7 @@ export default function WeeklyBarChart({ data }: { data: HeatmapDay[] }) {
 
   // Calculate the week's summary
   const weekCompleted = weekData.reduce((s, d) => s + d.completed, 0);
-  const weekTotal = weekData.reduce((s, d) => s + d.total, 0);
+  const weekDisplayTotal = weekCompleted === 0 ? 3 : Math.ceil(weekCompleted / 3) * 3;
 
   return (
     <div>
@@ -72,7 +72,7 @@ export default function WeeklyBarChart({ data }: { data: HeatmapDay[] }) {
           This week
         </span>
         <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--primary)" }}>
-          {weekCompleted}/{weekTotal} tasks
+          {weekCompleted}/{weekDisplayTotal} tasks
         </span>
       </div>
 
