@@ -184,6 +184,22 @@ export default function MobileAppPrompt() {
               3
             </div>
 
+            {/* Tagline */}
+            <p
+              style={{
+                fontSize: "0.75rem",
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                color: "#635bff",
+                textTransform: "uppercase" as const,
+                textAlign: "center",
+                marginBottom: "0.5rem",
+                animation: "mobilePromptSlideUp 0.5s ease 0.2s both",
+              }}
+            >
+              Do Less. Achieve More.
+            </p>
+
             {/* Heading — slides up */}
             <h1
               style={{
@@ -197,9 +213,9 @@ export default function MobileAppPrompt() {
                 animation: "mobilePromptSlideUp 0.5s ease 0.25s both",
               }}
             >
-              Your AI coach
+              Your goal.
               <br />
-              goes where you go
+              3 AI tasks. Every day.
             </h1>
 
             {/* Subtitle — slides up */}
@@ -213,7 +229,7 @@ export default function MobileAppPrompt() {
                 animation: "mobilePromptSlideUp 0.5s ease 0.35s both",
               }}
             >
-              Get reminded, stay consistent, and hit your goals faster.
+              Tell us what you want to achieve. We create the daily plan.
             </p>
 
             {/* Benefits — staggered slide up */}
@@ -228,19 +244,19 @@ export default function MobileAppPrompt() {
             >
               {[
                 {
-                  icon: "\u{1F514}",
-                  title: "Daily reminders",
-                  desc: "Get nudged when your 3 tasks are ready",
+                  icon: "\u{1F3AF}",
+                  title: "3 specific tasks every morning",
+                  desc: "Real steps, not generic advice",
                 },
                 {
                   icon: "\u2705",
-                  title: "Check off tasks anywhere",
+                  title: "Check them off anywhere",
                   desc: "Complete your daily 3 in seconds",
                 },
                 {
                   icon: "\u{1F9E0}",
-                  title: "AI insights after every session",
-                  desc: "Review your day and get smarter coaching",
+                  title: "AI adapts to your progress",
+                  desc: "Yesterday's work shapes today's plan",
                 },
               ].map((b, i) => (
                 <div
@@ -430,7 +446,7 @@ export default function MobileAppPrompt() {
                 lineHeight: 1.3,
               }}
             >
-              Better on the app
+              Do Less. Achieve More.
             </div>
           </div>
 

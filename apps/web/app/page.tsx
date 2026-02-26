@@ -5,23 +5,23 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 const TESTIMONIALS = [
-  { quote: "The tasks feel like they were written by a coach who actually knows my situation.", author: "Sarah K." },
-  { quote: "Three tasks a day changed how I work. It adapts when I struggle and pushes when I'm ready.", author: "Marcus T." },
-  { quote: "I've tried every productivity app. This is the first one that actually learns from me.", author: "Priya R." },
+  { quote: "I said I wanted to learn guitar. Next morning it told me to practice the G-C-D chord switch for 10 minutes. Not 'learn chords' — the exact thing I needed.", author: "Sarah K." },
+  { quote: "Three tasks. That's it. I stopped overthinking and started doing. 47 days straight and counting.", author: "Marcus T." },
+  { quote: "I've tried every productivity app. This one doesn't give me a list — it gives me a plan that changes every day based on what I actually did.", author: "Priya R." },
 ];
 
 const FAQ = [
   {
     q: "Does it work for any goal?",
-    a: "Yes. Threely works for anything — fitness, learning, creative projects, career goals, side businesses. You describe your goal in your own words and Threely Intelligence breaks it into a structured plan with daily tasks tailored to your experience, timeline, and available hours.",
+    a: "Yes. Fitness, learning an instrument, launching a side project, reading more, career goals — anything. You describe what you want in your own words and Threely breaks it into a real daily plan tailored to your experience, timeline, and schedule.",
   },
   {
     q: "How personalized is it really?",
-    a: "Very. Threely Intelligence factors in your goal details, your daily time budget, your intensity preference, what you completed yesterday, and your review feedback. Every set of tasks is generated fresh — not pulled from a template. The more you use it, the better it gets.",
+    a: "Very. Threely factors in your goal details, how much time you have, your intensity preference, what you completed yesterday, and your review feedback. Every set of tasks is generated fresh — not pulled from a template. The more you use it, the better it gets.",
   },
   {
     q: "What happens after I complete my tasks?",
-    a: "You leave a quick review — how difficult it felt, what went well, any notes. Threely Intelligence uses that feedback to generate a personalized coaching insight and calibrate tomorrow's tasks. It's a daily feedback loop that compounds over time.",
+    a: "You leave a quick review — how difficult it felt, what went well, any notes. Threely uses that feedback to generate a coaching insight and adjust tomorrow's tasks. It's a daily feedback loop that compounds over time.",
   },
   {
     q: "What if I miss a day?",
@@ -29,7 +29,7 @@ const FAQ = [
   },
   {
     q: "Is it free?",
-    a: "Threely offers a free 7-day trial so you can experience the full AI coaching loop. After that, it's a small subscription to keep Threely Intelligence generating your daily tasks and insights.",
+    a: "Threely offers a free 7-day trial so you can experience the full AI coaching loop. After that, it's a small subscription to keep your daily tasks and insights generating.",
   },
 ];
 
@@ -128,9 +128,20 @@ export default function LandingPage() {
             background: "#635bff", color: "#fff",
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 32, fontWeight: 800,
-            margin: "0 auto 2rem",
+            margin: "0 auto 1.5rem",
             boxShadow: "0 8px 24px rgba(99,91,255,0.25)",
           }}>3</div>
+
+          <p style={{
+            fontSize: "0.85rem",
+            fontWeight: 700,
+            letterSpacing: "0.08em",
+            color: "#635bff",
+            textTransform: "uppercase" as const,
+            marginBottom: "0.75rem",
+          }}>
+            Do Less. Achieve More.
+          </p>
 
           <h1 style={{
             fontSize: "clamp(2.5rem, 7vw, 4rem)",
@@ -139,8 +150,8 @@ export default function LandingPage() {
             lineHeight: 1.05,
             marginBottom: "1.25rem",
           }}>
-            Your AI coach.<br />
-            <span style={{ color: "#635bff" }}>Three tasks a day.</span>
+            Tell us your goal.<br />
+            <span style={{ color: "#635bff" }}>AI gives you 3 tasks a day.</span>
           </h1>
 
           <p style={{
@@ -150,7 +161,7 @@ export default function LandingPage() {
             maxWidth: 540,
             margin: "0 auto 2.5rem",
           }}>
-            Threely Intelligence learns your goals, your schedule, and your progress — then generates three personalized tasks every day that actually move you forward. Review, adapt, repeat.
+            Describe any goal — learn guitar, launch a business, get in shape. Every morning, our AI creates 3 specific tasks that fit your schedule. Not generic advice. Real next steps based on where you are today.
           </p>
 
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -203,7 +214,7 @@ export default function LandingPage() {
               ★★★★★
             </div>
             <p style={{ fontSize: "0.85rem", color: "#8898aa", fontWeight: 500 }}>
-              Join 2,000+ people hitting their goals every day
+              Join 2,000+ people making real progress every day
             </p>
           </div>
         </div>
@@ -251,7 +262,7 @@ export default function LandingPage() {
             From goal to done in three steps.
           </h2>
           <p style={{ color: "#425466", textAlign: "center", marginBottom: "3rem", fontSize: "0.95rem" }}>
-            Describe your goal. Get a personalized daily plan. Complete, review, and watch the AI adapt.
+            You bring the ambition. We bring the daily plan.
           </p>
 
           <div style={{
@@ -261,9 +272,9 @@ export default function LandingPage() {
             marginBottom: "3rem",
           }}>
             {[
-              { step: "01", title: "Describe your goal", desc: "Tell Threely what you're working toward in your own words — your experience level, timeline, and how much time you have each day." },
-              { step: "02", title: "Get tailored tasks", desc: "Threely Intelligence generates three specific, actionable tasks calibrated to your skill level, schedule, and what you've already accomplished." },
-              { step: "03", title: "Review & evolve", desc: "Complete your tasks, rate the difficulty, and leave feedback. The AI uses your review to generate coaching insights and refine tomorrow's plan." },
+              { step: "01", title: "Share your goal", desc: "Type it in plain English — 'Run a 5K in 8 weeks' or 'Launch my side project by April.' Be specific. The more detail you give about your experience, timeline, and schedule, the more targeted your tasks will be." },
+              { step: "02", title: "Get 3 real tasks every morning", desc: "Not 'work on your project.' You'll get things like 'Draft the pricing page copy focusing on 3 pain points from your user interviews.' Specific. Actionable. Sized to fit your time." },
+              { step: "03", title: "Review & watch it adapt", desc: "Finish your tasks, rate the difficulty, leave a quick note. Threely adjusts tomorrow's plan — harder if you're cruising, easier if you're struggling. A daily loop that gets smarter over time." },
             ].map(item => (
               <div key={item.step} style={{
                 background: "#fff",
@@ -400,19 +411,19 @@ export default function LandingPage() {
             lineHeight: 1.2,
             marginBottom: "1.5rem",
           }}>
-            Other apps give you a list.<br />
-            <span style={{ color: "#635bff" }}>Threely gives you a coach.</span>
+            Most apps give you a to-do list.<br />
+            <span style={{ color: "#635bff" }}>Threely gives you a game plan.</span>
           </h2>
           <p style={{
             fontSize: "1rem", color: "#425466", lineHeight: 1.8,
             marginBottom: "1.5rem",
           }}>
-            Most productivity tools dump an overwhelming list on you and hope you figure it out. They don&apos;t know your experience level. They don&apos;t know how much time you have. They don&apos;t care if yesterday was hard.
+            To-do apps let you write down tasks. But they don&apos;t know what to work on, in what order, or how much you can handle today. You still have to figure everything out yourself.
           </p>
           <p style={{
             fontSize: "1rem", color: "#425466", lineHeight: 1.8,
           }}>
-            Threely Intelligence is different. It understands your specific goals, adapts to your daily feedback, and generates exactly three tasks designed for where you are right now — not where some template assumes you should be.
+            Threely is different. You share your goal, and our AI builds a daily plan around your experience, your schedule, and what you did yesterday. Three tasks. Specific. Actionable. Designed for exactly where you are right now.
           </p>
         </div>
       </section>
@@ -430,7 +441,7 @@ export default function LandingPage() {
             Built around you, not a template.
           </h2>
           <p style={{ color: "#425466", textAlign: "center", marginBottom: "3rem", fontSize: "0.95rem" }}>
-            Every detail of Threely is designed to adapt to how you work.
+            Every detail adapts to how you work, how much time you have, and how you did yesterday.
           </p>
           <div style={{
             display: "grid",
@@ -440,33 +451,33 @@ export default function LandingPage() {
             {[
               {
                 icon: "🧠",
-                title: "AI That Learns From You",
-                desc: "After every session, you leave a quick review. Threely Intelligence uses your feedback to calibrate difficulty, shift focus areas, and generate smarter tasks tomorrow.",
+                title: "Gets Smarter Every Day",
+                desc: "After each session you leave a quick review. Threely uses your feedback to calibrate difficulty, shift focus, and generate better tasks tomorrow.",
               },
               {
                 icon: "⏱",
-                title: "Fits Your Schedule",
-                desc: "Set how much time you have each day — 15 minutes or 2 hours. Every task is scoped to fit your real life, not an idealized version of it.",
+                title: "Fits Your Real Schedule",
+                desc: "Tell us if you have 15 minutes or 2 hours. Every task is scoped to fit your actual day — not an idealized version of it.",
               },
               {
                 icon: "🎚",
                 title: "Your Intensity, Your Pace",
-                desc: "Choose from light to maximum. Threely adjusts the challenge level so you're always in the zone — building habits without burning out.",
+                desc: "Choose steady, committed, or all-in. Threely adjusts the challenge so you're always progressing — without burning out.",
               },
               {
                 icon: "💬",
                 title: "Daily Coaching Insights",
-                desc: "After your review, get a personalized AI coaching note that reflects on your progress and primes you for what's next.",
+                desc: "After your review, get an AI coaching note that reflects on your progress and tells you what to focus on next.",
               },
               {
                 icon: "🔄",
                 title: "Tasks That Build on Each Other",
-                desc: "Today's tasks reference what you did yesterday. Every day compounds — so you're not starting from scratch each morning.",
+                desc: "Today's tasks reference what you did yesterday. Every day compounds — you're never starting from scratch.",
               },
               {
                 icon: "🎯",
                 title: "Multiple Goals, One Plan",
-                desc: "Track fitness, business, learning, and more — all at once. Threely mixes tasks across goals so nothing falls behind.",
+                desc: "Track fitness, business, learning, and more — all at once. Threely mixes tasks across your goals so nothing falls behind.",
               },
             ].map(f => (
               <div key={f.title} style={{
@@ -497,23 +508,23 @@ export default function LandingPage() {
             The daily loop that compounds.
           </h2>
           <p style={{ color: "#425466", textAlign: "center", marginBottom: "3rem", fontSize: "0.95rem" }}>
-            This isn&apos;t a one-time plan. It&apos;s an ongoing coaching relationship.
+            Not a one-time plan. A coaching relationship that gets better every day.
           </p>
           {[
             {
               num: "1",
               title: "Describe your goal in plain language",
-              desc: "\"I want to launch a side project in 3 months. I can spend 30 minutes a day and I'm a beginner at marketing.\" — That's all Threely needs. The AI extracts your timeline, experience level, and constraints automatically.",
+              desc: "\"I want to launch a side project in 3 months. I can spend 30 minutes a day and I'm a beginner at marketing.\" — That's it. Be as specific as you can. The AI extracts your timeline, experience level, and constraints automatically.",
             },
             {
               num: "2",
-              title: "Get three tasks built for today",
-              desc: "Threely Intelligence generates tasks that are specific, actionable, and sized to fit your time budget. No vague suggestions — real next steps based on where you are in your journey right now.",
+              title: "Wake up to 3 specific tasks",
+              desc: "Not 'work on marketing' — you'll get things like 'Write 3 cold outreach emails using pain points from your user interviews.' Sized to your schedule. Built on what you did yesterday. Ready to go.",
             },
             {
               num: "3",
               title: "Complete, review, and watch it adapt",
-              desc: "After finishing, rate the difficulty and leave a quick note. The AI generates a coaching insight, then uses everything — your feedback, your pace, your progress — to craft a better plan tomorrow.",
+              desc: "Rate the difficulty. Leave a quick note. Threely generates a coaching insight, then uses your feedback, your pace, and your progress to build a better plan for tomorrow.",
             },
           ].map((item, i) => (
             <div key={item.num} style={{
@@ -619,7 +630,7 @@ export default function LandingPage() {
             letterSpacing: "-0.03em",
             marginBottom: "1rem",
           }}>
-            Ready to start?
+            Do Less. Achieve More.
           </h2>
           <p style={{
             fontSize: "1.05rem",
@@ -627,7 +638,7 @@ export default function LandingPage() {
             lineHeight: 1.6,
             marginBottom: "2rem",
           }}>
-            Set your first goal and get a personalized daily plan in under a minute.
+            Set your first goal and get 3 personalized tasks in under a minute.
           </p>
           <Link href="/register" onClick={handleMobileCTA} style={{
             display: "inline-block",
