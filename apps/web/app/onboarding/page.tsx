@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { markOnboarded, saveNickname } from "@/lib/auth-context";
 import { goalsApi, profileApi, tasksApi, type ParsedGoal, type TaskItem, type GoalChatMessage, type GoalChatResult } from "@/lib/api-client";
+import GoalTemplatesComponent from "@/components/GoalTemplates";
+import type { GoalCategory } from "@/lib/goal-templates";
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
@@ -89,6 +91,9 @@ export default function OnboardingPage() {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [parsing, setParsing] = useState(false);
   const [parseError, setParseError] = useState("");
+
+  // Step 2 — Category picker
+  const [showTemplates, setShowTemplates] = useState(true);
 
   // Step 2 — AI Plan chat
   const [showAiChat, setShowAiChat] = useState(false);
@@ -177,22 +182,38 @@ export default function OnboardingPage() {
     setShowConfirmation(false);
   }
 
+  // ─── Step 2: Category selection → opens AI chat ─────────────────────────
+
+  function handleCategorySelect(category: GoalCategory) {
+    setShowTemplates(false);
+    startAiChatWithMessage(category.starterMessage);
+  }
+
   // ─── Step 2: AI Plan chat ─────────────────────────────────────────────────
 
   async function startAiChat() {
+    startAiChatWithMessage("Help me define my goal.");
+  }
+
+  async function startAiChatWithMessage(initialMessage: string) {
     setShowAiChat(true);
     setChatHistory([]);
     setChatMessages([]);
     setChatDone(false);
     setChatGoalText(null);
+    setCustomInput("");
     setChatLoading(true);
     try {
-      const result = await goalsApi.chat([]);
+      const seedMessages: GoalChatMessage[] = [{ role: "user", content: initialMessage }];
+      const result = await goalsApi.chat(seedMessages);
       setChatMessages([
-        { role: "user", content: "Help me define my goal." },
+        { role: "user", content: initialMessage },
         { role: "assistant", content: result.raw_reply },
       ]);
-      setChatHistory([{ role: "assistant", text: result.message, options: result.options }]);
+      setChatHistory([
+        { role: "user", text: initialMessage },
+        { role: "assistant", text: result.message, options: result.options },
+      ]);
       if (result.done) {
         setChatDone(true);
         setChatGoalText(result.goal_text);
@@ -444,181 +465,19 @@ export default function OnboardingPage() {
         {/* ── Step 2: Goal ── */}
         {step === 2 && (
           <div className="fade-in" style={{ padding: "1.5rem 2rem 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-            <div>
-              <h2 style={{ fontSize: "1.4rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>
-                What are you working toward?
-              </h2>
-              <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.5 }}>
-                Describe your goal and where you're at. More context means a better plan from Threely Intelligence.
-              </p>
-            </div>
+            {showTemplates ? (
+              <GoalTemplatesComponent
+                onSelect={handleCategorySelect}
+                onClose={() => advanceStep(1)}
+                onOther={() => {
+                  setShowTemplates(false);
+                  startAiChatWithMessage("Help me define my goal.");
+                }}
+              />
+            ) : null}
 
-            {!showConfirmation ? (
-              <>
-                <textarea
-                  className="field-input"
-                  rows={5}
-                  placeholder="e.g. I want to launch my freelance design business and land my first 3 clients"
-                  value={rawGoalInput}
-                  onChange={(e) => setRawGoalInput(e.target.value)}
-                  disabled={parsing}
-                  style={{ resize: "vertical", minHeight: 120, opacity: parsing ? 0.6 : 1, verticalAlign: "top" }}
-                />
-
-                {parseError && (
-                  <p style={{ color: "var(--danger)", fontSize: "0.85rem" }}>{parseError}</p>
-                )}
-
-                {/* Show recommendations hint if user came back to edit after needs_more_context */}
-                {parsedGoal?.needs_more_context && parsedGoal.recommendations && (
-                  <div style={{
-                    background: "var(--primary-light)", borderRadius: "var(--radius)",
-                    border: "1px solid rgba(99,91,255,0.2)", padding: "0.875rem",
-                  }}>
-                    <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--primary)", marginBottom: 4 }}>
-                      Things that would strengthen your plan
-                    </p>
-                    <p style={{ fontSize: "0.8rem", color: "var(--subtext)", lineHeight: 1.6, whiteSpace: "pre-line" }}>
-                      {parsedGoal.recommendations}
-                    </p>
-                  </div>
-                )}
-
-                <button
-                  className="btn btn-primary"
-                  onClick={handleParseGoal}
-                  disabled={!rawGoalInput.trim() || parsing}
-                  style={{ height: 50, width: "100%" }}
-                >
-                  {parsing ? (
-                    <>
-                      <span className="spinner" style={{ marginRight: 8 }} />
-                      Analyzing your goal…
-                    </>
-                  ) : "Analyze my goal →"}
-                </button>
-
-                {/* Or divider */}
-                <div style={{
-                  display: "flex", alignItems: "center", gap: 12,
-                  margin: "4px 0",
-                }}>
-                  <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-                  <span style={{ fontSize: "0.8rem", color: "var(--muted)", fontWeight: 500 }}>or</span>
-                  <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-                </div>
-
-                {/* AI Plan button */}
-                <div style={{ position: "relative", width: "100%" }}>
-                  <span style={{
-                    position: "absolute", top: -9, right: 12,
-                    background: "var(--primary)", color: "#fff",
-                    fontSize: "0.65rem", fontWeight: 700,
-                    padding: "2px 8px", borderRadius: 20,
-                    letterSpacing: "0.03em", zIndex: 1,
-                    boxShadow: "0 1px 4px rgba(99,91,255,0.3)",
-                  }}>Recommended</span>
-                  <button
-                    className="btn btn-outline"
-                    onClick={startAiChat}
-                    disabled={parsing}
-                    style={{
-                      height: 50, width: "100%",
-                      border: "1.5px solid rgba(99,91,255,0.25)",
-                      color: "var(--primary)", fontWeight: 600,
-                    }}
-                  >
-                    <span style={{ fontSize: 16 }}>✦</span>
-                    AI Plan — let Threely guide you
-                  </button>
-                </div>
-              </>
-            ) : (
-              <>
-                {/* Confirmation card */}
-                <div style={{
-                  background: "var(--card)", borderRadius: "var(--radius-lg)",
-                  border: "1.5px solid rgba(99,91,255,0.27)", padding: "1.25rem",
-                  boxShadow: "var(--shadow-sm)",
-                }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-                    <span style={{ fontSize: 18, color: "var(--primary)" }}>✦</span>
-                    <span style={{
-                      fontSize: "0.75rem", fontWeight: 600, color: "var(--primary)",
-                      textTransform: "uppercase", letterSpacing: "0.06em",
-                    }}>
-                      Threely Intelligence read your goal
-                    </span>
-                  </div>
-
-                  {parsedGoal?.category && (
-                    <span style={{
-                      display: "inline-block", background: "var(--primary-light)",
-                      borderRadius: 20, padding: "3px 12px", fontSize: "0.75rem",
-                      fontWeight: 600, color: "var(--primary)", textTransform: "capitalize",
-                      marginBottom: 10,
-                    }}>
-                      {parsedGoal.category}
-                    </span>
-                  )}
-
-                  <p style={{ fontSize: "0.95rem", color: "var(--text)", lineHeight: 1.5, fontWeight: 500 }}>
-                    {parsedGoal?.structured_summary}
-                  </p>
-
-                  {parsedGoal?.deadline_detected && (
-                    <p style={{ fontSize: "0.85rem", color: "var(--subtext)", marginTop: 8 }}>
-                      📅 Deadline: {new Date(parsedGoal.deadline_detected + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-                    </p>
-                  )}
-
-                  {parsedGoal?.needs_more_context && parsedGoal.recommendations && (
-                    <div style={{
-                      marginTop: 12, background: "#FFF8EC", borderRadius: "var(--radius)",
-                      border: "1px solid rgba(245,166,35,0.33)", padding: "0.875rem",
-                    }}>
-                      <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#B45309", marginBottom: 4 }}>
-                        ⚠ Your plan could be more personalized
-                      </p>
-                      <p style={{ fontSize: "0.8rem", color: "#92400E", lineHeight: 1.6, whiteSpace: "pre-line" }}>
-                        {parsedGoal.recommendations}
-                      </p>
-                    </div>
-                  )}
-
-                </div>
-
-                {/* Footer buttons for confirmation */}
-                {parsedGoal?.needs_more_context ? (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <button
-                      className="btn btn-primary"
-                      onClick={handleAddMoreDetail}
-                      style={{ height: 50, width: "100%" }}
-                    >
-                      Add more detail →
-                    </button>
-                    <button
-                      onClick={() => advanceStep(3)}
-                      style={{
-                        fontSize: "0.85rem", color: "var(--muted)", textDecoration: "underline",
-                        background: "none", border: "none", cursor: "pointer", padding: "8px 0",
-                        textAlign: "center",
-                      }}
-                    >
-                      Continue anyway
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => advanceStep(3)}
-                    style={{ height: 50, width: "100%" }}
-                  >
-                    Looks good →
-                  </button>
-                )}
-              </>
+            {parseError && (
+              <p style={{ color: "var(--danger)", fontSize: "0.85rem" }}>{parseError}</p>
             )}
           </div>
         )}
@@ -992,7 +851,7 @@ export default function OnboardingPage() {
 
       {/* ── AI Plan Chat Modal ── */}
       {showAiChat && (
-        <div className="modal-overlay" onClick={() => setShowAiChat(false)}>
+        <div className="modal-overlay" onClick={() => { setShowAiChat(false); setShowTemplates(true); }}>
           <div
             className="modal-box"
             onClick={(e) => e.stopPropagation()}
@@ -1011,7 +870,7 @@ export default function OnboardingPage() {
                 </span>
               </div>
               <button
-                onClick={() => setShowAiChat(false)}
+                onClick={() => { setShowAiChat(false); setShowTemplates(true); }}
                 style={{
                   width: 32, height: 32, borderRadius: 8,
                   display: "flex", alignItems: "center", justifyContent: "center",

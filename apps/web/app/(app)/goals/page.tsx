@@ -50,7 +50,7 @@ const INTENSITY_OPTIONS_WEB = [
 
 function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClose: () => void }) {
   const [step, setStep] = useState<FlowStep>("goal");
-  const [showTemplates, setShowTemplates] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(true);
 
   // Goal input
   const [rawInput, setRawInput] = useState("");
@@ -260,7 +260,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
       return (
         <GoalTemplatesComponent
           onSelect={handleCategorySelect}
-          onClose={() => setShowTemplates(false)}
+          onClose={onClose}
           onOther={() => {
             setShowTemplates(false);
             startAiChatWithMessage("Help me define my goal.");
@@ -269,84 +269,8 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
       );
     }
 
-    return (
-      <>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>
-          What are you working toward?
-        </h2>
-        <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
-          Describe your goal and where you're at. More context means a better plan from Threely Intelligence.
-        </p>
-
-        <textarea
-          className="field-input"
-          rows={5}
-          placeholder="e.g. I want to launch my freelance design business and land my first 3 clients within 3 months. I have 2 years of hobby experience..."
-          value={rawInput}
-          onChange={e => setRawInput(e.target.value)}
-          autoFocus
-          disabled={parsing}
-          style={{ resize: "vertical", marginBottom: "0.75rem", opacity: parsing ? 0.6 : 1 }}
-        />
-
-        {parseError && <p style={{ color: "var(--danger)", fontSize: "0.85rem", marginBottom: "0.75rem" }}>{parseError}</p>}
-
-        {parsed?.needs_more_context && parsed.recommendations && step === "goal" && (
-          <div style={{
-            background: "var(--primary-light)", borderRadius: "var(--radius)",
-            padding: "1rem", border: "1px solid rgba(99,91,255,0.15)", marginBottom: "1rem",
-          }}>
-            <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--primary)", marginBottom: 6 }}>
-              Things that would strengthen your plan
-            </p>
-            <p style={{ fontSize: "0.85rem", color: "var(--text)", lineHeight: 1.7, whiteSpace: "pre-line" }}>
-              {parsed.recommendations}
-            </p>
-          </div>
-        )}
-
-        <button
-          className="btn btn-primary"
-          onClick={handleParse}
-          disabled={!rawInput.trim() || parsing}
-          style={{ width: "100%", padding: "0.75rem", marginBottom: "0.75rem" }}
-        >
-          {parsing ? (
-            <><span className="spinner" style={{ width: 18, height: 18 }} /> Analyzing your goal...</>
-          ) : (
-            "Analyze my goal \u2192"
-          )}
-        </button>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "0.25rem 0" }}>
-          <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-          <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>or</span>
-          <div style={{ flex: 1, height: 1, background: "var(--border)" }} />
-        </div>
-
-        <div style={{ position: "relative", width: "100%", marginTop: "0.75rem" }}>
-          <span style={{
-            position: "absolute", top: -9, right: 12,
-            background: "var(--primary)", color: "#fff",
-            fontSize: "0.65rem", fontWeight: 700,
-            padding: "2px 8px", borderRadius: 20,
-            letterSpacing: "0.03em", zIndex: 1,
-            boxShadow: "0 1px 4px rgba(99,91,255,0.3)",
-          }}>Recommended</span>
-          <button
-            className="btn btn-outline"
-            onClick={() => setShowTemplates(true)}
-            disabled={parsing}
-            style={{
-              width: "100%", padding: "0.75rem",
-              borderColor: "rgba(99,91,255,0.25)", color: "var(--primary)", fontWeight: 600,
-            }}
-          >
-            <span style={{ fontSize: 14 }}>&#10022;</span> AI Plan &mdash; let Threely guide you
-          </button>
-        </div>
-      </>
-    );
+    // Templates dismissed — AI chat is open. Show nothing behind the modal.
+    return null;
   }
 
   // ─── Render: Confirmation step ─────────────────────────────────────────────
@@ -729,7 +653,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
               <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>Threely Intelligence</span>
             </div>
             <button
-              onClick={() => setShowAiChat(false)}
+              onClick={() => { setShowAiChat(false); setShowTemplates(true); }}
               style={{
                 width: 30, height: 30, borderRadius: "var(--radius-sm)",
                 background: "var(--bg)", border: "1px solid var(--border)",
