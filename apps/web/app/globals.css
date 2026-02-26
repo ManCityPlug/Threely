@@ -356,6 +356,7 @@ input, textarea, select {
   .bottom-nav { display: flex; }
   .page-inner { padding: 1.25rem 1rem; }
   .modal-box { padding: 1.5rem; border-radius: var(--radius-lg); }
+  .desktop-only { display: none !important; }
 }
 
 @media (min-width: 769px) {
