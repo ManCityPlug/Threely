@@ -98,6 +98,31 @@ export default function MobileAppPrompt() {
     }, 350);
   }, []);
 
+  // Lock body scroll when interstitial is open
+  useEffect(() => {
+    if (view === "interstitial") {
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.width = "100%";
+      document.body.style.top = `-${window.scrollY}px`;
+    } else {
+      const scrollY = document.body.style.top;
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+      document.body.style.top = "";
+      if (scrollY) {
+        window.scrollTo(0, parseInt(scrollY || "0") * -1);
+      }
+    }
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.width = "";
+      document.body.style.top = "";
+    };
+  }, [view]);
+
   if (view === "none") return null;
 
   const font = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
@@ -116,22 +141,24 @@ export default function MobileAppPrompt() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            justifyContent: "center",
-            padding: "2rem 1.5rem",
             fontFamily: font,
             animation: animatingOut ? undefined : "mobilePromptFadeIn 0.4s ease both",
             opacity: animatingOut ? 0 : undefined,
             transition: animatingOut ? "opacity 0.35s ease" : undefined,
+            overflowY: "auto",
+            WebkitOverflowScrolling: "touch" as any,
+            overscrollBehavior: "contain" as any,
           }}
+          onTouchMove={(e) => e.stopPropagation()}
         >
           {/* Close X button */}
           <button
             onClick={dismissInterstitial}
             style={{
-              position: "absolute",
+              position: "fixed",
               top: 16,
               right: 16,
-              zIndex: 2,
+              zIndex: 10000,
               background: "none",
               border: "none",
               color: "#8898aa",
@@ -154,7 +181,7 @@ export default function MobileAppPrompt() {
               top: 0,
               left: 0,
               right: 0,
-              height: "40%",
+              height: 320,
               background: "linear-gradient(135deg, #f6f9fc 0%, #ede9ff 100%)",
               zIndex: 0,
             }}
@@ -169,6 +196,7 @@ export default function MobileAppPrompt() {
               alignItems: "center",
               maxWidth: 380,
               width: "100%",
+              padding: "2.5rem 1.5rem 2rem",
             }}
           >
             {/* App icon — bounces in */}
@@ -247,9 +275,9 @@ export default function MobileAppPrompt() {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                gap: 14,
+                gap: 12,
                 width: "100%",
-                marginBottom: "1.5rem",
+                marginBottom: "1.75rem",
               }}
             >
               {[
