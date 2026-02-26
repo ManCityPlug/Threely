@@ -21,8 +21,10 @@ import * as Haptics from "expo-haptics";
 import { goalsApi, profileApi, tasksApi, type TaskItem, type ParsedGoal, type GoalChatMessage, type GoalChatResult } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
 import { colors, spacing, typography, radius, shadow } from "@/constants/theme";
+import { GoalTemplates } from "@/components/GoalTemplates";
+import type { GoalCategory } from "@/constants/goal-templates";
 
-const TOTAL_STEPS = 5; // name, goal, deadline, time, intensity
+const TOTAL_STEPS = 4; // name, goal, deadline, time
 
 const TIME_OPTIONS = [
   { label: "15 min", value: 15 },
@@ -35,27 +37,6 @@ const SCROLL_HOURS = Array.from({ length: 15 }, (_, i) => i); // 0-14
 const SCROLL_MINUTES = [0, 15, 30, 45];
 const PICKER_ITEM_HEIGHT = 52;
 const PICKER_HEIGHT = PICKER_ITEM_HEIGHT * 3;
-
-const INTENSITY_OPTIONS = [
-  {
-    level: 1 as const,
-    emoji: "🌱",
-    label: "Building the habit",
-    description: "Steady, sustainable progress. Short daily wins.",
-  },
-  {
-    level: 2 as const,
-    emoji: "🎯",
-    label: "Making real progress",
-    description: "Committed and consistent. This is getting done.",
-  },
-  {
-    level: 3 as const,
-    emoji: "🚀",
-    label: "All in",
-    description: "Maximum effort. Push limits every day.",
-  },
-];
 
 const MONTHS = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -70,7 +51,8 @@ export default function OnboardingScreen() {
   // Step 1 — Name
   const [nameInput, setNameInput] = useState("");
 
-  // Step 2 — Goal input
+  // Step 2 — Goal input (templates shown first, free text via "Something else")
+  const [showFreeText, setShowFreeText] = useState(false);
   const [rawGoalInput, setRawGoalInput] = useState("");
   const [parsedGoal, setParsedGoal] = useState<ParsedGoal | null>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -86,6 +68,8 @@ export default function OnboardingScreen() {
   const [chatDone, setChatDone] = useState(false);
   const [chatGoalText, setChatGoalText] = useState<string | null>(null);
   const [customInput, setCustomInput] = useState("");
+  const [showTypingInput, setShowTypingInput] = useState(false);
+  const chatInputRef = useRef<TextInput>(null);
   const chatListRef = useRef<FlatList>(null);
 
   // Step 3 — Deadline (default: 1 month from today)
@@ -107,10 +91,7 @@ export default function OnboardingScreen() {
   const scrollHoursRef = useRef<ScrollView>(null);
   const scrollMinutesRef = useRef<ScrollView>(null);
 
-  // Step 4 — Intensity
-  const [intensityLevel, setIntensityLevel] = useState<1 | 2 | 3 | null>(null);
-
-  // Step 5 — Magic moment
+  // Magic moment
   const [generatedTasks, setGeneratedTasks] = useState<TaskItem[]>([]);
   const [coachNote, setCoachNote] = useState("");
   const [taskRevealAnims] = useState([
@@ -197,7 +178,6 @@ export default function OnboardingScreen() {
             // Auto-accept after 2 attempts — skip to next relevant step
             let nextStep = 3;
             if (result.deadline_detected) nextStep = 4;
-            if (result.daily_time_detected && result.daily_time_detected > 0) nextStep = 5;
             advanceStep(nextStep);
           } else {
             setShowConfirmation(true);
@@ -227,6 +207,10 @@ export default function OnboardingScreen() {
 
   // ─── Step 2: AI Plan chat ───────────────────────────────────────────────────
 
+  function handleCategorySelect(category: GoalCategory) {
+    startAiChatWithMessage(category.starterMessage);
+  }
+
   async function startAiChat() {
     startAiChatWithMessage("Help me define my goal.");
   }
@@ -238,6 +222,7 @@ export default function OnboardingScreen() {
     setChatDone(false);
     setChatGoalText(null);
     setCustomInput("");
+    setShowTypingInput(false);
     setChatLoading(true);
     try {
       const seedMessages: GoalChatMessage[] = [{ role: "user", content: initialMessage }];
@@ -265,6 +250,7 @@ export default function OnboardingScreen() {
     const userEntry = { role: "user" as const, text: answer };
     setChatHistory((prev) => [...prev, userEntry]);
     setCustomInput("");
+    setShowTypingInput(false);
     setChatLoading(true);
 
     const newMessages: GoalChatMessage[] = [...chatMessages, { role: "user", content: answer }];
@@ -340,9 +326,28 @@ export default function OnboardingScreen() {
         }
       }
       // Skip steps that AI Plan already covered
-      let nextStep = 3;
-      if (result.deadline_detected) nextStep = 4; // skip deadline step
-      if (result.daily_time_detected && result.daily_time_detected > 0) nextStep = 5; // skip time step too
+      let nextStep = 3; // deadline step
+      if (result.deadline_detected) nextStep = 4; // skip deadline → time step
+      if (result.deadline_detected && result.daily_time_detected && result.daily_time_detected > 0) {
+        // Both covered — go straight to build with overrides since state hasn't updated yet
+        const dailyMins = (() => {
+          const mins = result.daily_time_detected!;
+          const preset = TIME_OPTIONS.find((o) => o.value === mins);
+          if (preset) return mins;
+          if (mins >= 180) {
+            const hrs = Math.min(14, Math.floor(mins / 60));
+            const remainder = SCROLL_MINUTES.reduce((prev, curr) =>
+              Math.abs(curr - (mins % 60)) < Math.abs(prev - (mins % 60)) ? curr : prev
+            );
+            return hrs * 60 + remainder;
+          }
+          return TIME_OPTIONS.reduce((prev, curr) =>
+            Math.abs(curr.value - mins) < Math.abs(prev.value - mins) ? curr : prev
+          ).value;
+        })();
+        handleBuild({ goalText: chatGoalText!.trim(), parsed: result, dailyMinutes: dailyMins });
+        return;
+      }
       advanceStep(nextStep);
     } catch (e) {
       setParseError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
@@ -382,37 +387,46 @@ export default function OnboardingScreen() {
     }, 80);
   }
 
-  // ─── Build (Step 5) ─────────────────────────────────────────────────────────
+  // ─── Build ─────────────────────────────────────────────────────────────────
 
-  async function handleBuild() {
+  async function handleBuild(overrides?: {
+    goalText?: string;
+    parsed?: ParsedGoal;
+    dailyMinutes?: number;
+  }) {
     setBuildError("");
     setBuilding(true);
     advanceStep(TOTAL_STEPS + 1);
 
+    // Use overrides if provided (when called directly from handleUseGoal before state updates)
+    const effectiveGoalText = overrides?.goalText ?? rawGoalInput.trim();
+    const effectiveParsed = overrides?.parsed ?? parsedGoal;
+    const effectiveTime = overrides?.dailyMinutes ?? timeMinutes;
+
     try {
       const goalTitle =
-        parsedGoal?.short_title ??
-        rawGoalInput.trim().slice(0, 40);
+        effectiveParsed?.short_title ??
+        effectiveGoalText.slice(0, 40);
 
       // Save display name
       if (nameInput.trim()) {
         await AsyncStorage.setItem("@threely_nickname", nameInput.trim());
       }
 
-      // Save profile
+      // Save profile (intensity defaults to 2 — committed; AI chat handles pace context)
       await profileApi.save({
-        dailyTimeMinutes: timeMinutes ?? 60,
-        intensityLevel: intensityLevel ?? 2,
+        dailyTimeMinutes: effectiveTime ?? 60,
+        intensityLevel: 2,
       });
 
       // Create the goal with all parsed data + per-goal settings
       const goalResult = await goalsApi.create(goalTitle, {
-        rawInput: rawGoalInput.trim(),
-        structuredSummary: parsedGoal?.structured_summary ?? undefined,
-        category: parsedGoal?.category ?? undefined,
-        deadline: parsedGoal?.deadline_detected ?? getDeadlineISO(),
-        dailyTimeMinutes: timeMinutes ?? undefined,
-        intensityLevel: intensityLevel ?? undefined,
+        rawInput: effectiveGoalText,
+        structuredSummary: effectiveParsed?.structured_summary ?? undefined,
+        category: effectiveParsed?.category ?? undefined,
+        deadline: effectiveParsed?.deadline_detected ?? getDeadlineISO(),
+        dailyTimeMinutes: effectiveTime ?? undefined,
+        intensityLevel: 2,
       });
 
       // Generate tasks
@@ -482,45 +496,16 @@ export default function OnboardingScreen() {
   }
 
   function renderStep2() {
-    return (
-      <View style={{ flex: 1 }}>
-        <ScrollView
-          contentContainerStyle={styles.stepScroll}
-          keyboardShouldPersistTaps="handled"
-        >
-          <Text style={styles.stepTitle}>What are you working toward?</Text>
-          <Text style={styles.stepSubtitle}>
-            Describe your goal and where you're at. More context means a better plan from Threely Intelligence.
-          </Text>
+    // After parsing: show confirmation card
+    if (showConfirmation) {
+      return (
+        <View style={{ flex: 1 }}>
+          <ScrollView
+            contentContainerStyle={styles.stepScroll}
+            keyboardShouldPersistTaps="handled"
+          >
+            <Text style={styles.stepTitle}>Review your goal</Text>
 
-          {!showConfirmation ? (
-            <>
-              <TextInput
-                style={[styles.goalInput, parsing && styles.goalInputDisabled]}
-                placeholder={
-                  "e.g. I want to launch my freelance design business and land my first 3 clients"
-                }
-                placeholderTextColor={colors.textTertiary}
-                value={rawGoalInput}
-                onChangeText={setRawGoalInput}
-                multiline
-                numberOfLines={4}
-                textAlignVertical="top"
-                editable={!parsing}
-              />
-
-              {parseError ? (
-                <Text style={styles.errorText}>{parseError}</Text>
-              ) : null}
-
-              {parsedGoal?.needs_more_context && parsedGoal.recommendations ? (
-                <View style={styles.hintCard}>
-                  <Text style={styles.hintCardTitle}>Things that would strengthen your plan</Text>
-                  <Text style={styles.hintCardBody}>{parsedGoal.recommendations}</Text>
-                </View>
-              ) : null}
-            </>
-          ) : (
             <View style={styles.confirmCard}>
               <View style={styles.confirmHeader}>
                 <Text style={styles.confirmIcon}>✦</Text>
@@ -547,92 +532,111 @@ export default function OnboardingScreen() {
                   <Text style={styles.warningBody}>{parsedGoal.recommendations}</Text>
                 </View>
               ) : null}
-
             </View>
-          )}
-        </ScrollView>
+          </ScrollView>
 
-        <View style={styles.footer}>
-          {!showConfirmation ? (
-            <>
-              <TouchableOpacity
-                style={[
-                  styles.continueBtn,
-                  (!rawGoalInput.trim() || parsing) && styles.continueBtnDisabled,
-                ]}
-                onPress={handleParseGoal}
-                activeOpacity={rawGoalInput.trim() && !parsing ? 0.85 : 1}
-                disabled={parsing}
-              >
-                {parsing ? (
-                  <>
-                    <ActivityIndicator color={colors.primaryText} size="small" />
-                    <Text style={styles.continueBtnText}>Analyzing your goal…</Text>
-                  </>
-                ) : (
-                  <Text
-                    style={[
-                      styles.continueBtnText,
-                      !rawGoalInput.trim() && styles.continueBtnTextDisabled,
-                    ]}
-                  >
-                    Analyze my goal →
-                  </Text>
-                )}
-              </TouchableOpacity>
-
-              {/* Or divider */}
-              <View style={styles.orDivider}>
-                <View style={styles.orLine} />
-                <Text style={styles.orText}>or</Text>
-                <View style={styles.orLine} />
+          <View style={styles.footer}>
+            {parsedGoal?.needs_more_context ? (
+              <View style={styles.footerStack}>
+                <TouchableOpacity
+                  style={styles.continueBtn}
+                  onPress={handleAddMoreDetail}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.continueBtnText}>Add more detail →</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.continueBtn, { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.primary + "40" }]}
+                  onPress={() => startAiChatWithMessage(rawGoalInput.trim())}
+                  activeOpacity={0.85}
+                >
+                  <Text style={[styles.continueBtnText, { color: colors.primary }]}>✦ Use AI instead</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.skipWarningBtn}
+                  onPress={() => advanceStep(3)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.skipWarningText}>Continue anyway</Text>
+                </TouchableOpacity>
               </View>
-
-              {/* AI Plan button */}
-              <TouchableOpacity
-                style={styles.aiPlanBtn}
-                onPress={startAiChat}
-                activeOpacity={0.75}
-                disabled={parsing}
-              >
-                <Text style={styles.aiPlanIcon}>✦</Text>
-                <Text style={styles.aiPlanText}>AI Plan — let Threely guide you</Text>
-              </TouchableOpacity>
-            </>
-          ) : parsedGoal?.needs_more_context ? (
-            <View style={styles.footerStack}>
+            ) : (
               <TouchableOpacity
                 style={styles.continueBtn}
-                onPress={handleAddMoreDetail}
-                activeOpacity={0.85}
-              >
-                <Text style={styles.continueBtnText}>Add more detail →</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.continueBtn, { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.primary + "40" }]}
-                onPress={() => startAiChatWithMessage(rawGoalInput.trim())}
-                activeOpacity={0.85}
-              >
-                <Text style={[styles.continueBtnText, { color: colors.primary }]}>✦ Use AI instead</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.skipWarningBtn}
                 onPress={() => advanceStep(3)}
-                activeOpacity={0.7}
+                activeOpacity={0.85}
               >
-                <Text style={styles.skipWarningText}>Continue anyway</Text>
+                <Text style={styles.continueBtnText}>Looks good →</Text>
               </TouchableOpacity>
-            </View>
-          ) : (
-            <TouchableOpacity
-              style={styles.continueBtn}
-              onPress={() => advanceStep(3)}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.continueBtnText}>Looks good →</Text>
-            </TouchableOpacity>
-          )}
+            )}
+          </View>
         </View>
+      );
+    }
+
+    // Free text input (shown when "Something else" tapped)
+    if (showFreeText) {
+      return (
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
+        >
+          <ScrollView
+            contentContainerStyle={styles.stepScroll}
+            keyboardShouldPersistTaps="handled"
+          >
+            <Text style={styles.stepTitle}>What are you working toward?</Text>
+            <Text style={styles.stepSubtitle}>
+              Describe your goal and where you're at. More context means a better plan from Threely Intelligence.
+            </Text>
+
+            <TextInput
+              style={styles.goalInput}
+              placeholder="e.g. I want to launch my freelance design business and land my first 3 clients"
+              placeholderTextColor={colors.textTertiary}
+              value={rawGoalInput}
+              onChangeText={setRawGoalInput}
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+              autoFocus
+            />
+          </ScrollView>
+
+          <View style={styles.footer}>
+            <TouchableOpacity
+              style={[
+                styles.continueBtn,
+                !rawGoalInput.trim() && styles.continueBtnDisabled,
+              ]}
+              onPress={() => startAiChatWithMessage(rawGoalInput.trim())}
+              activeOpacity={rawGoalInput.trim() ? 0.85 : 1}
+              disabled={!rawGoalInput.trim()}
+            >
+              <Text
+                style={[
+                  styles.continueBtnText,
+                  !rawGoalInput.trim() && styles.continueBtnTextDisabled,
+                ]}
+              >
+                Continue →
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      );
+    }
+
+    // Default: show category templates grid
+    return (
+      <View style={{ flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.sm }}>
+        <GoalTemplates
+          onSelect={handleCategorySelect}
+          onClose={() => advanceStep(1)}
+          onOther={() => setShowFreeText(true)}
+          closeLabel="‹ Back"
+        />
       </View>
     );
   }
@@ -891,65 +895,14 @@ export default function OnboardingScreen() {
         <View style={styles.footer}>
           <TouchableOpacity
             style={[styles.continueBtn, !canContinue && styles.continueBtnDisabled]}
-            onPress={() => canContinue && advanceStep(5)}
+            onPress={canContinue ? handleBuild : undefined}
             activeOpacity={canContinue ? 0.85 : 1}
           >
             <Text
               style={[styles.continueBtnText, !canContinue && styles.continueBtnTextDisabled]}
             >
-              Continue
+              Build my plan →
             </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  }
-
-  function renderStep5() {
-    return (
-      <View style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.stepScroll}>
-          <Text style={styles.stepTitle}>What's your pace?</Text>
-          <Text style={styles.stepSubtitle}>
-            This shapes how ambitious Threely Intelligence makes your daily tasks.
-          </Text>
-
-          <View style={styles.intensityList}>
-            {INTENSITY_OPTIONS.map((opt) => {
-              const isSelected = intensityLevel === opt.level;
-              return (
-                <TouchableOpacity
-                  key={opt.level}
-                  style={[styles.intensityCard, isSelected && styles.intensityCardSelected]}
-                  onPress={() => {
-                    if (Platform.OS !== "web") Haptics.selectionAsync();
-                    setIntensityLevel(opt.level);
-                  }}
-                  activeOpacity={0.75}
-                >
-                  <Text style={styles.intensityEmoji}>{opt.emoji}</Text>
-                  <View style={styles.intensityText}>
-                    <Text
-                      style={[styles.intensityLabel, isSelected && styles.intensityLabelSelected]}
-                    >
-                      {opt.label}
-                    </Text>
-                    <Text style={styles.intensityDescription}>{opt.description}</Text>
-                  </View>
-                  {isSelected && <Text style={styles.intensityCheck}>✓</Text>}
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </ScrollView>
-
-        <View style={styles.footer}>
-          <TouchableOpacity
-            style={[styles.continueBtn, !intensityLevel && styles.continueBtnDisabled]}
-            onPress={intensityLevel ? handleBuild : undefined}
-            activeOpacity={intensityLevel ? 0.85 : 1}
-          >
-            <Text style={styles.continueBtnText}>Build my plan →</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -1064,23 +1017,38 @@ export default function OnboardingScreen() {
         </View>
       )}
 
-      {/* Step counter */}
-      {!isMagicMoment && (
+      {/* Step counter — hidden when Step 2 shows templates (GoalTemplates has its own header) */}
+      {!isMagicMoment && !(step === 2 && !showFreeText && !showConfirmation) && (
         <Text style={styles.stepCounter}>
           Step {step} of {TOTAL_STEPS}
         </Text>
       )}
 
       {/* Back button */}
-      {step > 1 && !isMagicMoment && (
+      {step === 2 && showFreeText && !showConfirmation && !isMagicMoment ? (
         <TouchableOpacity
           style={styles.backBtn}
-          onPress={() => advanceStep(step - 1)}
+          onPress={() => setShowFreeText(false)}
           hitSlop={12}
         >
           <Text style={styles.backText}>‹ Back</Text>
         </TouchableOpacity>
-      )}
+      ) : step > 1 && !isMagicMoment && !(step === 2 && !showFreeText && !showConfirmation) ? (
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={() => {
+            if (step === 2 && showConfirmation) {
+              setShowConfirmation(false);
+              setShowFreeText(true);
+            } else {
+              advanceStep(step - 1);
+            }
+          }}
+          hitSlop={12}
+        >
+          <Text style={styles.backText}>‹ Back</Text>
+        </TouchableOpacity>
+      ) : null}
 
       {/* Content */}
       <View style={{ flex: 1 }}>
@@ -1088,7 +1056,6 @@ export default function OnboardingScreen() {
         {step === 2 && renderStep2()}
         {step === 3 && renderStep3()}
         {step === 4 && renderStep4()}
-        {step === 5 && renderStep5()}
         {isMagicMoment && renderMagicMoment()}
       </View>
       {/* ── AI Plan Chat Modal ── */}
@@ -1129,7 +1096,8 @@ export default function OnboardingScreen() {
               ]}
               keyExtractor={(_, i) => String(i)}
               contentContainerStyle={styles.chatList}
-              onContentSizeChange={() => chatListRef.current?.scrollToEnd({ animated: true })}
+              onContentSizeChange={() => setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 100)}
+              onLayout={() => setTimeout(() => chatListRef.current?.scrollToEnd({ animated: false }), 100)}
               renderItem={({ item, index }) => {
                 if (item.role === "loading") {
                   return (
@@ -1160,21 +1128,28 @@ export default function OnboardingScreen() {
                       </Text>
                     </View>
                     {isLastAssistant && options && options.length > 0 && !chatLoading && !chatDone && (
-                      <>
-                        <View style={styles.chatOptions}>
-                          {options.map((opt, j) => (
-                            <TouchableOpacity
-                              key={j}
-                              style={styles.chatOptionBtn}
-                              onPress={() => sendChatAnswer(opt)}
-                              activeOpacity={0.7}
-                            >
-                              <Text style={styles.chatOptionText}>{opt}</Text>
-                            </TouchableOpacity>
-                          ))}
-                        </View>
-                        <Text style={{ fontSize: typography.sm, color: colors.textTertiary, textAlign: "center", marginTop: spacing.sm }}>or type your own below</Text>
-                      </>
+                      <View style={styles.chatOptions}>
+                        {options.map((opt, j) => (
+                          <TouchableOpacity
+                            key={j}
+                            style={styles.chatOptionBtn}
+                            onPress={() => sendChatAnswer(opt)}
+                            activeOpacity={0.7}
+                          >
+                            <Text style={styles.chatOptionText}>{opt}</Text>
+                          </TouchableOpacity>
+                        ))}
+                        <TouchableOpacity
+                          style={[styles.chatOptionBtn, { borderColor: colors.border, borderWidth: 1, backgroundColor: colors.bg }]}
+                          onPress={() => {
+                            setShowTypingInput(true);
+                            setTimeout(() => chatInputRef.current?.focus(), 100);
+                          }}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={[styles.chatOptionText, { color: colors.textSecondary }]}>Type my own answer</Text>
+                        </TouchableOpacity>
+                      </View>
                     )}
                   </View>
                 );
@@ -1202,30 +1177,46 @@ export default function OnboardingScreen() {
                     </Text>
                   </TouchableOpacity>
                 </View>
-              ) : (
+              ) : showTypingInput ? (
                 <View style={styles.chatInputRow}>
                   <TextInput
+                    ref={chatInputRef}
                     style={styles.chatInput}
-                    placeholder="Type your own answer…"
+                    placeholder="Type your answer…"
                     placeholderTextColor={colors.textTertiary}
                     value={customInput}
                     onChangeText={setCustomInput}
                     editable={!chatLoading}
                     returnKeyType="send"
                     onSubmitEditing={() => {
-                      if (customInput.trim() && !chatLoading) sendChatAnswer(customInput.trim());
+                      if (customInput.trim() && !chatLoading) {
+                        sendChatAnswer(customInput.trim());
+                        setShowTypingInput(false);
+                      }
                     }}
                   />
                   <TouchableOpacity
                     style={[styles.chatSendBtn, (!customInput.trim() || chatLoading) && { opacity: 0.4 }]}
-                    onPress={() => customInput.trim() && !chatLoading && sendChatAnswer(customInput.trim())}
+                    onPress={() => {
+                      if (customInput.trim() && !chatLoading) {
+                        sendChatAnswer(customInput.trim());
+                        setShowTypingInput(false);
+                      }
+                    }}
                     activeOpacity={0.75}
                     disabled={!customInput.trim() || chatLoading}
                   >
                     <Text style={styles.chatSendText}>Send</Text>
                   </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => { setShowTypingInput(false); setCustomInput(""); }}
+                    style={{ paddingHorizontal: 8, paddingVertical: 10 }}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={{ fontSize: 18, color: colors.textTertiary }}>×</Text>
+                  </TouchableOpacity>
                 </View>
-              )}
+              ) : null}
             </View>
           </KeyboardAvoidingView>
         </SafeAreaView>
