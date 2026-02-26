@@ -906,8 +906,26 @@ function GoalCard({ goal, onDeleted, onUpdated }: { goal: Goal; onDeleted: () =>
   const [showMenu, setShowMenu] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [completing, setCompleting] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
+  const [editDescription, setEditDescription] = useState(goal.description || "");
+  const [editSaving, setEditSaving] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu on outside click
+  useEffect(() => {
+    if (!showMenu) return;
+    function handleClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setShowMenu(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showMenu]);
 
   async function handleDelete() {
+    setShowMenu(false);
     if (!confirm("Delete this goal and all its tasks?")) return;
     setDeleting(true);
     try {
@@ -928,6 +946,37 @@ function GoalCard({ goal, onDeleted, onUpdated }: { goal: Goal; onDeleted: () =>
       // silently fail
     } finally {
       setToggling(false);
+    }
+  }
+
+  async function handleMarkComplete() {
+    setShowMenu(false);
+    if (!confirm(`Mark "${goal.title}" as complete? It will be removed from your active goals.`)) return;
+    setCompleting(true);
+    try {
+      const { goal: updated } = await goalsApi.update(goal.id, { isActive: false } as Partial<Goal>);
+      onDeleted(); // Remove from list (same behavior as delete visually)
+    } catch {
+      setCompleting(false);
+    }
+  }
+
+  function handleEditDetail() {
+    setShowMenu(false);
+    setEditDescription(goal.description || goal.structuredSummary || "");
+    setShowEdit(true);
+  }
+
+  async function handleEditSave() {
+    setEditSaving(true);
+    try {
+      const { goal: updated } = await goalsApi.update(goal.id, { description: editDescription } as Partial<Goal>);
+      onUpdated(updated);
+      setShowEdit(false);
+    } catch {
+      // silently fail
+    } finally {
+      setEditSaving(false);
     }
   }
 
@@ -995,7 +1044,7 @@ function GoalCard({ goal, onDeleted, onUpdated }: { goal: Goal; onDeleted: () =>
           )}
 
           {/* Menu */}
-          <div style={{ position: "relative" }}>
+          <div style={{ position: "relative" }} ref={menuRef}>
             <button
               onClick={() => setShowMenu(v => !v)}
               style={{
@@ -1013,20 +1062,40 @@ function GoalCard({ goal, onDeleted, onUpdated }: { goal: Goal; onDeleted: () =>
                   position: "absolute", right: 0, top: 36, zIndex: 20,
                   background: "var(--card)", border: "1px solid var(--border)",
                   borderRadius: "var(--radius)", boxShadow: "var(--shadow-lg)",
-                  minWidth: 160, overflow: "hidden",
+                  minWidth: 180, overflow: "hidden",
                 }}
-                onMouseLeave={() => setShowMenu(false)}
               >
+                <button
+                  onClick={handleEditDetail}
+                  style={{
+                    display: "block", width: "100%", padding: "0.6rem 0.875rem",
+                    textAlign: "left", color: "var(--text)", fontSize: "0.875rem",
+                    fontWeight: 500, cursor: "pointer", background: "none", border: "none",
+                  }}
+                >
+                  {"\u270F\uFE0F"} Add more detail
+                </button>
                 <button
                   onClick={handleTogglePause}
                   disabled={toggling}
                   style={{
                     display: "block", width: "100%", padding: "0.6rem 0.875rem",
-                    textAlign: "left", color: "var(--subtext)", fontSize: "0.875rem",
+                    textAlign: "left", color: "var(--warning)", fontSize: "0.875rem",
                     fontWeight: 500, cursor: "pointer", background: "none", border: "none",
                   }}
                 >
                   {toggling ? "..." : goal.isPaused ? "\u25B6 Resume goal" : "\u23F8 Pause goal"}
+                </button>
+                <button
+                  onClick={handleMarkComplete}
+                  disabled={completing}
+                  style={{
+                    display: "block", width: "100%", padding: "0.6rem 0.875rem",
+                    textAlign: "left", color: "var(--success)", fontSize: "0.875rem",
+                    fontWeight: 500, cursor: "pointer", background: "none", border: "none",
+                  }}
+                >
+                  {completing ? "..." : "\u2705 Mark as complete"}
                 </button>
                 <button
                   onClick={handleDelete}
@@ -1044,6 +1113,40 @@ function GoalCard({ goal, onDeleted, onUpdated }: { goal: Goal; onDeleted: () =>
           </div>
         </div>
       </div>
+
+      {/* Inline edit panel */}
+      {showEdit && (
+        <div style={{ marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid var(--border)" }}>
+          <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--subtext)", marginBottom: 6, display: "block" }}>
+            Description / details
+          </label>
+          <textarea
+            className="field-input"
+            rows={3}
+            value={editDescription}
+            onChange={e => setEditDescription(e.target.value)}
+            placeholder="Add more context about this goal..."
+            style={{ width: "100%", resize: "vertical", marginBottom: 8 }}
+          />
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+            <button
+              className="btn btn-outline"
+              onClick={() => setShowEdit(false)}
+              style={{ fontSize: "0.8rem", padding: "0.4rem 0.875rem" }}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={handleEditSave}
+              disabled={editSaving}
+              style={{ fontSize: "0.8rem", padding: "0.4rem 0.875rem" }}
+            >
+              {editSaving ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

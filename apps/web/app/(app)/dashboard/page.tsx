@@ -1133,21 +1133,21 @@ export default function DashboardPage() {
                   style={{
                     display: "flex", alignItems: "center", justifyContent: "space-between",
                     padding: "0.875rem 1rem", borderRadius: "var(--radius)",
-                    border: `2px solid ${selectedGoalId === "overdue" ? "var(--warning)" : "var(--border)"}`,
-                    background: selectedGoalId === "overdue" ? "var(--warning-light)" : "var(--card)",
+                    border: `2px solid ${selectedGoalId === "overdue" ? "var(--warning)" : "var(--warning)"}`,
+                    background: selectedGoalId === "overdue" ? "var(--warning-light)" : "var(--warning-light)",
                     cursor: "pointer", textAlign: "left", marginTop: 4,
                   }}
                 >
-                  <span style={{ fontWeight: 500, color: selectedGoalId === "overdue" ? "var(--warning)" : "var(--text)", fontSize: "0.95rem" }}>
+                  <span style={{ fontWeight: 600, color: "var(--warning)", fontSize: "0.95rem" }}>
                     Overdue tasks
                   </span>
                   <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
                     <span style={{
                       fontSize: "0.7rem", fontWeight: 600,
-                      color: "var(--warning)", background: "var(--warning-light)",
+                      color: "#fff", background: "var(--warning)",
                       borderRadius: 20, padding: "2px 8px",
                     }}>
-                      {totalOverdueCount}
+                      {totalOverdueCount} overdue
                     </span>
                     {selectedGoalId === "overdue" && <span style={{ color: "var(--warning)", fontWeight: 700 }}>{"✓"}</span>}
                   </span>

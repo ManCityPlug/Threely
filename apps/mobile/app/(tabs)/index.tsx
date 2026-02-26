@@ -1057,23 +1057,24 @@ export default function DashboardScreen() {
               return (
                 <TouchableOpacity
                   key={goal.id}
-                  style={[styles.menuItem, isSelected && styles.menuItemSelected]}
+                  style={[styles.menuItem, isSelected && styles.menuItemSelected, { flexDirection: "column", alignItems: "stretch" }]}
                   onPress={() => selectGoal(goal.id)}
                   activeOpacity={0.7}
                 >
-                  <View style={{ flex: 1 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
                     <Text
-                      style={[styles.menuItemText, isSelected && styles.menuItemTextSelected]}
+                      style={[styles.menuItemText, isSelected && styles.menuItemTextSelected, { flex: 1 }]}
                       numberOfLines={1}
                       ellipsizeMode="tail"
                     >
                       {goal.title}
                     </Text>
-                    <Text style={[styles.menuStaleness, { color: staleColor }]}>
+                    {isSelected && <Text style={styles.menuCheck}>✓</Text>}
+                  </View>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 4, flexWrap: "wrap" }}>
+                    <Text style={[styles.menuStaleness, { color: staleColor, marginTop: 0 }]}>
                       {stalenessLabel(days)}
                     </Text>
-                  </View>
-                  <View style={styles.menuItemRight}>
                     {stat && stat.overdueCount > 0 && (
                       <View style={styles.menuOverdueBadge}>
                         <Text style={styles.menuOverdueBadgeText}>{stat.overdueCount} overdue</Text>
@@ -1084,7 +1085,6 @@ export default function DashboardScreen() {
                         <Text style={styles.menuTimeBadgeText}>~{formatMinutes(goalTime)}/day</Text>
                       </View>
                     ) : null}
-                    {isSelected && <Text style={styles.menuCheck}>✓</Text>}
                   </View>
                 </TouchableOpacity>
               );
@@ -1110,7 +1110,7 @@ export default function DashboardScreen() {
                   </Text>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
                     <View style={styles.menuOverdueBadge}>
-                      <Text style={styles.menuOverdueBadgeText}>{totalOverdueCount}</Text>
+                      <Text style={styles.menuOverdueBadgeText}>{totalOverdueCount} overdue</Text>
                     </View>
                     {selectedGoal === "overdue" && (
                       <Text style={[styles.menuCheck, { color: colors.warning }]}>✓</Text>
