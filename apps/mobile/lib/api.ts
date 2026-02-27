@@ -94,6 +94,7 @@ export interface Stats {
   totalCompleted: number;
   activeGoals: number;
   streak: number;
+  bestStreak: number;
   totalHoursInvested: number;
   goalStats: GoalStat[];
 }
@@ -363,11 +364,11 @@ export interface WeeklySummary {
 }
 
 export const statsApi = {
-  get: () => apiFetch<Stats>("/api/stats"),
+  get: () => apiFetch<Stats>(`/api/stats?_t=${Date.now()}`),
 
   heatmap: (days = 90) => {
     const tz = new Date().getTimezoneOffset(); // minutes offset from UTC
-    return apiFetch<{ heatmap: HeatmapDay[] }>(`/api/stats/heatmap?days=${days}&tz=${tz}`);
+    return apiFetch<{ heatmap: HeatmapDay[] }>(`/api/stats/heatmap?days=${days}&tz=${tz}&_t=${Date.now()}`);
   },
 };
 

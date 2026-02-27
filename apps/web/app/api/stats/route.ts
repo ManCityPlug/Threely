@@ -71,6 +71,34 @@ export async function GET(request: NextRequest) {
     streak++;
   }
 
+  // Best streak: longest run of consecutive days with at least one completed task
+  let bestStreak = streak;
+  const allDateKeys = Array.from(tasksByDate.keys()).sort();
+  if (allDateKeys.length > 0) {
+    let currentRun = 0;
+    let prevDate: Date | null = null;
+    for (const key of allDateKeys) {
+      const dayTasks = tasksByDate.get(key)!;
+      const hasCompleted = dayTasks.some((dt) =>
+        (dt.tasks as unknown as TaskItem[]).some((t) => t.isCompleted)
+      );
+      if (hasCompleted) {
+        const thisDate = new Date(key + "T00:00:00Z");
+        if (prevDate) {
+          const diffDays = Math.round((thisDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+          currentRun = diffDays === 1 ? currentRun + 1 : 1;
+        } else {
+          currentRun = 1;
+        }
+        prevDate = thisDate;
+        if (currentRun > bestStreak) bestStreak = currentRun;
+      } else {
+        currentRun = 0;
+        prevDate = null;
+      }
+    }
+  }
+
   // Per-goal stats: lastWorkedAt + overdueCount
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
@@ -119,7 +147,9 @@ export async function GET(request: NextRequest) {
     };
   });
 
-  const result = { totalCompleted, activeGoals, streak, totalHoursInvested, goalStats };
+  const result = { totalCompleted, activeGoals, streak, bestStreak, totalHoursInvested, goalStats };
   setCachedStats(user.id, result);
-  return NextResponse.json(result);
+  return NextResponse.json(result, {
+    headers: { "Cache-Control": "no-store, max-age=0" },
+  });
 }

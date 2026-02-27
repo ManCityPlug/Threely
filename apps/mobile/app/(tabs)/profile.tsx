@@ -448,12 +448,16 @@ export default function ProfileScreen() {
               <SkeletonStatCard />
               <SkeletonStatCard />
             </View>
+            <View style={styles.statsRow}>
+              <SkeletonStatCard />
+              <View style={{ flex: 1 }} />
+            </View>
           </>
         ) : (
           <>
             <View style={styles.statsRow}>
               <StatCard
-                label="Tasks done"
+                label="Total tasks done"
                 value={stats?.totalCompleted ?? "—"}
                 numericValue={stats?.totalCompleted}
                 icon="checkmark-circle-outline"
@@ -476,6 +480,17 @@ export default function ProfileScreen() {
             </View>
             <View style={styles.statsRow}>
               <StatCard
+                label="Best streak"
+                value={stats ? `${stats.bestStreak ?? 0}d` : "—"}
+                numericValue={stats?.bestStreak ?? 0}
+                suffix="d"
+                icon="trophy-outline"
+                accentColor={colors.primary}
+                loading={statsLoading}
+                colors={colors}
+                styles={styles}
+              />
+              <StatCard
                 label="Goals"
                 value={stats?.activeGoals ?? "—"}
                 numericValue={stats?.activeGoals}
@@ -484,6 +499,8 @@ export default function ProfileScreen() {
                 colors={colors}
                 styles={styles}
               />
+            </View>
+            <View style={styles.statsRow}>
               <StatCard
                 label="Hours invested"
                 value={stats ? `${stats.totalHoursInvested ?? 0}h` : "—"}
@@ -494,6 +511,7 @@ export default function ProfileScreen() {
                 colors={colors}
                 styles={styles}
               />
+              <View style={{ flex: 1 }} />
             </View>
           </>
         )}

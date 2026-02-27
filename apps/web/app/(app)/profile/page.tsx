@@ -321,7 +321,7 @@ export default function ProfilePage() {
       {/* Stats row */}
       <div style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
+        gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
         gap: "0.75rem",
         marginBottom: "1.75rem",
       }}>
@@ -335,7 +335,7 @@ export default function ProfilePage() {
           <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--success)" }}>
             ✓ <AnimatedNumber value={stats?.totalCompleted ?? 0} />
           </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Tasks done</div>
+          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Total tasks done</div>
         </div>
         <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.16s" }}>
           <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--text)" }}>
@@ -348,6 +348,12 @@ export default function ProfilePage() {
             <AnimatedNumber value={stats?.totalHoursInvested ?? 0} suffix="h" />
           </div>
           <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Hours invested</div>
+        </div>
+        <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.32s" }}>
+          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--primary)" }}>
+            <AnimatedNumber value={stats?.bestStreak ?? 0} suffix="d" />
+          </div>
+          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Best streak</div>
         </div>
       </div>
 

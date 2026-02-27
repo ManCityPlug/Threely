@@ -127,7 +127,9 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ heatmap });
+    return NextResponse.json({ heatmap }, {
+      headers: { "Cache-Control": "no-store, max-age=0" },
+    });
   } catch (e) {
     console.error("[/api/stats/heatmap]", e);
     return NextResponse.json({ error: "Failed to fetch heatmap data" }, { status: 500 });
