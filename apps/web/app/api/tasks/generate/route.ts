@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
 import { generateTasks, type TaskItem } from "@/lib/claude";
+import { getUserAccess } from "@/lib/subscription";
 
 // POST /api/tasks/generate
 // Body: { goalId?, requestingAdditional?, focusShifted?, postReview? }
@@ -13,6 +14,16 @@ export async function POST(request: NextRequest) {
   const user = await getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Pro gate — free trial or active subscription required
+  const access = await getUserAccess(user.id);
+  if (!access.hasPro) {
+    return NextResponse.json({
+      error: "pro_required",
+      message: "Subscribe to keep your momentum going",
+      trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
+    }, { status: 403 });
+  }
+
   const { checkRateLimit } = await import("@/lib/rate-limit");
   const { allowed } = checkRateLimit(user.id);
   if (!allowed) {
@@ -20,15 +31,16 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json().catch(() => ({}));
-  const { goalId, requestingAdditional, focusShifted, postReview } = body as {
+  const { goalId, localDate, requestingAdditional, focusShifted, postReview } = body as {
     goalId?: string;
+    localDate?: string;
     requestingAdditional?: boolean;
     focusShifted?: boolean;
     postReview?: boolean;
   };
 
-  // Today at UTC midnight
-  const today = new Date();
+  // Use client's local date if provided, otherwise fall back to UTC midnight
+  const today = localDate ? new Date(localDate) : new Date();
   today.setUTCHours(0, 0, 0, 0);
 
   // Determine time of day for task calibration
@@ -123,10 +135,15 @@ export async function POST(request: NextRequest) {
           data: { tasks: mergedTasks as never, generatedAt: new Date() },
         });
       } else if (existing && postReview) {
-        // Replace tasks with fresh set after post-review generation
+        // Keep completed/skipped tasks and append fresh set
+        const existingTasks = Array.isArray(existing.tasks)
+          ? (existing.tasks as unknown as TaskItem[])
+          : [];
+        const completedTasks = existingTasks.filter(t => t.isCompleted || t.isSkipped);
+        const mergedTasks = [...completedTasks, ...result.tasks];
         dailyTask = await prisma.dailyTask.update({
           where: { goalId_date: { goalId: goal.id, date: today } },
-          data: { tasks: result.tasks as never, generatedAt: new Date(), isCompleted: false },
+          data: { tasks: mergedTasks as never, generatedAt: new Date(), isCompleted: false },
         });
       } else {
         dailyTask = await prisma.dailyTask.create({
@@ -151,7 +168,8 @@ export async function POST(request: NextRequest) {
     { status: 201 }
   );
   } catch (e) {
-    console.error("[/api/tasks/generate]", e);
-    return NextResponse.json({ error: "Failed to generate tasks" }, { status: 500 });
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[/api/tasks/generate]", msg, e);
+    return NextResponse.json({ error: msg || "Failed to generate tasks" }, { status: 500 });
   }
 }

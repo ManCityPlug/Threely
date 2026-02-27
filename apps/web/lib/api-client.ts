@@ -170,9 +170,12 @@ export const goalsApi = {
 export const tasksApi = {
   today: (includeOverdue?: boolean, date?: string) => {
     const params = new URLSearchParams();
-    if (date) params.set("date", date);
+    // Always send the browser's local date so the server matches local timezone
+    const now = new Date();
+    const localDate = date ?? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    params.set("date", localDate);
     if (includeOverdue) params.set("includeOverdue", "true");
-    const q = params.toString() ? `?${params.toString()}` : "";
+    const q = `?${params.toString()}`;
     return apiFetch<{ dailyTasks: DailyTask[]; overdueTasks: DailyTask[] }>(`/api/tasks${q}`);
   },
 
@@ -181,11 +184,14 @@ export const tasksApi = {
     requestingAdditional?: boolean;
     focusShifted?: boolean;
     postReview?: boolean;
-  }) =>
-    apiFetch<{ dailyTasks: DailyTask[]; coachNote?: string }>(
+  }) => {
+    const now = new Date();
+    const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    return apiFetch<{ dailyTasks: DailyTask[]; coachNote?: string }>(
       "/api/tasks/generate",
-      { method: "POST", body: JSON.stringify(opts ?? {}) }
-    ),
+      { method: "POST", body: JSON.stringify({ localDate, ...(opts ?? {}) }) }
+    );
+  },
 
   toggleTask: (dailyTaskId: string, taskItemId: string, isCompleted: boolean) =>
     apiFetch<{ dailyTask: DailyTask }>(`/api/tasks/${dailyTaskId}`, {
@@ -287,13 +293,29 @@ export interface WeeklySummary {
 export const statsApi = {
   get: () => apiFetch<Stats>("/api/stats"),
 
-  heatmap: (days = 90) =>
-    apiFetch<{ heatmap: HeatmapDay[] }>(`/api/stats/heatmap?days=${days}`),
+  heatmap: (days = 90) => {
+    const tz = new Date().getTimezoneOffset(); // minutes offset from UTC
+    return apiFetch<{ heatmap: HeatmapDay[] }>(`/api/stats/heatmap?days=${days}&tz=${tz}`);
+  },
 };
+
+export interface WeeklySummaryStatus {
+  status: "locked" | "ready" | "available" | "expired";
+  unlocksAt?: string;
+  weekStart?: string;
+  summary?: WeeklySummary;
+}
 
 export const summaryApi = {
   weekly: (withInsight = false) =>
     apiFetch<WeeklySummary>(`/api/summary/weekly${withInsight ? "?withInsight=true" : ""}`),
+  weeklyStatus: (tz: string) =>
+    apiFetch<WeeklySummaryStatus>(`/api/summary/weekly-status?tz=${encodeURIComponent(tz)}`),
+  weeklyOpen: (tz: string) =>
+    apiFetch<WeeklySummary>("/api/summary/weekly-open", {
+      method: "POST",
+      body: JSON.stringify({ tz }),
+    }),
 };
 
 // ─── Account API ──────────────────────────────────────────────────────────────

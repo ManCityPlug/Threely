@@ -31,16 +31,20 @@ export async function POST(request: NextRequest) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await request.json();
-    const { focusGoalId, shuffleTaskIds } = body as {
+    const { focusGoalId, shuffleTaskIds, localDate } = body as {
       focusGoalId: string;
       shuffleTaskIds?: string[];
+      localDate?: string;
     };
 
     if (!focusGoalId) {
       return NextResponse.json({ error: "focusGoalId is required" }, { status: 400 });
     }
 
-    const today = new Date(new Date().toISOString().slice(0, 10) + "T00:00:00.000Z");
+    // Use client's local date if provided, otherwise fall back to UTC
+    const today = localDate
+      ? new Date(localDate + "T00:00:00.000Z")
+      : new Date(new Date().toISOString().slice(0, 10) + "T00:00:00.000Z");
 
     const focus = await prisma.dailyFocus.upsert({
       where: { userId_date: { userId: user.id, date: today } },

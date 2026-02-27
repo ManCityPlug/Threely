@@ -8,7 +8,14 @@ interface TaskItem {
   isSkipped?: boolean;
 }
 
-// GET /api/stats/heatmap?days=90
+// Convert a full timestamp to a local date string using timezone offset
+// tz = getTimezoneOffset() from client (positive for west of UTC)
+function toLocalDateKey(timestamp: Date, tzOffsetMs: number): string {
+  const local = new Date(timestamp.getTime() - tzOffsetMs);
+  return local.toISOString().split("T")[0];
+}
+
+// GET /api/stats/heatmap?days=90&tz=360
 export async function GET(request: NextRequest) {
   try {
     const user = await getUserFromRequest(request);
@@ -16,36 +23,39 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const days = Math.min(parseInt(searchParams.get("days") ?? "90", 10), 365);
+    const tz = parseInt(searchParams.get("tz") ?? "0", 10); // client timezone offset in minutes
+    const tzOffsetMs = tz * 60 * 1000;
 
+    // Extend query range by 1 day to account for timezone differences
     const since = new Date();
     since.setUTCHours(0, 0, 0, 0);
-    since.setDate(since.getDate() - days);
+    since.setDate(since.getDate() - days - 1);
 
     const [dailyTasks, dailyFocusRecords] = await Promise.all([
       prisma.dailyTask.findMany({
         where: { userId: user.id, date: { gte: since } },
-        select: { date: true, goalId: true, tasks: true },
+        select: { date: true, goalId: true, tasks: true, generatedAt: true },
       }),
       prisma.dailyFocus.findMany({
         where: { userId: user.id, date: { gte: since } },
-        select: { date: true, focusGoalId: true, shuffleTaskIds: true },
+        select: { date: true, focusGoalId: true, shuffleTaskIds: true, createdAt: true },
       }),
     ]);
 
-    // Index focus records by date
+    // Index focus records by LOCAL date (using createdAt timestamp + tz)
     const focusByDate = new Map<string, { focusGoalId: string; shuffleTaskIds: string[] | null }>();
     for (const f of dailyFocusRecords) {
-      const key = new Date(f.date).toISOString().split("T")[0];
+      const key = toLocalDateKey(new Date(f.createdAt), tzOffsetMs);
       focusByDate.set(key, {
         focusGoalId: f.focusGoalId,
         shuffleTaskIds: Array.isArray(f.shuffleTaskIds) ? (f.shuffleTaskIds as string[]) : null,
       });
     }
 
-    // Group by date, filtering by focus
+    // Group by LOCAL date (using generatedAt timestamp + tz), filtering by focus
     const byDate = new Map<string, { completed: number; total: number }>();
     for (const dt of dailyTasks) {
-      const key = new Date(dt.date).toISOString().split("T")[0];
+      const key = toLocalDateKey(new Date(dt.generatedAt), tzOffsetMs);
       const focus = focusByDate.get(key);
       const items = Array.isArray(dt.tasks) ? (dt.tasks as unknown as TaskItem[]) : [];
 
@@ -77,14 +87,17 @@ export async function GET(request: NextRequest) {
       byDate.set(key, existing);
     }
 
-    // Build heatmap array for every day in range
+    // Build heatmap array for every day in range, using client's local "today"
     const heatmap: { date: string; completed: number; total: number; percentage: number }[] = [];
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
+    const nowLocal = new Date(Date.now() - tzOffsetMs);
+    const todayKey = nowLocal.toISOString().split("T")[0];
+
+    // Parse todayKey back to iterate dates cleanly
+    const todayDate = new Date(todayKey + "T00:00:00Z");
 
     for (let i = days; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
+      const d = new Date(todayDate);
+      d.setUTCDate(d.getUTCDate() - i);
       const key = d.toISOString().split("T")[0];
       const entry = byDate.get(key) ?? { completed: 0, total: 0 };
       heatmap.push({
