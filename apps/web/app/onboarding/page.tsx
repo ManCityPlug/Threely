@@ -297,15 +297,18 @@ export default function OnboardingPage() {
         intensityLevel: intensityLevel ?? 2,
       });
 
-      // Create goal with all parsed data
+      // Create goal with all parsed data + sensible defaults
+      const detectedWorkDays = (result.work_days_detected && result.work_days_detected.length > 0)
+        ? result.work_days_detected : [1, 2, 3, 4, 5, 6, 7];
       const goalResult = await goalsApi.create({
         title: goalTitle.slice(0, 80),
         rawInput: goalText,
         structuredSummary: result.structured_summary,
         category: result.category,
         deadline: result.deadline_detected ?? getDeadlineISO() ?? null,
-        dailyTimeMinutes: detectedTime ?? timeMinutes ?? undefined,
-        intensityLevel: intensityLevel ?? undefined,
+        dailyTimeMinutes: detectedTime ?? timeMinutes ?? 60,
+        intensityLevel: intensityLevel ?? 2,
+        workDays: detectedWorkDays,
       });
 
       // Generate tasks

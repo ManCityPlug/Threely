@@ -425,57 +425,23 @@ export default function GoalsScreen() {
 
   async function handleUseGoal() {
     if (!chatGoalText) return;
-    setRawGoalInput(chatGoalText);
+    const goalText = chatGoalText.trim();
+    setRawGoalInput(goalText);
     setShowAiChat(false);
     if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    // Auto-parse and advance
-    setParsing(true);
-    setParseError("");
+    // Go straight to building — AI chat already covered all details
+    setBuildError("");
+    advanceAddStep(TOTAL_ADD_STEPS); // show building screen immediately
     try {
-      const result = await goalsApi.parse(chatGoalText.trim());
+      const result = await goalsApi.parse(goalText);
       setParsedGoal(result);
-      if (result.deadline_detected) {
-        const d = new Date(result.deadline_detected + "T12:00:00");
-        setHasDeadline(true);
-        setDeadlineMonth(d.getMonth());
-        setDeadlineDay(d.getDate());
-        setDeadlineYear(d.getFullYear());
-      }
-      if (result.daily_time_detected && result.daily_time_detected > 0) {
-        const mins = result.daily_time_detected;
-        const preset = TIME_OPTIONS.find((o) => o.value === mins);
-        if (preset) {
-          setTimeMinutes(mins);
-          setShowCustomTime(false);
-        } else {
-          const closest = TIME_OPTIONS.reduce((prev, curr) =>
-            Math.abs(curr.value - mins) < Math.abs(prev.value - mins) ? curr : prev
-          );
-          setTimeMinutes(closest.value);
-          setShowCustomTime(false);
-        }
-      }
-      // Pre-fill work days if detected
       if (result.work_days_detected && result.work_days_detected.length > 0) {
         setWorkDays(result.work_days_detected);
-        const isCustom = !WORK_DAY_PRESETS.some(
-          (p) => p.value.length === result.work_days_detected!.length && p.value.every((d) => result.work_days_detected!.includes(d))
-        );
-        setShowCustomDays(isCustom);
       }
-      // Skip to deadline if no issues, or confirm if needs more context
-      if (result.needs_more_context) {
-        advanceAddStep(2);
-      } else {
-        let nextStep = 3; // deadline
-        if (result.deadline_detected) nextStep = 4; // skip deadline → time
-        if (result.daily_time_detected && result.daily_time_detected > 0) nextStep = 5; // skip time → work days
-        advanceAddStep(nextStep);
-      }
+      // Build immediately with parsed data
+      await handleBuild({ goalText, parsed: result, dailyMinutes: result.daily_time_detected && result.daily_time_detected > 0 ? result.daily_time_detected : undefined });
     } catch (e) {
-      setParseError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
-    } finally {
-      setParsing(false);
+      setBuildError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
     }
   }
 
@@ -499,7 +465,9 @@ export default function GoalsScreen() {
         effectiveGoalText.slice(0, 40);
 
       const deadlineISO = hasDeadline ? getDeadlineISO(deadlineMonth, deadlineDay, deadlineYear) : undefined;
-      const deadline = effectiveParsed?.deadline_detected ?? deadlineISO;
+      const deadline = effectiveParsed?.deadline_detected ?? deadlineISO ?? null;
+      const effectiveWorkDays = (effectiveParsed?.work_days_detected && effectiveParsed.work_days_detected.length > 0)
+        ? effectiveParsed.work_days_detected : workDays;
 
       let goalId: string;
 
@@ -510,9 +478,9 @@ export default function GoalsScreen() {
           structuredSummary: effectiveParsed?.structured_summary ?? undefined,
           category: effectiveParsed?.category ?? undefined,
           deadline: deadline ?? null,
-          dailyTimeMinutes: effectiveTime ?? undefined,
+          dailyTimeMinutes: effectiveTime ?? 60,
           intensityLevel: 2,
-          workDays,
+          workDays: effectiveWorkDays,
         });
         setGoals((prev) => prev.map((g) => g.id === editingGoalId ? goalResult.goal : g));
         goalId = editingGoalId;
@@ -522,9 +490,9 @@ export default function GoalsScreen() {
           structuredSummary: effectiveParsed?.structured_summary ?? undefined,
           category: effectiveParsed?.category ?? undefined,
           deadline,
-          dailyTimeMinutes: effectiveTime ?? undefined,
+          dailyTimeMinutes: effectiveTime ?? 60,
           intensityLevel: 2,
-          workDays,
+          workDays: effectiveWorkDays,
         });
         setGoals((prev) => [goalResult.goal, ...prev]);
         goalId = goalResult.goal.id;

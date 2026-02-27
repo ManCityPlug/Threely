@@ -409,15 +409,17 @@ export default function OnboardingScreen() {
         intensityLevel: 2,
       });
 
-      // Create the goal with all parsed data + per-goal settings
+      // Create the goal with all parsed data + sensible defaults
+      const detectedWorkDays = (effectiveParsed?.work_days_detected && effectiveParsed.work_days_detected.length > 0)
+        ? effectiveParsed.work_days_detected : workDays;
       const goalResult = await goalsApi.create(goalTitle, {
         rawInput: effectiveGoalText,
         structuredSummary: effectiveParsed?.structured_summary ?? undefined,
         category: effectiveParsed?.category ?? undefined,
         deadline: effectiveParsed?.deadline_detected ?? getDeadlineISO(),
-        dailyTimeMinutes: effectiveTime ?? undefined,
+        dailyTimeMinutes: effectiveTime ?? 60,
         intensityLevel: 2,
-        workDays,
+        workDays: detectedWorkDays,
       });
 
       // Generate tasks

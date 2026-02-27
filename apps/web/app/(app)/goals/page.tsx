@@ -14,7 +14,8 @@ import { useToast } from "@/components/ToastProvider";
 const CATEGORY_EMOJI: Record<string, string> = {
   fitness: "💪", business: "💼", learning: "📚", creative: "🎨",
   financial: "💰", health: "🌱", relationships: "🤝", productivity: "⚡",
-  other: "🎯",
+  spiritual: "🙏", religion: "🙏", mindfulness: "🧠", career: "💼",
+  wealth: "💰", other: "🎯",
 };
 
 function CategoryBadge({ category }: { category: string | null }) {
@@ -245,32 +246,25 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
 
   async function handleUseGoal() {
     if (!chatGoalText) return;
-    setRawInput(chatGoalText);
+    const goalText = chatGoalText.trim();
+    setRawInput(goalText);
     setShowAiChat(false);
-    // Auto-parse and advance through remaining steps
+    // Go straight to building — AI chat already covered all details
+    setBuildError("");
+    setStep("building");
     try {
-      const result = await goalsApi.parse(chatGoalText.trim());
+      const result = await goalsApi.parse(goalText);
       setParsed(result);
       if (result.deadline_detected) {
-        const d = new Date(result.deadline_detected + "T12:00:00");
         setHasDeadline(true);
-        setDeadlineYear(d.getFullYear());
-        setDeadlineMonth(d.getMonth() + 1);
-        setDeadlineDay(d.getDate());
       }
       if (result.work_days_detected && result.work_days_detected.length > 0) {
         setWorkDays(result.work_days_detected);
-        const isCustom = !WORK_DAY_PRESETS_WEB.some(
-          (p) => p.value.length === result.work_days_detected!.length && p.value.every((d) => result.work_days_detected!.includes(d))
-        );
-        setShowCustomDays(isCustom);
       }
-      // Skip to the first step AI didn't cover
-      let nextStep: FlowStep = "deadline";
-      if (result.deadline_detected) nextStep = "time";
-      setStep(nextStep);
+      // Build immediately with parsed data — use defaults for anything AI didn't extract
+      await handleBuild({ goalText, parsedGoal: result });
     } catch {
-      setParseError("Failed to analyze goal. Try again.");
+      setBuildError("Failed to analyze goal. Try again.");
       setStep("goal");
     }
   }
@@ -284,9 +278,13 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
       const effectiveRawInput = overrides?.goalText ?? rawInput.trim();
       const effectiveParsed = overrides?.parsedGoal ?? parsed;
       const goalTitle = effectiveParsed?.short_title ?? (effectiveRawInput.slice(0, 40) || "My Goal");
-      const deadline = effectiveParsed?.deadline_detected ?? (hasDeadline
-        ? `${deadlineYear}-${String(deadlineMonth).padStart(2, "0")}-${String(deadlineDay).padStart(2, "0")}`
-        : null);
+      // Use AI-detected deadline, or manual entry, or default 90-day rolling
+      const deadline = effectiveParsed?.deadline_detected
+        ?? (hasDeadline ? `${deadlineYear}-${String(deadlineMonth).padStart(2, "0")}-${String(deadlineDay).padStart(2, "0")}` : null);
+      const effectiveWorkDays = (effectiveParsed?.work_days_detected && effectiveParsed.work_days_detected.length > 0)
+        ? effectiveParsed.work_days_detected : workDays;
+      const effectiveTime = (effectiveParsed?.daily_time_detected && effectiveParsed.daily_time_detected > 0)
+        ? effectiveParsed.daily_time_detected : (timeMinutes ?? 60);
 
       const { goal } = await goalsApi.create({
         title: goalTitle,
@@ -294,9 +292,9 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
         structuredSummary: effectiveParsed?.structured_summary,
         category: effectiveParsed?.category,
         deadline,
-        dailyTimeMinutes: timeMinutes ?? undefined,
-        intensityLevel: intensityLevel ?? undefined,
-        workDays,
+        dailyTimeMinutes: effectiveTime,
+        intensityLevel: intensityLevel ?? 2,
+        workDays: effectiveWorkDays,
       });
       setSavedGoal(goal);
 
