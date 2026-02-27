@@ -129,7 +129,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatHistory, chatLoading]);
+  }, [chatHistory, chatLoading, selectedOptions.size]);
 
   // Auto-open AI chat when editing an existing goal
   const editGoalTriggered = useRef(false);
@@ -823,7 +823,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
           </div>
 
           {/* Chat messages */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.25rem", display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.25rem 1.5rem", display: "flex", flexDirection: "column", gap: 12 }}>
             {chatHistory.map((msg, i) => {
               const isAssistant = msg.role === "assistant";
               const isLastAssistant = isAssistant && i === chatHistory.length - 1;
