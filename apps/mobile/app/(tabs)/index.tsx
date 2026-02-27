@@ -457,7 +457,6 @@ export default function DashboardScreen() {
       return;
     }
     setGenerating(true);
-    setCompletionMessages(prev => { const next = { ...prev }; delete next[goalKey]; return next; });
     try {
       const goalId = selectedGoal === "shuffle" ? undefined : selectedGoal;
       const res = await tasksApi.generate(goalId);
@@ -635,7 +634,6 @@ export default function DashboardScreen() {
 
       // Auto-generate next tasks after review
       setGenerating(true);
-      setCompletionMessages(prev => { const next = { ...prev }; delete next[goalKey]; return next; });
       try {
         const goalId = selectedGoal === "shuffle" ? undefined : selectedGoal;
         const res = await tasksApi.generate(goalId, { requestingAdditional: true });
