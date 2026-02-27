@@ -62,6 +62,7 @@ model Goal {
   intensityLevel    Int?        @map("intensity_level")
   isActive          Boolean     @default(true) @map("is_active")
   isPaused          Boolean     @default(false) @map("is_paused")
+  workDays          Int[]       @default([1, 2, 3, 4, 5, 6, 7]) @map("work_days")
   createdAt         DateTime    @default(now()) @map("created_at")
   updatedAt         DateTime    @updatedAt @map("updated_at")
 
