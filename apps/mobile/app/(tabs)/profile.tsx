@@ -81,7 +81,7 @@ function StatCard({ label, value, numericValue, suffix = "", icon, accentColor, 
   return (
     <View style={styles.statCard}>
       <View style={[styles.statIconWrap, accentColor ? { backgroundColor: `${accentColor}18` } : undefined]}>
-        <Ionicons name={icon} size={20} color={iconColor} />
+        <Ionicons name={icon} size={18} color={iconColor} />
       </View>
       {loading ? (
         <ActivityIndicator color={colors.primary} size="small" style={{ marginVertical: 4 }} />
@@ -443,21 +443,18 @@ export default function ProfileScreen() {
             <View style={styles.statsRow}>
               <SkeletonStatCard />
               <SkeletonStatCard />
-            </View>
-            <View style={styles.statsRow}>
-              <SkeletonStatCard />
               <SkeletonStatCard />
             </View>
             <View style={styles.statsRow}>
               <SkeletonStatCard />
-              <View style={{ flex: 1 }} />
+              <SkeletonStatCard />
             </View>
           </>
         ) : (
           <>
             <View style={styles.statsRow}>
               <StatCard
-                label="Total tasks done"
+                label="Tasks done"
                 value={stats?.totalCompleted ?? "—"}
                 numericValue={stats?.totalCompleted}
                 icon="checkmark-circle-outline"
@@ -467,7 +464,7 @@ export default function ProfileScreen() {
                 styles={styles}
               />
               <StatCard
-                label="Current streak"
+                label="Streak"
                 value={stats ? `${stats.streak}d` : "—"}
                 numericValue={stats?.streak}
                 suffix="d"
@@ -477,8 +474,6 @@ export default function ProfileScreen() {
                 colors={colors}
                 styles={styles}
               />
-            </View>
-            <View style={styles.statsRow}>
               <StatCard
                 label="Best streak"
                 value={stats ? `${stats.bestStreak ?? 0}d` : "—"}
@@ -490,6 +485,8 @@ export default function ProfileScreen() {
                 colors={colors}
                 styles={styles}
               />
+            </View>
+            <View style={styles.statsRow}>
               <StatCard
                 label="Active goals"
                 value={stats?.activeGoals ?? "—"}
@@ -500,8 +497,6 @@ export default function ProfileScreen() {
                 colors={colors}
                 styles={styles}
               />
-            </View>
-            <View style={styles.statsRow}>
               <StatCard
                 label="Hours invested"
                 value={stats ? `${stats.totalHoursInvested ?? 0}h` : "—"}
@@ -513,7 +508,6 @@ export default function ProfileScreen() {
                 colors={colors}
                 styles={styles}
               />
-              <View style={{ flex: 1 }} />
             </View>
           </>
         )}
@@ -970,30 +964,31 @@ function createStyles(c: Colors) {
       flex: 1,
       backgroundColor: c.card,
       borderRadius: radius.lg,
-      padding: spacing.md,
+      paddingVertical: spacing.sm + 4,
+      paddingHorizontal: spacing.sm,
       alignItems: "center",
-      gap: spacing.xs,
+      gap: 3,
       borderWidth: 1,
       borderColor: c.border,
       ...shadow.sm,
     },
     statIconWrap: {
-      width: 36,
-      height: 36,
+      width: 32,
+      height: 32,
       borderRadius: radius.md,
       backgroundColor: c.primaryLight,
       alignItems: "center",
       justifyContent: "center",
-      marginBottom: 2,
+      marginBottom: 1,
     },
     statValue: {
-      fontSize: typography.xl,
+      fontSize: typography.lg,
       fontWeight: typography.bold,
       color: c.text,
       letterSpacing: -0.3,
     },
     statLabel: {
-      fontSize: typography.xs,
+      fontSize: typography.xs - 1,
       color: c.textSecondary,
       textAlign: "center",
     },
