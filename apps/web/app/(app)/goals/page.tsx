@@ -80,7 +80,7 @@ const INTENSITY_OPTIONS_WEB = [
 
 function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => void; onClose: () => void; editGoal?: Goal | null }) {
   const [step, setStep] = useState<FlowStep>("goal");
-  const [showTemplates, setShowTemplates] = useState(true);
+  const [showTemplates, setShowTemplates] = useState(!editGoal);
 
   // Goal input
   const [rawInput, setRawInput] = useState("");
@@ -137,7 +137,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
     if (editGoal && !editGoalTriggered.current) {
       editGoalTriggered.current = true;
       setRawInput(editGoal.rawInput || editGoal.title);
-      startAiChatWithMessage(`My current goal is: "${editGoal.rawInput || editGoal.title}". I'd like to add more detail or make changes to it.`);
+      startAiChatWithMessage(`I have an existing goal: "${editGoal.title}"${editGoal.structuredSummary ? ` — ${editGoal.structuredSummary}` : ""}. I'd like to make some changes to it. Ask me what I'd like to change and offer a few options like: change the deadline/timeline, adjust daily time commitment, change which days I work on it, refine the goal itself, or something else.`);
     }
   }, [editGoal]);
 
@@ -810,7 +810,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
               <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>Threely Intelligence</span>
             </div>
             <button
-              onClick={() => { setShowAiChat(false); setShowTemplates(true); }}
+              onClick={() => { if (editGoal) { onClose(); } else { setShowAiChat(false); setShowTemplates(true); } }}
               style={{
                 width: 30, height: 30, borderRadius: "var(--radius-sm)",
                 background: "var(--bg)", border: "1px solid var(--border)",

@@ -541,7 +541,7 @@ export default function GoalsScreen() {
     setAddStep(1);
 
     // Open AI chat with context about the existing goal
-    startAiChatWithMessage(`My current goal is: "${goal.rawInput || goal.title}". I'd like to add more detail or make changes to it.`);
+    startAiChatWithMessage(`I have an existing goal: "${goal.title}"${goal.structuredSummary ? ` — ${goal.structuredSummary}` : ""}. I'd like to make some changes to it. Ask me what I'd like to change and offer a few options like: change the deadline/timeline, adjust daily time commitment, change which days I work on it, refine the goal itself, or something else.`);
   }
 
   async function handleMarkCompletePress() {
@@ -727,7 +727,7 @@ export default function GoalsScreen() {
           {parsedGoal.needs_more_context ? (
             <View style={styles.footerStack}>
               <TouchableOpacity style={styles.continueBtn} onPress={() => { advanceAddStep(1); setParsedGoal(null); }} activeOpacity={0.85}>
-                <Text style={styles.continueBtnText}>Add more detail →</Text>
+                <Text style={styles.continueBtnText}>Edit goal →</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.continueBtn, { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.primary + "40" }]}
