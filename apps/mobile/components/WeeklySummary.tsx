@@ -18,9 +18,10 @@ import { spacing, typography, radius, shadow } from "@/constants/theme";
 interface WeeklySummaryProps {
   visible: boolean;
   onClose: () => void;
+  frozenData?: WeeklySummaryType | null;
 }
 
-export function WeeklySummary({ visible, onClose }: WeeklySummaryProps) {
+export function WeeklySummary({ visible, onClose, frozenData }: WeeklySummaryProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -30,6 +31,11 @@ export function WeeklySummary({ visible, onClose }: WeeklySummaryProps) {
 
   useEffect(() => {
     if (!visible) return;
+    // If frozen data is provided, use it directly (no fetch)
+    if (frozenData) {
+      setData(frozenData);
+      return;
+    }
     setLoading(true);
     setError("");
     summaryApi
@@ -37,7 +43,7 @@ export function WeeklySummary({ visible, onClose }: WeeklySummaryProps) {
       .then((res) => setData(res))
       .catch((e) => setError(e instanceof Error ? e.message : "Failed to load summary"))
       .finally(() => setLoading(false));
-  }, [visible]);
+  }, [visible, frozenData]);
 
   return (
     <Modal

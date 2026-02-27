@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
@@ -26,6 +27,14 @@ export async function POST(request: Request) {
       }
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
+
+    // Start automatic 3-day Pro trial (no credit card required)
+    const trialEndsAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+    await prisma.user.upsert({
+      where: { id: data.user.id },
+      update: { trialEndsAt },
+      create: { id: data.user.id, email, trialEndsAt },
+    });
 
     return NextResponse.json({ user: { id: data.user.id, email: data.user.email } });
   } catch {

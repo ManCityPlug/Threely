@@ -14,14 +14,7 @@ export default function GoalTemplates({
   return (
     <div>
       {/* Header */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 6,
-        }}
-      >
+      <div style={{ marginBottom: 6 }}>
         <h3
           style={{
             fontSize: "1.25rem",
@@ -31,19 +24,6 @@ export default function GoalTemplates({
         >
           What is your goal?
         </h3>
-        <button
-          onClick={onClose}
-          style={{
-            fontSize: 16,
-            color: "var(--muted)",
-            padding: 4,
-            cursor: "pointer",
-            background: "none",
-            border: "none",
-          }}
-        >
-          {"\u2715"}
-        </button>
       </div>
       <p
         style={{

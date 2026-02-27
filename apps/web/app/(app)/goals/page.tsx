@@ -1120,9 +1120,9 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
             )}
             {!goal.isPaused && (
               <span style={{
-                fontSize: "0.7rem", fontWeight: 500,
-                color: "var(--muted)",
-                background: "var(--bg)",
+                fontSize: "0.7rem", fontWeight: 600,
+                color: "#D97706",
+                background: "#FFFBEB",
                 borderRadius: 20, padding: "2px 8px",
                 display: "inline-flex", alignItems: "center", gap: 3,
               }}>

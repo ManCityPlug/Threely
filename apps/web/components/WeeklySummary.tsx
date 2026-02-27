@@ -3,12 +3,17 @@
 import { useEffect, useState } from "react";
 import { summaryApi, type WeeklySummary as WeeklySummaryType } from "@/lib/api-client";
 
-export default function WeeklySummaryModal({ onClose }: { onClose: () => void }) {
-  const [data, setData] = useState<WeeklySummaryType | null>(null);
-  const [loading, setLoading] = useState(true);
+export default function WeeklySummaryModal({ onClose, frozenData }: { onClose: () => void; frozenData?: WeeklySummaryType | null }) {
+  const [data, setData] = useState<WeeklySummaryType | null>(frozenData ?? null);
+  const [loading, setLoading] = useState(!frozenData);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (frozenData) {
+      setData(frozenData);
+      setLoading(false);
+      return;
+    }
     let cancelled = false;
     summaryApi
       .weekly(true)
@@ -24,7 +29,7 @@ export default function WeeklySummaryModal({ onClose }: { onClose: () => void })
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [frozenData]);
 
   return (
     <div className="modal-overlay" onClick={onClose}>

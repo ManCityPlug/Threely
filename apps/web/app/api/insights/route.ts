@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
 import { generateInsight, updateCoachingContext, type CoachingContext } from "@/lib/claude";
+import { getUserAccess } from "@/lib/subscription";
 
 // POST /api/insights
 // Body: { dailyTaskId: string }
@@ -10,6 +11,15 @@ export async function POST(request: NextRequest) {
   try {
     const user = await getUserFromRequest(request);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    // Pro gate
+    const access = await getUserAccess(user.id);
+    if (!access.hasPro) {
+      return NextResponse.json({
+        error: "pro_required",
+        message: "Subscribe to keep your momentum going",
+      }, { status: 403 });
+    }
 
     const { checkRateLimit } = await import("@/lib/rate-limit");
     const { allowed } = checkRateLimit(user.id);

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
-import { stripe, PRICE_MONTHLY, PRICE_YEARLY, TRIAL_DAYS } from "@/lib/stripe";
+import { stripe, PRICE_MONTHLY, PRICE_QUARTERLY, PRICE_YEARLY, TRIAL_DAYS } from "@/lib/stripe";
 
-const VALID_PRICES = new Set([PRICE_MONTHLY, PRICE_YEARLY]);
+const VALID_PRICES = new Set([PRICE_MONTHLY, PRICE_QUARTERLY, PRICE_YEARLY]);
 
 // ─── GET /api/subscription — return current subscription status ───────────────
 
@@ -14,7 +14,14 @@ export async function GET(request: NextRequest) {
   const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
 
   if (!dbUser?.subscriptionId) {
-    return NextResponse.json({ status: null, trialEndsAt: null, currentPeriodEnd: null });
+    // Check automatic 3-day trial (no Stripe subscription needed)
+    const trialEnd = dbUser?.trialEndsAt;
+    const isTrialing = trialEnd && new Date(trialEnd) > new Date();
+    return NextResponse.json({
+      status: isTrialing ? "trialing" : null,
+      trialEndsAt: trialEnd?.toISOString() ?? null,
+      currentPeriodEnd: null,
+    });
   }
 
   // Re-sync status from Stripe to catch webhook misses
@@ -44,7 +51,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// ─── POST /api/subscription — create subscription with 7-day trial ────────────
+// ─── POST /api/subscription — create subscription with trial ──────────────────
 
 export async function POST(request: NextRequest) {
   const user = await getUserFromRequest(request);
@@ -105,7 +112,7 @@ export async function POST(request: NextRequest) {
     metadata: { userId: user.id, priceId },
   });
 
-  // ── Create subscription with 7-day free trial ─────────────────────────────
+  // ── Create subscription with free trial ────────────────────────────────────
   const subscription = await stripe.subscriptions.create({
     customer: customerId,
     items: [{ price: priceId }],
@@ -143,9 +150,14 @@ async function createResubscription(userId: string, customerId: string, priceId:
   );
 
   // Create a PaymentIntent for immediate charge (no trial this time)
+  const amountMap: Record<string, number> = {
+    [PRICE_MONTHLY]: 1199,
+    [PRICE_QUARTERLY]: 2399,
+    [PRICE_YEARLY]: 5999,
+  };
   const paymentIntent = await stripe.paymentIntents.create({
     customer: customerId,
-    amount: priceId === "price_1T2mo8Q3O0etrH9yOIxkMv7H" ? 7000 : 799,
+    amount: amountMap[priceId] ?? 1199,
     currency: "usd",
     setup_future_usage: "off_session",
     metadata: { userId, priceId, type: "resubscribe" },

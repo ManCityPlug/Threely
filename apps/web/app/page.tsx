@@ -29,7 +29,7 @@ const FAQ = [
   },
   {
     q: "Is it free?",
-    a: "Threely offers a free 7-day trial so you can experience the full AI coaching loop. After that, it's a small subscription to keep your daily tasks and insights generating.",
+    a: "Threely offers a free 3-day trial so you can experience the full AI coaching loop — no credit card required. After that, choose a plan to keep your daily tasks and insights generating.",
   },
 ];
 
@@ -37,7 +37,7 @@ const FAQ = [
 
 function AppleIcon() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
       <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
     </svg>
   );
@@ -71,14 +71,6 @@ export default function LandingPage() {
     }
   }, []);
 
-  function handleMobileCTA(e: React.MouseEvent) {
-    if (isMobile && window.__openThreelyAppPrompt) {
-      e.preventDefault();
-      window.__openThreelyAppPrompt();
-    }
-    // On desktop, the default Link/anchor behavior proceeds normally
-  }
-
   return (
     <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", overflowX: "hidden", background: "#fff" }}>
       {/* Nav */}
@@ -109,7 +101,7 @@ export default function LandingPage() {
           }}>
             Sign in
           </Link>
-          <Link href="/register" onClick={handleMobileCTA} className="desktop-only" style={{
+          <Link href="/register" className="desktop-only" style={{
             padding: "0.4rem 1rem",
             fontSize: "0.875rem",
             fontWeight: 600,
@@ -178,7 +170,7 @@ export default function LandingPage() {
             }}>
               Sign in
             </Link>
-            <Link href="/register" onClick={(e) => { setMenuOpen(false); handleMobileCTA(e); }} style={{
+            <Link href="/register" onClick={() => setMenuOpen(false)} style={{
               flex: 1, textAlign: "center",
               padding: "0.6rem 0",
               fontSize: "0.875rem", fontWeight: 600,
@@ -260,16 +252,16 @@ export default function LandingPage() {
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 padding: "14px 28px 14px 18px",
                 minWidth: 190,
-                background: "#635bff",
+                background: "#0a2540",
                 color: "#fff",
                 borderRadius: 12,
                 fontSize: "0.95rem",
                 fontWeight: 600,
                 textDecoration: "none",
                 position: "relative" as const,
-                border: "1.5px solid rgba(99,91,255,0.25)",
+                border: "1.5px solid rgba(10,37,64,0.25)",
               }}>
-                <span className="new-badge" style={{ position: "absolute" as const, top: -9, right: -10 }}>New</span>
+                <span className="new-badge" style={{ position: "absolute" as const, top: -14, right: -10 }}>New</span>
                 <AppleIcon />
                 <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
                   <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
@@ -282,16 +274,16 @@ export default function LandingPage() {
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                 padding: "14px 28px 14px 18px",
                 minWidth: 190,
-                background: "#635bff",
+                background: "#0a2540",
                 color: "#fff",
                 borderRadius: 12,
                 fontSize: "0.95rem",
                 fontWeight: 600,
                 textDecoration: "none",
                 position: "relative" as const,
-                border: "1.5px solid rgba(99,91,255,0.25)",
+                border: "1.5px solid rgba(10,37,64,0.25)",
               }}>
-                <span className="new-badge" style={{ position: "absolute" as const, top: -9, right: -10 }}>New</span>
+                <span className="new-badge" style={{ position: "absolute" as const, top: -14, right: -10 }}>New</span>
                 <PlayIcon />
                 <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
                   <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
@@ -736,7 +728,7 @@ export default function LandingPage() {
           }}>
             Set your first goal and get 3 personalized tasks in under a minute.
           </p>
-          <Link href="/register" onClick={handleMobileCTA} style={{
+          <Link href="/register" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#fff",
@@ -815,7 +807,7 @@ export default function LandingPage() {
           <Link href="/login" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Sign in
           </Link>
-          <Link href="/register" onClick={handleMobileCTA} style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
+          <Link href="/register" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Get started
           </Link>
           <Link href="/faq" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>

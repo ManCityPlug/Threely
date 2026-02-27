@@ -6,7 +6,7 @@ import MarketingFooter from "@/components/MarketingFooter";
 export const metadata: Metadata = {
   title: "Pricing — Threely AI Goal Coach",
   description:
-    "Threely pricing: start with a free 7-day trial, then choose monthly or yearly. AI-powered goal coaching with personalized daily tasks, coaching insights, and progress tracking.",
+    "Threely pricing: start with a free 3-day trial, then choose monthly, quarterly, or yearly. AI-powered goal coaching with personalized daily tasks, coaching insights, and progress tracking.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -43,36 +43,37 @@ export default function PricingPage() {
             Simple, transparent pricing
           </h1>
           <p style={{ fontSize: "1.05rem", color: "#425466", lineHeight: 1.7 }}>
-            Start free. Upgrade when you&apos;re ready. No surprises.
+            Start free for 3 days. No credit card required. Upgrade when you&apos;re ready.
           </p>
         </div>
       </section>
 
-      {/* Pricing cards */}
+      {/* Pricing cards — 3 tiers */}
       <section style={{ padding: "3.5rem 1.5rem", background: "#fff" }}>
         <div style={{
-          maxWidth: 840,
+          maxWidth: 900,
           margin: "0 auto",
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
           gap: "1.5rem",
           alignItems: "start",
         }}>
-          {/* Free trial */}
+          {/* Monthly */}
           <div style={{
             padding: "2rem 1.5rem",
             borderRadius: 16,
             border: "1px solid #e3e8ef",
             background: "#fff",
           }}>
-            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#8898aa", textTransform: "uppercase", marginBottom: 8 }}>
-              FREE TRIAL
+            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#635bff", textTransform: "uppercase", marginBottom: 8 }}>
+              MONTHLY
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$0</span>
+              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$11.99</span>
+              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/month</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              7 days of full access. No credit card required.
+              Full AI coaching. Cancel anytime.<br />3-day free trial included.
             </p>
             <Link href="/register" style={{
               display: "block",
@@ -86,11 +87,53 @@ export default function PricingPage() {
               fontSize: "0.95rem",
               textDecoration: "none",
             }}>
-              Start free trial
+              Start Free Trial
             </Link>
           </div>
 
-          {/* Monthly */}
+          {/* Quarterly */}
+          <div style={{
+            padding: "2rem 1.5rem",
+            borderRadius: 16,
+            border: "1px solid #e3e8ef",
+            background: "#fff",
+            position: "relative",
+          }}>
+            <div style={{
+              position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)",
+              background: "#3ecf8e", color: "#fff",
+              padding: "3px 14px", borderRadius: 20,
+              fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.05em",
+            }}>
+              SAVE 33%
+            </div>
+            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#3ecf8e", textTransform: "uppercase", marginBottom: 8 }}>
+              QUARTERLY
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
+              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$23.99</span>
+              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/quarter</span>
+            </div>
+            <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
+              $7.99/month · billed quarterly.<br />3-day free trial included.
+            </p>
+            <Link href="/register" style={{
+              display: "block",
+              textAlign: "center",
+              padding: "0.75rem 1.5rem",
+              background: "#fff",
+              color: "#635bff",
+              border: "1.5px solid #635bff",
+              borderRadius: 10,
+              fontWeight: 700,
+              fontSize: "0.95rem",
+              textDecoration: "none",
+            }}>
+              Start Free Trial
+            </Link>
+          </div>
+
+          {/* Yearly */}
           <div style={{
             padding: "2rem 1.5rem",
             borderRadius: 16,
@@ -108,14 +151,14 @@ export default function PricingPage() {
               MOST POPULAR
             </div>
             <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#635bff", textTransform: "uppercase", marginBottom: 8 }}>
-              MONTHLY
+              YEARLY — BEST VALUE
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$6.99</span>
-              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/month</span>
+              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$59.99</span>
+              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/year</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              Full AI coaching. Cancel anytime.
+              $4.99/month · billed annually.<br />3-day free trial included.
             </p>
             <Link href="/register" style={{
               display: "block",
@@ -129,40 +172,7 @@ export default function PricingPage() {
               textDecoration: "none",
               boxShadow: "0 4px 14px rgba(99,91,255,0.3)",
             }}>
-              Get started
-            </Link>
-          </div>
-
-          {/* Yearly */}
-          <div style={{
-            padding: "2rem 1.5rem",
-            borderRadius: 16,
-            border: "1px solid #e3e8ef",
-            background: "#fff",
-          }}>
-            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#3ecf8e", textTransform: "uppercase", marginBottom: 8 }}>
-              YEARLY — SAVE 40%
-            </div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$49.99</span>
-              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/year</span>
-            </div>
-            <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              Best value. That&apos;s $4.17/month.
-            </p>
-            <Link href="/register" style={{
-              display: "block",
-              textAlign: "center",
-              padding: "0.75rem 1.5rem",
-              background: "#fff",
-              color: "#635bff",
-              border: "1.5px solid #635bff",
-              borderRadius: 10,
-              fontWeight: 700,
-              fontSize: "0.95rem",
-              textDecoration: "none",
-            }}>
-              Get started
+              Start Free Trial
             </Link>
           </div>
         </div>
@@ -212,7 +222,7 @@ export default function PricingPage() {
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             {[
-              { q: "Do I need a credit card to start?", a: "No. The 7-day free trial requires no payment information. You'll only be asked to add a payment method when the trial ends and you choose to subscribe." },
+              { q: "Do I need a credit card to start?", a: "No. The 3-day free trial requires no payment information. You'll only be asked to add a payment method when the trial ends and you choose to subscribe." },
               { q: "Can I cancel anytime?", a: "Yes. Cancel your subscription at any time from your profile settings. You'll keep access until the end of your current billing period." },
               { q: "What happens when my trial ends?", a: "You'll be prompted to choose a plan. If you don't subscribe, your account stays active — you just won't receive new AI-generated tasks until you upgrade." },
               { q: "Is there a refund policy?", a: "If you're not happy within the first 14 days of a paid subscription, contact us for a full refund. No questions asked." },

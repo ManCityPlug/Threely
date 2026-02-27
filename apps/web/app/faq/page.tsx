@@ -62,11 +62,11 @@ const CATEGORIES = [
     items: [
       {
         q: "Is Threely free?",
-        a: "Threely offers a free 7-day trial with full access to all features. After that, you can choose a monthly ($6.99/mo) or yearly ($49.99/yr) subscription to keep the AI coaching active.",
+        a: "Threely offers a free 3-day trial with full access to all features — no credit card required. After that, you can choose a monthly ($11.99/mo), quarterly ($23.99/quarter), or yearly ($59.99/yr) subscription to keep the AI coaching active.",
       },
       {
         q: "Do I need a credit card to start?",
-        a: "No. The 7-day free trial requires no payment information. You'll only be asked to add a payment method when the trial ends and you choose to subscribe.",
+        a: "No. The 3-day free trial requires no payment information. You'll only be asked to add a payment method when the trial ends and you choose to subscribe.",
       },
       {
         q: "Can I cancel anytime?",
@@ -173,7 +173,7 @@ export default function FaqPage() {
             Still have questions?
           </h2>
           <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", marginBottom: "1.5rem" }}>
-            Try Threely free for 7 days and see for yourself.
+            Try Threely free for 3 days and see for yourself.
           </p>
           <Link href="/register" style={{
             display: "inline-block",

@@ -44,6 +44,12 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
   const ringPct = lifetimeCompletionPct !== undefined ? Math.min(100, lifetimeCompletionPct) : undefined;
   const status = getStatusText(completedToday, totalToday);
 
+  const daysLeft = goal.deadline
+    ? Math.ceil((new Date(goal.deadline).getTime() - Date.now()) / 86400000)
+    : null;
+
+  const addedDate = new Date(goal.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
   return (
     <TouchableOpacity
       style={[styles.card, isPaused && styles.cardPaused]}
@@ -77,28 +83,56 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
         <View style={[styles.progressFill, { width: `${progressPct}%` }, isPaused && styles.progressFillPaused]} />
       </View>
 
-      <View style={styles.bottomRow}>
-        <Text style={[styles.progressLabel, { flex: 1, textAlign: "left" }]}>
-          {completedToday}/{totalToday} today
-        </Text>
-        {!isPaused && (
-          <Text style={[styles.scheduleBadge, { flex: 1, textAlign: "center" }]}>
-            {formatWorkDays(goal.workDays)}
+      {/* Badge row */}
+      <View style={styles.badgeRow}>
+        {/* Tasks pill */}
+        <View style={[styles.pill, { backgroundColor: `${colors.primary}14` }]}>
+          <Text style={[styles.pillText, { color: colors.primary }]}>
+            {completedToday}/{totalToday} today
           </Text>
+        </View>
+
+        {/* Schedule pill */}
+        {!isPaused && (
+          <View style={[styles.pill, { backgroundColor: `${colors.warning}18` }]}>
+            <Ionicons name="calendar-outline" size={11} color={colors.warning} style={{ marginRight: 3 }} />
+            <Text style={[styles.pillText, { color: colors.warning }]}>
+              {formatWorkDays(goal.workDays)}
+            </Text>
+          </View>
         )}
-        <View style={{ flex: 1, alignItems: "flex-end" }}>
-          {status && !isPaused && (
-            <Text style={[styles.statusText, { color: colors[status.color] }]}>
+
+        {/* Days left pill */}
+        {daysLeft !== null && !isPaused && (
+          <View style={[styles.pill, { backgroundColor: daysLeft < 14 ? `${colors.danger}14` : `${colors.textTertiary}14` }]}>
+            <Text style={[styles.pillText, { color: daysLeft < 14 ? colors.danger : colors.textTertiary }]}>
+              {daysLeft > 0 ? `${daysLeft}d left` : "Overdue"}
+            </Text>
+          </View>
+        )}
+
+        {/* Status pill */}
+        {status && !isPaused && (
+          <View style={[styles.pill, {
+            backgroundColor: status.color === "success" ? `${colors.success}18`
+              : status.color === "warning" ? `${colors.warning}18`
+              : `${colors.textTertiary}14`,
+          }]}>
+            <Text style={[styles.pillText, { color: colors[status.color], fontWeight: typography.semibold }]}>
               {status.text}
             </Text>
-          )}
-          {isPaused && (
-            <Text style={[styles.statusText, { color: colors.textTertiary }]}>
-              Paused
-            </Text>
-          )}
-        </View>
+          </View>
+        )}
+
+        {isPaused && (
+          <View style={[styles.pill, { backgroundColor: `${colors.textTertiary}14` }]}>
+            <Text style={[styles.pillText, { color: colors.textTertiary }]}>Paused</Text>
+          </View>
+        )}
       </View>
+
+      {/* Added date */}
+      <Text style={styles.addedDate}>Added {addedDate}</Text>
 
       {onViewTasks && !isPaused && (
         <TouchableOpacity
@@ -156,7 +190,7 @@ function createStyles(c: Colors) {
       backgroundColor: c.border,
       borderRadius: radius.full,
       overflow: "hidden",
-      marginBottom: spacing.xs,
+      marginBottom: spacing.sm,
     },
     progressFill: {
       height: "100%",
@@ -164,24 +198,27 @@ function createStyles(c: Colors) {
       borderRadius: radius.full,
       minWidth: 0,
     },
-    bottomRow: {
+    badgeRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 6,
+      marginBottom: spacing.xs,
+    },
+    pill: {
       flexDirection: "row",
       alignItems: "center",
-      justifyContent: "space-between",
+      borderRadius: 20,
+      paddingHorizontal: 8,
+      paddingVertical: 3,
     },
-    progressLabel: {
-      fontSize: typography.xs,
-      color: c.textTertiary,
+    pillText: {
+      fontSize: typography.xs - 1,
       fontWeight: typography.medium,
     },
-    scheduleBadge: {
-      fontSize: typography.xs,
+    addedDate: {
+      fontSize: typography.xs - 1,
       color: c.textTertiary,
-      fontWeight: typography.medium,
-    },
-    statusText: {
-      fontSize: typography.xs,
-      fontWeight: typography.semibold,
+      marginBottom: 2,
     },
     viewTasksBtn: {
       marginTop: spacing.sm,

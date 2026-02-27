@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
 } from "react-native";
 import {
@@ -40,10 +39,7 @@ export function GoalTemplates({ onSelect, onClose, onOther, closeLabel = "Back" 
       </Text>
 
       {/* Category grid */}
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.gridContent}
-      >
+      <View style={styles.gridContent}>
         <View style={styles.grid}>
           {goalCategories.map((cat) => (
             <TouchableOpacity
@@ -75,7 +71,7 @@ export function GoalTemplates({ onSelect, onClose, onOther, closeLabel = "Back" 
             </TouchableOpacity>
           )}
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 }

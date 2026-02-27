@@ -870,24 +870,20 @@ export default function DashboardPage() {
       {goals.length > 0 && dailyTasks.length > 0 && selectedGoalId !== null && (
         <>
           {/* Goal selector + progress */}
-          <div className="card" style={{ padding: "1.25rem", marginBottom: "1.25rem" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem", marginBottom: "0.875rem" }}>
-              <button
-                onClick={() => { if (goals.length > 1) setGoalPickerOpen(true); }}
-                style={{
-                  display: "flex", alignItems: "center", gap: 6,
-                  background: "none", border: "none", padding: 0,
-                  cursor: goals.length > 1 ? "pointer" : "default",
-                }}
-              >
-                <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>
-                  {selectedGoalId === null ? "Select a goal" : selectedGoalId === "all" ? "Mix all goals" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
-                </span>
-                {goals.length > 1 && (
-                  <span style={{ fontSize: "0.7rem", color: "var(--primary)", transition: "transform 0.2s" }}>&#9660;</span>
-                )}
-              </button>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div
+            className="card"
+            onClick={() => { if (goals.length > 1) setGoalPickerOpen(true); }}
+            style={{
+              padding: "1.25rem", marginBottom: "1.25rem",
+              cursor: goals.length > 1 ? "pointer" : "default",
+              transition: "border-color 0.15s",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.875rem" }}>
+              <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", flex: 1, minWidth: 0 }}>
+                {selectedGoalId === null ? "Select a goal" : selectedGoalId === "all" ? "Mix all goals" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
+              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                 {totalEstimatedMinutes > 0 && (
                   <span style={{
                     fontSize: "0.75rem", fontWeight: 600,
@@ -902,9 +898,12 @@ export default function DashboardPage() {
                   fontSize: "0.85rem", fontWeight: 600,
                   color: allDone ? "var(--success)" : "var(--subtext)",
                 }}>
-                  {completedCount}/{totalCount} tasks complete
+                  {completedCount}/{totalCount}
                 </span>
               </div>
+              {goals.length > 1 && (
+                <span style={{ fontSize: "0.7rem", color: "var(--primary)", flexShrink: 0 }}>&#9660;</span>
+              )}
             </div>
             <div className="progress-track">
               <div className="progress-fill" style={{ width: `${progress}%`, background: allDone ? "var(--success)" : undefined }} />
