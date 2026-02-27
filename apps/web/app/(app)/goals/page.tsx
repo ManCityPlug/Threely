@@ -997,7 +997,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
 
         {/* Content */}
         <div style={{ padding: "1.25rem 2rem 2rem" }}>
-          {step === "goal" && renderGoalStep()}
+          {step === "goal" && !showAiChat && renderGoalStep()}
           {step === "confirm" && renderConfirmStep()}
           {step === "deadline" && renderDeadlineStep()}
           {step === "time" && renderTimeStep()}
@@ -1263,6 +1263,7 @@ export default function GoalsPage() {
 
   function handleAddDetail(goal: Goal) {
     setEditGoal(goal);
+    setShowTemplates(false); // skip template selector — go straight to AI chat
     setShowAdd(true);
   }
 
