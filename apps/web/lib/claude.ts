@@ -388,7 +388,7 @@ CRITICAL — The final goal MUST include ALL of these details (ask about any you
 6. Which days of the week they want to work on this — offer presets: "Every day", "Weekdays (Mon–Fri)", "Weekends (Sat–Sun)", "Every other day (Mon, Wed, Fri)", or let them customize
 
 RULES:
-- Ask ONE question at a time with 3-4 multiple-choice options
+- Ask ONE question at a time with 3-4 multiple-choice options. NEVER include a catch-all "Something else", "Other", "None of the above", or "Tell me what" option — the UI already has a separate "Type my own" button for custom answers
 - Keep questions short and conversational (1-2 sentences max)
 - Ask 4-7 questions to cover all 6 areas above, then wrap up
 - CRITICAL: Every option MUST be genuinely distinct and non-overlapping. Before generating options, mentally check: "Could a user reasonably pick two of these at once?" If yes, they overlap — rewrite them. Bad example: "I have equipment" + "No major constraints" (having equipment IS having no constraints). Good example: "I have all the gear I need" vs "I need to buy equipment first" vs "I have limited space to practice"
