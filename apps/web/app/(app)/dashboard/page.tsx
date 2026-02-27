@@ -385,10 +385,11 @@ export default function DashboardPage() {
       setGoalStats(statsRes.goalStats ?? []);
       setRestDay(tasksRes.restDay ?? false);
 
-      // Restore saved focus or prompt user to pick
+      // Restore saved focus or auto-select
       const todayKey = `threely_focus_${new Date().toISOString().slice(0, 10)}`;
       const saved = sessionStorage.getItem(todayKey);
-      if (saved) {
+      const savedIsValid = saved === "all" || goalsRes.goals.some(g => g.id === saved);
+      if (saved && savedIsValid) {
         setSelectedGoalId(saved as "all" | string);
       } else if (goalsRes.goals.length === 1) {
         const onlyGoalId = goalsRes.goals[0].id;
@@ -718,8 +719,8 @@ export default function DashboardPage() {
       {welcomeProVisible && (
         <div className="modal-overlay" onClick={() => setWelcomeProVisible(false)}>
           <div className="modal-box fade-in" onClick={e => e.stopPropagation()} style={{ maxWidth: 420, textAlign: "center", padding: "2.5rem 2rem" }}>
-            <div style={{ fontSize: 44, marginBottom: 16 }}>✦</div>
-            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8 }}>
+            <div style={{ fontSize: 44, marginBottom: 16, color: "var(--primary)" }}>✦</div>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8, color: "var(--primary)" }}>
               You&apos;ve got Pro!
             </h2>
             <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: 20 }}>
@@ -854,17 +855,19 @@ export default function DashboardPage() {
                 <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>
                   {selectedGoalId === null ? "Select a goal" : selectedGoalId === "all" ? "Mix all goals" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
                 </span>
-                <button
-                  onClick={() => setGoalPickerOpen(true)}
-                  style={{
-                    fontSize: "0.75rem", fontWeight: 600,
-                    color: "var(--primary)", background: "var(--primary-light)",
-                    border: "none", borderRadius: 20, padding: "3px 10px",
-                    cursor: "pointer",
-                  }}
-                >
-                  {goals.length > 1 ? "Change" : "Select"}
-                </button>
+                {goals.length > 1 && (
+                  <button
+                    onClick={() => setGoalPickerOpen(true)}
+                    style={{
+                      fontSize: "0.75rem", fontWeight: 600,
+                      color: "var(--primary)", background: "var(--primary-light)",
+                      border: "none", borderRadius: 20, padding: "3px 10px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Change
+                  </button>
+                )}
               </div>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 {totalEstimatedMinutes > 0 && (

@@ -1099,8 +1099,8 @@ export default function DashboardScreen() {
       <Modal visible={welcomeProVisible} transparent animationType="fade">
         <Pressable style={styles.welcomeOverlay} onPress={() => setWelcomeProVisible(false)}>
           <Pressable style={styles.welcomeBox} onPress={() => {}}>
-            <Text style={{ fontSize: 40, textAlign: "center", marginBottom: spacing.md }}>✦</Text>
-            <Text style={styles.welcomeTitle}>You've got Pro!</Text>
+            <Text style={{ fontSize: 40, textAlign: "center", marginBottom: spacing.md, color: colors.primary }}>✦</Text>
+            <Text style={[styles.welcomeTitle, { color: colors.primary }]}>You've got Pro!</Text>
             <Text style={styles.welcomeSubtitle}>
               Enjoy full access to Threely Pro for 3 days — completely free, no credit card needed.
             </Text>

@@ -362,11 +362,14 @@ export default function OnboardingScreen() {
         );
         setShowCustomDays(isCustom);
       }
-      // Skip steps that AI Plan already covered
-      let nextStep = 3; // deadline step
-      if (result.deadline_detected) nextStep = 4; // skip deadline → time step
-      if (result.daily_time_detected && result.daily_time_detected > 0) nextStep = 5; // skip time → work days
-      advanceStep(nextStep);
+      // AI chat already collected all needed info — skip straight to building the plan
+      handleBuild({
+        goalText: chatGoalText.trim(),
+        parsed: result,
+        dailyMinutes: result.daily_time_detected && result.daily_time_detected > 0
+          ? result.daily_time_detected
+          : undefined,
+      });
     } catch (e) {
       setParseError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
     } finally {

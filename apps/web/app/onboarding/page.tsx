@@ -292,11 +292,8 @@ export default function OnboardingPage() {
           setShowCustomTime(true);
         }
       }
-      // Skip steps that AI Plan already covered
-      let nextStep = 3;
-      if (result.deadline_detected) nextStep = 4; // skip deadline step
-      if (result.daily_time_detected && result.daily_time_detected > 0) nextStep = 5; // skip time step too
-      advanceStep(nextStep);
+      // AI chat already collected all needed info — skip straight to building the plan
+      handleBuild();
     } catch (e) {
       setParseError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
     } finally {
