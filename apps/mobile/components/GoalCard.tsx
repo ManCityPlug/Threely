@@ -78,15 +78,15 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
       </View>
 
       <View style={styles.bottomRow}>
-        <Text style={styles.progressLabel}>
-          {completedToday}/{totalToday} tasks today
+        <Text style={[styles.progressLabel, { flex: 1, textAlign: "left" }]}>
+          {completedToday}/{totalToday} today
         </Text>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xs }}>
-          {!isPaused && (
-            <Text style={styles.scheduleBadge}>
-              {formatWorkDays(goal.workDays)}
-            </Text>
-          )}
+        {!isPaused && (
+          <Text style={[styles.scheduleBadge, { flex: 1, textAlign: "center" }]}>
+            {formatWorkDays(goal.workDays)}
+          </Text>
+        )}
+        <View style={{ flex: 1, alignItems: "flex-end" }}>
           {status && !isPaused && (
             <Text style={[styles.statusText, { color: colors[status.color] }]}>
               {status.text}
