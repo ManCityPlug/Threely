@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
 import { getCachedStats, setCachedStats } from "@/lib/stats-cache";
 
+export const dynamic = "force-dynamic";
+
 interface TaskItem {
   id: string;
   isCompleted: boolean;

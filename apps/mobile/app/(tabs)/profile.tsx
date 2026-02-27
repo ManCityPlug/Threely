@@ -464,12 +464,11 @@ export default function ProfileScreen() {
                 styles={styles}
               />
               <StatCard
-                label="Streak"
-                value={stats ? `${stats.streak}d` : "—"}
-                numericValue={stats?.streak}
-                suffix="d"
-                icon="flame-outline"
-                accentColor={colors.warning}
+                label="Active goals"
+                value={stats?.activeGoals ?? "—"}
+                numericValue={stats?.activeGoals}
+                icon="flag-outline"
+                accentColor="#3B82F6"
                 loading={statsLoading}
                 colors={colors}
                 styles={styles}
@@ -488,11 +487,12 @@ export default function ProfileScreen() {
             </View>
             <View style={styles.statsRow}>
               <StatCard
-                label="Active goals"
-                value={stats?.activeGoals ?? "—"}
-                numericValue={stats?.activeGoals}
-                icon="flag-outline"
-                accentColor="#3B82F6"
+                label="Streak"
+                value={stats ? `${stats.streak}d` : "—"}
+                numericValue={stats?.streak}
+                suffix="d"
+                icon="flame-outline"
+                accentColor={colors.warning}
                 loading={statsLoading}
                 colors={colors}
                 styles={styles}

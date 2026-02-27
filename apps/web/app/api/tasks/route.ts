@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
 
+export const dynamic = "force-dynamic";
+
 interface TaskItem {
   id: string;
   isCompleted: boolean;
