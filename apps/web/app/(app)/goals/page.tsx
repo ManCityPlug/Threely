@@ -30,9 +30,26 @@ const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov
 
 // ─── Add Goal Flow (full-screen, matches mobile onboarding) ──────────────────
 
-type FlowStep = "goal" | "confirm" | "deadline" | "time" | "intensity" | "building" | "done";
+type FlowStep = "goal" | "confirm" | "deadline" | "time" | "workdays" | "intensity" | "building" | "done";
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 1;
+
+const WORK_DAY_PRESETS_WEB = [
+  { label: "Every day", value: [1, 2, 3, 4, 5, 6, 7] },
+  { label: "Weekdays (Mon\u2013Fri)", value: [1, 2, 3, 4, 5] },
+  { label: "Weekends (Sat\u2013Sun)", value: [6, 7] },
+  { label: "Mon, Wed, Fri", value: [1, 3, 5] },
+] as const;
+
+const DAY_LABELS_WEB = [
+  { iso: 1, short: "M", full: "Mon" },
+  { iso: 2, short: "T", full: "Tue" },
+  { iso: 3, short: "W", full: "Wed" },
+  { iso: 4, short: "T", full: "Thu" },
+  { iso: 5, short: "F", full: "Fri" },
+  { iso: 6, short: "S", full: "Sat" },
+  { iso: 7, short: "S", full: "Sun" },
+];
 
 const TIME_OPTIONS_WEB = [
   { label: "15 min", value: 15 },
@@ -81,6 +98,10 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
   const [timeMinutes, setTimeMinutes] = useState<number | null>(null);
   const [intensityLevel, setIntensityLevel] = useState<number | null>(null);
 
+  // Work days
+  const [workDays, setWorkDays] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
+  const [showCustomDays, setShowCustomDays] = useState(false);
+
   // Building
   const [buildError, setBuildError] = useState("");
   const [builtTasks, setBuiltTasks] = useState<TaskItem[]>([]);
@@ -88,7 +109,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
   const [savedGoal, setSavedGoal] = useState<Goal | null>(null);
 
   // Progress
-  const stepIndex = step === "goal" ? 1 : step === "confirm" ? 2 : step === "deadline" ? 3 : step === "time" ? 4 : step === "intensity" ? 5 : 5;
+  const stepIndex = 1;
   const progressPercent = step === "building" || step === "done" ? 100 : Math.round((stepIndex / TOTAL_STEPS) * 100);
 
   useEffect(() => {
@@ -118,6 +139,13 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
         setDeadlineYear(d.getFullYear());
         setDeadlineMonth(d.getMonth() + 1);
         setDeadlineDay(d.getDate());
+      }
+      if (result.work_days_detected && result.work_days_detected.length > 0) {
+        setWorkDays(result.work_days_detected);
+        const isCustom = !WORK_DAY_PRESETS_WEB.some(
+          (p) => p.value.length === result.work_days_detected!.length && p.value.every((d) => result.work_days_detected!.includes(d))
+        );
+        setShowCustomDays(isCustom);
       }
       setStep("confirm");
     } catch {
@@ -193,9 +221,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
     if (!chatGoalText) return;
     setRawInput(chatGoalText);
     setShowAiChat(false);
-    // Auto-parse
-    setParsing(true);
-    setParseError("");
+    // Auto-parse and advance through remaining steps
     try {
       const result = await goalsApi.parse(chatGoalText.trim());
       setParsed(result);
@@ -206,39 +232,45 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
         setDeadlineMonth(d.getMonth() + 1);
         setDeadlineDay(d.getDate());
       }
-      // Skip to deadline step (or confirm if needs more context)
-      if (result.needs_more_context) {
-        setStep("confirm");
-      } else {
-        setStep("deadline");
+      if (result.work_days_detected && result.work_days_detected.length > 0) {
+        setWorkDays(result.work_days_detected);
+        const isCustom = !WORK_DAY_PRESETS_WEB.some(
+          (p) => p.value.length === result.work_days_detected!.length && p.value.every((d) => result.work_days_detected!.includes(d))
+        );
+        setShowCustomDays(isCustom);
       }
+      // Skip to the first step AI didn't cover
+      let nextStep: FlowStep = "deadline";
+      if (result.deadline_detected) nextStep = "time";
+      setStep(nextStep);
     } catch {
       setParseError("Failed to analyze goal. Try again.");
       setStep("goal");
-    } finally {
-      setParsing(false);
     }
   }
 
   // ─── Build (save goal + generate tasks) ────────────────────────────────────
 
-  async function handleBuild() {
+  async function handleBuild(overrides?: { goalText?: string; parsedGoal?: ParsedGoal }) {
     setBuildError("");
     setStep("building");
     try {
-      const goalTitle = parsed?.short_title ?? rawInput.trim().slice(0, 40);
-      const deadline = hasDeadline
+      const effectiveRawInput = overrides?.goalText ?? rawInput.trim();
+      const effectiveParsed = overrides?.parsedGoal ?? parsed;
+      const goalTitle = effectiveParsed?.short_title ?? effectiveRawInput.slice(0, 40);
+      const deadline = effectiveParsed?.deadline_detected ?? (hasDeadline
         ? `${deadlineYear}-${String(deadlineMonth).padStart(2, "0")}-${String(deadlineDay).padStart(2, "0")}`
-        : null;
+        : null);
 
       const { goal } = await goalsApi.create({
         title: goalTitle,
-        rawInput: rawInput.trim(),
-        structuredSummary: parsed?.structured_summary,
-        category: parsed?.category,
+        rawInput: effectiveRawInput,
+        structuredSummary: effectiveParsed?.structured_summary,
+        category: effectiveParsed?.category,
         deadline,
         dailyTimeMinutes: timeMinutes ?? undefined,
         intensityLevel: intensityLevel ?? undefined,
+        workDays,
       });
       setSavedGoal(goal);
 
@@ -249,7 +281,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
       setStep("done");
     } catch (e) {
       setBuildError(e instanceof Error ? e.message : "Something went wrong.");
-      setStep("intensity");
+      setStep("goal");
     }
   }
 
@@ -325,7 +357,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
               Add more detail &#8594;
             </button>
             <button
-              onClick={() => setStep("deadline")}
+              onClick={() => handleBuild()}
               style={{
                 display: "block", margin: "0.25rem auto 0", fontSize: "0.8rem",
                 color: "var(--muted)", textDecoration: "underline", background: "none", border: "none", cursor: "pointer",
@@ -335,8 +367,8 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
             </button>
           </div>
         ) : (
-          <button className="btn btn-primary" onClick={() => setStep("deadline")} style={{ width: "100%", padding: "0.75rem", marginTop: "0.5rem" }}>
-            Looks good &#8594;
+          <button className="btn btn-primary" onClick={() => handleBuild()} style={{ width: "100%", padding: "0.75rem", marginTop: "0.5rem" }}>
+            Build my plan &#8594;
           </button>
         )}
       </>
@@ -404,10 +436,10 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
           <button className="btn btn-outline" onClick={() => setStep("confirm")} style={{ flex: 1 }}>
             &#8592; Back
           </button>
-          <button className="btn btn-primary" onClick={() => setStep("time")} style={{ flex: 2 }}>
+          <button className="btn btn-primary" onClick={() => handleBuild()} style={{ flex: 2 }}>
             {hasDeadline
-              ? `Set deadline & continue \u2192`
-              : "No deadline \u2014 continue \u2192"}
+              ? `Set deadline & build my plan \u2192`
+              : "No deadline \u2014 build my plan \u2192"}
           </button>
         </div>
       </>
@@ -490,9 +522,110 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
           </button>
           <button
             className="btn btn-primary"
-            onClick={() => effectiveTime && setStep("intensity")}
+            onClick={() => effectiveTime && setStep("workdays")}
             disabled={!effectiveTime}
             style={{ flex: 2, opacity: effectiveTime ? 1 : 0.5 }}
+          >
+            Continue &#8594;
+          </button>
+        </div>
+      </>
+    );
+  }
+
+  // ─── Render: Work days step ─────────────────────────────────────────────────
+
+  function renderWorkDaysStep() {
+    const matchesPreset = WORK_DAY_PRESETS_WEB.find(
+      (p) => p.value.length === workDays.length && p.value.every((d) => workDays.includes(d))
+    );
+
+    function toggleDay(iso: number) {
+      setWorkDays((prev) => {
+        if (prev.includes(iso)) {
+          if (prev.length <= 1) return prev;
+          return prev.filter((d) => d !== iso);
+        }
+        return [...prev, iso].sort();
+      });
+    }
+
+    return (
+      <>
+        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>
+          Which days will you work on this?
+        </h2>
+        <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+          Pick a schedule that fits your routine.
+        </p>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: "1.5rem" }}>
+          {WORK_DAY_PRESETS_WEB.map((preset) => {
+            const isActive = !showCustomDays && matchesPreset?.label === preset.label;
+            return (
+              <button
+                key={preset.label}
+                onClick={() => { setShowCustomDays(false); setWorkDays([...preset.value]); }}
+                style={{
+                  padding: "0.85rem 1.25rem", borderRadius: "var(--radius-lg)", cursor: "pointer",
+                  border: `1.5px solid ${isActive ? "var(--primary)" : "var(--border)"}`,
+                  background: isActive ? "var(--primary-light)" : "var(--card)",
+                  textAlign: "center", fontWeight: 600, fontSize: "0.95rem",
+                  color: isActive ? "var(--primary)" : "var(--text)",
+                }}
+              >
+                {preset.label}
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => setShowCustomDays(true)}
+            style={{
+              padding: "0.85rem 1.25rem", borderRadius: "var(--radius-lg)", cursor: "pointer",
+              border: `1.5px solid ${showCustomDays ? "var(--primary)" : "var(--border)"}`,
+              background: showCustomDays ? "var(--primary-light)" : "var(--card)",
+              textAlign: "center", fontWeight: 600, fontSize: "0.95rem",
+              color: showCustomDays ? "var(--primary)" : "var(--text)",
+            }}
+          >
+            Custom
+          </button>
+
+          {showCustomDays && (
+            <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 8 }}>
+              {DAY_LABELS_WEB.map((day) => {
+                const isActive = workDays.includes(day.iso);
+                return (
+                  <button
+                    key={day.iso}
+                    onClick={() => toggleDay(day.iso)}
+                    title={day.full}
+                    style={{
+                      width: 44, height: 44, borderRadius: "50%", cursor: "pointer",
+                      border: `1.5px solid ${isActive ? "var(--primary)" : "var(--border)"}`,
+                      background: isActive ? "var(--primary-light)" : "var(--card)",
+                      fontWeight: 700, fontSize: "0.9rem",
+                      color: isActive ? "var(--primary)" : "var(--subtext)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                    }}
+                  >
+                    {day.short}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        <div style={{ display: "flex", gap: 8 }}>
+          <button className="btn btn-outline" onClick={() => setStep("time")} style={{ flex: 1 }}>
+            &#8592; Back
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={() => setStep("intensity")}
+            style={{ flex: 2 }}
           >
             Continue &#8594;
           </button>
@@ -544,7 +677,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
         </div>
 
         <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn btn-outline" onClick={() => setStep("time")} style={{ flex: 1 }}>
+          <button className="btn btn-outline" onClick={() => setStep("workdays")} style={{ flex: 1 }}>
             &#8592; Back
           </button>
           <button
@@ -697,6 +830,20 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
                           {opt}
                         </button>
                       ))}
+                      <button
+                        onClick={() => {
+                          const el = document.getElementById("chat-custom-input");
+                          if (el) el.focus();
+                        }}
+                        style={{
+                          padding: "0.45rem 0.85rem", borderRadius: 20,
+                          border: "1.5px solid var(--border)", background: "var(--bg)",
+                          fontSize: "0.82rem", fontWeight: 600, color: "var(--subtext)",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Type my own answer
+                      </button>
                     </div>
                   )}
                 </div>
@@ -750,6 +897,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
             ) : (
               <div style={{ display: "flex", gap: 8 }}>
                 <input
+                  id="chat-custom-input"
                   className="field-input"
                   placeholder="Type your own answer..."
                   value={customInput}
@@ -787,23 +935,15 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
         onClick={e => e.stopPropagation()}
         style={{ maxWidth: 560, padding: 0, overflow: "hidden" }}
       >
-        {/* Progress bar */}
+        {/* Close button */}
         {step !== "building" && step !== "done" && (
-          <div style={{ padding: "1.5rem 2rem 0" }}>
-            <div className="progress-track" style={{ marginBottom: 4 }}>
-              <div className="progress-fill" style={{ width: `${progressPercent}%` }} />
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "0.7rem", fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                Step {stepIndex} of {TOTAL_STEPS}
-              </span>
-              <button
-                onClick={onClose}
-                style={{ fontSize: 18, color: "var(--muted)", padding: 4, cursor: "pointer", background: "none", border: "none" }}
-              >
-                &#x2715;
-              </button>
-            </div>
+          <div style={{ padding: "1rem 1.5rem 0", display: "flex", justifyContent: "flex-end" }}>
+            <button
+              onClick={onClose}
+              style={{ fontSize: 18, color: "var(--muted)", padding: 4, cursor: "pointer", background: "none", border: "none" }}
+            >
+              &#x2715;
+            </button>
           </div>
         )}
 
@@ -813,6 +953,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
           {step === "confirm" && renderConfirmStep()}
           {step === "deadline" && renderDeadlineStep()}
           {step === "time" && renderTimeStep()}
+          {step === "workdays" && renderWorkDaysStep()}
           {step === "intensity" && renderIntensityStep()}
           {step === "building" && renderBuildingStep()}
           {step === "done" && renderDoneStep()}

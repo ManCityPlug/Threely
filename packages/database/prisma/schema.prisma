@@ -26,9 +26,11 @@ model User {
   subscriptionStatus String?      @map("subscription_status")
   trialClaimedAt     DateTime?    @map("trial_claimed_at")
   trialDeviceId      String?      @map("trial_device_id")
+  trialEndsAt        DateTime?    @map("trial_ends_at")
   goals              Goal[]
   dailyTasks         DailyTask[]
   dailyFocus         DailyFocus[]
+  weeklySummaries    WeeklySummary[]
   profile            UserProfile?
 
   @@map("users")
@@ -66,6 +68,7 @@ model Goal {
   intensityLevel    Int?        @map("intensity_level")
   isActive          Boolean     @default(true) @map("is_active")
   isPaused          Boolean     @default(false) @map("is_paused")
+  workDays          Int[]       @default([1, 2, 3, 4, 5, 6, 7]) @map("work_days")
   createdAt         DateTime    @default(now()) @map("created_at")
   updatedAt         DateTime    @updatedAt @map("updated_at")
 
@@ -140,4 +143,24 @@ model DailyReview {
   dailyTask        DailyTask @relation(fields: [dailyTaskId], references: [id], onDelete: Cascade)
 
   @@map("daily_reviews")
+}
+
+// ─── WeeklySummary ──────────────────────────────────────────────────────────
+// Frozen weekly snapshot generated on first open after the week ends.
+// Stats JSON is self-contained so deleted goals don't affect historical data.
+model WeeklySummary {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  weekStart     DateTime  @db.Date          // Monday date (e.g. 2026-02-23)
+  stats         Json                        // Frozen snapshot of all metrics
+  insight       String?                     // AI coaching text
+  timezone      String                      // e.g. "America/New_York"
+  firstOpenedAt DateTime? @map("first_opened_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart])
+  @@index([userId])
+  @@map("weekly_summaries")
 }

@@ -54,7 +54,25 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ dailyTasks, overdueTasks });
+    // Check if today is a rest day (no goals scheduled for today's day-of-week)
+    let restDay = false;
+    if (dailyTasks.length === 0) {
+      const jsDay = date.getUTCDay(); // 0=Sun..6=Sat
+      const isoDay = jsDay === 0 ? 7 : jsDay; // 1=Mon..7=Sun
+      const activeGoals = await prisma.goal.findMany({
+        where: { userId: user.id, isActive: true, isPaused: false },
+        select: { workDays: true },
+      });
+      if (activeGoals.length > 0) {
+        const anyScheduled = activeGoals.some(g => {
+          const workDays: number[] = (g.workDays as number[]) ?? [1, 2, 3, 4, 5, 6, 7];
+          return workDays.includes(isoDay);
+        });
+        restDay = !anyScheduled;
+      }
+    }
+
+    return NextResponse.json({ dailyTasks, overdueTasks, restDay });
   } catch (e) {
     console.error("[GET /api/tasks]", e);
     return NextResponse.json({ error: "Failed to fetch tasks" }, { status: 500 });

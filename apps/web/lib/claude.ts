@@ -16,6 +16,8 @@ export interface TaskItem {
   isCompleted: boolean;
   isSkipped?: boolean;
   isRescheduled?: boolean;
+  isCarriedOver?: boolean;
+  carriedFromDate?: string;
 }
 
 export interface ParsedGoal {
@@ -24,6 +26,7 @@ export interface ParsedGoal {
   category: string;
   deadline_detected: string | null; // ISO date YYYY-MM-DD or null
   daily_time_detected: number | null; // minutes per day, or null if not mentioned
+  work_days_detected: number[] | null; // [1,2,3,4,5] for weekdays, null if not mentioned
   needs_more_context: boolean;
   recommendations: string | null; // personalized tips if needs_more_context is true
 }
@@ -114,6 +117,8 @@ export interface GenerateTasksInput {
   focusShifted?: boolean;
   postReview?: boolean;
   timeOfDay?: "morning" | "afternoon" | "evening";
+  carriedOverTasks?: { task: string; description: string; why: string }[];
+  newTaskCount?: number; // 1, 2, or 3 (default 3)
 }
 
 export interface GenerateTasksResult {
@@ -380,17 +385,18 @@ CRITICAL — The final goal MUST include ALL of these details (ask about any you
 3. How much time per day they can dedicate (e.g. "1 hour a day", "30 minutes daily")
 4. Their desired pace/intensity — are they going all-in or building slowly? (e.g. "aggressive, maximum effort daily" or "steady, sustainable habit-building")
 5. Key constraints, resources, or context (e.g. "while working full-time", "budget of $500", "already have equipment")
+6. Which days of the week they want to work on this — offer presets: "Every day", "Weekdays (Mon–Fri)", "Weekends (Sat–Sun)", "Every other day (Mon, Wed, Fri)", or let them customize
 
 RULES:
 - Ask ONE question at a time with 3-4 multiple-choice options
 - Keep questions short and conversational (1-2 sentences max)
-- Ask 4-6 questions to cover all 5 areas above, then wrap up
+- Ask 4-7 questions to cover all 6 areas above, then wrap up
 - CRITICAL: Every option MUST be genuinely distinct and non-overlapping. Before generating options, mentally check: "Could a user reasonably pick two of these at once?" If yes, they overlap — rewrite them. Bad example: "I have equipment" + "No major constraints" (having equipment IS having no constraints). Good example: "I have all the gear I need" vs "I need to buy equipment first" vs "I have limited space to practice"
 - Never include a generic "no constraints" or "I'm good to go" option alongside specific resource options — instead, make every option describe a specific situation
 - If the user provides a custom answer, roll with it naturally
 - Do NOT ask "when do you want to achieve this?" with short timeframe options that everyone picks. Instead, based on their goal complexity and daily time, SUGGEST a realistic timeline: "Based on your goal and 30 min/day, this typically takes about 2-3 months. Does that work for you?" with options like "Yes, that timeline works", "I want to push harder and do it faster", "I'd prefer a more relaxed pace"
 ${shouldWrapUp ? "- IMPORTANT: You have asked enough questions. You MUST wrap up NOW and produce the final goal_text." : ""}
-- Do NOT wrap up until you have specifics for at least areas 1-4 above
+- Do NOT wrap up until you have specifics for at least areas 1-4 and area 6 above
 
 RESPONSE FORMAT — respond with ONLY valid JSON, no markdown:
 {
@@ -405,7 +411,7 @@ When wrapping up (done: true):
   "message": "A short encouraging summary",
   "options": [],
   "done": true,
-  "goal_text": "A detailed 3-5 sentence goal description in first person. MUST include: the specific measurable outcome, where they're starting from, how much daily time they have, their preferred pace/intensity, their target timeline, and any constraints or context discussed. Example quality: 'I want to launch my freelance web design business and land my first 3 paying clients within the next 3 months. I have 2 years of hobby experience with HTML/CSS and can dedicate about 1 hour per day while working my full-time job. I want to take a committed, steady approach — consistent daily progress without burning out. I'll focus on building a portfolio site, reaching out to local small businesses, and pricing my services competitively with a budget of $200 for tools and hosting.'"
+  "goal_text": "A detailed 3-5 sentence goal description in first person. MUST include: the specific measurable outcome, where they're starting from, how much daily time they have, their preferred pace/intensity, their target timeline, their work schedule (which days), and any constraints or context discussed. Example quality: 'I want to launch my freelance web design business and land my first 3 paying clients within the next 3 months. I have 2 years of hobby experience with HTML/CSS and can dedicate about 1 hour per day on weekdays while working my full-time job. I want to take a committed, steady approach — consistent daily progress without burning out. I'll focus on building a portfolio site, reaching out to local small businesses, and pricing my services competitively with a budget of $200 for tools and hosting.'"
 }`;
 
   // If messages is empty, inject a seed to start the conversation
@@ -484,6 +490,7 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
   "category": "One of: fitness, business, learning, creative, financial, health, relationships, productivity, other",
   "deadline_detected": "ISO date string YYYY-MM-DD calculated from today's date (${today}) if a specific deadline or timeframe is mentioned (e.g. 'in 3 months' = add 3 months to today, 'by summer' = ${new Date().getFullYear()}-09-01, 'by December' = ${new Date().getFullYear()}-12-01), otherwise null",
   "daily_time_detected": "Integer number of minutes per day if the user mentions a daily time commitment (e.g. '2 hours a day' = 120, '30 minutes daily' = 30, '3 hours per day' = 180). Only extract if they explicitly mention a daily/per-day time amount. null if not mentioned",
+  "work_days_detected": "Array of day numbers (1=Monday, 2=Tuesday, ..., 7=Sunday) if the user mentions specific days or schedule. Examples: 'weekdays' = [1,2,3,4,5], 'weekends' = [6,7], 'Mon Wed Fri' = [1,3,5], 'every day' = [1,2,3,4,5,6,7]. null if not mentioned",
   "needs_more_context": true if the goal lacks enough detail to generate truly personalized daily tasks — consider: does it have a specific outcome (not just a direction)? Do we know where they're starting from (skill level, current state)? Is there any sense of scale or scope? Would two different people with this goal need completely different tasks? If yes to that last question, it's too vague. Set false only if the goal gives enough to build a genuinely tailored plan,
   "recommendations": "If needs_more_context is true: 2-4 short personalized bullet points (each on its own line starting with •) telling the user exactly what to add, referencing what they wrote. Think: their starting point or experience level, a specific measurable target, any constraints or context (tools, budget, schedule), what they've already tried or have in place. Keep it encouraging and specific to their goal — not generic advice. If needs_more_context is false: null"
 }`;
@@ -512,6 +519,7 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
     category: parsed.category ?? "other",
     deadline_detected: parsed.deadline_detected ?? null,
     daily_time_detected: parsed.daily_time_detected ?? null,
+    work_days_detected: Array.isArray(parsed.work_days_detected) ? parsed.work_days_detected : null,
     needs_more_context: parsed.needs_more_context ?? false,
     recommendations: parsed.recommendations ?? null,
   };
@@ -535,6 +543,8 @@ export async function generateTasks(input: GenerateTasksInput): Promise<Generate
     focusShifted,
     postReview,
     timeOfDay,
+    carriedOverTasks,
+    newTaskCount = 3,
   } = input;
 
   const deadlineStr = goal.deadline
@@ -559,7 +569,14 @@ export async function generateTasks(input: GenerateTasksInput): Promise<Generate
     .filter(Boolean)
     .join(", ");
 
-  const userPrompt = `Generate ${requestingAdditional ? "3 ADDITIONAL stretch tasks" : "3 daily tasks"}.
+  const taskCountLabel = requestingAdditional ? "3 ADDITIONAL stretch tasks" : `${newTaskCount} daily task${newTaskCount !== 1 ? "s" : ""}`;
+
+  const carriedOverSection = carriedOverTasks && carriedOverTasks.length > 0
+    ? `\nCARRIED OVER FROM PREVIOUS DAYS (${carriedOverTasks.length} task${carriedOverTasks.length !== 1 ? "s" : ""} — already included, generate complementary tasks that don't overlap):
+${carriedOverTasks.map((t, i) => `${i + 1}. "${t.task}" — ${t.description}`).join("\n")}`
+    : "";
+
+  const userPrompt = `Generate ${taskCountLabel}.
 
 GOAL: ${goal.title} | ${goal.category ?? "general"} | ${deadlineStr}
 ${goal.structuredSummary ? `Summary: ${goal.structuredSummary}` : `Input: "${goal.rawInput}"`}
@@ -567,7 +584,7 @@ goal_id: ${goal.id}
 
 PROFILE: ${profile.dailyTimeMinutes} min/day | Intensity: ${profile.intensityLevel} | Days active: ${daysActive} | Completed: ${tasksCompletedTotal}${timeOfDay ? `\nTime of day: ${timeOfDay}` : ""}
 Flags: ${flags || "none"}
-
+${carriedOverSection}
 COACHING CONTEXT:
 ${coachingContext ? JSON.stringify(coachingContext) : "null — first session"}
 ${coachingContext?.recent_task_themes && coachingContext.recent_task_themes.length > 0 ? `\nRECENT TASK THEMES (last 14 days):\n${JSON.stringify(coachingContext.recent_task_themes)}` : ""}`;
@@ -591,9 +608,11 @@ ${coachingContext?.recent_task_themes && coachingContext.recent_task_themes.leng
     throw new Error("Claude returned invalid JSON for task generation");
   }
 
-  if (!Array.isArray(parsed.tasks) || parsed.tasks.length !== 3) {
-    throw new Error("Claude did not return exactly 3 tasks");
+  if (!Array.isArray(parsed.tasks) || parsed.tasks.length === 0 || parsed.tasks.length > newTaskCount + 1) {
+    throw new Error(`Claude returned ${parsed.tasks?.length ?? 0} tasks, expected ${newTaskCount}`);
   }
+  // Trim to requested count in case AI returned extra
+  parsed.tasks = parsed.tasks.slice(0, newTaskCount);
 
   const tasks: TaskItem[] = parsed.tasks.map((t, i) => ({
     id: `task-${Date.now()}-${i}`,

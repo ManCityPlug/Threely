@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { title, description, rawInput, structuredSummary, category, deadline, dailyTimeMinutes, intensityLevel } = body as {
+  const { title, description, rawInput, structuredSummary, category, deadline, dailyTimeMinutes, intensityLevel, workDays } = body as {
     title: string;
     description?: string;
     rawInput?: string;
@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
     deadline?: string; // ISO date string
     dailyTimeMinutes?: number;
     intensityLevel?: number;
+    workDays?: number[];
   };
 
   if (!title?.trim()) {
@@ -71,6 +72,7 @@ export async function POST(request: NextRequest) {
       deadline: deadline ? new Date(deadline) : null,
       dailyTimeMinutes: dailyTimeMinutes ?? null,
       intensityLevel: intensityLevel ?? null,
+      ...(workDays ? { workDays } : {}),
     },
   });
 

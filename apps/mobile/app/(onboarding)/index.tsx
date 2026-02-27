@@ -24,7 +24,24 @@ import { colors, spacing, typography, radius, shadow } from "@/constants/theme";
 import { GoalTemplates } from "@/components/GoalTemplates";
 import type { GoalCategory } from "@/constants/goal-templates";
 
-const TOTAL_STEPS = 4; // name, goal, deadline, time
+const TOTAL_STEPS = 5; // name, goal, deadline, time, workdays
+
+const WORK_DAY_PRESETS = [
+  { label: "Every day", value: [1, 2, 3, 4, 5, 6, 7] },
+  { label: "Weekdays (Mon\u2013Fri)", value: [1, 2, 3, 4, 5] },
+  { label: "Weekends (Sat\u2013Sun)", value: [6, 7] },
+  { label: "Mon, Wed, Fri", value: [1, 3, 5] },
+] as const;
+
+const DAY_LABELS = [
+  { iso: 1, short: "M" },
+  { iso: 2, short: "T" },
+  { iso: 3, short: "W" },
+  { iso: 4, short: "T" },
+  { iso: 5, short: "F" },
+  { iso: 6, short: "S" },
+  { iso: 7, short: "S" },
+];
 
 const TIME_OPTIONS = [
   { label: "15 min", value: 15 },
@@ -91,6 +108,10 @@ export default function OnboardingScreen() {
   const scrollHoursRef = useRef<ScrollView>(null);
   const scrollMinutesRef = useRef<ScrollView>(null);
 
+  // Step 5 — Work days
+  const [workDays, setWorkDays] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
+  const [showCustomDays, setShowCustomDays] = useState(false);
+
   // Magic moment
   const [generatedTasks, setGeneratedTasks] = useState<TaskItem[]>([]);
   const [coachNote, setCoachNote] = useState("");
@@ -145,6 +166,14 @@ export default function OnboardingScreen() {
         setDeadlineMonth(d.getMonth());
         setDeadlineDay(d.getDate());
         setDeadlineYear(d.getFullYear());
+      }
+      // Auto-fill work days if detected
+      if (result.work_days_detected && result.work_days_detected.length > 0) {
+        setWorkDays(result.work_days_detected);
+        const isCustom = !WORK_DAY_PRESETS.some(
+          (p) => p.value.length === result.work_days_detected!.length && p.value.every((d) => result.work_days_detected!.includes(d))
+        );
+        setShowCustomDays(isCustom);
       }
       // Auto-fill daily time if detected
       if (result.daily_time_detected && result.daily_time_detected > 0) {
@@ -325,29 +354,18 @@ export default function OnboardingScreen() {
           setShowCustomTime(false);
         }
       }
+      // Pre-fill work days if detected
+      if (result.work_days_detected && result.work_days_detected.length > 0) {
+        setWorkDays(result.work_days_detected);
+        const isCustom = !WORK_DAY_PRESETS.some(
+          (p) => p.value.length === result.work_days_detected!.length && p.value.every((d) => result.work_days_detected!.includes(d))
+        );
+        setShowCustomDays(isCustom);
+      }
       // Skip steps that AI Plan already covered
       let nextStep = 3; // deadline step
       if (result.deadline_detected) nextStep = 4; // skip deadline → time step
-      if (result.deadline_detected && result.daily_time_detected && result.daily_time_detected > 0) {
-        // Both covered — go straight to build with overrides since state hasn't updated yet
-        const dailyMins = (() => {
-          const mins = result.daily_time_detected!;
-          const preset = TIME_OPTIONS.find((o) => o.value === mins);
-          if (preset) return mins;
-          if (mins >= 180) {
-            const hrs = Math.min(14, Math.floor(mins / 60));
-            const remainder = SCROLL_MINUTES.reduce((prev, curr) =>
-              Math.abs(curr - (mins % 60)) < Math.abs(prev - (mins % 60)) ? curr : prev
-            );
-            return hrs * 60 + remainder;
-          }
-          return TIME_OPTIONS.reduce((prev, curr) =>
-            Math.abs(curr.value - mins) < Math.abs(prev.value - mins) ? curr : prev
-          ).value;
-        })();
-        handleBuild({ goalText: chatGoalText!.trim(), parsed: result, dailyMinutes: dailyMins });
-        return;
-      }
+      if (result.daily_time_detected && result.daily_time_detected > 0) nextStep = 5; // skip time → work days
       advanceStep(nextStep);
     } catch (e) {
       setParseError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
@@ -427,6 +445,7 @@ export default function OnboardingScreen() {
         deadline: effectiveParsed?.deadline_detected ?? getDeadlineISO(),
         dailyTimeMinutes: effectiveTime ?? undefined,
         intensityLevel: 2,
+        workDays,
       });
 
       // Generate tasks
@@ -895,14 +914,105 @@ export default function OnboardingScreen() {
         <View style={styles.footer}>
           <TouchableOpacity
             style={[styles.continueBtn, !canContinue && styles.continueBtnDisabled]}
-            onPress={canContinue ? handleBuild : undefined}
+            onPress={canContinue ? () => advanceStep(5) : undefined}
             activeOpacity={canContinue ? 0.85 : 1}
           >
             <Text
               style={[styles.continueBtnText, !canContinue && styles.continueBtnTextDisabled]}
             >
-              Build my plan →
+              Continue →
             </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  function renderStep5() {
+    const matchesPreset = WORK_DAY_PRESETS.find(
+      (p) => p.value.length === workDays.length && p.value.every((d) => workDays.includes(d))
+    );
+
+    function toggleDay(iso: number) {
+      setWorkDays((prev) => {
+        if (prev.includes(iso)) {
+          if (prev.length <= 1) return prev;
+          return prev.filter((d) => d !== iso);
+        }
+        return [...prev, iso].sort();
+      });
+    }
+
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepTitle}>Which days will you work on this?</Text>
+        <Text style={styles.stepSubtitle}>Pick a schedule that fits your routine.</Text>
+
+        <View style={{ gap: spacing.sm, marginTop: spacing.lg }}>
+          {WORK_DAY_PRESETS.map((preset) => {
+            const isActive = !showCustomDays && matchesPreset?.label === preset.label;
+            return (
+              <TouchableOpacity
+                key={preset.label}
+                style={[styles.optionChip, isActive && styles.optionChipActive]}
+                onPress={() => {
+                  setShowCustomDays(false);
+                  setWorkDays([...preset.value]);
+                  if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.optionChipText, isActive && styles.optionChipTextActive]}>
+                  {preset.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+
+          <TouchableOpacity
+            style={[styles.optionChip, showCustomDays && styles.optionChipActive]}
+            onPress={() => {
+              setShowCustomDays(true);
+              if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.optionChipText, showCustomDays && styles.optionChipTextActive]}>
+              Custom
+            </Text>
+          </TouchableOpacity>
+
+          {showCustomDays && (
+            <View style={styles.dayCircleRow}>
+              {DAY_LABELS.map((day) => {
+                const isActive = workDays.includes(day.iso);
+                return (
+                  <TouchableOpacity
+                    key={day.iso}
+                    style={[styles.dayCircle, isActive && styles.dayCircleActive]}
+                    onPress={() => {
+                      toggleDay(day.iso);
+                      if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.dayCircleText, isActive && styles.dayCircleTextActive]}>
+                      {day.short}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+        </View>
+
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.continueBtn}
+            onPress={() => handleBuild()}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.continueBtnText}>Build my plan →</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -1056,6 +1166,7 @@ export default function OnboardingScreen() {
         {step === 2 && renderStep2()}
         {step === 3 && renderStep3()}
         {step === 4 && renderStep4()}
+        {step === 5 && renderStep5()}
         {isMagicMoment && renderMagicMoment()}
       </View>
       {/* ── AI Plan Chat Modal ── */}
@@ -1495,6 +1606,57 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   timeLabelSelected: {
+    color: colors.primary,
+  },
+  // ─── Work days step ────────────────────────────────────────────────────────
+  optionChip: {
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 14,
+    borderRadius: radius.lg,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    backgroundColor: colors.card,
+    alignItems: "center",
+    ...shadow.sm,
+  },
+  optionChipActive: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primaryLight,
+  },
+  optionChipText: {
+    fontSize: typography.base,
+    fontWeight: typography.semibold,
+    color: colors.text,
+  },
+  optionChipTextActive: {
+    color: colors.primary,
+  },
+  dayCircleRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  dayCircle: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    backgroundColor: colors.card,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  dayCircleActive: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primaryLight,
+  },
+  dayCircleText: {
+    fontSize: typography.sm,
+    fontWeight: typography.bold,
+    color: colors.textSecondary,
+  },
+  dayCircleTextActive: {
     color: colors.primary,
   },
   // ─── Scroll picker (shared) ─────────────────────────────────────────────────

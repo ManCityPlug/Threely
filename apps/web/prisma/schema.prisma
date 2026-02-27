@@ -22,9 +22,11 @@ model User {
   subscriptionStatus String?      @map("subscription_status")
   trialClaimedAt     DateTime?    @map("trial_claimed_at")
   trialDeviceId      String?      @map("trial_device_id")
+  trialEndsAt        DateTime?    @map("trial_ends_at")
   goals              Goal[]
   dailyTasks         DailyTask[]
   dailyFocus         DailyFocus[]
+  weeklySummaries    WeeklySummary[]
   profile            UserProfile?
 
   @@map("users")
@@ -60,7 +62,6 @@ model Goal {
   intensityLevel    Int?        @map("intensity_level")
   isActive          Boolean     @default(true) @map("is_active")
   isPaused          Boolean     @default(false) @map("is_paused")
-  focusDays         String?     @map("focus_days")
   createdAt         DateTime    @default(now()) @map("created_at")
   updatedAt         DateTime    @updatedAt @map("updated_at")
 
@@ -122,4 +123,22 @@ model DailyReview {
   dailyTask        DailyTask @relation(fields: [dailyTaskId], references: [id], onDelete: Cascade)
 
   @@map("daily_reviews")
+}
+
+// ─── WeeklySummary ──────────────────────────────────────────────────────────
+model WeeklySummary {
+  id            String    @id @default(cuid())
+  userId        String    @map("user_id")
+  weekStart     DateTime  @db.Date
+  stats         Json
+  insight       String?
+  timezone      String
+  firstOpenedAt DateTime? @map("first_opened_at")
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart])
+  @@index([userId])
+  @@map("weekly_summaries")
 }

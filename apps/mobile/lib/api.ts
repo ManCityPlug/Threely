@@ -15,6 +15,7 @@ export interface Goal {
   deadline: string | null;
   dailyTimeMinutes: number | null;
   intensityLevel: number | null;
+  workDays: number[];
   isActive: boolean;
   isPaused: boolean;
   createdAt: string;
@@ -31,6 +32,8 @@ export interface TaskItem {
   isCompleted: boolean;
   isSkipped?: boolean;
   isRescheduled?: boolean;
+  isCarriedOver?: boolean;
+  carriedFromDate?: string;
 }
 
 export interface DailyTask {
@@ -61,6 +64,7 @@ export interface ParsedGoal {
   category: string;
   deadline_detected: string | null;
   daily_time_detected: number | null;
+  work_days_detected: number[] | null;
   needs_more_context: boolean;
   recommendations: string | null;
 }
@@ -192,6 +196,7 @@ export const goalsApi = {
       deadline?: string;
       dailyTimeMinutes?: number;
       intensityLevel?: number;
+      workDays?: number[];
     }
   ) =>
     apiFetch<{ goal: Goal }>("/api/goals", {
@@ -199,7 +204,7 @@ export const goalsApi = {
       body: JSON.stringify({ title, ...options }),
     }),
 
-  update: (id: string, data: Partial<Pick<Goal, "title" | "description" | "isActive" | "rawInput" | "structuredSummary" | "category" | "deadline" | "dailyTimeMinutes" | "intensityLevel">>) =>
+  update: (id: string, data: Partial<Pick<Goal, "title" | "description" | "isActive" | "rawInput" | "structuredSummary" | "category" | "deadline" | "dailyTimeMinutes" | "intensityLevel" | "workDays">>) =>
     apiFetch<{ goal: Goal }>(`/api/goals/${id}`, {
       method: "PATCH",
       body: JSON.stringify(data),
@@ -232,7 +237,7 @@ export const tasksApi = {
     params.set("date", localDate);
     if (includeOverdue) params.set("includeOverdue", "true");
     const qs = `?${params.toString()}`;
-    return apiFetch<{ dailyTasks: DailyTask[]; overdueTasks: DailyTask[] }>(`/api/tasks${qs}`);
+    return apiFetch<{ dailyTasks: DailyTask[]; overdueTasks: DailyTask[]; restDay?: boolean }>(`/api/tasks${qs}`);
   },
 
   history: (days = 14) =>
@@ -248,7 +253,7 @@ export const tasksApi = {
   ) => {
     const now = new Date();
     const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-    return apiFetch<{ dailyTasks: DailyTask[]; coachNote?: string }>("/api/tasks/generate", {
+    return apiFetch<{ dailyTasks: DailyTask[]; coachNote?: string; restDay?: boolean }>("/api/tasks/generate", {
       method: "POST",
       body: JSON.stringify({ goalId, localDate, ...options }),
     });

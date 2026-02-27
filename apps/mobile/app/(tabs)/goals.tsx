@@ -40,7 +40,24 @@ const DAYS_IN_MONTH = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const PICKER_ITEM_HEIGHT = 52;
 const PICKER_HEIGHT = PICKER_ITEM_HEIGHT * 3;
 
-const TOTAL_ADD_STEPS = 5; // goal, confirm, deadline, time, building
+const TOTAL_ADD_STEPS = 6; // goal, confirm, deadline, time, workdays, building
+
+const WORK_DAY_PRESETS = [
+  { label: "Every day", value: [1, 2, 3, 4, 5, 6, 7] },
+  { label: "Weekdays (Mon\u2013Fri)", value: [1, 2, 3, 4, 5] },
+  { label: "Weekends (Sat\u2013Sun)", value: [6, 7] },
+  { label: "Mon, Wed, Fri", value: [1, 3, 5] },
+] as const;
+
+const DAY_LABELS = [
+  { iso: 1, short: "M" },
+  { iso: 2, short: "T" },
+  { iso: 3, short: "W" },
+  { iso: 4, short: "T" },
+  { iso: 5, short: "F" },
+  { iso: 6, short: "S" },
+  { iso: 7, short: "S" },
+];
 
 const TIME_OPTIONS = [
   { label: "15 min", value: 15 },
@@ -120,7 +137,11 @@ export default function GoalsScreen() {
   const scrollHoursRef = useRef<ScrollView>(null);
   const scrollMinutesRef = useRef<ScrollView>(null);
 
-  // Step 5 — Building
+  // Step 5 — Work days
+  const [workDays, setWorkDays] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
+  const [showCustomDays, setShowCustomDays] = useState(false);
+
+  // Step 6 — Building
   const [buildError, setBuildError] = useState("");
   const [builtTasks, setBuiltTasks] = useState<TaskItem[]>([]);
   const [coachNote, setCoachNote] = useState("");
@@ -235,6 +256,8 @@ export default function GoalsScreen() {
     }
     setTimeMinutes(goal.dailyTimeMinutes);
     setShowCustomTime(false);
+    setWorkDays(goal.workDays ?? [1, 2, 3, 4, 5, 6, 7]);
+    setShowCustomDays(false);
 
     setShowFreeText(true); // Skip templates when editing
     advanceAddStep(1);
@@ -270,6 +293,14 @@ export default function GoalsScreen() {
         setDeadlineMonth(d.getMonth());
         setDeadlineDay(d.getDate());
         setDeadlineYear(d.getFullYear());
+      }
+      // Pre-fill work days if detected
+      if (result.work_days_detected && result.work_days_detected.length > 0) {
+        setWorkDays(result.work_days_detected);
+        const isCustom = !WORK_DAY_PRESETS.some(
+          (p) => p.value.length === result.work_days_detected!.length && p.value.every((d) => result.work_days_detected!.includes(d))
+        );
+        setShowCustomDays(isCustom);
       }
       // Pre-fill daily time if detected
       if (result.daily_time_detected && result.daily_time_detected > 0) {
@@ -422,25 +453,21 @@ export default function GoalsScreen() {
           setShowCustomTime(false);
         }
       }
+      // Pre-fill work days if detected
+      if (result.work_days_detected && result.work_days_detected.length > 0) {
+        setWorkDays(result.work_days_detected);
+        const isCustom = !WORK_DAY_PRESETS.some(
+          (p) => p.value.length === result.work_days_detected!.length && p.value.every((d) => result.work_days_detected!.includes(d))
+        );
+        setShowCustomDays(isCustom);
+      }
       // Skip to deadline if no issues, or confirm if needs more context
       if (result.needs_more_context) {
         advanceAddStep(2);
       } else {
         let nextStep = 3; // deadline
         if (result.deadline_detected) nextStep = 4; // skip deadline → time
-        if (result.deadline_detected && result.daily_time_detected && result.daily_time_detected > 0) {
-          // Both covered — go straight to build with overrides
-          const dailyMins = (() => {
-            const mins = result.daily_time_detected!;
-            const preset = TIME_OPTIONS.find((o) => o.value === mins);
-            if (preset) return mins;
-            return TIME_OPTIONS.reduce((prev, curr) =>
-              Math.abs(curr.value - mins) < Math.abs(prev.value - mins) ? curr : prev
-            ).value;
-          })();
-          handleBuild({ goalText: chatGoalText!.trim(), parsed: result, dailyMinutes: dailyMins });
-          return;
-        }
+        if (result.daily_time_detected && result.daily_time_detected > 0) nextStep = 5; // skip time → work days
         advanceAddStep(nextStep);
       }
     } catch (e) {
@@ -483,6 +510,7 @@ export default function GoalsScreen() {
           deadline: deadline ?? null,
           dailyTimeMinutes: effectiveTime ?? undefined,
           intensityLevel: 2,
+          workDays,
         });
         setGoals((prev) => prev.map((g) => g.id === editingGoalId ? goalResult.goal : g));
         goalId = editingGoalId;
@@ -494,6 +522,7 @@ export default function GoalsScreen() {
           deadline,
           dailyTimeMinutes: effectiveTime ?? undefined,
           intensityLevel: 2,
+          workDays,
         });
         setGoals((prev) => [goalResult.goal, ...prev]);
         goalId = goalResult.goal.id;
@@ -990,12 +1019,103 @@ export default function GoalsScreen() {
         <View style={styles.footer}>
           <TouchableOpacity
             style={[styles.continueBtn, !canContinue && styles.continueBtnDisabled]}
-            onPress={canContinue ? () => handleBuild() : undefined}
+            onPress={canContinue ? () => advanceAddStep(5) : undefined}
             activeOpacity={canContinue ? 0.85 : 1}
           >
             <Text style={[styles.continueBtnText, !canContinue && styles.continueBtnTextDisabled]}>
-              Build my plan →
+              Continue →
             </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
+  function renderAddStep5() {
+    const matchesPreset = WORK_DAY_PRESETS.find(
+      (p) => p.value.length === workDays.length && p.value.every((d) => workDays.includes(d))
+    );
+
+    function toggleDay(iso: number) {
+      setWorkDays((prev) => {
+        if (prev.includes(iso)) {
+          if (prev.length <= 1) return prev;
+          return prev.filter((d) => d !== iso);
+        }
+        return [...prev, iso].sort();
+      });
+    }
+
+    return (
+      <View style={styles.stepContainer}>
+        <Text style={styles.stepTitle}>Which days will you work on this?</Text>
+        <Text style={styles.stepSubtitle}>Pick a schedule that fits your routine.</Text>
+
+        <View style={{ gap: spacing.sm, marginTop: spacing.lg }}>
+          {WORK_DAY_PRESETS.map((preset) => {
+            const isActive = !showCustomDays && matchesPreset?.label === preset.label;
+            return (
+              <TouchableOpacity
+                key={preset.label}
+                style={[styles.optionChip, isActive && styles.optionChipActive]}
+                onPress={() => {
+                  setShowCustomDays(false);
+                  setWorkDays([...preset.value]);
+                  if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                }}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.optionChipText, isActive && styles.optionChipTextActive]}>
+                  {preset.label}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+
+          <TouchableOpacity
+            style={[styles.optionChip, showCustomDays && styles.optionChipActive]}
+            onPress={() => {
+              setShowCustomDays(true);
+              if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            }}
+            activeOpacity={0.8}
+          >
+            <Text style={[styles.optionChipText, showCustomDays && styles.optionChipTextActive]}>
+              Custom
+            </Text>
+          </TouchableOpacity>
+
+          {showCustomDays && (
+            <View style={styles.dayCircleRow}>
+              {DAY_LABELS.map((day) => {
+                const isActive = workDays.includes(day.iso);
+                return (
+                  <TouchableOpacity
+                    key={day.iso}
+                    style={[styles.dayCircle, isActive && styles.dayCircleActive]}
+                    onPress={() => {
+                      toggleDay(day.iso);
+                      if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    }}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={[styles.dayCircleText, isActive && styles.dayCircleTextActive]}>
+                      {day.short}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
+        </View>
+
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.continueBtn}
+            onPress={() => handleBuild()}
+            activeOpacity={0.85}
+          >
+            <Text style={styles.continueBtnText}>Build my plan →</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -1111,6 +1231,7 @@ export default function GoalsScreen() {
         {addStep === 2 && renderAddStep2()}
         {addStep === 3 && renderAddStep3()}
         {addStep === 4 && renderAddStep4()}
+        {addStep === 5 && renderAddStep5()}
         {addStep === TOTAL_ADD_STEPS && renderBuildingStep()}
 
         {/* ── AI Plan Chat Modal ── */}
@@ -1707,6 +1828,58 @@ function createStyles(c: Colors) {
       color: c.text,
     },
     timeLabelSelected: {
+      color: c.primary,
+    },
+
+    // ── Work days step ─────────────────────────────────────────────────────────
+    optionChip: {
+      paddingHorizontal: spacing.lg,
+      paddingVertical: 14,
+      borderRadius: radius.lg,
+      borderWidth: 1.5,
+      borderColor: c.border,
+      backgroundColor: c.card,
+      alignItems: "center",
+      ...shadow.sm,
+    },
+    optionChipActive: {
+      borderColor: c.primary,
+      backgroundColor: c.primaryLight,
+    },
+    optionChipText: {
+      fontSize: typography.base,
+      fontWeight: typography.semibold,
+      color: c.text,
+    },
+    optionChipTextActive: {
+      color: c.primary,
+    },
+    dayCircleRow: {
+      flexDirection: "row",
+      justifyContent: "center",
+      gap: spacing.sm,
+      marginTop: spacing.sm,
+    },
+    dayCircle: {
+      width: 42,
+      height: 42,
+      borderRadius: 21,
+      borderWidth: 1.5,
+      borderColor: c.border,
+      backgroundColor: c.card,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    dayCircleActive: {
+      borderColor: c.primary,
+      backgroundColor: c.primaryLight,
+    },
+    dayCircleText: {
+      fontSize: typography.sm,
+      fontWeight: typography.bold,
+      color: c.textSecondary,
+    },
+    dayCircleTextActive: {
       color: c.primary,
     },
 

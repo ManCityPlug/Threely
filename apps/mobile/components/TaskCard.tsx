@@ -10,6 +10,7 @@ import {
   Platform,
   TextInput,
   ActivityIndicator,
+  KeyboardAvoidingView,
 } from "react-native";
 import * as Haptics from "expo-haptics";
 import type { TaskItem } from "@/lib/api";
@@ -133,6 +134,11 @@ export function TaskCard({ task, onToggle, onEdit, onRefine, readonly = false }:
                   </Text>
                 </View>
               ) : null}
+              {task.isCarriedOver && (
+                <View style={styles.overduePill}>
+                  <Text style={styles.overduePillText}>Overdue</Text>
+                </View>
+              )}
             </View>
 
             {task.description ? (
@@ -163,18 +169,22 @@ export function TaskCard({ task, onToggle, onEdit, onRefine, readonly = false }:
         animationType="fade"
         onRequestClose={() => setModalVisible(false)}
       >
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
         <TouchableOpacity
           style={styles.modalOverlay}
           activeOpacity={1}
           onPress={() => setModalVisible(false)}
         >
-          <TouchableOpacity activeOpacity={1} style={styles.modalSheet} onPress={() => {}}>
+          <TouchableOpacity activeOpacity={1} style={[styles.modalSheet, (refineMode || editing) && styles.modalSheetExpanded]} onPress={() => {}}>
             {/* Header */}
             <View style={styles.modalHeader}>
               <View style={styles.modalHandle} />
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
               {/* Time badge */}
               {task.estimated_minutes ? (
                 <View style={styles.modalTimeBadge}>
@@ -363,6 +373,7 @@ export function TaskCard({ task, onToggle, onEdit, onRefine, readonly = false }:
             ) : null}
           </TouchableOpacity>
         </TouchableOpacity>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );
@@ -446,6 +457,19 @@ function createStyles(c: Colors) {
     timeBadgeTextDone: {
       color: c.success,
     },
+    overduePill: {
+      backgroundColor: c.warningLight,
+      borderRadius: radius.full,
+      paddingHorizontal: 7,
+      paddingVertical: 2,
+      flexShrink: 0,
+      marginTop: 2,
+    },
+    overduePillText: {
+      fontSize: typography.xs,
+      fontWeight: typography.semibold,
+      color: c.warning,
+    },
     description: {
       fontSize: typography.sm,
       color: c.textSecondary,
@@ -477,6 +501,9 @@ function createStyles(c: Colors) {
       paddingBottom: spacing.xxl,
       maxHeight: "75%",
       ...shadow.lg,
+    },
+    modalSheetExpanded: {
+      maxHeight: "90%",
     },
     modalHeader: {
       alignItems: "center",
