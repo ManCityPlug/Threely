@@ -37,6 +37,7 @@ import {
   type GoalStat,
 } from "@/lib/api";
 import { TaskCard } from "@/components/TaskCard";
+import { Confetti } from "@/components/Confetti";
 import { Button } from "@/components/ui/Button";
 import { SkeletonCard } from "@/components/Skeleton";
 import { useToast } from "@/lib/toast";
@@ -152,6 +153,9 @@ export default function DashboardScreen() {
   const [insightText, setInsightText] = useState("");
   const [showInsightCard, setShowInsightCard] = useState(false);
   const [insightLoading, setInsightLoading] = useState(false);
+
+  // ─── Confetti state ───────────────────────────────────────────────────────────
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // ─── Focus lock state ────────────────────────────────────────────────────────
   const [tasksCompletedSinceGenerate, setTasksCompletedSinceGenerate] = useState(false);
@@ -374,12 +378,14 @@ export default function DashboardScreen() {
     }
   }, [loading, buildNotifContext, goals.length]);
 
-  // Mark focus lock when all tasks become done
+  // Mark focus lock + confetti when all tasks become done
   const prevAllDone = useRef(false);
   const goalKey = selectedGoal ?? "none";
   useEffect(() => {
     if (allDone && !prevAllDone.current && newTaskItems.length > 0) {
       setTasksCompletedSinceGenerate(true);
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
     }
     prevAllDone.current = allDone;
   }, [allDone, newTaskItems.length]);
@@ -472,9 +478,8 @@ export default function DashboardScreen() {
   async function handleToggleTask(dailyTaskId: string, taskItemId: string, isCompleted: boolean) {
     try {
       const res = await tasksApi.completeItem(dailyTaskId, taskItemId, isCompleted);
-      setDailyTasks((prev) =>
-        prev.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt))
-      );
+      const newDailyTasks = dailyTasks.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt));
+      setDailyTasks(newDailyTasks);
       // Update notifications after task completion
       if (isCompleted) {
         onTaskCompleted(buildNotifContext()).catch(() => {});
@@ -525,6 +530,8 @@ export default function DashboardScreen() {
       }
       // Trigger confetti and completion banner
       setTasksCompletedSinceGenerate(true);
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 3000);
     } catch {
       showToast("Couldn't complete all tasks. Try again.", "error");
     }
@@ -639,6 +646,7 @@ export default function DashboardScreen() {
   return (
     <SwipeNavigator currentIndex={0}>
     <View style={styles.container}>
+      <Confetti active={showConfetti} />
       {/* Fixed header — outside ScrollView so it never hides under Dynamic Island */}
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <View style={styles.headerRow}>

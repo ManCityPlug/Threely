@@ -1,9 +1,10 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
+  RefreshControl,
   Alert,
   TouchableOpacity,
   ActivityIndicator,
@@ -12,11 +13,12 @@ import {
   Modal,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { SwipeNavigator } from "@/components/SwipeNavigator";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/lib/supabase";
-import { statsApi, accountApi, tasksApi, type Stats, type DailyTask, type TaskItem, type HeatmapDay } from "@/lib/api";
+import { statsApi, accountApi, tasksApi, summaryApi, type Stats, type DailyTask, type TaskItem, type HeatmapDay, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus } from "@/lib/api";
 import { TaskCard } from "@/components/TaskCard";
 import { WeeklyBarChart } from "@/components/WeeklyBarChart";
 import { WeeklySummary } from "@/components/WeeklySummary";
@@ -63,26 +65,28 @@ interface StatCardProps {
   numericValue?: number;
   suffix?: string;
   icon: keyof typeof Ionicons.glyphMap;
+  accentColor?: string;
   loading?: boolean;
   colors: Colors;
   styles: ReturnType<typeof createStyles>;
 }
 
-function StatCard({ label, value, numericValue, suffix = "", icon, loading, colors, styles }: StatCardProps) {
+function StatCard({ label, value, numericValue, suffix = "", icon, accentColor, loading, colors, styles }: StatCardProps) {
   const animatedValue = useCountUp(loading ? 0 : (numericValue ?? 0));
   const displayValue = numericValue !== undefined && !loading
     ? `${animatedValue}${suffix}`
     : value;
+  const iconColor = accentColor ?? colors.primary;
 
   return (
     <View style={styles.statCard}>
-      <View style={styles.statIconWrap}>
-        <Ionicons name={icon} size={20} color={colors.primary} />
+      <View style={[styles.statIconWrap, accentColor ? { backgroundColor: `${accentColor}18` } : undefined]}>
+        <Ionicons name={icon} size={20} color={iconColor} />
       </View>
       {loading ? (
         <ActivityIndicator color={colors.primary} size="small" style={{ marginVertical: 4 }} />
       ) : (
-        <Text style={styles.statValue}>{displayValue}</Text>
+        <Text style={[styles.statValue, accentColor ? { color: accentColor } : undefined]}>{displayValue}</Text>
       )}
       <Text style={styles.statLabel}>{label}</Text>
     </View>
@@ -171,9 +175,14 @@ export default function ProfileScreen() {
   // Heatmap
   const [heatmapData, setHeatmapData] = useState<HeatmapDay[]>([]);
   const [heatmapLoading, setHeatmapLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
   // Weekly summary
   const [weeklySummaryOpen, setWeeklySummaryOpen] = useState(false);
+  const [weeklyStatus, setWeeklyStatus] = useState<WeeklySummaryStatus | null>(null);
+  const [weeklyFrozenData, setWeeklyFrozenData] = useState<WeeklySummaryType | null>(null);
+  const [weeklyOpening, setWeeklyOpening] = useState(false);
+  const [countdown, setCountdown] = useState("");
 
   // History
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -192,41 +201,117 @@ export default function ProfileScreen() {
   // Appearance
   const [appearanceSheetOpen, setAppearanceSheetOpen] = useState(false);
 
+  const loadProfileData = useCallback(async () => {
+    try {
+      const [{ data: { user } }, statsRes, notifRes, savedNickname, heatmapRes] = await Promise.all([
+        supabase.auth.getUser(),
+        statsApi.get(),
+        getNotifPreference(),
+        AsyncStorage.getItem("@threely_nickname"),
+        statsApi.heatmap(90).catch(() => ({ heatmap: [] })),
+      ]);
+      if (user) {
+        setEmail(user.email ?? "");
+        const d = new Date(user.created_at);
+        setMemberSince(d.toLocaleDateString("en-US", { month: "long", year: "numeric" }));
+      }
+      setStats(statsRes);
+      setNotifPref(notifRes);
+      if (savedNickname) setNickname(savedNickname);
+      setHeatmapData(heatmapRes.heatmap);
+    } catch {
+      // silently keep previous values
+    } finally {
+      setStatsLoading(false);
+      setHeatmapLoading(false);
+    }
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
-      let active = true;
-      async function load() {
-        try {
-          const [{ data: { user } }, statsRes, notifRes, savedNickname, heatmapRes] = await Promise.all([
-            supabase.auth.getUser(),
-            statsApi.get(),
-            getNotifPreference(),
-            AsyncStorage.getItem("@threely_nickname"),
-            statsApi.heatmap(90).catch(() => ({ heatmap: [] })),
-          ]);
-          if (!active) return;
-          if (user) {
-            setEmail(user.email ?? "");
-            const d = new Date(user.created_at);
-            setMemberSince(d.toLocaleDateString("en-US", { month: "long", year: "numeric" }));
-          }
-          setStats(statsRes);
-          setNotifPref(notifRes);
-          if (savedNickname) setNickname(savedNickname);
-          setHeatmapData(heatmapRes.heatmap);
-        } catch {
-          // silently keep previous values
-        } finally {
-          if (active) {
-            setStatsLoading(false);
-            setHeatmapLoading(false);
-          }
+      loadProfileData();
+    }, [loadProfileData])
+  );
+
+  async function onRefresh() {
+    setRefreshing(true);
+    await loadProfileData();
+    setRefreshing(false);
+  }
+
+  // ── Weekly analysis status ───────────────────────────────────────────────────
+
+  useFocusEffect(
+    useCallback(() => {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      summaryApi.weeklyStatus(tz).then((res) => {
+        setWeeklyStatus(res);
+        if (res.status === "available" && res.summary) {
+          setWeeklyFrozenData(res.summary);
         }
-      }
-      load();
-      return () => { active = false; };
+      }).catch(() => {});
+      return () => {};
     }, [])
   );
+
+  // Countdown timer for locked/expired states (with client-side fallback)
+  useEffect(() => {
+    // Use server-provided unlocksAt, or compute next Monday locally as fallback
+    let targetDate: string | undefined = weeklyStatus?.unlocksAt;
+
+    if (!targetDate) {
+      // Compute next Monday 00:00 local time
+      const now = new Date();
+      const day = now.getDay(); // 0=Sun
+      const daysUntilMon = day === 0 ? 1 : day === 1 ? 7 : 8 - day;
+      const nextMon = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilMon);
+      targetDate = nextMon.toISOString();
+    }
+
+    const isLockState = !weeklyStatus || weeklyStatus.status === "locked" || weeklyStatus.status === "expired";
+    if (!isLockState) {
+      setCountdown("");
+      return;
+    }
+
+    function updateCountdown() {
+      const diff = new Date(targetDate!).getTime() - Date.now();
+      if (diff <= 0) {
+        setCountdown("Available now");
+        return;
+      }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diff / (1000 * 60)) % 60);
+      if (days > 0) setCountdown(`Unlocks in ${days}d ${hours}h`);
+      else if (hours > 0) setCountdown(`Unlocks in ${hours}h ${mins}m`);
+      else setCountdown(`Unlocks in ${mins}m`);
+    }
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000);
+    return () => clearInterval(interval);
+  }, [weeklyStatus]);
+
+  async function handleOpenWeekly() {
+    if (weeklyStatus?.status === "available" && weeklyFrozenData) {
+      setWeeklySummaryOpen(true);
+      return;
+    }
+    if (weeklyStatus?.status !== "ready") return;
+    setWeeklyOpening(true);
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const data = await summaryApi.weeklyOpen(tz);
+      setWeeklyFrozenData(data);
+      setWeeklyStatus({ status: "available", summary: data });
+      setWeeklySummaryOpen(true);
+    } catch {
+      Alert.alert("Error", "Failed to load weekly analysis.");
+    } finally {
+      setWeeklyOpening(false);
+    }
+  }
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
 
@@ -314,7 +399,8 @@ export default function ProfileScreen() {
   // ── Derived display values ────────────────────────────────────────────────────
 
   const initials = (nickname || email) ? (nickname || email)[0].toUpperCase() : "?";
-  const displayName = nickname || email;
+  const displayNameRaw = nickname || email;
+  const displayName = displayNameRaw ? displayNameRaw.charAt(0).toUpperCase() + displayNameRaw.slice(1) : "";
 
   const notifLabel = (() => {
     if (!notifPref) return "Off";
@@ -326,8 +412,15 @@ export default function ProfileScreen() {
   const schemeCurrent = SCHEME_OPTIONS.find((s) => s.value === preference) ?? SCHEME_OPTIONS[2];
 
   return (
+    <SwipeNavigator currentIndex={2}>
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+        }
+      >
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Profile</Text>
@@ -364,6 +457,7 @@ export default function ProfileScreen() {
                 value={stats?.totalCompleted ?? "—"}
                 numericValue={stats?.totalCompleted}
                 icon="checkmark-circle-outline"
+                accentColor={colors.success}
                 loading={statsLoading}
                 colors={colors}
                 styles={styles}
@@ -374,6 +468,7 @@ export default function ProfileScreen() {
                 numericValue={stats?.streak}
                 suffix="d"
                 icon="flame-outline"
+                accentColor={colors.warning}
                 loading={statsLoading}
                 colors={colors}
                 styles={styles}
@@ -413,27 +508,58 @@ export default function ProfileScreen() {
           </>
         )}
 
-        {/* Settings */}
-        <Text style={styles.sectionLabel}>Settings</Text>
-        <View style={styles.menuCard}>
-          {/* Weekly Summary */}
+        {/* Weekly Analysis Card */}
+        <Text style={styles.sectionLabel}>Weekly analysis</Text>
+        {weeklyStatus?.status === "ready" ? (
           <TouchableOpacity
-            style={styles.menuRow}
-            onPress={() => setWeeklySummaryOpen(true)}
+            style={[styles.weeklyCard, { borderColor: colors.primary, borderWidth: 1.5 }]}
+            onPress={handleOpenWeekly}
+            activeOpacity={0.7}
+            disabled={weeklyOpening}
+          >
+            <View style={[styles.weeklyIconWrap, { backgroundColor: colors.primaryLight }]}>
+              <Ionicons name="sparkles" size={20} color={colors.primary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.menuLabel, { color: colors.primary }]}>Your weekly analysis is ready!</Text>
+              <Text style={styles.menuValue}>Tap to view your stats + AI insight</Text>
+            </View>
+            {weeklyOpening ? (
+              <ActivityIndicator size="small" color={colors.primary} />
+            ) : (
+              <Ionicons name="chevron-forward" size={16} color={colors.primary} />
+            )}
+          </TouchableOpacity>
+        ) : weeklyStatus?.status === "available" ? (
+          <TouchableOpacity
+            style={styles.weeklyCard}
+            onPress={handleOpenWeekly}
             activeOpacity={0.7}
           >
-            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="bar-chart-outline" size={18} color={colors.primary} />
+            <View style={[styles.weeklyIconWrap, { backgroundColor: colors.primaryLight }]}>
+              <Ionicons name="bar-chart-outline" size={20} color={colors.primary} />
             </View>
-            <View style={styles.menuText}>
-              <Text style={styles.menuLabel}>Weekly summary</Text>
-              <Text style={styles.menuValue}>Stats + AI insight</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.menuLabel}>Weekly Analysis</Text>
+              <Text style={styles.menuValue}>Tap to re-read</Text>
             </View>
             <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
           </TouchableOpacity>
+        ) : (
+          <View style={[styles.weeklyCard, { opacity: 0.7 }]}>
+            <View style={[styles.weeklyIconWrap, { backgroundColor: colors.bg }]}>
+              <Ionicons name="lock-closed-outline" size={20} color={colors.textTertiary} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.menuLabel, { color: colors.textSecondary }]}>Weekly Analysis</Text>
+              <Text style={styles.menuValue}>{countdown ? countdown.replace("Unlocks in ", "Available in ") : "Loading..."}</Text>
+            </View>
+          </View>
+        )}
 
-          <View style={styles.divider} />
-
+        {/* Settings */}
+        <Text style={styles.sectionLabel}>Settings</Text>
+        <View style={styles.menuCard}>
           {/* History */}
           <TouchableOpacity
             style={styles.menuRow}
@@ -746,8 +872,10 @@ export default function ProfileScreen() {
       <WeeklySummary
         visible={weeklySummaryOpen}
         onClose={() => setWeeklySummaryOpen(false)}
+        frozenData={weeklyFrozenData}
       />
     </SafeAreaView>
+    </SwipeNavigator>
   );
 }
 
@@ -848,6 +976,25 @@ function createStyles(c: Colors) {
       fontSize: typography.xs,
       color: c.textSecondary,
       textAlign: "center",
+    },
+    weeklyCard: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: c.card,
+      borderRadius: radius.lg,
+      borderWidth: 1,
+      borderColor: c.border,
+      padding: spacing.md,
+      gap: spacing.md,
+      marginBottom: spacing.xl,
+      ...shadow.sm,
+    },
+    weeklyIconWrap: {
+      width: 40,
+      height: 40,
+      borderRadius: radius.md,
+      alignItems: "center",
+      justifyContent: "center",
     },
     menuCard: {
       backgroundColor: c.card,

@@ -890,6 +890,38 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* Complete all bar — shown above tasks when not all done */}
+          {!allDone && !insight && totalCount > 0 && (
+            <div className="give-more-bar locked" style={{ marginBottom: "1.25rem" }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: "50%",
+                background: "var(--bg)", display: "flex",
+                alignItems: "center", justifyContent: "center",
+                fontSize: 18, flexShrink: 0,
+              }}>
+                {"🔒"}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>
+                  Complete all {totalCount} tasks to unlock more
+                </div>
+                <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
+                  {completedCount}/{totalCount} done — {totalCount - completedCount} remaining
+                </div>
+              </div>
+              {incompleteCount >= 2 && (
+                <button
+                  className="btn btn-outline"
+                  onClick={handleCompleteAll}
+                  disabled={completingAll}
+                  style={{ fontSize: "0.8rem", flexShrink: 0 }}
+                >
+                  {completingAll ? <><span className="spinner" style={{ width: 14, height: 14 }} /> ...</> : "✓ Complete all"}
+                </button>
+              )}
+            </div>
+          )}
+
           {/* Coach note card */}
           {insight && (
             <div className="card fade-in" style={{
@@ -957,8 +989,8 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          {/* Actions bar */}
-          {allDone && !insight ? (
+          {/* Give me more bar — shown after tasks when all done */}
+          {allDone && !insight && (
             <div className="give-more-bar unlocked">
               <button
                 onClick={handleGiveMore}
@@ -976,39 +1008,10 @@ export default function DashboardPage() {
                 {generating ? <><span className="spinner spinner-dark" style={{ width: 18, height: 18 }} /> Loading...</> : "🚀 Give me more"}
               </button>
               <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.9)", fontWeight: 500 }}>
-                All done! Ready for the next challenge?
+                Great work! Review and get your next steps.
               </span>
             </div>
-          ) : !insight && totalCount > 0 ? (
-            <div className="give-more-bar locked">
-              <div style={{
-                width: 36, height: 36, borderRadius: "50%",
-                background: "var(--bg)", display: "flex",
-                alignItems: "center", justifyContent: "center",
-                fontSize: 18, flexShrink: 0,
-              }}>
-                {"🔒"}
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>
-                  Complete all {totalCount} tasks to unlock more
-                </div>
-                <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
-                  {completedCount}/{totalCount} done — {totalCount - completedCount} remaining
-                </div>
-              </div>
-              {incompleteCount >= 2 && (
-                <button
-                  className="btn btn-outline"
-                  onClick={handleCompleteAll}
-                  disabled={completingAll}
-                  style={{ fontSize: "0.8rem", flexShrink: 0 }}
-                >
-                  {completingAll ? <><span className="spinner" style={{ width: 14, height: 14 }} /> ...</> : "✓ Complete all"}
-                </button>
-              )}
-            </div>
-          ) : null}
+          )}
         </>
       )}
 
