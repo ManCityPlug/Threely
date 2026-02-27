@@ -28,6 +28,18 @@ function CategoryBadge({ category }: { category: string | null }) {
 
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
+function formatWorkDays(days: number[] | undefined | null): string {
+  if (!days || days.length === 0 || days.length === 7) return "Every day";
+  const sorted = [...days].sort();
+  const key = sorted.join(",");
+  if (key === "1,2,3,4,5") return "Weekdays";
+  if (key === "6,7") return "Weekends";
+  if (key === "1,3,5") return "Mon, Wed, Fri";
+  if (key === "2,4") return "Tue, Thu";
+  const names = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  return sorted.map(d => names[d]).join(", ");
+}
+
 // ─── Add Goal Flow (full-screen, matches mobile onboarding) ──────────────────
 
 type FlowStep = "goal" | "confirm" | "deadline" | "time" | "workdays" | "intensity" | "building" | "done";
@@ -1103,6 +1115,17 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
                 borderRadius: 20, padding: "2px 8px",
               }}>
                 {daysLeft > 0 ? `${daysLeft}d left` : "Overdue"}
+              </span>
+            )}
+            {!goal.isPaused && (
+              <span style={{
+                fontSize: "0.7rem", fontWeight: 500,
+                color: "var(--muted)",
+                background: "var(--bg)",
+                borderRadius: 20, padding: "2px 8px",
+                display: "inline-flex", alignItems: "center", gap: 3,
+              }}>
+                🗓 {formatWorkDays(goal.workDays)}
               </span>
             )}
           </div>

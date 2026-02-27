@@ -7,6 +7,18 @@ import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
 import { ProgressRing } from "@/components/ProgressRing";
 
+function formatWorkDays(days: number[] | undefined | null): string {
+  if (!days || days.length === 0 || days.length === 7) return "Every day";
+  const sorted = [...days].sort();
+  const key = sorted.join(",");
+  if (key === "1,2,3,4,5") return "Weekdays";
+  if (key === "6,7") return "Weekends";
+  if (key === "1,3,5") return "Mon, Wed, Fri";
+  if (key === "2,4") return "Tue, Thu";
+  const names = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  return sorted.map(d => names[d]).join(", ");
+}
+
 interface GoalCardProps {
   goal: Goal;
   completedToday?: number;
@@ -68,16 +80,23 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, li
         <Text style={styles.progressLabel}>
           {completedToday}/{totalToday} tasks today
         </Text>
-        {status && !isPaused && (
-          <Text style={[styles.statusText, { color: colors[status.color] }]}>
-            {status.text}
-          </Text>
-        )}
-        {isPaused && (
-          <Text style={[styles.statusText, { color: colors.textTertiary }]}>
-            Paused
-          </Text>
-        )}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xs }}>
+          {!isPaused && (
+            <Text style={styles.scheduleBadge}>
+              {formatWorkDays(goal.workDays)}
+            </Text>
+          )}
+          {status && !isPaused && (
+            <Text style={[styles.statusText, { color: colors[status.color] }]}>
+              {status.text}
+            </Text>
+          )}
+          {isPaused && (
+            <Text style={[styles.statusText, { color: colors.textTertiary }]}>
+              Paused
+            </Text>
+          )}
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -140,6 +159,11 @@ function createStyles(c: Colors) {
       justifyContent: "space-between",
     },
     progressLabel: {
+      fontSize: typography.xs,
+      color: c.textTertiary,
+      fontWeight: typography.medium,
+    },
+    scheduleBadge: {
       fontSize: typography.xs,
       color: c.textTertiary,
       fontWeight: typography.medium,
