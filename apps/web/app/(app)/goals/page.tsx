@@ -89,7 +89,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
   const [parseError, setParseError] = useState("");
 
   // AI Plan chat
-  const [showAiChat, setShowAiChat] = useState(false);
+  const [showAiChat, setShowAiChat] = useState(!!editGoal);
   const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant" | "loading" | "goal"; text: string; options?: string[] }>>([]);
   const [chatMessages, setChatMessages] = useState<GoalChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
