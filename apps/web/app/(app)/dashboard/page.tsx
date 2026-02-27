@@ -870,16 +870,23 @@ export default function DashboardPage() {
       {goals.length > 0 && dailyTasks.length > 0 && selectedGoalId !== null && (
         <>
           {/* Goal selector + progress */}
-          <div
-            className="card"
-            onClick={() => { if (goals.length > 1) setGoalPickerOpen(true); }}
-            style={{
-              padding: "1.25rem", marginBottom: "1.25rem",
-              cursor: goals.length > 1 ? "pointer" : "default",
-              transition: "border-color 0.15s",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem", marginBottom: "0.875rem" }}>
+          <div className="card" style={{ padding: "1.25rem", marginBottom: "1.25rem" }}>
+            {/* Goal selector row */}
+            <div
+              onClick={() => { if (goals.length > 1) setGoalPickerOpen(true); }}
+              style={{
+                display: "flex", alignItems: "center", gap: "0.75rem",
+                marginBottom: "0.875rem",
+                cursor: goals.length > 1 ? "pointer" : "default",
+                padding: "0.5rem 0.75rem",
+                borderRadius: "var(--radius)",
+                background: goals.length > 1 ? "var(--bg)" : "transparent",
+                border: goals.length > 1 ? "1px solid var(--border)" : "none",
+                transition: "background 0.15s, border-color 0.15s",
+              }}
+              onMouseEnter={e => { if (goals.length > 1) e.currentTarget.style.borderColor = "var(--primary)"; }}
+              onMouseLeave={e => { if (goals.length > 1) e.currentTarget.style.borderColor = "var(--border)"; }}
+            >
               <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", flex: 1, minWidth: 0 }}>
                 {selectedGoalId === null ? "Select a goal" : selectedGoalId === "all" ? "Mix all goals" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
               </span>
@@ -902,9 +909,12 @@ export default function DashboardPage() {
                 </span>
               </div>
               {goals.length > 1 && (
-                <span style={{ fontSize: "0.7rem", color: "var(--primary)", flexShrink: 0 }}>&#9660;</span>
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0 }}>
+                  <path d="M3 4.5L6 7.5L9 4.5" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
               )}
             </div>
+            {/* Progress bar */}
             <div className="progress-track">
               <div className="progress-fill" style={{ width: `${progress}%`, background: allDone ? "var(--success)" : undefined }} />
             </div>

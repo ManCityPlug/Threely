@@ -1483,6 +1483,7 @@ export default function GoalsScreen() {
                   completedToday={cStats?.completed ?? 0}
                   totalToday={cStats?.total ?? 3}
                   onPress={() => setActionGoal(goal)}
+                  onMenu={() => setActionGoal(goal)}
                   onViewTasks={() => router.push("/(tabs)")}
                 />
               );
@@ -1499,6 +1500,7 @@ export default function GoalsScreen() {
                     completedToday={0}
                     totalToday={0}
                     onPress={() => setActionGoal(goal)}
+                    onMenu={() => setActionGoal(goal)}
                     isPaused
                   />
                 ))}

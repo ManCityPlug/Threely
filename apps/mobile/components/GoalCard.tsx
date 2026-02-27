@@ -25,6 +25,7 @@ interface GoalCardProps {
   totalToday?: number;
   onPress?: () => void;
   onViewTasks?: () => void;
+  onMenu?: () => void;
   lifetimeCompletionPct?: number;
   isPaused?: boolean;
 }
@@ -36,7 +37,7 @@ function getStatusText(completedToday: number, totalToday: number): { text: stri
   return { text: "In progress", color: "warning" };
 }
 
-export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, onViewTasks, lifetimeCompletionPct, isPaused }: GoalCardProps) {
+export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, onViewTasks, onMenu, lifetimeCompletionPct, isPaused }: GoalCardProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -49,6 +50,36 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
     : null;
 
   const addedDate = new Date(goal.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+
+  // Build badge items for even 4-column layout
+  const badges: { label: string; color: string; bg: string; icon?: string }[] = [];
+  // 1. Tasks
+  badges.push({ label: `${completedToday}/${totalToday} today`, color: colors.primary, bg: `${colors.primary}14` });
+  // 2. Schedule
+  if (!isPaused) {
+    badges.push({ label: formatWorkDays(goal.workDays), color: colors.warning, bg: `${colors.warning}18`, icon: "calendar-outline" });
+  }
+  // 3. Days left
+  if (daysLeft !== null && !isPaused) {
+    badges.push({
+      label: daysLeft > 0 ? `${daysLeft}d left` : "Overdue",
+      color: daysLeft < 14 ? colors.danger : colors.textTertiary,
+      bg: daysLeft < 14 ? `${colors.danger}14` : `${colors.textTertiary}14`,
+    });
+  }
+  // 4. Status
+  if (status && !isPaused) {
+    badges.push({
+      label: status.text,
+      color: colors[status.color],
+      bg: status.color === "success" ? `${colors.success}18`
+        : status.color === "warning" ? `${colors.warning}18`
+        : `${colors.textTertiary}14`,
+    });
+  }
+  if (isPaused) {
+    badges.push({ label: "Paused", color: colors.textTertiary, bg: `${colors.textTertiary}14` });
+  }
 
   return (
     <TouchableOpacity
@@ -77,58 +108,34 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
         {ringPct !== undefined && !isPaused && (
           <ProgressRing percentage={ringPct} size={36} />
         )}
+        {onMenu && (
+          <TouchableOpacity
+            onPress={(e) => { e.stopPropagation(); onMenu(); }}
+            activeOpacity={0.6}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            style={styles.menuBtn}
+          >
+            <Ionicons name="ellipsis-horizontal" size={18} color={colors.textTertiary} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <View style={styles.progressTrack}>
         <View style={[styles.progressFill, { width: `${progressPct}%` }, isPaused && styles.progressFillPaused]} />
       </View>
 
-      {/* Badge row */}
+      {/* Badge row — even columns */}
       <View style={styles.badgeRow}>
-        {/* Tasks pill */}
-        <View style={[styles.pill, { backgroundColor: `${colors.primary}14` }]}>
-          <Text style={[styles.pillText, { color: colors.primary }]}>
-            {completedToday}/{totalToday} today
-          </Text>
-        </View>
-
-        {/* Schedule pill */}
-        {!isPaused && (
-          <View style={[styles.pill, { backgroundColor: `${colors.warning}18` }]}>
-            <Ionicons name="calendar-outline" size={11} color={colors.warning} style={{ marginRight: 3 }} />
-            <Text style={[styles.pillText, { color: colors.warning }]}>
-              {formatWorkDays(goal.workDays)}
-            </Text>
+        {badges.map((b, i) => (
+          <View key={i} style={[styles.badgeCol, { flex: 1 }]}>
+            <View style={[styles.pill, { backgroundColor: b.bg }]}>
+              {b.icon && <Ionicons name={b.icon as keyof typeof Ionicons.glyphMap} size={11} color={b.color} style={{ marginRight: 3 }} />}
+              <Text style={[styles.pillText, { color: b.color }]} numberOfLines={1}>
+                {b.label}
+              </Text>
+            </View>
           </View>
-        )}
-
-        {/* Days left pill */}
-        {daysLeft !== null && !isPaused && (
-          <View style={[styles.pill, { backgroundColor: daysLeft < 14 ? `${colors.danger}14` : `${colors.textTertiary}14` }]}>
-            <Text style={[styles.pillText, { color: daysLeft < 14 ? colors.danger : colors.textTertiary }]}>
-              {daysLeft > 0 ? `${daysLeft}d left` : "Overdue"}
-            </Text>
-          </View>
-        )}
-
-        {/* Status pill */}
-        {status && !isPaused && (
-          <View style={[styles.pill, {
-            backgroundColor: status.color === "success" ? `${colors.success}18`
-              : status.color === "warning" ? `${colors.warning}18`
-              : `${colors.textTertiary}14`,
-          }]}>
-            <Text style={[styles.pillText, { color: colors[status.color], fontWeight: typography.semibold }]}>
-              {status.text}
-            </Text>
-          </View>
-        )}
-
-        {isPaused && (
-          <View style={[styles.pill, { backgroundColor: `${colors.textTertiary}14` }]}>
-            <Text style={[styles.pillText, { color: colors.textTertiary }]}>Paused</Text>
-          </View>
-        )}
+        ))}
       </View>
 
       {/* Added date */}
@@ -200,20 +207,27 @@ function createStyles(c: Colors) {
     },
     badgeRow: {
       flexDirection: "row",
-      flexWrap: "wrap",
-      gap: 6,
+      gap: 4,
       marginBottom: spacing.xs,
+    },
+    badgeCol: {
+      alignItems: "center",
     },
     pill: {
       flexDirection: "row",
       alignItems: "center",
+      justifyContent: "center",
       borderRadius: 20,
-      paddingHorizontal: 8,
+      paddingHorizontal: 6,
       paddingVertical: 3,
     },
     pillText: {
       fontSize: typography.xs - 1,
       fontWeight: typography.medium,
+    },
+    menuBtn: {
+      padding: 4,
+      marginLeft: 2,
     },
     addedDate: {
       fontSize: typography.xs - 1,
