@@ -1304,6 +1304,7 @@ export default function GoalsPage() {
                       goal={goal}
                       onDeleted={() => handleGoalDeleted(goal.id)}
                       onUpdated={handleGoalUpdated}
+                      onAddDetail={handleAddDetail}
                     />
                   </div>
                 ))}
