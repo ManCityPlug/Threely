@@ -1020,10 +1020,12 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
 
 function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onDeleted: () => void; onUpdated: (goal: Goal) => void; onAddDetail: (goal: Goal) => void }) {
   const [showMenu, setShowMenu] = useState(false);
+  const [menuPos, setMenuPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const [deleting, setDeleting] = useState(false);
   const [toggling, setToggling] = useState(false);
   const [completing, setCompleting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
 
   // Close menu on outside click
   useEffect(() => {
@@ -1094,7 +1096,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
   })();
 
   return (
-    <div className="card" style={{ padding: "1.25rem", opacity: goal.isPaused ? 0.7 : 1, position: "relative", zIndex: showMenu ? 30 : 1, overflow: showMenu ? "visible" : undefined }}>
+    <div className="card" style={{ padding: "1.25rem", opacity: goal.isPaused ? 0.7 : 1 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
@@ -1167,9 +1169,16 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
           )}
 
           {/* Menu */}
-          <div style={{ position: "relative" }} ref={menuRef}>
+          <div ref={menuRef}>
             <button
-              onClick={() => setShowMenu(v => !v)}
+              ref={btnRef}
+              onClick={() => {
+                if (!showMenu && btnRef.current) {
+                  const rect = btnRef.current.getBoundingClientRect();
+                  setMenuPos({ top: rect.bottom + 4, left: rect.right - 180 });
+                }
+                setShowMenu(v => !v);
+              }}
               style={{
                 width: 30, height: 30, borderRadius: "50%",
                 background: "var(--bg)", color: "var(--subtext)",
@@ -1182,7 +1191,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
             {showMenu && (
               <div
                 style={{
-                  position: "absolute", right: 0, top: 36, zIndex: 50,
+                  position: "fixed", top: menuPos.top, left: menuPos.left, zIndex: 9999,
                   background: "var(--card)", border: "1px solid var(--border)",
                   borderRadius: "var(--radius)", boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
                   minWidth: 180, overflow: "hidden",
