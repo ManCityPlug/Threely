@@ -1263,7 +1263,6 @@ export default function GoalsPage() {
 
   function handleAddDetail(goal: Goal) {
     setEditGoal(goal);
-    setShowTemplates(false); // skip template selector — go straight to AI chat
     setShowAdd(true);
   }
 
