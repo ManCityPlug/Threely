@@ -603,7 +603,7 @@ export default function DashboardPage() {
 
   async function handleCompleteAll() {
     const incomplete = displayedTasks.filter(x => !x.task.isCompleted && !x.task.isSkipped);
-    if (incomplete.length < 2) return;
+    if (incomplete.length === 0) return;
     setCompletingAll(true);
     try {
       await Promise.all(
@@ -909,7 +909,7 @@ export default function DashboardPage() {
                   {completedCount}/{totalCount} done — {totalCount - completedCount} remaining
                 </div>
               </div>
-              {incompleteCount >= 2 && (
+              {incompleteCount >= 1 && (
                 <button
                   className="btn btn-outline"
                   onClick={handleCompleteAll}

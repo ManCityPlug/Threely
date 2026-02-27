@@ -503,7 +503,7 @@ export default function DashboardScreen() {
 
   async function handleCompleteAll() {
     const incompleteTasks = newTaskItems.filter((t) => !t.isCompleted);
-    if (incompleteTasks.length < 2) return;
+    if (incompleteTasks.length === 0) return;
 
     try {
       for (const task of incompleteTasks) {
@@ -722,8 +722,8 @@ export default function DashboardScreen() {
           </View>
         )}
 
-        {/* Complete All button — shown when 2+ incomplete tasks remain */}
-        {newTaskItems.length > 0 && newTaskItems.filter(t => !t.isCompleted).length >= 2 && !allDone && (
+        {/* Complete All button — shown when any incomplete tasks remain */}
+        {newTaskItems.length > 0 && newTaskItems.filter(t => !t.isCompleted).length >= 1 && !allDone && (
           <TouchableOpacity
             style={styles.completeAllBtn}
             onPress={handleCompleteAll}
