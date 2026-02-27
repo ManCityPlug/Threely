@@ -485,8 +485,8 @@ Goal text: "${rawInput}"
 
 Return ONLY valid JSON with this exact shape (no markdown, no explanation):
 {
-  "short_title": "A concise 2-4 word label for this goal, used in dropdowns and headers. Capitalize like a title. Examples: 'Lose 10 lbs', 'WGU Degree', 'Meta Ads Tool', 'YouTube 10K Subs', 'Launch Freelance Biz'. Never start with 'I want to' or 'You want to'.",
-  "structured_summary": "A clear, 1-2 sentence restatement of the goal in second person starting with 'You want to...'",
+  "short_title": "A very short 2-5 word goal name used as the display title. Keep it punchy and specific. Capitalize like a title. Examples: 'Lose 10 lbs', 'Get to 11% BF', 'WGU Degree', 'Launch Meta Ads Tool', 'YouTube 10K Subs', 'Run a Sub-25 5K', 'Learn Piano Basics'. NEVER include timeframes, method details, or full sentences. NEVER start with 'I want to' or 'You want to'.",
+  "structured_summary": "A clear 1-sentence restatement of the core goal in second person starting with 'You want to...'. Keep it under 15 words — just the outcome, no method details or timeframes.",
   "category": "One of: fitness, business, learning, creative, financial, health, relationships, productivity, other",
   "deadline_detected": "ISO date string YYYY-MM-DD calculated from today's date (${today}) if a specific deadline or timeframe is mentioned (e.g. 'in 3 months' = add 3 months to today, 'by summer' = ${new Date().getFullYear()}-09-01, 'by December' = ${new Date().getFullYear()}-12-01), otherwise null",
   "daily_time_detected": "Integer number of minutes per day if the user mentions a daily time commitment (e.g. '2 hours a day' = 120, '30 minutes daily' = 30, '3 hours per day' = 180). Only extract if they explicitly mention a daily/per-day time amount. null if not mentioned",

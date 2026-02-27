@@ -328,8 +328,8 @@ export default function OnboardingPage() {
 
     try {
       const goalTitle =
-        parsedGoal?.structured_summary?.replace(/^You want to /i, "").replace(/\.$/, "") ??
-        rawGoalInput.trim();
+        parsedGoal?.short_title ??
+        rawGoalInput.trim().slice(0, 40);
 
       // Save display name
       const name = nameInput.trim() || user?.email?.split("@")[0] || "Champion";
