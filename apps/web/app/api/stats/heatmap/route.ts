@@ -42,20 +42,20 @@ export async function GET(request: NextRequest) {
       }),
     ]);
 
-    // Index focus records by LOCAL date (using createdAt timestamp + tz)
+    // Index focus records by date (the DB `date` column is the canonical day)
     const focusByDate = new Map<string, { focusGoalId: string; shuffleTaskIds: string[] | null }>();
     for (const f of dailyFocusRecords) {
-      const key = toLocalDateKey(new Date(f.createdAt), tzOffsetMs);
+      const key = new Date(f.date).toISOString().split("T")[0];
       focusByDate.set(key, {
         focusGoalId: f.focusGoalId,
         shuffleTaskIds: Array.isArray(f.shuffleTaskIds) ? (f.shuffleTaskIds as string[]) : null,
       });
     }
 
-    // Group by LOCAL date (using generatedAt timestamp + tz), filtering by focus
+    // Group by the task's date column (the canonical day), filtering by focus
     const byDate = new Map<string, { completed: number; total: number }>();
     for (const dt of dailyTasks) {
-      const key = toLocalDateKey(new Date(dt.generatedAt), tzOffsetMs);
+      const key = new Date(dt.date).toISOString().split("T")[0];
       const focus = focusByDate.get(key);
       const items = Array.isArray(dt.tasks) ? (dt.tasks as unknown as TaskItem[]) : [];
 

@@ -65,7 +65,7 @@ const INTENSITY_OPTIONS_WEB = [
   { level: 3, emoji: "\uD83D\uDE80", label: "All in", description: "Maximum effort. Push limits every day." },
 ];
 
-function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClose: () => void }) {
+function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => void; onClose: () => void; editGoal?: Goal | null }) {
   const [step, setStep] = useState<FlowStep>("goal");
   const [showTemplates, setShowTemplates] = useState(true);
 
@@ -115,6 +115,16 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [chatHistory, chatLoading]);
+
+  // Auto-open AI chat when editing an existing goal
+  const editGoalTriggered = useRef(false);
+  useEffect(() => {
+    if (editGoal && !editGoalTriggered.current) {
+      editGoalTriggered.current = true;
+      setRawInput(editGoal.rawInput || editGoal.title);
+      startAiChatWithMessage(`My current goal is: "${editGoal.rawInput || editGoal.title}". I'd like to add more detail or make changes to it.`);
+    }
+  }, [editGoal]);
 
   // ─── Category selection → opens AI chat ─────────────────────────────────
 
@@ -967,14 +977,11 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
 
 // ─── Goal Card ────────────────────────────────────────────────────────────────
 
-function GoalCard({ goal, onDeleted, onUpdated }: { goal: Goal; onDeleted: () => void; onUpdated: (goal: Goal) => void }) {
+function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onDeleted: () => void; onUpdated: (goal: Goal) => void; onAddDetail: (goal: Goal) => void }) {
   const [showMenu, setShowMenu] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [toggling, setToggling] = useState(false);
   const [completing, setCompleting] = useState(false);
-  const [showEdit, setShowEdit] = useState(false);
-  const [editDescription, setEditDescription] = useState(goal.description || "");
-  const [editSaving, setEditSaving] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu on outside click
@@ -1028,21 +1035,7 @@ function GoalCard({ goal, onDeleted, onUpdated }: { goal: Goal; onDeleted: () =>
 
   function handleEditDetail() {
     setShowMenu(false);
-    setEditDescription(goal.description || goal.structuredSummary || "");
-    setShowEdit(true);
-  }
-
-  async function handleEditSave() {
-    setEditSaving(true);
-    try {
-      const { goal: updated } = await goalsApi.update(goal.id, { description: editDescription } as Partial<Goal>);
-      onUpdated(updated);
-      setShowEdit(false);
-    } catch {
-      // silently fail
-    } finally {
-      setEditSaving(false);
-    }
+    onAddDetail(goal);
   }
 
   const daysLeft = goal.deadline
@@ -1179,39 +1172,6 @@ function GoalCard({ goal, onDeleted, onUpdated }: { goal: Goal; onDeleted: () =>
         </div>
       </div>
 
-      {/* Inline edit panel */}
-      {showEdit && (
-        <div style={{ marginTop: "1rem", paddingTop: "1rem", borderTop: "1px solid var(--border)" }}>
-          <label style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--subtext)", marginBottom: 6, display: "block" }}>
-            Description / details
-          </label>
-          <textarea
-            className="field-input"
-            rows={3}
-            value={editDescription}
-            onChange={e => setEditDescription(e.target.value)}
-            placeholder="Add more context about this goal..."
-            style={{ width: "100%", resize: "vertical", marginBottom: 8 }}
-          />
-          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-            <button
-              className="btn btn-outline"
-              onClick={() => setShowEdit(false)}
-              style={{ fontSize: "0.8rem", padding: "0.4rem 0.875rem" }}
-            >
-              Cancel
-            </button>
-            <button
-              className="btn btn-primary"
-              onClick={handleEditSave}
-              disabled={editSaving}
-              style={{ fontSize: "0.8rem", padding: "0.4rem 0.875rem" }}
-            >
-              {editSaving ? "Saving..." : "Save"}
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
@@ -1224,6 +1184,7 @@ export default function GoalsPage() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(searchParams.get("add") === "true");
+  const [editGoal, setEditGoal] = useState<Goal | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -1249,6 +1210,11 @@ export default function GoalsPage() {
 
   function handleGoalUpdated(updated: Goal) {
     setGoals(prev => prev.map(g => g.id === updated.id ? updated : g));
+  }
+
+  function handleAddDetail(goal: Goal) {
+    setEditGoal(goal);
+    setShowAdd(true);
   }
 
   const activeGoals = goals.filter(g => !g.isPaused);
@@ -1315,6 +1281,7 @@ export default function GoalsPage() {
                   goal={goal}
                   onDeleted={() => handleGoalDeleted(goal.id)}
                   onUpdated={handleGoalUpdated}
+                  onAddDetail={handleAddDetail}
                 />
               </div>
             ))}
@@ -1349,7 +1316,8 @@ export default function GoalsPage() {
       {showAdd && (
         <AddGoalFlow
           onDone={handleGoalAdded}
-          onClose={() => setShowAdd(false)}
+          onClose={() => { setShowAdd(false); setEditGoal(null); }}
+          editGoal={editGoal}
         />
       )}
     </div>

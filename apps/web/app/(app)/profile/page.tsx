@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { tasksApi, statsApi, accountApi, type DailyTask, type Stats, type HeatmapDay } from "@/lib/api-client";
+import { tasksApi, statsApi, accountApi, summaryApi, type DailyTask, type Stats, type HeatmapDay, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus } from "@/lib/api-client";
 import { SkeletonStatCard, SkeletonCard } from "@/components/Skeleton";
 import WeeklyBarChart from "@/components/WeeklyBarChart";
 import WeeklySummaryModal from "@/components/WeeklySummary";
@@ -133,6 +133,10 @@ export default function ProfilePage() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showWeeklySummary, setShowWeeklySummary] = useState(false);
+  const [weeklyStatus, setWeeklyStatus] = useState<WeeklySummaryStatus | null>(null);
+  const [weeklyFrozenData, setWeeklyFrozenData] = useState<WeeklySummaryType | null>(null);
+  const [weeklyOpening, setWeeklyOpening] = useState(false);
+  const [countdown, setCountdown] = useState("");
 
   const load = useCallback(async () => {
     try {
@@ -152,6 +156,68 @@ export default function ProfilePage() {
   }, [showToast]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Re-fetch on tab visibility change (e.g. after completing tasks on dashboard)
+  useEffect(() => {
+    function onVisibility() {
+      if (document.visibilityState === "visible") load();
+    }
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [load]);
+
+  // Weekly analysis status
+  useEffect(() => {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    summaryApi.weeklyStatus(tz).then((res) => {
+      setWeeklyStatus(res);
+      if (res.status === "available" && res.summary) {
+        setWeeklyFrozenData(res.summary);
+      }
+    }).catch(() => {});
+  }, []);
+
+  // Countdown timer
+  useEffect(() => {
+    const unlocksAt = weeklyStatus?.unlocksAt;
+    if (!unlocksAt || (weeklyStatus?.status !== "locked" && weeklyStatus?.status !== "expired")) {
+      setCountdown("");
+      return;
+    }
+    function update() {
+      const diff = new Date(unlocksAt!).getTime() - Date.now();
+      if (diff <= 0) { setCountdown("Available now"); return; }
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diff / (1000 * 60)) % 60);
+      if (days > 0) setCountdown(`Unlocks in ${days}d ${hours}h`);
+      else if (hours > 0) setCountdown(`Unlocks in ${hours}h ${mins}m`);
+      else setCountdown(`Unlocks in ${mins}m`);
+    }
+    update();
+    const interval = setInterval(update, 60000);
+    return () => clearInterval(interval);
+  }, [weeklyStatus]);
+
+  async function handleOpenWeekly() {
+    if (weeklyStatus?.status === "available" && weeklyFrozenData) {
+      setShowWeeklySummary(true);
+      return;
+    }
+    if (weeklyStatus?.status !== "ready") return;
+    setWeeklyOpening(true);
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const data = await summaryApi.weeklyOpen(tz);
+      setWeeklyFrozenData(data);
+      setWeeklyStatus({ status: "available", summary: data });
+      setShowWeeklySummary(true);
+    } catch {
+      // silently fail
+    } finally {
+      setWeeklyOpening(false);
+    }
+  }
 
   async function handleDeleteAccount() {
     setDeleting(true);
@@ -200,17 +266,45 @@ export default function ProfilePage() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.75rem" }}>
         <div>
           <h1 style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.03em" }}>Profile</h1>
-          <p style={{ color: "var(--subtext)", fontSize: "0.875rem", marginTop: 2 }}>
-            {user?.email}
-          </p>
         </div>
-        <button
-          className="btn btn-outline"
-          onClick={() => setShowWeeklySummary(true)}
-          style={{ fontSize: "0.85rem" }}
-        >
-          {"\uD83D\uDCCA"} Weekly Summary
-        </button>
+        {weeklyStatus?.status === "ready" ? (
+          <button
+            className="btn"
+            onClick={handleOpenWeekly}
+            disabled={weeklyOpening}
+            style={{
+              fontSize: "0.85rem",
+              background: "var(--primary)",
+              color: "white",
+              border: "none",
+            }}
+          >
+            {weeklyOpening ? "Loading..." : "\u2728 Weekly Analysis Ready!"}
+          </button>
+        ) : weeklyStatus?.status === "available" ? (
+          <button
+            className="btn btn-outline"
+            onClick={handleOpenWeekly}
+            style={{ fontSize: "0.85rem" }}
+          >
+            {"\uD83D\uDCCA"} Weekly Analysis
+          </button>
+        ) : (
+          <button
+            className="btn btn-outline"
+            disabled
+            style={{
+              fontSize: "0.85rem",
+              opacity: 0.5,
+              cursor: "not-allowed",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+            }}
+          >
+            {"\uD83D\uDD12"} Weekly Analysis {countdown ? `· ${countdown.replace("Unlocks in ", "")}` : ""}
+          </button>
+        )}
       </div>
 
       {/* Weekly activity */}
@@ -232,14 +326,14 @@ export default function ProfilePage() {
         marginBottom: "1.75rem",
       }}>
         <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0s" }}>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--primary)" }}>
-            <AnimatedNumber value={stats?.streak ?? 0} />
+          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--warning)" }}>
+            {(stats?.streak ?? 0) > 2 ? "🔥 " : ""}<AnimatedNumber value={stats?.streak ?? 0} />
           </div>
           <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Day streak</div>
         </div>
         <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.08s" }}>
           <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--success)" }}>
-            <AnimatedNumber value={stats?.totalCompleted ?? 0} />
+            ✓ <AnimatedNumber value={stats?.totalCompleted ?? 0} />
           </div>
           <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Tasks done</div>
         </div>
@@ -370,7 +464,7 @@ export default function ProfilePage() {
 
       {/* Weekly Summary modal */}
       {showWeeklySummary && (
-        <WeeklySummaryModal onClose={() => setShowWeeklySummary(false)} />
+        <WeeklySummaryModal onClose={() => setShowWeeklySummary(false)} frozenData={weeklyFrozenData} />
       )}
     </div>
   );
