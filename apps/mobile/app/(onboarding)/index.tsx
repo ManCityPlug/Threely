@@ -24,7 +24,7 @@ import { colors, spacing, typography, radius, shadow } from "@/constants/theme";
 import { GoalTemplates } from "@/components/GoalTemplates";
 import type { GoalCategory } from "@/constants/goal-templates";
 
-const TOTAL_STEPS = 5; // name, goal, deadline, time, workdays
+const TOTAL_STEPS = 3; // name, goal, AI chat (deadline/time/workdays handled by AI)
 
 const WORK_DAY_PRESETS = [
   { label: "Every day", value: [1, 2, 3, 4, 5, 6, 7] },
@@ -1164,9 +1164,9 @@ export default function OnboardingScreen() {
       <View style={{ flex: 1 }}>
         {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}
-        {step === 3 && renderStep3()}
-        {step === 4 && renderStep4()}
-        {step === 5 && renderStep5()}
+        {step === 3 && !isMagicMoment && renderStep3()}
+        {step === 4 && !isMagicMoment && renderStep4()}
+        {step === 5 && !isMagicMoment && renderStep5()}
         {isMagicMoment && renderMagicMoment()}
       </View>
       {/* ── AI Plan Chat Modal ── */}

@@ -10,7 +10,7 @@ import type { GoalCategory } from "@/lib/goal-templates";
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
-const TOTAL_STEPS = 5; // name, goal, deadline, time, intensity
+const TOTAL_STEPS = 3; // name, goal, AI chat (deadline/time/intensity handled by AI)
 
 const TIME_OPTIONS = [
   { label: "15 min", value: 15 },
@@ -476,8 +476,8 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* ── Step 3: Deadline ── */}
-        {step === 3 && (
+        {/* ── Step 3: Deadline (legacy — skipped by AI chat) ── */}
+        {step === 3 && !isMagicMoment && (
           <div className="fade-in" style={{ padding: "1.5rem 2rem 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             <div>
               <h2 style={{ fontSize: "1.4rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>
@@ -580,8 +580,8 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* ── Step 4: Time ── */}
-        {step === 4 && (
+        {/* ── Step 4: Time (legacy — skipped by AI chat) ── */}
+        {step === 4 && !isMagicMoment && (
           <div className="fade-in" style={{ padding: "1.5rem 2rem 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             <div>
               <h2 style={{ fontSize: "1.4rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>
@@ -662,8 +662,8 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* ── Step 5: Intensity ── */}
-        {step === 5 && (
+        {/* ── Step 5: Intensity (legacy — skipped by AI chat) ── */}
+        {step === 5 && !isMagicMoment && (
           <div className="fade-in" style={{ padding: "1.5rem 2rem 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             <div>
               <h2 style={{ fontSize: "1.4rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>
