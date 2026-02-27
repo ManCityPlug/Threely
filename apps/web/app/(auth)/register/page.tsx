@@ -27,18 +27,39 @@ function PlayIcon() {
   );
 }
 
+type DeviceType = "iphone" | "ipad" | "android_phone" | "android_tablet" | "desktop";
+
+function detectDevice(): DeviceType {
+  const ua = navigator.userAgent;
+  // iPad: check for iPad in UA or Mac with touch (iPadOS 13+)
+  if (/iPad/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1)) return "ipad";
+  if (/iPhone|iPod/i.test(ua)) return "iphone";
+  if (/Android/i.test(ua)) {
+    // Android tablets typically don't have "Mobile" in the UA
+    return /Mobile/i.test(ua) ? "android_phone" : "android_tablet";
+  }
+  if (/webOS|BlackBerry|IEMobile|Opera Mini/i.test(ua)) return "android_phone";
+  return "desktop";
+}
+
+function deviceLabel(device: DeviceType): string {
+  switch (device) {
+    case "ipad": return "your iPad";
+    case "android_tablet": return "your tablet";
+    default: return "your phone";
+  }
+}
+
 export default function RegisterPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [isMobile, setIsMobile] = useState(false);
+  const [device, setDevice] = useState<DeviceType>("desktop");
 
   useEffect(() => {
-    setIsMobile(
-      /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    );
+    setDevice(detectDevice());
   }, []);
 
   async function handleRegister(e: React.FormEvent) {
@@ -85,8 +106,12 @@ export default function RegisterPage() {
     }
   }
 
-  // Mobile: show "get the app" screen instead of registration form
-  if (isMobile) {
+  const isMobileDevice = device !== "desktop";
+  const isAppleDevice = device === "iphone" || device === "ipad";
+  const isAndroidDevice = device === "android_phone" || device === "android_tablet";
+
+  // Mobile/tablet: show "get the app" screen instead of registration form
+  if (isMobileDevice) {
     return (
       <div className="card fade-in" style={{ padding: "2.5rem 2rem", textAlign: "center" }}>
         {/* App icon */}
@@ -104,7 +129,7 @@ export default function RegisterPage() {
           letterSpacing: "-0.03em", marginBottom: 8,
           lineHeight: 1.2,
         }}>
-          Threely is built for your phone
+          Threely is built for {deviceLabel(device)}
         </h1>
 
         <p style={{
@@ -118,45 +143,55 @@ export default function RegisterPage() {
         {/* Store buttons */}
         <div style={{
           display: "flex", gap: 10,
-          justifyContent: "center", marginBottom: "1.5rem",
+          justifyContent: "center", marginBottom: "1.25rem",
         }}>
-          <a
-            href={APP_STORE_URL}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "10px 18px",
-              background: "#0a2540", color: "#fff",
-              borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
-              textDecoration: "none",
-              position: "relative",
-            }}
-          >
-            <span className="new-badge" style={{ position: "absolute", top: -14, right: -6 }}>New</span>
-            <AppleIcon />
-            <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-              <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
-              <span>App Store</span>
-            </span>
-          </a>
-          <a
-            href={PLAY_STORE_URL}
-            style={{
-              display: "inline-flex", alignItems: "center", gap: 8,
-              padding: "10px 18px",
-              background: "#0a2540", color: "#fff",
-              borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
-              textDecoration: "none",
-              position: "relative",
-            }}
-          >
-            <span className="new-badge" style={{ position: "absolute", top: -14, right: -6 }}>New</span>
-            <PlayIcon />
-            <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-              <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
-              <span>Google Play</span>
-            </span>
-          </a>
+          {!isAndroidDevice && (
+            <a
+              href={APP_STORE_URL}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "10px 18px",
+                background: "#0a2540", color: "#fff",
+                borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
+                textDecoration: "none",
+                position: "relative",
+              }}
+            >
+              <span className="new-badge" style={{ position: "absolute", top: -14, right: -6 }}>New</span>
+              <AppleIcon />
+              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
+                <span>App Store</span>
+              </span>
+            </a>
+          )}
+          {!isAppleDevice && (
+            <a
+              href={PLAY_STORE_URL}
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "10px 18px",
+                background: "#0a2540", color: "#fff",
+                borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
+                textDecoration: "none",
+                position: "relative",
+              }}
+            >
+              <span className="new-badge" style={{ position: "absolute", top: -14, right: -6 }}>New</span>
+              <PlayIcon />
+              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
+                <span>Google Play</span>
+              </span>
+            </a>
+          )}
         </div>
+
+        <p style={{ color: "var(--muted)", fontSize: "0.8rem", lineHeight: 1.5, marginBottom: "1.25rem" }}>
+          Threely is also available on the web at{" "}
+          <span style={{ fontWeight: 600, color: "var(--primary)" }}>threely.co</span>
+          {" "}on your computer.
+        </p>
 
         <p style={{ color: "var(--subtext)", fontSize: "0.875rem" }}>
           Already have an account?{" "}

@@ -1102,9 +1102,9 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
   }
 
   return (
-    <div className="card" style={{ padding: "1.25rem", opacity: goal.isPaused ? 0.7 : 1, display: "flex", flexDirection: "column", gap: 10 }}>
+    <div className="card" style={{ padding: "1.25rem", opacity: goal.isPaused ? 0.7 : 1, display: "flex", flexDirection: "column", gap: 10, height: "100%" }}>
       {/* Top row: category + title + menu */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flex: 1 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
             <CategoryBadge category={goal.category} />

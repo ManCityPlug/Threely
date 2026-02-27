@@ -234,7 +234,7 @@ export default function LandingPage() {
             Not sure where to start? Don't have a plan? That's the whole point. Tell us your goal — Threely figures out your next steps and gives you a clear path forward, every single day.
           </p>
 
-          {/* Now available on mobile banner */}
+          {/* Platform availability banner */}
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 10,
             padding: isMobile ? "8px 20px" : "10px 24px",
@@ -242,8 +242,10 @@ export default function LandingPage() {
             borderRadius: 24,
             marginBottom: isMobile ? "1rem" : "1.25rem",
           }}>
-            <span style={{ fontSize: isMobile ? "0.95rem" : "1.05rem" }}>📱</span>
-            <span style={{ fontSize: isMobile ? "0.9rem" : "0.95rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
+            <span style={{ fontSize: isMobile ? "0.95rem" : "1.05rem" }}>{isMobile ? "💻" : "📱"}</span>
+            <span style={{ fontSize: isMobile ? "0.9rem" : "0.95rem", fontWeight: 600, color: "#635bff" }}>
+              {isMobile ? "Also available on web at threely.co" : "Available on iOS, Android & Web"}
+            </span>
           </div>
 
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
