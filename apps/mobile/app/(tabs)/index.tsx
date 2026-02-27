@@ -728,13 +728,15 @@ export default function DashboardScreen() {
                 </View>
               )}
             </View>
-            <TouchableOpacity
-              style={styles.shufflePill}
-              onPress={() => setGoalPickerVisible(true)}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.shuffleText}>{goals.length > 1 ? "Change" : "Select"}</Text>
-            </TouchableOpacity>
+            {goals.length > 1 && (
+              <TouchableOpacity
+                style={styles.shufflePill}
+                onPress={() => setGoalPickerVisible(true)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.shuffleText}>Change</Text>
+              </TouchableOpacity>
+            )}
           </View>
         )}
 

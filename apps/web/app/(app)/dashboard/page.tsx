@@ -872,24 +872,21 @@ export default function DashboardPage() {
           {/* Goal selector + progress */}
           <div className="card" style={{ padding: "1.25rem", marginBottom: "1.25rem" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem", marginBottom: "0.875rem" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <button
+                onClick={() => { if (goals.length > 1) setGoalPickerOpen(true); }}
+                style={{
+                  display: "flex", alignItems: "center", gap: 6,
+                  background: "none", border: "none", padding: 0,
+                  cursor: goals.length > 1 ? "pointer" : "default",
+                }}
+              >
                 <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>
                   {selectedGoalId === null ? "Select a goal" : selectedGoalId === "all" ? "Mix all goals" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
                 </span>
                 {goals.length > 1 && (
-                  <button
-                    onClick={() => setGoalPickerOpen(true)}
-                    style={{
-                      fontSize: "0.75rem", fontWeight: 600,
-                      color: "var(--primary)", background: "var(--primary-light)",
-                      border: "none", borderRadius: 20, padding: "3px 10px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Change
-                  </button>
+                  <span style={{ fontSize: "0.7rem", color: "var(--primary)", transition: "transform 0.2s" }}>&#9660;</span>
                 )}
-              </div>
+              </button>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 {totalEstimatedMinutes > 0 && (
                   <span style={{
