@@ -978,35 +978,38 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div
-        className="modal-box"
-        onClick={e => e.stopPropagation()}
-        style={{ maxWidth: 560, padding: 0, overflow: "hidden" }}
-      >
-        {/* Close button */}
-        {step !== "building" && step !== "done" && (
-          <div style={{ padding: "1rem 1.5rem 0", display: "flex", justifyContent: "flex-end" }}>
-            <button
-              onClick={onClose}
-              style={{ fontSize: 18, color: "var(--muted)", padding: 4, cursor: "pointer", background: "none", border: "none" }}
-            >
-              &#x2715;
-            </button>
-          </div>
-        )}
+      {/* Hide the modal box entirely when AI chat is open (edit mode) */}
+      {!showAiChat && (
+        <div
+          className="modal-box"
+          onClick={e => e.stopPropagation()}
+          style={{ maxWidth: 560, padding: 0, overflow: "hidden" }}
+        >
+          {/* Close button */}
+          {step !== "building" && step !== "done" && (
+            <div style={{ padding: "1rem 1.5rem 0", display: "flex", justifyContent: "flex-end" }}>
+              <button
+                onClick={onClose}
+                style={{ fontSize: 18, color: "var(--muted)", padding: 4, cursor: "pointer", background: "none", border: "none" }}
+              >
+                &#x2715;
+              </button>
+            </div>
+          )}
 
-        {/* Content */}
-        <div style={{ padding: "1.25rem 2rem 2rem" }}>
-          {step === "goal" && !showAiChat && renderGoalStep()}
-          {step === "confirm" && renderConfirmStep()}
-          {step === "deadline" && renderDeadlineStep()}
-          {step === "time" && renderTimeStep()}
-          {step === "workdays" && renderWorkDaysStep()}
-          {step === "intensity" && renderIntensityStep()}
-          {step === "building" && renderBuildingStep()}
-          {step === "done" && renderDoneStep()}
+          {/* Content */}
+          <div style={{ padding: "1.25rem 2rem 2rem" }}>
+            {step === "goal" && renderGoalStep()}
+            {step === "confirm" && renderConfirmStep()}
+            {step === "deadline" && renderDeadlineStep()}
+            {step === "time" && renderTimeStep()}
+            {step === "workdays" && renderWorkDaysStep()}
+            {step === "intensity" && renderIntensityStep()}
+            {step === "building" && renderBuildingStep()}
+            {step === "done" && renderDoneStep()}
+          </div>
         </div>
-      </div>
+      )}
 
       {renderAiChat()}
     </div>
