@@ -239,9 +239,9 @@ function TaskDetailModal({
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <KeyboardAvoidingView style={{ flex: 1, justifyContent: "flex-end" }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
         <Animated.View style={[styles.modalOverlay, { opacity: overlayOpacity }]}>
-          <Pressable style={{ flex: 1 }} onPress={onClose} />
+          <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
         </Animated.View>
 
         <Animated.View
@@ -496,10 +496,6 @@ function createStyles(c: Colors) {
       backgroundColor: "rgba(0,0,0,0.45)",
     },
     modalSheet: {
-      position: "absolute",
-      bottom: 0,
-      left: 0,
-      right: 0,
       backgroundColor: c.card,
       borderTopLeftRadius: radius.xl,
       borderTopRightRadius: radius.xl,
