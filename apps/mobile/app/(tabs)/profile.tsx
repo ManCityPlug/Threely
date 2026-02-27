@@ -467,7 +467,7 @@ export default function ProfileScreen() {
                 styles={styles}
               />
               <StatCard
-                label="Day streak"
+                label="Current streak"
                 value={stats ? `${stats.streak}d` : "—"}
                 numericValue={stats?.streak}
                 suffix="d"
@@ -491,10 +491,11 @@ export default function ProfileScreen() {
                 styles={styles}
               />
               <StatCard
-                label="Goals"
+                label="Active goals"
                 value={stats?.activeGoals ?? "—"}
                 numericValue={stats?.activeGoals}
                 icon="flag-outline"
+                accentColor="#3B82F6"
                 loading={statsLoading}
                 colors={colors}
                 styles={styles}
@@ -507,6 +508,7 @@ export default function ProfileScreen() {
                 numericValue={stats?.totalHoursInvested ?? 0}
                 suffix="h"
                 icon="time-outline"
+                accentColor="#0891B2"
                 loading={statsLoading}
                 colors={colors}
                 styles={styles}

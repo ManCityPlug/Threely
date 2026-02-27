@@ -155,9 +155,11 @@ export default function ProfilePage() {
     }
   }, [showToast]);
 
-  useEffect(() => { load(); }, [load]);
+  // Always fetch fresh data on mount (fires every time the page is navigated to)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, []);
 
-  // Re-fetch on tab visibility change (e.g. after completing tasks on dashboard)
+  // Also re-fetch when load reference changes or tab regains visibility
   useEffect(() => {
     function onVisibility() {
       if (document.visibilityState === "visible") load();
@@ -327,9 +329,9 @@ export default function ProfilePage() {
       }}>
         <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0s" }}>
           <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--warning)" }}>
-            {(stats?.streak ?? 0) > 2 ? "🔥 " : ""}<AnimatedNumber value={stats?.streak ?? 0} />
+            🔥 <AnimatedNumber value={stats?.streak ?? 0} />
           </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Day streak</div>
+          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Current streak</div>
         </div>
         <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.08s" }}>
           <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--success)" }}>
@@ -338,13 +340,13 @@ export default function ProfilePage() {
           <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Total tasks done</div>
         </div>
         <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.16s" }}>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--text)" }}>
+          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "#3B82F6" }}>
             <AnimatedNumber value={stats?.activeGoals ?? 0} />
           </div>
           <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Active goals</div>
         </div>
         <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.24s" }}>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--text)" }}>
+          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "#0891B2" }}>
             <AnimatedNumber value={stats?.totalHoursInvested ?? 0} suffix="h" />
           </div>
           <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Hours invested</div>
