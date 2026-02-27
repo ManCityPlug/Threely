@@ -484,9 +484,6 @@ export default function OnboardingScreen() {
       <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.stepScroll} keyboardShouldPersistTaps="handled">
           <Text style={styles.stepTitle}>What should we call you?</Text>
-          <Text style={styles.stepSubtitle}>
-            This appears in your daily greeting.
-          </Text>
           <TextInput
             style={styles.nameInput}
             placeholder="Your first name"

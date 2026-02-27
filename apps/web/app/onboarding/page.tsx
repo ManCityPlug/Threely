@@ -438,9 +438,6 @@ export default function OnboardingPage() {
               <h2 style={{ fontSize: "1.4rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>
                 What should we call you?
               </h2>
-              <p style={{ color: "var(--subtext)", fontSize: "0.9rem" }}>
-                This appears in your daily greeting.
-              </p>
             </div>
             <input
               className="field-input"
