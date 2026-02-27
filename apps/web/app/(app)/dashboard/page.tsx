@@ -157,39 +157,38 @@ function TaskCard({
           </div>
         ) : (
           <>
-            <div style={{
-              fontWeight: 600,
-              fontSize: "0.95rem",
-              color: task.isCompleted ? "var(--muted)" : "var(--text)",
-              textDecoration: task.isCompleted ? "line-through" : "none",
-              marginBottom: 4,
-            }}>
-              {task.task}
-            </div>
-            <div style={{ fontSize: "0.85rem", color: "var(--subtext)", marginBottom: 6, lineHeight: 1.5 }}>
-              {task.description}
-            </div>
-            <div style={{ fontSize: "0.8rem", color: "var(--primary)", fontStyle: "italic", marginBottom: 6 }}>
-              {task.why}
-            </div>
-            <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
               <div style={{
-                display: "inline-flex", alignItems: "center", gap: 4,
-                fontSize: "0.75rem", color: "var(--muted)",
-                background: "var(--bg)", borderRadius: 20,
-                padding: "2px 8px",
+                fontWeight: 600,
+                fontSize: "0.95rem",
+                color: task.isCompleted ? "var(--muted)" : "var(--text)",
+                textDecoration: task.isCompleted ? "line-through" : "none",
+                lineHeight: 1.4,
               }}>
-                {"⏱"} {task.estimated_minutes} min
+                {task.task}
               </div>
-              {task.isCarriedOver && (
+              <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
                 <span style={{
-                  fontSize: "0.7rem", fontWeight: 600,
-                  color: "var(--warning)", background: "var(--warning-light)",
+                  fontSize: "0.72rem", fontWeight: 600,
+                  color: "var(--muted)", background: "var(--bg)",
                   borderRadius: 20, padding: "2px 8px",
+                  whiteSpace: "nowrap",
                 }}>
-                  Overdue
+                  {task.estimated_minutes}m
                 </span>
-              )}
+                {task.isCarriedOver && (
+                  <span style={{
+                    fontSize: "0.7rem", fontWeight: 600,
+                    color: "var(--warning)", background: "var(--warning-light)",
+                    borderRadius: 20, padding: "2px 8px",
+                  }}>
+                    Overdue
+                  </span>
+                )}
+              </div>
+            </div>
+            <div style={{ fontSize: "0.84rem", color: "var(--subtext)", marginTop: 4, lineHeight: 1.5 }}>
+              {task.description}
             </div>
           </>
         )}
@@ -952,6 +951,30 @@ export default function DashboardPage() {
             </div>
           )}
 
+          {/* Give me more bar — shown above tasks when all done */}
+          {allDone && !insight && (
+            <div className="give-more-bar unlocked" style={{ marginBottom: "1.25rem" }}>
+              <button
+                onClick={handleGiveMore}
+                disabled={generating}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  background: "#fff", color: "var(--primary)",
+                  fontWeight: 700, fontSize: "0.95rem",
+                  padding: "0.7rem 1.5rem", borderRadius: "var(--radius)",
+                  border: "none", cursor: "pointer",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  transition: "transform 0.15s",
+                }}
+              >
+                {generating ? <><span className="spinner spinner-dark" style={{ width: 18, height: 18 }} /> Loading...</> : "🚀 Give me more"}
+              </button>
+              <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.9)", fontWeight: 500 }}>
+                Great work! Review and get your next steps.
+              </span>
+            </div>
+          )}
+
           {/* Coach note card */}
           {insight && (
             <div className="card fade-in" style={{
@@ -1019,29 +1042,6 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          {/* Give me more bar — shown after tasks when all done */}
-          {allDone && !insight && (
-            <div className="give-more-bar unlocked">
-              <button
-                onClick={handleGiveMore}
-                disabled={generating}
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: 8,
-                  background: "#fff", color: "var(--primary)",
-                  fontWeight: 700, fontSize: "0.95rem",
-                  padding: "0.7rem 1.5rem", borderRadius: "var(--radius)",
-                  border: "none", cursor: "pointer",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  transition: "transform 0.15s",
-                }}
-              >
-                {generating ? <><span className="spinner spinner-dark" style={{ width: 18, height: 18 }} /> Loading...</> : "🚀 Give me more"}
-              </button>
-              <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.9)", fontWeight: 500 }}>
-                Great work! Review and get your next steps.
-              </span>
-            </div>
-          )}
         </>
       )}
 

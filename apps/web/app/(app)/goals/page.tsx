@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { goalsApi, tasksApi, type Goal, type ParsedGoal, type GoalChatMessage, type GoalChatResult, type TaskItem } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/Skeleton";
-import ProgressRing from "@/components/ProgressRing";
 import GoalTemplatesComponent from "@/components/GoalTemplates";
 import type { GoalCategory } from "@/lib/goal-templates";
 import { useToast } from "@/components/ToastProvider";
@@ -1020,12 +1019,10 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
 
 function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onDeleted: () => void; onUpdated: (goal: Goal) => void; onAddDetail: (goal: Goal) => void }) {
   const [showMenu, setShowMenu] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
   const [deleting, setDeleting] = useState(false);
   const [toggling, setToggling] = useState(false);
   const [completing, setCompleting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const btnRef = useRef<HTMLButtonElement>(null);
 
   // Close menu on outside click
   useEffect(() => {
@@ -1069,8 +1066,8 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
     if (!confirm(`Mark "${goal.title}" as complete? It will be removed from your active goals.`)) return;
     setCompleting(true);
     try {
-      const { goal: updated } = await goalsApi.update(goal.id, { isActive: false } as Partial<Goal>);
-      onDeleted(); // Remove from list (same behavior as delete visually)
+      await goalsApi.update(goal.id, { isActive: false } as Partial<Goal>);
+      onDeleted();
     } catch {
       setCompleting(false);
     }
@@ -1085,167 +1082,153 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
     ? Math.ceil((new Date(goal.deadline).getTime() - Date.now()) / 86400000)
     : null;
 
-  // Progress ring: days elapsed vs total days
-  const progressPercent = (() => {
-    if (!goal.deadline) return 0;
-    const created = new Date(goal.createdAt).getTime();
-    const deadline = new Date(goal.deadline).getTime();
-    const totalDays = Math.max(1, (deadline - created) / 86400000);
-    const elapsed = (Date.now() - created) / 86400000;
-    return Math.min(100, Math.max(0, Math.round((elapsed / totalDays) * 100)));
-  })();
+  // Build badge array like mobile
+  const badges: { label: string; color: string; bg: string }[] = [];
+  if (!goal.isPaused) {
+    // Schedule badge
+    badges.push({ label: formatWorkDays(goal.workDays), color: "#D97706", bg: "#FFFBEB" });
+    // Days left badge
+    if (daysLeft !== null) {
+      badges.push({
+        label: daysLeft > 0 ? `${daysLeft}d left` : "Overdue",
+        color: daysLeft < 14 ? "var(--danger)" : "var(--muted)",
+        bg: daysLeft < 14 ? "var(--danger-light)" : "var(--bg)",
+      });
+    }
+    // Status badge
+    badges.push({ label: "Active", color: "var(--success)", bg: "rgba(34,197,94,0.08)" });
+  } else {
+    badges.push({ label: "Paused", color: "var(--muted)", bg: "var(--bg)" });
+  }
 
   return (
-    <div className="card" style={{ padding: "1.25rem", opacity: goal.isPaused ? 0.7 : 1 }}>
+    <div className="card" style={{ padding: "1.25rem", opacity: goal.isPaused ? 0.7 : 1, display: "flex", flexDirection: "column", gap: 10 }}>
+      {/* Top row: category + title + menu */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
             <CategoryBadge category={goal.category} />
-            {goal.isPaused && (
-              <span style={{
-                fontSize: "0.7rem", fontWeight: 600,
-                color: "var(--muted)", background: "var(--bg)",
-                borderRadius: 20, padding: "2px 8px",
-              }}>
-                Paused
-              </span>
-            )}
-            {daysLeft !== null && !goal.isPaused && (
-              <span style={{
-                fontSize: "0.72rem", fontWeight: 600,
-                color: daysLeft < 14 ? "var(--danger)" : "var(--muted)",
-                background: daysLeft < 14 ? "var(--danger-light)" : "var(--bg)",
-                borderRadius: 20, padding: "2px 8px",
-              }}>
-                {daysLeft > 0 ? `${daysLeft}d left` : "Overdue"}
-              </span>
-            )}
-            {!goal.isPaused && (
-              <span style={{
-                fontSize: "0.7rem", fontWeight: 600,
-                color: "#D97706",
-                background: "#FFFBEB",
-                borderRadius: 20, padding: "2px 8px",
-                display: "inline-flex", alignItems: "center", gap: 3,
-              }}>
-                🗓 {formatWorkDays(goal.workDays)}
-              </span>
-            )}
           </div>
           <h3 style={{
             fontWeight: 600, fontSize: "0.95rem",
             color: goal.isPaused ? "var(--muted)" : "var(--text)",
-            lineHeight: 1.4, marginBottom: 4,
+            lineHeight: 1.4, margin: 0,
           }}>
             {goal.title}
           </h3>
           {goal.structuredSummary && (
-            <p style={{ fontSize: "0.82rem", color: "var(--subtext)", lineHeight: 1.5, marginBottom: 6 }}>
+            <p style={{ fontSize: "0.82rem", color: "var(--subtext)", lineHeight: 1.5, marginTop: 4, marginBottom: 0 }}>
               {goal.structuredSummary}
             </p>
           )}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
-            <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
-              Added {new Date(goal.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-            </p>
-            {!goal.isPaused && (
-              <a
-                href="/dashboard"
-                style={{
-                  fontSize: "0.78rem", fontWeight: 600, color: "var(--primary)",
-                  textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 3,
-                }}
-              >
-                View today's tasks &#8594;
-              </a>
-            )}
-          </div>
         </div>
 
-        <div style={{ display: "flex", alignItems: "flex-start", gap: 8, flexShrink: 0 }}>
-          {/* Progress ring */}
-          {goal.deadline && !goal.isPaused && (
-            <ProgressRing percentage={progressPercent} size={36} strokeWidth={3} />
-          )}
-
-          {/* Menu */}
-          <div ref={menuRef}>
-            <button
-              ref={btnRef}
-              onClick={() => {
-                if (!showMenu && btnRef.current) {
-                  const rect = btnRef.current.getBoundingClientRect();
-                  setMenuPos({ top: rect.bottom + 4, left: rect.right - 180 });
-                }
-                setShowMenu(v => !v);
-              }}
+        {/* Menu button */}
+        <div ref={menuRef} style={{ position: "relative", flexShrink: 0 }}>
+          <button
+            onClick={() => setShowMenu(v => !v)}
+            style={{
+              width: 30, height: 30, borderRadius: "50%",
+              background: "var(--bg)", color: "var(--subtext)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 18, cursor: "pointer", border: "none",
+            }}
+          >
+            &#x22EF;
+          </button>
+          {showMenu && (
+            <div
               style={{
-                width: 30, height: 30, borderRadius: "50%",
-                background: "var(--bg)", color: "var(--subtext)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 18, cursor: "pointer",
+                position: "absolute", right: 0, top: "100%", marginTop: 4, zIndex: 50,
+                background: "var(--card)", border: "1px solid var(--border)",
+                borderRadius: "var(--radius)", boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
+                minWidth: 180, overflow: "hidden",
               }}
             >
-              &#x22EF;
-            </button>
-            {showMenu && (
-              <div
+              <button
+                onClick={handleEditDetail}
                 style={{
-                  position: "fixed", top: menuPos.top, left: menuPos.left, zIndex: 9999,
-                  background: "var(--card)", border: "1px solid var(--border)",
-                  borderRadius: "var(--radius)", boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
-                  minWidth: 180, overflow: "hidden",
+                  display: "block", width: "100%", padding: "0.6rem 0.875rem",
+                  textAlign: "left", color: "var(--text)", fontSize: "0.875rem",
+                  fontWeight: 500, cursor: "pointer", background: "none", border: "none",
                 }}
               >
-                <button
-                  onClick={handleEditDetail}
-                  style={{
-                    display: "block", width: "100%", padding: "0.6rem 0.875rem",
-                    textAlign: "left", color: "var(--text)", fontSize: "0.875rem",
-                    fontWeight: 500, cursor: "pointer", background: "none", border: "none",
-                  }}
-                >
-                  {"\u270F\uFE0F"} Edit goal
-                </button>
-                <button
-                  onClick={handleTogglePause}
-                  disabled={toggling}
-                  style={{
-                    display: "block", width: "100%", padding: "0.6rem 0.875rem",
-                    textAlign: "left", color: "var(--warning)", fontSize: "0.875rem",
-                    fontWeight: 500, cursor: "pointer", background: "none", border: "none",
-                  }}
-                >
-                  {toggling ? "..." : goal.isPaused ? "\u25B6 Resume goal" : "\u23F8 Pause goal"}
-                </button>
-                <button
-                  onClick={handleMarkComplete}
-                  disabled={completing}
-                  style={{
-                    display: "block", width: "100%", padding: "0.6rem 0.875rem",
-                    textAlign: "left", color: "var(--success)", fontSize: "0.875rem",
-                    fontWeight: 500, cursor: "pointer", background: "none", border: "none",
-                  }}
-                >
-                  {completing ? "..." : "\u2705 Mark as complete"}
-                </button>
-                <button
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  style={{
-                    display: "block", width: "100%", padding: "0.6rem 0.875rem",
-                    textAlign: "left", color: "var(--danger)", fontSize: "0.875rem",
-                    fontWeight: 500, cursor: "pointer", background: "none", border: "none",
-                  }}
-                >
-                  {deleting ? "Deleting..." : "\uD83D\uDDD1 Delete goal"}
-                </button>
-              </div>
-            )}
-          </div>
+                {"\u270F\uFE0F"} Edit goal
+              </button>
+              <button
+                onClick={handleTogglePause}
+                disabled={toggling}
+                style={{
+                  display: "block", width: "100%", padding: "0.6rem 0.875rem",
+                  textAlign: "left", color: "var(--warning)", fontSize: "0.875rem",
+                  fontWeight: 500, cursor: "pointer", background: "none", border: "none",
+                }}
+              >
+                {toggling ? "..." : goal.isPaused ? "\u25B6 Resume goal" : "\u23F8 Pause goal"}
+              </button>
+              <button
+                onClick={handleMarkComplete}
+                disabled={completing}
+                style={{
+                  display: "block", width: "100%", padding: "0.6rem 0.875rem",
+                  textAlign: "left", color: "var(--success)", fontSize: "0.875rem",
+                  fontWeight: 500, cursor: "pointer", background: "none", border: "none",
+                }}
+              >
+                {completing ? "..." : "\u2705 Mark as complete"}
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                style={{
+                  display: "block", width: "100%", padding: "0.6rem 0.875rem",
+                  textAlign: "left", color: "var(--danger)", fontSize: "0.875rem",
+                  fontWeight: 500, cursor: "pointer", background: "none", border: "none",
+                }}
+              >
+                {deleting ? "Deleting..." : "\uD83D\uDDD1 Delete goal"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
+      {/* Badge row — even columns like mobile */}
+      <div style={{ display: "flex", gap: 6 }}>
+        {badges.map((b, i) => (
+          <div key={i} style={{ flex: 1, minWidth: 0 }}>
+            <span style={{
+              display: "block", textAlign: "center",
+              fontSize: "0.7rem", fontWeight: 600,
+              color: b.color, background: b.bg,
+              borderRadius: 20, padding: "3px 6px",
+              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
+            }}>
+              {b.label}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {/* Footer: date + view tasks button */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <p style={{ fontSize: "0.75rem", color: "var(--muted)", margin: 0 }}>
+          Added {new Date(goal.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+        </p>
+        {!goal.isPaused && (
+          <a
+            href="/dashboard"
+            style={{
+              fontSize: "0.78rem", fontWeight: 600, color: "#fff",
+              background: "var(--primary)", textDecoration: "none",
+              padding: "5px 12px", borderRadius: 6,
+              display: "inline-flex", alignItems: "center",
+            }}
+          >
+            View tasks
+          </a>
+        )}
+      </div>
     </div>
   );
 }
