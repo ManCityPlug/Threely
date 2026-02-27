@@ -1,27 +1,24 @@
-import React, { useEffect, useMemo, useRef } from "react";
-import { View, Text, StyleSheet, Animated } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { View, Text, StyleSheet, Animated, TouchableOpacity } from "react-native";
 import type { HeatmapDay } from "@/lib/api";
 import { useTheme } from "@/lib/theme";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius } from "@/constants/theme";
 
 const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-const BAR_MAX = 3;
 const BAR_HEIGHT = 120;
 
 function getWeekDates(): string[] {
   const now = new Date();
-  const day = now.getDay(); // 0=Sun
+  const day = now.getUTCDay(); // 0=Sun — use UTC to match server dates
   const mondayOffset = day === 0 ? -6 : 1 - day;
-  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + mondayOffset);
+  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + mondayOffset));
 
   const dates: string[] = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    dates.push(
-      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
-    );
+    d.setUTCDate(monday.getUTCDate() + i);
+    dates.push(d.toISOString().split("T")[0]);
   }
   return dates;
 }
@@ -33,10 +30,10 @@ interface WeeklyBarChartProps {
 export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
   const todayStr = useMemo(() => {
-    const n = new Date();
-    return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+    return new Date().toISOString().split("T")[0]; // UTC to match server
   }, []);
 
   const weekDates = useMemo(() => getWeekDates(), []);
@@ -64,8 +61,12 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
     });
   }, [weekDates, dateMap, todayStr]);
 
+  // Weekly totals — denominator rounds up to next batch of 3
   const weekCompleted = weekData.reduce((s, d) => s + d.completed, 0);
   const weekDisplayTotal = weekCompleted === 0 ? 3 : Math.ceil(weekCompleted / 3) * 3;
+
+  // Find the max total for any single day this week (for bar scaling)
+  const maxDayTotal = Math.max(...weekData.map(d => d.total), 3);
 
   // Entrance animation for bars
   const barAnims = useRef(weekData.map(() => new Animated.Value(0))).current;
@@ -92,13 +93,16 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
       {/* Week summary */}
       <View style={styles.headerRow}>
         <Text style={styles.headerLabel}>This week</Text>
-        <Text style={styles.headerValue}>{weekCompleted}/{weekDisplayTotal} tasks</Text>
+        <Text style={styles.headerValue}>
+          {weekCompleted}/{weekDisplayTotal} tasks
+        </Text>
       </View>
 
       {/* Bars */}
       <View style={styles.barsRow}>
         {weekData.map((day, i) => {
-          const fillRatio = day.isFuture ? 0 : Math.min(day.completed / BAR_MAX, 1);
+          const dayMax = day.total > 0 ? day.total : maxDayTotal;
+          const fillRatio = day.isFuture ? 0 : Math.min(day.completed / dayMax, 1);
           const targetHeight = Math.max(fillRatio * BAR_HEIGHT, fillRatio > 0 ? 8 : 4);
 
           const animatedHeight = barAnims[i].interpolate({
@@ -108,14 +112,33 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
 
           const barColor = day.isFuture || day.completed === 0
             ? colors.border
-            : day.completed >= BAR_MAX
+            : day.completed >= day.total && day.total > 0
               ? colors.primary
               : `rgba(99,91,255,0.4)`;
 
+          const isSelected = selectedDay === i;
+
           return (
-            <View key={day.dateStr} style={styles.barCol}>
-              {/* Count label */}
-              {!day.isFuture && day.completed > 0 && (
+            <TouchableOpacity
+              key={day.dateStr}
+              style={styles.barCol}
+              onPress={() => {
+                if (day.isFuture) return;
+                setSelectedDay(isSelected ? null : i);
+              }}
+              activeOpacity={0.7}
+            >
+              {/* Tooltip when tapped */}
+              {isSelected && !day.isFuture && (
+                <View style={[styles.tooltip, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                  <Text style={[styles.tooltipText, { color: colors.text }]}>
+                    {day.completed}/{day.total} done
+                  </Text>
+                </View>
+              )}
+
+              {/* Count label (always visible if completed > 0) */}
+              {!day.isFuture && day.completed > 0 && !isSelected && (
                 <Text style={[
                   styles.countLabel,
                   day.isToday && { color: colors.primary },
@@ -133,8 +156,8 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
                       height: animatedHeight,
                       backgroundColor: barColor,
                       opacity: day.isFuture ? 0.3 : 1,
-                      borderColor: day.isToday ? colors.primary : "transparent",
-                      borderWidth: day.isToday ? 1.5 : 0,
+                      borderColor: day.isToday || isSelected ? colors.primary : "transparent",
+                      borderWidth: day.isToday || isSelected ? 1.5 : 0,
                     },
                   ]}
                 />
@@ -143,11 +166,11 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
               {/* Day label */}
               <Text style={[
                 styles.dayLabel,
-                day.isToday && { color: colors.primary, fontWeight: typography.bold },
+                (day.isToday || isSelected) && { color: colors.primary, fontWeight: typography.bold },
               ]}>
                 {day.label}
               </Text>
-            </View>
+            </TouchableOpacity>
           );
         })}
       </View>
@@ -160,7 +183,7 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
         </View>
         <View style={styles.legendItem}>
           <View style={[styles.legendDot, { backgroundColor: colors.primary }]} />
-          <Text style={styles.legendText}>All 3 done</Text>
+          <Text style={styles.legendText}>All done</Text>
         </View>
       </View>
     </View>
@@ -196,7 +219,7 @@ function createStyles(c: Colors) {
       flexDirection: "row",
       alignItems: "flex-end",
       gap: 6,
-      height: BAR_HEIGHT + 20, // extra space for count labels
+      height: BAR_HEIGHT + 40, // extra space for count labels + tooltip
       marginBottom: spacing.xs,
     },
     barCol: {
@@ -204,6 +227,17 @@ function createStyles(c: Colors) {
       alignItems: "center",
       justifyContent: "flex-end",
       height: "100%",
+    },
+    tooltip: {
+      borderWidth: 1,
+      borderRadius: radius.sm,
+      paddingHorizontal: 6,
+      paddingVertical: 3,
+      marginBottom: 4,
+    },
+    tooltipText: {
+      fontSize: typography.xs - 1,
+      fontWeight: typography.bold,
     },
     countLabel: {
       fontSize: typography.xs,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth, getNickname } from "@/lib/auth-context";
 import {
   tasksApi, goalsApi, reviewsApi, insightsApi, statsApi,
   type DailyTask, type TaskItem, type Goal, type GoalStat,
@@ -405,6 +405,8 @@ export default function DashboardPage() {
   const [completingAll, setCompletingAll] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [appNudgeDismissed, setAppNudgeDismissed] = useState(false);
+  const [proExpired, setProExpired] = useState(false);
+  const [welcomeProVisible, setWelcomeProVisible] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -451,6 +453,17 @@ export default function DashboardPage() {
       /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
     );
   }, []);
+
+  // Welcome to Pro popup (shown once after first registration)
+  useEffect(() => {
+    if (loading || !user) return;
+    const key = `threely_welcome_shown_${user.id}`;
+    if (!sessionStorage.getItem(key) && !localStorage.getItem(key)) {
+      setWelcomeProVisible(true);
+      localStorage.setItem(key, "true");
+      sessionStorage.setItem(key, "true");
+    }
+  }, [loading, user]);
 
   // Refetch when tab becomes visible (sync across devices)
   useEffect(() => {
@@ -551,8 +564,12 @@ export default function DashboardPage() {
       const res = await tasksApi.generate();
       setDailyTasks(res.dailyTasks);
 
-    } catch {
-      showToast("Failed to generate tasks", "error");
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message?.includes("pro_required")) {
+        setProExpired(true);
+      } else {
+        showToast("Failed to generate tasks", "error");
+      }
     } finally {
       setGenerating(false);
     }
@@ -723,8 +740,12 @@ export default function DashboardPage() {
       const res = await tasksApi.generate({ postReview: true, goalId });
       setDailyTasks(res.dailyTasks);
 
-    } catch {
-      showToast("Failed to generate next tasks", "error");
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message?.includes("pro_required")) {
+        setProExpired(true);
+      } else {
+        showToast("Failed to generate next tasks", "error");
+      }
     } finally {
       setGenerating(false);
     }
@@ -791,13 +812,74 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* Welcome to Pro modal */}
+      {welcomeProVisible && (
+        <div className="modal-overlay" onClick={() => setWelcomeProVisible(false)}>
+          <div className="modal-box fade-in" onClick={e => e.stopPropagation()} style={{ maxWidth: 420, textAlign: "center", padding: "2.5rem 2rem" }}>
+            <div style={{ fontSize: 44, marginBottom: 16 }}>✦</div>
+            <h2 style={{ fontSize: "1.5rem", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: 8 }}>
+              You&apos;ve got Pro!
+            </h2>
+            <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: 20 }}>
+              Enjoy full access to Threely Pro for 3 days — completely free, no credit card needed.
+            </p>
+            <div style={{ textAlign: "left", display: "inline-flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+              <span style={{ fontSize: "0.9rem", color: "var(--text)" }}>✦  AI-powered daily tasks</span>
+              <span style={{ fontSize: "0.9rem", color: "var(--text)" }}>✦  Personalized coaching insights</span>
+              <span style={{ fontSize: "0.9rem", color: "var(--text)" }}>✦  Unlimited goals & tracking</span>
+            </div>
+            <p style={{ color: "var(--muted)", fontSize: "0.8rem", marginBottom: 20 }}>
+              Love it? Pick a plan anytime to keep going.
+            </p>
+            <button
+              className="btn btn-primary"
+              onClick={() => setWelcomeProVisible(false)}
+              style={{ width: "100%", height: 46, fontSize: "1rem" }}
+            >
+              Let&apos;s go!
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div style={{ marginBottom: "1.75rem" }}>
         <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: 4 }}>{todayStr()}</p>
-        <h1 style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.03em" }}>
-          {greeting()} {"👋"}
+        <h1 style={{ fontSize: "2rem", fontWeight: 800, letterSpacing: "-0.04em" }}>
+          {greeting()}, {(() => {
+            const raw = getNickname() || user?.email?.split("@")[0] || "";
+            const first = raw.split(/\s+/)[0] || "there";
+            return first.charAt(0).toUpperCase() + first.slice(1);
+          })()} {"👋"}
         </h1>
       </div>
+
+      {/* Pro expired banner */}
+      {proExpired && (
+        <a href="/pricing" className="card fade-in" style={{
+          padding: "1rem 1.25rem",
+          background: "var(--primary-light)",
+          border: "1.5px solid var(--primary)",
+          marginBottom: "1.25rem",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          textDecoration: "none", gap: "1rem",
+        }}>
+          <div>
+            <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", marginBottom: 2 }}>
+              Your free trial has ended
+            </div>
+            <div style={{ fontSize: "0.825rem", color: "var(--subtext)" }}>
+              Subscribe to keep your momentum going
+            </div>
+          </div>
+          <span style={{
+            fontSize: "0.85rem", fontWeight: 700, color: "var(--primary)",
+            flexShrink: 0, whiteSpace: "nowrap",
+          }}>
+            Subscribe →
+          </span>
+        </a>
+      )}
 
       {/* Overdue banner for other goals */}
       {otherGoalsOverdueCount > 0 && !overdueBannerDismissed && (
@@ -926,22 +1008,39 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Insight card */}
+          {/* Coach note card */}
           {insight && (
             <div className="card fade-in" style={{
               padding: "1.25rem",
-              background: "var(--success-light)",
-              border: "1px solid rgba(62,207,142,0.25)",
+              background: "rgba(99,91,255,0.08)",
+              border: "1px solid rgba(99,91,255,0.2)",
               marginBottom: "1.25rem",
             }}>
-              <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--success)", marginBottom: 6 }}>
-                Coach insight
-              </p>
-              <p style={{ fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.6 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--primary)", margin: 0 }}>
+                  ✦ Coach note
+                </p>
+                <button
+                  onClick={() => setInsight(null)}
+                  style={{
+                    fontSize: "0.75rem",
+                    fontWeight: 600,
+                    color: "var(--primary)",
+                    background: "rgba(99,91,255,0.12)",
+                    border: "none",
+                    borderRadius: 6,
+                    padding: "4px 12px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Got it
+                </button>
+              </div>
+              <p style={{ fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.6, margin: 0 }}>
                 {insight}
               </p>
               {generating && (
-                <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: 8 }}>
+                <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: 8, margin: 0 }}>
                   <span className="spinner" style={{ marginRight: 6 }} />Generating next tasks...
                 </p>
               )}

@@ -8,17 +8,15 @@ const BAR_HEIGHT = 120;
 
 function getWeekDates(): string[] {
   const now = new Date();
-  const day = now.getDay(); // 0=Sun
+  const day = now.getUTCDay(); // 0=Sun — use UTC to match server dates
   const mondayOffset = day === 0 ? -6 : 1 - day;
-  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + mondayOffset);
+  const monday = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + mondayOffset));
 
   const dates: string[] = [];
   for (let i = 0; i < 7; i++) {
     const d = new Date(monday);
-    d.setDate(monday.getDate() + i);
-    dates.push(
-      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
-    );
+    d.setUTCDate(monday.getUTCDate() + i);
+    dates.push(d.toISOString().split("T")[0]);
   }
   return dates;
 }
@@ -27,8 +25,7 @@ export default function WeeklyBarChart({ data }: { data: HeatmapDay[] }) {
   const [selectedDay, setSelectedDay] = useState<number | null>(null);
 
   const todayStr = useMemo(() => {
-    const n = new Date();
-    return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+    return new Date().toISOString().split("T")[0]; // UTC to match server
   }, []);
 
   const weekDates = useMemo(() => getWeekDates(), []);

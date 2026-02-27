@@ -19,6 +19,7 @@ import {
   Pressable,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { SwipeNavigator } from "@/components/SwipeNavigator";
 import * as Haptics from "expo-haptics";
 import { supabase } from "@/lib/supabase";
 import {
@@ -29,6 +30,7 @@ import {
   insightsApi,
   statsApi,
   focusApi,
+  subscriptionApi,
   type DailyTask,
   type Goal,
   type TaskItem,
@@ -37,9 +39,8 @@ import {
 import { TaskCard } from "@/components/TaskCard";
 import { Button } from "@/components/ui/Button";
 import { SkeletonCard } from "@/components/Skeleton";
-import { Confetti } from "@/components/Confetti";
 import { useToast } from "@/lib/toast";
-import { useStaggeredEntrance, celebrationHaptic } from "@/lib/animations";
+import { useStaggeredEntrance } from "@/lib/animations";
 import { scheduleNotifications, onTaskCompleted, type NotifContext } from "@/lib/notifications";
 import { useTheme } from "@/lib/theme";
 import type { Colors } from "@/constants/theme";
@@ -48,13 +49,6 @@ import { spacing, typography, radius, shadow } from "@/constants/theme";
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-const COMPLETION_MESSAGES = [
-  "Crushed it today",
-  "All done. Nice work.",
-  "3 for 3. You're on fire.",
-  "That's a wrap for today",
-  "Nailed it.",
-];
 
 function formatDate(d: Date) {
   return `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`;
@@ -160,13 +154,6 @@ export default function DashboardScreen() {
   const [showInsightCard, setShowInsightCard] = useState(false);
   const [insightLoading, setInsightLoading] = useState(false);
 
-  // ─── Confetti state ─────────────────────────────────────────────────────────
-  const [confettiActive, setConfettiActive] = useState(false);
-
-  // ─── Completion message state ────────────────────────────────────────────────
-  const [completionMessage, setCompletionMessage] = useState("");
-  const [showCompletionBanner, setShowCompletionBanner] = useState(false);
-
   // ─── Overdue paging state ────────────────────────────────────────────────────
   const [overduePageSize, setOverduePageSize] = useState(3);
 
@@ -174,53 +161,70 @@ export default function DashboardScreen() {
   const [tasksCompletedSinceGenerate, setTasksCompletedSinceGenerate] = useState(false);
   const [hasGeneratedMore, setHasGeneratedMore] = useState(false);
 
+  // ─── Pro / trial state ────────────────────────────────────────────────────────
+  const [welcomeProVisible, setWelcomeProVisible] = useState(false);
+  const [proExpired, setProExpired] = useState(false);
+
   const hasLoadedOnce = useRef(false);
   const reviewShownForDate = useRef<string>("");
+
+  // Load nickname + email eagerly (outside loadData) so greeting never shows "there"
+  useEffect(() => {
+    (async () => {
+      const [saved, { data: sessionData }] = await Promise.all([
+        AsyncStorage.getItem("@threely_nickname"),
+        supabase.auth.getSession(),
+      ]);
+      if (saved) setNickname(saved);
+      if (sessionData?.session?.user?.email) setUserEmail(sessionData.session.user.email);
+    })();
+  }, []);
 
   const loadData = useCallback(async () => {
     try {
       const todayKey = `@threely_focus_${new Date().toISOString().slice(0, 10)}`;
       const bannerKey = `@threely_overdue_banner_${new Date().toISOString().slice(0, 10)}`;
-      const [tasksRes, goalsRes, profileRes, statsRes, focusRes, { data: { user } }, savedNickname, savedFocus, bannerDismissed] = await Promise.all([
+      const [tasksRes, goalsRes, profileRes, statsRes, focusRes, savedFocus, bannerDismissed] = await Promise.all([
         tasksApi.today(true),
         goalsApi.list(),
         profileApi.get().catch(() => ({ profile: null })),
         statsApi.get().catch(() => ({ totalCompleted: 0, activeGoals: 0, streak: 0, goalStats: [] })),
         focusApi.get().catch(() => ({ focus: null })),
-        supabase.auth.getUser(),
-        AsyncStorage.getItem("@threely_nickname"),
-        AsyncStorage.getItem(todayKey),
-        AsyncStorage.getItem(bannerKey),
+        AsyncStorage.getItem(`@threely_focus_${new Date().toISOString().slice(0, 10)}`),
+        AsyncStorage.getItem(`@threely_overdue_banner_${new Date().toISOString().slice(0, 10)}`),
       ]);
       setDailyTasks(tasksRes.dailyTasks);
       setOverdueTasks(tasksRes.overdueTasks ?? []);
       setGoals(goalsRes.goals);
       setGoalStats(statsRes.goalStats ?? []);
       if (profileRes.profile) setDailyTimeMinutes(profileRes.profile.dailyTimeMinutes);
-      if (user?.email) setUserEmail(user.email);
-      if (savedNickname) setNickname(savedNickname);
       if (bannerDismissed) setOverdueBannerDismissed(true);
 
       // Restore saved focus: prefer server, fallback to AsyncStorage
       const serverFocus = focusRes.focus?.focusGoalId;
       const restoredFocus = serverFocus ?? savedFocus;
-      if (restoredFocus) {
+      const activeGoalIds = new Set(goalsRes.goals.map(g => g.id));
+      const isValidFocus = restoredFocus && (restoredFocus === "shuffle" || restoredFocus === "overdue" || activeGoalIds.has(restoredFocus));
+      if (isValidFocus) {
         setSelectedGoal(restoredFocus as GoalSelection);
         setGoalPickerShownToday(true);
         // Sync AsyncStorage with server
         if (serverFocus && !savedFocus) {
           await AsyncStorage.setItem(todayKey, serverFocus);
         }
-      } else if (goalsRes.goals.length > 0) {
-        // No focus set today — auto-open the focus picker on first visit
+      } else if (goalsRes.goals.length === 1) {
+        // Only one goal — auto-select it, no need to show picker
+        setSelectedGoal(goalsRes.goals[0].id);
+        setGoalPickerShownToday(true);
+      } else if (goalsRes.goals.length > 1) {
+        // Multiple goals, no valid focus — auto-open the focus picker on first visit
         setSelectedGoal(goalsRes.goals[0].id);
         if (!hasLoadedOnce.current) {
-          // Will be shown after loading finishes (via effect below)
           setGoalPickerShownToday(false);
         }
       }
     } catch (e) {
-      console.error("loadData error", e);
+      console.warn("loadData error", e);
     }
   }, []);
 
@@ -242,6 +246,21 @@ export default function DashboardScreen() {
     });
     return () => sub.remove();
   }, [loadData]);
+
+  // ─── Welcome to Pro modal (shown once after first onboarding) ─────────────
+  useEffect(() => {
+    if (loading || dailyTasks.length === 0) return;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const key = `@threely_welcome_shown_${user.id}`;
+      const shown = await AsyncStorage.getItem(key);
+      if (!shown) {
+        setWelcomeProVisible(true);
+        await AsyncStorage.setItem(key, "true");
+      }
+    })();
+  }, [loading, dailyTasks.length]);
 
   useMemo(() => {
     if (goals.length >= 1 && !selectedGoal) setSelectedGoal(goals[0].id);
@@ -379,25 +398,11 @@ export default function DashboardScreen() {
     }
   }, [loading, buildNotifContext, goals.length]);
 
-  // Trigger confetti + completion message when all tasks become done
+  // Mark focus lock when all tasks become done
   const prevAllDone = useRef(false);
+  const goalKey = selectedGoal ?? "none";
   useEffect(() => {
     if (allDone && !prevAllDone.current && newTaskItems.length > 0) {
-      setConfettiActive(true);
-      celebrationHaptic();
-      // Pick a random completion message
-      const isOverdueMode = selectedGoal === "overdue";
-      const noMoreOverdue = displayedOverdue.length === 0 || (pagedOverdue.length === displayedOverdue.length && displayedOverdueItems.every(t => t.isCompleted));
-      if (isOverdueMode && noMoreOverdue) {
-        setCompletionMessage("You're all caught up");
-      } else {
-        const msg = COMPLETION_MESSAGES[Math.floor(Math.random() * COMPLETION_MESSAGES.length)];
-        setCompletionMessage(msg);
-      }
-      setShowCompletionBanner(true);
-      setTimeout(() => setConfettiActive(false), 2500);
-      setTimeout(() => setShowCompletionBanner(false), 4000);
-      // Mark tasks as completed for focus lock
       setTasksCompletedSinceGenerate(true);
     }
     prevAllDone.current = allDone;
@@ -452,6 +457,7 @@ export default function DashboardScreen() {
       return;
     }
     setGenerating(true);
+    setCompletionMessages(prev => { const next = { ...prev }; delete next[goalKey]; return next; });
     try {
       const goalId = selectedGoal === "shuffle" ? undefined : selectedGoal;
       const res = await tasksApi.generate(goalId);
@@ -581,14 +587,7 @@ export default function DashboardScreen() {
         }
       }
       // Trigger confetti and completion banner
-      setConfettiActive(true);
-      celebrationHaptic();
-      const msg = COMPLETION_MESSAGES[Math.floor(Math.random() * COMPLETION_MESSAGES.length)];
-      setCompletionMessage(msg);
-      setShowCompletionBanner(true);
       setTasksCompletedSinceGenerate(true);
-      setTimeout(() => setConfettiActive(false), 2500);
-      setTimeout(() => setShowCompletionBanner(false), 4000);
     } catch {
       showToast("Couldn't complete all tasks. Try again.", "error");
     }
@@ -636,9 +635,10 @@ export default function DashboardScreen() {
 
       // Auto-generate next tasks after review
       setGenerating(true);
+      setCompletionMessages(prev => { const next = { ...prev }; delete next[goalKey]; return next; });
       try {
         const goalId = selectedGoal === "shuffle" ? undefined : selectedGoal;
-        const res = await tasksApi.generate(goalId, { postReview: true });
+        const res = await tasksApi.generate(goalId, { requestingAdditional: true });
         setDailyTasks((prev) => {
           const updatedGoalIds = new Set(res.dailyTasks.map((dt) => dt.goalId));
           const updated = [
@@ -655,8 +655,11 @@ export default function DashboardScreen() {
         // Re-lock focus after generating more tasks
         setHasGeneratedMore(true);
         setTasksCompletedSinceGenerate(false);
-      } catch {
-        // silently fail — insight is still shown
+      } catch (err: unknown) {
+        // Check if trial/subscription expired
+        if (err instanceof Error && err.message?.includes("pro_required")) {
+          setProExpired(true);
+        }
       } finally {
         setGenerating(false);
       }
@@ -674,7 +677,9 @@ export default function DashboardScreen() {
   // ─── Render ────────────────────────────────────────────────────────────────
 
   const today = new Date();
-  const firstName = nickname || userEmail.split("@")[0] || "there";
+  const rawName = nickname || (userEmail ? userEmail.split("@")[0] : "");
+  const firstNameRaw = rawName.split(/\s+/)[0] || "there";
+  const firstName = firstNameRaw.charAt(0).toUpperCase() + firstNameRaw.slice(1);
 
   // Staggered entrance animations for task cards
   const staggerAnims = useStaggeredEntrance(loading ? 0 : newTaskItems.length);
@@ -702,10 +707,8 @@ export default function DashboardScreen() {
   }
 
   return (
+    <SwipeNavigator currentIndex={0}>
     <View style={styles.container}>
-      {/* Confetti overlay */}
-      <Confetti active={confettiActive} />
-
       {/* Fixed header — outside ScrollView so it never hides under Dynamic Island */}
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <View style={styles.headerRow}>
@@ -725,6 +728,21 @@ export default function DashboardScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
+
+        {/* Pro expired banner */}
+        {proExpired && (
+          <TouchableOpacity
+            style={styles.expiredBanner}
+            onPress={() => router.push("/payment" as never)}
+            activeOpacity={0.85}
+          >
+            <View style={{ flex: 1 }}>
+              <Text style={styles.expiredTitle}>Your free trial has ended</Text>
+              <Text style={styles.expiredSubtitle}>Subscribe to keep your momentum going</Text>
+            </View>
+            <Text style={styles.expiredCta}>Subscribe</Text>
+          </TouchableOpacity>
+        )}
 
         {/* Goal selector */}
         {goals.length > 0 && (
@@ -789,13 +807,6 @@ export default function DashboardScreen() {
             </Text>
             <Text style={styles.overdueBannerClose}>{"\u2715"}</Text>
           </TouchableOpacity>
-        )}
-
-        {/* Completion banner */}
-        {showCompletionBanner && (
-          <View style={styles.completionBanner}>
-            <Text style={styles.completionBannerText}>{completionMessage}</Text>
-          </View>
         )}
 
         {/* Overdue tasks section */}
@@ -980,7 +991,7 @@ export default function DashboardScreen() {
             {/* Action buttons when all done */}
             {selectedGoal !== "overdue" && (
               <View style={styles.nextSection}>
-                {allDone ? (
+                {allDone && !proExpired ? (
                   <TouchableOpacity
                     style={styles.giveMeMoreBtn}
                     onPress={handleGiveMoreTasks}
@@ -1130,13 +1141,19 @@ export default function DashboardScreen() {
             <Text style={styles.pickerSubtitle}>Pick a goal to focus on</Text>
             {goals.map((goal) => {
               const isSelected = selectedGoal === goal.id;
-              const goalTime = goal.dailyTimeMinutes;
               const stat = goalStats.find(s => s.goalId === goal.id);
               const days = daysSince(stat?.lastWorkedAt ?? null);
               const staleColor = days === null ? colors.textTertiary
                 : days < 7 ? colors.success
                 : days < 14 ? colors.warning
                 : colors.danger;
+              // Calculate remaining time from incomplete tasks for this goal
+              const goalDt = dailyTasks.find(dt => dt.goalId === goal.id);
+              const goalItems = goalDt && Array.isArray(goalDt.tasks) ? (goalDt.tasks as unknown as TaskItem[]) : [];
+              const remainingMin = goalItems.filter(t => !t.isCompleted).reduce((s, t) => s + (t.estimated_minutes || 0), 0);
+              // Show remaining time if tasks exist, otherwise fall back to daily budget
+              const displayTime = goalItems.length > 0 ? remainingMin : (goal.dailyTimeMinutes ?? 0);
+              const timeLabel = goalItems.length > 0 ? formatMinutes(remainingMin) : (goal.dailyTimeMinutes ? `~${formatMinutes(goal.dailyTimeMinutes)}/day` : null);
               return (
                 <TouchableOpacity
                   key={goal.id}
@@ -1153,9 +1170,9 @@ export default function DashboardScreen() {
                       {goal.title}
                     </Text>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                      {goalTime ? (
+                      {timeLabel ? (
                         <View style={styles.menuTimeBadge}>
-                          <Text style={styles.menuTimeBadgeText}>~{formatMinutes(goalTime)}/day</Text>
+                          <Text style={styles.menuTimeBadgeText}>{timeLabel}</Text>
                         </View>
                       ) : null}
                       {isSelected && <Text style={styles.menuCheck}>✓</Text>}
@@ -1232,7 +1249,35 @@ export default function DashboardScreen() {
           </Pressable>
         </Pressable>
       </Modal>
+      {/* ── Welcome to Pro modal ──────────────────────────────────────────── */}
+      <Modal visible={welcomeProVisible} transparent animationType="fade">
+        <Pressable style={styles.welcomeOverlay} onPress={() => setWelcomeProVisible(false)}>
+          <Pressable style={styles.welcomeBox} onPress={() => {}}>
+            <Text style={{ fontSize: 40, textAlign: "center", marginBottom: spacing.md }}>✦</Text>
+            <Text style={styles.welcomeTitle}>You've got Pro!</Text>
+            <Text style={styles.welcomeSubtitle}>
+              Enjoy full access to Threely Pro for 3 days — completely free, no credit card needed.
+            </Text>
+            <View style={{ gap: spacing.sm, marginBottom: spacing.lg }}>
+              <Text style={styles.welcomeFeature}>✦  AI-powered daily tasks</Text>
+              <Text style={styles.welcomeFeature}>✦  Personalized coaching insights</Text>
+              <Text style={styles.welcomeFeature}>✦  Unlimited goals & tracking</Text>
+            </View>
+            <Text style={styles.welcomeNote}>
+              Love it? Pick a plan anytime to keep going.
+            </Text>
+            <TouchableOpacity
+              style={styles.welcomeBtn}
+              onPress={() => setWelcomeProVisible(false)}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.welcomeBtnText}>Let's go!</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
+    </SwipeNavigator>
   );
 }
 
@@ -1421,7 +1466,7 @@ function createStyles(c: Colors) {
       fontWeight: typography.bold,
       color: c.primaryText,
     },
-    section: { marginBottom: spacing.xl },
+    section: { marginBottom: 0 },
     mixItem: { marginBottom: spacing.xs },
     mixGoalChip: {
       fontSize: typography.xs,
@@ -1449,7 +1494,7 @@ function createStyles(c: Colors) {
       marginBottom: spacing.xl,
     },
     generateBtn: { width: "100%" },
-    nextSection: { alignItems: "center", marginTop: spacing.sm, gap: spacing.sm },
+    nextSection: { alignItems: "center", marginTop: spacing.sm, gap: spacing.xs },
     // Give me more (unlocked)
     giveMeMoreBtn: {
       flexDirection: "row",
@@ -1743,6 +1788,7 @@ function createStyles(c: Colors) {
       borderColor: c.warning,
       backgroundColor: c.warningLight,
       marginTop: spacing.xs,
+      marginBottom: spacing.xs,
     },
     catchUpIcon: { fontSize: 14 },
     catchUpText: {
@@ -1750,22 +1796,6 @@ function createStyles(c: Colors) {
       fontWeight: typography.semibold,
       color: c.warning,
       letterSpacing: -0.2,
-    },
-    // ── Completion banner ───────────────────────────────────────────────────
-    completionBanner: {
-      backgroundColor: c.success,
-      borderRadius: radius.lg,
-      paddingVertical: 14,
-      paddingHorizontal: spacing.lg,
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: spacing.lg,
-    },
-    completionBannerText: {
-      fontSize: typography.lg,
-      fontWeight: typography.bold,
-      color: "#fff",
-      letterSpacing: -0.3,
     },
     // ── Review sheet ─────────────────────────────────────────────────────────
     historyOverlay: {
@@ -1948,6 +1978,92 @@ function createStyles(c: Colors) {
       fontSize: typography.sm,
       fontWeight: typography.semibold,
       color: c.primary,
+    },
+    // ── Welcome to Pro modal ──────────────────────────────────────────────────
+    welcomeOverlay: {
+      flex: 1,
+      backgroundColor: c.overlay,
+      justifyContent: "center",
+      alignItems: "center",
+      padding: spacing.lg,
+    },
+    welcomeBox: {
+      width: "100%",
+      backgroundColor: c.card,
+      borderRadius: radius.xl,
+      padding: spacing.xl,
+      alignItems: "center",
+      ...shadow.lg,
+    },
+    welcomeTitle: {
+      fontSize: typography.xxl,
+      fontWeight: typography.bold,
+      color: c.text,
+      letterSpacing: -0.5,
+      marginBottom: spacing.sm,
+      textAlign: "center",
+    },
+    welcomeSubtitle: {
+      fontSize: typography.base,
+      color: c.textSecondary,
+      textAlign: "center",
+      lineHeight: 22,
+      marginBottom: spacing.lg,
+    },
+    welcomeFeature: {
+      fontSize: typography.sm,
+      fontWeight: typography.medium,
+      color: c.text,
+      lineHeight: 22,
+    },
+    welcomeNote: {
+      fontSize: typography.xs,
+      color: c.textTertiary,
+      textAlign: "center",
+      marginBottom: spacing.lg,
+    },
+    welcomeBtn: {
+      width: "100%",
+      height: 50,
+      backgroundColor: c.primary,
+      borderRadius: radius.lg,
+      alignItems: "center",
+      justifyContent: "center",
+      ...shadow.sm,
+    },
+    welcomeBtnText: {
+      fontSize: typography.md,
+      fontWeight: typography.bold,
+      color: "#fff",
+      letterSpacing: -0.2,
+    },
+    // ── Pro expired banner ────────────────────────────────────────────────────
+    expiredBanner: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: c.primaryLight,
+      borderRadius: radius.lg,
+      borderWidth: 1.5,
+      borderColor: c.primary,
+      padding: spacing.md,
+      marginBottom: spacing.lg,
+      gap: spacing.md,
+    },
+    expiredTitle: {
+      fontSize: typography.sm,
+      fontWeight: typography.bold,
+      color: c.text,
+      marginBottom: 2,
+    },
+    expiredSubtitle: {
+      fontSize: typography.xs,
+      color: c.textSecondary,
+    },
+    expiredCta: {
+      fontSize: typography.sm,
+      fontWeight: typography.bold,
+      color: c.primary,
+      flexShrink: 0,
     },
   });
 }

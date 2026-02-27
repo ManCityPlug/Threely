@@ -184,7 +184,7 @@ Generic tasks are a failure. "Research your niche" is unacceptable. The standard
 ## TASK GENERATION RULES
 
 1. Generate exactly 3 tasks per request (unless the prompt says otherwise).
-2. CRITICAL TIME BUDGET: The sum of all 3 tasks' estimated_minutes MUST total approximately the user's daily time budget (within 10%). Each task should be roughly one-third of the budget. Do NOT generate tasks that total significantly less than the daily budget.
+2. CRITICAL TIME BUDGET: The sum of all 3 tasks' estimated_minutes MUST NOT exceed the user's daily time budget. Estimate each task's time REALISTICALLY based on what the task actually involves — do NOT just divide the budget by 3. A quick 5-minute task should say 5 minutes; a deep 45-minute task should say 45 minutes. Use your best judgment for how long each task would truly take an average person at the user's level. The total should fit within their budget but doesn't need to fill it exactly — it's better to be honest about time than to artificially inflate or deflate estimates. Round to the nearest 5 minutes. Common realistic ranges: quick tasks (5-15 min), medium tasks (20-35 min), deep tasks (40-60 min).
 3. Tasks must be concrete, specific, and actionable — never vague like "work on goal" or "research more." Start each task title with an action verb.
 4. Each task needs a compelling "why" that connects it directly to the user's goal and their current stage.
 5. Do not repeat tasks the user has done in the last 2 sessions (use coaching context to judge).
@@ -323,14 +323,31 @@ Respond with ONLY valid JSON (no markdown, no explanation):
   "coach_note": "2-4 sentences, intensity-matched, specific to their progress"
 }
 
-Example task (for a fitness goal, 60 min/day, intensity 2, day 3):
-{
-  "task": "Complete a 20-minute lower body strength circuit using the Strong app",
-  "description": "Open the Strong app (free on iOS/Android). Do 4 rounds of: 12 goblet squats (25lb dumbbell), 10 Romanian deadlifts (30lb dumbbells), 15 bodyweight hip thrusts, 60s plank hold. Rest 60-90s between rounds. Log all sets in the app so you can track progressive overload next week. Done = 4 rounds logged in Strong with weights recorded.",
-  "estimated_minutes": 20,
-  "why": "Building lower body strength in week 1 establishes your foundation — you need leg power and core stability before adding running volume toward your 5K goal",
-  "goal_id": "abc123"
-}`;
+Example tasks (for a fitness goal, 60 min/day, intensity 2, day 3):
+[
+  {
+    "task": "Complete a lower body strength circuit using the Strong app",
+    "description": "Open the Strong app (free on iOS/Android). Do 4 rounds of: 12 goblet squats (25lb dumbbell), 10 Romanian deadlifts (30lb dumbbells), 15 bodyweight hip thrusts, 60s plank hold. Rest 60-90s between rounds. Log all sets in the app so you can track progressive overload next week. Done = 4 rounds logged in Strong with weights recorded.",
+    "estimated_minutes": 35,
+    "why": "Building lower body strength in week 1 establishes your foundation — you need leg power and core stability before adding running volume toward your 5K goal",
+    "goal_id": "abc123"
+  },
+  {
+    "task": "Plan tomorrow's meals and hit your protein target in MyFitnessPal",
+    "description": "Open MyFitnessPal → Diary → tomorrow. Pre-log 3 meals hitting 120g protein minimum. Focus on whole foods: chicken, eggs, Greek yogurt, lentils. Screenshot your planned day. Done = tomorrow fully logged with 120g+ protein.",
+    "estimated_minutes": 10,
+    "why": "Nutrition is 80% of body composition — pre-logging removes decision fatigue and guarantees you hit your protein target instead of guessing",
+    "goal_id": "abc123"
+  },
+  {
+    "task": "Do a 15-minute guided mobility routine on YouTube",
+    "description": "Search YouTube for 'Tom Merrick 15 min full body stretch'. Follow along — focus on hip flexors, hamstrings, and thoracic spine. Do this after your strength work while muscles are warm. Done = completed the full 15-min video.",
+    "estimated_minutes": 15,
+    "why": "Recovery work prevents injury and improves squat/deadlift depth — skipping mobility is the #1 reason beginners stall in month 2",
+    "goal_id": "abc123"
+  }
+]
+Note: These 3 tasks total 60 min but with realistic per-task estimates (35 + 10 + 15) instead of artificially equal splits.`;
 
 // ─── goalChat ─────────────────────────────────────────────────────────────────
 
@@ -361,15 +378,17 @@ CRITICAL — The final goal MUST include ALL of these details (ask about any you
 1. A SPECIFIC measurable outcome (not vague like "explore" or "improve" — e.g. "land 3 freelance clients" or "run a 5K in under 30 minutes")
 2. Their current starting point / experience level (e.g. "complete beginner", "have 2 years experience", "already have a website")
 3. How much time per day they can dedicate (e.g. "1 hour a day", "30 minutes daily")
-4. A timeline or deadline (e.g. "in 3 months", "by June 2026")
-5. Key constraints, tools, or context (e.g. "while working full-time", "budget of $500", "using Python")
+4. Their desired pace/intensity — are they going all-in or building slowly? (e.g. "aggressive, maximum effort daily" or "steady, sustainable habit-building")
+5. Key constraints, resources, or context (e.g. "while working full-time", "budget of $500", "already have equipment")
 
 RULES:
 - Ask ONE question at a time with 3-4 multiple-choice options
 - Keep questions short and conversational (1-2 sentences max)
-- Ask 4-5 questions to cover all 5 areas above, then wrap up
-- Make options SPECIFIC and concrete — never vague like "Something creative" or "Other areas"
+- Ask 4-6 questions to cover all 5 areas above, then wrap up
+- CRITICAL: Every option MUST be genuinely distinct and non-overlapping. Before generating options, mentally check: "Could a user reasonably pick two of these at once?" If yes, they overlap — rewrite them. Bad example: "I have equipment" + "No major constraints" (having equipment IS having no constraints). Good example: "I have all the gear I need" vs "I need to buy equipment first" vs "I have limited space to practice"
+- Never include a generic "no constraints" or "I'm good to go" option alongside specific resource options — instead, make every option describe a specific situation
 - If the user provides a custom answer, roll with it naturally
+- Do NOT ask "when do you want to achieve this?" with short timeframe options that everyone picks. Instead, based on their goal complexity and daily time, SUGGEST a realistic timeline: "Based on your goal and 30 min/day, this typically takes about 2-3 months. Does that work for you?" with options like "Yes, that timeline works", "I want to push harder and do it faster", "I'd prefer a more relaxed pace"
 ${shouldWrapUp ? "- IMPORTANT: You have asked enough questions. You MUST wrap up NOW and produce the final goal_text." : ""}
 - Do NOT wrap up until you have specifics for at least areas 1-4 above
 
@@ -386,7 +405,7 @@ When wrapping up (done: true):
   "message": "A short encouraging summary",
   "options": [],
   "done": true,
-  "goal_text": "A detailed 3-5 sentence goal description in first person. MUST include: the specific measurable outcome, where they're starting from, how much daily time they have, their target timeline, and any constraints or context discussed. Example quality: 'I want to launch my freelance web design business and land my first 3 paying clients within the next 3 months. I have 2 years of hobby experience with HTML/CSS and can dedicate about 1 hour per day while working my full-time job. I'll focus on building a portfolio site, reaching out to local small businesses, and pricing my services competitively with a budget of $200 for tools and hosting.'"
+  "goal_text": "A detailed 3-5 sentence goal description in first person. MUST include: the specific measurable outcome, where they're starting from, how much daily time they have, their preferred pace/intensity, their target timeline, and any constraints or context discussed. Example quality: 'I want to launch my freelance web design business and land my first 3 paying clients within the next 3 months. I have 2 years of hobby experience with HTML/CSS and can dedicate about 1 hour per day while working my full-time job. I want to take a committed, steady approach — consistent daily progress without burning out. I'll focus on building a portfolio site, reaching out to local small businesses, and pricing my services competitively with a budget of $200 for tools and hosting.'"
 }`;
 
   // If messages is empty, inject a seed to start the conversation

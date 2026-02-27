@@ -1140,7 +1140,7 @@ export default function GoalsScreen() {
             <KeyboardAvoidingView
               style={{ flex: 1 }}
               behavior={Platform.OS === "ios" ? "padding" : undefined}
-              keyboardVerticalOffset={0}
+              keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0}
             >
               <FlatList
                 ref={chatListRef}
@@ -1182,7 +1182,7 @@ export default function GoalsScreen() {
                           {item.text}
                         </Text>
                       </View>
-                      {isLastAssistant && options && options.length > 0 && !chatLoading && !chatDone && (
+                      {isLastAssistant && options && options.length > 0 && !chatLoading && !chatDone && !showTypingInput && (
                         <View style={styles.chatOptions}>
                           {options.map((opt, j) => (
                             <TouchableOpacity
@@ -1198,7 +1198,7 @@ export default function GoalsScreen() {
                             style={[styles.chatOptionBtn, { borderColor: colors.border, borderWidth: 1, backgroundColor: colors.bg }]}
                             onPress={() => {
                               setShowTypingInput(true);
-                              setTimeout(() => chatInputRef.current?.focus(), 100);
+                              setTimeout(() => chatInputRef.current?.focus(), 150);
                             }}
                             activeOpacity={0.7}
                           >
@@ -1211,9 +1211,54 @@ export default function GoalsScreen() {
                 }}
               />
 
-              {/* Bottom input / Use this goal */}
-              <View style={styles.chatFooter}>
-                {chatDone ? (
+              {/* Bottom: typing input */}
+              {showTypingInput && !chatDone && (
+                <View style={styles.chatFooter}>
+                  <View style={styles.chatInputRow}>
+                    <TextInput
+                      ref={chatInputRef}
+                      style={styles.chatInput}
+                      placeholder="Type your answer…"
+                      placeholderTextColor={colors.textTertiary}
+                      value={customInput}
+                      onChangeText={setCustomInput}
+                      editable={!chatLoading}
+                      returnKeyType="send"
+                      autoFocus
+                      onSubmitEditing={() => {
+                        if (customInput.trim() && !chatLoading) {
+                          sendChatAnswer(customInput.trim());
+                          setCustomInput("");
+                          setShowTypingInput(false);
+                        }
+                      }}
+                    />
+                    <TouchableOpacity
+                      style={[styles.chatSendBtn, (!customInput.trim() || chatLoading) && { opacity: 0.4 }]}
+                      onPress={() => {
+                        if (customInput.trim() && !chatLoading) {
+                          sendChatAnswer(customInput.trim());
+                          setCustomInput("");
+                          setShowTypingInput(false);
+                        }
+                      }}
+                      activeOpacity={0.75}
+                      disabled={!customInput.trim() || chatLoading}
+                    >
+                      <Text style={styles.chatSendText}>Send</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => { setShowTypingInput(false); setCustomInput(""); }}
+                      style={{ paddingHorizontal: 8, paddingVertical: 10 }}
+                      activeOpacity={0.7}
+                    >
+                      <Text style={{ fontSize: 18, color: colors.textTertiary }}>×</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+              {chatDone && (
+                <View style={styles.chatFooter}>
                   <View style={{ gap: spacing.sm }}>
                     <TouchableOpacity
                       style={styles.continueBtn}
@@ -1236,47 +1281,8 @@ export default function GoalsScreen() {
                       </Text>
                     </TouchableOpacity>
                   </View>
-                ) : showTypingInput ? (
-                  <View style={styles.chatInputRow}>
-                    <TextInput
-                      ref={chatInputRef}
-                      style={styles.chatInput}
-                      placeholder="Type your answer…"
-                      placeholderTextColor={colors.textTertiary}
-                      value={customInput}
-                      onChangeText={setCustomInput}
-                      editable={!chatLoading}
-                      returnKeyType="send"
-                      onSubmitEditing={() => {
-                        if (customInput.trim() && !chatLoading) {
-                          sendChatAnswer(customInput.trim());
-                          setShowTypingInput(false);
-                        }
-                      }}
-                    />
-                    <TouchableOpacity
-                      style={[styles.chatSendBtn, (!customInput.trim() || chatLoading) && { opacity: 0.4 }]}
-                      onPress={() => {
-                        if (customInput.trim() && !chatLoading) {
-                          sendChatAnswer(customInput.trim());
-                          setShowTypingInput(false);
-                        }
-                      }}
-                      activeOpacity={0.75}
-                      disabled={!customInput.trim() || chatLoading}
-                    >
-                      <Text style={styles.chatSendText}>Send</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => { setShowTypingInput(false); setCustomInput(""); }}
-                      style={{ paddingHorizontal: 8, paddingVertical: 10 }}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={{ fontSize: 18, color: colors.textTertiary }}>×</Text>
-                    </TouchableOpacity>
-                  </View>
-                ) : null}
-              </View>
+                </View>
+              )}
             </KeyboardAvoidingView>
           </SafeAreaView>
         </Modal>
