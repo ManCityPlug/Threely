@@ -86,6 +86,7 @@ export default function OnboardingScreen() {
   const [chatGoalText, setChatGoalText] = useState<string | null>(null);
   const [customInput, setCustomInput] = useState("");
   const [showTypingInput, setShowTypingInput] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
   const chatInputRef = useRef<TextInput>(null);
   const chatListRef = useRef<FlatList>(null);
 
@@ -280,6 +281,7 @@ export default function OnboardingScreen() {
     setChatHistory((prev) => [...prev, userEntry]);
     setCustomInput("");
     setShowTypingInput(false);
+    setSelectedOptions(new Set());
     setChatLoading(true);
 
     const newMessages: GoalChatMessage[] = [...chatMessages, { role: "user", content: answer }];
@@ -315,65 +317,31 @@ export default function OnboardingScreen() {
 
   async function handleUseGoal() {
     if (!chatGoalText) return;
-    setRawGoalInput(chatGoalText);
+    const goalText = chatGoalText.trim();
+    setRawGoalInput(goalText);
     setShowAiChat(false);
     if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    // Auto-parse and advance to step 3
-    setParsing(true);
-    setParseError("");
+    // Show generating screen immediately — no flash
+    setBuildError("");
+    setBuilding(true);
+    advanceStep(TOTAL_STEPS + 1);
+
     try {
-      const result = await goalsApi.parse(chatGoalText.trim());
+      const result = await goalsApi.parse(goalText);
       setParsedGoal(result);
-      if (result.deadline_detected) {
-        const d = new Date(result.deadline_detected + "T12:00:00");
-        setHasDeadline(true);
-        setDeadlineMonth(d.getMonth());
-        setDeadlineDay(d.getDate());
-        setDeadlineYear(d.getFullYear());
-      }
-      if (result.daily_time_detected && result.daily_time_detected > 0) {
-        const mins = result.daily_time_detected;
-        const preset = TIME_OPTIONS.find((o) => o.value === mins);
-        if (preset) {
-          setTimeMinutes(mins);
-          setShowCustomTime(false);
-        } else if (mins >= 180) {
-          const hrs = Math.min(14, Math.floor(mins / 60));
-          const remainder = SCROLL_MINUTES.reduce((prev, curr) =>
-            Math.abs(curr - (mins % 60)) < Math.abs(prev - (mins % 60)) ? curr : prev
-          );
-          setScrollPickerHours(hrs);
-          setScrollPickerMinutes(remainder);
-          setTimeMinutes(hrs * 60 + remainder);
-          setShowCustomTime(true);
-        } else {
-          const closest = TIME_OPTIONS.reduce((prev, curr) =>
-            Math.abs(curr.value - mins) < Math.abs(prev.value - mins) ? curr : prev
-          );
-          setTimeMinutes(closest.value);
-          setShowCustomTime(false);
-        }
-      }
-      // Pre-fill work days if detected
-      if (result.work_days_detected && result.work_days_detected.length > 0) {
-        setWorkDays(result.work_days_detected);
-        const isCustom = !WORK_DAY_PRESETS.some(
-          (p) => p.value.length === result.work_days_detected!.length && p.value.every((d) => result.work_days_detected!.includes(d))
-        );
-        setShowCustomDays(isCustom);
-      }
-      // AI chat already collected all needed info — skip straight to building the plan
+
+      // Build with parsed data directly (avoid stale state)
       handleBuild({
-        goalText: chatGoalText.trim(),
+        goalText,
         parsed: result,
         dailyMinutes: result.daily_time_detected && result.daily_time_detected > 0
           ? result.daily_time_detected
           : undefined,
+        skipAdvance: true, // already advanced above
       });
     } catch (e) {
-      setParseError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
-    } finally {
-      setParsing(false);
+      setBuildError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
+      setBuilding(false);
     }
   }
 
@@ -414,10 +382,11 @@ export default function OnboardingScreen() {
     goalText?: string;
     parsed?: ParsedGoal;
     dailyMinutes?: number;
+    skipAdvance?: boolean;
   }) {
     setBuildError("");
     setBuilding(true);
-    advanceStep(TOTAL_STEPS + 1);
+    if (!overrides?.skipAdvance) advanceStep(TOTAL_STEPS + 1);
 
     // Use overrides if provided (when called directly from handleUseGoal before state updates)
     const effectiveGoalText = overrides?.goalText ?? rawGoalInput.trim();
@@ -427,7 +396,7 @@ export default function OnboardingScreen() {
     try {
       const goalTitle =
         effectiveParsed?.short_title ??
-        effectiveGoalText.slice(0, 40);
+        effectiveGoalText.slice(0, 40) || "My Goal";
 
       // Save display name
       if (nameInput.trim()) {
@@ -1240,16 +1209,33 @@ export default function OnboardingScreen() {
                     </View>
                     {isLastAssistant && options && options.length > 0 && !chatLoading && !chatDone && !showTypingInput && (
                       <View style={styles.chatOptions}>
-                        {options.map((opt, j) => (
-                          <TouchableOpacity
-                            key={j}
-                            style={styles.chatOptionBtn}
-                            onPress={() => sendChatAnswer(opt)}
-                            activeOpacity={0.7}
-                          >
-                            <Text style={styles.chatOptionText}>{opt}</Text>
-                          </TouchableOpacity>
-                        ))}
+                        {options.map((opt, j) => {
+                          const isSelected = selectedOptions.has(opt);
+                          return (
+                            <TouchableOpacity
+                              key={j}
+                              style={[
+                                styles.chatOptionBtn,
+                                isSelected && { backgroundColor: colors.primary, borderColor: colors.primary },
+                              ]}
+                              onPress={() => {
+                                if (Platform.OS !== "web") Haptics.selectionAsync();
+                                setSelectedOptions((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(opt)) next.delete(opt);
+                                  else next.add(opt);
+                                  return next;
+                                });
+                              }}
+                              activeOpacity={0.7}
+                            >
+                              <Text style={[
+                                styles.chatOptionText,
+                                isSelected && { color: "#fff" },
+                              ]}>{isSelected ? `✓ ${opt}` : opt}</Text>
+                            </TouchableOpacity>
+                          );
+                        })}
                         <TouchableOpacity
                           style={[styles.chatOptionBtn, { borderColor: colors.border, borderWidth: 1, backgroundColor: colors.bg }]}
                           onPress={() => {
@@ -1258,8 +1244,19 @@ export default function OnboardingScreen() {
                           }}
                           activeOpacity={0.7}
                         >
-                          <Text style={[styles.chatOptionText, { color: colors.textSecondary }]}>Type my own answer</Text>
+                          <Text style={[styles.chatOptionText, { color: colors.textSecondary }]}>Type my own</Text>
                         </TouchableOpacity>
+                        {selectedOptions.size > 0 && (
+                          <TouchableOpacity
+                            style={[styles.chatOptionBtn, { backgroundColor: colors.primary, borderColor: colors.primary, width: "100%", alignItems: "center", marginTop: 4 }]}
+                            onPress={() => sendChatAnswer(Array.from(selectedOptions).join(" + "))}
+                            activeOpacity={0.7}
+                          >
+                            <Text style={[styles.chatOptionText, { color: "#fff", fontWeight: "700" }]}>
+                              Continue with {selectedOptions.size} selected →
+                            </Text>
+                          </TouchableOpacity>
+                        )}
                       </View>
                     )}
                   </View>

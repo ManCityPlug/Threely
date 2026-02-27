@@ -388,8 +388,9 @@ export default function DashboardScreen() {
       staleGoals: goalStats
         .map(s => ({ name: s.title, daysSince: daysSince(s.lastWorkedAt) ?? 999 }))
         .filter(s => s.daysSince >= 7),
+      isRestDay: restDay,
     };
-  }, [selectedGoal, goals, newTaskItems, allDone, goalStats]);
+  }, [selectedGoal, goals, newTaskItems, allDone, goalStats, restDay]);
 
   // Schedule notifications after data loads
   useEffect(() => {

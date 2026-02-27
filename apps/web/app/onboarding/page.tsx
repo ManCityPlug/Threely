@@ -103,6 +103,7 @@ export default function OnboardingPage() {
   const [chatDone, setChatDone] = useState(false);
   const [chatGoalText, setChatGoalText] = useState<string | null>(null);
   const [customInput, setCustomInput] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatInputRef = useRef<HTMLInputElement>(null);
 
@@ -230,6 +231,7 @@ export default function OnboardingPage() {
     const userEntry = { role: "user" as const, text: answer };
     setChatHistory((prev) => [...prev, userEntry]);
     setCustomInput("");
+    setSelectedOptions(new Set());
     setChatLoading(true);
 
     const newMessages: GoalChatMessage[] = [...chatMessages, { role: "user", content: answer }];
@@ -267,40 +269,59 @@ export default function OnboardingPage() {
 
   async function handleUseGoal() {
     if (!chatGoalText) return;
-    setRawGoalInput(chatGoalText);
+    const goalText = chatGoalText.trim();
+    setRawGoalInput(goalText);
     setShowAiChat(false);
-    // Auto-parse and advance to step 3
-    setParsing(true);
-    setParseError("");
+    // Show generating screen immediately — no flash
+    setBuildError("");
+    setBuilding(true);
+    setRevealedCount(0);
+    advanceStep(TOTAL_STEPS + 1);
+
     try {
-      const result = await goalsApi.parse(chatGoalText.trim());
+      // Parse goal while generating screen is visible
+      const result = await goalsApi.parse(goalText);
       setParsedGoal(result);
-      if (result.deadline_detected) {
-        const d = new Date(result.deadline_detected + "T12:00:00");
-        setHasDeadline(true);
-        setDeadlineMonth(d.getMonth());
-        setDeadlineDay(d.getDate());
-        setDeadlineYear(d.getFullYear());
-      }
-      if (result.daily_time_detected && result.daily_time_detected > 0) {
-        const mins = result.daily_time_detected;
-        setTimeMinutes(mins);
-        const preset = TIME_OPTIONS.find((o) => o.value === mins);
-        if (preset) {
-          setShowCustomTime(false);
-        } else {
-          const hrs = Math.max(3, Math.min(14, Math.round(mins / 60)));
-          setCustomHours(hrs);
-          setTimeMinutes(hrs * 60);
-          setShowCustomTime(true);
-        }
-      }
-      // AI chat already collected all needed info — skip straight to building the plan
-      handleBuild();
+
+      const goalTitle = result.short_title ?? goalText.slice(0, 40);
+      const detectedTime = result.daily_time_detected && result.daily_time_detected > 0
+        ? result.daily_time_detected : null;
+
+      // Save display name
+      const name = nameInput.trim() || user?.email?.split("@")[0] || "Champion";
+      saveNickname(name);
+
+      // Save profile
+      await profileApi.save({
+        dailyTimeMinutes: detectedTime ?? timeMinutes ?? 60,
+        intensityLevel: intensityLevel ?? 2,
+      });
+
+      // Create goal with all parsed data
+      const goalResult = await goalsApi.create({
+        title: goalTitle.slice(0, 80),
+        rawInput: goalText,
+        structuredSummary: result.structured_summary,
+        category: result.category,
+        deadline: result.deadline_detected ?? getDeadlineISO() ?? null,
+        dailyTimeMinutes: detectedTime ?? timeMinutes ?? undefined,
+        intensityLevel: intensityLevel ?? undefined,
+      });
+
+      // Generate tasks
+      const tasksResult = await tasksApi.generate({ goalId: goalResult.goal.id });
+      const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
+      setGeneratedTasks(allTasks);
+      if (tasksResult.coachNote) setCoachNote(tasksResult.coachNote);
+      setBuilding(false);
+
+      // Staggered reveal
+      allTasks.forEach((_, i) => {
+        setTimeout(() => setRevealedCount((c) => c + 1), 600 + i * 500);
+      });
     } catch (e) {
-      setParseError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
-    } finally {
-      setParsing(false);
+      setBuildError(e instanceof Error ? e.message : "Something went wrong");
+      setBuilding(false);
     }
   }
 
@@ -330,9 +351,10 @@ export default function OnboardingPage() {
     advanceStep(TOTAL_STEPS + 1);
 
     try {
+      const effectiveRawInput = rawGoalInput.trim() || chatGoalText?.trim() || "";
       const goalTitle =
         parsedGoal?.short_title ??
-        rawGoalInput.trim().slice(0, 40);
+        effectiveRawInput.slice(0, 40) || "My Goal";
 
       // Save display name
       const name = nameInput.trim() || user?.email?.split("@")[0] || "Champion";
@@ -347,7 +369,7 @@ export default function OnboardingPage() {
       // Create goal with all parsed data + per-goal settings
       const goalResult = await goalsApi.create({
         title: goalTitle.slice(0, 80),
-        rawInput: rawGoalInput.trim(),
+        rawInput: effectiveRawInput,
         structuredSummary: parsedGoal?.structured_summary,
         category: parsedGoal?.category,
         deadline: parsedGoal?.deadline_detected ?? getDeadlineISO() ?? null,
@@ -908,34 +930,64 @@ export default function OnboardingPage() {
                     </div>
                   )}
 
-                  {/* Option buttons for assistant messages */}
+                  {/* Option buttons for assistant messages — multi-select toggle */}
                   {entry.role === "assistant" && entry.options && entry.options.length > 0 && !chatLoading && i === chatHistory.length - 1 && !chatDone && (
-                    <div style={{
-                      display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10,
-                    }}>
-                      {entry.options.map((opt, j) => (
+                    <div style={{ marginTop: 10 }}>
+                      <div style={{
+                        display: "flex", flexWrap: "wrap", gap: 8,
+                      }}>
+                        {entry.options.map((opt, j) => {
+                          const isSelected = selectedOptions.has(opt);
+                          return (
+                            <button
+                              key={j}
+                              onClick={() => {
+                                setSelectedOptions((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(opt)) next.delete(opt);
+                                  else next.add(opt);
+                                  return next;
+                                });
+                              }}
+                              style={{
+                                padding: "8px 16px", borderRadius: 20,
+                                border: `1.5px solid ${isSelected ? "var(--primary)" : "rgba(99,91,255,0.25)"}`,
+                                background: isSelected ? "var(--primary)" : "var(--card)",
+                                color: isSelected ? "#fff" : "var(--primary)",
+                                fontSize: "0.85rem", fontWeight: 600,
+                                cursor: "pointer", transition: "all 0.15s",
+                              }}
+                            >
+                              {isSelected ? `✓ ${opt}` : opt}
+                            </button>
+                          );
+                        })}
+                        {/* Type my own button */}
                         <button
-                          key={j}
-                          onClick={() => sendChatAnswer(opt)}
+                          onClick={() => chatInputRef.current?.focus()}
                           style={{
                             padding: "8px 16px", borderRadius: 20,
-                            border: "1.5px solid rgba(99,91,255,0.25)",
-                            background: "var(--card)", color: "var(--primary)",
+                            border: "1px solid var(--border)",
+                            background: "var(--bg)", color: "var(--subtext)",
                             fontSize: "0.85rem", fontWeight: 600,
                             cursor: "pointer", transition: "all 0.15s",
                           }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.background = "var(--primary-light)";
-                            e.currentTarget.style.borderColor = "var(--primary)";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.background = "var(--card)";
-                            e.currentTarget.style.borderColor = "rgba(99,91,255,0.25)";
+                        >
+                          Type my own
+                        </button>
+                      </div>
+                      {selectedOptions.size > 0 && (
+                        <button
+                          onClick={() => sendChatAnswer(Array.from(selectedOptions).join(" + "))}
+                          className="btn btn-primary"
+                          style={{
+                            marginTop: 10, height: 38, width: "100%",
+                            fontSize: "0.85rem", fontWeight: 700,
                           }}
                         >
-                          {opt}
+                          Continue with {selectedOptions.size} selected →
                         </button>
-                      ))}
+                      )}
                     </div>
                   )}
                 </div>

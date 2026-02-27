@@ -20,6 +20,7 @@ export interface NotifContext {
   incompleteCount: number;
   allDone: boolean;
   staleGoals: { name: string; daysSince: number }[];
+  isRestDay?: boolean; // true if no goals are scheduled for today
 }
 
 // ─── Notification identifiers ─────────────────────────────────────────────────
@@ -116,6 +117,9 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
     cancelById(ID_MIDDAY),
     cancelById(ID_EVENING),
   ]);
+
+  // Skip task notifications on rest days (no goals scheduled today)
+  if (ctx.isRestDay) return;
 
   const now = new Date();
   const todayAt = (h: number, m: number) => {

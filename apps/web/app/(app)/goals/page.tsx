@@ -83,7 +83,9 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
   const [chatDone, setChatDone] = useState(false);
   const [chatGoalText, setChatGoalText] = useState<string | null>(null);
   const [customInput, setCustomInput] = useState("");
+  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatInputRef = useRef<HTMLInputElement>(null);
 
   // Deadline (default: 1 month from today)
   const [hasDeadline, setHasDeadline] = useState(true);
@@ -204,6 +206,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
   async function sendChatAnswer(answer: string) {
     setChatHistory(prev => [...prev, { role: "user", text: answer }]);
     setCustomInput("");
+    setSelectedOptions(new Set());
     setChatLoading(true);
 
     const newMessages: GoalChatMessage[] = [...chatMessages, { role: "user", content: answer }];
@@ -224,6 +227,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
       setChatHistory(prev => [...prev, { role: "assistant", text: "Something went wrong. Please try again." }]);
     } finally {
       setChatLoading(false);
+      setTimeout(() => chatInputRef.current?.focus(), 100);
     }
   }
 
@@ -267,7 +271,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
     try {
       const effectiveRawInput = overrides?.goalText ?? rawInput.trim();
       const effectiveParsed = overrides?.parsedGoal ?? parsed;
-      const goalTitle = effectiveParsed?.short_title ?? effectiveRawInput.slice(0, 40);
+      const goalTitle = effectiveParsed?.short_title ?? effectiveRawInput.slice(0, 40) || "My Goal";
       const deadline = effectiveParsed?.deadline_detected ?? (hasDeadline
         ? `${deadlineYear}-${String(deadlineMonth).padStart(2, "0")}-${String(deadlineDay).padStart(2, "0")}`
         : null);
@@ -825,35 +829,58 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
                     {msg.text}
                   </div>
                   {isLastAssistant && msg.options && msg.options.length > 0 && !chatLoading && !chatDone && (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 8 }}>
-                      {msg.options.map((opt, j) => (
+                    <div style={{ marginTop: 8 }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                        {msg.options.map((opt, j) => {
+                          const isSelected = selectedOptions.has(opt);
+                          return (
+                            <button
+                              key={j}
+                              onClick={() => {
+                                setSelectedOptions((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(opt)) next.delete(opt);
+                                  else next.add(opt);
+                                  return next;
+                                });
+                              }}
+                              style={{
+                                padding: "0.45rem 0.85rem", borderRadius: 20,
+                                border: `1.5px solid ${isSelected ? "var(--primary)" : "rgba(99,91,255,0.25)"}`,
+                                background: isSelected ? "var(--primary)" : "var(--card)",
+                                color: isSelected ? "#fff" : "var(--primary)",
+                                fontSize: "0.82rem", fontWeight: 600,
+                                cursor: "pointer", transition: "all 0.15s",
+                              }}
+                            >
+                              {isSelected ? `✓ ${opt}` : opt}
+                            </button>
+                          );
+                        })}
                         <button
-                          key={j}
-                          onClick={() => sendChatAnswer(opt)}
+                          onClick={() => chatInputRef.current?.focus()}
                           style={{
                             padding: "0.45rem 0.85rem", borderRadius: 20,
-                            border: "1.5px solid rgba(99,91,255,0.25)", background: "var(--card)",
-                            fontSize: "0.82rem", fontWeight: 600, color: "var(--primary)",
+                            border: "1.5px solid var(--border)", background: "var(--bg)",
+                            fontSize: "0.82rem", fontWeight: 600, color: "var(--subtext)",
                             cursor: "pointer",
                           }}
                         >
-                          {opt}
+                          Type my own
                         </button>
-                      ))}
-                      <button
-                        onClick={() => {
-                          const el = document.getElementById("chat-custom-input");
-                          if (el) el.focus();
-                        }}
-                        style={{
-                          padding: "0.45rem 0.85rem", borderRadius: 20,
-                          border: "1.5px solid var(--border)", background: "var(--bg)",
-                          fontSize: "0.82rem", fontWeight: 600, color: "var(--subtext)",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Type my own answer
-                      </button>
+                      </div>
+                      {selectedOptions.size > 0 && (
+                        <button
+                          onClick={() => sendChatAnswer(Array.from(selectedOptions).join(" + "))}
+                          className="btn btn-primary"
+                          style={{
+                            marginTop: 8, height: 36, width: "100%",
+                            fontSize: "0.82rem", fontWeight: 700,
+                          }}
+                        >
+                          Continue with {selectedOptions.size} selected →
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -907,6 +934,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
             ) : (
               <div style={{ display: "flex", gap: 8 }}>
                 <input
+                  ref={chatInputRef}
                   id="chat-custom-input"
                   className="field-input"
                   placeholder="Type your own answer..."

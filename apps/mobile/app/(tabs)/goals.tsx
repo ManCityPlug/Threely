@@ -114,6 +114,7 @@ export default function GoalsScreen() {
   const [chatGoalText, setChatGoalText] = useState<string | null>(null);
   const [customInput, setCustomInput] = useState("");
   const [showTypingInput, setShowTypingInput] = useState(false);
+  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
   const chatInputRef = useRef<TextInput>(null);
   const chatListRef = useRef<FlatList>(null);
 
@@ -394,6 +395,7 @@ export default function GoalsScreen() {
     setChatHistory((prev) => [...prev, { role: "user" as const, text: answer }]);
     setCustomInput("");
     setShowTypingInput(false);
+    setSelectedOptions(new Set());
     setChatLoading(true);
 
     const newMessages: GoalChatMessage[] = [...chatMessages, { role: "user", content: answer }];
@@ -1309,16 +1311,33 @@ export default function GoalsScreen() {
                       </View>
                       {isLastAssistant && options && options.length > 0 && !chatLoading && !chatDone && !showTypingInput && (
                         <View style={styles.chatOptions}>
-                          {options.map((opt, j) => (
-                            <TouchableOpacity
-                              key={j}
-                              style={styles.chatOptionBtn}
-                              onPress={() => sendChatAnswer(opt)}
-                              activeOpacity={0.7}
-                            >
-                              <Text style={styles.chatOptionText}>{opt}</Text>
-                            </TouchableOpacity>
-                          ))}
+                          {options.map((opt, j) => {
+                            const isSelected = selectedOptions.has(opt);
+                            return (
+                              <TouchableOpacity
+                                key={j}
+                                style={[
+                                  styles.chatOptionBtn,
+                                  isSelected && { backgroundColor: colors.primary, borderColor: colors.primary },
+                                ]}
+                                onPress={() => {
+                                  if (Platform.OS !== "web") Haptics.selectionAsync();
+                                  setSelectedOptions((prev) => {
+                                    const next = new Set(prev);
+                                    if (next.has(opt)) next.delete(opt);
+                                    else next.add(opt);
+                                    return next;
+                                  });
+                                }}
+                                activeOpacity={0.7}
+                              >
+                                <Text style={[
+                                  styles.chatOptionText,
+                                  isSelected && { color: "#fff" },
+                                ]}>{isSelected ? `✓ ${opt}` : opt}</Text>
+                              </TouchableOpacity>
+                            );
+                          })}
                           <TouchableOpacity
                             style={[styles.chatOptionBtn, { borderColor: colors.border, borderWidth: 1, backgroundColor: colors.bg }]}
                             onPress={() => {
@@ -1327,8 +1346,19 @@ export default function GoalsScreen() {
                             }}
                             activeOpacity={0.7}
                           >
-                            <Text style={[styles.chatOptionText, { color: colors.textSecondary }]}>Type my own answer</Text>
+                            <Text style={[styles.chatOptionText, { color: colors.textSecondary }]}>Type my own</Text>
                           </TouchableOpacity>
+                          {selectedOptions.size > 0 && (
+                            <TouchableOpacity
+                              style={[styles.chatOptionBtn, { backgroundColor: colors.primary, borderColor: colors.primary, width: "100%", alignItems: "center", marginTop: 4 }]}
+                              onPress={() => sendChatAnswer(Array.from(selectedOptions).join(" + "))}
+                              activeOpacity={0.7}
+                            >
+                              <Text style={[styles.chatOptionText, { color: "#fff", fontWeight: "700" }]}>
+                                Continue with {selectedOptions.size} selected →
+                              </Text>
+                            </TouchableOpacity>
+                          )}
                         </View>
                       )}
                     </View>
