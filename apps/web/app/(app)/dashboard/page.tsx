@@ -60,22 +60,18 @@ const DIFFICULTY_OPTIONS = [
 // ─── Task Card ────────────────────────────────────────────────────────────────
 
 function TaskCard({
-  task, onToggle, onSkip, onReschedule, onEdit, onRefine, readonly = false, overdue = false,
+  task, onToggle, onSkip, onReschedule, onRefine, readonly = false, overdue = false,
 }: {
   task: TaskItem;
   onToggle?: (id: string, done: boolean) => void;
   onSkip?: (id: string) => void;
   onReschedule?: (id: string) => void;
-  onEdit?: (id: string, data: { task?: string; description?: string }) => void;
   onRefine?: (id: string, userRequest: string) => void;
   readonly?: boolean;
   overdue?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [editMode, setEditMode] = useState(false);
   const [refineMode, setRefineMode] = useState(false);
-  const [editName, setEditName] = useState(task.task);
-  const [editDesc, setEditDesc] = useState(task.description);
   const [refineInput, setRefineInput] = useState("");
   const [refining, setRefining] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -91,18 +87,6 @@ function TaskCard({
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [menuOpen]);
-
-  function handleStartEdit() {
-    setMenuOpen(false);
-    setEditName(task.task);
-    setEditDesc(task.description);
-    setEditMode(true);
-  }
-
-  function handleSaveEdit() {
-    onEdit?.(task.id, { task: editName, description: editDesc });
-    setEditMode(false);
-  }
 
   function handleStartRefine() {
     setMenuOpen(false);
@@ -143,32 +127,7 @@ function TaskCard({
         </button>
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
-        {editMode ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <input
-              className="field-input"
-              value={editName}
-              onChange={e => setEditName(e.target.value)}
-              placeholder="Task name"
-              style={{ fontSize: "0.9rem", padding: "6px 10px" }}
-            />
-            <input
-              className="field-input"
-              value={editDesc}
-              onChange={e => setEditDesc(e.target.value)}
-              placeholder="Description"
-              style={{ fontSize: "0.85rem", padding: "6px 10px" }}
-            />
-            <div style={{ display: "flex", gap: 6 }}>
-              <button className="btn btn-primary" onClick={handleSaveEdit} style={{ fontSize: "0.8rem", padding: "4px 12px" }}>
-                Save
-              </button>
-              <button className="btn btn-outline" onClick={() => setEditMode(false)} style={{ fontSize: "0.8rem", padding: "4px 12px" }}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        ) : refineMode ? (
+        {refineMode ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <p style={{ fontSize: "0.8rem", color: "var(--subtext)", margin: 0 }}>
               Tell AI how to adjust this task:
@@ -254,11 +213,6 @@ function TaskCard({
               borderRadius: "var(--radius)", boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
               minWidth: 180, overflow: "hidden",
             }}>
-              {onEdit && (
-                <button onClick={handleStartEdit} style={menuItemStyle}>
-                  Edit task
-                </button>
-              )}
               {onRefine && (
                 <button onClick={handleStartRefine} style={menuItemStyle}>
                   Ask AI to refine
@@ -608,18 +562,6 @@ export default function DashboardPage() {
       }
     } catch {
       showToast("Failed to update task", "error");
-    }
-  }
-
-  async function handleEditTask(dailyTaskId: string, taskItemId: string, editData: { task?: string; description?: string }) {
-    try {
-      const res = await tasksApi.editItem(dailyTaskId, taskItemId, editData);
-      setDailyTasks(prev =>
-        prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt)
-      );
-      showToast("Task updated", "success");
-    } catch {
-      showToast("Failed to edit task", "error");
     }
   }
 
@@ -1006,9 +948,6 @@ export default function DashboardPage() {
                   }
                   onReschedule={(taskItemId) =>
                     handleRescheduleToday(dt.id, taskItemId)
-                  }
-                  onEdit={(taskItemId, data) =>
-                    handleEditTask(dt.id, taskItemId, data)
                   }
                   onRefine={(taskItemId, userRequest) =>
                     handleRefineTask(dt.id, taskItemId, userRequest)

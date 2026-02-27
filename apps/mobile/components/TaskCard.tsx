@@ -11,6 +11,9 @@ import {
   TextInput,
   ActivityIndicator,
   KeyboardAvoidingView,
+  PanResponder,
+  Dimensions,
+  Pressable,
 } from "react-native";
 import * as Haptics from "expo-haptics";
 import type { TaskItem } from "@/lib/api";
@@ -22,20 +25,14 @@ import { scalePress } from "@/lib/animations";
 interface TaskCardProps {
   task: TaskItem;
   onToggle: (isCompleted: boolean) => void;
-  onEdit?: (editData: { task?: string; description?: string }) => void;
   onRefine?: (userRequest: string) => Promise<void>;
   readonly?: boolean;
 }
 
-export function TaskCard({ task, onToggle, onEdit, onRefine, readonly = false }: TaskCardProps) {
+export function TaskCard({ task, onToggle, onRefine, readonly = false }: TaskCardProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [modalVisible, setModalVisible] = useState(false);
-
-  // Edit mode state
-  const [editing, setEditing] = useState(false);
-  const [editTask, setEditTask] = useState(task.task);
-  const [editDesc, setEditDesc] = useState(task.description ?? "");
 
   // Refine (AI) mode state
   const [refineMode, setRefineMode] = useState(false);
@@ -163,219 +160,225 @@ export function TaskCard({ task, onToggle, onEdit, onRefine, readonly = false }:
       </Animated.View>
 
       {/* Detail modal */}
-      <Modal
-        visible={modalVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+      {modalVisible && (
+        <TaskDetailModal
+          visible={modalVisible}
+          task={task}
+          taskTitle={taskTitle}
+          colors={colors}
+          styles={styles}
+          readonly={readonly}
+          onClose={() => { setModalVisible(false); setRefineMode(false); setRefineInput(""); }}
+          onCheckPress={() => { handleCheckPress(); setModalVisible(false); }}
+          onRefine={onRefine}
+          refineMode={refineMode}
+          setRefineMode={setRefineMode}
+          refineInput={refineInput}
+          setRefineInput={setRefineInput}
+          refineLoading={refineLoading}
+          setRefineLoading={setRefineLoading}
+        />
+      )}
+    </>
+  );
+}
+
+// ─── Swipe-to-dismiss detail modal ──────────────────────────────────────────
+
+const DISMISS_THRESHOLD = 120;
+
+function TaskDetailModal({
+  visible, task, taskTitle, colors, styles, readonly,
+  onClose, onCheckPress, onRefine,
+  refineMode, setRefineMode, refineInput, setRefineInput, refineLoading, setRefineLoading,
+}: {
+  visible: boolean;
+  task: TaskItem;
+  taskTitle: string;
+  colors: Colors;
+  styles: ReturnType<typeof createStyles>;
+  readonly: boolean;
+  onClose: () => void;
+  onCheckPress: () => void;
+  onRefine?: (userRequest: string) => Promise<void>;
+  refineMode: boolean;
+  setRefineMode: (v: boolean) => void;
+  refineInput: string;
+  setRefineInput: (v: string) => void;
+  refineLoading: boolean;
+  setRefineLoading: (v: boolean) => void;
+}) {
+  const translateY = useRef(new Animated.Value(0)).current;
+  const overlayOpacity = useRef(new Animated.Value(1)).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, g) => g.dy > 8 && Math.abs(g.dy) > Math.abs(g.dx) * 1.5,
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) {
+          translateY.setValue(g.dy);
+          overlayOpacity.setValue(Math.max(0, 1 - g.dy / 400));
+        }
+      },
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > DISMISS_THRESHOLD || g.vy > 0.5) {
+          Animated.parallel([
+            Animated.timing(translateY, { toValue: Dimensions.get("window").height, duration: 250, useNativeDriver: true }),
+            Animated.timing(overlayOpacity, { toValue: 0, duration: 250, useNativeDriver: true }),
+          ]).start(onClose);
+        } else {
+          Animated.parallel([
+            Animated.spring(translateY, { toValue: 0, useNativeDriver: true, tension: 200, friction: 20 }),
+            Animated.timing(overlayOpacity, { toValue: 1, duration: 150, useNativeDriver: true }),
+          ]).start();
+        }
+      },
+    })
+  ).current;
+
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+        <Animated.View style={[styles.modalOverlay, { opacity: overlayOpacity }]}>
+          <Pressable style={{ flex: 1 }} onPress={onClose} />
+        </Animated.View>
+
+        <Animated.View
+          style={[
+            styles.modalSheet,
+            refineMode && styles.modalSheetExpanded,
+            { transform: [{ translateY }] },
+          ]}
+          {...panResponder.panHandlers}
         >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setModalVisible(false)}
-        >
-          <TouchableOpacity activeOpacity={1} style={[styles.modalSheet, (refineMode || editing) && styles.modalSheetExpanded]} onPress={() => {}}>
-            {/* Header */}
-            <View style={styles.modalHeader}>
-              <View style={styles.modalHandle} />
-            </View>
+          {/* Header: handle + X button */}
+          <View style={styles.modalHeader}>
+            <View style={styles.modalHandle} />
+            <TouchableOpacity style={styles.modalCloseBtn} onPress={onClose} hitSlop={12}>
+              <Text style={styles.modalCloseBtnText}>✕</Text>
+            </TouchableOpacity>
+          </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-              {/* Time badge */}
-              {task.estimated_minutes ? (
-                <View style={styles.modalTimeBadge}>
-                  <Text style={styles.modalTimeBadgeText}>~{task.estimated_minutes} min</Text>
-                </View>
-              ) : null}
+          <ScrollView
+            showsVerticalScrollIndicator={true}
+            keyboardShouldPersistTaps="handled"
+            bounces={true}
+            style={{ flex: 1 }}
+          >
+            {/* Time badge */}
+            {task.estimated_minutes ? (
+              <View style={styles.modalTimeBadge}>
+                <Text style={styles.modalTimeBadgeText}>~{task.estimated_minutes} min</Text>
+              </View>
+            ) : null}
 
-              {editing ? (
-                <>
-                  {/* Edit mode */}
-                  <Text style={styles.modalSectionLabel}>Task name</Text>
-                  <TextInput
-                    style={styles.editInput}
-                    value={editTask}
-                    onChangeText={setEditTask}
-                    placeholder="Task name"
-                    placeholderTextColor={colors.textTertiary}
-                    multiline
-                  />
-                  <Text style={styles.modalSectionLabel}>Description</Text>
-                  <TextInput
-                    style={[styles.editInput, { minHeight: 80 }]}
-                    value={editDesc}
-                    onChangeText={setEditDesc}
-                    placeholder="Description"
-                    placeholderTextColor={colors.textTertiary}
-                    multiline
-                    textAlignVertical="top"
-                  />
-                  <View style={styles.editActions}>
-                    <TouchableOpacity
-                      style={styles.editCancelBtn}
-                      onPress={() => {
-                        setEditing(false);
-                        setEditTask(task.task);
-                        setEditDesc(task.description ?? "");
-                      }}
-                      activeOpacity={0.7}
-                    >
-                      <Text style={styles.editCancelText}>Cancel</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={styles.editSaveBtn}
-                      onPress={() => {
-                        if (onEdit) {
-                          const data: { task?: string; description?: string } = {};
-                          if (editTask.trim() !== task.task) data.task = editTask.trim();
-                          if (editDesc.trim() !== (task.description ?? "")) data.description = editDesc.trim();
-                          if (data.task !== undefined || data.description !== undefined) {
-                            onEdit(data);
-                          }
-                        }
-                        setEditing(false);
-                        setModalVisible(false);
-                      }}
-                      activeOpacity={0.85}
-                    >
-                      <Text style={styles.editSaveText}>Save</Text>
-                    </TouchableOpacity>
-                  </View>
-                </>
-              ) : (
-                <>
-                  {/* Title */}
-                  <Text style={[styles.modalTitle, task.isCompleted && styles.modalTitleDone]}>
-                    {taskTitle}
-                  </Text>
+            {/* Title */}
+            <Text style={[styles.modalTitle, task.isCompleted && styles.modalTitleDone]}>
+              {taskTitle}
+            </Text>
 
-                  {/* Description */}
-                  {task.description ? (
-                    <>
-                      <Text style={styles.modalSectionLabel}>What to do</Text>
-                      <Text style={styles.modalBody}>{task.description}</Text>
-                    </>
-                  ) : null}
+            {/* Description */}
+            {task.description ? (
+              <>
+                <Text style={styles.modalSectionLabel}>What to do</Text>
+                <Text style={styles.modalBody}>{task.description}</Text>
+              </>
+            ) : null}
 
-                  {/* Why */}
-                  {task.why ? (
-                    <>
-                      <Text style={styles.modalSectionLabel}>Why it matters</Text>
-                      <Text style={styles.modalWhy}>{task.why}</Text>
-                    </>
-                  ) : null}
+            {/* Why */}
+            {task.why ? (
+              <>
+                <Text style={styles.modalSectionLabel}>Why it matters</Text>
+                <Text style={styles.modalWhy}>{task.why}</Text>
+              </>
+            ) : null}
 
-                  {/* AI Refine inline */}
-                  {refineMode && onRefine && (
-                    <View style={styles.refineSection}>
-                      <Text style={styles.modalSectionLabel}>Ask AI to adjust this task</Text>
-                      <TextInput
-                        style={styles.refineInput}
-                        value={refineInput}
-                        onChangeText={setRefineInput}
-                        placeholder='e.g. "Make it easier" or "Add more detail"'
-                        placeholderTextColor={colors.textTertiary}
-                        multiline
-                        editable={!refineLoading}
-                      />
-                      <View style={styles.editActions}>
-                        <TouchableOpacity
-                          style={styles.editCancelBtn}
-                          onPress={() => { setRefineMode(false); setRefineInput(""); }}
-                          activeOpacity={0.7}
-                        >
-                          <Text style={styles.editCancelText}>Cancel</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                          style={[styles.editSaveBtn, (!refineInput.trim() || refineLoading) && { opacity: 0.5 }]}
-                          onPress={async () => {
-                            if (!refineInput.trim() || refineLoading) return;
-                            setRefineLoading(true);
-                            try {
-                              await onRefine(refineInput.trim());
-                              setRefineMode(false);
-                              setRefineInput("");
-                              setModalVisible(false);
-                            } catch {
-                              // handled by parent
-                            } finally {
-                              setRefineLoading(false);
-                            }
-                          }}
-                          activeOpacity={0.85}
-                          disabled={!refineInput.trim() || refineLoading}
-                        >
-                          {refineLoading ? (
-                            <ActivityIndicator color="#fff" size="small" />
-                          ) : (
-                            <Text style={styles.editSaveText}>Send</Text>
-                          )}
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  )}
-                </>
-              )}
-            </ScrollView>
-
-            {/* Action buttons: Edit + Ask AI */}
-            {!readonly && !editing && !refineMode && (
-              <View style={styles.modalActionRow}>
-                {onEdit && (
+            {/* AI Refine inline */}
+            {refineMode && onRefine && (
+              <View style={styles.refineSection}>
+                <Text style={styles.modalSectionLabel}>Ask AI to adjust this task</Text>
+                <TextInput
+                  style={styles.refineInput}
+                  value={refineInput}
+                  onChangeText={setRefineInput}
+                  placeholder='e.g. "Make it easier" or "Add more detail"'
+                  placeholderTextColor={colors.textTertiary}
+                  multiline
+                  editable={!refineLoading}
+                />
+                <View style={styles.editActions}>
                   <TouchableOpacity
-                    style={styles.modalActionBtn}
-                    onPress={() => {
-                      setEditTask(task.task);
-                      setEditDesc(task.description ?? "");
-                      setEditing(true);
+                    style={styles.editCancelBtn}
+                    onPress={() => { setRefineMode(false); setRefineInput(""); }}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.editCancelText}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.editSaveBtn, (!refineInput.trim() || refineLoading) && { opacity: 0.5 }]}
+                    onPress={async () => {
+                      if (!refineInput.trim() || refineLoading) return;
+                      setRefineLoading(true);
+                      try {
+                        await onRefine(refineInput.trim());
+                        setRefineMode(false);
+                        setRefineInput("");
+                        onClose();
+                      } catch {
+                        // handled by parent
+                      } finally {
+                        setRefineLoading(false);
+                      }
                     }}
-                    activeOpacity={0.7}
+                    activeOpacity={0.85}
+                    disabled={!refineInput.trim() || refineLoading}
                   >
-                    <Text style={styles.modalActionText}>Edit</Text>
+                    {refineLoading ? (
+                      <ActivityIndicator color="#fff" size="small" />
+                    ) : (
+                      <Text style={styles.editSaveText}>Send</Text>
+                    )}
                   </TouchableOpacity>
-                )}
-                {onRefine && (
-                  <TouchableOpacity
-                    style={styles.modalActionBtn}
-                    onPress={() => setRefineMode(true)}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.modalActionText}>Ask AI</Text>
-                  </TouchableOpacity>
-                )}
+                </View>
               </View>
             )}
+          </ScrollView>
 
-            {/* Check off button / completed badge */}
-            {readonly ? (
-              task.isCompleted ? (
-                <View style={styles.modalCompletedBadge}>
-                  <Text style={styles.modalCompletedBadgeText}>✓  Completed</Text>
-                </View>
-              ) : null
-            ) : !editing && !refineMode ? (
+          {/* Action button: Ask AI */}
+          {!readonly && !refineMode && onRefine && (
+            <View style={styles.modalActionRow}>
               <TouchableOpacity
-                style={[styles.modalCheckBtn, task.isCompleted && styles.modalCheckBtnDone]}
-                onPress={() => {
-                  handleCheckPress();
-                  setModalVisible(false);
-                }}
-                activeOpacity={0.85}
+                style={styles.modalActionBtn}
+                onPress={() => setRefineMode(true)}
+                activeOpacity={0.7}
               >
-                <Text style={[styles.modalCheckBtnText, task.isCompleted && styles.modalCheckBtnTextDone]}>
-                  {task.isCompleted ? "Mark as incomplete" : "Mark as complete"}
-                </Text>
+                <Text style={styles.modalActionText}>Ask AI to refine</Text>
               </TouchableOpacity>
-            ) : null}
-          </TouchableOpacity>
-        </TouchableOpacity>
-        </KeyboardAvoidingView>
-      </Modal>
-    </>
+            </View>
+          )}
+
+          {/* Check off button / completed badge */}
+          {readonly ? (
+            task.isCompleted ? (
+              <View style={styles.modalCompletedBadge}>
+                <Text style={styles.modalCompletedBadgeText}>✓  Completed</Text>
+              </View>
+            ) : null
+          ) : !refineMode ? (
+            <TouchableOpacity
+              style={[styles.modalCheckBtn, task.isCompleted && styles.modalCheckBtnDone]}
+              onPress={onCheckPress}
+              activeOpacity={0.85}
+            >
+              <Text style={[styles.modalCheckBtnText, task.isCompleted && styles.modalCheckBtnTextDone]}>
+                {task.isCompleted ? "Mark as incomplete" : "Mark as complete"}
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+        </Animated.View>
+      </KeyboardAvoidingView>
+    </Modal>
   );
 }
 
@@ -489,31 +492,54 @@ function createStyles(c: Colors) {
     },
     // ── Detail Modal ────────────────────────────────────────────────────────
     modalOverlay: {
-      flex: 1,
+      ...StyleSheet.absoluteFillObject,
       backgroundColor: "rgba(0,0,0,0.45)",
-      justifyContent: "flex-end",
     },
     modalSheet: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
       backgroundColor: c.card,
       borderTopLeftRadius: radius.xl,
       borderTopRightRadius: radius.xl,
       padding: spacing.lg,
       paddingBottom: spacing.xxl,
-      maxHeight: "75%",
+      maxHeight: "80%",
       ...shadow.lg,
     },
     modalSheetExpanded: {
       maxHeight: "90%",
     },
     modalHeader: {
+      flexDirection: "row",
       alignItems: "center",
+      justifyContent: "center",
       marginBottom: spacing.md,
+      position: "relative",
     },
     modalHandle: {
       width: 36,
       height: 4,
       borderRadius: 2,
       backgroundColor: c.border,
+    },
+    modalCloseBtn: {
+      position: "absolute",
+      right: 0,
+      top: -4,
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: c.bg,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    modalCloseBtnText: {
+      fontSize: 16,
+      fontWeight: typography.semibold,
+      color: c.textSecondary,
+      lineHeight: 18,
     },
     modalTimeBadge: {
       alignSelf: "flex-start",
@@ -598,18 +624,7 @@ function createStyles(c: Colors) {
       fontWeight: typography.bold,
       color: c.success,
     },
-    // ── Edit / Refine ──────────────────────────────────────────────────────────
-    editInput: {
-      backgroundColor: c.bg,
-      borderWidth: 1.5,
-      borderColor: c.border,
-      borderRadius: radius.md,
-      padding: spacing.md,
-      fontSize: typography.base,
-      color: c.text,
-      lineHeight: 22,
-      marginBottom: spacing.md,
-    },
+    // ── Refine ──────────────────────────────────────────────────────────────
     editActions: {
       flexDirection: "row",
       gap: spacing.sm,

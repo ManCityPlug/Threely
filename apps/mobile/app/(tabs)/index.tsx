@@ -484,18 +484,6 @@ export default function DashboardScreen() {
     }
   }
 
-  async function handleEditTask(dailyTaskId: string, taskItemId: string, editData: { task?: string; description?: string }) {
-    try {
-      const res = await tasksApi.editItem(dailyTaskId, taskItemId, editData);
-      setDailyTasks((prev) =>
-        prev.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt))
-      );
-      showToast("Task updated", "success");
-    } catch {
-      showToast("Couldn't update task. Try again.", "error");
-    }
-  }
-
   async function handleRefineTask(dailyTaskId: string, taskItemId: string, userRequest: string) {
     try {
       const res = await tasksApi.refineItem(dailyTaskId, taskItemId, userRequest);
@@ -833,7 +821,6 @@ export default function DashboardScreen() {
                       onToggle={(isCompleted) =>
                         handleToggleTask(dailyTaskId, task.id, isCompleted)
                       }
-                      onEdit={(editData) => handleEditTask(dailyTaskId, task.id, editData)}
                       onRefine={(userRequest) => handleRefineTask(dailyTaskId, task.id, userRequest)}
                     />
                   </Animated.View>
@@ -859,7 +846,6 @@ export default function DashboardScreen() {
                             onToggle={(isCompleted) =>
                               handleToggleTask(dt.id, task.id, isCompleted)
                             }
-                            onEdit={(editData) => handleEditTask(dt.id, task.id, editData)}
                             onRefine={(userRequest) => handleRefineTask(dt.id, task.id, userRequest)}
                           />
                         </Animated.View>

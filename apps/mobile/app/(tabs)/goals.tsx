@@ -565,6 +565,10 @@ export default function GoalsScreen() {
       setDeadlineYear(d.getFullYear());
     }
     setTimeMinutes(goal.dailyTimeMinutes);
+    setWorkDays(goal.workDays ?? [1, 2, 3, 4, 5, 6, 7]);
+
+    // Open the add flow overlay (step 1) so the AI chat modal can render
+    setAddStep(1);
 
     // Open AI chat with context about the existing goal
     startAiChatWithMessage(`My current goal is: "${goal.rawInput || goal.title}". I'd like to add more detail or make changes to it.`);
