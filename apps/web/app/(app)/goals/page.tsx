@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { goalsApi, tasksApi, type Goal, type ParsedGoal, type GoalChatMessage, type GoalChatResult, type TaskItem } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/Skeleton";
 import ProgressRing from "@/components/ProgressRing";
@@ -1142,9 +1142,22 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
               {goal.structuredSummary}
             </p>
           )}
-          <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
-            Added {new Date(goal.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-          </p>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2 }}>
+            <p style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
+              Added {new Date(goal.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+            </p>
+            {!goal.isPaused && (
+              <a
+                href="/dashboard"
+                style={{
+                  fontSize: "0.78rem", fontWeight: 600, color: "var(--primary)",
+                  textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 3,
+                }}
+              >
+                View today's tasks &#8594;
+              </a>
+            )}
+          </div>
         </div>
 
         <div style={{ display: "flex", alignItems: "flex-start", gap: 8, flexShrink: 0 }}>

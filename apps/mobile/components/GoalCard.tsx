@@ -24,6 +24,7 @@ interface GoalCardProps {
   completedToday?: number;
   totalToday?: number;
   onPress?: () => void;
+  onViewTasks?: () => void;
   lifetimeCompletionPct?: number;
   isPaused?: boolean;
 }
@@ -35,7 +36,7 @@ function getStatusText(completedToday: number, totalToday: number): { text: stri
   return { text: "In progress", color: "warning" };
 }
 
-export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, lifetimeCompletionPct, isPaused }: GoalCardProps) {
+export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, onViewTasks, lifetimeCompletionPct, isPaused }: GoalCardProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -98,6 +99,16 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, li
           )}
         </View>
       </View>
+
+      {onViewTasks && !isPaused && (
+        <TouchableOpacity
+          style={styles.viewTasksBtn}
+          onPress={(e) => { e.stopPropagation(); onViewTasks(); }}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.viewTasksText}>View today's tasks →</Text>
+        </TouchableOpacity>
+      )}
     </TouchableOpacity>
   );
 }
@@ -171,6 +182,18 @@ function createStyles(c: Colors) {
     statusText: {
       fontSize: typography.xs,
       fontWeight: typography.semibold,
+    },
+    viewTasksBtn: {
+      marginTop: spacing.sm,
+      paddingVertical: spacing.xs + 2,
+      borderTopWidth: 1,
+      borderTopColor: c.border,
+      alignItems: "center",
+    },
+    viewTasksText: {
+      fontSize: typography.sm,
+      fontWeight: typography.semibold,
+      color: c.primary,
     },
     cardPaused: {
       opacity: 0.6,

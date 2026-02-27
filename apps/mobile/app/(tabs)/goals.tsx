@@ -19,7 +19,7 @@ import {
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { SwipeNavigator } from "@/components/SwipeNavigator";
-import { useFocusEffect } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { goalsApi, tasksApi, type Goal, type TaskItem, type ParsedGoal, type GoalChatMessage } from "@/lib/api";
@@ -80,6 +80,7 @@ export default function GoalsScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { showToast } = useToast();
 
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -1482,6 +1483,7 @@ export default function GoalsScreen() {
                   completedToday={cStats?.completed ?? 0}
                   totalToday={cStats?.total ?? 3}
                   onPress={() => setActionGoal(goal)}
+                  onViewTasks={() => router.push("/(tabs)")}
                 />
               );
             })}
