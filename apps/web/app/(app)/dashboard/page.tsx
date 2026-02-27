@@ -106,11 +106,11 @@ function TaskCard({
 
   return (
     <div
-      className="card"
+      className={`card${!task.isCompleted && !task.isSkipped ? " task-card-hover" : ""}`}
       style={{
         padding: "1rem 1.25rem",
         opacity: task.isCompleted || task.isSkipped ? 0.7 : 1,
-        transition: "opacity 0.2s",
+        transition: "opacity 0.2s, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
         display: "flex",
         gap: "1rem",
         alignItems: "flex-start",
@@ -957,44 +957,58 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          {/* Actions */}
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-            {/* Complete All button — shown when 2+ tasks remain incomplete */}
-            {incompleteCount >= 2 && !allDone && (
+          {/* Actions bar */}
+          {allDone && !insight ? (
+            <div className="give-more-bar unlocked">
               <button
-                className="btn btn-outline"
-                onClick={handleCompleteAll}
-                disabled={completingAll}
-                style={{ fontSize: "0.85rem" }}
-              >
-                {completingAll ? <><span className="spinner" style={{ width: 16, height: 16 }} /> Completing...</> : "\u2713 Complete all"}
-              </button>
-            )}
-
-            {allDone && !insight ? (
-              <button
-                className="btn btn-primary"
                 onClick={handleGiveMore}
                 disabled={generating}
-                style={{ fontSize: "0.9rem" }}
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  background: "#fff", color: "var(--primary)",
+                  fontWeight: 700, fontSize: "0.95rem",
+                  padding: "0.7rem 1.5rem", borderRadius: "var(--radius)",
+                  border: "none", cursor: "pointer",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  transition: "transform 0.15s",
+                }}
               >
-                {generating ? <><span className="spinner" /> Loading...</> : "🚀 Give me more"}
+                {generating ? <><span className="spinner spinner-dark" style={{ width: 18, height: 18 }} /> Loading...</> : "🚀 Give me more"}
               </button>
-            ) : !insight && totalCount > 0 && (
-              <>
+              <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.9)", fontWeight: 500 }}>
+                All done! Ready for the next challenge?
+              </span>
+            </div>
+          ) : !insight && totalCount > 0 ? (
+            <div className="give-more-bar locked">
+              <div style={{
+                width: 36, height: 36, borderRadius: "50%",
+                background: "var(--bg)", display: "flex",
+                alignItems: "center", justifyContent: "center",
+                fontSize: 18, flexShrink: 0,
+              }}>
+                {"🔒"}
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>
+                  Complete all {totalCount} tasks to unlock more
+                </div>
+                <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
+                  {completedCount}/{totalCount} done — {totalCount - completedCount} remaining
+                </div>
+              </div>
+              {incompleteCount >= 2 && (
                 <button
                   className="btn btn-outline"
-                  disabled
-                  style={{ fontSize: "0.9rem", opacity: 0.5, cursor: "not-allowed" }}
+                  onClick={handleCompleteAll}
+                  disabled={completingAll}
+                  style={{ fontSize: "0.8rem", flexShrink: 0 }}
                 >
-                  {"🔒"} Give me more
+                  {completingAll ? <><span className="spinner" style={{ width: 14, height: 14 }} /> ...</> : "✓ Complete all"}
                 </button>
-                <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
-                  Complete all {totalCount} tasks to unlock
-                </span>
-              </>
-            )}
-          </div>
+              )}
+            </div>
+          ) : null}
         </>
       )}
 

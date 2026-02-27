@@ -1460,11 +1460,18 @@ export default function GoalsScreen() {
         {goals.length === 0 && pausedGoals.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyIcon}>🎯</Text>
-            <Text style={styles.emptyTitle}>No goals yet</Text>
+            <Text style={styles.emptyTitle}>What will you achieve?</Text>
             <Text style={styles.emptySubtitle}>
-              Add your first goal and Threely will generate 3 daily tasks to keep you moving.
+              Set a goal and your AI coach will break it into 3 small daily tasks — the proven way to make real progress.
             </Text>
-            <Button title="Add your first goal" onPress={openAddFlow} style={styles.emptyBtn} />
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.lg }}>
+              <Text style={{ fontSize: typography.xs, color: colors.textSecondary }}>✦ AI-powered tasks</Text>
+              <Text style={{ fontSize: typography.xs, color: colors.textTertiary }}>·</Text>
+              <Text style={{ fontSize: typography.xs, color: colors.textSecondary }}>✦ Daily coaching</Text>
+              <Text style={{ fontSize: typography.xs, color: colors.textTertiary }}>·</Text>
+              <Text style={{ fontSize: typography.xs, color: colors.textSecondary }}>✦ Progress tracking</Text>
+            </View>
+            <Button title="Create your first goal" onPress={openAddFlow} style={styles.emptyBtn} />
           </View>
         ) : (
           <>
@@ -1506,7 +1513,9 @@ export default function GoalsScreen() {
         <View style={styles.overlay}>
           <Pressable style={styles.backdrop} onPress={() => setActionGoal(null)} />
           <View style={styles.sheet}>
-            <View style={styles.handle} />
+            <Pressable onPress={() => setActionGoal(null)} style={{ alignItems: "center", paddingVertical: 8 }}>
+              <View style={styles.handle} />
+            </Pressable>
             <Text style={styles.sheetTitle} numberOfLines={1}>{actionGoal.title}</Text>
             <Text style={styles.sheetSubtitle}>What would you like to do?</Text>
 

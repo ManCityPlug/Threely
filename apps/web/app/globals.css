@@ -26,9 +26,11 @@
   --radius: 10px;
   --radius-lg: 14px;
   --radius-xl: 20px;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
-  --shadow: 0 2px 8px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.1);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow: 0 2px 8px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.04);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.1), 0 16px 48px rgba(0,0,0,0.06);
+  --accent: #f59e0b;
+  --accent-light: #fef3c7;
 }
 
 /* ─── Dark mode ─────────────────────────────────────────────────────────────── */
@@ -48,9 +50,11 @@
   --danger-light: rgba(255,107,107,0.12);
   --warning: #f59e0b;
   --warning-light: rgba(245,158,11,0.12);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow: 0 2px 8px rgba(0,0,0,0.35);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.4);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.25), 0 2px 8px rgba(0,0,0,0.15);
+  --shadow: 0 2px 8px rgba(0,0,0,0.3), 0 4px 16px rgba(0,0,0,0.15);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.35), 0 16px 48px rgba(0,0,0,0.2);
+  --accent: #f59e0b;
+  --accent-light: rgba(245,158,11,0.12);
   color-scheme: dark;
 }
 
@@ -160,6 +164,86 @@ input, textarea, select {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
+}
+
+/* ─── Task card hover ────────────────────────────────────────────────────────── */
+.task-card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.task-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+  border-color: rgba(99,91,255,0.2);
+}
+
+/* ─── Sidebar nav link ───────────────────────────────────────────────────────── */
+.sidebar-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius);
+  margin-bottom: 2px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+  text-decoration: none;
+  color: var(--subtext);
+  background: transparent;
+}
+.sidebar-nav-link:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+.sidebar-nav-link.active {
+  color: var(--primary);
+  background: var(--primary-light);
+  font-weight: 600;
+}
+.sidebar-nav-link .nav-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+.sidebar-nav-link .nav-icon {
+  background: var(--bg);
+  color: var(--subtext);
+}
+.sidebar-nav-link:hover .nav-icon {
+  background: var(--border);
+  color: var(--text);
+}
+.sidebar-nav-link.active .nav-icon {
+  background: var(--primary);
+  color: #fff;
+}
+.sidebar-nav-link .nav-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* ─── Give me more footer bar ────────────────────────────────────────────────── */
+.give-more-bar {
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.give-more-bar.unlocked {
+  background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+  box-shadow: 0 4px 16px rgba(99,91,255,0.25);
+}
+.give-more-bar.locked {
+  background: var(--card);
+  border: 1.5px dashed var(--border);
 }
 
 /* ─── Button ─────────────────────────────────────────────────────────────────── */
@@ -306,8 +390,8 @@ input, textarea, select {
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  background: #fff;
-  color: #635bff;
+  background: #635bff;
+  color: #fff;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   z-index: 1;
 }

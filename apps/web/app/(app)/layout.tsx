@@ -7,10 +7,28 @@ import { useAuth, isOnboarded, markOnboarded, getNickname } from "@/lib/auth-con
 import { profileApi } from "@/lib/api-client";
 import ToastProvider from "@/components/ToastProvider";
 
+const NAV_ICONS: Record<string, React.ReactNode> = {
+  today: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+    </svg>
+  ),
+  goals: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" />
+    </svg>
+  ),
+  profile: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+};
+
 const NAV = [
-  { href: "/dashboard", label: "Today", icon: "✓" },
-  { href: "/goals", label: "Goals", icon: "⚑" },
-  { href: "/profile", label: "Profile", icon: "◉" },
+  { href: "/dashboard", label: "Today", iconKey: "today" },
+  { href: "/goals", label: "Goals", iconKey: "goals" },
+  { href: "/profile", label: "Profile", iconKey: "profile" },
 ];
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -142,7 +160,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                     textDecoration: "none",
                   }}
                 >
-                  <span style={{ fontSize: 16 }}>{item.icon}</span>
+                  <span style={{ fontSize: 16, width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>{NAV_ICONS[item.iconKey]}</span>
                   {item.label}
                 </Link>
               );
@@ -179,19 +197,26 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className="sidebar">
         {/* Logo */}
         <div style={{
-          padding: "1.5rem 1.25rem 1rem",
+          padding: "1.5rem 1.25rem 1.25rem",
           borderBottom: "1px solid var(--border)",
           display: "flex", alignItems: "center", gap: 10,
         }}>
           <div style={{
             width: 36, height: 36, borderRadius: 10,
-            background: "var(--primary)", color: "#fff",
+            background: "linear-gradient(135deg, var(--primary), var(--primary-hover))",
+            color: "#fff",
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 18, fontWeight: 700, flexShrink: 0,
+            boxShadow: "0 2px 8px rgba(99,91,255,0.3)",
           }}>3</div>
-          <span style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--text)" }}>
-            Threely
-          </span>
+          <div>
+            <span style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--text)", display: "block" }}>
+              Threely
+            </span>
+            <span style={{ fontSize: "0.7rem", color: "var(--muted)", fontWeight: 500 }}>
+              Do Less, Achieve More
+            </span>
+          </div>
         </div>
 
         {/* Nav */}
@@ -202,27 +227,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                style={{
-                  display: "flex", alignItems: "center", gap: 10,
-                  padding: "0.6rem 0.75rem",
-                  borderRadius: "var(--radius)",
-                  marginBottom: 2,
-                  color: active ? "var(--primary)" : "var(--subtext)",
-                  background: active ? "var(--primary-light)" : "transparent",
-                  fontWeight: active ? 600 : 500,
-                  fontSize: "0.9rem",
-                  transition: "all 0.15s",
-                  textDecoration: "none",
-                }}
+                className={`sidebar-nav-link${active ? " active" : ""}`}
               >
-                <span style={{
-                  width: 28, height: 28, borderRadius: 8,
-                  background: active ? "var(--primary)" : "var(--border)",
-                  color: active ? "#fff" : "var(--subtext)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 13, flexShrink: 0,
-                }}>
-                  {item.icon}
+                <span className="nav-icon">
+                  {NAV_ICONS[item.iconKey]}
                 </span>
                 {item.label}
               </Link>
@@ -276,7 +284,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               href={item.href}
               className={`bottom-nav-item${active ? " active" : ""}`}
             >
-              <span style={{ fontSize: 20 }}>{item.icon}</span>
+              <span style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center" }}>{NAV_ICONS[item.iconKey]}</span>
               <span>{item.label}</span>
             </Link>
           );

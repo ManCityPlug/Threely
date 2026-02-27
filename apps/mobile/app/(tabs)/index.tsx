@@ -902,7 +902,12 @@ export default function DashboardScreen() {
           style={styles.historyOverlay}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
+          <Pressable style={{ flex: 1 }} onPress={closeReview} />
           <View style={styles.reviewSheet}>
+
+            <Pressable onPress={closeReview} style={{ alignItems: "center", paddingVertical: 8 }}>
+              <View style={styles.historyHandle} />
+            </Pressable>
 
             <View style={styles.reviewHeaderRow}>
               <Text style={styles.reviewTitle}>Daily Review</Text>
@@ -1240,19 +1245,22 @@ function createStyles(c: Colors) {
       color: c.text,
     },
     completeAllBtn: {
-      backgroundColor: c.successLight,
+      backgroundColor: c.success,
       borderRadius: radius.md,
-      borderWidth: 1.5,
-      borderColor: c.success,
-      paddingVertical: 10,
+      paddingVertical: 12,
       alignItems: "center",
       justifyContent: "center",
       marginBottom: spacing.md,
+      shadowColor: c.success,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.25,
+      shadowRadius: 8,
+      elevation: 4,
     },
     completeAllText: {
       fontSize: typography.sm,
-      fontWeight: typography.semibold,
-      color: c.success,
+      fontWeight: typography.bold,
+      color: "#fff",
     },
     // ── Insight card ────────────────────────────────────────────────────────
     insightCard: {

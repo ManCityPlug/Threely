@@ -1263,12 +1263,19 @@ export default function GoalsPage() {
       {goals.length === 0 ? (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
           <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"\uD83C\uDFAF"}</div>
-          <h2 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 8 }}>No goals yet</h2>
-          <p style={{ color: "var(--subtext)", marginBottom: "1.5rem", fontSize: "0.9rem" }}>
-            Add your first goal and get AI-powered daily tasks.
+          <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>What will you achieve?</h2>
+          <p style={{ color: "var(--subtext)", marginBottom: "1rem", fontSize: "0.9rem", lineHeight: 1.6 }}>
+            Set a goal and your AI coach will break it into 3 small daily tasks — the proven way to make real progress.
           </p>
-          <button className="btn btn-primary" onClick={() => setShowAdd(true)}>
-            Add your first goal &#8594;
+          <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: "1.5rem", flexWrap: "wrap" }}>
+            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>{"✦"} AI-powered tasks</span>
+            <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{"·"}</span>
+            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>{"✦"} Daily coaching</span>
+            <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{"·"}</span>
+            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>{"✦"} Progress tracking</span>
+          </div>
+          <button className="btn btn-primary" onClick={() => setShowAdd(true)} style={{ fontSize: "0.95rem", padding: "0.75rem 2rem" }}>
+            Create your first goal {"\u2192"}
           </button>
         </div>
       ) : (
