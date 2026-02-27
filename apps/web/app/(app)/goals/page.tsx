@@ -1094,7 +1094,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
   })();
 
   return (
-    <div className="card" style={{ padding: "1.25rem", opacity: goal.isPaused ? 0.7 : 1 }}>
+    <div className="card" style={{ padding: "1.25rem", opacity: goal.isPaused ? 0.7 : 1, position: "relative", zIndex: showMenu ? 30 : 1 }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>

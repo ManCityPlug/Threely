@@ -347,9 +347,16 @@ export default function ProfilePage() {
         </div>
         <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.24s" }}>
           <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "#0891B2" }}>
-            <AnimatedNumber value={stats?.totalHoursInvested ?? 0} suffix="h" />
+            {(() => {
+              const totalMin = stats?.totalMinutesInvested ?? (stats?.totalHoursInvested ? Math.round(stats.totalHoursInvested * 60) : 0);
+              const h = Math.floor(totalMin / 60);
+              const m = totalMin % 60;
+              if (h === 0) return <>{m}m</>;
+              if (m === 0) return <>{h}h</>;
+              return <>{h}h {m}m</>;
+            })()}
           </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Hours invested</div>
+          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Time invested</div>
         </div>
         <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.32s" }}>
           <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--primary)" }}>

@@ -96,6 +96,7 @@ export interface Stats {
   streak: number;
   bestStreak: number;
   totalHoursInvested: number;
+  totalMinutesInvested?: number;
   goalStats: GoalStat[];
 }
 

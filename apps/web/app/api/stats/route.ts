@@ -149,7 +149,7 @@ export async function GET(request: NextRequest) {
     };
   });
 
-  const result = { totalCompleted, activeGoals, streak, bestStreak, totalHoursInvested, goalStats };
+  const result = { totalCompleted, activeGoals, streak, bestStreak, totalHoursInvested, totalMinutesInvested, goalStats };
   setCachedStats(user.id, result);
   return NextResponse.json(result, {
     headers: { "Cache-Control": "no-store, max-age=0" },

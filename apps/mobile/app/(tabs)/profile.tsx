@@ -498,10 +498,16 @@ export default function ProfileScreen() {
                 styles={styles}
               />
               <StatCard
-                label="Hours invested"
-                value={stats ? `${stats.totalHoursInvested ?? 0}h` : "—"}
-                numericValue={stats?.totalHoursInvested ?? 0}
-                suffix="h"
+                label="Time invested"
+                value={stats ? (() => {
+                  const totalMin = stats.totalMinutesInvested
+                    ?? Math.round((stats.totalHoursInvested ?? 0) * 60);
+                  const h = Math.floor(totalMin / 60);
+                  const m = totalMin % 60;
+                  if (h === 0) return `${m}m`;
+                  if (m === 0) return `${h}h`;
+                  return `${h}h ${m}m`;
+                })() : "—"}
                 icon="time-outline"
                 accentColor="#0891B2"
                 loading={statsLoading}
