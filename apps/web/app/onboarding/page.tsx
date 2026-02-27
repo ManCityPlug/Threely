@@ -104,6 +104,7 @@ export default function OnboardingPage() {
   const [chatGoalText, setChatGoalText] = useState<string | null>(null);
   const [customInput, setCustomInput] = useState("");
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatInputRef = useRef<HTMLInputElement>(null);
 
   // Step 3 — Deadline (default: 1 month from today)
   const now = new Date();
@@ -253,6 +254,8 @@ export default function OnboardingPage() {
       ]);
     } finally {
       setChatLoading(false);
+      // Auto-focus the text input so user can type immediately
+      setTimeout(() => chatInputRef.current?.focus(), 100);
     }
   }
 
@@ -999,6 +1002,7 @@ export default function OnboardingPage() {
               ) : (
                 <div style={{ display: "flex", gap: 8 }}>
                   <input
+                    ref={chatInputRef}
                     className="field-input"
                     placeholder="Type your own answer…"
                     value={customInput}
