@@ -1521,7 +1521,7 @@ export default function GoalsScreen() {
               <View style={[styles.actionIcon, { backgroundColor: colors.primaryLight }]}>
                 <Ionicons name="chatbubble-ellipses-outline" size={18} color={colors.primary} />
               </View>
-              <Text style={styles.actionLabel}>Add more detail</Text>
+              <Text style={styles.actionLabel}>Edit goal</Text>
               <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
             </Pressable>
             <View style={styles.divider} />

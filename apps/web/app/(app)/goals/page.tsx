@@ -378,7 +378,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
         {parsed.needs_more_context ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: "0.5rem" }}>
             <button className="btn btn-primary" onClick={() => { setStep("goal"); }} style={{ width: "100%", padding: "0.75rem" }}>
-              Add more detail &#8594;
+              Edit goal &#8594;
             </button>
             <button
               onClick={() => handleBuild()}
@@ -1180,7 +1180,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
                     fontWeight: 500, cursor: "pointer", background: "none", border: "none",
                   }}
                 >
-                  {"\u270F\uFE0F"} Add more detail
+                  {"\u270F\uFE0F"} Edit goal
                 </button>
                 <button
                   onClick={handleTogglePause}
