@@ -271,7 +271,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
     try {
       const effectiveRawInput = overrides?.goalText ?? rawInput.trim();
       const effectiveParsed = overrides?.parsedGoal ?? parsed;
-      const goalTitle = effectiveParsed?.short_title ?? effectiveRawInput.slice(0, 40) || "My Goal";
+      const goalTitle = effectiveParsed?.short_title ?? (effectiveRawInput.slice(0, 40) || "My Goal");
       const deadline = effectiveParsed?.deadline_detected ?? (hasDeadline
         ? `${deadlineYear}-${String(deadlineMonth).padStart(2, "0")}-${String(deadlineDay).padStart(2, "0")}`
         : null);

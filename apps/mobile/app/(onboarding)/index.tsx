@@ -396,7 +396,7 @@ export default function OnboardingScreen() {
     try {
       const goalTitle =
         effectiveParsed?.short_title ??
-        effectiveGoalText.slice(0, 40) || "My Goal";
+        (effectiveGoalText.slice(0, 40) || "My Goal");
 
       // Save display name
       if (nameInput.trim()) {

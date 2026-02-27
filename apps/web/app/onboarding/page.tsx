@@ -354,7 +354,7 @@ export default function OnboardingPage() {
       const effectiveRawInput = rawGoalInput.trim() || chatGoalText?.trim() || "";
       const goalTitle =
         parsedGoal?.short_title ??
-        effectiveRawInput.slice(0, 40) || "My Goal";
+        (effectiveRawInput.slice(0, 40) || "My Goal");
 
       // Save display name
       const name = nameInput.trim() || user?.email?.split("@")[0] || "Champion";
