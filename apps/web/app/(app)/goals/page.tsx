@@ -1094,7 +1094,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
   })();
 
   return (
-    <div className="card" style={{ padding: "1.25rem", opacity: goal.isPaused ? 0.7 : 1, position: "relative", zIndex: showMenu ? 30 : 1 }}>
+    <div className="card" style={{ padding: "1.25rem", opacity: goal.isPaused ? 0.7 : 1, position: "relative", zIndex: showMenu ? 30 : 1, overflow: showMenu ? "visible" : undefined }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
@@ -1182,9 +1182,9 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
             {showMenu && (
               <div
                 style={{
-                  position: "absolute", right: 0, top: 36, zIndex: 20,
+                  position: "absolute", right: 0, top: 36, zIndex: 50,
                   background: "var(--card)", border: "1px solid var(--border)",
-                  borderRadius: "var(--radius)", boxShadow: "var(--shadow-lg)",
+                  borderRadius: "var(--radius)", boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
                   minWidth: 180, overflow: "hidden",
                 }}
               >
