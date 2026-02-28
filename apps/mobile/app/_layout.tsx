@@ -18,7 +18,16 @@ import * as Notifications from "expo-notifications";
 // TODO: Uncomment for production builds — not supported in Expo Go
 // import * as Clarity from "@microsoft/react-native-clarity";
 import { LinearGradient } from "expo-linear-gradient";
-import { StripeProvider } from "@stripe/stripe-react-native";
+// StripeProvider uses native modules (OnrampSdk etc.) that crash in Expo Go.
+// Only import it for production/custom dev-client builds.
+let StripeProvider: React.ComponentType<{ publishableKey: string; merchantIdentifier: string; children: React.ReactNode }> | null = null;
+if (!__DEV__) {
+  try {
+    StripeProvider = require("@stripe/stripe-react-native").StripeProvider;
+  } catch {
+    // Not available (Expo Go) — leave null
+  }
+}
 import { supabase } from "@/lib/supabase";
 import { subscriptionApi, profileApi } from "@/lib/api";
 import { ThemeProvider, useTheme } from "@/lib/theme";
@@ -331,13 +340,21 @@ function AppContent() {
 }
 
 export default function RootLayout() {
-  return (
-    <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} merchantIdentifier="merchant.com.threely.app">
-      <ThemeProvider>
-        <ToastProvider>
-          <AppContent />
-        </ToastProvider>
-      </ThemeProvider>
-    </StripeProvider>
+  const content = (
+    <ThemeProvider>
+      <ToastProvider>
+        <AppContent />
+      </ToastProvider>
+    </ThemeProvider>
   );
+
+  if (StripeProvider) {
+    return (
+      <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} merchantIdentifier="merchant.com.threely.app">
+        {content}
+      </StripeProvider>
+    );
+  }
+
+  return content;
 }
