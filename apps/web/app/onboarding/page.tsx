@@ -482,12 +482,7 @@ export default function OnboardingPage() {
       }}>
         {/* Logo */}
         <div style={{ textAlign: "center", padding: "2rem 2rem 0" }}>
-          <div style={{
-            width: 44, height: 44, borderRadius: 12,
-            background: "var(--primary)", color: "#fff",
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            fontSize: 22, fontWeight: 700,
-          }}>3</div>
+          <img src="/favicon.png" alt="Threely" width={44} height={44} style={{ borderRadius: 12 }} />
         </div>
 
         {/* Progress bar */}

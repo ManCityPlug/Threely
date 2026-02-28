@@ -90,12 +90,7 @@ export default function LandingPage() {
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 28 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{
-              width: 34, height: 34, borderRadius: 9,
-              background: "#635bff", color: "#fff",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 18, fontWeight: 700,
-            }}>3</div>
+            <img src="/favicon.png" alt="Threely" width={34} height={34} style={{ borderRadius: 9 }} />
             <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em" }}>Threely</span>
           </div>
           {/* Desktop nav links */}
@@ -245,14 +240,12 @@ export default function LandingPage() {
       }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           {/* Logo mark */}
-          <div style={{
-            width: isMobile ? 56 : 64, height: isMobile ? 56 : 64, borderRadius: isMobile ? 14 : 16,
-            background: "#635bff", color: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: isMobile ? 28 : 32, fontWeight: 800,
+          <img src="/favicon.png" alt="Threely" width={isMobile ? 56 : 64} height={isMobile ? 56 : 64} style={{
+            borderRadius: isMobile ? 14 : 16,
             margin: isMobile ? "0 auto 1rem" : "0 auto 1.5rem",
             boxShadow: "0 8px 24px rgba(99,91,255,0.25)",
-          }}>3</div>
+            display: "block",
+          }} />
 
           <p style={{
             fontSize: "0.85rem",
@@ -849,12 +842,7 @@ export default function LandingPage() {
         fontSize: "0.825rem",
       }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 16 }}>
-          <div style={{
-            width: 28, height: 28, borderRadius: 7,
-            background: "#635bff", color: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 14, fontWeight: 700,
-          }}>3</div>
+          <img src="/favicon.png" alt="Threely" width={28} height={28} style={{ borderRadius: 7 }} />
           <span style={{ color: "#fff", fontWeight: 600 }}>Threely</span>
         </div>
         <div style={{ display: "flex", justifyContent: "center", gap: 20, flexWrap: "wrap", marginBottom: 16 }}>

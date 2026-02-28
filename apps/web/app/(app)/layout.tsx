@@ -251,14 +251,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           borderBottom: "1px solid var(--border)",
           display: "flex", alignItems: "center", gap: 10,
         }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 10,
-            background: "linear-gradient(135deg, var(--primary), var(--primary-hover))",
-            color: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 18, fontWeight: 700, flexShrink: 0,
-            boxShadow: "0 2px 8px rgba(99,91,255,0.3)",
-          }}>3</div>
+          <img src="/favicon.png" alt="Threely" width={36} height={36} style={{ borderRadius: 10, flexShrink: 0 }} />
           <div>
             <span style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--text)", display: "block" }}>
               Threely

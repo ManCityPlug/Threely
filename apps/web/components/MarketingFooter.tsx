@@ -19,14 +19,7 @@ export default function MarketingFooter() {
           {/* Brand column */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-              <div style={{
-                width: 28, height: 28, borderRadius: 7,
-                background: "linear-gradient(145deg, #7c74ff 0%, #635bff 50%, #5144e8 100%)", color: "#fff",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 14, fontWeight: 700,
-                boxShadow: "0 3px 10px rgba(99,91,255,0.25), inset 0 1px 1px rgba(255,255,255,0.2)",
-                textShadow: "0 1px 2px rgba(0,0,0,0.12)",
-              }}>3</div>
+              <img src="/favicon.png" alt="Threely" width={28} height={28} style={{ borderRadius: 7 }} />
               <span style={{ color: "#fff", fontWeight: 600 }}>Threely</span>
             </div>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.8rem", lineHeight: 1.6, maxWidth: 260 }}>
