@@ -883,10 +883,26 @@ export default function RegisterPage() {
 
     return (
       <div className="card fade-in" style={{ padding: "2.5rem 2rem", textAlign: "center" }}>
-        <img src="/favicon.png" alt="Threely" width={64} height={64} style={{
-          borderRadius: 16, margin: "0 auto 1.25rem", display: "block",
-          boxShadow: "0 8px 24px rgba(99,91,255,0.25)",
-        }} />
+        {/* Animated logo with glow + sparkles */}
+        <div style={{ width: 80, height: 80, margin: "0 auto 1.25rem", position: "relative" }}>
+          <div style={{
+            position: "absolute", left: -12, top: -12, width: 104, height: 104, borderRadius: 52,
+            backgroundColor: "rgba(99, 91, 255, 0.25)", animation: "pulse 3s ease-in-out infinite",
+          }} />
+          <img src="/favicon.png" alt="Threely" width={80} height={80} style={{
+            position: "relative", borderRadius: 20, animation: "pulse 3s ease-in-out infinite", zIndex: 2,
+          }} />
+          {[0, 60, 120, 180, 240, 300].map((angle, idx) => {
+            const rad = (angle * Math.PI) / 180;
+            return (
+              <div key={idx} style={{
+                position: "absolute", left: 40 + Math.cos(rad) * 55 - 3, top: 40 + Math.sin(rad) * 55 - 3,
+                width: 6, height: 6, borderRadius: 3, backgroundColor: "#FFF",
+                animation: `sparkle 2s ease-in-out ${0.6 + idx * 0.08}s infinite`, zIndex: 3,
+              }} />
+            );
+          })}
+        </div>
 
         <h1 style={{
           fontSize: "1.5rem", fontWeight: 800,

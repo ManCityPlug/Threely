@@ -239,13 +239,45 @@ export default function LandingPage() {
         textAlign: "center",
       }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
-          {/* Logo mark */}
-          <img src="/favicon.png" alt="Threely" width={isMobile ? 56 : 64} height={isMobile ? 56 : 64} style={{
-            borderRadius: isMobile ? 14 : 16,
+          {/* Animated logo with glow + sparkles */}
+          <div style={{
+            position: "relative",
+            width: isMobile ? 72 : 80,
+            height: isMobile ? 72 : 80,
             margin: isMobile ? "0 auto 1rem" : "0 auto 1.5rem",
-            boxShadow: "0 8px 24px rgba(99,91,255,0.25)",
-            display: "block",
-          }} />
+          }}>
+            <div style={{
+              position: "absolute",
+              left: -12, top: -12,
+              width: (isMobile ? 72 : 80) + 24,
+              height: (isMobile ? 72 : 80) + 24,
+              borderRadius: "50%",
+              backgroundColor: "rgba(99, 91, 255, 0.2)",
+              animation: "pulse 3s ease-in-out infinite",
+            }} />
+            <img src="/favicon.png" alt="Threely" width={isMobile ? 72 : 80} height={isMobile ? 72 : 80} style={{
+              position: "relative",
+              borderRadius: isMobile ? 18 : 20,
+              animation: "pulse 3s ease-in-out infinite",
+              zIndex: 2,
+            }} />
+            {[0, 60, 120, 180, 240, 300].map((angle, idx) => {
+              const rad = (angle * Math.PI) / 180;
+              const center = (isMobile ? 72 : 80) / 2;
+              const dist = isMobile ? 50 : 55;
+              return (
+                <div key={idx} style={{
+                  position: "absolute",
+                  left: center + Math.cos(rad) * dist - 3,
+                  top: center + Math.sin(rad) * dist - 3,
+                  width: 6, height: 6, borderRadius: 3,
+                  backgroundColor: "#635bff",
+                  animation: `sparkle 2s ease-in-out ${0.6 + idx * 0.08}s infinite`,
+                  zIndex: 3,
+                }} />
+              );
+            })}
+          </div>
 
           <p style={{
             fontSize: "0.85rem",
@@ -425,9 +457,9 @@ export default function LandingPage() {
             marginBottom: "3rem",
           }}>
             {[
-              { step: "01", title: "Share your goal", desc: "Type it in plain English — 'Run a 5K in 8 weeks' or 'Launch my side project by April.' Be specific. The more detail you give about your experience, timeline, and schedule, the more targeted your tasks will be." },
-              { step: "02", title: "Get 3 real tasks every morning", desc: "Not 'work on your project.' You'll get things like 'Draft the pricing page copy focusing on 3 pain points from your user interviews.' Specific. Actionable. Sized to fit your time." },
-              { step: "03", title: "Review & watch it adapt", desc: "Finish your tasks, rate the difficulty, leave a quick note. Threely adjusts tomorrow's plan — harder if you're cruising, easier if you're struggling. A daily loop that gets smarter over time." },
+              { step: "01", title: "Tell Threely your goal", desc: "Just describe what you want to achieve — 'Run a 5K in 8 weeks' or 'Launch my app by April.' Threely Intelligence analyzes your goal, identifies key milestones, and builds a structured roadmap around your experience, schedule, and deadline. You don't need a plan. That's our job." },
+              { step: "02", title: "Get 3 expert-level tasks every morning", desc: "Not generic prompts. Each task is crafted by Threely Intelligence using your specific context, yesterday's progress, and your real schedule. It's like having a personal strategist who knows your project inside and out." },
+              { step: "03", title: "Review & watch it evolve", desc: "Rate the difficulty, leave a quick note. Threely Intelligence recalibrates your trajectory and generates tomorrow's plan. Struggling? It eases up. Crushing it? It pushes further. A daily coaching loop that compounds over time." },
             ].map(item => (
               <div key={item.step} style={{
                 background: "#fff",
@@ -483,9 +515,9 @@ export default function LandingPage() {
             {/* Tasks with time badges */}
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {[
-                { text: "Draft 3 cold outreach emails using the pain points from user interviews", time: "15m", done: true },
-                { text: "Set up Stripe test mode and connect webhook to your /api/payments route", time: "10m", done: true },
-                { text: "Write the hero section copy for your landing page — focus on the outcome, not features", time: "5m", done: false },
+                { text: "Rewrite your pricing page headline to address the #1 objection from yesterday's user interviews — frame it around ROI, not features", time: "15m", done: true },
+                { text: "Set up Stripe with 3 pricing tiers and connect the checkout webhook to /api/payments — use the test keys from Day 9", time: "10m", done: true },
+                { text: "Draft a 5-email onboarding sequence outline — email 1: welcome + quick win, email 2: core feature walkthrough", time: "5m", done: false },
               ].map(task => (
                 <div key={task.text} style={{
                   display: "flex", alignItems: "flex-start", gap: 10,
@@ -547,7 +579,7 @@ export default function LandingPage() {
                 AI COACHING INSIGHT
               </div>
               <p style={{ fontSize: "0.78rem", color: "#425466", lineHeight: 1.5, margin: 0 }}>
-                You&apos;re ahead of schedule on the technical setup. Tomorrow I&apos;ll shift focus to your go-to-market messaging since the outreach emails are drafted.
+                You&apos;re ahead of schedule on the technical setup. Based on your interview notes, pricing is your biggest conversion blocker — tomorrow I&apos;ll shift focus to building the comparison page and ROI calculator.
               </p>
             </div>
           </div>
@@ -666,18 +698,18 @@ export default function LandingPage() {
           {[
             {
               num: "1",
-              title: "Describe your goal in plain language",
-              desc: "\"I want to launch a side project in 3 months. I can spend 30 minutes a day and I'm a beginner at marketing.\" — That's it. Be as specific as you can. The AI extracts your timeline, experience level, and constraints automatically.",
+              title: "Tell Threely Intelligence your goal",
+              desc: "\"I want to launch a side project in 3 months. I can spend 30 minutes a day and I'm a beginner at marketing.\" — That's all we need. Threely Intelligence breaks it down, identifies the critical path, and builds a personalized roadmap around your experience, timeline, and schedule.",
             },
             {
               num: "2",
-              title: "Wake up knowing exactly what to do",
-              desc: "Not 'work on marketing' — you'll get things like 'Write 3 cold outreach emails using pain points from your user interviews.' Sized to your schedule. Built on what you did yesterday. Ready to go.",
+              title: "Wake up to a plan that knows your project",
+              desc: "Not 'work on marketing.' You'll get things like 'Rewrite your pricing headline to address the ROI objection from yesterday's user interviews.' Every task references your context, builds on previous days, and fits your exact schedule.",
             },
             {
               num: "3",
-              title: "Complete, review, and watch it adapt",
-              desc: "Rate the difficulty. Leave a quick note. Threely generates a coaching insight, then uses your feedback, your pace, and your progress to build a better plan for tomorrow.",
+              title: "Review, and watch Threely get smarter",
+              desc: "Rate the difficulty. Leave a quick note. Threely Intelligence generates a coaching insight, recalibrates your trajectory, and builds a sharper plan for tomorrow. The more you use it, the more it understands how you work.",
             },
           ].map((item, i) => (
             <div key={item.num} style={{

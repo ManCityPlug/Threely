@@ -58,7 +58,67 @@ const KEYFRAMES_STYLE = `
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+}
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0); }
+  50% { opacity: 1; transform: scale(1); }
+}
 `;
+
+function AnimatedLogo({ size, glowSize, sparkleDistance }: { size: number; glowSize: number; sparkleDistance: number }) {
+  const center = size / 2;
+  return (
+    <div style={{ position: "relative", width: size, height: size }}>
+      {/* Glow */}
+      <div style={{
+        position: "absolute",
+        left: (size - glowSize) / 2,
+        top: (size - glowSize) / 2,
+        width: glowSize,
+        height: glowSize,
+        borderRadius: "50%",
+        backgroundColor: "rgba(99, 91, 255, 0.25)",
+        animation: "pulse 3s ease-in-out infinite",
+      }} />
+      {/* Logo */}
+      <img
+        src="/favicon.png"
+        alt="Threely"
+        width={size}
+        height={size}
+        style={{
+          position: "relative",
+          borderRadius: size * 0.22,
+          animation: "pulse 3s ease-in-out infinite",
+          zIndex: 2,
+        }}
+      />
+      {/* Sparkles */}
+      {[0, 60, 120, 180, 240, 300].map((angle, idx) => {
+        const rad = (angle * Math.PI) / 180;
+        return (
+          <div
+            key={idx}
+            style={{
+              position: "absolute",
+              left: center + Math.cos(rad) * sparkleDistance - 3,
+              top: center + Math.sin(rad) * sparkleDistance - 3,
+              width: 6,
+              height: 6,
+              borderRadius: 3,
+              backgroundColor: "#FFF",
+              animation: `sparkle 2s ease-in-out ${0.6 + idx * 0.08}s infinite`,
+              zIndex: 3,
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+}
 
 export default function MobileAppPrompt() {
   const [view, setView] = useState<"none" | "interstitial" | "banner">("none");
@@ -185,19 +245,13 @@ export default function MobileAppPrompt() {
               padding: "2.5rem 1.5rem 2rem",
             }}
           >
-            {/* App icon — bounces in */}
-            <img
-              src="/favicon.png"
-              alt="Threely"
-              width={96}
-              height={96}
-              style={{
-                borderRadius: 22,
-                boxShadow: "0 12px 32px rgba(99,91,255,0.3)",
-                marginBottom: "1.5rem",
-                animation: "mobilePromptScaleIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both",
-              }}
-            />
+            {/* App icon — animated with glow + sparkles */}
+            <div style={{
+              marginBottom: "1.5rem",
+              animation: "mobilePromptScaleIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both",
+            }}>
+              <AnimatedLogo size={96} glowSize={120} sparkleDistance={62} />
+            </div>
 
             {/* Tagline */}
             <p
