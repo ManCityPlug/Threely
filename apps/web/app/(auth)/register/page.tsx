@@ -461,7 +461,7 @@ function DotIndicators({ current, total }: { current: number; total: number }) {
 
 /* ── Onboarding Slideshow ────────────────────────────────────────────────────── */
 
-function OnboardingSlides({ onSignUp, onSignIn }: { onSignUp: () => void; onSignIn: () => void }) {
+function OnboardingSlides({ onSignUp, onSignIn, onBack }: { onSignUp: () => void; onSignIn: () => void; onBack: () => void }) {
   const [current, setCurrent] = useState(0);
   const [visited, setVisited] = useState<Set<number>>(() => new Set([0]));
 
@@ -631,21 +631,19 @@ function OnboardingSlides({ onSignUp, onSignIn }: { onSignUp: () => void; onSign
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Back button */}
-        {current > 0 && (
-          <button
-            onClick={handlePrev}
-            style={{
-              position: "absolute", top: 24, left: 24,
-              width: 40, height: 40, borderRadius: 20,
-              backgroundColor: "rgba(255,255,255,0.12)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              border: "none", cursor: "pointer", zIndex: 10, color: "#FFF", fontSize: 18,
-            }}
-          >
-            ‹
-          </button>
-        )}
+        {/* Back button — always visible; page 0 goes to homepage */}
+        <button
+          onClick={current === 0 ? onBack : handlePrev}
+          style={{
+            position: "absolute", top: 24, left: 24,
+            width: 40, height: 40, borderRadius: 20,
+            backgroundColor: "rgba(255,255,255,0.12)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            border: "none", cursor: "pointer", zIndex: 10, color: "#FFF", fontSize: 18,
+          }}
+        >
+          ‹
+        </button>
 
         {/* Pages */}
         <div style={{ flex: 1, position: "relative" }}>
@@ -934,6 +932,7 @@ export default function RegisterPage() {
       <OnboardingSlides
         onSignUp={() => setShowSlides(false)}
         onSignIn={() => router.push("/login")}
+        onBack={() => router.push("/")}
       />
     );
   }
