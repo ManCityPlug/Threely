@@ -279,6 +279,24 @@ export default function LandingPage() {
             Not sure where to start? Don't have a plan? That's the whole point. Tell us your goal — Threely figures out your next steps and gives you a clear path forward, every single day.
           </p>
 
+          {/* Get started button */}
+          <div style={{ marginBottom: isMobile ? "1rem" : "1.5rem" }}>
+            <Link href={loggedIn ? "/dashboard" : "/register"} style={{
+              display: "inline-block",
+              padding: "0.875rem 2.5rem",
+              background: "#635bff",
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: "1.05rem",
+              borderRadius: 12,
+              boxShadow: "0 4px 14px rgba(99,91,255,0.35)",
+              textDecoration: "none",
+              letterSpacing: "-0.01em",
+            }}>
+              {loggedIn ? "Go to dashboard" : "Get started \u2192"}
+            </Link>
+          </div>
+
           {/* Platform availability banner */}
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 10,
