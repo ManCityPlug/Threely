@@ -70,6 +70,7 @@ function LoginPageInner() {
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
+  const [forgotCooldown, setForgotCooldown] = useState(0);
 
   useEffect(() => {
     setDevice(detectDevice());
@@ -335,9 +336,32 @@ function LoginPageInner() {
                 </p>
                 <button
                   type="button"
-                  className="btn btn-outline"
-                  onClick={() => { setShowForgotPassword(false); setForgotSent(false); setForgotEmail(""); }}
+                  className="btn btn-primary"
+                  disabled={forgotCooldown > 0 || forgotLoading}
+                  onClick={async () => {
+                    setForgotLoading(true);
+                    const supabase = getSupabase();
+                    await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
+                      redirectTo: `${window.location.origin}/api/auth/callback?type=recovery`,
+                    });
+                    setForgotLoading(false);
+                    setForgotCooldown(60);
+                    const timer = setInterval(() => {
+                      setForgotCooldown((prev) => {
+                        if (prev <= 1) { clearInterval(timer); return 0; }
+                        return prev - 1;
+                      });
+                    }, 1000);
+                  }}
                   style={{ marginTop: "1.25rem", width: "100%" }}
+                >
+                  {forgotLoading ? <span className="spinner" /> : forgotCooldown > 0 ? `Resend in ${forgotCooldown}s` : "Resend reset link"}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => { setShowForgotPassword(false); setForgotSent(false); setForgotEmail(""); setForgotCooldown(0); }}
+                  style={{ marginTop: "0.5rem", width: "100%" }}
                 >
                   Back to sign in
                 </button>
@@ -358,6 +382,13 @@ function LoginPageInner() {
                   });
                   setForgotLoading(false);
                   setForgotSent(true);
+                  setForgotCooldown(60);
+                  const timer = setInterval(() => {
+                    setForgotCooldown((prev) => {
+                      if (prev <= 1) { clearInterval(timer); return 0; }
+                      return prev - 1;
+                    });
+                  }, 1000);
                 }}>
                   <label className="field-label">Email</label>
                   <input

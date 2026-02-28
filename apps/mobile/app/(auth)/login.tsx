@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Alert,
   Pressable,
   ActivityIndicator,
+  Modal,
 } from "react-native";
 import { Link } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -32,6 +33,40 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    return () => { if (timerRef.current) clearInterval(timerRef.current); };
+  }, []);
+
+  function startCooldown() {
+    setCooldown(60);
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) { clearInterval(timerRef.current!); timerRef.current = null; return 0; }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+
+  async function handleForgotPassword() {
+    const trimmed = (forgotEmail || email).trim();
+    if (!trimmed) return;
+    setForgotLoading(true);
+    await supabase.auth.resetPasswordForEmail(trimmed, {
+      redirectTo: "https://threely.co/api/auth/callback?type=recovery",
+    });
+    setForgotLoading(false);
+    setForgotSent(true);
+    setForgotEmail(trimmed);
+    startCooldown();
+  }
 
   const { promptAsync: googlePromptAsync, loading: googleLoading } = useGoogleSignIn();
   const { signIn: appleSignIn, loading: appleLoading } = useAppleSignIn();
@@ -123,7 +158,14 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.fieldGroup}>
-              <Text style={styles.label}>Password</Text>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                <Text style={styles.label}>Password</Text>
+                <Pressable onPress={() => { setForgotEmail(email); setShowForgot(true); }}>
+                  <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: typography.xs, fontWeight: typography.medium }}>
+                    Forgot password?
+                  </Text>
+                </Pressable>
+              </View>
               <TextInput
                 style={[styles.input, passwordFocused && styles.inputFocused]}
                 value={password}
@@ -158,6 +200,87 @@ export default function LoginScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Forgot password modal */}
+      <Modal visible={showForgot} transparent animationType="fade">
+        <Pressable
+          style={styles.modalOverlay}
+          onPress={() => { setShowForgot(false); setForgotSent(false); }}
+        >
+          <Pressable style={styles.modalCard} onPress={() => {}}>
+            {forgotSent ? (
+              <View style={{ alignItems: "center" }}>
+                <View style={styles.successCircle}>
+                  <Text style={{ color: "#4ade80", fontSize: 22, fontWeight: "700" }}>✓</Text>
+                </View>
+                <Text style={styles.modalTitle}>Check your email</Text>
+                <Text style={styles.modalSubtitle}>
+                  We sent a password reset link to{" "}
+                  <Text style={{ fontWeight: "700", color: "#fff" }}>{forgotEmail}</Text>.
+                  {"\n"}Click the link to set a new password.
+                </Text>
+                <Pressable
+                  style={[styles.modalBtn, (cooldown > 0 || forgotLoading) && { opacity: 0.5 }]}
+                  onPress={handleForgotPassword}
+                  disabled={cooldown > 0 || forgotLoading}
+                >
+                  {forgotLoading ? (
+                    <ActivityIndicator color="#1A1040" size="small" />
+                  ) : (
+                    <Text style={styles.modalBtnText}>
+                      {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend reset link"}
+                    </Text>
+                  )}
+                </Pressable>
+                <Pressable
+                  style={styles.modalBtnOutline}
+                  onPress={() => { setShowForgot(false); setForgotSent(false); }}
+                >
+                  <Text style={styles.modalBtnOutlineText}>Back to sign in</Text>
+                </Pressable>
+              </View>
+            ) : (
+              <View>
+                <Text style={styles.modalTitle}>Reset your password</Text>
+                <Text style={styles.modalSubtitle}>
+                  Enter your email and we'll send you a link to reset your password.
+                </Text>
+                <Text style={[styles.label, { marginBottom: spacing.xs }]}>Email</Text>
+                <TextInput
+                  style={[styles.input, { marginBottom: spacing.md }]}
+                  value={forgotEmail}
+                  onChangeText={setForgotEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  placeholderTextColor="rgba(255,255,255,0.35)"
+                  autoFocus
+                />
+                <View style={{ flexDirection: "row", gap: 10 }}>
+                  <Pressable
+                    style={styles.modalBtnOutline}
+                    onPress={() => setShowForgot(false)}
+                  >
+                    <Text style={styles.modalBtnOutlineText}>Cancel</Text>
+                  </Pressable>
+                  <Pressable
+                    style={[styles.modalBtn, { flex: 1 }, forgotLoading && { opacity: 0.6 }]}
+                    onPress={handleForgotPassword}
+                    disabled={forgotLoading}
+                  >
+                    {forgotLoading ? (
+                      <ActivityIndicator color="#1A1040" size="small" />
+                    ) : (
+                      <Text style={styles.modalBtnText}>Send reset link</Text>
+                    )}
+                  </Pressable>
+                </View>
+              </View>
+            )}
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -309,5 +432,71 @@ const styles = StyleSheet.create({
   dividerText: {
     color: "rgba(255,255,255,0.5)",
     fontSize: typography.sm,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: spacing.lg,
+  },
+  modalCard: {
+    width: "100%",
+    maxWidth: 400,
+    backgroundColor: "#1A1040",
+    borderRadius: radius.lg,
+    padding: spacing.xl,
+    borderWidth: 1,
+    borderColor: "rgba(255,255,255,0.1)",
+  },
+  modalTitle: {
+    fontSize: typography.lg,
+    fontWeight: typography.bold,
+    color: "#FFFFFF",
+    marginBottom: spacing.xs,
+    textAlign: "center",
+  },
+  modalSubtitle: {
+    fontSize: typography.sm,
+    color: "rgba(255,255,255,0.6)",
+    lineHeight: 20,
+    textAlign: "center",
+    marginBottom: spacing.lg,
+  },
+  modalBtn: {
+    height: 44,
+    borderRadius: radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+    flex: 1,
+  },
+  modalBtnText: {
+    color: "#1A1040",
+    fontSize: typography.sm,
+    fontWeight: typography.semibold,
+  },
+  modalBtnOutline: {
+    height: 44,
+    borderRadius: radius.md,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1.5,
+    borderColor: "rgba(255,255,255,0.2)",
+    flex: 1,
+  },
+  modalBtnOutlineText: {
+    color: "rgba(255,255,255,0.7)",
+    fontSize: typography.sm,
+    fontWeight: typography.medium,
+  },
+  successCircle: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: "rgba(74, 222, 128, 0.15)",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: spacing.md,
   },
 });
