@@ -226,7 +226,7 @@ export default function PricingPage() {
               { q: "Do I need a credit card to start?", a: "No. The 3-day free trial requires no payment information. You'll only be asked to add a payment method when the trial ends and you choose to subscribe." },
               { q: "Can I cancel anytime?", a: "Yes. Cancel your subscription at any time from your profile settings. You'll keep access until the end of your current billing period." },
               { q: "What happens when my trial ends?", a: "You'll be prompted to choose a plan. If you don't subscribe, your account stays active — you just won't receive new AI-generated tasks until you upgrade." },
-              { q: "Is there a refund policy?", a: "If you're not happy within the first 7 days, email refund@threely.co for a full refund. No questions asked." },
+              { q: "Is there a refund policy?", a: "Yes! We offer a 7-day, no-questions-asked refund policy. If you're not satisfied within 7 days of your first charge, just email refund@threely.co and we'll refund you in full.", link: "/refund", linkText: "View Refund Policy" },
             ].map(item => (
               <div key={item.q} style={{
                 background: "#f6f9fc",
@@ -236,6 +236,21 @@ export default function PricingPage() {
               }}>
                 <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 8 }}>{item.q}</h3>
                 <p style={{ fontSize: "0.9rem", color: "#425466", lineHeight: 1.7 }}>{item.a}</p>
+                {"link" in item && item.link && (
+                  <Link href={item.link} style={{
+                    display: "inline-block",
+                    marginTop: 12,
+                    padding: "0.5rem 1.15rem",
+                    background: "#635bff",
+                    color: "#fff",
+                    borderRadius: 8,
+                    fontSize: "0.85rem",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                  }}>
+                    {item.linkText} →
+                  </Link>
+                )}
               </div>
             ))}
           </div>

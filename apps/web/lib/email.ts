@@ -28,18 +28,18 @@ export async function sendRefundConfirmation(
         </div>
         <h1 style="font-size: 1.4rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem;">Your refund has been processed</h1>
         <p style="font-size: 0.95rem; color: #425466; line-height: 1.7; text-align: center;">
-          We've issued a refund of <strong>${amount}</strong> to your original payment method. It should appear on your statement within <strong>5–7 business days</strong>, depending on your bank.
+          We're sorry to see you go. We've issued a refund of <strong>${amount}</strong> to your original payment method. It should appear on your statement within <strong>5–7 business days</strong>, depending on your bank.
         </p>
         <div style="background: #f6f9fc; border-radius: 12px; padding: 1.25rem; margin: 1.5rem 0; border: 1px solid #e3e8ef;">
           <p style="font-size: 0.9rem; color: #425466; line-height: 1.7; margin: 0;">
-            Your subscription has been cancelled and you will not be charged again. Your account remains active — you can continue using Threely's free features, and resubscribe anytime.
+            Your subscription has been cancelled and you will not be charged again. If you ever want to give Threely another try, we'd love to have you back — you can resubscribe anytime from the app or at <a href="https://threely.co/pricing" style="color: #635bff;">threely.co/pricing</a>.
           </p>
         </div>
         <p style="font-size: 0.9rem; color: #425466; line-height: 1.7;">
-          If you have any questions, feel free to reply to this email or contact us at <a href="mailto:support@threely.co" style="color: #635bff;">support@threely.co</a>.
+          We'd love to know what we could do better. If you have any feedback or questions, feel free to reply to this email or contact us at <a href="mailto:support@threely.co" style="color: #635bff;">support@threely.co</a>.
         </p>
         <p style="font-size: 0.9rem; color: #425466; line-height: 1.7;">
-          Thank you for trying Threely. We hope to see you again!
+          Thank you for giving Threely a try — we wish you the best on your goals!
         </p>
         <div style="border-top: 1px solid #e3e8ef; margin-top: 2rem; padding-top: 1.25rem; text-align: center;">
           <p style="font-size: 0.78rem; color: #8898aa;">

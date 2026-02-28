@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -11,6 +11,7 @@ import {
   Alert,
   Pressable,
   ActivityIndicator,
+  Animated,
 } from "react-native";
 import { Link } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -37,6 +38,32 @@ export default function RegisterScreen() {
   const { promptAsync: googlePromptAsync, loading: googleLoading } = useGoogleSignIn();
   const { signIn: appleSignIn, loading: appleLoading } = useAppleSignIn();
   const socialLoading = googleLoading || appleLoading;
+
+  // Animated logo — pulsing glow + sparkles
+  const glowAnim = useRef(new Animated.Value(0)).current;
+  const sparkleAnims = useRef([0, 1, 2, 3, 4, 5].map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    // Pulsing glow loop
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
+        Animated.timing(glowAnim, { toValue: 0, duration: 1500, useNativeDriver: true }),
+      ])
+    ).start();
+
+    // Sparkle loops — staggered
+    sparkleAnims.forEach((anim, idx) => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.delay(idx * 150),
+          Animated.timing(anim, { toValue: 1, duration: 800, useNativeDriver: true }),
+          Animated.timing(anim, { toValue: 0, duration: 800, useNativeDriver: true }),
+          Animated.delay(400),
+        ])
+      ).start();
+    });
+  }, []);
 
   async function handleRegister() {
     if (!email || !password) return;
@@ -97,10 +124,48 @@ export default function RegisterScreen() {
           contentContainerStyle={styles.inner}
           keyboardShouldPersistTaps="handled"
         >
-          <Image
-            source={require("@/assets/icon.png")}
-            style={styles.logo}
-          />
+          {/* Animated logo with pulsing glow + sparkles */}
+          <View style={styles.logoContainer}>
+            {/* Glow */}
+            <Animated.View
+              style={[
+                styles.logoGlow,
+                {
+                  opacity: glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.2, 0.5] }),
+                  transform: [{ scale: glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1.15] }) }],
+                },
+              ]}
+            />
+            {/* Logo */}
+            <Animated.Image
+              source={require("@/assets/icon.png")}
+              style={[
+                styles.logo,
+                {
+                  transform: [{ scale: glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.97, 1.03] }) }],
+                },
+              ]}
+            />
+            {/* Sparkles */}
+            {sparkleAnims.map((anim, idx) => {
+              const angle = (idx * 60 * Math.PI) / 180;
+              const dist = 50;
+              return (
+                <Animated.View
+                  key={idx}
+                  style={[
+                    styles.sparkle,
+                    {
+                      left: 37 + Math.cos(angle) * dist,
+                      top: 37 + Math.sin(angle) * dist,
+                      opacity: anim,
+                      transform: [{ scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) }],
+                    },
+                  ]}
+                />
+              );
+            })}
+          </View>
 
           <Text style={styles.title}>Create account</Text>
           <Text style={styles.subtitle}>Start turning your goals into action</Text>
@@ -218,17 +283,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.xxl,
   },
-  logo: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
-    marginBottom: spacing.xl,
+  logoContainer: {
+    width: 80,
+    height: 80,
     alignSelf: "center",
-    shadowColor: PRIMARY,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.4,
-    shadowRadius: 16,
-    elevation: 8,
+    marginBottom: spacing.xl,
+  },
+  logoGlow: {
+    position: "absolute",
+    left: -12,
+    top: -12,
+    width: 104,
+    height: 104,
+    borderRadius: 52,
+    backgroundColor: "rgba(99, 91, 255, 0.35)",
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    borderRadius: 20,
+    zIndex: 2,
+  },
+  sparkle: {
+    position: "absolute",
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: "#FFFFFF",
+    zIndex: 3,
   },
   checkCircle: {
     width: 80,
