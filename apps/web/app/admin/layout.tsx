@@ -6,6 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 const SIDEBAR_ITEMS = [
   { label: "Overview", href: "/admin", icon: "📊" },
   { label: "Users", href: "/admin/users", icon: "👥" },
+  { label: "Costs", href: "/admin/costs", icon: "💰" },
 ];
 
 export default function AdminLayout({
