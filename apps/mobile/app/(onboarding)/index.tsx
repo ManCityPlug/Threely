@@ -439,8 +439,9 @@ export default function OnboardingScreen() {
 
       // Save display name locally + to Supabase user metadata
       if (nameInput.trim()) {
-        await AsyncStorage.setItem("@threely_nickname", nameInput.trim());
-        supabase.auth.updateUser({ data: { display_name: nameInput.trim() } }).catch(() => {});
+        const formatted = nameInput.trim().replace(/\s+/g, " ").split(" ").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
+        await AsyncStorage.setItem("@threely_nickname", formatted);
+        supabase.auth.updateUser({ data: { display_name: formatted } }).catch(() => {});
       }
 
       // Save profile (intensity defaults to 2 — committed; AI chat handles pace context)

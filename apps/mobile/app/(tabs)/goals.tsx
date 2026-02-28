@@ -1678,7 +1678,48 @@ function GoalActionSheet({
         </View>
 
         <Text style={styles.sheetTitle} numberOfLines={1}>{goal.title}</Text>
-        <Text style={styles.sheetSubtitle}>What would you like to do?</Text>
+
+        {/* Goal info badges */}
+        {(() => {
+          const fmtDays = (days: number[] | undefined | null): string => {
+            if (!days || days.length === 0 || days.length === 7) return "Every day";
+            const sorted = [...days].sort();
+            const key = sorted.join(",");
+            if (key === "1,2,3,4,5") return "Weekdays";
+            if (key === "6,7") return "Weekends";
+            if (key === "1,3,5") return "Mon, Wed, Fri";
+            const names = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+            return sorted.map(d => names[d]).join(", ");
+          };
+          const dLeft = goal.deadline ? Math.ceil((new Date(goal.deadline).getTime() - Date.now()) / 86400000) : null;
+          const infoBadges: { label: string; color: string; bg: string }[] = [];
+          infoBadges.push({ label: fmtDays(goal.workDays), color: colors.warning, bg: `${colors.warning}18` });
+          if (goal.dailyTimeMinutes) {
+            const h = Math.floor(goal.dailyTimeMinutes / 60);
+            const m = goal.dailyTimeMinutes % 60;
+            const tl = h > 0 && m > 0 ? `${h}h ${m}m/day` : h > 0 ? `${h}h/day` : `${m}m/day`;
+            infoBadges.push({ label: tl, color: "#0891B2", bg: "#0891B218" });
+          }
+          if (dLeft !== null) {
+            infoBadges.push({ label: dLeft > 0 ? `${dLeft}d left` : "Overdue", color: dLeft < 14 ? colors.danger : colors.textTertiary, bg: dLeft < 14 ? `${colors.danger}14` : `${colors.textTertiary}14` });
+          }
+          if (!goal.isPaused) {
+            infoBadges.push({ label: "Active", color: colors.success, bg: `${colors.success}18` });
+          } else {
+            infoBadges.push({ label: "Paused", color: colors.textTertiary, bg: `${colors.textTertiary}14` });
+          }
+          return (
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 6, marginTop: 8, marginBottom: 4 }}>
+              {infoBadges.map((b, i) => (
+                <View key={i} style={{ backgroundColor: b.bg, borderRadius: 20, paddingHorizontal: 10, paddingVertical: 4 }}>
+                  <Text style={{ fontSize: 12, fontWeight: "600", color: b.color }}>{b.label}</Text>
+                </View>
+              ))}
+            </View>
+          );
+        })()}
+
+        <Text style={[styles.sheetSubtitle, { marginTop: 12 }]}>What would you like to do?</Text>
 
         <Pressable style={styles.actionRow} onPress={onEdit}>
           <View style={[styles.actionIcon, { backgroundColor: colors.primaryLight }]}>

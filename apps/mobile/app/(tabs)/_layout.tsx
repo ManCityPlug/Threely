@@ -26,8 +26,12 @@ export default function TabsLayout() {
         name="index"
         options={{
           title: "Today",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="checkmark-circle-outline" size={size} color={color} />
+          tabBarIcon: ({ focused, size }) => (
+            <Ionicons
+              name={focused ? "flash" : "flash-outline"}
+              size={size}
+              color={focused ? "#F59E0B" : colors.textTertiary}
+            />
           ),
         }}
       />
@@ -35,8 +39,12 @@ export default function TabsLayout() {
         name="goals"
         options={{
           title: "Goals",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="flag-outline" size={size} color={color} />
+          tabBarIcon: ({ focused, size }) => (
+            <Ionicons
+              name={focused ? "disc" : "disc-outline"}
+              size={size}
+              color={focused ? "#EF4444" : colors.textTertiary}
+            />
           ),
         }}
       />
@@ -44,8 +52,12 @@ export default function TabsLayout() {
         name="profile"
         options={{
           title: "Profile",
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
+          tabBarIcon: ({ focused, size }) => (
+            <Ionicons
+              name={focused ? "person" : "person-outline"}
+              size={size}
+              color={focused ? "#635BFF" : colors.textTertiary}
+            />
           ),
         }}
       />

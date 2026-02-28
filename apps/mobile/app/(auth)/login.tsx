@@ -3,6 +3,7 @@ import {
   View,
   Text,
   TextInput,
+  Image,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -67,9 +68,10 @@ export default function LoginScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* Logo */}
-          <View style={styles.logo}>
-            <Text style={styles.logoText}>3</Text>
-          </View>
+          <Image
+            source={require("@/assets/icon.png")}
+            style={styles.logo}
+          />
 
           <Text style={styles.title}>Welcome back</Text>
           <Text style={styles.subtitle}>Sign in to your Threely account</Text>
@@ -185,23 +187,14 @@ const styles = StyleSheet.create({
   logo: {
     width: 56,
     height: 56,
-    borderRadius: radius.lg,
-    backgroundColor: PRIMARY,
-    alignItems: "center",
-    justifyContent: "center",
+    borderRadius: 14,
     marginBottom: spacing.xl,
     alignSelf: "center",
-    // Subtle glow
     shadowColor: PRIMARY,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.4,
     shadowRadius: 16,
     elevation: 8,
-  },
-  logoText: {
-    color: "#FFFFFF",
-    fontSize: typography.xxl,
-    fontWeight: typography.bold,
   },
   title: {
     fontSize: typography.xxl,

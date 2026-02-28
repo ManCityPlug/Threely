@@ -1154,6 +1154,13 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
   if (!goal.isPaused) {
     // Schedule badge
     badges.push({ label: formatWorkDays(goal.workDays), color: "#D97706", bg: "#FFFBEB" });
+    // Daily time badge
+    if (goal.dailyTimeMinutes) {
+      const h = Math.floor(goal.dailyTimeMinutes / 60);
+      const m = goal.dailyTimeMinutes % 60;
+      const timeLabel = h > 0 && m > 0 ? `${h}h ${m}m/day` : h > 0 ? `${h}h/day` : `${m}m/day`;
+      badges.push({ label: timeLabel, color: "#0891B2", bg: "#ECFEFF" });
+    }
     // Days left badge
     if (daysLeft !== null) {
       badges.push({

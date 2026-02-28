@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabase } from "@/lib/supabase-client";
 import { useAuth } from "@/lib/auth-context";
-import { tasksApi, statsApi, accountApi, summaryApi, subscriptionApi, type DailyTask, type Stats, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus, type SubscriptionStatus } from "@/lib/api-client";
+import { tasksApi, statsApi, accountApi, summaryApi, subscriptionApi, goalsApi, type DailyTask, type Stats, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus, type SubscriptionStatus, type Goal } from "@/lib/api-client";
 import { SkeletonStatCard, SkeletonCard } from "@/components/Skeleton";
 
 import WeeklySummaryModal from "@/components/WeeklySummary";
@@ -131,7 +131,7 @@ export default function ProfilePage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [history, setHistory] = useState<DailyTask[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"history" | "settings">("history");
+  const [activeTab, setActiveTab] = useState<"history" | "settings">("settings");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showChangePassword, setShowChangePassword] = useState(false);
@@ -149,6 +149,18 @@ export default function ProfilePage() {
   const [weeklyOpening, setWeeklyOpening] = useState(false);
   const [countdown, setCountdown] = useState("");
   const [subStatus, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
+  const [subTrialEnd, setSubTrialEnd] = useState<string | null>(null);
+  const [notifEnabled, setNotifEnabled] = useState(false);
+  const [notifPreset, setNotifPreset] = useState<string | null>(null);
+  const [notifBlocked, setNotifBlocked] = useState(false);
+  const [showCustomTime, setShowCustomTime] = useState(false);
+  const [customStartHour, setCustomStartHour] = useState(8);
+  const [customStartMinute, setCustomStartMinute] = useState(0);
+  const [customStartAmPm, setCustomStartAmPm] = useState<"AM" | "PM">("AM");
+  const [customEndHour, setCustomEndHour] = useState(9);
+  const [customEndMinute, setCustomEndMinute] = useState(0);
+  const [customEndAmPm, setCustomEndAmPm] = useState<"AM" | "PM">("AM");
+  const [focusGoalName, setFocusGoalName] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -171,7 +183,51 @@ export default function ProfilePage() {
 
   // Fetch subscription status
   useEffect(() => {
-    subscriptionApi.status().then(res => setSubStatus(res.status)).catch(() => {});
+    subscriptionApi.status().then(res => {
+      setSubStatus(res.status);
+      if (res.trialEndsAt) setSubTrialEnd(res.trialEndsAt);
+    }).catch(() => {});
+  }, []);
+
+  // Load notification preference from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("threely_notif_pref");
+      if (saved) {
+        const pref = JSON.parse(saved);
+        setNotifEnabled(true);
+        setNotifPreset(pref.label || null);
+        if (pref.label === "Custom") {
+          const h24 = pref.hour as number;
+          const isPm = h24 >= 12;
+          setCustomStartAmPm(isPm ? "PM" : "AM");
+          setCustomStartHour(h24 === 0 ? 12 : h24 > 12 ? h24 - 12 : h24);
+          setCustomStartMinute(pref.minute || 0);
+          if (pref.endHour !== undefined) {
+            const eh = pref.endHour as number;
+            const epm = eh >= 12;
+            setCustomEndAmPm(epm ? "PM" : "AM");
+            setCustomEndHour(eh === 0 ? 12 : eh > 12 ? eh - 12 : eh);
+            setCustomEndMinute(pref.endMinute || 0);
+          }
+        }
+      }
+      if (typeof Notification !== "undefined" && Notification.permission === "denied") {
+        setNotifBlocked(true);
+      }
+    } catch {}
+  }, []);
+
+  // Load focus goal name
+  useEffect(() => {
+    const today = new Date().toISOString().slice(0, 10);
+    const focusId = localStorage.getItem(`threely_focus_${today}`);
+    if (focusId) {
+      goalsApi.list().then(res => {
+        const goal = res.goals.find((g: Goal) => g.id === focusId);
+        if (goal) setFocusGoalName(goal.title);
+      }).catch(() => {});
+    }
   }, []);
 
   // Also re-fetch when load reference changes or tab regains visibility
@@ -248,6 +304,15 @@ export default function ProfilePage() {
     } catch {
       setDeleting(false);
       setShowDeleteConfirm(false);
+    }
+  }
+
+  function sendConfirmNotif(time: string) {
+    if (typeof Notification !== "undefined" && Notification.permission === "granted") {
+      new Notification("Threely reminders enabled!", {
+        body: `You'll be reminded daily at ${time}. Stay consistent, stay focused!`,
+        icon: "/favicon.png",
+      });
     }
   }
 
@@ -387,7 +452,7 @@ export default function ProfilePage() {
         display: "flex", gap: 4, marginBottom: "1rem",
         borderBottom: "1px solid var(--border)", paddingBottom: 0,
       }}>
-        {(["history", "settings"] as const).map(tab => (
+        {(["settings", "history"] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -439,6 +504,297 @@ export default function ProfilePage() {
                     {opt === "light" ? "\u2600\uFE0F Light" : "\uD83C\uDF19 Dark"}
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* Notifications */}
+            <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+                <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", margin: 0 }}>
+                  Notifications
+                </h3>
+                {notifBlocked ? (
+                  <span style={{ fontSize: "0.72rem", color: "var(--danger)", fontWeight: 500 }}>Blocked</span>
+                ) : (
+                  <button
+                    onClick={async () => {
+                      if (notifEnabled) {
+                        setNotifEnabled(false);
+                        setNotifPreset(null);
+                        setShowCustomTime(false);
+                        localStorage.removeItem("threely_notif_pref");
+                        return;
+                      }
+                      if (typeof Notification !== "undefined" && Notification.permission === "default") {
+                        const perm = await Notification.requestPermission();
+                        if (perm === "denied") { setNotifBlocked(true); return; }
+                        if (perm !== "granted") return;
+                      }
+                      setNotifEnabled(true);
+                    }}
+                    style={{
+                      width: 44, height: 24, borderRadius: 12, border: "none", cursor: "pointer",
+                      background: notifEnabled ? "var(--primary)" : "var(--border)",
+                      position: "relative", transition: "background 0.2s", flexShrink: 0,
+                    }}
+                  >
+                    <span style={{
+                      position: "absolute", top: 2, left: notifEnabled ? 22 : 2,
+                      width: 20, height: 20, borderRadius: "50%", background: "#fff",
+                      transition: "left 0.2s", boxShadow: "0 1px 3px rgba(0,0,0,0.2)",
+                    }} />
+                  </button>
+                )}
+              </div>
+              <p style={{ fontSize: "0.8rem", color: "var(--subtext)", marginBottom: notifEnabled ? 14 : 0, marginTop: 4 }}>
+                {notifBlocked
+                  ? "Notifications blocked. Enable in your browser settings."
+                  : notifEnabled
+                  ? "When should we remind you to check your tasks?"
+                  : "Enable to get daily task reminders in your browser."}
+              </p>
+
+              {notifEnabled && !notifBlocked && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {[
+                    { label: "Morning", emoji: "\uD83C\uDF05", range: "6:00 \u2013 9:00 AM", time: "7:00 AM", hour: 7, minute: 0 },
+                    { label: "Afternoon", emoji: "\u2600\uFE0F", range: "12:00 \u2013 3:00 PM", time: "1:00 PM", hour: 13, minute: 0 },
+                    { label: "Evening", emoji: "\uD83C\uDF06", range: "5:00 \u2013 8:00 PM", time: "7:00 PM", hour: 19, minute: 0 },
+                    { label: "Night", emoji: "\uD83C\uDF19", range: "9:00 \u2013 11:00 PM", time: "9:00 PM", hour: 21, minute: 0 },
+                  ].map(preset => {
+                    const active = notifPreset === preset.label;
+                    return (
+                      <button
+                        key={preset.label}
+                        onClick={() => {
+                          setNotifPreset(preset.label);
+                          setShowCustomTime(false);
+                          localStorage.setItem("threely_notif_pref", JSON.stringify({ label: preset.label, time: preset.time, hour: preset.hour, minute: preset.minute }));
+                          sendConfirmNotif(preset.time);
+                        }}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 12,
+                          padding: "0.7rem 0.875rem", borderRadius: "var(--radius)",
+                          border: `1.5px solid ${active ? "var(--primary)" : "var(--border)"}`,
+                          background: active ? "var(--primary-light)" : "var(--card)",
+                          cursor: "pointer", transition: "all 0.15s", textAlign: "left",
+                        }}
+                      >
+                        <span style={{ fontSize: "1.25rem", width: 28, textAlign: "center", flexShrink: 0 }}>{preset.emoji}</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: "0.85rem", fontWeight: 600, color: active ? "var(--primary)" : "var(--text)" }}>{preset.label}</div>
+                          <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{preset.range}</div>
+                        </div>
+                        <span style={{ fontSize: "0.8rem", fontWeight: 500, color: active ? "var(--primary)" : "var(--subtext)", flexShrink: 0 }}>{preset.time}</span>
+                        {active && <span style={{ color: "var(--primary)", fontSize: 16, marginLeft: 4 }}>{"\u2714"}</span>}
+                      </button>
+                    );
+                  })}
+
+                  {/* Throughout the day */}
+                  {(() => {
+                    const active = notifPreset === "AllDay";
+                    return (
+                      <button
+                        onClick={() => {
+                          setNotifPreset("AllDay");
+                          setShowCustomTime(false);
+                          localStorage.setItem("threely_notif_pref", JSON.stringify({ label: "AllDay", time: "8:00 AM \u2013 9:00 PM", hour: 8, minute: 0, endHour: 21, endMinute: 0 }));
+                          sendConfirmNotif("8:00 AM \u2013 9:00 PM");
+                        }}
+                        style={{
+                          display: "flex", alignItems: "center", gap: 12,
+                          padding: "0.7rem 0.875rem", borderRadius: "var(--radius)",
+                          border: `1.5px solid ${active ? "var(--primary)" : "var(--border)"}`,
+                          background: active ? "var(--primary-light)" : "var(--card)",
+                          cursor: "pointer", transition: "all 0.15s", textAlign: "left",
+                        }}
+                      >
+                        <span style={{ fontSize: "1.25rem", width: 28, textAlign: "center", flexShrink: 0 }}>{"\uD83D\uDD14"}</span>
+                        <div style={{ flex: 1 }}>
+                          <div style={{ fontSize: "0.85rem", fontWeight: 600, color: active ? "var(--primary)" : "var(--text)" }}>Remind me throughout the day</div>
+                          <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{"8:00 AM \u2013 9:00 PM"}</div>
+                        </div>
+                        {active && <span style={{ color: "var(--primary)", fontSize: 16, marginLeft: 4 }}>{"\u2714"}</span>}
+                      </button>
+                    );
+                  })()}
+
+                  {/* Custom time range */}
+                  <button
+                    onClick={() => setShowCustomTime(v => !v)}
+                    style={{
+                      display: "flex", alignItems: "center", gap: 12,
+                      padding: "0.7rem 0.875rem", borderRadius: "var(--radius)",
+                      border: `1.5px solid ${notifPreset === "Custom" ? "var(--primary)" : "var(--border)"}`,
+                      background: notifPreset === "Custom" ? "var(--primary-light)" : "var(--card)",
+                      cursor: "pointer", transition: "all 0.15s", textAlign: "left",
+                    }}
+                  >
+                    <span style={{ fontSize: "1.25rem", width: 28, textAlign: "center", flexShrink: 0 }}>{"\u2699\uFE0F"}</span>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: "0.85rem", fontWeight: 600, color: notifPreset === "Custom" ? "var(--primary)" : "var(--text)" }}>Custom time range</div>
+                      <div style={{ fontSize: "0.75rem", color: "var(--muted)" }}>Set your own start and end time</div>
+                    </div>
+                    <span style={{ fontSize: 14, color: "var(--subtext)", transform: showCustomTime ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.2s" }}>{"\u25BC"}</span>
+                  </button>
+
+                  {showCustomTime && (
+                    <div style={{
+                      padding: "0.875rem", borderRadius: "var(--radius)",
+                      border: "1.5px solid var(--border)", background: "var(--bg)",
+                      display: "flex", flexDirection: "column", gap: 12,
+                    }}>
+                      {/* Start time */}
+                      <div>
+                        <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text)", display: "block", marginBottom: 6 }}>Start time</label>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <select value={customStartHour} onChange={e => setCustomStartHour(Number(e.target.value))}
+                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer" }}>
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (<option key={h} value={h}>{h}</option>))}
+                          </select>
+                          <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)" }}>:</span>
+                          <select value={customStartMinute} onChange={e => setCustomStartMinute(Number(e.target.value))}
+                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer" }}>
+                            {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map(m => (<option key={m} value={m}>{String(m).padStart(2, "0")}</option>))}
+                          </select>
+                          <div style={{ display: "flex", gap: 0, borderRadius: "var(--radius)", overflow: "hidden", border: "1.5px solid var(--border)" }}>
+                            {(["AM", "PM"] as const).map(p => (
+                              <button key={p} onClick={() => setCustomStartAmPm(p)}
+                                style={{ padding: "0.45rem 0.65rem", border: "none", cursor: "pointer", background: customStartAmPm === p ? "var(--primary)" : "var(--card)", color: customStartAmPm === p ? "#fff" : "var(--subtext)", fontSize: "0.8rem", fontWeight: 600 }}>
+                                {p}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* End time */}
+                      <div>
+                        <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text)", display: "block", marginBottom: 6 }}>End time</label>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <select value={customEndHour} onChange={e => setCustomEndHour(Number(e.target.value))}
+                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer" }}>
+                            {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (<option key={h} value={h}>{h}</option>))}
+                          </select>
+                          <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)" }}>:</span>
+                          <select value={customEndMinute} onChange={e => setCustomEndMinute(Number(e.target.value))}
+                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer" }}>
+                            {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map(m => (<option key={m} value={m}>{String(m).padStart(2, "0")}</option>))}
+                          </select>
+                          <div style={{ display: "flex", gap: 0, borderRadius: "var(--radius)", overflow: "hidden", border: "1.5px solid var(--border)" }}>
+                            {(["AM", "PM"] as const).map(p => (
+                              <button key={p} onClick={() => setCustomEndAmPm(p)}
+                                style={{ padding: "0.45rem 0.65rem", border: "none", cursor: "pointer", background: customEndAmPm === p ? "var(--primary)" : "var(--card)", color: customEndAmPm === p ? "#fff" : "var(--subtext)", fontSize: "0.8rem", fontWeight: 600 }}>
+                                {p}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => {
+                          const startH24 = customStartAmPm === "PM" ? (customStartHour === 12 ? 12 : customStartHour + 12) : (customStartHour === 12 ? 0 : customStartHour);
+                          const endH24 = customEndAmPm === "PM" ? (customEndHour === 12 ? 12 : customEndHour + 12) : (customEndHour === 12 ? 0 : customEndHour);
+                          const startStr = `${customStartHour}:${String(customStartMinute).padStart(2, "0")} ${customStartAmPm}`;
+                          const endStr = `${customEndHour}:${String(customEndMinute).padStart(2, "0")} ${customEndAmPm}`;
+                          const timeStr = `${startStr} \u2013 ${endStr}`;
+                          setNotifPreset("Custom");
+                          localStorage.setItem("threely_notif_pref", JSON.stringify({ label: "Custom", time: timeStr, hour: startH24, minute: customStartMinute, endHour: endH24, endMinute: customEndMinute }));
+                          sendConfirmNotif(timeStr);
+                        }}
+                        style={{ fontSize: "0.825rem", width: "100%" }}
+                      >
+                        Set custom range
+                      </button>
+                    </div>
+                  )}
+
+                  <p style={{ fontSize: "0.72rem", color: "var(--muted)", margin: "4px 0 0", textAlign: "center" }}>
+                    Notifications work when this tab is open in your browser.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Focus Goal */}
+            <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
+              <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
+                Today's Focus Goal
+              </h3>
+              {focusGoalName ? (
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "0.85rem", color: "var(--text)", fontWeight: 500 }}>
+                    {focusGoalName}
+                  </span>
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => {
+                      const today = new Date().toISOString().slice(0, 10);
+                      localStorage.removeItem(`threely_focus_${today}`);
+                      setFocusGoalName(null);
+                      router.push("/dashboard");
+                    }}
+                    style={{ fontSize: "0.8rem", padding: "0.35rem 0.75rem" }}
+                  >
+                    Change focus
+                  </button>
+                </div>
+              ) : (
+                <p style={{ fontSize: "0.825rem", color: "var(--subtext)", margin: 0 }}>
+                  No focus goal set for today
+                </p>
+              )}
+            </div>
+
+            {/* Subscription */}
+            <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
+              <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
+                Subscription
+              </h3>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  {subStatus === "trialing" && (
+                    <>
+                      <span style={{
+                        display: "inline-block", padding: "2px 10px", borderRadius: 999,
+                        background: "#ecfdf5", color: "#059669", fontSize: "0.75rem", fontWeight: 600,
+                      }}>Pro Trial</span>
+                      {subTrialEnd && (
+                        <p style={{ fontSize: "0.78rem", color: "var(--subtext)", margin: "6px 0 0" }}>
+                          Trial ends {new Date(subTrialEnd).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                        </p>
+                      )}
+                    </>
+                  )}
+                  {subStatus === "active" && (
+                    <span style={{
+                      display: "inline-block", padding: "2px 10px", borderRadius: 999,
+                      background: "var(--primary-light)", color: "var(--primary)", fontSize: "0.75rem", fontWeight: 600,
+                    }}>Pro</span>
+                  )}
+                  {subStatus !== undefined && subStatus !== "trialing" && subStatus !== "active" && (
+                    <span style={{
+                      display: "inline-block", padding: "2px 10px", borderRadius: 999,
+                      background: "#f3f4f6", color: "#6b7280", fontSize: "0.75rem", fontWeight: 600,
+                    }}>No plan</span>
+                  )}
+                </div>
+                <button
+                  className="btn btn-outline"
+                  onClick={() => {
+                    if (hasPro) {
+                      window.open("/api/subscription?action=portal", "_blank");
+                    } else {
+                      showPaywall();
+                    }
+                  }}
+                  style={{ fontSize: "0.8rem", padding: "0.35rem 0.75rem" }}
+                >
+                  {hasPro ? "Manage subscription" : "Upgrade to Pro"}
+                </button>
               </div>
             </div>
 
@@ -560,6 +916,27 @@ export default function ProfilePage() {
                   </div>
                 </form>
               )}
+            </div>
+
+            {/* Sign out */}
+            <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
+              <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
+                Sign out
+              </h3>
+              <p style={{ fontSize: "0.825rem", color: "var(--subtext)", marginBottom: 12 }}>
+                Sign out of your Threely account on this device.
+              </p>
+              <button
+                className="btn btn-outline"
+                onClick={async () => {
+                  if (!window.confirm("Are you sure you want to sign out?")) return;
+                  await signOut();
+                  router.replace("/login");
+                }}
+                style={{ fontSize: "0.825rem" }}
+              >
+                Sign out
+              </button>
             </div>
 
             {/* Danger zone */}

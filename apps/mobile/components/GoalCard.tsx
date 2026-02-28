@@ -51,7 +51,7 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
 
   const addedDate = new Date(goal.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
-  // Build badge items for even 4-column layout
+  // Build badge items for even column layout
   const badges: { label: string; color: string; bg: string; icon?: string }[] = [];
   // 1. Tasks
   badges.push({ label: `${completedToday}/${totalToday} today`, color: colors.primary, bg: `${colors.primary}14` });
@@ -59,7 +59,14 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
   if (!isPaused) {
     badges.push({ label: formatWorkDays(goal.workDays), color: colors.warning, bg: `${colors.warning}18`, icon: "calendar-outline" });
   }
-  // 3. Days left
+  // 3. Daily time
+  if (goal.dailyTimeMinutes && !isPaused) {
+    const h = Math.floor(goal.dailyTimeMinutes / 60);
+    const m = goal.dailyTimeMinutes % 60;
+    const timeLabel = h > 0 && m > 0 ? `${h}h ${m}m/day` : h > 0 ? `${h}h/day` : `${m}m/day`;
+    badges.push({ label: timeLabel, color: "#0891B2", bg: "#0891B214" });
+  }
+  // 4. Days left
   if (daysLeft !== null && !isPaused) {
     badges.push({
       label: daysLeft > 0 ? `${daysLeft}d left` : "Overdue",
@@ -67,7 +74,7 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
       bg: daysLeft < 14 ? `${colors.danger}14` : `${colors.textTertiary}14`,
     });
   }
-  // 4. Status
+  // 5. Status
   if (status && !isPaused) {
     badges.push({
       label: status.text,
@@ -124,13 +131,13 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
         <View style={[styles.progressFill, { width: `${progressPct}%` }, isPaused && styles.progressFillPaused]} />
       </View>
 
-      {/* Badge row — even columns */}
+      {/* Badge row — wrapping */}
       <View style={styles.badgeRow}>
         {badges.map((b, i) => (
-          <View key={i} style={[styles.badgeCol, { flex: 1 }]}>
+          <View key={i} style={styles.badgeCol}>
             <View style={[styles.pill, { backgroundColor: b.bg }]}>
               {b.icon && <Ionicons name={b.icon as keyof typeof Ionicons.glyphMap} size={11} color={b.color} style={{ marginRight: 3 }} />}
-              <Text style={[styles.pillText, { color: b.color }]} numberOfLines={1}>
+              <Text style={[styles.pillText, { color: b.color }]}>
                 {b.label}
               </Text>
             </View>
@@ -207,6 +214,7 @@ function createStyles(c: Colors) {
     },
     badgeRow: {
       flexDirection: "row",
+      flexWrap: "wrap",
       gap: 4,
       marginBottom: spacing.xs,
     },

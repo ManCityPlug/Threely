@@ -8,6 +8,7 @@ import { getSupabase } from "@/lib/supabase-client";
 import { goalsApi, profileApi, tasksApi, type ParsedGoal, type TaskItem, type GoalChatMessage, type GoalChatResult } from "@/lib/api-client";
 import GoalTemplatesComponent from "@/components/GoalTemplates";
 import type { GoalCategory } from "@/lib/goal-templates";
+import { formatDisplayName } from "@/lib/format-name";
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
@@ -340,7 +341,7 @@ export default function OnboardingPage() {
         ? result.daily_time_detected : null;
 
       // Save display name
-      const name = nameInput.trim() || user?.email?.split("@")[0] || "Champion";
+      const name = formatDisplayName(nameInput.trim() || user?.email?.split("@")[0] || "Champion");
       saveNickname(name);
       getSupabase().auth.updateUser({ data: { display_name: name } }).catch(() => {});
 
@@ -415,7 +416,7 @@ export default function OnboardingPage() {
         (effectiveRawInput.slice(0, 40) || "My Goal");
 
       // Save display name
-      const name = nameInput.trim() || user?.email?.split("@")[0] || "Champion";
+      const name = formatDisplayName(nameInput.trim() || user?.email?.split("@")[0] || "Champion");
       saveNickname(name);
       getSupabase().auth.updateUser({ data: { display_name: name } }).catch(() => {});
 

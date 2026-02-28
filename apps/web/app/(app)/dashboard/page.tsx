@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth, getNickname } from "@/lib/auth-context";
+import { formatDisplayName } from "@/lib/format-name";
 import {
   tasksApi, goalsApi, reviewsApi, insightsApi, statsApi,
   type DailyTask, type TaskItem, type Goal, type GoalStat,
@@ -770,8 +771,9 @@ export default function DashboardPage() {
         <h1 style={{ fontSize: "2rem", fontWeight: 800, letterSpacing: "-0.04em" }}>
           {greeting()}, {(() => {
             const raw = getNickname() || user?.email?.split("@")[0] || "";
-            const first = raw.split(/\s+/)[0] || "there";
-            return first.charAt(0).toUpperCase() + first.slice(1);
+            const formatted = formatDisplayName(raw);
+            const first = formatted.split(" ")[0] || "there";
+            return first;
           })()} {"👋"}
         </h1>
       </div>

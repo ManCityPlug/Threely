@@ -3,6 +3,7 @@ import {
   Animated,
   BackHandler,
   Dimensions,
+  Image,
   Platform,
   Pressable,
   StyleSheet,
@@ -149,9 +150,10 @@ function PageHook({ anim }: { anim: Animated.Value }) {
         ]}
       >
         <View style={styles.hookLogoGlow} />
-        <View style={styles.hookLogo}>
-          <Text style={styles.hookLogoText}>3</Text>
-        </View>
+        <Image
+          source={require("@/assets/icon.png")}
+          style={styles.hookLogo}
+        />
         {sparklePositions.map((pos, idx) => {
           const rad = (pos.angle * Math.PI) / 180;
           const dist = 55;
@@ -442,8 +444,11 @@ function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoadi
   return (
     <View style={styles.page}>
       {/* Logo */}
-      <Animated.View style={[styles.authLogo, { opacity: anim }]}>
-        <Text style={styles.authLogoText}>3</Text>
+      <Animated.View style={[{ opacity: anim }]}>
+        <Image
+          source={require("@/assets/icon.png")}
+          style={styles.authLogo}
+        />
       </Animated.View>
 
       <Animated.Text style={[styles.titleXXL, { opacity: anim, marginTop: spacing.lg }]}>
@@ -758,10 +763,7 @@ const styles = StyleSheet.create({
   hookLogo: {
     width: 80,
     height: 80,
-    borderRadius: 24,
-    backgroundColor: PRIMARY,
-    alignItems: "center",
-    justifyContent: "center",
+    borderRadius: 20,
   },
   hookLogoGlow: {
     position: "absolute",
@@ -769,11 +771,6 @@ const styles = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     backgroundColor: "rgba(99, 91, 255, 0.25)",
-  },
-  hookLogoText: {
-    color: "#FFFFFF",
-    fontSize: 40,
-    fontWeight: typography.bold,
   },
   sparkle: {
     position: "absolute",
@@ -876,15 +873,7 @@ const styles = StyleSheet.create({
   authLogo: {
     width: 56,
     height: 56,
-    borderRadius: radius.lg,
-    backgroundColor: PRIMARY,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  authLogoText: {
-    color: "#FFFFFF",
-    fontSize: typography.xxl,
-    fontWeight: typography.bold,
+    borderRadius: 14,
   },
   authButtons: {
     width: "100%",

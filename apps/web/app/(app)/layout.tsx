@@ -5,24 +5,30 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth, isOnboarded, markOnboarded, getNickname } from "@/lib/auth-context";
 import { profileApi, subscriptionApi, type SubscriptionStatus } from "@/lib/api-client";
+import { formatDisplayName } from "@/lib/format-name";
 import ToastProvider from "@/components/ToastProvider";
 import { SubscriptionProvider, useSubscription } from "@/lib/subscription-context";
 import PaywallModal from "@/components/PaywallModal";
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
   today: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#F59E0B" stroke="#F59E0B" strokeWidth={1} strokeLinejoin="round" />
     </svg>
   ),
   goals: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" />
+    <svg viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" fill="#FEE2E2" stroke="#EF4444" strokeWidth={1.5} />
+      <circle cx="12" cy="12" r="6" fill="#FECACA" stroke="#EF4444" strokeWidth={1.5} />
+      <circle cx="12" cy="12" r="2.5" fill="#EF4444" />
+      <line x1="18" y1="3" x2="13.5" y2="10" stroke="#F97316" strokeWidth={2} strokeLinecap="round" />
+      <polygon points="19,1 20.5,4.5 17,3.5" fill="#F97316" />
     </svg>
   ),
   profile: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
+    <svg viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="8" r="4" stroke="#635BFF" strokeWidth={2} fill="#EDE9FE" />
+      <path d="M5 20.5c0-3.5 3.134-6.5 7-6.5s7 3 7 6.5" stroke="#635BFF" strokeWidth={2} strokeLinecap="round" fill="#EDE9FE" />
     </svg>
   ),
 };
@@ -116,7 +122,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const nickname = getNickname() || user.email?.split("@")[0] || "You";
+  const nicknameRaw = getNickname() || user.email?.split("@")[0] || "You";
+  const nickname = formatDisplayName(nicknameRaw);
   const initials = nickname[0]?.toUpperCase() ?? "?";
 
   const subBadge = subStatus === "trialing"
@@ -242,7 +249,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className="sidebar">
         {/* Logo */}
         <div style={{
-          padding: "1.5rem 1.25rem 1.25rem",
+          padding: "2rem 1.25rem 1.25rem",
           borderBottom: "1px solid var(--border)",
           display: "flex", alignItems: "center", gap: 10,
         }}>

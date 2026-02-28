@@ -199,6 +199,9 @@ export default function ProfileScreen() {
   const [customHour, setCustomHour] = useState(8);
   const [customMinute, setCustomMinute] = useState(0);
   const [customPeriod, setCustomPeriod] = useState<"AM" | "PM">("AM");
+  const [customEndHour, setCustomEndHour] = useState(9);
+  const [customEndMinute, setCustomEndMinute] = useState(0);
+  const [customEndPeriod, setCustomEndPeriod] = useState<"AM" | "PM">("AM");
 
   // Appearance
   const [appearanceSheetOpen, setAppearanceSheetOpen] = useState(false);
@@ -380,9 +383,15 @@ export default function ProfileScreen() {
     if (customPeriod === "AM" && h === 12) h = 0;
     else if (customPeriod === "PM" && h !== 12) h = h + 12;
 
+    let eh = customEndHour;
+    if (customEndPeriod === "AM" && eh === 12) eh = 0;
+    else if (customEndPeriod === "PM" && eh !== 12) eh = eh + 12;
+
     const minStr = customMinute === 0 ? "00" : String(customMinute);
-    const displayHour = customHour;
-    const displayTime = `${displayHour}:${minStr} ${customPeriod}`;
+    const endMinStr = customEndMinute === 0 ? "00" : String(customEndMinute);
+    const startTime = `${customHour}:${minStr} ${customPeriod}`;
+    const endTime = `${customEndHour}:${endMinStr} ${customEndPeriod}`;
+    const displayTime = `${startTime} \u2013 ${endTime}`;
 
     await handleSelectNotif({
       label: "Custom",
@@ -423,9 +432,10 @@ export default function ProfileScreen() {
 
   // ── Derived display values ────────────────────────────────────────────────────
 
-  const initials = (nickname || email) ? (nickname || email)[0].toUpperCase() : "?";
+  const formatName = (raw: string) => raw.trim().replace(/\s+/g, " ").split(" ").map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
   const displayNameRaw = nickname || email;
-  const displayName = displayNameRaw ? displayNameRaw.charAt(0).toUpperCase() + displayNameRaw.slice(1) : "";
+  const displayName = displayNameRaw ? formatName(displayNameRaw) : "";
+  const initials = displayName ? displayName[0].toUpperCase() : "?";
 
   const notifLabel = (() => {
     if (!notifPref) return "Off";
@@ -860,31 +870,59 @@ export default function ProfileScreen() {
 
             {/* Custom inline picker */}
             {customOpen && (
-              <View style={styles.customPickerWrap}>
-                <PickerCol
-                  items={HOURS}
-                  selected={customHour}
-                  onSelect={setCustomHour}
-                  format={(v) => String(v)}
-                  colors={colors}
-                />
-                <Text style={styles.colonSep}>:</Text>
-                <PickerCol
-                  items={MINUTES}
-                  selected={customMinute}
-                  onSelect={setCustomMinute}
-                  format={(v) => v === 0 ? "00" : String(v)}
-                  colors={colors}
-                />
-                <PickerCol
-                  items={PERIODS as ("AM" | "PM")[]}
-                  selected={customPeriod}
-                  onSelect={(v) => setCustomPeriod(v as "AM" | "PM")}
-                  format={(v) => v}
-                  colors={colors}
-                />
+              <View style={{ gap: 8 }}>
+                <Text style={{ fontSize: typography.xs, fontWeight: typography.semibold, color: colors.textSecondary, marginLeft: 4, marginTop: 4 }}>Start time</Text>
+                <View style={styles.customPickerWrap}>
+                  <PickerCol
+                    items={HOURS}
+                    selected={customHour}
+                    onSelect={setCustomHour}
+                    format={(v) => String(v)}
+                    colors={colors}
+                  />
+                  <Text style={styles.colonSep}>:</Text>
+                  <PickerCol
+                    items={MINUTES}
+                    selected={customMinute}
+                    onSelect={setCustomMinute}
+                    format={(v) => v === 0 ? "00" : String(v)}
+                    colors={colors}
+                  />
+                  <PickerCol
+                    items={PERIODS as ("AM" | "PM")[]}
+                    selected={customPeriod}
+                    onSelect={(v) => setCustomPeriod(v as "AM" | "PM")}
+                    format={(v) => v}
+                    colors={colors}
+                  />
+                </View>
+                <Text style={{ fontSize: typography.xs, fontWeight: typography.semibold, color: colors.textSecondary, marginLeft: 4 }}>End time</Text>
+                <View style={styles.customPickerWrap}>
+                  <PickerCol
+                    items={HOURS}
+                    selected={customEndHour}
+                    onSelect={setCustomEndHour}
+                    format={(v) => String(v)}
+                    colors={colors}
+                  />
+                  <Text style={styles.colonSep}>:</Text>
+                  <PickerCol
+                    items={MINUTES}
+                    selected={customEndMinute}
+                    onSelect={setCustomEndMinute}
+                    format={(v) => v === 0 ? "00" : String(v)}
+                    colors={colors}
+                  />
+                  <PickerCol
+                    items={PERIODS as ("AM" | "PM")[]}
+                    selected={customEndPeriod}
+                    onSelect={(v) => setCustomEndPeriod(v as "AM" | "PM")}
+                    format={(v) => v}
+                    colors={colors}
+                  />
+                </View>
                 <TouchableOpacity style={styles.customSaveBtn} onPress={handleSaveCustomNotif} disabled={notifSaving}>
-                  <Text style={styles.customSaveBtnText}>Set</Text>
+                  <Text style={styles.customSaveBtnText}>Set custom range</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -1054,7 +1092,7 @@ export default function ProfileScreen() {
 function createStyles(c: Colors) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: c.bg },
-    scroll: { paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl },
+    scroll: { paddingHorizontal: spacing.lg, paddingBottom: spacing.md },
     header: { paddingTop: spacing.lg, marginBottom: spacing.lg },
     title: {
       fontSize: typography.xxl,

@@ -3,6 +3,7 @@ import {
   View,
   Text,
   TextInput,
+  Image,
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
@@ -96,9 +97,10 @@ export default function RegisterScreen() {
           contentContainerStyle={styles.inner}
           keyboardShouldPersistTaps="handled"
         >
-          <View style={styles.logo}>
-            <Text style={styles.logoText}>3</Text>
-          </View>
+          <Image
+            source={require("@/assets/icon.png")}
+            style={styles.logo}
+          />
 
           <Text style={styles.title}>Create account</Text>
           <Text style={styles.subtitle}>Start turning your goals into action</Text>
@@ -219,10 +221,7 @@ const styles = StyleSheet.create({
   logo: {
     width: 56,
     height: 56,
-    borderRadius: radius.lg,
-    backgroundColor: PRIMARY,
-    alignItems: "center",
-    justifyContent: "center",
+    borderRadius: 14,
     marginBottom: spacing.xl,
     alignSelf: "center",
     shadowColor: PRIMARY,
@@ -230,11 +229,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 16,
     elevation: 8,
-  },
-  logoText: {
-    color: "#FFFFFF",
-    fontSize: typography.xxl,
-    fontWeight: typography.bold,
   },
   checkCircle: {
     width: 80,

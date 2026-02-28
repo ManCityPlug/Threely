@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, LogBox, Platform, Text, View } from "react-native";
+import { ActivityIndicator, Image, LogBox, Platform, Text, View } from "react-native";
 
 // Suppress network/API errors that show up in Expo Go when API points to production
 LogBox.ignoreLogs([
@@ -71,32 +71,26 @@ function BrandedSplash() {
       {/* Outer glow */}
       <View
         style={{
-          width: 160,
-          height: 160,
-          borderRadius: 80,
+          width: 180,
+          height: 180,
+          borderRadius: 90,
           backgroundColor: "rgba(99, 91, 255, 0.25)",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        {/* Logo container */}
-        <View
+        <Image
+          source={require("@/assets/icon.png")}
           style={{
             width: 120,
             height: 120,
-            borderRadius: 36,
-            backgroundColor: "#635BFF",
-            alignItems: "center",
-            justifyContent: "center",
+            borderRadius: 32,
             shadowColor: "#635BFF",
             shadowOffset: { width: 0, height: 0 },
             shadowOpacity: 0.5,
             shadowRadius: 30,
-            elevation: 15,
           }}
-        >
-          <Text style={{ color: "#FFFFFF", fontSize: 64, fontWeight: "800" }}>3</Text>
-        </View>
+        />
       </View>
     </LinearGradient>
   );
