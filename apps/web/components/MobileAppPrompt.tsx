@@ -186,25 +186,18 @@ export default function MobileAppPrompt() {
             }}
           >
             {/* App icon — bounces in */}
-            <div
+            <img
+              src="/favicon.png"
+              alt="Threely"
+              width={96}
+              height={96}
               style={{
-                width: 96,
-                height: 96,
                 borderRadius: 22,
-                background: "#635bff",
-                color: "#fff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 48,
-                fontWeight: 800,
                 boxShadow: "0 12px 32px rgba(99,91,255,0.3)",
                 marginBottom: "1.5rem",
                 animation: "mobilePromptScaleIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both",
               }}
-            >
-              3
-            </div>
+            />
 
             {/* Tagline */}
             <p
@@ -490,23 +483,13 @@ export default function MobileAppPrompt() {
           }}
         >
           {/* App icon */}
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 10,
-              background: "#635bff",
-              color: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 20,
-              fontWeight: 800,
-              flexShrink: 0,
-            }}
-          >
-            3
-          </div>
+          <img
+            src="/favicon.png"
+            alt="Threely"
+            width={40}
+            height={40}
+            style={{ borderRadius: 10, flexShrink: 0 }}
+          />
 
           {/* Text */}
           <div style={{ flex: 1, minWidth: 0 }}>

@@ -140,12 +140,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       {/* ── Mobile top bar ──────────────────────────────────────────────────── */}
       <div className="mobile-topbar" ref={menuRef}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 32, height: 32, borderRadius: 8,
-            background: "var(--primary)", color: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 16, fontWeight: 700, flexShrink: 0,
-          }}>3</div>
+          <img src="/favicon.png" alt="Threely" width={32} height={32} style={{ borderRadius: 8, flexShrink: 0 }} />
           <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.02em", color: "var(--text)" }}>
             Threely
           </span>

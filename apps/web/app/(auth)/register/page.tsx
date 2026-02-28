@@ -120,14 +120,10 @@ export default function RegisterPage() {
     return (
       <div className="card fade-in" style={{ padding: "2.5rem 2rem", textAlign: "center" }}>
         {/* App icon */}
-        <div style={{
-          width: 64, height: 64, borderRadius: 16,
-          background: "var(--primary)", color: "#fff",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 32, fontWeight: 800,
-          margin: "0 auto 1.25rem",
+        <img src="/favicon.png" alt="Threely" width={64} height={64} style={{
+          borderRadius: 16, margin: "0 auto 1.25rem", display: "block",
           boxShadow: "0 8px 24px rgba(99,91,255,0.25)",
-        }}>3</div>
+        }} />
 
         <h1 style={{
           fontSize: "1.5rem", fontWeight: 800,
@@ -209,12 +205,7 @@ export default function RegisterPage() {
   return (
     <div className="card fade-in" style={{ padding: "2.5rem 2rem" }}>
       <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <div style={{
-          width: 52, height: 52, borderRadius: 14,
-          background: "var(--primary)", color: "#fff",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 24, fontWeight: 700, margin: "0 auto 1rem",
-        }}>3</div>
+        <img src="/favicon.png" alt="Threely" width={52} height={52} style={{ borderRadius: 14, margin: "0 auto 1rem", display: "block" }} />
         <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 4 }}>
           Create account
         </h1>
