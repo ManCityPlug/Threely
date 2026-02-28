@@ -1,8 +1,7 @@
-import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL!;
-const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH!;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD!;
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET!;
 const COOKIE_NAME = "admin_session";
 
@@ -13,7 +12,7 @@ export async function verifyAdminCredentials(
   password: string
 ): Promise<boolean> {
   if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) return false;
-  return bcrypt.compareSync(password, ADMIN_PASSWORD_HASH);
+  return password === ADMIN_PASSWORD;
 }
 
 // ─── JWT via Web Crypto (HMAC-SHA256) ────────────────────────────────────────
