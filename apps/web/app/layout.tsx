@@ -11,7 +11,9 @@ export const metadata: Metadata = {
     "Turn your goals into personalized daily tasks with AI coaching. Threely builds smart, actionable plans tailored to your life.",
   icons: {
     icon: "/favicon.png",
+    apple: "/icon-192x192.png",
   },
+  manifest: "/manifest.json",
 };
 
 // Inline script to prevent flash of wrong theme on page load
