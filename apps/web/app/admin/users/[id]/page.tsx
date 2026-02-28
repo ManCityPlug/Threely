@@ -3,6 +3,34 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
+interface TaskItem {
+  id: string;
+  task: string;
+  description?: string;
+  estimated_minutes?: number;
+  goal_id?: string;
+  why?: string;
+  isCompleted: boolean;
+  isSkipped?: boolean;
+}
+
+interface GoalItem {
+  id: string;
+  title: string;
+  description: string | null;
+  rawInput: string;
+  structuredSummary: string | null;
+  category: string | null;
+  roadmap: string | null;
+  dailyTimeMinutes: number | null;
+  intensityLevel: number | null;
+  deadline: string | null;
+  isActive: boolean;
+  isPaused: boolean;
+  createdAt: string;
+  todayTasks: TaskItem[] | null;
+}
+
 interface UserDetail {
   user: {
     id: string;
@@ -20,14 +48,7 @@ interface UserDetail {
     active: number;
     completed: number;
     last30d: number;
-    list: {
-      id: string;
-      title: string;
-      category: string | null;
-      isActive: boolean;
-      isPaused: boolean;
-      createdAt: string;
-    }[];
+    list: GoalItem[];
   };
   tasks: {
     totalGenerated: number;
@@ -67,13 +88,7 @@ const sectionTitle: React.CSSProperties = {
   marginBottom: "0.75rem",
 };
 
-function Stat({
-  label,
-  value,
-}: {
-  label: string;
-  value: string | number;
-}) {
+function Stat({ label, value }: { label: string; value: string | number }) {
   return (
     <div>
       <div
@@ -103,6 +118,192 @@ function daysSince(dateStr: string): string {
   if (days < 30) return `${days} days ago`;
   const months = Math.floor(days / 30);
   return months === 1 ? "1 month ago" : `${months} months ago`;
+}
+
+const INTENSITY = ["", "Steady", "Committed", "All-in"];
+
+function GoalCard({ goal }: { goal: GoalItem }) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div
+      style={{
+        ...cardStyle,
+        marginBottom: "0.75rem",
+        cursor: "pointer",
+        transition: "border-color 0.15s",
+        borderColor: expanded ? "#3f3f46" : "#27272a",
+      }}
+    >
+      {/* Header — always visible */}
+      <div
+        onClick={() => setExpanded(!expanded)}
+        style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}
+      >
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+            <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>
+              {goal.title}
+            </span>
+            <span
+              style={{
+                padding: "2px 8px",
+                borderRadius: 6,
+                fontSize: "0.7rem",
+                fontWeight: 600,
+                background: goal.isActive
+                  ? goal.isPaused ? "#422006" : "#052e16"
+                  : "#27272a",
+                color: goal.isActive
+                  ? goal.isPaused ? "#fbbf24" : "#4ade80"
+                  : "#71717a",
+              }}
+            >
+              {goal.isActive ? (goal.isPaused ? "Paused" : "Active") : "Done"}
+            </span>
+            {goal.category && (
+              <span style={{ fontSize: "0.75rem", color: "#71717a" }}>
+                {goal.category}
+              </span>
+            )}
+          </div>
+          <div style={{ fontSize: "0.78rem", color: "#52525b", marginTop: 4 }}>
+            Created {new Date(goal.createdAt).toLocaleDateString()}
+            {goal.dailyTimeMinutes && ` · ${goal.dailyTimeMinutes}min/day`}
+            {goal.intensityLevel && ` · ${INTENSITY[goal.intensityLevel]}`}
+            {goal.deadline && ` · Deadline: ${new Date(goal.deadline).toLocaleDateString()}`}
+          </div>
+        </div>
+        <span style={{ color: "#71717a", fontSize: "1.1rem", flexShrink: 0, marginLeft: 12 }}>
+          {expanded ? "▾" : "▸"}
+        </span>
+      </div>
+
+      {/* Expanded content */}
+      {expanded && (
+        <div style={{ marginTop: "1rem", borderTop: "1px solid #27272a", paddingTop: "1rem" }}>
+          {/* Today's Tasks */}
+          {goal.todayTasks && goal.todayTasks.length > 0 && (
+            <div style={{ marginBottom: "1.25rem" }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#635bff", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
+                Today&apos;s Tasks
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {goal.todayTasks.map((t) => (
+                  <div
+                    key={t.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 10,
+                      padding: "0.5rem 0.65rem",
+                      background: "#0f1117",
+                      borderRadius: 8,
+                      border: "1px solid #1e1e21",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 20,
+                        height: 20,
+                        borderRadius: "50%",
+                        border: t.isCompleted ? "none" : t.isSkipped ? "none" : "2px solid #3f3f46",
+                        background: t.isCompleted ? "#635bff" : t.isSkipped ? "#422006" : "transparent",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                        marginTop: 2,
+                      }}
+                    >
+                      {t.isCompleted && <span style={{ color: "#fff", fontSize: 11, fontWeight: 700 }}>&#10003;</span>}
+                      {t.isSkipped && <span style={{ color: "#fbbf24", fontSize: 10 }}>—</span>}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div
+                        style={{
+                          fontSize: "0.85rem",
+                          color: t.isCompleted ? "#71717a" : t.isSkipped ? "#71717a" : "#e4e4e7",
+                          textDecoration: t.isCompleted ? "line-through" : "none",
+                          lineHeight: 1.4,
+                        }}
+                      >
+                        {t.task}
+                      </div>
+                      {t.description && (
+                        <div style={{ fontSize: "0.78rem", color: "#52525b", marginTop: 3, lineHeight: 1.4 }}>
+                          {t.description}
+                        </div>
+                      )}
+                    </div>
+                    {t.estimated_minutes && (
+                      <span style={{ fontSize: "0.72rem", fontWeight: 600, color: "#52525b", flexShrink: 0 }}>
+                        {t.estimated_minutes}m
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {goal.todayTasks === null && (
+            <div style={{ fontSize: "0.8rem", color: "#52525b", marginBottom: "1.25rem", fontStyle: "italic" }}>
+              No tasks generated for today
+            </div>
+          )}
+
+          {/* Raw Input */}
+          {goal.rawInput && (
+            <div style={{ marginBottom: "1rem" }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
+                User&apos;s Raw Input
+              </div>
+              <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#0f1117", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
+                {goal.rawInput}
+              </div>
+            </div>
+          )}
+
+          {/* Structured Summary */}
+          {goal.structuredSummary && (
+            <div style={{ marginBottom: "1rem" }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
+                Structured Summary
+              </div>
+              <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#0f1117", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
+                {goal.structuredSummary}
+              </div>
+            </div>
+          )}
+
+          {/* Roadmap */}
+          {goal.roadmap && (
+            <div>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
+                Full Roadmap
+              </div>
+              <div
+                style={{
+                  fontSize: "0.83rem",
+                  color: "#d4d4d8",
+                  lineHeight: 1.7,
+                  background: "#0f1117",
+                  borderRadius: 8,
+                  padding: "0.75rem",
+                  border: "1px solid #1e1e21",
+                  whiteSpace: "pre-wrap",
+                  maxHeight: 400,
+                  overflowY: "auto",
+                }}
+              >
+                {goal.roadmap}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function AdminUserDetailPage() {
@@ -182,8 +383,8 @@ export default function AdminUserDetailPage() {
         </div>
       </div>
 
-      {/* Goals */}
-      <h2 style={sectionTitle}>Goals</h2>
+      {/* Goals — expandable cards */}
+      <h2 style={sectionTitle}>Goals ({goals.total})</h2>
       <div
         style={{
           display: "grid",
@@ -192,9 +393,6 @@ export default function AdminUserDetailPage() {
           marginBottom: "1rem",
         }}
       >
-        <div style={cardStyle}>
-          <Stat label="Total" value={goals.total} />
-        </div>
         <div style={cardStyle}>
           <Stat label="Active" value={goals.active} />
         </div>
@@ -206,83 +404,10 @@ export default function AdminUserDetailPage() {
         </div>
       </div>
       {goals.list.length > 0 && (
-        <div style={{ ...cardStyle, marginBottom: "2rem" }}>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              fontSize: "0.85rem",
-            }}
-          >
-            <thead>
-              <tr style={{ borderBottom: "1px solid #27272a" }}>
-                {["Title", "Category", "Status", "Created"].map((h) => (
-                  <th
-                    key={h}
-                    style={{
-                      textAlign: "left",
-                      padding: "0.5rem 0.75rem",
-                      color: "#71717a",
-                      fontWeight: 600,
-                      fontSize: "0.8rem",
-                    }}
-                  >
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {goals.list.map((g) => (
-                <tr key={g.id} style={{ borderBottom: "1px solid #1e1e21" }}>
-                  <td
-                    style={{
-                      padding: "0.5rem 0.75rem",
-                      color: "#e4e4e7",
-                      maxWidth: 300,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {g.title}
-                  </td>
-                  <td style={{ padding: "0.5rem 0.75rem", color: "#a1a1aa" }}>
-                    {g.category || "—"}
-                  </td>
-                  <td style={{ padding: "0.5rem 0.75rem" }}>
-                    <span
-                      style={{
-                        padding: "2px 8px",
-                        borderRadius: 6,
-                        fontSize: "0.75rem",
-                        fontWeight: 600,
-                        background: g.isActive
-                          ? g.isPaused
-                            ? "#422006"
-                            : "#052e16"
-                          : "#27272a",
-                        color: g.isActive
-                          ? g.isPaused
-                            ? "#fbbf24"
-                            : "#4ade80"
-                          : "#71717a",
-                      }}
-                    >
-                      {g.isActive
-                        ? g.isPaused
-                          ? "Paused"
-                          : "Active"
-                        : "Done"}
-                    </span>
-                  </td>
-                  <td style={{ padding: "0.5rem 0.75rem", color: "#71717a" }}>
-                    {new Date(g.createdAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div style={{ marginBottom: "2rem" }}>
+          {goals.list.map((g) => (
+            <GoalCard key={g.id} goal={g} />
+          ))}
         </div>
       )}
 
@@ -309,10 +434,7 @@ export default function AdminUserDetailPage() {
           <Stat label="Completion %" value={`${tasks.completionRate}%`} />
         </div>
         <div style={cardStyle}>
-          <Stat
-            label="Hours Invested"
-            value={tasks.totalHoursInvested}
-          />
+          <Stat label="Hours Invested" value={tasks.totalHoursInvested} />
         </div>
         <div style={cardStyle}>
           <Stat label="Daily Records" value={tasks.dailyTaskRecords} />
@@ -334,10 +456,7 @@ export default function AdminUserDetailPage() {
         </div>
         {subscription.stripeCustomerId && (
           <div style={cardStyle}>
-            <Stat
-              label="Stripe ID"
-              value={subscription.stripeCustomerId}
-            />
+            <Stat label="Stripe ID" value={subscription.stripeCustomerId} />
           </div>
         )}
         {subscription.trialEndsAt && (
@@ -374,34 +493,13 @@ export default function AdminUserDetailPage() {
         >
           <thead>
             <tr style={{ borderBottom: "1px solid #27272a" }}>
-              <th
-                style={{
-                  textAlign: "left",
-                  padding: "0.5rem 0",
-                  color: "#71717a",
-                  fontWeight: 600,
-                }}
-              >
+              <th style={{ textAlign: "left", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>
                 Function
               </th>
-              <th
-                style={{
-                  textAlign: "right",
-                  padding: "0.5rem 0",
-                  color: "#71717a",
-                  fontWeight: 600,
-                }}
-              >
+              <th style={{ textAlign: "right", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>
                 Calls
               </th>
-              <th
-                style={{
-                  textAlign: "right",
-                  padding: "0.5rem 0",
-                  color: "#71717a",
-                  fontWeight: 600,
-                }}
-              >
+              <th style={{ textAlign: "right", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>
                 Est. Cost
               </th>
             </tr>
@@ -409,25 +507,11 @@ export default function AdminUserDetailPage() {
           <tbody>
             {Object.entries(ai.breakdown).map(([fn, info]) => (
               <tr key={fn} style={{ borderBottom: "1px solid #1e1e21" }}>
-                <td style={{ padding: "0.4rem 0", color: "#e4e4e7" }}>
-                  {fn}
-                </td>
-                <td
-                  style={{
-                    padding: "0.4rem 0",
-                    textAlign: "right",
-                    color: "#a1a1aa",
-                  }}
-                >
+                <td style={{ padding: "0.4rem 0", color: "#e4e4e7" }}>{fn}</td>
+                <td style={{ padding: "0.4rem 0", textAlign: "right", color: "#a1a1aa" }}>
                   {info.calls.toLocaleString()}
                 </td>
-                <td
-                  style={{
-                    padding: "0.4rem 0",
-                    textAlign: "right",
-                    color: "#a1a1aa",
-                  }}
-                >
+                <td style={{ padding: "0.4rem 0", textAlign: "right", color: "#a1a1aa" }}>
                   ${info.cost.toFixed(3)}
                 </td>
               </tr>

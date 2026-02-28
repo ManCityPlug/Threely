@@ -7,9 +7,13 @@ export const dynamic = "force-dynamic";
 
 interface TaskItem {
   id: string;
+  task: string;
+  description?: string;
+  estimated_minutes?: number;
+  goal_id?: string;
+  why?: string;
   isCompleted: boolean;
   isSkipped?: boolean;
-  estimated_minutes?: number;
 }
 
 const AI_COSTS = {
@@ -187,14 +191,33 @@ export async function GET(
       active: goals.filter((g) => g.isActive).length,
       completed: goals.filter((g) => !g.isActive).length,
       last30d: goalsLast30d,
-      list: goals.map((g) => ({
-        id: g.id,
-        title: g.title,
-        category: g.category,
-        isActive: g.isActive,
-        isPaused: g.isPaused,
-        createdAt: g.createdAt,
-      })),
+      list: goals.map((g) => {
+        // Find today's tasks for this goal
+        const todayKey = new Date().toISOString().split("T")[0];
+        const todayDailyTask = allDailyTasks.find(
+          (dt) =>
+            dt.goalId === g.id &&
+            new Date(dt.date).toISOString().split("T")[0] === todayKey
+        );
+        return {
+          id: g.id,
+          title: g.title,
+          description: g.description,
+          rawInput: g.rawInput,
+          structuredSummary: g.structuredSummary,
+          category: g.category,
+          roadmap: g.roadmap,
+          dailyTimeMinutes: g.dailyTimeMinutes,
+          intensityLevel: g.intensityLevel,
+          deadline: g.deadline,
+          isActive: g.isActive,
+          isPaused: g.isPaused,
+          createdAt: g.createdAt,
+          todayTasks: todayDailyTask
+            ? (todayDailyTask.tasks as unknown as TaskItem[])
+            : null,
+        };
+      }),
     },
     tasks: {
       totalGenerated: totalTaskItems,
