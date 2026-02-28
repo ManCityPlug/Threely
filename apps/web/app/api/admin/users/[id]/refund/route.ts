@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { getAdminFromRequest } from "@/lib/admin-auth";
+import { sendRefundConfirmation } from "@/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -62,9 +63,18 @@ export async function POST(
     data: { subscriptionStatus: "canceled" },
   });
 
+  const amountStr = `$${(refundableCharge.amount / 100).toFixed(2)}`;
+
+  // Send refund confirmation email
+  try {
+    await sendRefundConfirmation(user.email, amountStr);
+  } catch {
+    // Don't fail the refund if email fails
+  }
+
   return NextResponse.json({
     success: true,
-    message: `Refund of $${(refundableCharge.amount / 100).toFixed(2)} issued successfully`,
+    message: `Refund of ${amountStr} issued and confirmation email sent to ${user.email}`,
     refundId: refund.id,
     amount: refundableCharge.amount / 100,
   });

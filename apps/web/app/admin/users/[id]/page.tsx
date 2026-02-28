@@ -340,6 +340,7 @@ export default function AdminUserDetailPage() {
   const [error, setError] = useState("");
   const [cancelLoading, setCancelLoading] = useState(false);
   const [refundLoading, setRefundLoading] = useState(false);
+  const [denyLoading, setDenyLoading] = useState(false);
   const [actionMessage, setActionMessage] = useState("");
 
   useEffect(() => {
@@ -589,7 +590,7 @@ export default function AdminUserDetailPage() {
         {subscription.stripeCustomerId && getRefundEligibility(subscription).label.includes("Eligible") && (
           <button
             onClick={async () => {
-              if (!confirm("Issue a full refund and cancel subscription immediately?")) return;
+              if (!confirm("Issue a full refund and cancel subscription immediately? A confirmation email will be sent.")) return;
               setRefundLoading(true);
               setActionMessage("");
               try {
@@ -623,7 +624,43 @@ export default function AdminUserDetailPage() {
               opacity: refundLoading ? 0.6 : 1,
             }}
           >
-            {refundLoading ? "Refunding..." : "Issue Refund"}
+            {refundLoading ? "Refunding..." : "Issue Refund & Notify"}
+          </button>
+        )}
+        {subscription.stripeCustomerId && getRefundEligibility(subscription).label === "Not Eligible" && (
+          <button
+            onClick={async () => {
+              if (!confirm(`Send refund denial email to ${user.email}?`)) return;
+              setDenyLoading(true);
+              setActionMessage("");
+              try {
+                const res = await fetch(`/api/admin/users/${user.id}/deny-refund`, { method: "POST" });
+                const json = await res.json();
+                if (res.ok) {
+                  setActionMessage(json.message);
+                } else {
+                  setActionMessage(`Error: ${json.error}`);
+                }
+              } catch (e) {
+                setActionMessage(`Error: ${e instanceof Error ? e.message : "Failed"}`);
+              } finally {
+                setDenyLoading(false);
+              }
+            }}
+            disabled={denyLoading}
+            style={{
+              padding: "0.6rem 1.25rem",
+              borderRadius: 10,
+              background: "#27272a",
+              color: "#a1a1aa",
+              fontWeight: 700,
+              fontSize: "0.85rem",
+              border: "1px solid #3f3f46",
+              cursor: denyLoading ? "not-allowed" : "pointer",
+              opacity: denyLoading ? 0.6 : 1,
+            }}
+          >
+            {denyLoading ? "Sending..." : "Deny Refund & Notify"}
           </button>
         )}
       </div>
