@@ -1335,7 +1335,7 @@ export default function GoalsPage() {
     } else {
       // New goal: add to list and redirect to dashboard
       setGoals(prev => [...prev, goal]);
-      sessionStorage.setItem(`threely_focus_${new Date().toISOString().slice(0, 10)}`, goal.id);
+      localStorage.setItem(`threely_focus_${new Date().toISOString().slice(0, 10)}`, goal.id);
       router.push("/dashboard");
     }
   }
