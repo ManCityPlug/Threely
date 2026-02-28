@@ -2,6 +2,12 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // Skip Supabase session refresh for admin routes
+  const { pathname } = request.nextUrl;
+  if (pathname.startsWith("/admin") || pathname.startsWith("/api/admin")) {
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(

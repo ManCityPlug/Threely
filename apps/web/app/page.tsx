@@ -235,7 +235,7 @@ export default function LandingPage() {
       {/* ─── Hero ──────────────────────────────────────────────────────────────── */}
       <section style={{
         background: "linear-gradient(135deg, #f6f9fc 0%, #ede9ff 100%)",
-        padding: isMobile ? "3rem 1.5rem 2.5rem" : "5rem 1.5rem 3.5rem",
+        padding: isMobile ? "1.5rem 1.5rem 2.5rem" : "5rem 1.5rem 3.5rem",
         textAlign: "center",
       }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
