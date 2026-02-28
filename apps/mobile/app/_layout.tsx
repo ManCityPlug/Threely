@@ -112,6 +112,7 @@ function AppContent() {
   const [authOverlay, setAuthOverlay] = useState(false);
   const [welcomeInitialPage, setWelcomeInitialPage] = useState(0);
   const pendingDestination = useRef<"register" | "login" | null>(null);
+  const routingResolved = useRef(false);
 
   // Register the "go back to welcome" callback for auth screens
   useEffect(() => {
@@ -170,8 +171,16 @@ function AppContent() {
     return () => authListener.subscription.unsubscribe();
   }, []);
 
+  // Reset routing when session changes (login/logout)
+  useEffect(() => {
+    routingResolved.current = false;
+    setReady(false);
+  }, [session]);
+
   useEffect(() => {
     if (session === undefined) return;
+    // Once we've resolved the destination, don't re-run on segment changes
+    if (routingResolved.current) return;
 
     const inAuthGroup   = segments[0] === "(auth)";
     const inOnboarding  = segments[0] === "(onboarding)";
@@ -182,6 +191,7 @@ function AppContent() {
         const dest = pendingDestination.current;
         if (dest) {
           pendingDestination.current = null;
+          routingResolved.current = true;
           const route = dest === "register" ? "/(auth)/register" : "/(auth)/login";
           if (!inAuthGroup) {
             setTimeout(() => {
@@ -192,6 +202,7 @@ function AppContent() {
           } else {
             setAuthOverlay(false);
           }
+          setReady(true);
           return;
         }
       }
@@ -201,6 +212,9 @@ function AppContent() {
 
     const onboardingKey = `@threely_onboarding_done_${session.user.id}`;
     AsyncStorage.getItem(onboardingKey).then(async (done) => {
+      // Guard against race: another run may have resolved while we were awaiting
+      if (routingResolved.current) return;
+
       // Not onboarded locally — check backend for existing profile
       if (!done) {
         try {
@@ -215,7 +229,10 @@ function AppContent() {
         }
       }
 
+      if (routingResolved.current) return;
+
       if (!done) {
+        routingResolved.current = true;
         if (!inOnboarding) router.replace("/(onboarding)");
         setReady(true);
         return;
@@ -227,6 +244,7 @@ function AppContent() {
       const cachedStatus = await AsyncStorage.getItem("@threely_subscription_status");
 
       if (isAccessGranted(cachedStatus)) {
+        routingResolved.current = true;
         if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
         setReady(true);
         return;
@@ -236,18 +254,23 @@ function AppContent() {
       try {
         const { status } = await subscriptionApi.status();
 
+        if (routingResolved.current) return;
+
         if (isAccessGranted(status)) {
           await AsyncStorage.setItem("@threely_subscription_status", status ?? "");
+          routingResolved.current = true;
           if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
           setReady(true);
           return;
         }
 
         // No valid subscription — show payment screen
+        routingResolved.current = true;
         if (!inPayment) router.replace("/payment");
         setReady(true);
       } catch {
         // Backend unreachable — be lenient (don't block offline users)
+        routingResolved.current = true;
         if (inAuthGroup || inOnboarding) router.replace("/(tabs)");
         setReady(true);
       }
