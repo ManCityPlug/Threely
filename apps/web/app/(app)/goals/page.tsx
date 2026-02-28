@@ -7,6 +7,7 @@ import { SkeletonCard } from "@/components/Skeleton";
 import GoalTemplatesComponent from "@/components/GoalTemplates";
 import type { GoalCategory } from "@/lib/goal-templates";
 import { useToast } from "@/components/ToastProvider";
+import { useSubscription } from "@/lib/subscription-context";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -78,6 +79,7 @@ const INTENSITY_OPTIONS_WEB = [
 ];
 
 function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => void; onClose: () => void; editGoal?: Goal | null }) {
+  const { showPaywall } = useSubscription();
   const [step, setStep] = useState<FlowStep>("goal");
   const [showTemplates, setShowTemplates] = useState(!editGoal);
 
@@ -121,6 +123,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
   const [builtTasks, setBuiltTasks] = useState<TaskItem[]>([]);
   const [coachNote, setCoachNote] = useState("");
   const [savedGoal, setSavedGoal] = useState<Goal | null>(null);
+  const [offDayMessage, setOffDayMessage] = useState<string | null>(null);
 
   // Progress
   const stepIndex = 1;
@@ -208,8 +211,13 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
         setChatDone(true);
         setChatGoalText(result.goal_text);
       }
-    } catch {
-      setChatHistory([{ role: "assistant", text: "Something went wrong. Please close and try again." }]);
+    } catch (err) {
+      if (err instanceof Error && err.message?.includes("pro_required")) {
+        onClose();
+        showPaywall();
+      } else {
+        setChatHistory([{ role: "assistant", text: "Something went wrong. Please close and try again." }]);
+      }
     } finally {
       setChatLoading(false);
     }
@@ -235,8 +243,13 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
         setChatDone(true);
         setChatGoalText(result.goal_text);
       }
-    } catch {
-      setChatHistory(prev => [...prev, { role: "assistant", text: "Something went wrong. Please try again." }]);
+    } catch (err) {
+      if (err instanceof Error && err.message?.includes("pro_required")) {
+        onClose();
+        showPaywall();
+      } else {
+        setChatHistory(prev => [...prev, { role: "assistant", text: "Something went wrong. Please try again." }]);
+      }
     } finally {
       setChatLoading(false);
       setTimeout(() => chatInputRef.current?.focus(), 100);
@@ -262,9 +275,14 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
       }
       // Build immediately with parsed data — use defaults for anything AI didn't extract
       await handleBuild({ goalText, parsedGoal: result });
-    } catch {
-      setBuildError("Failed to analyze goal. Try again.");
-      setStep("goal");
+    } catch (err) {
+      if (err instanceof Error && err.message?.includes("pro_required")) {
+        onClose();
+        showPaywall();
+      } else {
+        setBuildError("Failed to analyze goal. Try again.");
+        setStep("goal");
+      }
     }
   }
 
@@ -285,26 +303,60 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
       const effectiveTime = (effectiveParsed?.daily_time_detected && effectiveParsed.daily_time_detected > 0)
         ? effectiveParsed.daily_time_detected : (timeMinutes ?? 60);
 
-      const { goal } = await goalsApi.create({
-        title: goalTitle,
-        rawInput: effectiveRawInput,
-        structuredSummary: effectiveParsed?.structured_summary,
-        category: effectiveParsed?.category,
-        deadline,
-        dailyTimeMinutes: effectiveTime,
-        intensityLevel: intensityLevel ?? 2,
-        workDays: effectiveWorkDays,
-      });
+      let goal: Goal;
+      if (editGoal) {
+        const res = await goalsApi.update(editGoal.id, {
+          title: goalTitle,
+          rawInput: effectiveRawInput,
+          structuredSummary: effectiveParsed?.structured_summary,
+          category: effectiveParsed?.category,
+          deadline,
+          dailyTimeMinutes: effectiveTime,
+          intensityLevel: intensityLevel ?? 2,
+          workDays: effectiveWorkDays,
+        });
+        goal = res.goal;
+      } else {
+        const res = await goalsApi.create({
+          title: goalTitle,
+          rawInput: effectiveRawInput,
+          structuredSummary: effectiveParsed?.structured_summary,
+          category: effectiveParsed?.category,
+          deadline,
+          dailyTimeMinutes: effectiveTime,
+          intensityLevel: intensityLevel ?? 2,
+          workDays: effectiveWorkDays,
+        });
+        goal = res.goal;
+      }
       setSavedGoal(goal);
 
-      const result = await tasksApi.generate({ goalId: goal.id });
-      const tasks = result.dailyTasks.flatMap(dt => dt.tasks).slice(0, 3);
-      setBuiltTasks(tasks);
-      if (result.coachNote) setCoachNote(result.coachNote);
+      // Check if today is a work day for this goal
+      const todayIso = new Date().getDay();
+      const todayIsoDay = todayIso === 0 ? 7 : todayIso;
+      const isTodayWorkDay = effectiveWorkDays.length === 0 || effectiveWorkDays.length === 7 || effectiveWorkDays.includes(todayIsoDay);
+
+      if (isTodayWorkDay) {
+        const result = await tasksApi.generate({ goalId: goal.id });
+        const tasks = result.dailyTasks.flatMap(dt => dt.tasks).slice(0, 3);
+        setBuiltTasks(tasks);
+        if (result.coachNote) setCoachNote(result.coachNote);
+      } else {
+        // Find next work day name
+        const dayNames = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const sorted = [...effectiveWorkDays].sort((a, b) => a - b);
+        const nextDay = sorted.find(d => d > todayIsoDay) ?? sorted[0];
+        setOffDayMessage(`Your first tasks will appear on ${dayNames[nextDay]}!`);
+      }
       setStep("done");
     } catch (e) {
-      setBuildError(e instanceof Error ? e.message : "Something went wrong.");
-      setStep("goal");
+      if (e instanceof Error && e.message?.includes("pro_required")) {
+        onClose();
+        showPaywall();
+      } else {
+        setBuildError(e instanceof Error ? e.message : "Something went wrong.");
+        setStep("goal");
+      }
     }
   }
 
@@ -739,7 +791,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
     return (
       <>
         <h2 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>
-          Your plan is ready &#10022;
+          {offDayMessage ? "Goal created &#10022;" : "Your plan is ready &#10022;"}
         </h2>
         {coachNote && (
           <p style={{ fontSize: "0.9rem", color: "var(--subtext)", fontStyle: "italic", lineHeight: 1.6, marginBottom: "1.25rem" }}>
@@ -747,29 +799,44 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
           </p>
         )}
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: "1.5rem" }}>
-          {builtTasks.map((task, i) => (
-            <div
-              key={task.id}
-              className="card fade-in"
-              style={{ padding: "1rem 1.25rem", animationDelay: `${i * 0.15}s` }}
-            >
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                <p style={{ fontWeight: 600, fontSize: "0.95rem", color: "var(--text)", lineHeight: 1.4 }}>
-                  {task.task}
-                </p>
-                {task.estimated_minutes > 0 && (
-                  <span className="badge" style={{ flexShrink: 0 }}>~{task.estimated_minutes}m</span>
+        {offDayMessage ? (
+          <div className="card fade-in" style={{
+            padding: "2rem 1.5rem", textAlign: "center", marginBottom: "1.5rem",
+            background: "rgba(99,91,255,0.08)", border: "1px solid rgba(99,91,255,0.2)",
+          }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>&#128197;</div>
+            <p style={{ fontSize: "1.1rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
+              {offDayMessage}
+            </p>
+            <p style={{ fontSize: "0.85rem", color: "var(--subtext)", lineHeight: 1.5 }}>
+              We'll generate your first 3 tasks on your next scheduled day.
+            </p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: "1.5rem" }}>
+            {builtTasks.map((task, i) => (
+              <div
+                key={task.id}
+                className="card fade-in"
+                style={{ padding: "1rem 1.25rem", animationDelay: `${i * 0.15}s` }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                  <p style={{ fontWeight: 600, fontSize: "0.95rem", color: "var(--text)", lineHeight: 1.4 }}>
+                    {task.task}
+                  </p>
+                  {task.estimated_minutes > 0 && (
+                    <span className="badge" style={{ flexShrink: 0 }}>~{task.estimated_minutes}m</span>
+                  )}
+                </div>
+                {task.why && (
+                  <p style={{ fontSize: "0.82rem", color: "var(--subtext)", fontStyle: "italic", marginTop: 6, lineHeight: 1.5 }}>
+                    {task.why}
+                  </p>
                 )}
               </div>
-              {task.why && (
-                <p style={{ fontSize: "0.82rem", color: "var(--subtext)", fontStyle: "italic", marginTop: 6, lineHeight: 1.5 }}>
-                  {task.why}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <button
           className="btn btn-primary"
@@ -1237,7 +1304,9 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
 
 export default function GoalsPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { showToast } = useToast();
+  const { hasPro, showPaywall } = useSubscription();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(searchParams.get("add") === "true");
@@ -1257,8 +1326,18 @@ export default function GoalsPage() {
   useEffect(() => { load(); }, [load]);
 
   function handleGoalAdded(goal: Goal) {
+    const isEdit = editGoal !== null;
     setShowAdd(false);
-    setGoals(prev => [...prev, goal]);
+    setEditGoal(null);
+    if (isEdit) {
+      // Update existing goal in the list
+      setGoals(prev => prev.map(g => g.id === goal.id ? goal : g));
+    } else {
+      // New goal: add to list and redirect to dashboard
+      setGoals(prev => [...prev, goal]);
+      sessionStorage.setItem(`threely_focus_${new Date().toISOString().slice(0, 10)}`, goal.id);
+      router.push("/dashboard");
+    }
   }
 
   function handleGoalDeleted(id: string) {
@@ -1309,7 +1388,7 @@ export default function GoalsPage() {
         </div>
         <button
           className="btn btn-primary"
-          onClick={() => setShowAdd(true)}
+          onClick={() => hasPro ? setShowAdd(true) : showPaywall()}
           style={{ fontSize: "0.875rem" }}
         >
           + Add goal
@@ -1331,7 +1410,7 @@ export default function GoalsPage() {
             <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{"·"}</span>
             <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>{"✦"} Progress tracking</span>
           </div>
-          <button className="btn btn-primary" onClick={() => setShowAdd(true)} style={{ fontSize: "0.95rem", padding: "0.75rem 2rem" }}>
+          <button className="btn btn-primary" onClick={() => hasPro ? setShowAdd(true) : showPaywall()} style={{ fontSize: "0.95rem", padding: "0.75rem 2rem" }}>
             Create your first goal {"\u2192"}
           </button>
         </div>

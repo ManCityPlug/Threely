@@ -64,8 +64,6 @@ function getGreeting() {
   return "Good evening";
 }
 
-type GoalSelection = string | "shuffle";
-
 function formatMinutes(min: number): string {
   if (min < 60) return `${min}m`;
   const h = Math.floor(min / 60);
@@ -97,29 +95,19 @@ function stalenessLabel(days: number | null): string {
   return `${days}d ago`;
 }
 
-type MixItem = { dailyTaskId: string; goalTitle: string; task: TaskItem };
+function getTodayIsoDay(): number {
+  const d = new Date().getDay();
+  return d === 0 ? 7 : d;
+}
 
-function computeMixItems(dailyTasks: DailyTask[]): MixItem[] {
-  const result: MixItem[] = [];
-  let round = 0;
-  while (result.length < 3) {
-    let addedThisRound = 0;
-    for (const dt of dailyTasks) {
-      const tasks = (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).slice(-3);
-      if (tasks[round]) {
-        result.push({
-          dailyTaskId: dt.id,
-          goalTitle: dt.goal?.title ?? "",
-          task: tasks[round],
-        });
-        addedThisRound++;
-        if (result.length >= 3) break;
-      }
-    }
-    if (addedThisRound === 0) break;
-    round++;
-  }
-  return result;
+function isGoalWorkDay(workDays: number[] | undefined): boolean {
+  if (!workDays || workDays.length === 0 || workDays.length === 7) return true;
+  return workDays.includes(getTodayIsoDay());
+}
+
+function formatWorkDaysList(workDays: number[]): string {
+  const names = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  return [...workDays].sort((a, b) => a - b).map(d => names[d]).join(", ");
 }
 
 // Enable LayoutAnimation on Android
@@ -143,7 +131,7 @@ export default function DashboardScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [nickname, setNickname] = useState("");
-  const [selectedGoal, setSelectedGoal] = useState<GoalSelection>("shuffle");
+  const [selectedGoal, setSelectedGoal] = useState("");
   const [dailyTimeMinutes, setDailyTimeMinutes] = useState(0);
   const [goalPickerVisible, setGoalPickerVisible] = useState(false);
   const [goalPickerShownToday, setGoalPickerShownToday] = useState(false);
@@ -163,10 +151,6 @@ export default function DashboardScreen() {
 
   // ─── Confetti state ───────────────────────────────────────────────────────────
   const [showConfetti, setShowConfetti] = useState(false);
-
-  // ─── Focus lock state ────────────────────────────────────────────────────────
-  const [tasksCompletedSinceGenerate, setTasksCompletedSinceGenerate] = useState(false);
-  const [hasGeneratedMore, setHasGeneratedMore] = useState(false);
 
   // ─── Pro / trial state ────────────────────────────────────────────────────────
   const [welcomeProVisible, setWelcomeProVisible] = useState(false);
@@ -211,9 +195,9 @@ export default function DashboardScreen() {
       const serverFocus = focusRes.focus?.focusGoalId;
       const restoredFocus = serverFocus ?? savedFocus;
       const activeGoalIds = new Set(goalsRes.goals.map(g => g.id));
-      const isValidFocus = restoredFocus && (restoredFocus === "shuffle" || activeGoalIds.has(restoredFocus));
+      const isValidFocus = restoredFocus && activeGoalIds.has(restoredFocus);
       if (isValidFocus) {
-        setSelectedGoal(restoredFocus as GoalSelection);
+        setSelectedGoal(restoredFocus);
         setGoalPickerShownToday(true);
         // Sync AsyncStorage with server
         if (serverFocus && !savedFocus) {
@@ -316,25 +300,11 @@ export default function DashboardScreen() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _sort = sortTrigger; // subscribe to sort trigger for delayed reorder
 
-  const mixItems = useMemo<MixItem[]>(() => {
-    if (selectedGoal !== "shuffle") return [];
-    const items = computeMixItems(dailyTasks);
-    // Sort: incomplete first, completed last (recently toggled stay in place)
-    const incomplete = items.filter(x => !x.task.isCompleted || recentlyToggledRef.current.has(x.task.id));
-    const completed = items.filter(x => x.task.isCompleted && !recentlyToggledRef.current.has(x.task.id));
-    return [...incomplete, ...completed];
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dailyTasks, selectedGoal, sortTrigger]);
-
   const visibleTasks: DailyTask[] =
-    selectedGoal === "shuffle"
-      ? []
-      : dailyTasks.filter((dt) => dt.goalId === selectedGoal);
+    dailyTasks.filter((dt) => dt.goalId === selectedGoal);
 
   const allTaskItems =
-    selectedGoal === "shuffle"
-      ? mixItems.map((m) => m.task)
-      : visibleTasks.flatMap((dt) => (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []));
+    visibleTasks.flatMap((dt) => (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []));
 
   const displayVisibleTasks: DailyTask[] = visibleTasks.map((dt) => {
     const tasks = (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).slice(-3);
@@ -345,20 +315,14 @@ export default function DashboardScreen() {
   });
 
   const newTaskItems =
-    selectedGoal === "shuffle"
-      ? mixItems.map((m) => m.task)
-      : displayVisibleTasks.flatMap((dt) => (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []));
+    displayVisibleTasks.flatMap((dt) => (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []));
 
   const selectedLabel =
-    selectedGoal === "shuffle"
-      ? "Mix all goals"
-      : goals.find((g) => g.id === selectedGoal)?.title ?? "Select goal";
+    goals.find((g) => g.id === selectedGoal)?.title ?? "Select goal";
 
   const hasAnyTasks = goals.length > 0;
 
-  const hasVisibleTasks =
-    selectedGoal === "shuffle" ? mixItems.length > 0
-    : visibleTasks.length > 0;
+  const hasVisibleTasks = visibleTasks.length > 0;
 
   const allDisplayedItems = newTaskItems;
   const allDone = allDisplayedItems.length > 0 && allDisplayedItems.every((t) => t.isCompleted);
@@ -366,9 +330,7 @@ export default function DashboardScreen() {
   const totalCount = allDisplayedItems.length;
 
   const totalEstimatedMinutes = (() => {
-    const displayed = selectedGoal === "shuffle"
-      ? mixItems.map(m => m.task)
-      : displayVisibleTasks.flatMap(dt => Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []);
+    const displayed = displayVisibleTasks.flatMap(dt => Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []);
     return displayed
       .filter(t => !t.isCompleted)
       .reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
@@ -376,9 +338,7 @@ export default function DashboardScreen() {
 
   // Build notification context from current state
   const buildNotifContext = useCallback((): NotifContext => {
-    const focusGoalName = selectedGoal === "shuffle"
-      ? null
-      : goals.find(g => g.id === selectedGoal)?.title ?? null;
+    const focusGoalName = goals.find(g => g.id === selectedGoal)?.title ?? null;
     const incomplete = newTaskItems.filter(t => !t.isCompleted && !t.isSkipped);
     return {
       focusGoalName,
@@ -404,7 +364,6 @@ export default function DashboardScreen() {
   const goalKey = selectedGoal ?? "none";
   useEffect(() => {
     if (allDone && !prevAllDone.current && newTaskItems.length > 0) {
-      setTasksCompletedSinceGenerate(true);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
     }
@@ -415,7 +374,7 @@ export default function DashboardScreen() {
 
   // ─── Goal picker ───────────────────────────────────────────────────────────
 
-  async function persistFocus(val: GoalSelection) {
+  async function persistFocus(val: string) {
     if (Platform.OS !== "web") Haptics.selectionAsync();
     setSelectedGoal(val);
     setGoalPickerVisible(false);
@@ -423,77 +382,79 @@ export default function DashboardScreen() {
     // Persist locally + server
     const todayKey = `@threely_focus_${new Date().toISOString().slice(0, 10)}`;
     await AsyncStorage.setItem(todayKey, val);
-    // Compute shuffle task IDs if applicable
-    const shuffleIds = val === "shuffle"
-      ? computeMixItems(dailyTasks).map(m => m.task.id)
-      : undefined;
-    focusApi.save(val, shuffleIds).catch(() => {});
+    focusApi.save(val).catch(() => {});
   }
 
-  function selectGoal(val: GoalSelection) {
-    if (goalPickerShownToday) {
-      // Focus lock: if they completed 3/3 and haven't generated more, allow free switch
-      const canSwitchFreely = tasksCompletedSinceGenerate && !hasGeneratedMore;
-      if (canSwitchFreely) {
-        persistFocus(val);
-        return;
-      }
-      // Otherwise confirm before switching
+  function selectGoal(val: string) {
+    // Check if this is an off-day goal
+    const stat = goalStats.find(s => s.goalId === val);
+    if (stat && !isGoalWorkDay(stat.workDays)) {
+      const dayNames = formatWorkDaysList(stat.workDays);
       Alert.alert(
-        "Change focus?",
-        "This will reset today's progress. Are you sure?",
+        "Off-Day Goal",
+        `This goal is scheduled for ${dayNames}. Would you like to work on it today?`,
         [
-          { text: "Cancel", style: "cancel", onPress: () => setGoalPickerVisible(false) },
-          { text: "Change", style: "destructive", onPress: () => persistFocus(val) },
+          { text: "Cancel", style: "cancel" },
+          { text: "Work on it", onPress: () => persistFocus(val) },
         ]
       );
-    } else {
-      persistFocus(val);
+      return;
     }
+    persistFocus(val);
   }
 
   // ─── Handlers ──────────────────────────────────────────────────────────────
 
   async function handleFirstGenerate() {
+    if (proExpired) { router.push("/payment" as never); return; }
     if (goals.length === 0) {
       router.navigate("/(tabs)/goals");
       return;
     }
     setGenerating(true);
     try {
-      const goalId = selectedGoal === "shuffle" ? undefined : selectedGoal;
-      const res = await tasksApi.generate(goalId);
+      const res = await tasksApi.generate(selectedGoal || undefined);
       setDailyTasks((prev) => {
         const newIds = new Set(res.dailyTasks.map((dt) => dt.id));
-        const updated = [
+        return [
           ...prev.filter(
             (dt) => !newIds.has(dt.id) && res.dailyTasks.every((r) => r.goalId !== dt.goalId)
           ),
           ...res.dailyTasks,
         ];
-        // Save shuffle task IDs after generation
-        if (selectedGoal === "shuffle") {
-          const shuffleIds = computeMixItems(updated).map(m => m.task.id);
-          focusApi.save("shuffle", shuffleIds).catch(() => {});
-        }
-        return updated;
       });
     } catch (e: unknown) {
-      showToast(e instanceof Error ? e.message : "Failed to generate tasks", "error");
+      if (e instanceof Error && e.message?.includes("pro_required")) {
+        setProExpired(true);
+      } else {
+        showToast(e instanceof Error ? e.message : "Failed to generate tasks", "error");
+      }
     } finally {
       setGenerating(false);
     }
   }
 
   function handleGiveMoreTasks() {
+    if (proExpired) { router.push("/payment" as never); return; }
     if (!allDone) return;
-    if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-    // Force review before generating more tasks
-    const targetDt = selectedGoal === "shuffle" ? dailyTasks[0] : visibleTasks[0];
-    if (targetDt) {
-      setReviewDailyTaskId(targetDt.id);
-      setReviewOpen(true);
-    }
+    Alert.alert(
+      "Work Ahead?",
+      "We automatically create new tasks for you each day. Are you sure you want to generate more now?",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Generate More",
+          onPress: () => {
+            if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+            const targetDt = visibleTasks[0];
+            if (targetDt) {
+              setReviewDailyTaskId(targetDt.id);
+              setReviewOpen(true);
+            }
+          },
+        },
+      ]
+    );
   }
 
   async function handleToggleTask(dailyTaskId: string, taskItemId: string, isCompleted: boolean) {
@@ -540,16 +501,11 @@ export default function DashboardScreen() {
       for (const task of incompleteTasks) {
         // Find the dailyTaskId for this task
         let dtId: string | undefined;
-        if (selectedGoal === "shuffle") {
-          const mix = mixItems.find((m) => m.task.id === task.id);
-          dtId = mix?.dailyTaskId;
-        } else {
-          for (const dt of visibleTasks) {
-            const items = Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : [];
-            if (items.find((t) => t.id === task.id)) {
-              dtId = dt.id;
-              break;
-            }
+        for (const dt of visibleTasks) {
+          const items = Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : [];
+          if (items.find((t) => t.id === task.id)) {
+            dtId = dt.id;
+            break;
           }
         }
         if (dtId) {
@@ -560,7 +516,6 @@ export default function DashboardScreen() {
         }
       }
       // Trigger confetti and completion banner
-      setTasksCompletedSinceGenerate(true);
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
     } catch {
@@ -605,24 +560,14 @@ export default function DashboardScreen() {
       // Auto-generate next tasks after review
       setGenerating(true);
       try {
-        const goalId = selectedGoal === "shuffle" ? undefined : selectedGoal;
-        const res = await tasksApi.generate(goalId, { requestingAdditional: true });
+        const res = await tasksApi.generate(selectedGoal || undefined, { requestingAdditional: true });
         setDailyTasks((prev) => {
           const updatedGoalIds = new Set(res.dailyTasks.map((dt) => dt.goalId));
-          const updated = [
+          return [
             ...prev.filter((dt) => !updatedGoalIds.has(dt.goalId)),
             ...res.dailyTasks,
           ];
-          // Re-save shuffle task IDs after regeneration
-          if (selectedGoal === "shuffle") {
-            const newShuffleIds = computeMixItems(updated).map(m => m.task.id);
-            focusApi.save("shuffle", newShuffleIds).catch(() => {});
-          }
-          return updated;
         });
-        // Re-lock focus after generating more tasks
-        setHasGeneratedMore(true);
-        setTasksCompletedSinceGenerate(false);
       } catch (err: unknown) {
         // Check if trial/subscription expired
         if (err instanceof Error && err.message?.includes("pro_required")) {
@@ -730,11 +675,11 @@ export default function DashboardScreen() {
             </View>
             {goals.length > 1 && (
               <TouchableOpacity
-                style={styles.shufflePill}
+                style={styles.changePill}
                 onPress={() => setGoalPickerVisible(true)}
                 activeOpacity={0.8}
               >
-                <Text style={styles.shuffleText}>Change</Text>
+                <Text style={styles.changeText}>Change</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -841,34 +786,44 @@ export default function DashboardScreen() {
           </View>
         ) : (
           <>
-            {selectedGoal === "shuffle" ? (
-              <View style={styles.section}>
-                {mixItems.map(({ dailyTaskId, goalTitle, task }, idx) => (
-                  <Animated.View
-                    key={task.id}
-                    style={[
-                      styles.mixItem,
-                      staggerAnims[idx] ? {
-                        opacity: staggerAnims[idx],
-                        transform: [{ translateY: staggerAnims[idx].interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
-                      } : undefined,
-                    ]}
+            {/* Give me more — above task cards */}
+            <View style={styles.nextSection}>
+              {allDone && !proExpired ? (
+                <TouchableOpacity
+                  style={styles.giveMeMoreBtn}
+                  onPress={handleGiveMoreTasks}
+                  disabled={generating}
+                  activeOpacity={0.85}
+                >
+                  {generating ? (
+                    <ActivityIndicator color={colors.primaryText} size="small" />
+                  ) : (
+                    <>
+                      <Text style={styles.giveMeMoreIcon}>🚀</Text>
+                      <Text style={styles.giveMeMoreText}>Get more tasks</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                    style={styles.nextButtonLocked}
+                    activeOpacity={0.7}
+                    onPress={() => {
+                      if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                      Alert.alert(
+                        "Locked",
+                        `Complete all ${newTaskItems.length} tasks to unlock more. Keep going!`,
+                        [{ text: "OK" }],
+                      );
+                    }}
                   >
-                    {goalTitle ? (
-                      <Text style={styles.mixGoalChip}>{goalTitle}</Text>
-                    ) : null}
-                    <TaskCard
-                      task={task}
-                      onToggle={(isCompleted) =>
-                        handleToggleTask(dailyTaskId, task.id, isCompleted)
-                      }
-                      onRefine={(userRequest) => handleRefineTask(dailyTaskId, task.id, userRequest)}
-                    />
-                  </Animated.View>
-                ))}
-              </View>
-            ) : (
-              displayVisibleTasks.map((dt) => {
+                    <Text style={styles.lockIcon}>🔒</Text>
+                    <Text style={styles.nextButtonTextLocked}>Get more tasks</Text>
+                  </TouchableOpacity>
+              )}
+            </View>
+
+            {displayVisibleTasks.map((dt) => {
                 let taskIdx = 0;
                 return (
                   <View key={dt.id} style={styles.section}>
@@ -894,45 +849,7 @@ export default function DashboardScreen() {
                     })}
                   </View>
                 );
-              })
-            )}
-
-            {/* Action buttons when all done */}
-            {(
-              <View style={styles.nextSection}>
-                {allDone && !proExpired ? (
-                  <TouchableOpacity
-                    style={styles.giveMeMoreBtn}
-                    onPress={handleGiveMoreTasks}
-                    disabled={generating}
-                    activeOpacity={0.85}
-                  >
-                    {generating ? (
-                      <ActivityIndicator color={colors.primaryText} size="small" />
-                    ) : (
-                      <>
-                        <Text style={styles.giveMeMoreIcon}>🚀</Text>
-                        <Text style={styles.giveMeMoreText}>Give me more</Text>
-                      </>
-                    )}
-                  </TouchableOpacity>
-                ) : (
-                  <>
-                    <TouchableOpacity
-                      style={styles.nextButtonLocked}
-                      disabled
-                      activeOpacity={1}
-                    >
-                      <Text style={styles.lockIcon}>🔒</Text>
-                      <Text style={styles.nextButtonTextLocked}>Give me more</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.lockHint}>
-                      Complete all {newTaskItems.length} tasks to unlock
-                    </Text>
-                  </>
-                )}
-              </View>
-            )}
+              })}
           </>
         )}
       </ScrollView>
@@ -1061,6 +978,7 @@ export default function DashboardScreen() {
                 : days < 7 ? colors.success
                 : days < 14 ? colors.warning
                 : colors.danger;
+              const offDay = stat ? !isGoalWorkDay(stat.workDays) : false;
               // Calculate remaining time from incomplete tasks for this goal
               const goalDt = dailyTasks.find(dt => dt.goalId === goal.id);
               const goalItems = goalDt && Array.isArray(goalDt.tasks) ? (goalDt.tasks as unknown as TaskItem[]) : [];
@@ -1071,20 +989,28 @@ export default function DashboardScreen() {
               return (
                 <TouchableOpacity
                   key={goal.id}
-                  style={[styles.menuItem, isSelected && styles.menuItemSelected, { flexDirection: "column", alignItems: "stretch" }]}
+                  style={[styles.menuItem, isSelected && styles.menuItemSelected, { flexDirection: "column", alignItems: "stretch", opacity: offDay && !isSelected ? 0.5 : 1 }]}
                   onPress={() => selectGoal(goal.id)}
                   activeOpacity={0.7}
                 >
                   <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                     <Text
-                      style={[styles.menuItemText, isSelected && styles.menuItemTextSelected, { flex: 1 }]}
+                      style={[styles.menuItemText, isSelected && styles.menuItemTextSelected, offDay && !isSelected && { color: colors.textTertiary }, { flex: 1 }]}
                       numberOfLines={2}
                       ellipsizeMode="tail"
                     >
                       {goal.title}
                     </Text>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                      {timeLabel ? (
+                      {offDay && stat?.nextWorkDay ? (
+                        <View style={[styles.menuTimeBadge, { backgroundColor: colors.primaryLight }]}>
+                          <Text style={[styles.menuTimeBadgeText, { color: colors.primary }]}>Next: {stat.nextWorkDay}</Text>
+                        </View>
+                      ) : stat && stat.overdueCount > 0 ? (
+                        <View style={[styles.menuTimeBadge, { backgroundColor: colors.warningLight }]}>
+                          <Text style={[styles.menuTimeBadgeText, { color: colors.warning }]}>{stat.overdueCount} overdue</Text>
+                        </View>
+                      ) : timeLabel ? (
                         <View style={styles.menuTimeBadge}>
                           <Text style={styles.menuTimeBadgeText}>{timeLabel}</Text>
                         </View>
@@ -1100,31 +1026,6 @@ export default function DashboardScreen() {
                 </TouchableOpacity>
               );
             })}
-            {goals.length > 1 && (
-              <>
-                <View style={styles.menuDivider} />
-                <TouchableOpacity
-                  style={[
-                    styles.menuItem,
-                    selectedGoal === "shuffle" && styles.menuItemSelected,
-                  ]}
-                  onPress={() => selectGoal("shuffle")}
-                  activeOpacity={0.7}
-                >
-                  <Text
-                    style={[
-                      styles.menuItemText,
-                      selectedGoal === "shuffle" && styles.menuItemTextSelected,
-                    ]}
-                  >
-                    ✦ Mix all goals
-                  </Text>
-                  {selectedGoal === "shuffle" && (
-                    <Text style={styles.menuCheck}>✓</Text>
-                  )}
-                </TouchableOpacity>
-              </>
-            )}
           </Pressable>
         </Pressable>
       </Modal>
@@ -1248,7 +1149,7 @@ function createStyles(c: Colors) {
       fontWeight: typography.semibold,
       color: c.textSecondary,
     },
-    shufflePill: {
+    changePill: {
       backgroundColor: c.primaryLight,
       borderRadius: radius.full,
       paddingHorizontal: spacing.md,
@@ -1256,7 +1157,7 @@ function createStyles(c: Colors) {
       borderWidth: 1,
       borderColor: c.primary + "33",
     },
-    shuffleText: {
+    changeText: {
       fontSize: typography.sm,
       fontWeight: typography.semibold,
       color: c.primary,
@@ -1349,16 +1250,6 @@ function createStyles(c: Colors) {
       color: c.primaryText,
     },
     section: { marginBottom: 0 },
-    mixItem: { marginBottom: spacing.xs },
-    mixGoalChip: {
-      fontSize: typography.xs,
-      fontWeight: typography.semibold,
-      color: c.primary,
-      textTransform: "uppercase",
-      letterSpacing: 0.6,
-      marginBottom: 3,
-      marginLeft: 2,
-    },
     empty: { alignItems: "center", paddingVertical: spacing.xxl },
     emptyIcon: { fontSize: 40, marginBottom: spacing.md, color: c.primary },
     emptyTitle: {
@@ -1376,7 +1267,7 @@ function createStyles(c: Colors) {
       marginBottom: spacing.xl,
     },
     generateBtn: { width: "100%" },
-    nextSection: { alignItems: "center", marginTop: spacing.sm, gap: spacing.xs },
+    nextSection: { alignItems: "center", marginTop: spacing.sm, marginBottom: spacing.sm, gap: spacing.xs },
     // Give me more (unlocked)
     giveMeMoreBtn: {
       flexDirection: "row",
@@ -1417,7 +1308,6 @@ function createStyles(c: Colors) {
       color: c.textSecondary,
       letterSpacing: -0.2,
     },
-    lockHint: { fontSize: typography.sm, color: c.textTertiary, textAlign: "center" },
     reviewPromptBtn: {
       paddingVertical: spacing.sm,
     },

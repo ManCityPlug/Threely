@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
   // Compute aggregate stats across all goals
   const allHistory = await prisma.dailyTask.findMany({
     where: { userId: user.id },
-    select: { date: true, tasks: true },
+    select: { date: true, tasks: true, goalId: true },
   });
 
   const daysActive = new Set(
@@ -97,6 +97,22 @@ export async function POST(request: NextRequest) {
     const items = Array.isArray(dt.tasks) ? (dt.tasks as unknown as { isCompleted: boolean }[]) : [];
     return sum + items.filter((t) => t.isCompleted).length;
   }, 0);
+
+  // Collect compact task history (last 7 days) with descriptions for AI context
+  const sevenDaysAgoGlobal = new Date(today);
+  sevenDaysAgoGlobal.setDate(sevenDaysAgoGlobal.getDate() - 7);
+  const recentTaskHistory = allHistory
+    .filter((dt) => new Date(dt.date) >= sevenDaysAgoGlobal)
+    .flatMap((dt) => {
+      const daysAgo = Math.round((today.getTime() - new Date(dt.date).getTime()) / (1000 * 60 * 60 * 24));
+      const items = Array.isArray(dt.tasks) ? (dt.tasks as unknown as { task: string; description: string; isCompleted: boolean }[]) : [];
+      return items.filter(t => t.task).map(t => ({
+        daysAgo,
+        task: t.task,
+        description: t.description ?? "",
+        completed: !!t.isCompleted,
+      }));
+    });
 
   try {
   const results = await Promise.all(
@@ -193,6 +209,18 @@ export async function POST(request: NextRequest) {
       let coachNote: string | undefined;
 
       if (newTaskCount > 0) {
+        // Compute per-goal completion stats
+        const goalHistory = allHistory.filter((dt) => (dt as unknown as { goalId: string }).goalId === goal.id);
+        const goalTotalGenerated = goalHistory.reduce((sum, dt) => {
+          const items = Array.isArray(dt.tasks) ? (dt.tasks as unknown as { isCompleted: boolean }[]) : [];
+          return sum + items.length;
+        }, 0);
+        const goalTotalCompleted = goalHistory.reduce((sum, dt) => {
+          const items = Array.isArray(dt.tasks) ? (dt.tasks as unknown as { isCompleted: boolean }[]) : [];
+          return sum + items.filter(t => t.isCompleted).length;
+        }, 0);
+        const goalCompletionRate = goalTotalGenerated > 0 ? Math.round((goalTotalCompleted / goalTotalGenerated) * 100) : 0;
+
         const result = await generateTasks({
           goal: {
             id: goal.id,
@@ -202,6 +230,7 @@ export async function POST(request: NextRequest) {
             category: goal.category ?? null,
             deadline: goal.deadline ?? null,
             createdAt: goal.createdAt,
+            roadmap: goal.roadmap ?? null,
           },
           profile: goalProfile,
           daysActive,
@@ -215,6 +244,12 @@ export async function POST(request: NextRequest) {
             ? carriedOverItems.map(t => ({ task: t.task, description: t.description, why: t.why }))
             : undefined,
           newTaskCount,
+          previousTasks: recentTaskHistory,
+          goalCompletionStats: {
+            totalGenerated: goalTotalGenerated,
+            totalCompleted: goalTotalCompleted,
+            completionRate: goalCompletionRate,
+          },
         });
 
         aiTasks = result.tasks;

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { getSupabase } from "@/lib/supabase-client";
 
 const TESTIMONIALS = [
   { quote: "I said I wanted to learn guitar. Next morning it told me to practice the G-C-D chord switch for 10 minutes. Not 'learn chords' — the exact thing I needed.", author: "Sarah K." },
@@ -55,10 +55,10 @@ function PlayIcon() {
 }
 
 export default function LandingPage() {
-  const router = useRouter();
   const [isMobile, setIsMobile] = useState(false);
   const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
   const [menuOpen, setMenuOpen] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     const ua = navigator.userAgent;
@@ -71,6 +71,10 @@ export default function LandingPage() {
     } else if (/Android/i.test(ua)) {
       setPlatform("android");
     }
+
+    getSupabase().auth.getSession().then(({ data: { session } }) => {
+      if (session) setLoggedIn(true);
+    });
   }, []);
 
   return (
@@ -84,17 +88,41 @@ export default function LandingPage() {
         height: 60,
         display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 34, height: 34, borderRadius: 9,
-            background: "#635bff", color: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 18, fontWeight: 700,
-          }}>3</div>
-          <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em" }}>Threely</span>
+        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 28 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{
+              width: 34, height: 34, borderRadius: 9,
+              background: "#635bff", color: "#fff",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: 18, fontWeight: 700,
+            }}>3</div>
+            <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em" }}>Threely</span>
+          </div>
+          {/* Desktop nav links */}
+          {!isMobile && (
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              {[
+                { label: "How It Works", href: "#how-it-works" },
+                { label: "Pricing", href: "/pricing" },
+                { label: "FAQ", href: "/faq" },
+                { label: "About", href: "/about" },
+              ].map(item => (
+                <Link key={item.label} href={item.href} style={{
+                  padding: "0.35rem 0.75rem",
+                  fontSize: "0.85rem",
+                  fontWeight: 500,
+                  color: "#425466",
+                  borderRadius: 6,
+                  textDecoration: "none",
+                }}>
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {!isMobile && (
+          {!isMobile && !loggedIn && (
             <Link href="/login" style={{
               padding: "0.4rem 0.875rem",
               fontSize: "0.875rem",
@@ -106,7 +134,7 @@ export default function LandingPage() {
             </Link>
           )}
           {!isMobile && (
-            <Link href="/register" style={{
+            <Link href={loggedIn ? "/dashboard" : "/register"} style={{
               padding: "0.4rem 1rem",
               fontSize: "0.875rem",
               fontWeight: 600,
@@ -114,28 +142,30 @@ export default function LandingPage() {
               background: "#635bff",
               borderRadius: 8,
             }}>
-              Get started
+              {loggedIn ? "Go to dashboard" : "Get started"}
             </Link>
           )}
-          {/* Hamburger */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            style={{
-              background: "none", border: "none", cursor: "pointer",
-              padding: 6, display: "flex", flexDirection: "column", gap: 4,
-              marginLeft: 4,
-            }}
-            aria-label="Menu"
-          >
-            <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
-            <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
-            <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
-          </button>
+          {/* Hamburger — mobile only */}
+          {isMobile && (
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              style={{
+                background: "none", border: "none", cursor: "pointer",
+                padding: 6, display: "flex", flexDirection: "column", gap: 4,
+                marginLeft: 4,
+              }}
+              aria-label="Menu"
+            >
+              <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
+              <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
+              <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
+            </button>
+          )}
         </div>
       </nav>
 
       {/* Mobile dropdown menu */}
-      {menuOpen && (
+      {isMobile && menuOpen && (
         <div style={{
           position: "sticky", top: 60, zIndex: 99,
           background: "#fff",
@@ -165,28 +195,44 @@ export default function LandingPage() {
 
           {/* Auth buttons */}
           <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
-            <Link href="/login" onClick={() => setMenuOpen(false)} style={{
-              flex: 1, textAlign: "center",
-              padding: "0.6rem 0",
-              fontSize: "0.875rem", fontWeight: 600,
-              color: "#425466",
-              border: "1.5px solid #e3e8ef",
-              borderRadius: 8,
-              textDecoration: "none",
-            }}>
-              Sign in
-            </Link>
-            <Link href="/register" onClick={() => setMenuOpen(false)} style={{
-              flex: 1, textAlign: "center",
-              padding: "0.6rem 0",
-              fontSize: "0.875rem", fontWeight: 600,
-              color: "#fff",
-              background: "#635bff",
-              borderRadius: 8,
-              textDecoration: "none",
-            }}>
-              Get started
-            </Link>
+            {loggedIn ? (
+              <Link href="/dashboard" onClick={() => setMenuOpen(false)} style={{
+                flex: 1, textAlign: "center",
+                padding: "0.6rem 0",
+                fontSize: "0.875rem", fontWeight: 600,
+                color: "#fff",
+                background: "#635bff",
+                borderRadius: 8,
+                textDecoration: "none",
+              }}>
+                Go to dashboard
+              </Link>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => setMenuOpen(false)} style={{
+                  flex: 1, textAlign: "center",
+                  padding: "0.6rem 0",
+                  fontSize: "0.875rem", fontWeight: 600,
+                  color: "#425466",
+                  border: "1.5px solid #e3e8ef",
+                  borderRadius: 8,
+                  textDecoration: "none",
+                }}>
+                  Sign in
+                </Link>
+                <Link href="/register" onClick={() => setMenuOpen(false)} style={{
+                  flex: 1, textAlign: "center",
+                  padding: "0.6rem 0",
+                  fontSize: "0.875rem", fontWeight: 600,
+                  color: "#fff",
+                  background: "#635bff",
+                  borderRadius: 8,
+                  textDecoration: "none",
+                }}>
+                  Get started
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -248,9 +294,9 @@ export default function LandingPage() {
             borderRadius: 24,
             marginBottom: isMobile ? "1rem" : "1.25rem",
           }}>
-            <span style={{ fontSize: isMobile ? "0.95rem" : "1.05rem" }}>{isMobile ? "💻" : "📱"}</span>
+            <span style={{ fontSize: isMobile ? "0.95rem" : "1.05rem" }}>{isMobile ? "📱" : "📱"}</span>
             <span style={{ fontSize: isMobile ? "0.9rem" : "0.95rem", fontWeight: 600, color: "#635bff" }}>
-              {isMobile ? "Also available on web at threely.co" : "Available on iOS, Android & Web"}
+              {isMobile ? "Now available on mobile" : "Now available on mobile"}
             </span>
           </div>
 

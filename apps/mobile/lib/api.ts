@@ -88,6 +88,8 @@ export interface GoalStat {
   dailyTimeMinutes: number | null;
   lifetimeCompleted: number;
   lifetimeTotal: number;
+  workDays: number[];
+  nextWorkDay: string | null;
 }
 
 export interface Stats {

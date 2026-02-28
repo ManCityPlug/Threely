@@ -10,15 +10,16 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#f6f9fc"
+      "backgroundColor": "#1A1040"
     },
     "ios": {
-      "supportsTablet": false,
+      "supportsTablet": true,
       "bundleIdentifier": "com.threely.app",
       "appleTeamId": "Y3U56GWWBJ",
       "usesAppleSignIn": true,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSCameraUsageDescription": "Threely needs camera access to let you set a profile photo."
       }
     },
     "android": {
@@ -42,6 +43,13 @@
           "icon": "./assets/icon.png",
           "color": "#635BFF",
           "sounds": []
+        }
+      ],
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.threely.app",
+          "enableGooglePay": true
         }
       ]
     ],

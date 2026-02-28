@@ -63,6 +63,8 @@ export interface GoalStat {
   lastWorkedAt: string | null;
   overdueCount: number;
   dailyTimeMinutes: number | null;
+  workDays: number[];
+  nextWorkDay: string | null;
 }
 
 export interface Stats {
@@ -324,6 +326,18 @@ export const summaryApi = {
       method: "POST",
       body: JSON.stringify({ tz }),
     }),
+};
+
+// ─── Subscription API ─────────────────────────────────────────────────────────
+
+export interface SubscriptionStatus {
+  status: "trialing" | "active" | "past_due" | "canceled" | null;
+  trialEndsAt: string | null;
+  currentPeriodEnd: string | null;
+}
+
+export const subscriptionApi = {
+  status: () => apiFetch<SubscriptionStatus>("/api/subscription"),
 };
 
 // ─── Account API ──────────────────────────────────────────────────────────────

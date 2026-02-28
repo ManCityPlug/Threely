@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, LogBox, Platform, View } from "react-native";
+import { ActivityIndicator, LogBox, Platform, Text, View } from "react-native";
 
 // Suppress network/API errors that show up in Expo Go when API points to production
 LogBox.ignoreLogs([
@@ -17,11 +17,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
 // TODO: Uncomment for production builds — not supported in Expo Go
 // import * as Clarity from "@microsoft/react-native-clarity";
+import { LinearGradient } from "expo-linear-gradient";
+import { StripeProvider } from "@stripe/stripe-react-native";
 import { supabase } from "@/lib/supabase";
 import { subscriptionApi, profileApi } from "@/lib/api";
 import { ThemeProvider, useTheme } from "@/lib/theme";
 import { ToastProvider } from "@/lib/toast";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
+
+const STRIPE_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
 
 if (Platform.OS !== "web") {
   Notifications.setNotificationHandler({
@@ -55,6 +59,48 @@ export function markPaywallSkipped() {
 let _goBackToWelcome: (() => void) | null = null;
 export function goBackToWelcome() {
   _goBackToWelcome?.();
+}
+
+function BrandedSplash() {
+  return (
+    <LinearGradient
+      colors={["#1A1040", "#2D1B69", "#635BFF"]}
+      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+    >
+      {/* Outer glow */}
+      <View
+        style={{
+          width: 160,
+          height: 160,
+          borderRadius: 80,
+          backgroundColor: "rgba(99, 91, 255, 0.25)",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {/* Logo container */}
+        <View
+          style={{
+            width: 120,
+            height: 120,
+            borderRadius: 36,
+            backgroundColor: "#635BFF",
+            alignItems: "center",
+            justifyContent: "center",
+            shadowColor: "#635BFF",
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0.5,
+            shadowRadius: 30,
+            elevation: 15,
+          }}
+        >
+          <Text style={{ color: "#FFFFFF", fontSize: 64, fontWeight: "800" }}>3</Text>
+        </View>
+      </View>
+    </LinearGradient>
+  );
 }
 
 function AppContent() {
@@ -184,7 +230,7 @@ function AppContent() {
       //    Also check the in-memory ref to avoid race conditions when navigating
       //    away from the payment screen (segments change triggers this effect again
       //    before AsyncStorage read resolves).
-      if (paywallSkippedRef.current || _paywallSkippedGlobal || __DEV__) {
+      if (paywallSkippedRef.current || _paywallSkippedGlobal) {
         if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
         setReady(true);
         return;
@@ -217,26 +263,9 @@ function AppContent() {
           return;
         }
 
-        // No valid subscription — enforce paywall
-        if (!inPayment) {
-          const paywallShown = await AsyncStorage.getItem("@threely_paywall_shown");
-
-          if (!paywallShown) {
-            // First time — let them land on the tabs, then pop paywall after 10 s
-            if (inAuthGroup || inOnboarding) router.replace("/(tabs)");
-            setReady(true);
-            paywallTimerRef.current = setTimeout(async () => {
-              await AsyncStorage.setItem("@threely_paywall_shown", "true");
-              router.replace("/payment" as never);
-            }, 10000);
-          } else {
-            // Returning user with no valid sub — straight to paywall
-            router.replace("/payment" as never);
-            setReady(true);
-          }
-        } else {
-          setReady(true);
-        }
+        // No valid subscription — let users browse, per-action gating handles enforcement
+        if (inAuthGroup || inOnboarding) router.replace("/(tabs)");
+        setReady(true);
       } catch {
         // Backend unreachable — be lenient (don't block offline users)
         if (inAuthGroup || inOnboarding) router.replace("/(tabs)");
@@ -253,9 +282,7 @@ function AppContent() {
   if (session === undefined) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <ActivityIndicator />
-        </View>
+        <BrandedSplash />
       </GestureHandlerRootView>
     );
   }
@@ -273,9 +300,7 @@ function AppContent() {
   if (!ready) {
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-          <ActivityIndicator />
-        </View>
+        <BrandedSplash />
       </GestureHandlerRootView>
     );
   }
@@ -307,10 +332,12 @@ function AppContent() {
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <ToastProvider>
-        <AppContent />
-      </ToastProvider>
-    </ThemeProvider>
+    <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} merchantIdentifier="merchant.com.threely.app">
+      <ThemeProvider>
+        <ToastProvider>
+          <AppContent />
+        </ToastProvider>
+      </ThemeProvider>
+    </StripeProvider>
   );
 }

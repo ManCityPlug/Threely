@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
 import { clearStatsCache } from "@/lib/stats-cache";
+import { notifyFirstTaskComplete } from "@/lib/discord";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -116,6 +117,26 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     });
 
     clearStatsCache(user.id);
+
+    // Check for first-ever task completion
+    if (!action && isCompleted) {
+      // Count total completed tasks across all daily tasks for this user
+      const allUserTasks = await prisma.dailyTask.findMany({
+        where: { userId: user.id },
+        select: { tasks: true },
+      });
+      let totalCompleted = 0;
+      for (const dt of allUserTasks) {
+        const items = dt.tasks as unknown as TaskItem[];
+        totalCompleted += items.filter(t => t.isCompleted).length;
+      }
+      // If exactly 1 completed task, this was their first ever
+      if (totalCompleted === 1) {
+        const goal = await prisma.goal.findUnique({ where: { id: dailyTask.goalId }, select: { title: true } });
+        notifyFirstTaskComplete(user.email ?? "unknown", goal?.title ?? "Unknown goal");
+      }
+    }
+
     return NextResponse.json({ dailyTask: updated });
   } catch (e) {
     console.error("[PATCH /api/tasks/:id]", e);

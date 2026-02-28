@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth, isOnboarded, markOnboarded, getNickname } from "@/lib/auth-context";
-import { profileApi } from "@/lib/api-client";
+import { profileApi, subscriptionApi, type SubscriptionStatus } from "@/lib/api-client";
 import ToastProvider from "@/components/ToastProvider";
+import { SubscriptionProvider, useSubscription } from "@/lib/subscription-context";
+import PaywallModal from "@/components/PaywallModal";
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
   today: (
@@ -48,6 +50,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [checkingOnboarding, setCheckingOnboarding] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const [subStatus, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -81,6 +84,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     });
   }, [user, loading, router]);
 
+  // Fetch subscription status
+  useEffect(() => {
+    if (!user) return;
+    subscriptionApi.status().then(res => setSubStatus(res.status)).catch(() => {});
+  }, [user]);
+
   // Close menu on outside click
   useEffect(() => {
     if (!menuOpen) return;
@@ -110,6 +119,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const nickname = getNickname() || user.email?.split("@")[0] || "You";
   const initials = nickname[0]?.toUpperCase() ?? "?";
 
+  const subBadge = subStatus === "trialing"
+    ? { label: "Pro Trial", bg: "#ecfdf5", color: "#059669" }
+    : subStatus === "active"
+    ? { label: "Pro", bg: "var(--primary-light)", color: "var(--primary)" }
+    : subStatus !== undefined
+    ? { label: "No plan", bg: "#f3f4f6", color: "#6b7280" }
+    : null;
+
   async function handleSignOut() {
     await signOut();
     router.replace("/login");
@@ -117,6 +134,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ToastProvider>
+    <SubscriptionProvider>
+    <PaywallGate />
     <div className={`app-shell${isTablet ? " force-mobile" : ""}`}>
       {/* ── Mobile top bar ──────────────────────────────────────────────────── */}
       <div className="mobile-topbar" ref={menuRef}>
@@ -190,9 +209,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontWeight: 700, fontSize: "0.8rem", flexShrink: 0,
               }}>{initials}</div>
-              <span style={{ fontSize: "0.85rem", fontWeight: 500, color: "var(--text)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                {nickname}
-              </span>
+              <div style={{ flex: 1, overflow: "hidden" }}>
+                <span style={{ fontSize: "0.85rem", fontWeight: 500, color: "var(--text)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {nickname}
+                </span>
+                {subBadge && (
+                  <span style={{
+                    display: "inline-block",
+                    padding: "1px 8px",
+                    borderRadius: 999,
+                    background: subBadge.bg,
+                    color: subBadge.color,
+                    fontSize: "0.65rem",
+                    fontWeight: 600,
+                    marginTop: 2,
+                  }}>
+                    {subBadge.label}
+                  </span>
+                )}
+              </div>
               <button
                 onClick={handleSignOut}
                 style={{
@@ -274,6 +309,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           </div>
+          {subBadge && (
+            <div style={{
+              display: "inline-block",
+              padding: "2px 10px",
+              borderRadius: 999,
+              background: subBadge.bg,
+              color: subBadge.color,
+              fontSize: "0.7rem",
+              fontWeight: 600,
+              marginBottom: "0.5rem",
+            }}>
+              {subBadge.label}
+            </div>
+          )}
           <button
             onClick={handleSignOut}
             className="btn btn-outline"
@@ -306,6 +355,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         })}
       </nav>
     </div>
+    </SubscriptionProvider>
     </ToastProvider>
   );
+}
+
+function PaywallGate() {
+  const { paywallOpen, closePaywall } = useSubscription();
+  if (!paywallOpen) return null;
+  return <PaywallModal onClose={closePaywall} />;
 }

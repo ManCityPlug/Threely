@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
+import { notifyGoalCreated } from "@/lib/discord";
+import { generateRoadmap } from "@/lib/claude";
+import { getUserAccess } from "@/lib/subscription";
 
 // GET /api/goals — list all active goals for the authenticated user
 export async function GET(request: NextRequest) {
@@ -35,6 +38,16 @@ export async function POST(request: NextRequest) {
   const user = await getUserFromRequest(request);
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // Pro gate
+  const access = await getUserAccess(user.id);
+  if (!access.hasPro) {
+    return NextResponse.json({
+      error: "pro_required",
+      message: "Subscribe to keep your momentum going",
+      trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
+    }, { status: 403 });
   }
 
   const body = await request.json();
@@ -76,5 +89,33 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  return NextResponse.json({ goal }, { status: 201 });
+  // Discord notification
+  notifyGoalCreated(user.email ?? "unknown", goal.title, goal.category);
+
+  // Generate roadmap with Opus (async — don't block the response)
+  // Load user profile for context
+  const profile = await prisma.userProfile.findUnique({ where: { userId: user.id } });
+  try {
+    const roadmap = await generateRoadmap({
+      title: goal.title,
+      rawInput: goal.rawInput,
+      structuredSummary: goal.structuredSummary ?? null,
+      category: goal.category ?? null,
+      deadline: goal.deadline ?? null,
+      dailyTimeMinutes: goal.dailyTimeMinutes ?? profile?.dailyTimeMinutes ?? 60,
+      intensityLevel: goal.intensityLevel ?? profile?.intensityLevel ?? 2,
+    });
+
+    await prisma.goal.update({
+      where: { id: goal.id },
+      data: { roadmap },
+    });
+
+    // Return goal with roadmap
+    return NextResponse.json({ goal: { ...goal, roadmap } }, { status: 201 });
+  } catch (e) {
+    console.error("[POST /api/goals] Roadmap generation failed:", e);
+    // Return goal without roadmap — task generation still works, just without the master plan
+    return NextResponse.json({ goal }, { status: 201 });
+  }
 }

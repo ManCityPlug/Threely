@@ -137,7 +137,7 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
     await Notifications.scheduleNotificationAsync({
       identifier: ID_MORNING,
       content: {
-        title: `Time to work on ${goalName}!`,
+        title: `Time to work on "${goalName}"!`,
         body: `Your daily tasks are waiting.${timeLabel}`,
         sound: true,
       },
@@ -154,7 +154,7 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
     await Notifications.scheduleNotificationAsync({
       identifier: ID_MIDDAY,
       content: {
-        title: `Still have tasks on ${goalName}`,
+        title: `Still have tasks on "${goalName}"`,
         body: "Keep going! You've got this.",
         sound: true,
       },
@@ -169,11 +169,11 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
   const eveningTime = todayAt(20, 0);
   if (now < eveningTime) {
     const title = ctx.allDone
-      ? `Great job on ${goalName}!`
+      ? `Great job on "${goalName}"!`
       : `You still have ${ctx.incompleteCount} task${ctx.incompleteCount > 1 ? "s" : ""} left`;
     const body = ctx.allDone
       ? "You completed all your tasks today. Keep the streak going!"
-      : `Finish strong on ${goalName}!`;
+      : `Finish strong on "${goalName}"!`;
     await Notifications.scheduleNotificationAsync({
       identifier: ID_EVENING,
       content: { title, body, sound: true },
@@ -196,7 +196,7 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
 
     await Notifications.scheduleNotificationAsync({
       content: {
-        title: `Haven't worked on ${stale.name} in ${stale.daysSince} days`,
+        title: `Haven't worked on "${stale.name}" in ${stale.daysSince} days`,
         body: "Ready to get back to it?",
         sound: true,
       },
@@ -228,11 +228,11 @@ export async function onTaskCompleted(ctx: NotifContext): Promise<void> {
   if (now < eveningTime) {
     const goalName = ctx.focusGoalName ?? "your goals";
     const title = ctx.allDone
-      ? `Great job on ${goalName}!`
+      ? `Great job on "${goalName}"!`
       : `You still have ${ctx.incompleteCount} task${ctx.incompleteCount > 1 ? "s" : ""} left`;
     const body = ctx.allDone
       ? "You completed all your tasks today. Keep the streak going!"
-      : `Finish strong on ${goalName}!`;
+      : `Finish strong on "${goalName}"!`;
     await Notifications.scheduleNotificationAsync({
       identifier: ID_EVENING,
       content: { title, body, sound: true },

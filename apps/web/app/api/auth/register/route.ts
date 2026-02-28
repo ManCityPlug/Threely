@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { prisma } from "@/lib/prisma";
+import { notifyNewSignup } from "@/lib/discord";
 
 export async function POST(request: Request) {
   try {
@@ -35,6 +36,9 @@ export async function POST(request: Request) {
       update: { trialEndsAt },
       create: { id: data.user.id, email, trialEndsAt },
     });
+
+    // Discord notification (fire and forget)
+    notifyNewSignup(email);
 
     return NextResponse.json({ user: { id: data.user.id, email: data.user.email } });
   } catch {

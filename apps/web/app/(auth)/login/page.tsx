@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabase } from "@/lib/supabase-client";
 import { isOnboarded, markOnboarded } from "@/lib/auth-context";
 import { profileApi } from "@/lib/api-client";
+import { SocialAuthButtons, AuthDivider } from "@/components/SocialAuthButtons";
+import { MagicLinkForm } from "@/components/MagicLinkForm";
 
 type DeviceType = "iphone" | "ipad" | "android_phone" | "android_tablet" | "desktop";
 
@@ -48,16 +50,38 @@ function PlayIcon() {
 }
 
 export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginPageInner />
+    </Suspense>
+  );
+}
+
+function LoginPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [device, setDevice] = useState<DeviceType>("desktop");
+  const [showMagicLink, setShowMagicLink] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
   useEffect(() => {
     setDevice(detectDevice());
-  }, []);
+    // Show error banner if redirected from failed OAuth
+    if (searchParams.get("error") === "auth") {
+      setError("Sign-in failed. Please try again.");
+    }
+    // Redirect if already logged in
+    getSupabase().auth.getSession().then(({ data: { session } }) => {
+      if (session) router.replace("/dashboard");
+    });
+  }, [searchParams, router]);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -151,6 +175,12 @@ export default function LoginPage() {
         </div>
       )}
 
+      {/* Social auth buttons */}
+      <SocialAuthButtons />
+
+      <AuthDivider />
+
+      {/* Email/password form */}
       <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         <div>
           <label className="field-label">Email</label>
@@ -166,7 +196,19 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <label className="field-label">Password</label>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+            <label className="field-label">Password</label>
+            <button
+              type="button"
+              onClick={() => setShowForgotPassword(true)}
+              style={{
+                color: "var(--primary)", fontSize: "0.8rem", fontWeight: 500,
+                background: "none", border: "none", cursor: "pointer", padding: 0,
+              }}
+            >
+              Forgot password?
+            </button>
+          </div>
           <input
             className="field-input"
             type="password"
@@ -198,12 +240,124 @@ export default function LoginPage() {
         </button>
       </form>
 
+      {/* Magic link toggle */}
+      <div style={{ textAlign: "center", marginTop: "1rem" }}>
+        {showMagicLink ? (
+          <div style={{ marginTop: "0.5rem" }}>
+            <MagicLinkForm />
+            <button
+              type="button"
+              onClick={() => setShowMagicLink(false)}
+              style={{
+                marginTop: "0.75rem", color: "var(--muted)", fontSize: "0.8rem",
+                background: "none", border: "none", cursor: "pointer",
+              }}
+            >
+              Back to password sign in
+            </button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setShowMagicLink(true)}
+            style={{
+              color: "var(--primary)", fontSize: "0.85rem", fontWeight: 500,
+              background: "none", border: "none", cursor: "pointer",
+            }}
+          >
+            Sign in with a magic link instead
+          </button>
+        )}
+      </div>
+
       <p style={{ textAlign: "center", marginTop: "1.5rem", color: "var(--subtext)", fontSize: "0.875rem" }}>
         Don't have an account?{" "}
         <Link href="/register" style={{ color: "var(--primary)", fontWeight: 600 }}>
           Sign up
         </Link>
       </p>
+
+      {/* Forgot password overlay */}
+      {showForgotPassword && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 1000,
+          background: "rgba(0,0,0,0.4)", display: "flex",
+          alignItems: "center", justifyContent: "center", padding: "1rem",
+        }} onClick={() => setShowForgotPassword(false)}>
+          <div className="card" style={{ padding: "2rem", maxWidth: 400, width: "100%" }} onClick={e => e.stopPropagation()}>
+            {forgotSent ? (
+              <div style={{ textAlign: "center" }}>
+                <div style={{
+                  width: 48, height: 48, borderRadius: 12,
+                  background: "var(--success-light)", color: "var(--success)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 22, fontWeight: 700, margin: "0 auto 1rem",
+                }}>✓</div>
+                <h2 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 8 }}>Check your email</h2>
+                <p style={{ color: "var(--subtext)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+                  We sent a password reset link to <strong>{forgotEmail}</strong>. Click the link to set a new password.
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => { setShowForgotPassword(false); setForgotSent(false); setForgotEmail(""); }}
+                  style={{ marginTop: "1.25rem", width: "100%" }}
+                >
+                  Back to sign in
+                </button>
+              </div>
+            ) : (
+              <>
+                <h2 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 4 }}>Reset your password</h2>
+                <p style={{ color: "var(--subtext)", fontSize: "0.875rem", marginBottom: "1.25rem" }}>
+                  Enter your email and we'll send you a link to reset your password.
+                </p>
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!forgotEmail.trim()) return;
+                  setForgotLoading(true);
+                  const supabase = getSupabase();
+                  await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
+                    redirectTo: `${window.location.origin}/api/auth/callback?type=recovery`,
+                  });
+                  setForgotLoading(false);
+                  setForgotSent(true);
+                }}>
+                  <label className="field-label">Email</label>
+                  <input
+                    className="field-input"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={forgotEmail}
+                    onChange={e => setForgotEmail(e.target.value)}
+                    autoComplete="email"
+                    required
+                    autoFocus
+                  />
+                  <div style={{ display: "flex", gap: 10, marginTop: "1rem" }}>
+                    <button
+                      type="button"
+                      className="btn btn-outline"
+                      onClick={() => setShowForgotPassword(false)}
+                      style={{ flex: 1 }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={forgotLoading}
+                      style={{ flex: 1 }}
+                    >
+                      {forgotLoading ? <span className="spinner" /> : "Send reset link"}
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

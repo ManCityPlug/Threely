@@ -19,6 +19,8 @@ interface GoalStat {
   dailyTimeMinutes: number | null;
   lifetimeCompleted: number;
   lifetimeTotal: number;
+  workDays: number[];
+  nextWorkDay: string | null;
 }
 
 // GET /api/stats — returns aggregate stats for the authenticated user
@@ -32,7 +34,7 @@ export async function GET(request: NextRequest) {
   const [allDailyTasks, activeGoals, activeGoalsList] = await Promise.all([
     prisma.dailyTask.findMany({ where: { userId: user.id } }),
     prisma.goal.count({ where: { userId: user.id, isActive: true } }),
-    prisma.goal.findMany({ where: { userId: user.id, isActive: true }, select: { id: true, title: true, dailyTimeMinutes: true } }),
+    prisma.goal.findMany({ where: { userId: user.id, isActive: true }, select: { id: true, title: true, dailyTimeMinutes: true, workDays: true } }),
   ]);
 
   // Total completed task items + total hours invested
@@ -101,12 +103,28 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Per-goal stats: lastWorkedAt + overdueCount
+  // Per-goal stats: lastWorkedAt + overdueCount + workDays + nextWorkDay
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
   const yesterdayKey = yesterday.toISOString().split("T")[0];
 
+  // ISO day: Monday=1 ... Sunday=7
+  const todayIsoDay = today.getUTCDay() === 0 ? 7 : today.getUTCDay();
+  const yesterdayIsoDay = yesterday.getUTCDay() === 0 ? 7 : yesterday.getUTCDay();
+
+  const DAY_NAMES = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+  function computeNextWorkDay(workDays: number[]): string | null {
+    if (!workDays || workDays.length === 0 || workDays.length === 7) return null;
+    if (workDays.includes(todayIsoDay)) return null; // today is a work day
+    const sorted = [...workDays].sort((a, b) => a - b);
+    // Find the next day after today
+    const next = sorted.find(d => d > todayIsoDay) ?? sorted[0];
+    return DAY_NAMES[next] ?? null;
+  }
+
   const goalStats: GoalStat[] = activeGoalsList.map((goal) => {
+    const goalWorkDays = (goal.workDays as number[]) ?? [];
     const goalTasks = allDailyTasks.filter((dt) => dt.goalId === goal.id);
 
     // Last worked at: most recent date with at least one completed task
@@ -119,14 +137,17 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Overdue count: incomplete + not-skipped items from yesterday
+    // Overdue count: only count if yesterday was a work day for this goal
     let overdueCount = 0;
-    const yesterdayTasks = goalTasks.filter(
-      (dt) => new Date(dt.date).toISOString().split("T")[0] === yesterdayKey
-    );
-    for (const dt of yesterdayTasks) {
-      const items = dt.tasks as unknown as TaskItem[];
-      overdueCount += items.filter((t) => !t.isCompleted && !t.isSkipped).length;
+    const yesterdayIsWorkDay = goalWorkDays.length === 0 || goalWorkDays.includes(yesterdayIsoDay);
+    if (yesterdayIsWorkDay) {
+      const yesterdayTasks = goalTasks.filter(
+        (dt) => new Date(dt.date).toISOString().split("T")[0] === yesterdayKey
+      );
+      for (const dt of yesterdayTasks) {
+        const items = dt.tasks as unknown as TaskItem[];
+        overdueCount += items.filter((t) => !t.isCompleted && !t.isSkipped).length;
+      }
     }
 
     // Lifetime task completion counts
@@ -146,6 +167,8 @@ export async function GET(request: NextRequest) {
       dailyTimeMinutes: goal.dailyTimeMinutes,
       lifetimeCompleted,
       lifetimeTotal,
+      workDays: goalWorkDays,
+      nextWorkDay: computeNextWorkDay(goalWorkDays),
     };
   });
 

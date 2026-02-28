@@ -9,6 +9,7 @@ import {
 import { SkeletonCard } from "@/components/Skeleton";
 import Confetti from "@/components/Confetti";
 import { useToast } from "@/components/ToastProvider";
+import { useSubscription } from "@/lib/subscription-context";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -48,6 +49,21 @@ function stalenessLabel(days: number | null): string {
   if (days === 0) return "Worked today";
   if (days === 1) return "Worked yesterday";
   return `${days}d ago`;
+}
+
+function getTodayIsoDay(): number {
+  const d = new Date().getDay(); // 0=Sun
+  return d === 0 ? 7 : d;
+}
+
+function isWorkDay(workDays: number[] | undefined): boolean {
+  if (!workDays || workDays.length === 0 || workDays.length === 7) return true;
+  return workDays.includes(getTodayIsoDay());
+}
+
+function formatWorkDaysList(workDays: number[]): string {
+  const names = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  return workDays.sort((a, b) => a - b).map(d => names[d]).join(", ");
 }
 
 const DIFFICULTY_OPTIONS = [
@@ -353,10 +369,11 @@ function ReviewModal({
 export default function DashboardPage() {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { hasPro, showPaywall } = useSubscription();
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [goalStats, setGoalStats] = useState<GoalStat[]>([]);
-  const [selectedGoalId, setSelectedGoalId] = useState<"all" | string | null>(null);
+  const [selectedGoalId, setSelectedGoalId] = useState<string | null>(null);
   const [goalPickerOpen, setGoalPickerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -364,6 +381,7 @@ export default function DashboardPage() {
   const [showReview, setShowReview] = useState(false);
   const [reviewDailyTaskId, setReviewDailyTaskId] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [showWorkAhead, setShowWorkAhead] = useState(false);
   const [completingAll, setCompletingAll] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [appNudgeDismissed, setAppNudgeDismissed] = useState(false);
@@ -389,9 +407,9 @@ export default function DashboardPage() {
       // Restore saved focus or auto-select
       const todayKey = `threely_focus_${new Date().toISOString().slice(0, 10)}`;
       const saved = sessionStorage.getItem(todayKey);
-      const savedIsValid = saved === "all" || goalsRes.goals.some(g => g.id === saved);
+      const savedIsValid = saved !== null && saved !== "all" && goalsRes.goals.some(g => g.id === saved);
       if (saved && savedIsValid) {
-        setSelectedGoalId(saved as "all" | string);
+        setSelectedGoalId(saved);
       } else if (goalsRes.goals.length === 1) {
         const onlyGoalId = goalsRes.goals[0].id;
         setSelectedGoalId(onlyGoalId);
@@ -421,6 +439,7 @@ export default function DashboardPage() {
         } catch (err: unknown) {
           if (err instanceof Error && err.message?.includes("pro_required")) {
             setProExpired(true);
+            showPaywall();
           }
           // Silently fail auto-generate — user can retry
         } finally {
@@ -469,30 +488,10 @@ export default function DashboardPage() {
   const _sort = sortTrigger; // subscribe to sort trigger for delayed reorder
 
   const displayedTasks = (() => {
-    let items: { dt: DailyTask; task: TaskItem }[];
     if (selectedGoalId === null) return [];
-    if (selectedGoalId === "all") {
-      const result: { dt: DailyTask; task: TaskItem }[] = [];
-      let round = 0;
-      while (result.length < 3) {
-        let addedThisRound = 0;
-        for (const dt of dailyTasks) {
-          const taskList = dt.tasks.slice(-3);
-          if (taskList[round]) {
-            result.push({ dt, task: taskList[round] });
-            addedThisRound++;
-            if (result.length >= 3) break;
-          }
-        }
-        if (addedThisRound === 0) break;
-        round++;
-      }
-      items = result;
-    } else {
-      const dt = dailyTasks.find(d => d.goalId === selectedGoalId);
-      if (!dt) return [];
-      items = dt.tasks.slice(-3).map(task => ({ dt, task }));
-    }
+    const dt = dailyTasks.find(d => d.goalId === selectedGoalId);
+    if (!dt) return [];
+    const items = dt.tasks.slice(-3).map(task => ({ dt, task }));
 
     // Sort: incomplete first, completed last (recently toggled stay in place)
     const incomplete = items.filter(x => !x.task.isCompleted || recentlyToggledRef.current.has(x.task.id));
@@ -510,15 +509,26 @@ export default function DashboardPage() {
     .filter(t => !t.isCompleted)
     .reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
 
-  function pickGoal(val: "all" | string) {
+  function pickGoal(val: string) {
     setSelectedGoalId(val);
     setGoalPickerOpen(false);
     sessionStorage.setItem(`threely_focus_${new Date().toISOString().slice(0, 10)}`, val);
   }
 
+  function handlePickGoalWithOffDayCheck(goalId: string) {
+    const stat = goalStats.find(s => s.goalId === goalId);
+    const offDay = stat && !isWorkDay(stat.workDays);
+    if (offDay) {
+      const dayNames = formatWorkDaysList(stat.workDays);
+      if (!window.confirm(`This goal is scheduled for ${dayNames}. Would you like to work on it today?`)) return;
+    }
+    pickGoal(goalId);
+  }
+
   // ── Handlers ─────────────────────────────────────────────────────────────────
 
   async function handleGenerate() {
+    if (!hasPro) { showPaywall(); return; }
     setGenerating(true);
     try {
       const res = await tasksApi.generate();
@@ -527,6 +537,7 @@ export default function DashboardPage() {
     } catch (err: unknown) {
       if (err instanceof Error && err.message?.includes("pro_required")) {
         setProExpired(true);
+        showPaywall();
       } else {
         showToast("Failed to generate tasks", "error");
       }
@@ -554,24 +565,6 @@ export default function DashboardPage() {
       if (isCompleted) {
         const currentDisplayed = (() => {
           if (selectedGoalId === null) return [];
-          if (selectedGoalId === "all") {
-            const result: TaskItem[] = [];
-            let round = 0;
-            while (result.length < 3) {
-              let addedThisRound = 0;
-              for (const dt of newDailyTasks) {
-                const items = dt.tasks.slice(-3);
-                if (items[round]) {
-                  result.push(items[round]);
-                  addedThisRound++;
-                  if (result.length >= 3) break;
-                }
-              }
-              if (addedThisRound === 0) break;
-              round++;
-            }
-            return result;
-          }
           const dt = newDailyTasks.find(d => d.goalId === selectedGoalId);
           return dt ? dt.tasks.slice(-3) : [];
         })();
@@ -627,9 +620,10 @@ export default function DashboardPage() {
     if (incomplete.length === 0) return;
     setCompletingAll(true);
     try {
-      await Promise.all(
-        incomplete.map(({ dt, task }) => tasksApi.toggleTask(dt.id, task.id, true))
-      );
+      // Sequential to avoid race condition — each PATCH reads/writes the same JSON array
+      for (const { dt, task } of incomplete) {
+        await tasksApi.toggleTask(dt.id, task.id, true);
+      }
       // Reload to get fresh state
       const tasksRes = await tasksApi.today(false);
       setDailyTasks(tasksRes.dailyTasks);
@@ -644,9 +638,13 @@ export default function DashboardPage() {
   }
 
   function handleGiveMore() {
-    const dt = selectedGoalId !== "all"
-      ? dailyTasks.find(d => d.goalId === selectedGoalId)
-      : dailyTasks[0];
+    if (!hasPro) { showPaywall(); return; }
+    setShowWorkAhead(true);
+  }
+
+  function confirmWorkAhead() {
+    setShowWorkAhead(false);
+    const dt = dailyTasks.find(d => d.goalId === selectedGoalId);
     if (dt) {
       setReviewDailyTaskId(dt.id);
       setShowReview(true);
@@ -659,13 +657,14 @@ export default function DashboardPage() {
 
     setGenerating(true);
     try {
-      const goalId = selectedGoalId && selectedGoalId !== "all" ? selectedGoalId : undefined;
+      const goalId = selectedGoalId ?? undefined;
       const res = await tasksApi.generate({ postReview: true, goalId });
       setDailyTasks(res.dailyTasks);
 
     } catch (err: unknown) {
       if (err instanceof Error && err.message?.includes("pro_required")) {
         setProExpired(true);
+        showPaywall();
       } else {
         showToast("Failed to generate next tasks", "error");
       }
@@ -779,13 +778,14 @@ export default function DashboardPage() {
 
       {/* Pro expired banner */}
       {proExpired && (
-        <a href="/pricing" className="card fade-in" style={{
+        <button onClick={showPaywall} className="card fade-in" style={{
           padding: "1rem 1.25rem",
           background: "var(--primary-light)",
           border: "1.5px solid var(--primary)",
           marginBottom: "1.25rem",
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          textDecoration: "none", gap: "1rem",
+          textDecoration: "none", gap: "1rem", width: "100%", cursor: "pointer",
+          textAlign: "left",
         }}>
           <div>
             <div style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)", marginBottom: 2 }}>
@@ -799,9 +799,9 @@ export default function DashboardPage() {
             fontSize: "0.85rem", fontWeight: 700, color: "var(--primary)",
             flexShrink: 0, whiteSpace: "nowrap",
           }}>
-            Subscribe →
+            Subscribe {"\u2192"}
           </span>
-        </a>
+        </button>
       )}
 
       {/* No goals — prompt to create one */}
@@ -887,7 +887,7 @@ export default function DashboardPage() {
               onMouseLeave={e => { if (goals.length > 1) e.currentTarget.style.borderColor = "var(--border)"; }}
             >
               <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", flex: 1, minWidth: 0 }}>
-                {selectedGoalId === null ? "Select a goal" : selectedGoalId === "all" ? "Mix all goals" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
+                {selectedGoalId === null ? "Select a goal" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
               </span>
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                 {totalEstimatedMinutes > 0 && (
@@ -967,7 +967,7 @@ export default function DashboardPage() {
                   transition: "transform 0.15s",
                 }}
               >
-                {generating ? <><span className="spinner spinner-dark" style={{ width: 18, height: 18 }} /> Loading...</> : "🚀 Give me more"}
+                {generating ? <><span className="spinner spinner-dark" style={{ width: 18, height: 18 }} /> Loading...</> : "🚀 Get more tasks"}
               </button>
               <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.9)", fontWeight: 500 }}>
                 Great work! Review and get your next steps.
@@ -1045,6 +1045,36 @@ export default function DashboardPage() {
         </>
       )}
 
+      {/* Work Ahead confirmation modal */}
+      {showWorkAhead && (
+        <div className="modal-overlay" onClick={() => setShowWorkAhead(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 400, textAlign: "center", padding: "2rem" }}>
+            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 8 }}>
+              Work Ahead?
+            </h2>
+            <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+              We automatically create new tasks for you each day. Are you sure you want to generate more now?
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <button
+                className="btn btn-primary"
+                onClick={confirmWorkAhead}
+                style={{ width: "100%", padding: "0.75rem", fontSize: "0.95rem" }}
+              >
+                Generate More
+              </button>
+              <button
+                className="btn btn-outline"
+                onClick={() => setShowWorkAhead(false)}
+                style={{ width: "100%", padding: "0.75rem", fontSize: "0.95rem" }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Review modal */}
       {showReview && reviewDailyTaskId && (
         <ReviewModal
@@ -1069,20 +1099,22 @@ export default function DashboardPage() {
                 const isSelected = selectedGoalId === g.id;
                 const stat = goalStats.find(s => s.goalId === g.id);
                 const days = daysSince(stat?.lastWorkedAt ?? null);
+                const offDay = stat ? !isWorkDay(stat.workDays) : false;
                 return (
                   <button
                     key={g.id}
-                    onClick={() => pickGoal(g.id)}
+                    onClick={() => handlePickGoalWithOffDayCheck(g.id)}
                     style={{
                       display: "flex", alignItems: "center", justifyContent: "space-between",
                       padding: "0.875rem 1rem", borderRadius: "var(--radius)",
                       border: `2px solid ${isSelected ? "var(--primary)" : "var(--border)"}`,
                       background: isSelected ? "var(--primary-light)" : "var(--card)",
                       cursor: "pointer", textAlign: "left",
+                      opacity: offDay && !isSelected ? 0.5 : 1,
                     }}
                   >
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ fontWeight: 500, color: isSelected ? "var(--primary)" : "var(--text)", fontSize: "0.95rem" }}>
+                      <span style={{ fontWeight: 500, color: offDay && !isSelected ? "var(--muted)" : isSelected ? "var(--primary)" : "var(--text)", fontSize: "0.95rem" }}>
                         {g.title}
                       </span>
                       <div style={{ display: "flex", gap: 8, marginTop: 4, flexWrap: "wrap" }}>
@@ -1092,7 +1124,15 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     <span style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                      {stat && stat.overdueCount > 0 && (
+                      {offDay && stat?.nextWorkDay ? (
+                        <span style={{
+                          fontSize: "0.7rem", fontWeight: 600,
+                          color: "var(--primary)", background: "var(--primary-light)",
+                          borderRadius: 20, padding: "2px 8px",
+                        }}>
+                          Next: {stat.nextWorkDay}
+                        </span>
+                      ) : stat && stat.overdueCount > 0 ? (
                         <span style={{
                           fontSize: "0.7rem", fontWeight: 600,
                           color: "var(--warning)", background: "var(--warning-light)",
@@ -1100,7 +1140,7 @@ export default function DashboardPage() {
                         }}>
                           {stat.overdueCount} overdue
                         </span>
-                      )}
+                      ) : null}
                       {g.dailyTimeMinutes && (
                         <span style={{
                           fontSize: "0.75rem", fontWeight: 600,
@@ -1115,23 +1155,6 @@ export default function DashboardPage() {
                   </button>
                 );
               })}
-              {goals.length > 1 && (
-                <button
-                  onClick={() => pickGoal("all")}
-                  style={{
-                    display: "flex", alignItems: "center", justifyContent: "space-between",
-                    padding: "0.875rem 1rem", borderRadius: "var(--radius)",
-                    border: `2px solid ${selectedGoalId === "all" ? "var(--primary)" : "var(--border)"}`,
-                    background: selectedGoalId === "all" ? "var(--primary-light)" : "var(--card)",
-                    cursor: "pointer", textAlign: "left", marginTop: 4,
-                  }}
-                >
-                  <span style={{ fontWeight: 500, color: selectedGoalId === "all" ? "var(--primary)" : "var(--text)", fontSize: "0.95rem" }}>
-                    {"✦"} Mix all goals
-                  </span>
-                  {selectedGoalId === "all" && <span style={{ color: "var(--primary)", fontWeight: 700 }}>{"✓"}</span>}
-                </button>
-              )}
             </div>
           </div>
         </div>

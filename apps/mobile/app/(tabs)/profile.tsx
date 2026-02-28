@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
+  TextInput,
   StyleSheet,
   ScrollView,
   RefreshControl,
@@ -11,6 +12,7 @@ import {
   Pressable,
   Platform,
   Modal,
+  KeyboardAvoidingView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SwipeNavigator } from "@/components/SwipeNavigator";
@@ -18,9 +20,9 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/lib/supabase";
-import { statsApi, accountApi, tasksApi, summaryApi, type Stats, type DailyTask, type TaskItem, type HeatmapDay, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus } from "@/lib/api";
+import { statsApi, accountApi, tasksApi, summaryApi, subscriptionApi, type Stats, type DailyTask, type TaskItem, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus, type SubscriptionStatus } from "@/lib/api";
 import { TaskCard } from "@/components/TaskCard";
-import { WeeklyBarChart } from "@/components/WeeklyBarChart";
+
 import { WeeklySummary } from "@/components/WeeklySummary";
 import { SkeletonStatCard } from "@/components/Skeleton";
 import { useCountUp } from "@/lib/animations";
@@ -172,9 +174,9 @@ export default function ProfileScreen() {
   // Nickname (display only — set during onboarding)
   const [nickname, setNickname] = useState("");
 
-  // Heatmap
-  const [heatmapData, setHeatmapData] = useState<HeatmapDay[]>([]);
-  const [heatmapLoading, setHeatmapLoading] = useState(true);
+  // Subscription
+  const [subStatus, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
+
   const [refreshing, setRefreshing] = useState(false);
 
   // Weekly summary
@@ -201,29 +203,43 @@ export default function ProfileScreen() {
   // Appearance
   const [appearanceSheetOpen, setAppearanceSheetOpen] = useState(false);
 
+  // Change password
+  const [pwSheetOpen, setPwSheetOpen] = useState(false);
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState("");
+  const [authProvider, setAuthProvider] = useState<"email" | "google" | "apple" | "other">("email");
+
   const loadProfileData = useCallback(async () => {
     try {
-      const [{ data: { user } }, statsRes, notifRes, savedNickname, heatmapRes] = await Promise.all([
+      const [{ data: { user } }, statsRes, notifRes, savedNickname] = await Promise.all([
         supabase.auth.getUser(),
         statsApi.get(),
         getNotifPreference(),
         AsyncStorage.getItem("@threely_nickname"),
-        statsApi.heatmap(90).catch(() => ({ heatmap: [] })),
       ]);
       if (user) {
         setEmail(user.email ?? "");
         const d = new Date(user.created_at);
         setMemberSince(d.toLocaleDateString("en-US", { month: "long", year: "numeric" }));
+        // Detect auth provider for password change flow
+        const provider = user.app_metadata?.provider as string | undefined;
+        if (provider === "google") setAuthProvider("google");
+        else if (provider === "apple") setAuthProvider("apple");
+        else if (provider === "email") setAuthProvider("email");
+        else setAuthProvider("other");
       }
       setStats(statsRes);
       setNotifPref(notifRes);
       if (savedNickname) setNickname(savedNickname);
-      setHeatmapData(heatmapRes.heatmap);
+      // Fetch subscription status (non-blocking)
+      subscriptionApi.status().then(res => setSubStatus(res.status)).catch(() => {});
     } catch {
       // silently keep previous values
     } finally {
       setStatsLoading(false);
-      setHeatmapLoading(false);
     }
   }, []);
 
@@ -294,6 +310,11 @@ export default function ProfileScreen() {
   }, [weeklyStatus]);
 
   async function handleOpenWeekly() {
+    // Gate behind subscription
+    if (subStatus !== "trialing" && subStatus !== "active") {
+      router.push("/payment" as never);
+      return;
+    }
     if (weeklyStatus?.status === "available" && weeklyFrozenData) {
       setWeeklySummaryOpen(true);
       return;
@@ -306,8 +327,12 @@ export default function ProfileScreen() {
       setWeeklyFrozenData(data);
       setWeeklyStatus({ status: "available", summary: data });
       setWeeklySummaryOpen(true);
-    } catch {
-      Alert.alert("Error", "Failed to load weekly analysis.");
+    } catch (err) {
+      if (err instanceof Error && err.message?.includes("pro_required")) {
+        router.push("/payment" as never);
+      } else {
+        Alert.alert("Error", "Failed to load weekly analysis.");
+      }
     } finally {
       setWeeklyOpening(false);
     }
@@ -434,6 +459,21 @@ export default function ProfileScreen() {
           <Text style={styles.displayName}>{displayName}</Text>
           {nickname ? <Text style={styles.emailSmall}>{email}</Text> : null}
           <Text style={styles.memberSince}>Member since {memberSince}</Text>
+          {subStatus === "trialing" && (
+            <View style={{ backgroundColor: "#ecfdf5", paddingHorizontal: 12, paddingVertical: 3, borderRadius: 999, marginTop: spacing.xs }}>
+              <Text style={{ color: "#059669", fontSize: typography.xs, fontWeight: typography.semibold }}>Pro Trial</Text>
+            </View>
+          )}
+          {subStatus === "active" && (
+            <View style={{ backgroundColor: colors.primaryLight, paddingHorizontal: 12, paddingVertical: 3, borderRadius: 999, marginTop: spacing.xs }}>
+              <Text style={{ color: colors.primary, fontSize: typography.xs, fontWeight: typography.semibold }}>Pro</Text>
+            </View>
+          )}
+          {subStatus !== undefined && subStatus !== "trialing" && subStatus !== "active" && (
+            <View style={{ backgroundColor: "#f3f4f6", paddingHorizontal: 12, paddingVertical: 3, borderRadius: 999, marginTop: spacing.xs }}>
+              <Text style={{ color: "#6b7280", fontSize: typography.xs, fontWeight: typography.semibold }}>No plan</Text>
+            </View>
+          )}
         </View>
 
         {/* Stats */}
@@ -518,16 +558,6 @@ export default function ProfileScreen() {
           </>
         )}
 
-        {/* Calendar heatmap */}
-        {!heatmapLoading && (
-          <>
-            <Text style={styles.sectionLabel}>Activity</Text>
-            <View style={{ marginBottom: spacing.xl }}>
-              <WeeklyBarChart data={heatmapData} />
-            </View>
-          </>
-        )}
-
         {/* Weekly Analysis Card */}
         <Text style={styles.sectionLabel}>Weekly analysis</Text>
         {weeklyStatus?.status === "ready" ? (
@@ -566,7 +596,18 @@ export default function ProfileScreen() {
             <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
           </TouchableOpacity>
         ) : (
-          <View style={[styles.weeklyCard, { opacity: 0.7 }]}>
+          <TouchableOpacity
+            style={[styles.weeklyCard, { opacity: 0.7 }]}
+            activeOpacity={0.7}
+            onPress={() => {
+              if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              Alert.alert(
+                "Weekly Analysis",
+                "Your weekly analysis is generated every Monday. Check back then to see your progress report and personalized insights!",
+                [{ text: "OK" }],
+              );
+            }}
+          >
             <View style={[styles.weeklyIconWrap, { backgroundColor: colors.bg }]}>
               <Ionicons name="lock-closed-outline" size={20} color={colors.textTertiary} />
             </View>
@@ -574,7 +615,7 @@ export default function ProfileScreen() {
               <Text style={[styles.menuLabel, { color: colors.textSecondary }]}>Weekly Analysis</Text>
               <Text style={styles.menuValue}>{countdown ? countdown.replace("Unlocks in ", "Available in ") : "Loading..."}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
 
         {/* Settings */}
@@ -676,6 +717,16 @@ export default function ProfileScreen() {
         {/* Account */}
         <Text style={styles.sectionLabel}>Account</Text>
         <View style={styles.menuCard}>
+          <TouchableOpacity style={styles.menuRow} onPress={() => setPwSheetOpen(true)} activeOpacity={0.7}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
+              <Ionicons name="key-outline" size={18} color={colors.primary} />
+            </View>
+            <Text style={styles.menuLabel}>Change password</Text>
+            <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} style={{ marginLeft: "auto" }} />
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
           <TouchableOpacity style={styles.menuRow} onPress={handleSignOut} activeOpacity={0.7}>
             <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
               <Ionicons name="log-out-outline" size={18} color={colors.primary} />
@@ -886,6 +937,107 @@ export default function ProfileScreen() {
             })}
           </TouchableOpacity>
         </TouchableOpacity>
+      )}
+
+      {/* ── Change Password Sheet ──────────────────────────────────────────────── */}
+      {pwSheetOpen && (
+        <Modal visible transparent animationType="slide" onRequestClose={() => setPwSheetOpen(false)}>
+          <KeyboardAvoidingView style={{ flex: 1, justifyContent: "flex-end" }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+            <Pressable style={styles.overlay} onPress={() => setPwSheetOpen(false)} />
+            <View style={styles.sheet}>
+              <View style={styles.handle} />
+              <Text style={styles.sheetTitle}>
+                {authProvider === "email" ? "Change password" : "Set a password"}
+              </Text>
+              <Text style={styles.sheetSubtitle}>
+                {authProvider === "email"
+                  ? "Enter your current password and choose a new one."
+                  : `You signed in with ${authProvider === "google" ? "Google" : authProvider === "apple" ? "Apple" : "a social account"}. Set a password to also sign in with email.`}
+              </Text>
+
+              {authProvider === "email" && (
+                <TextInput
+                  style={[styles.pwInput, pwError && currentPw === "" ? { borderColor: colors.danger } : {}]}
+                  placeholder="Current password"
+                  placeholderTextColor={colors.textTertiary}
+                  secureTextEntry
+                  value={currentPw}
+                  onChangeText={setCurrentPw}
+                  autoComplete="current-password"
+                />
+              )}
+              <TextInput
+                style={styles.pwInput}
+                placeholder="New password (min. 8 characters)"
+                placeholderTextColor={colors.textTertiary}
+                secureTextEntry
+                value={newPw}
+                onChangeText={setNewPw}
+                autoComplete="new-password"
+              />
+              <TextInput
+                style={styles.pwInput}
+                placeholder="Confirm new password"
+                placeholderTextColor={colors.textTertiary}
+                secureTextEntry
+                value={confirmPw}
+                onChangeText={setConfirmPw}
+                autoComplete="new-password"
+              />
+
+              {pwError ? (
+                <View style={{ backgroundColor: colors.dangerLight, borderRadius: radius.md, padding: spacing.sm, marginBottom: spacing.sm }}>
+                  <Text style={{ color: colors.danger, fontSize: typography.sm }}>{pwError}</Text>
+                </View>
+              ) : null}
+
+              <View style={{ flexDirection: "row", gap: spacing.sm, marginTop: spacing.xs }}>
+                <TouchableOpacity
+                  style={[styles.pwBtn, { backgroundColor: colors.bg, borderWidth: 1.5, borderColor: colors.border }]}
+                  onPress={() => { setPwSheetOpen(false); setPwError(""); setCurrentPw(""); setNewPw(""); setConfirmPw(""); }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={[styles.pwBtnText, { color: colors.textSecondary }]}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.pwBtn, { backgroundColor: colors.primary }, pwLoading && { opacity: 0.6 }]}
+                  onPress={async () => {
+                    setPwError("");
+                    if (authProvider === "email" && !currentPw.trim()) { setPwError("Enter your current password."); return; }
+                    if (newPw.length < 8) { setPwError("New password must be at least 8 characters."); return; }
+                    if (newPw !== confirmPw) { setPwError("New passwords do not match."); return; }
+                    setPwLoading(true);
+                    try {
+                      // Only verify current password for email users
+                      if (authProvider === "email") {
+                        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password: currentPw });
+                        if (signInErr) { setPwError("Current password is incorrect."); setPwLoading(false); return; }
+                      }
+                      // Update/set password
+                      const { error: updateErr } = await supabase.auth.updateUser({ password: newPw });
+                      if (updateErr) { setPwError(updateErr.message); setPwLoading(false); return; }
+                      setPwSheetOpen(false);
+                      setCurrentPw(""); setNewPw(""); setConfirmPw(""); setPwError("");
+                      Alert.alert("Success", authProvider === "email" ? "Your password has been updated." : "Password set! You can now sign in with email and password too.");
+                    } catch {
+                      setPwError("Something went wrong. Please try again.");
+                    } finally {
+                      setPwLoading(false);
+                    }
+                  }}
+                  activeOpacity={0.85}
+                  disabled={pwLoading}
+                >
+                  {pwLoading ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={[styles.pwBtnText, { color: "#fff" }]}>Update password</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </Modal>
       )}
 
       {/* ── Weekly Summary Modal ───────────────────────────────────────────────── */}
@@ -1230,6 +1382,28 @@ function createStyles(c: Colors) {
       backgroundColor: c.bg,
       alignItems: "center",
       justifyContent: "center",
+    },
+    // ── Change Password ──────────────────────────────────────────────────────
+    pwInput: {
+      backgroundColor: c.bg,
+      borderWidth: 1.5,
+      borderColor: c.border,
+      borderRadius: radius.md,
+      padding: spacing.md,
+      fontSize: typography.base,
+      color: c.text,
+      marginBottom: spacing.sm,
+    },
+    pwBtn: {
+      flex: 1,
+      height: 46,
+      borderRadius: radius.md,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    pwBtnText: {
+      fontSize: typography.base,
+      fontWeight: typography.semibold,
     },
   });
 }

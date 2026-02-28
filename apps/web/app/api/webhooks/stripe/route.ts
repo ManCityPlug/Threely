@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import type Stripe from "stripe";
+import { notifySubscription, notifyCancellation, notifyTrialExpiring } from "@/lib/discord";
 
 // Disable body parsing — Stripe needs the raw body to verify signature
 export const runtime = "nodejs";
@@ -34,22 +35,33 @@ export async function POST(request: NextRequest) {
           where: { subscriptionId: sub.id },
           data: { subscriptionStatus: sub.status },
         });
+        // Notify on new active subscription
+        if (sub.status === "active" && event.type === "customer.subscription.created") {
+          const user = await prisma.user.findFirst({ where: { subscriptionId: sub.id } });
+          const planName = sub.items.data[0]?.price?.nickname ?? sub.items.data[0]?.price?.id ?? "Pro";
+          notifySubscription(user?.email ?? "unknown", planName, sub.status);
+        }
         break;
       }
 
       // Subscription deleted / canceled
       case "customer.subscription.deleted": {
         const sub = event.data.object as Stripe.Subscription;
+        const cancelledUser = await prisma.user.findFirst({ where: { subscriptionId: sub.id } });
         await prisma.user.updateMany({
           where: { subscriptionId: sub.id },
           data: { subscriptionStatus: "canceled" },
         });
+        notifyCancellation(cancelledUser?.email ?? "unknown", sub.id);
         break;
       }
 
-      // Trial will end in 3 days — good place to send reminder (optional)
+      // Trial will end in 3 days — send Discord alert
       case "customer.subscription.trial_will_end": {
-        // TODO: send push notification reminder
+        const sub = event.data.object as Stripe.Subscription;
+        const trialUser = await prisma.user.findFirst({ where: { subscriptionId: sub.id } });
+        const trialEnd = sub.trial_end ? new Date(sub.trial_end * 1000).toLocaleDateString() : "soon";
+        notifyTrialExpiring(trialUser?.email ?? "unknown", trialEnd);
         break;
       }
 

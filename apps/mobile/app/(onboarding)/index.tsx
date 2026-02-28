@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -20,7 +20,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
 import { goalsApi, profileApi, tasksApi, type TaskItem, type ParsedGoal, type GoalChatMessage, type GoalChatResult } from "@/lib/api";
 import { supabase } from "@/lib/supabase";
-import { colors, spacing, typography, radius, shadow } from "@/constants/theme";
+import { spacing, typography, radius, shadow } from "@/constants/theme";
+import type { Colors } from "@/constants/theme";
+import { useTheme } from "@/lib/theme";
 import { GoalTemplates } from "@/components/GoalTemplates";
 import type { GoalCategory } from "@/constants/goal-templates";
 
@@ -60,8 +62,45 @@ const MONTHS = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
+const BUILDING_STEPS = [
+  "Analyzing your goal…",
+  "Crafting your personalized roadmap…",
+  "Generating 3 perfect tasks to start with…",
+  "Almost there — putting the finishing touches…",
+];
+
+function BuildingProgressMobile({ styles, colors }: { styles: any; colors: Colors }) {
+  const [stepIdx, setStepIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStepIdx((prev) => Math.min(prev + 1, BUILDING_STEPS.length - 1));
+    }, 7000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <View style={styles.buildingCenter}>
+      <Text style={styles.buildIcon}>✦</Text>
+      <Text style={styles.buildTitle}>Threely Intelligence is building your plan…</Text>
+      <Text style={styles.buildSubtitle}>{BUILDING_STEPS[stepIdx]}</Text>
+      <View style={{ flexDirection: "row", gap: 6, marginTop: spacing.md, marginBottom: spacing.sm }}>
+        {BUILDING_STEPS.map((_: string, i: number) => (
+          <View key={i} style={{
+            width: 8, height: 8, borderRadius: 4,
+            backgroundColor: i <= stepIdx ? colors.primary : colors.border,
+          }} />
+        ))}
+      </View>
+      <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.sm }} />
+    </View>
+  );
+}
+
 export default function OnboardingScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [step, setStep] = useState(1);
   const progressAnim = useRef(new Animated.Value(1 / TOTAL_STEPS)).current;
 
@@ -398,9 +437,10 @@ export default function OnboardingScreen() {
         effectiveParsed?.short_title ??
         (effectiveGoalText.slice(0, 40) || "My Goal");
 
-      // Save display name
+      // Save display name locally + to Supabase user metadata
       if (nameInput.trim()) {
         await AsyncStorage.setItem("@threely_nickname", nameInput.trim());
+        supabase.auth.updateUser({ data: { display_name: nameInput.trim() } }).catch(() => {});
       }
 
       // Save profile (intensity defaults to 2 — committed; AI chat handles pace context)
@@ -994,16 +1034,7 @@ export default function OnboardingScreen() {
     const tasksReady = generatedTasks.length > 0;
 
     if (!tasksReady && !buildError) {
-      return (
-        <View style={styles.buildingCenter}>
-          <Text style={styles.buildIcon}>✦</Text>
-          <Text style={styles.buildTitle}>Threely Intelligence is building your plan…</Text>
-          <Text style={styles.buildSubtitle}>
-            Analyzing your goal and crafting{"\n"}3 perfect tasks to start with.
-          </Text>
-          <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.lg }} />
-        </View>
-      );
+      return <BuildingProgressMobile styles={styles} colors={colors} />;
     }
 
     if (buildError) {
@@ -1341,7 +1372,8 @@ export default function OnboardingScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+function createStyles(colors: Colors) {
+  return StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.bg,
@@ -1504,21 +1536,21 @@ const styles = StyleSheet.create({
   },
   warningCard: {
     marginTop: spacing.md,
-    backgroundColor: "#FFF8EC",
+    backgroundColor: colors.warningLight ?? "#FFF8EC",
     borderRadius: radius.md,
     borderWidth: 1,
-    borderColor: "#F5A623" + "55",
+    borderColor: (colors.warning ?? "#F5A623") + "55",
     padding: spacing.md,
   },
   warningTitle: {
     fontSize: typography.sm,
     fontWeight: typography.semibold,
-    color: "#B45309",
+    color: colors.warning ?? "#B45309",
     marginBottom: spacing.xs,
   },
   warningBody: {
     fontSize: typography.sm,
-    color: "#92400E",
+    color: colors.textSecondary,
     lineHeight: 20,
   },
   footerStack: {
@@ -2060,3 +2092,4 @@ const styles = StyleSheet.create({
     color: colors.primaryText,
   },
 });
+}

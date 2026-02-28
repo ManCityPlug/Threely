@@ -155,8 +155,18 @@ export function TaskCard({ task, onToggle, onRefine, readonly = false }: TaskCar
                 {task.why}
               </Text>
             ) : null}
+
           </TouchableOpacity>
         </View>
+
+        {/* View task link — centered with top divider, matching GoalCard style */}
+        <TouchableOpacity
+          style={styles.viewTaskBtn}
+          onPress={handleTextPress}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.viewTaskBtnText}>View task →</Text>
+        </TouchableOpacity>
       </Animated.View>
 
       {/* Detail modal */}
@@ -210,6 +220,7 @@ function TaskDetailModal({
 }) {
   const translateY = useRef(new Animated.Value(0)).current;
   const overlayOpacity = useRef(new Animated.Value(1)).current;
+  const scrollRef = useRef<ScrollView>(null);
 
   const panResponder = useRef(
     PanResponder.create({
@@ -237,9 +248,11 @@ function TaskDetailModal({
     })
   ).current;
 
+  const inputRef = useRef<TextInput>(null);
+
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-      <KeyboardAvoidingView style={{ flex: 1, justifyContent: "flex-end" }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
+      <KeyboardAvoidingView style={{ flex: 1, justifyContent: "flex-end" }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}>
         <Animated.View style={[styles.modalOverlay, { opacity: overlayOpacity }]}>
           <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
         </Animated.View>
@@ -261,10 +274,11 @@ function TaskDetailModal({
           </View>
 
           <ScrollView
+            ref={scrollRef}
             showsVerticalScrollIndicator={true}
             keyboardShouldPersistTaps="handled"
             bounces={true}
-            style={{ flex: 1 }}
+            style={{ flexShrink: 1 }}
           >
             {/* Time badge */}
             {task.estimated_minutes ? (
@@ -293,59 +307,64 @@ function TaskDetailModal({
                 <Text style={styles.modalWhy}>{task.why}</Text>
               </>
             ) : null}
-
-            {/* AI Refine inline */}
-            {refineMode && onRefine && (
-              <View style={styles.refineSection}>
-                <Text style={styles.modalSectionLabel}>Ask AI to adjust this task</Text>
-                <TextInput
-                  style={styles.refineInput}
-                  value={refineInput}
-                  onChangeText={setRefineInput}
-                  placeholder='e.g. "Make it easier" or "Add more detail"'
-                  placeholderTextColor={colors.textTertiary}
-                  multiline
-                  editable={!refineLoading}
-                />
-                <View style={styles.editActions}>
-                  <TouchableOpacity
-                    style={styles.editCancelBtn}
-                    onPress={() => { setRefineMode(false); setRefineInput(""); }}
-                    activeOpacity={0.7}
-                  >
-                    <Text style={styles.editCancelText}>Cancel</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.editSaveBtn, (!refineInput.trim() || refineLoading) && { opacity: 0.5 }]}
-                    onPress={async () => {
-                      if (!refineInput.trim() || refineLoading) return;
-                      setRefineLoading(true);
-                      try {
-                        await onRefine(refineInput.trim());
-                        setRefineMode(false);
-                        setRefineInput("");
-                        onClose();
-                      } catch {
-                        // handled by parent
-                      } finally {
-                        setRefineLoading(false);
-                      }
-                    }}
-                    activeOpacity={0.85}
-                    disabled={!refineInput.trim() || refineLoading}
-                  >
-                    {refineLoading ? (
-                      <ActivityIndicator color="#fff" size="small" />
-                    ) : (
-                      <Text style={styles.editSaveText}>Send</Text>
-                    )}
-                  </TouchableOpacity>
-                </View>
-              </View>
-            )}
           </ScrollView>
 
-          {/* Action button: Ask AI */}
+          {/* Threely Intelligence — AI refine, pinned below ScrollView */}
+          {refineMode && onRefine && (
+            <View style={styles.refineSection}>
+              <View style={styles.intelligenceHeader}>
+                <Text style={styles.intelligenceIcon}>✦</Text>
+                <Text style={styles.intelligenceTitle}>Threely Intelligence</Text>
+              </View>
+              <TextInput
+                ref={inputRef}
+                style={styles.refineInput}
+                value={refineInput}
+                onChangeText={setRefineInput}
+                placeholder='e.g. "Make it easier" or "Add more detail"'
+                placeholderTextColor={colors.textTertiary}
+                multiline
+                autoFocus
+                editable={!refineLoading}
+              />
+              <View style={styles.editActions}>
+                <TouchableOpacity
+                  style={styles.editCancelBtn}
+                  onPress={() => { setRefineMode(false); setRefineInput(""); }}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.editCancelText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.editSaveBtn, (!refineInput.trim() || refineLoading) && { opacity: 0.5 }]}
+                  onPress={async () => {
+                    if (!refineInput.trim() || refineLoading) return;
+                    setRefineLoading(true);
+                    try {
+                      await onRefine(refineInput.trim());
+                      setRefineMode(false);
+                      setRefineInput("");
+                      onClose();
+                    } catch {
+                      // handled by parent
+                    } finally {
+                      setRefineLoading(false);
+                    }
+                  }}
+                  activeOpacity={0.85}
+                  disabled={!refineInput.trim() || refineLoading}
+                >
+                  {refineLoading ? (
+                    <ActivityIndicator color="#fff" size="small" />
+                  ) : (
+                    <Text style={styles.editSaveText}>Send</Text>
+                  )}
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {/* Action button: Threely Intelligence */}
           {!readonly && !refineMode && onRefine && (
             <View style={styles.modalActionRow}>
               <TouchableOpacity
@@ -353,7 +372,8 @@ function TaskDetailModal({
                 onPress={() => setRefineMode(true)}
                 activeOpacity={0.7}
               >
-                <Text style={styles.modalActionText}>Ask AI to refine</Text>
+                <Text style={styles.intelligenceActionIcon}>✦</Text>
+                <Text style={styles.modalActionText}>Refine with Threely Intelligence</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -489,6 +509,18 @@ function createStyles(c: Colors) {
     },
     whyDone: {
       color: c.textTertiary,
+    },
+    viewTaskBtn: {
+      marginTop: 0,
+      paddingVertical: spacing.xs + 2,
+      borderTopWidth: 1,
+      borderTopColor: c.border,
+      alignItems: "center",
+    },
+    viewTaskBtnText: {
+      fontSize: typography.sm,
+      fontWeight: typography.semibold as "600",
+      color: c.primary,
     },
     // ── Detail Modal ────────────────────────────────────────────────────────
     modalOverlay: {
@@ -670,6 +702,22 @@ function createStyles(c: Colors) {
       minHeight: 60,
       marginBottom: spacing.md,
     },
+    intelligenceHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+      marginBottom: spacing.sm,
+    },
+    intelligenceIcon: {
+      fontSize: 16,
+      color: c.primary,
+    },
+    intelligenceTitle: {
+      fontSize: typography.sm,
+      fontWeight: typography.bold,
+      color: c.primary,
+      letterSpacing: -0.2,
+    },
     modalActionRow: {
       flexDirection: "row",
       gap: spacing.sm,
@@ -681,15 +729,21 @@ function createStyles(c: Colors) {
       height: 40,
       borderRadius: radius.md,
       borderWidth: 1.5,
-      borderColor: c.border,
-      backgroundColor: c.bg,
+      borderColor: c.primary + "44",
+      backgroundColor: c.primaryLight,
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
+      gap: spacing.xs,
+    },
+    intelligenceActionIcon: {
+      fontSize: 14,
+      color: c.primary,
     },
     modalActionText: {
       fontSize: typography.sm,
       fontWeight: typography.semibold,
-      color: c.textSecondary,
+      color: c.primary,
     },
   });
 }

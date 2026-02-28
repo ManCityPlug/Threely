@@ -568,14 +568,85 @@ input, textarea, select {
   color: #fff;
 }
 
-/* ─── Marketing nav: mobile responsive ──────────────────────────────────────── */
+/* ─── Social auth buttons ────────────────────────────────────────────────────── */
+.btn-social {
+  width: 100%;
+  height: 46px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-google {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+.btn-google:hover {
+  background: var(--bg);
+  border-color: var(--muted);
+}
+.btn-google:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-apple {
+  background: #0a2540;
+  color: #fff;
+  border: 1px solid #0a2540;
+}
+.btn-apple:hover {
+  background: #0d2f4f;
+}
+.btn-apple:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+[data-theme="dark"] .btn-google {
+  background: var(--card);
+  border-color: var(--border);
+  color: var(--text);
+}
+[data-theme="dark"] .btn-google:hover {
+  background: var(--bg);
+}
+[data-theme="dark"] .btn-apple {
+  background: #fff;
+  color: #0a2540;
+  border-color: #fff;
+}
+[data-theme="dark"] .btn-apple:hover {
+  background: #f0f0f0;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 1rem 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: lowercase;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ─── Marketing: mobile responsive ──────────────────────────────────────── */
 @media (max-width: 768px) {
-  .marketing-nav-links { display: none !important; }
-  .mobile-menu-btn { display: flex !important; }
   .footer-grid {
     grid-template-columns: 1fr 1fr !important;
   }
-}
-@media (min-width: 769px) {
-  .mobile-menu-btn { display: none !important; }
 }

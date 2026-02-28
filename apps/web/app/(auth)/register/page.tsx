@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getSupabase } from "@/lib/supabase-client";
+import { SocialAuthButtons, AuthDivider } from "@/components/SocialAuthButtons";
 
 const APP_STORE_URL = "#";
 const PLAY_STORE_URL = "#";
@@ -60,7 +61,11 @@ export default function RegisterPage() {
 
   useEffect(() => {
     setDevice(detectDevice());
-  }, []);
+    // Redirect if already logged in
+    getSupabase().auth.getSession().then(({ data: { session } }) => {
+      if (session) router.replace("/dashboard");
+    });
+  }, [router]);
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
@@ -188,9 +193,7 @@ export default function RegisterPage() {
         </div>
 
         <p style={{ color: "var(--muted)", fontSize: "0.8rem", lineHeight: 1.5, marginBottom: "1.25rem" }}>
-          Threely is also available on the web at{" "}
-          <span style={{ fontWeight: 600, color: "var(--primary)" }}>threely.co</span>
-          {" "}on your computer.
+          Also available on the web at threely.co
         </p>
 
         <p style={{ color: "var(--subtext)", fontSize: "0.875rem" }}>
@@ -219,6 +222,11 @@ export default function RegisterPage() {
           Start turning your goals into action
         </p>
       </div>
+
+      {/* Social auth buttons */}
+      <SocialAuthButtons />
+
+      <AuthDivider />
 
       <form onSubmit={handleRegister} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
         <div>

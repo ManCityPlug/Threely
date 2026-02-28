@@ -73,7 +73,7 @@ export default function PricingPage() {
               <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/month</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              Full AI coaching. Cancel anytime.<br />3-day free trial included.
+              Monthly access.<br />3-day free trial included.
             </p>
             <Link href="/register" style={{
               display: "block",
@@ -86,6 +86,50 @@ export default function PricingPage() {
               fontWeight: 700,
               fontSize: "0.95rem",
               textDecoration: "none",
+            }}>
+              Start Free Trial
+            </Link>
+          </div>
+
+          {/* Yearly — center position */}
+          <div style={{
+            padding: "2rem 1.5rem",
+            borderRadius: 16,
+            border: "2px solid #635bff",
+            background: "#fff",
+            position: "relative",
+            boxShadow: "0 4px 20px rgba(99,91,255,0.12)",
+          }}>
+            <div style={{
+              position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)",
+              background: "#635bff", color: "#fff",
+              padding: "3px 14px", borderRadius: 20,
+              fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.05em",
+              whiteSpace: "nowrap",
+            }}>
+              MOST POPULAR · SAVE 58%
+            </div>
+            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#635bff", textTransform: "uppercase", marginBottom: 8 }}>
+              YEARLY — BEST VALUE
+            </div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
+              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$59.99</span>
+              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/year</span>
+            </div>
+            <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
+              $4.99/month · billed annually.<br />3-day free trial included.
+            </p>
+            <Link href="/register" style={{
+              display: "block",
+              textAlign: "center",
+              padding: "0.75rem 1.5rem",
+              background: "#635bff",
+              color: "#fff",
+              borderRadius: 10,
+              fontWeight: 700,
+              fontSize: "0.95rem",
+              textDecoration: "none",
+              boxShadow: "0 4px 14px rgba(99,91,255,0.3)",
             }}>
               Start Free Trial
             </Link>
@@ -128,49 +172,6 @@ export default function PricingPage() {
               fontWeight: 700,
               fontSize: "0.95rem",
               textDecoration: "none",
-            }}>
-              Start Free Trial
-            </Link>
-          </div>
-
-          {/* Yearly */}
-          <div style={{
-            padding: "2rem 1.5rem",
-            borderRadius: 16,
-            border: "2px solid #635bff",
-            background: "#fff",
-            position: "relative",
-            boxShadow: "0 4px 20px rgba(99,91,255,0.12)",
-          }}>
-            <div style={{
-              position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)",
-              background: "#635bff", color: "#fff",
-              padding: "3px 14px", borderRadius: 20,
-              fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.05em",
-            }}>
-              MOST POPULAR
-            </div>
-            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#635bff", textTransform: "uppercase", marginBottom: 8 }}>
-              YEARLY — BEST VALUE
-            </div>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$59.99</span>
-              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/year</span>
-            </div>
-            <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              $4.99/month · billed annually.<br />3-day free trial included.
-            </p>
-            <Link href="/register" style={{
-              display: "block",
-              textAlign: "center",
-              padding: "0.75rem 1.5rem",
-              background: "#635bff",
-              color: "#fff",
-              borderRadius: 10,
-              fontWeight: 700,
-              fontSize: "0.95rem",
-              textDecoration: "none",
-              boxShadow: "0 4px 14px rgba(99,91,255,0.3)",
             }}>
               Start Free Trial
             </Link>

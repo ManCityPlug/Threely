@@ -16,13 +16,15 @@ import {
   Modal,
   KeyboardAvoidingView,
   FlatList,
+  PanResponder,
+  Dimensions,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { SwipeNavigator } from "@/components/SwipeNavigator";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { goalsApi, tasksApi, type Goal, type TaskItem, type ParsedGoal, type GoalChatMessage } from "@/lib/api";
+import { goalsApi, tasksApi, subscriptionApi, type Goal, type TaskItem, type ParsedGoal, type GoalChatMessage } from "@/lib/api";
 import { GoalCard } from "@/components/GoalCard";
 import { GoalTemplates } from "@/components/GoalTemplates";
 import { SkeletonCard } from "@/components/Skeleton";
@@ -147,11 +149,15 @@ export default function GoalsScreen() {
   const [buildError, setBuildError] = useState("");
   const [builtTasks, setBuiltTasks] = useState<TaskItem[]>([]);
   const [coachNote, setCoachNote] = useState("");
+  const [offDayMessage, setOffDayMessage] = useState<string | null>(null);
   const taskRevealAnims = useRef([
     new Animated.Value(0),
     new Animated.Value(0),
     new Animated.Value(0),
   ]).current;
+
+  // Subscription gate
+  const [proExpired, setProExpired] = useState(false);
 
   // Action sheet
   const [actionGoal, setActionGoal] = useState<Goal | null>(null);
@@ -204,6 +210,10 @@ export default function GoalsScreen() {
       } else {
         loadGoals();
       }
+      // Check subscription status
+      subscriptionApi.status().then(({ status }) => {
+        setProExpired(status !== "trialing" && status !== "active");
+      }).catch(() => {});
     }, [loadGoals])
   );
 
@@ -215,6 +225,7 @@ export default function GoalsScreen() {
 
   // ── Add flow helpers ────────────────────────────────────────────────────────
   function openAddFlow() {
+    if (proExpired) { router.push("/payment" as never); return; }
     setEditingGoalId(null);
     setRawGoalInput("");
     setParsedGoal(null);
@@ -350,7 +361,12 @@ export default function GoalsScreen() {
       }
       if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     } catch (e) {
-      setParseError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
+      if (e instanceof Error && e.message?.includes("pro_required")) {
+        closeAddFlow();
+        router.push("/payment" as never);
+      } else {
+        setParseError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
+      }
     } finally {
       setParsing(false);
     }
@@ -385,8 +401,14 @@ export default function GoalsScreen() {
         setChatDone(true);
         setChatGoalText(result.goal_text);
       }
-    } catch {
-      setChatHistory([{ role: "assistant" as const, text: "Something went wrong. Please close and try again." }]);
+    } catch (err) {
+      if (err instanceof Error && err.message?.includes("pro_required")) {
+        setShowAiChat(false);
+        closeAddFlow();
+        router.push("/payment" as never);
+      } else {
+        setChatHistory([{ role: "assistant" as const, text: "Something went wrong. Please close and try again." }]);
+      }
     } finally {
       setChatLoading(false);
     }
@@ -414,11 +436,17 @@ export default function GoalsScreen() {
         setChatDone(true);
         setChatGoalText(result.goal_text);
       }
-    } catch {
-      setChatHistory((prev) => [
-        ...prev,
-        { role: "assistant", text: "Something went wrong. Please try again." },
-      ]);
+    } catch (err) {
+      if (err instanceof Error && err.message?.includes("pro_required")) {
+        setShowAiChat(false);
+        closeAddFlow();
+        router.push("/payment" as never);
+      } else {
+        setChatHistory((prev) => [
+          ...prev,
+          { role: "assistant", text: "Something went wrong. Please try again." },
+        ]);
+      }
     } finally {
       setChatLoading(false);
     }
@@ -499,24 +527,42 @@ export default function GoalsScreen() {
         goalId = goalResult.goal.id;
       }
 
-      const tasksResult = await tasksApi.generate(goalId);
-      const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
-      setBuiltTasks(allTasks);
-      if (tasksResult.coachNote) setCoachNote(tasksResult.coachNote);
+      // Check if today is a work day for this goal
+      const todayJs = new Date().getDay();
+      const todayIsoDay = todayJs === 0 ? 7 : todayJs;
+      const isTodayWorkDay = effectiveWorkDays.length === 0 || effectiveWorkDays.length === 7 || effectiveWorkDays.includes(todayIsoDay);
 
-      // Staggered reveal
-      allTasks.forEach((_, i) => {
-        setTimeout(() => {
-          Animated.spring(taskRevealAnims[i], {
-            toValue: 1,
-            useNativeDriver: true,
-            tension: 120,
-            friction: 8,
-          }).start();
-        }, i * 300);
-      });
+      if (isTodayWorkDay) {
+        const tasksResult = await tasksApi.generate(goalId);
+        const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
+        setBuiltTasks(allTasks);
+        if (tasksResult.coachNote) setCoachNote(tasksResult.coachNote);
+
+        // Staggered reveal
+        allTasks.forEach((_, i) => {
+          setTimeout(() => {
+            Animated.spring(taskRevealAnims[i], {
+              toValue: 1,
+              useNativeDriver: true,
+              tension: 120,
+              friction: 8,
+            }).start();
+          }, i * 300);
+        });
+      } else {
+        // Off-day: show message about next work day
+        const dayNames = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        const sorted = [...effectiveWorkDays].sort((a, b) => a - b);
+        const nextDay = sorted.find(d => d > todayIsoDay) ?? sorted[0];
+        setOffDayMessage(`Your first tasks will appear on ${dayNames[nextDay]}!`);
+      }
     } catch (e: unknown) {
-      setBuildError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+      if (e instanceof Error && e.message?.includes("pro_required")) {
+        closeAddFlow();
+        router.push("/payment" as never);
+      } else {
+        setBuildError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+      }
     }
   }
 
@@ -628,6 +674,8 @@ export default function GoalsScreen() {
   // ── Step renders ────────────────────────────────────────────────────────────
 
   function renderAddStep1() {
+    // When editing, don't show templates — AI chat is the only UI
+    if (editingGoalId) return null;
     // Show free-text input when "Something else" is tapped
     if (showFreeText) {
       return (
@@ -1099,8 +1147,9 @@ export default function GoalsScreen() {
 
   function renderBuildingStep() {
     const tasksReady = builtTasks.length > 0;
+    const isOffDay = offDayMessage !== null;
 
-    if (!tasksReady && !buildError) {
+    if (!tasksReady && !buildError && !isOffDay) {
       return (
         <View style={styles.buildingCenter}>
           <Text style={styles.buildIcon}>✦</Text>
@@ -1127,32 +1176,62 @@ export default function GoalsScreen() {
     return (
       <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.stepScroll} showsVerticalScrollIndicator={false}>
-          <Text style={styles.buildReadyTitle}>Your plan is ready ✦</Text>
+          <Text style={styles.buildReadyTitle}>{isOffDay ? "Goal created ✦" : "Your plan is ready ✦"}</Text>
           {coachNote ? <Text style={styles.coachNote}>{coachNote}</Text> : null}
-          <View style={{ gap: spacing.md, marginTop: spacing.md }}>
-            {builtTasks.map((task, i) => (
-              <Animated.View
-                key={task.id}
-                style={[
-                  styles.taskRevealCard,
-                  {
-                    opacity: taskRevealAnims[i],
-                    transform: [{ translateY: taskRevealAnims[i].interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
-                  },
-                ]}
-              >
-                <View style={styles.taskRevealRow}>
-                  <Text style={styles.taskRevealName}>{task.task}</Text>
-                  {task.estimated_minutes ? (
-                    <View style={styles.timeBadge}>
-                      <Text style={styles.timeBadgeText}>~{task.estimated_minutes}m</Text>
-                    </View>
-                  ) : null}
-                </View>
-                {task.why ? <Text style={styles.taskRevealWhy}>{task.why}</Text> : null}
-              </Animated.View>
-            ))}
-          </View>
+
+          {isOffDay ? (
+            <View style={{
+              backgroundColor: colors.primaryLight,
+              borderRadius: radius.lg,
+              padding: spacing.xl,
+              alignItems: "center",
+              marginTop: spacing.md,
+            }}>
+              <Text style={{ fontSize: 40, marginBottom: spacing.sm }}>📅</Text>
+              <Text style={{
+                fontSize: typography.lg.fontSize,
+                fontWeight: "700" as const,
+                color: colors.text,
+                textAlign: "center",
+                marginBottom: spacing.xs,
+              }}>
+                {offDayMessage}
+              </Text>
+              <Text style={{
+                fontSize: typography.sm.fontSize,
+                color: colors.textSecondary,
+                textAlign: "center",
+                lineHeight: 20,
+              }}>
+                We'll generate your first 3 tasks on your next scheduled day.
+              </Text>
+            </View>
+          ) : (
+            <View style={{ gap: spacing.md, marginTop: spacing.md }}>
+              {builtTasks.map((task, i) => (
+                <Animated.View
+                  key={task.id}
+                  style={[
+                    styles.taskRevealCard,
+                    {
+                      opacity: taskRevealAnims[i],
+                      transform: [{ translateY: taskRevealAnims[i].interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
+                    },
+                  ]}
+                >
+                  <View style={styles.taskRevealRow}>
+                    <Text style={styles.taskRevealName}>{task.task}</Text>
+                    {task.estimated_minutes ? (
+                      <View style={styles.timeBadge}>
+                        <Text style={styles.timeBadgeText}>~{task.estimated_minutes}m</Text>
+                      </View>
+                    ) : null}
+                  </View>
+                  {task.why ? <Text style={styles.taskRevealWhy}>{task.why}</Text> : null}
+                </Animated.View>
+              ))}
+            </View>
+          )}
         </ScrollView>
         <View style={styles.footer}>
           <TouchableOpacity style={styles.continueBtn} onPress={closeAddFlow} activeOpacity={0.85}>
@@ -1214,7 +1293,7 @@ export default function GoalsScreen() {
           visible={showAiChat}
           animationType="slide"
           presentationStyle="pageSheet"
-          onRequestClose={() => setShowAiChat(false)}
+          onRequestClose={() => { setShowAiChat(false); if (editingGoalId && addStep === 1) closeAddFlow(); }}
         >
           <SafeAreaView style={styles.chatModal}>
             {/* Header */}
@@ -1225,7 +1304,7 @@ export default function GoalsScreen() {
               </View>
               <TouchableOpacity
                 style={styles.chatCloseBtn}
-                onPress={() => setShowAiChat(false)}
+                onPress={() => { setShowAiChat(false); if (editingGoalId && addStep === 1) closeAddFlow(); }}
                 hitSlop={12}
               >
                 <Text style={styles.chatCloseText}>×</Text>
@@ -1512,61 +1591,135 @@ export default function GoalsScreen() {
 
       {/* ── Action Sheet ──────────────────────────────────────────────────────── */}
       {!!actionGoal && (
-        <View style={styles.overlay}>
-          <Pressable style={styles.backdrop} onPress={() => setActionGoal(null)} />
-          <View style={styles.sheet}>
-            <Pressable onPress={() => setActionGoal(null)} style={{ alignItems: "center", paddingVertical: 8 }}>
-              <View style={styles.handle} />
-            </Pressable>
-            <Text style={styles.sheetTitle} numberOfLines={1}>{actionGoal.title}</Text>
-            <Text style={styles.sheetSubtitle}>What would you like to do?</Text>
-
-            <Pressable style={styles.actionRow} onPress={handleEditPress}>
-              <View style={[styles.actionIcon, { backgroundColor: colors.primaryLight }]}>
-                <Ionicons name="chatbubble-ellipses-outline" size={18} color={colors.primary} />
-              </View>
-              <Text style={styles.actionLabel}>Edit goal</Text>
-              <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
-            </Pressable>
-            <View style={styles.divider} />
-            <Pressable style={styles.actionRow} onPress={handleTogglePause}>
-              <View style={[styles.actionIcon, { backgroundColor: colors.warningLight }]}>
-                <Ionicons
-                  name={actionGoal.isPaused ? "play-outline" : "pause-outline"}
-                  size={18}
-                  color={colors.warning}
-                />
-              </View>
-              <Text style={[styles.actionLabel, { color: colors.warning }]}>
-                {actionGoal.isPaused ? "Resume goal" : "Pause goal"}
-              </Text>
-              <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
-            </Pressable>
-            <View style={styles.divider} />
-            <Pressable style={styles.actionRow} onPress={handleMarkCompletePress}>
-              <View style={[styles.actionIcon, { backgroundColor: colors.successLight }]}>
-                <Ionicons name="checkmark-circle-outline" size={18} color={colors.success} />
-              </View>
-              <Text style={[styles.actionLabel, { color: colors.success }]}>Mark as complete</Text>
-              <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
-            </Pressable>
-            <View style={styles.divider} />
-            <Pressable style={styles.actionRow} onPress={handleDeletePress}>
-              <View style={[styles.actionIcon, { backgroundColor: colors.dangerLight }]}>
-                <Ionicons name="trash-outline" size={18} color={colors.danger} />
-              </View>
-              <Text style={[styles.actionLabel, { color: colors.danger }]}>Delete goal</Text>
-              <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
-            </Pressable>
-            <Button title="Cancel" onPress={() => setActionGoal(null)} variant="outline" style={styles.cancelBtn} />
-          </View>
-        </View>
+        <GoalActionSheet
+          goal={actionGoal}
+          colors={colors}
+          styles={styles}
+          onClose={() => setActionGoal(null)}
+          onEdit={handleEditPress}
+          onTogglePause={handleTogglePause}
+          onMarkComplete={handleMarkCompletePress}
+          onDelete={handleDeletePress}
+        />
       )}
 
       {/* ── Add / Edit goal full-screen flow ─────────────────────────────────────────── */}
       {renderAddFlow()}
     </SafeAreaView>
     </SwipeNavigator>
+  );
+}
+
+// ─── Swipe-to-dismiss goal action sheet ──────────────────────────────────────
+
+const SHEET_DISMISS_THRESHOLD = 120;
+
+function GoalActionSheet({
+  goal, colors, styles, onClose, onEdit, onTogglePause, onMarkComplete, onDelete,
+}: {
+  goal: Goal;
+  colors: Colors;
+  styles: ReturnType<typeof createStyles>;
+  onClose: () => void;
+  onEdit: () => void;
+  onTogglePause: () => void;
+  onMarkComplete: () => void;
+  onDelete: () => void;
+}) {
+  const translateY = useRef(new Animated.Value(0)).current;
+  const overlayOpacity = useRef(new Animated.Value(1)).current;
+
+  const dismiss = () => {
+    Animated.parallel([
+      Animated.timing(translateY, { toValue: Dimensions.get("window").height, duration: 250, useNativeDriver: true }),
+      Animated.timing(overlayOpacity, { toValue: 0, duration: 250, useNativeDriver: true }),
+    ]).start(onClose);
+  };
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, g) => g.dy > 8 && Math.abs(g.dy) > Math.abs(g.dx) * 1.5,
+      onPanResponderMove: (_, g) => {
+        if (g.dy > 0) {
+          translateY.setValue(g.dy);
+          overlayOpacity.setValue(Math.max(0, 1 - g.dy / 400));
+        }
+      },
+      onPanResponderRelease: (_, g) => {
+        if (g.dy > SHEET_DISMISS_THRESHOLD || g.vy > 0.5) {
+          dismiss();
+        } else {
+          Animated.parallel([
+            Animated.spring(translateY, { toValue: 0, useNativeDriver: true, tension: 200, friction: 20 }),
+            Animated.timing(overlayOpacity, { toValue: 1, duration: 150, useNativeDriver: true }),
+          ]).start();
+        }
+      },
+    })
+  ).current;
+
+  return (
+    <View style={styles.overlay}>
+      <Animated.View style={[styles.backdrop, { opacity: overlayOpacity }]}>
+        <Pressable style={{ flex: 1 }} onPress={dismiss} />
+      </Animated.View>
+      <Animated.View style={[styles.sheet, { transform: [{ translateY }] }]} {...panResponder.panHandlers}>
+        {/* Header: handle + X button */}
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center", position: "relative", paddingVertical: 8 }}>
+          <View style={styles.handle} />
+          <TouchableOpacity
+            style={{ position: "absolute", right: 0, top: 4, width: 32, height: 32, borderRadius: 16, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center" }}
+            onPress={dismiss}
+            hitSlop={12}
+          >
+            <Text style={{ fontSize: 16, fontWeight: "600", color: colors.textSecondary, lineHeight: 18 }}>✕</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.sheetTitle} numberOfLines={1}>{goal.title}</Text>
+        <Text style={styles.sheetSubtitle}>What would you like to do?</Text>
+
+        <Pressable style={styles.actionRow} onPress={onEdit}>
+          <View style={[styles.actionIcon, { backgroundColor: colors.primaryLight }]}>
+            <Ionicons name="chatbubble-ellipses-outline" size={18} color={colors.primary} />
+          </View>
+          <Text style={styles.actionLabel}>Edit goal</Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
+        </Pressable>
+        <View style={styles.divider} />
+        <Pressable style={styles.actionRow} onPress={onTogglePause}>
+          <View style={[styles.actionIcon, { backgroundColor: colors.warningLight }]}>
+            <Ionicons
+              name={goal.isPaused ? "play-outline" : "pause-outline"}
+              size={18}
+              color={colors.warning}
+            />
+          </View>
+          <Text style={[styles.actionLabel, { color: colors.warning }]}>
+            {goal.isPaused ? "Resume goal" : "Pause goal"}
+          </Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
+        </Pressable>
+        <View style={styles.divider} />
+        <Pressable style={styles.actionRow} onPress={onMarkComplete}>
+          <View style={[styles.actionIcon, { backgroundColor: colors.successLight }]}>
+            <Ionicons name="checkmark-circle-outline" size={18} color={colors.success} />
+          </View>
+          <Text style={[styles.actionLabel, { color: colors.success }]}>Mark as complete</Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
+        </Pressable>
+        <View style={styles.divider} />
+        <Pressable style={styles.actionRow} onPress={onDelete}>
+          <View style={[styles.actionIcon, { backgroundColor: colors.dangerLight }]}>
+            <Ionicons name="trash-outline" size={18} color={colors.danger} />
+          </View>
+          <Text style={[styles.actionLabel, { color: colors.danger }]}>Delete goal</Text>
+          <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
+        </Pressable>
+        <Button title="Cancel" onPress={dismiss} variant="outline" style={styles.cancelBtn} />
+      </Animated.View>
+    </View>
   );
 }
 
@@ -1611,11 +1764,10 @@ function createStyles(c: Colors) {
     overlay: {
       position: "absolute",
       top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: c.overlay,
       justifyContent: "flex-end",
       zIndex: 100,
     },
-    backdrop: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0 },
+    backdrop: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: c.overlay },
     sheet: {
       backgroundColor: c.card,
       borderTopLeftRadius: radius.xl,

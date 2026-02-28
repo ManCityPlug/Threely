@@ -2,13 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { getSupabase } from "@/lib/supabase-client";
 import { useAuth } from "@/lib/auth-context";
-import { tasksApi, statsApi, accountApi, summaryApi, type DailyTask, type Stats, type HeatmapDay, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus } from "@/lib/api-client";
+import { tasksApi, statsApi, accountApi, summaryApi, subscriptionApi, type DailyTask, type Stats, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus, type SubscriptionStatus } from "@/lib/api-client";
 import { SkeletonStatCard, SkeletonCard } from "@/components/Skeleton";
-import WeeklyBarChart from "@/components/WeeklyBarChart";
+
 import WeeklySummaryModal from "@/components/WeeklySummary";
 import { useToast } from "@/components/ToastProvider";
 import { useTheme } from "@/lib/theme-context";
+import { useSubscription } from "@/lib/subscription-context";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -125,29 +127,37 @@ export default function ProfilePage() {
   const router = useRouter();
   const { showToast } = useToast();
   const { mode, setMode } = useTheme();
+  const { hasPro, showPaywall } = useSubscription();
   const [stats, setStats] = useState<Stats | null>(null);
   const [history, setHistory] = useState<DailyTask[]>([]);
-  const [heatmapData, setHeatmapData] = useState<HeatmapDay[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"history" | "settings">("history");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPw, setCurrentPw] = useState("");
+  const [newPw, setNewPw] = useState("");
+  const [confirmPw, setConfirmPw] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState("");
+  const [pwSuccess, setPwSuccess] = useState(false);
+  const isOAuthUser = user?.app_metadata?.provider === "google" || user?.app_metadata?.provider === "apple";
+  const providerName = user?.app_metadata?.provider === "google" ? "Google" : user?.app_metadata?.provider === "apple" ? "Apple" : "";
   const [showWeeklySummary, setShowWeeklySummary] = useState(false);
   const [weeklyStatus, setWeeklyStatus] = useState<WeeklySummaryStatus | null>(null);
   const [weeklyFrozenData, setWeeklyFrozenData] = useState<WeeklySummaryType | null>(null);
   const [weeklyOpening, setWeeklyOpening] = useState(false);
   const [countdown, setCountdown] = useState("");
+  const [subStatus, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
 
   const load = useCallback(async () => {
     try {
-      const [statsRes, historyRes, heatmapRes] = await Promise.all([
+      const [statsRes, historyRes] = await Promise.all([
         statsApi.get(),
         tasksApi.history(30),
-        statsApi.heatmap(90),
       ]);
       setStats(statsRes);
       setHistory(historyRes.dailyTasks);
-      setHeatmapData(heatmapRes.heatmap);
     } catch {
       showToast("Failed to load profile data", "error");
     } finally {
@@ -158,6 +168,11 @@ export default function ProfilePage() {
   // Always fetch fresh data on mount (fires every time the page is navigated to)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { load(); }, []);
+
+  // Fetch subscription status
+  useEffect(() => {
+    subscriptionApi.status().then(res => setSubStatus(res.status)).catch(() => {});
+  }, []);
 
   // Also re-fetch when load reference changes or tab regains visibility
   useEffect(() => {
@@ -202,6 +217,7 @@ export default function ProfilePage() {
   }, [weeklyStatus]);
 
   async function handleOpenWeekly() {
+    if (!hasPro) { showPaywall(); return; }
     if (weeklyStatus?.status === "available" && weeklyFrozenData) {
       setShowWeeklySummary(true);
       return;
@@ -214,8 +230,10 @@ export default function ProfilePage() {
       setWeeklyFrozenData(data);
       setWeeklyStatus({ status: "available", summary: data });
       setShowWeeklySummary(true);
-    } catch {
-      // silently fail
+    } catch (err) {
+      if (err instanceof Error && err.message?.includes("pro_required")) {
+        showPaywall();
+      }
     } finally {
       setWeeklyOpening(false);
     }
@@ -266,8 +284,17 @@ export default function ProfilePage() {
     <div className="page-inner">
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.75rem" }}>
-        <div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <h1 style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.03em" }}>Profile</h1>
+          {subStatus === "trialing" && (
+            <span style={{ padding: "2px 10px", borderRadius: 999, background: "#ecfdf5", color: "#059669", fontSize: "0.75rem", fontWeight: 600 }}>Pro Trial</span>
+          )}
+          {subStatus === "active" && (
+            <span style={{ padding: "2px 10px", borderRadius: 999, background: "var(--primary-light)", color: "var(--primary)", fontSize: "0.75rem", fontWeight: 600 }}>Pro</span>
+          )}
+          {subStatus !== undefined && subStatus !== "trialing" && subStatus !== "active" && (
+            <span style={{ padding: "2px 10px", borderRadius: 999, background: "#f3f4f6", color: "#6b7280", fontSize: "0.75rem", fontWeight: 600 }}>No plan</span>
+          )}
         </div>
         {weeklyStatus?.status === "ready" ? (
           <button
@@ -294,11 +321,11 @@ export default function ProfilePage() {
         ) : (
           <button
             className="btn btn-outline"
-            disabled
+            onClick={() => alert("Your weekly analysis is generated every Monday. Check back then to see your progress report and personalized insights!")}
             style={{
               fontSize: "0.85rem",
               opacity: 0.5,
-              cursor: "not-allowed",
+              cursor: "pointer",
               display: "flex",
               alignItems: "center",
               gap: 6,
@@ -307,17 +334,6 @@ export default function ProfilePage() {
             {"\uD83D\uDD12"} Weekly Analysis {countdown ? `· ${countdown.replace("Unlocks in ", "")}` : ""}
           </button>
         )}
-      </div>
-
-      {/* Weekly activity */}
-      <div className="card slide-up" style={{ padding: "1.25rem", marginBottom: "1.25rem" }}>
-        <h3 style={{
-          fontSize: "0.8rem", fontWeight: 600, color: "var(--subtext)",
-          textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 10,
-        }}>
-          Activity
-        </h3>
-        <WeeklyBarChart data={heatmapData} />
       </div>
 
       {/* Stats row */}
@@ -424,6 +440,126 @@ export default function ProfilePage() {
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Change password */}
+            <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
+              <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
+                {isOAuthUser ? "Set a password" : "Change password"}
+              </h3>
+              {!showChangePassword ? (
+                <div>
+                  <p style={{ fontSize: "0.825rem", color: "var(--subtext)", marginBottom: 12 }}>
+                    {isOAuthUser
+                      ? `You signed in with ${providerName}. Set a password to also sign in with email.`
+                      : "Update the password you use to sign in."}
+                  </p>
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => setShowChangePassword(true)}
+                    style={{ fontSize: "0.825rem" }}
+                  >
+                    {isOAuthUser ? "Set password" : "Change password"}
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  setPwError("");
+                  if (!isOAuthUser && !currentPw.trim()) { setPwError("Enter your current password."); return; }
+                  if (newPw.length < 8) { setPwError("New password must be at least 8 characters."); return; }
+                  if (newPw !== confirmPw) { setPwError("New passwords do not match."); return; }
+                  setPwLoading(true);
+                  try {
+                    const supabase = getSupabase();
+                    // Only verify current password for email users
+                    if (!isOAuthUser) {
+                      const { error: signInErr } = await supabase.auth.signInWithPassword({
+                        email: user?.email ?? "",
+                        password: currentPw,
+                      });
+                      if (signInErr) { setPwError("Current password is incorrect."); setPwLoading(false); return; }
+                    }
+                    // Update/set password
+                    const { error: updateErr } = await supabase.auth.updateUser({ password: newPw });
+                    if (updateErr) { setPwError(updateErr.message); setPwLoading(false); return; }
+                    setPwSuccess(true);
+                    setCurrentPw(""); setNewPw(""); setConfirmPw("");
+                    setTimeout(() => { setPwSuccess(false); setShowChangePassword(false); }, 2000);
+                  } catch {
+                    setPwError("Something went wrong. Please try again.");
+                  } finally {
+                    setPwLoading(false);
+                  }
+                }} style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: 8 }}>
+                  {!isOAuthUser && (
+                    <div>
+                      <label className="field-label">Current password</label>
+                      <input
+                        className="field-input"
+                        type="password"
+                        value={currentPw}
+                        onChange={e => setCurrentPw(e.target.value)}
+                        autoComplete="current-password"
+                        required
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <label className="field-label">New password</label>
+                    <input
+                      className="field-input"
+                      type="password"
+                      placeholder="Min. 8 characters"
+                      value={newPw}
+                      onChange={e => setNewPw(e.target.value)}
+                      autoComplete="new-password"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="field-label">Confirm new password</label>
+                    <input
+                      className="field-input"
+                      type="password"
+                      value={confirmPw}
+                      onChange={e => setConfirmPw(e.target.value)}
+                      autoComplete="new-password"
+                      required
+                    />
+                  </div>
+                  {pwError && (
+                    <div style={{
+                      background: "var(--danger-light)", color: "var(--danger)",
+                      padding: "0.5rem 0.75rem", borderRadius: "var(--radius)", fontSize: "0.825rem",
+                    }}>{pwError}</div>
+                  )}
+                  {pwSuccess && (
+                    <div style={{
+                      background: "var(--success-light)", color: "var(--success)",
+                      padding: "0.5rem 0.75rem", borderRadius: "var(--radius)", fontSize: "0.825rem",
+                    }}>{isOAuthUser ? "Password set! You can now sign in with email too." : "Password updated successfully!"}</div>
+                  )}
+                  <div style={{ display: "flex", gap: 8 }}>
+                    <button
+                      type="button"
+                      className="btn btn-outline"
+                      onClick={() => { setShowChangePassword(false); setPwError(""); setCurrentPw(""); setNewPw(""); setConfirmPw(""); }}
+                      style={{ fontSize: "0.825rem" }}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={pwLoading}
+                      style={{ fontSize: "0.825rem" }}
+                    >
+                      {pwLoading ? "Updating..." : "Update password"}
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
 
             {/* Danger zone */}

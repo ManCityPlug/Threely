@@ -60,6 +60,7 @@ model Goal {
   deadline          DateTime?
   dailyTimeMinutes  Int?        @map("daily_time_minutes")
   intensityLevel    Int?        @map("intensity_level")
+  roadmap           String?     @db.Text
   isActive          Boolean     @default(true) @map("is_active")
   isPaused          Boolean     @default(false) @map("is_paused")
   workDays          Int[]       @default([1, 2, 3, 4, 5, 6, 7]) @map("work_days")

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { markOnboarded, saveNickname } from "@/lib/auth-context";
+import { getSupabase } from "@/lib/supabase-client";
 import { goalsApi, profileApi, tasksApi, type ParsedGoal, type TaskItem, type GoalChatMessage, type GoalChatResult } from "@/lib/api-client";
 import GoalTemplatesComponent from "@/components/GoalTemplates";
 import type { GoalCategory } from "@/lib/goal-templates";
@@ -54,6 +55,57 @@ const CATEGORY_EMOJI: Record<string, string> = {
   financial: "💰", health: "🌱", relationships: "🤝", productivity: "⚡",
   other: "🎯",
 };
+
+// ─── Building Progress (rotating status messages) ─────────────────────────────
+
+const BUILDING_STEPS = [
+  "Analyzing your goal…",
+  "Crafting your personalized roadmap…",
+  "Generating 3 perfect tasks to start with…",
+  "Almost there — putting the finishing touches…",
+];
+
+function BuildingProgress() {
+  const [stepIdx, setStepIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStepIdx((prev) => Math.min(prev + 1, BUILDING_STEPS.length - 1));
+    }, 7000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div style={{
+      flex: 1, display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      textAlign: "center", padding: "2rem 0",
+    }}>
+      <span style={{ fontSize: 48, color: "var(--primary)", marginBottom: 20 }}>✦</span>
+      <h2 style={{ fontSize: "1.2rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 8 }}>
+        Threely Intelligence is building your plan…
+      </h2>
+      <p style={{
+        color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.5,
+        transition: "opacity 0.3s ease",
+        minHeight: 44,
+      }}>
+        {BUILDING_STEPS[stepIdx]}
+      </p>
+      {/* Progress dots */}
+      <div style={{ display: "flex", gap: 6, marginTop: 20, marginBottom: 16 }}>
+        {BUILDING_STEPS.map((_, i) => (
+          <div key={i} style={{
+            width: 8, height: 8, borderRadius: 4,
+            backgroundColor: i <= stepIdx ? "var(--primary)" : "var(--border)",
+            transition: "background-color 0.3s ease",
+          }} />
+        ))}
+      </div>
+      <span className="spinner spinner-dark" />
+    </div>
+  );
+}
 
 // ─── Step Dots ─────────────────────────────────────────────────────────────────
 
@@ -290,6 +342,7 @@ export default function OnboardingPage() {
       // Save display name
       const name = nameInput.trim() || user?.email?.split("@")[0] || "Champion";
       saveNickname(name);
+      getSupabase().auth.updateUser({ data: { display_name: name } }).catch(() => {});
 
       // Save profile
       await profileApi.save({
@@ -329,8 +382,10 @@ export default function OnboardingPage() {
   }
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatHistory, chatLoading]);
+    // Delay to let the DOM update (e.g. "Continue with X selected" button appearing)
+    const t = setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), 200);
+    return () => clearTimeout(t);
+  }, [chatHistory, chatLoading, selectedOptions.size]);
 
   // ─── Step 3: Deadline helpers ──────────────────────────────────────────────
 
@@ -362,6 +417,7 @@ export default function OnboardingPage() {
       // Save display name
       const name = nameInput.trim() || user?.email?.split("@")[0] || "Champion";
       saveNickname(name);
+      getSupabase().auth.updateUser({ data: { display_name: name } }).catch(() => {});
 
       // Save profile
       await profileApi.save({
@@ -752,24 +808,9 @@ export default function OnboardingPage() {
         {/* ── Magic Moment ── */}
         {isMagicMoment && (
           <div style={{ padding: "2rem", flex: 1, display: "flex", flexDirection: "column" }}>
-            {/* Building state */}
+            {/* Building state with rotating progress messages */}
             {building && !buildError && (
-              <div style={{
-                flex: 1, display: "flex", flexDirection: "column",
-                alignItems: "center", justifyContent: "center",
-                textAlign: "center", padding: "2rem 0",
-              }}>
-                <span style={{ fontSize: 48, color: "var(--primary)", marginBottom: 20 }}>✦</span>
-                <h2 style={{ fontSize: "1.2rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 8 }}>
-                  Threely Intelligence is building your plan…
-                </h2>
-                <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.5 }}>
-                  Analyzing your goal and crafting<br />3 perfect tasks to start with.
-                </p>
-                <div style={{ marginTop: 24 }}>
-                  <span className="spinner spinner-dark" />
-                </div>
-              </div>
+              <BuildingProgress />
             )}
 
             {/* Error state */}
@@ -906,7 +947,7 @@ export default function OnboardingPage() {
 
             {/* Chat area */}
             <div style={{
-              flex: 1, overflowY: "auto", padding: "1.25rem 1.5rem",
+              flex: 1, overflowY: "auto", padding: "1.25rem 1.5rem 2rem",
               display: "flex", flexDirection: "column", gap: 12,
             }}>
               {chatHistory.map((entry, i) => (
