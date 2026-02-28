@@ -330,17 +330,47 @@ function PageAuth({ visible, onSignUp, onSignIn }: {
       opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(20px)",
       transition: "opacity 0.6s ease, transform 0.6s ease",
     }}>
-      {/* Logo */}
-      <img
-        src="/favicon.png"
-        alt="Threely"
-        width={56}
-        height={56}
-        style={{
-          borderRadius: 14,
-          boxShadow: "0 0 30px rgba(99, 91, 255, 0.4)",
-        }}
-      />
+      {/* Logo with pulsing glow + sparkles (same as Page 1) */}
+      <div style={{ position: "relative", width: 80, height: 80, marginBottom: 0 }}>
+        {/* Glow */}
+        <div style={{
+          position: "absolute", left: -10, top: -10,
+          width: 100, height: 100, borderRadius: 50,
+          backgroundColor: "rgba(99, 91, 255, 0.25)",
+          animation: "pulse 3s ease-in-out infinite",
+        }} />
+        {/* Logo */}
+        <img
+          src="/favicon.png"
+          alt="Threely"
+          width={80}
+          height={80}
+          style={{
+            position: "relative", borderRadius: 20,
+            animation: "pulse 3s ease-in-out infinite",
+            zIndex: 2,
+          }}
+        />
+        {/* Sparkles */}
+        {[0, 60, 120, 180, 240, 300].map((angle, idx) => {
+          const rad = (angle * Math.PI) / 180;
+          const dist = 55;
+          return (
+            <div
+              key={idx}
+              style={{
+                position: "absolute",
+                left: 40 + Math.cos(rad) * dist - 3,
+                top: 40 + Math.sin(rad) * dist - 3,
+                width: 6, height: 6, borderRadius: 3,
+                backgroundColor: "#FFF",
+                animation: `sparkle 2s ease-in-out ${0.6 + idx * 0.08}s infinite`,
+                zIndex: 3,
+              }}
+            />
+          );
+        })}
+      </div>
 
       <h2 style={{
         fontSize: "clamp(1.75rem, 4vw, 2.5rem)", fontWeight: 800, color: "#FFF",
