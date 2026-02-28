@@ -897,7 +897,7 @@ export default function RegisterPage() {
             return (
               <div key={idx} style={{
                 position: "absolute", left: 40 + Math.cos(rad) * 55 - 3, top: 40 + Math.sin(rad) * 55 - 3,
-                width: 6, height: 6, borderRadius: 3, backgroundColor: "#FFF",
+                width: 6, height: 6, borderRadius: 3, backgroundColor: "#635bff",
                 animation: `sparkle 2s ease-in-out ${0.6 + idx * 0.08}s infinite`, zIndex: 3,
               }} />
             );
