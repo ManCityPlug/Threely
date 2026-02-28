@@ -68,7 +68,7 @@ const KEYFRAMES_STYLE = `
 }
 `;
 
-function AnimatedLogo({ size, glowSize, sparkleDistance }: { size: number; glowSize: number; sparkleDistance: number }) {
+function AnimatedLogo({ size, glowSize, sparkleDistance, sparkleColor = "#635bff" }: { size: number; glowSize: number; sparkleDistance: number; sparkleColor?: string }) {
   const center = size / 2;
   return (
     <div style={{ position: "relative", width: size, height: size }}>
@@ -109,7 +109,7 @@ function AnimatedLogo({ size, glowSize, sparkleDistance }: { size: number; glowS
               width: 6,
               height: 6,
               borderRadius: 3,
-              backgroundColor: "#FFF",
+              backgroundColor: sparkleColor,
               animation: `sparkle 2s ease-in-out ${0.6 + idx * 0.08}s infinite`,
               zIndex: 3,
             }}
