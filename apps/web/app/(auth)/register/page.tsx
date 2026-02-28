@@ -382,7 +382,7 @@ function PageAuth({ visible, onSignUp, onSignIn }: {
         color: "rgba(255,255,255,0.7)", fontSize: "1rem",
         textAlign: "center", maxWidth: 320, marginBottom: 32,
       }}>
-        Your goals are waiting. Let&apos;s make them happen.
+        Your goals are waiting.<br />Let&apos;s make them happen.
       </p>
 
       <div style={{ width: "100%", maxWidth: 340, display: "flex", flexDirection: "column", gap: 12 }}>
