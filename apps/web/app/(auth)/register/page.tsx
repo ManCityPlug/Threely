@@ -912,8 +912,9 @@ export default function RegisterPage() {
           )}
         </div>
 
-        <p style={{ color: "var(--muted)", fontSize: "0.8rem", lineHeight: 1.5, marginBottom: "1.25rem" }}>
-          Also available on the web at threely.co
+        <p style={{ color: "var(--subtext)", fontSize: "0.95rem", lineHeight: 1.5, marginBottom: "1.25rem" }}>
+          On a computer? Use the web version at{" "}
+          <a href="https://threely.co" style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "none" }}>threely.co</a>
         </p>
 
         <p style={{ color: "var(--subtext)", fontSize: "0.875rem" }}>
