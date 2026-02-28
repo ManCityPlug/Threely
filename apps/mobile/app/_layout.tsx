@@ -54,16 +54,6 @@ function isAccessGranted(status: string | null): boolean {
   return status === "trialing" || status === "active";
 }
 
-// ── Paywall skip: persisted flag so the "Skip" button actually sticks ─────────
-const PAYWALL_SKIP_KEY = "@threely_paywall_skipped";
-
-// In-memory flag set by the payment screen before navigating, so the layout
-// effect sees it synchronously and doesn't race with AsyncStorage reads.
-let _paywallSkippedGlobal = false;
-export function markPaywallSkipped() {
-  _paywallSkippedGlobal = true;
-}
-
 // Allow auth screens to navigate back to the welcome flow
 let _goBackToWelcome: (() => void) | null = null;
 export function goBackToWelcome() {
@@ -122,8 +112,6 @@ function AppContent() {
   const [authOverlay, setAuthOverlay] = useState(false);
   const [welcomeInitialPage, setWelcomeInitialPage] = useState(0);
   const pendingDestination = useRef<"register" | "login" | null>(null);
-  const paywallTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const paywallSkippedRef = useRef(false);
 
   // Register the "go back to welcome" callback for auth screens
   useEffect(() => {
@@ -235,24 +223,7 @@ function AppContent() {
 
       // Onboarded — check subscription gate
 
-      // 1. Check if user pressed "Skip" on the paywall (persists across restarts)
-      //    Also check the in-memory ref to avoid race conditions when navigating
-      //    away from the payment screen (segments change triggers this effect again
-      //    before AsyncStorage read resolves).
-      if (paywallSkippedRef.current || _paywallSkippedGlobal) {
-        if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
-        setReady(true);
-        return;
-      }
-      const skipped = await AsyncStorage.getItem(PAYWALL_SKIP_KEY);
-      if (skipped) {
-        paywallSkippedRef.current = true;
-        if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
-        setReady(true);
-        return;
-      }
-
-      // 2. Check cached subscription status
+      // 1. Check cached subscription status
       const cachedStatus = await AsyncStorage.getItem("@threely_subscription_status");
 
       if (isAccessGranted(cachedStatus)) {
@@ -261,7 +232,7 @@ function AppContent() {
         return;
       }
 
-      // 3. Re-check with backend (catches trial expiry, cancellation, etc.)
+      // 2. Re-check with backend (catches trial expiry, cancellation, etc.)
       try {
         const { status } = await subscriptionApi.status();
 
@@ -272,8 +243,8 @@ function AppContent() {
           return;
         }
 
-        // No valid subscription — let users browse, per-action gating handles enforcement
-        if (inAuthGroup || inOnboarding) router.replace("/(tabs)");
+        // No valid subscription — show payment screen
+        if (!inPayment) router.replace("/payment");
         setReady(true);
       } catch {
         // Backend unreachable — be lenient (don't block offline users)
@@ -281,10 +252,6 @@ function AppContent() {
         setReady(true);
       }
     });
-
-    return () => {
-      if (paywallTimerRef.current) clearTimeout(paywallTimerRef.current);
-    };
   }, [session, segments, welcomeDone]);
 
   // Still loading auth state

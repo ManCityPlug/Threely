@@ -29,7 +29,7 @@ import { subscriptionApi } from "@/lib/api";
 // ─── Price IDs (must match backend stripe.ts) ────────────────────────────────
 const PRICE_IDS: Record<string, string> = {
   monthly: "price_1T2mnkQ3O0etrH9yHFjRpjtt",
-  quarterly: "price_quarterly_placeholder",
+  quarterly: "price_1T5qCcQ3O0etrH9yiHGixSSU",
   yearly: "price_1T2mo8Q3O0etrH9yOIxkMv7H",
 };
 
