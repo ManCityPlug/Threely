@@ -405,7 +405,7 @@ export default function DashboardPage() {
       setRestDay(tasksRes.restDay ?? false);
 
       // Restore saved focus or auto-select
-      const todayKey = `threely_focus_${new Date().toISOString().slice(0, 10)}`;
+      const todayKey = `threely_focus_${new Date().toLocaleDateString("en-CA")}`;
       const saved = localStorage.getItem(todayKey);
       const savedIsValid = saved !== null && saved !== "all" && goalsRes.goals.some(g => g.id === saved);
       if (saved && savedIsValid) {
@@ -512,7 +512,7 @@ export default function DashboardPage() {
   function pickGoal(val: string) {
     setSelectedGoalId(val);
     setGoalPickerOpen(false);
-    localStorage.setItem(`threely_focus_${new Date().toISOString().slice(0, 10)}`, val);
+    localStorage.setItem(`threely_focus_${new Date().toLocaleDateString("en-CA")}`, val);
   }
 
   function handlePickGoalWithOffDayCheck(goalId: string) {
