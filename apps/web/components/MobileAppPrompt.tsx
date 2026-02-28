@@ -227,7 +227,7 @@ export default function MobileAppPrompt() {
               top: 0,
               left: 0,
               right: 0,
-              height: 320,
+              height: 400,
               background: "linear-gradient(135deg, #f6f9fc 0%, #ede9ff 100%)",
               zIndex: 0,
             }}
@@ -294,7 +294,7 @@ export default function MobileAppPrompt() {
                 color: "#425466",
                 textAlign: "center",
                 lineHeight: 1.6,
-                marginBottom: "1.5rem",
+                marginBottom: "2rem",
                 animation: "mobilePromptSlideUp 0.5s ease 0.35s both",
               }}
             >
