@@ -70,12 +70,15 @@ export async function POST(request: NextRequest) {
   }
 
   // Work days filter: only include goals scheduled for today
-  const goals = allGoals.filter(g => {
-    const workDays: number[] = (g.workDays as number[]) ?? [1, 2, 3, 4, 5, 6, 7];
-    return workDays.includes(isoDay);
-  });
+  // Skip filter when a specific goalId is provided (goal creation / onboarding always generates)
+  const goals = goalId
+    ? allGoals
+    : allGoals.filter(g => {
+        const workDays: number[] = (g.workDays as number[]) ?? [1, 2, 3, 4, 5, 6, 7];
+        return workDays.includes(isoDay);
+      });
 
-  // Rest day: no goals scheduled for today
+  // Rest day: no goals scheduled for today (only when generating for all goals)
   if (goals.length === 0) {
     return NextResponse.json({ dailyTasks: [], restDay: true }, { status: 200 });
   }

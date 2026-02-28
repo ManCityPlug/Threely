@@ -31,13 +31,28 @@ const NAV = [
   { href: "/profile", label: "Profile", iconKey: "profile" },
 ];
 
+function isTabletDevice(): boolean {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent;
+  // iPadOS 13+ reports as Macintosh with touch support
+  if (/iPad/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1)) return true;
+  // Android tablets don't have "Mobile" in UA
+  if (/Android/i.test(ua) && !/Mobile/i.test(ua)) return true;
+  return false;
+}
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [checkingOnboarding, setCheckingOnboarding] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsTablet(isTabletDevice());
+  }, []);
 
   useEffect(() => {
     if (loading) return;
@@ -102,7 +117,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <ToastProvider>
-    <div className="app-shell">
+    <div className={`app-shell${isTablet ? " force-mobile" : ""}`}>
       {/* ── Mobile top bar ──────────────────────────────────────────────────── */}
       <div className="mobile-topbar" ref={menuRef}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>

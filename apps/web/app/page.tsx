@@ -62,9 +62,11 @@ export default function LandingPage() {
 
   useEffect(() => {
     const ua = navigator.userAgent;
-    const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
+    // Detect iPadOS 13+ (reports as Macintosh with touch support)
+    const isIPad = /iPad/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
+    const mobile = isIPad || /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
     setIsMobile(mobile);
-    if (/iPhone|iPad|iPod/i.test(ua)) {
+    if (/iPhone|iPod/i.test(ua) || isIPad) {
       setPlatform("ios");
     } else if (/Android/i.test(ua)) {
       setPlatform("android");
@@ -92,25 +94,29 @@ export default function LandingPage() {
           <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em" }}>Threely</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Link href="/login" className="desktop-only" style={{
-            padding: "0.4rem 0.875rem",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-            color: "#425466",
-            borderRadius: 8,
-          }}>
-            Sign in
-          </Link>
-          <Link href="/register" className="desktop-only" style={{
-            padding: "0.4rem 1rem",
-            fontSize: "0.875rem",
-            fontWeight: 600,
-            color: "#fff",
-            background: "#635bff",
-            borderRadius: 8,
-          }}>
-            Get started
-          </Link>
+          {!isMobile && (
+            <Link href="/login" style={{
+              padding: "0.4rem 0.875rem",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              color: "#425466",
+              borderRadius: 8,
+            }}>
+              Sign in
+            </Link>
+          )}
+          {!isMobile && (
+            <Link href="/register" style={{
+              padding: "0.4rem 1rem",
+              fontSize: "0.875rem",
+              fontWeight: 600,
+              color: "#fff",
+              background: "#635bff",
+              borderRadius: 8,
+            }}>
+              Get started
+            </Link>
+          )}
           {/* Hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}

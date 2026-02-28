@@ -449,6 +449,15 @@ input, textarea, select {
   .mobile-topbar { display: none; }
 }
 
+/* ─── Force mobile layout for tablets (iPad/Android tablets) ─────────────── */
+.force-mobile .sidebar { display: none !important; }
+.force-mobile .mobile-topbar { display: flex !important; }
+.force-mobile .main-content { margin-left: 0 !important; padding-bottom: 70px !important; padding-top: 0 !important; }
+.force-mobile .bottom-nav { display: flex !important; }
+.force-mobile .page-inner { padding: 1.25rem 1rem !important; }
+.force-mobile .modal-box { padding: 1.5rem !important; border-radius: var(--radius-lg) !important; }
+.force-mobile .desktop-only { display: none !important; }
+
 /* ─── Slide-up animation ────────────────────────────────────────────────────── */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(16px); }
