@@ -244,6 +244,19 @@ export async function onTaskCompleted(ctx: NotifContext): Promise<void> {
   }
 }
 
+/**
+ * Send an immediate local notification (e.g. when tasks finish generating).
+ */
+export async function sendInstantNotification(title: string, body: string): Promise<void> {
+  if (Platform.OS === "web") return;
+  const granted = await requestNotificationPermissions();
+  if (!granted) return;
+  await Notifications.scheduleNotificationAsync({
+    content: { title, body, sound: true },
+    trigger: null, // immediate
+  });
+}
+
 function formatMin(min: number): string {
   if (min < 60) return `${min}m`;
   const h = Math.floor(min / 60);

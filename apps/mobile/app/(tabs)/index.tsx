@@ -44,7 +44,7 @@ import { Button } from "@/components/ui/Button";
 import { SkeletonCard } from "@/components/Skeleton";
 import { useToast } from "@/lib/toast";
 import { useStaggeredEntrance } from "@/lib/animations";
-import { scheduleNotifications, onTaskCompleted, type NotifContext } from "@/lib/notifications";
+import { scheduleNotifications, onTaskCompleted, sendInstantNotification, type NotifContext } from "@/lib/notifications";
 import { useTheme } from "@/lib/theme";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
@@ -230,6 +230,10 @@ export default function DashboardScreen() {
             setRestDay(true);
           } else {
             setDailyTasks(res.dailyTasks);
+            sendInstantNotification(
+              "Your tasks are ready!",
+              "Your personalized daily tasks have been generated. Open Threely to get started."
+            );
           }
         } catch (err: unknown) {
           if (err instanceof Error && err.message?.includes("pro_required")) {
@@ -437,6 +441,10 @@ export default function DashboardScreen() {
           ...res.dailyTasks,
         ];
       });
+      sendInstantNotification(
+        "Your tasks are ready!",
+        "Your personalized daily tasks have been generated. Open Threely to get started."
+      );
     } catch (e: unknown) {
       if (e instanceof Error && e.message?.includes("pro_required")) {
         setProExpired(true);
@@ -582,6 +590,10 @@ export default function DashboardScreen() {
             ...res.dailyTasks,
           ];
         });
+        sendInstantNotification(
+          "Your next tasks are ready!",
+          "New tasks have been generated based on your review. Keep the momentum going!"
+        );
       } catch (err: unknown) {
         // Check if trial/subscription expired
         if (err instanceof Error && err.message?.includes("pro_required")) {
@@ -738,9 +750,15 @@ export default function DashboardScreen() {
               <>
                 <Text style={styles.insightText}>{insightText}</Text>
                 {generating ? (
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 8, marginTop: spacing.xs }}>
-                    <ActivityIndicator color={colors.primary} size="small" />
-                    <Text style={{ fontSize: typography.sm, color: colors.textSecondary }}>Generating next tasks…</Text>
+                  <View style={{ marginTop: spacing.xs }}>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      <ActivityIndicator color={colors.primary} size="small" />
+                      <Text style={{ fontSize: typography.sm, color: colors.textSecondary }}>Generating next tasks…</Text>
+                    </View>
+                    <Text style={{ fontSize: typography.xs, color: colors.textTertiary, marginTop: 4 }}>
+                      <Text style={{ fontWeight: typography.bold }}>This can take a couple of minutes. </Text>
+                      We'll notify you when they're ready.
+                    </Text>
                   </View>
                 ) : (
                   <TouchableOpacity
@@ -783,6 +801,10 @@ export default function DashboardScreen() {
             <SkeletonCard />
             <SkeletonCard />
             <SkeletonCard />
+            <Text style={{ textAlign: "center", marginTop: spacing.sm, fontSize: typography.sm, color: colors.textSecondary, lineHeight: 20 }}>
+              <Text style={{ fontWeight: typography.bold }}>This can take a couple of minutes.{"\n"}</Text>
+              We'll send you a notification when your tasks are ready.
+            </Text>
           </View>
         ) : !hasVisibleTasks ? (
           <View style={styles.empty}>
@@ -797,6 +819,12 @@ export default function DashboardScreen() {
               loading={generating}
               style={styles.generateBtn}
             />
+            {generating && (
+              <Text style={{ textAlign: "center", marginTop: spacing.sm, fontSize: typography.xs, color: colors.textTertiary, lineHeight: 18 }}>
+                <Text style={{ fontWeight: typography.bold }}>This can take a couple of minutes. </Text>
+                We'll notify you when your tasks are ready.
+              </Text>
+            )}
           </View>
         ) : (
           <>

@@ -122,10 +122,85 @@ function LoginPageInner() {
   const isAppleDevice = device === "iphone" || device === "ipad";
   const isAndroidDevice = device === "android_phone" || device === "android_tablet";
 
+  // Mobile/tablet: block sign-in, show app download screen
+  if (isMobileDevice) {
+    return (
+      <div className="card fade-in" style={{ padding: "2.5rem 2rem", textAlign: "center" }}>
+        <img src="/favicon.png" alt="Threely" width={64} height={64} style={{
+          borderRadius: 16, margin: "0 auto 1.25rem", display: "block",
+          boxShadow: "0 8px 24px rgba(99,91,255,0.25)",
+        }} />
+
+        <h1 style={{
+          fontSize: "1.5rem", fontWeight: 800,
+          letterSpacing: "-0.03em", marginBottom: 8, lineHeight: 1.2,
+        }}>
+          Threely is built for {deviceLabel(device)}
+        </h1>
+
+        <p style={{
+          color: "var(--subtext)", fontSize: "0.9rem",
+          lineHeight: 1.6, marginBottom: "1.75rem",
+          maxWidth: 320, margin: "0 auto 1.75rem",
+        }}>
+          Get the full experience — daily reminders, task tracking, and AI coaching — all in the app.
+        </p>
+
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: "1.25rem" }}>
+          {!isAndroidDevice && (
+            <a
+              href="#"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "10px 18px", background: "#0a2540", color: "#fff",
+                borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
+                textDecoration: "none", position: "relative",
+              }}
+            >
+              <AppleIcon />
+              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
+                <span>App Store</span>
+              </span>
+            </a>
+          )}
+          {!isAppleDevice && (
+            <a
+              href="#"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "10px 18px", background: "#0a2540", color: "#fff",
+                borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
+                textDecoration: "none", position: "relative",
+              }}
+            >
+              <PlayIcon />
+              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
+                <span>Google Play</span>
+              </span>
+            </a>
+          )}
+        </div>
+
+        <p style={{ color: "var(--muted)", fontSize: "0.8rem", lineHeight: 1.5, marginBottom: "1.25rem" }}>
+          Also available on the web at threely.co
+        </p>
+
+        <p style={{ color: "var(--subtext)", fontSize: "0.875rem" }}>
+          Don{"'"}t have an account?{" "}
+          <Link href="/register" style={{ color: "var(--primary)", fontWeight: 600 }}>
+            Sign up
+          </Link>
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="card fade-in" style={{ padding: "2.5rem 2rem" }}>
       {/* Logo */}
-      <div style={{ textAlign: "center", marginBottom: isMobileDevice ? "1.25rem" : "2rem" }}>
+      <div style={{ textAlign: "center", marginBottom: "2rem" }}>
         <img src="/favicon.png" alt="Threely" width={52} height={52} style={{ borderRadius: 14, margin: "0 auto 1rem", display: "block" }} />
         <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 4 }}>
           Welcome back
@@ -134,41 +209,6 @@ function LoginPageInner() {
           Sign in to your Threely account
         </p>
       </div>
-
-      {/* Mobile/tablet: suggest app download */}
-      {isMobileDevice && (
-        <div style={{
-          background: "var(--primary-light)", border: "1px solid rgba(99,91,255,0.2)",
-          borderRadius: "var(--radius)", padding: "1rem",
-          marginBottom: "1.25rem", textAlign: "center",
-        }}>
-          <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-            Threely is built for {deviceLabel(device)}
-          </p>
-          <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
-            {!isAndroidDevice && (
-              <a href="#" style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                padding: "6px 12px", background: "#0a2540", color: "#fff",
-                borderRadius: 8, fontSize: "0.75rem", fontWeight: 600, textDecoration: "none",
-              }}>
-                <AppleIcon />
-                <span>App Store</span>
-              </a>
-            )}
-            {!isAppleDevice && (
-              <a href="#" style={{
-                display: "inline-flex", alignItems: "center", gap: 6,
-                padding: "6px 12px", background: "#0a2540", color: "#fff",
-                borderRadius: 8, fontSize: "0.75rem", fontWeight: 600, textDecoration: "none",
-              }}>
-                <PlayIcon />
-                <span>Google Play</span>
-              </a>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Social auth buttons */}
       <SocialAuthButtons />

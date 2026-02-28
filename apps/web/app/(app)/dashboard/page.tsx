@@ -865,6 +865,11 @@ export default function DashboardPage() {
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
+          <p style={{ textAlign: "center", marginTop: "0.5rem", color: "var(--subtext)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+            <strong>This can take a couple of minutes.</strong>
+            <br />
+            Feel free to leave this page — your tasks will be ready when you come back.
+          </p>
         </div>
       )}
 
@@ -969,10 +974,10 @@ export default function DashboardPage() {
                   transition: "transform 0.15s",
                 }}
               >
-                {generating ? <><span className="spinner spinner-dark" style={{ width: 18, height: 18 }} /> Loading...</> : "🚀 Get more tasks"}
+                {generating ? <><span className="spinner spinner-dark" style={{ width: 18, height: 18 }} /> Generating...</> : "🚀 Get more tasks"}
               </button>
               <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.9)", fontWeight: 500 }}>
-                Great work! Review and get your next steps.
+                {generating ? <><strong>This can take a couple of minutes.</strong> Hang tight!</> : "Great work! Review and get your next steps."}
               </span>
             </div>
           )}
