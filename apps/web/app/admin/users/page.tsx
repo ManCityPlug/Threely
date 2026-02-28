@@ -132,6 +132,7 @@ export default function AdminUsersPage() {
         <input
           type="text"
           placeholder="Search by email..."
+          autoComplete="off"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => { if (suggestions.length > 0) setShowDropdown(true); }}
