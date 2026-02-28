@@ -32,7 +32,7 @@ interface GoalCardProps {
 
 function getStatusText(completedToday: number, totalToday: number): { text: string; color: "success" | "warning" | "textTertiary" } | null {
   if (totalToday === 0) return null;
-  if (completedToday === 0) return { text: "Not started", color: "textTertiary" };
+  if (completedToday === 0) return { text: "Not started", color: "danger" };
   if (completedToday >= totalToday) return { text: "Done for today", color: "success" };
   return { text: "In progress", color: "warning" };
 }
@@ -70,8 +70,8 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
   if (daysLeft !== null && !isPaused) {
     badges.push({
       label: daysLeft > 0 ? `${daysLeft}d left` : "Overdue",
-      color: daysLeft < 14 ? colors.danger : colors.textTertiary,
-      bg: daysLeft < 14 ? `${colors.danger}14` : `${colors.textTertiary}14`,
+      color: daysLeft < 14 ? colors.danger : "#D97706",
+      bg: daysLeft < 14 ? `${colors.danger}14` : "#D9770614",
     });
   }
   // 5. Status
@@ -81,7 +81,7 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
       color: colors[status.color],
       bg: status.color === "success" ? `${colors.success}18`
         : status.color === "warning" ? `${colors.warning}18`
-        : `${colors.textTertiary}14`,
+        : `${colors.danger}14`,
     });
   }
   if (isPaused) {

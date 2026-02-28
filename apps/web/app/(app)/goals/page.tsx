@@ -1165,8 +1165,8 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
     if (daysLeft !== null) {
       badges.push({
         label: daysLeft > 0 ? `${daysLeft}d left` : "Overdue",
-        color: daysLeft < 14 ? "var(--danger)" : "var(--muted)",
-        bg: daysLeft < 14 ? "var(--danger-light)" : "var(--bg)",
+        color: daysLeft < 14 ? "var(--danger)" : "#D97706",
+        bg: daysLeft < 14 ? "var(--danger-light)" : "#FFFBEB",
       });
     }
     // Status badge
