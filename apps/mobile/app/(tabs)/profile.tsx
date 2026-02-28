@@ -673,6 +673,7 @@ export default function ProfileScreen() {
             onPress={async () => {
               const today = new Date().toISOString().slice(0, 10);
               await AsyncStorage.removeItem(`@threely_focus_${today}`);
+              await AsyncStorage.setItem("@threely_open_focus_picker", "1");
               router.push("/(tabs)" as never);
             }}
             activeOpacity={0.7}

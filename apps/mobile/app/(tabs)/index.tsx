@@ -289,6 +289,20 @@ export default function DashboardScreen() {
     }
   }, [loading, goals.length, goalPickerShownToday]);
 
+  // Open focus picker when navigating from Profile → "Change today's focus"
+  useFocusEffect(
+    useCallback(() => {
+      AsyncStorage.getItem("@threely_open_focus_picker").then((val) => {
+        if (val === "1") {
+          AsyncStorage.removeItem("@threely_open_focus_picker");
+          if (goals.length > 1) {
+            setGoalPickerVisible(true);
+          }
+        }
+      });
+    }, [goals.length])
+  );
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await loadData();
