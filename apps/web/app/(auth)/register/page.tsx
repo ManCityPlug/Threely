@@ -465,30 +465,108 @@ function OnboardingSlides({ onSignUp, onSignIn }: { onSignUp: () => void; onSign
   const [current, setCurrent] = useState(0);
   const [visited, setVisited] = useState<Set<number>>(() => new Set([0]));
 
+  // Drag/swipe state
+  const dragRef = useRef<{ startX: number; startY: number; dragging: boolean } | null>(null);
+  const SWIPE_THRESHOLD = 50;
+
+  const goTo = useCallback((page: number) => {
+    const clamped = Math.max(0, Math.min(TOTAL_SLIDES - 1, page));
+    setCurrent(clamped);
+    setVisited(prev => new Set(prev).add(clamped));
+  }, []);
+
   const handleNext = useCallback(() => {
-    if (current < TOTAL_SLIDES - 1) {
-      const next = current + 1;
-      setCurrent(next);
-      setVisited(prev => new Set(prev).add(next));
-    }
-  }, [current]);
+    if (current < TOTAL_SLIDES - 1) goTo(current + 1);
+  }, [current, goTo]);
 
   const handlePrev = useCallback(() => {
-    if (current > 0) setCurrent(current - 1);
-  }, [current]);
+    if (current > 0) goTo(current - 1);
+  }, [current, goTo]);
+
+  // Mouse drag
+  const onDragStart = useCallback((clientX: number, clientY: number) => {
+    dragRef.current = { startX: clientX, startY: clientY, dragging: true };
+  }, []);
+
+  const onDragEnd = useCallback((clientX: number) => {
+    if (!dragRef.current?.dragging) return;
+    const dx = dragRef.current.startX - clientX;
+    dragRef.current = null;
+    if (Math.abs(dx) < SWIPE_THRESHOLD) return;
+    if (dx > 0) {
+      // Swiped left → next
+      if (current < TOTAL_SLIDES - 1) goTo(current + 1);
+    } else {
+      // Swiped right → prev
+      if (current > 0) goTo(current - 1);
+    }
+  }, [current, goTo]);
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Don't start drag on buttons/links/inputs
+    const tag = (e.target as HTMLElement).tagName;
+    if (tag === "BUTTON" || tag === "A" || tag === "INPUT") return;
+    onDragStart(e.clientX, e.clientY);
+  }, [onDragStart]);
+
+  const handleMouseUp = useCallback((e: React.MouseEvent) => {
+    onDragEnd(e.clientX);
+  }, [onDragEnd]);
+
+  const handleMouseLeave = useCallback(() => {
+    dragRef.current = null;
+  }, []);
+
+  // Touch swipe
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    onDragStart(e.touches[0].clientX, e.touches[0].clientY);
+  }, [onDragStart]);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    onDragEnd(e.changedTouches[0].clientX);
+  }, [onDragEnd]);
+
+  // Mouse wheel (horizontal scroll or vertical scroll to change slides)
+  useEffect(() => {
+    let wheelTimeout: ReturnType<typeof setTimeout> | null = null;
+    let wheelAccum = 0;
+
+    function handleWheel(e: WheelEvent) {
+      e.preventDefault();
+      wheelAccum += e.deltaY || e.deltaX;
+
+      if (wheelTimeout) clearTimeout(wheelTimeout);
+      wheelTimeout = setTimeout(() => { wheelAccum = 0; }, 200);
+
+      if (Math.abs(wheelAccum) > 80) {
+        if (wheelAccum > 0) {
+          setCurrent(prev => {
+            const next = Math.min(TOTAL_SLIDES - 1, prev + 1);
+            setVisited(old => new Set(old).add(next));
+            return next;
+          });
+        } else {
+          setCurrent(prev => Math.max(0, prev - 1));
+        }
+        wheelAccum = 0;
+      }
+    }
+
+    window.addEventListener("wheel", handleWheel, { passive: false });
+    return () => window.removeEventListener("wheel", handleWheel);
+  }, []);
 
   // Keyboard navigation
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (e.key === "ArrowRight" || e.key === " ") {
         e.preventDefault();
-        if (current < TOTAL_SLIDES - 1) {
-          setCurrent(prev => {
-            const next = prev + 1;
-            setVisited(old => new Set(old).add(next));
-            return next;
-          });
-        }
+        setCurrent(prev => {
+          if (prev >= TOTAL_SLIDES - 1) return prev;
+          const next = prev + 1;
+          setVisited(old => new Set(old).add(next));
+          return next;
+        });
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         setCurrent(prev => Math.max(0, prev - 1));
@@ -496,7 +574,7 @@ function OnboardingSlides({ onSignUp, onSignIn }: { onSignUp: () => void; onSign
     }
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [current]);
+  }, []);
 
   return (
     <div style={{
@@ -544,10 +622,17 @@ function OnboardingSlides({ onSignUp, onSignIn }: { onSignUp: () => void; onSign
 
       <FloatingParticles />
 
-      {/* Slide content */}
-      <div style={{ position: "relative", zIndex: 2, height: "100%", display: "flex", flexDirection: "column" }}>
-        {/* Skip / back button */}
-        {current > 0 && current < 3 && (
+      {/* Slide content — drag/swipe area */}
+      <div
+        style={{ position: "relative", zIndex: 2, height: "100%", display: "flex", flexDirection: "column", cursor: "grab", userSelect: "none" }}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Back button */}
+        {current > 0 && (
           <button
             onClick={handlePrev}
             style={{
@@ -590,11 +675,12 @@ function OnboardingSlides({ onSignUp, onSignIn }: { onSignUp: () => void; onSign
               onClick={handleNext}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                backgroundColor: "#635BFF", color: "#FFF",
+                backgroundColor: "#FFFFFF", color: "#1A1040",
                 height: 52, borderRadius: 14,
-                fontSize: "1rem", fontWeight: 600,
+                fontSize: "1rem", fontWeight: 700,
                 border: "none", cursor: "pointer",
                 width: "100%", maxWidth: 400,
+                boxShadow: "0 4px 20px rgba(0,0,0,0.2)",
               }}
             >
               Next
