@@ -89,8 +89,10 @@ export async function POST(request: NextRequest) {
     },
   });
 
-  // Discord notification
-  notifyGoalCreated(user.email ?? "unknown", goal.title, goal.category);
+  // Discord notification with goal counts
+  const totalGoals = await prisma.goal.count({ where: { userId: user.id } });
+  const activeGoals = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
+  notifyGoalCreated(user.email ?? "unknown", goal.title, goal.category, { total: totalGoals, active: activeGoals });
 
   // Generate roadmap with Opus (async — don't block the response)
   // Load user profile for context

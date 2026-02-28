@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
+import { notifyGoalDeleted } from "@/lib/discord";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -72,5 +73,11 @@ export async function DELETE(request: NextRequest, { params }: Params) {
   if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   await prisma.goal.delete({ where: { id } });
+
+  // Discord notification with updated counts
+  const totalGoals = await prisma.goal.count({ where: { userId: user.id } });
+  const activeGoals = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
+  notifyGoalDeleted(user.email ?? "unknown", existing.title, { total: totalGoals, active: activeGoals });
+
   return NextResponse.json({ success: true });
 }

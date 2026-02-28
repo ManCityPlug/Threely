@@ -86,7 +86,7 @@ export function notifyTrialExpiring(email: string, expiresAt: string) {
   });
 }
 
-export function notifyGoalCreated(email: string, goalTitle: string, category: string | null) {
+export function notifyGoalCreated(email: string, goalTitle: string, category: string | null, counts: { total: number; active: number }) {
   return send("goalCreated", {
     title: "🎯 New Goal Created",
     color: 0x635BFF,
@@ -94,6 +94,21 @@ export function notifyGoalCreated(email: string, goalTitle: string, category: st
       { name: "Email", value: email, inline: true },
       { name: "Goal", value: goalTitle, inline: true },
       ...(category ? [{ name: "Category", value: category, inline: true }] : []),
+      { name: "Total Goals", value: `${counts.total}`, inline: true },
+      { name: "Active Goals", value: `${counts.active}`, inline: true },
+    ],
+  });
+}
+
+export function notifyGoalDeleted(email: string, goalTitle: string, counts: { total: number; active: number }) {
+  return send("goalCreated", {
+    title: "🗑️ Goal Deleted",
+    color: 0xFF1744,
+    fields: [
+      { name: "Email", value: email, inline: true },
+      { name: "Deleted Goal", value: goalTitle, inline: true },
+      { name: "Remaining Goals", value: `${counts.total}`, inline: true },
+      { name: "Active Goals", value: `${counts.active}`, inline: true },
     ],
   });
 }
