@@ -250,7 +250,7 @@ export default function MobileAppPrompt() {
               marginBottom: "1.5rem",
               animation: "mobilePromptScaleIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both",
             }}>
-              <AnimatedLogo size={96} glowSize={120} sparkleDistance={62} />
+              <AnimatedLogo size={72} glowSize={96} sparkleDistance={50} />
             </div>
 
             {/* Tagline */}
