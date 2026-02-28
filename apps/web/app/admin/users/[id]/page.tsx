@@ -65,6 +65,8 @@ interface UserDetail {
     stripeCustomerId: string | null;
     trialClaimedAt: string | null;
     trialEndsAt: string | null;
+    firstChargeDate: string | null;
+    subscriptionStartDate: string | null;
   };
   ai: {
     breakdown: Record<string, { calls: number; cost: number }>;
@@ -306,11 +308,39 @@ function GoalCard({ goal }: { goal: GoalItem }) {
   );
 }
 
+function getRefundEligibility(subscription: UserDetail["subscription"]): {
+  label: string;
+  color: string;
+  bg: string;
+} {
+  const status = subscription.status;
+  if (!status || status === "none" || status === "trialing") {
+    return { label: "None", color: "#71717a", bg: "#27272a" };
+  }
+
+  const chargeDate = subscription.firstChargeDate;
+  if (!chargeDate) {
+    return { label: "None", color: "#71717a", bg: "#27272a" };
+  }
+
+  const daysSinceCharge = Math.floor(
+    (Date.now() - new Date(chargeDate).getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  if (daysSinceCharge <= 7) {
+    return { label: `Eligible (${7 - daysSinceCharge}d left)`, color: "#4ade80", bg: "#052e16" };
+  }
+  return { label: "Not Eligible", color: "#f87171", bg: "#450a0a" };
+}
+
 export default function AdminUserDetailPage() {
   const params = useParams();
   const router = useRouter();
   const [data, setData] = useState<UserDetail | null>(null);
   const [error, setError] = useState("");
+  const [cancelLoading, setCancelLoading] = useState(false);
+  const [refundLoading, setRefundLoading] = useState(false);
+  const [actionMessage, setActionMessage] = useState("");
 
   useEffect(() => {
     fetch(`/api/admin/users/${params.id}`)
@@ -448,7 +478,7 @@ export default function AdminUserDetailPage() {
           display: "grid",
           gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
           gap: "1rem",
-          marginBottom: "2rem",
+          marginBottom: "1rem",
         }}
       >
         <div style={cardStyle}>
@@ -466,6 +496,135 @@ export default function AdminUserDetailPage() {
               value={new Date(subscription.trialEndsAt).toLocaleDateString()}
             />
           </div>
+        )}
+        {subscription.firstChargeDate && (
+          <div style={cardStyle}>
+            <Stat
+              label="First Charge"
+              value={new Date(subscription.firstChargeDate).toLocaleDateString()}
+            />
+          </div>
+        )}
+        <div style={cardStyle}>
+          <div style={{
+            fontSize: "0.72rem", fontWeight: 600, color: "#71717a",
+            textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2,
+          }}>
+            Refund Eligibility
+          </div>
+          {(() => {
+            const elig = getRefundEligibility(subscription);
+            return (
+              <span style={{
+                display: "inline-block",
+                padding: "4px 10px",
+                borderRadius: 8,
+                fontSize: "0.85rem",
+                fontWeight: 700,
+                color: elig.color,
+                background: elig.bg,
+                marginTop: 4,
+              }}>
+                {elig.label}
+              </span>
+            );
+          })()}
+        </div>
+      </div>
+
+      {/* Action buttons */}
+      {actionMessage && (
+        <div style={{
+          padding: "0.75rem 1rem",
+          borderRadius: 10,
+          background: actionMessage.includes("Error") ? "#450a0a" : "#052e16",
+          color: actionMessage.includes("Error") ? "#f87171" : "#4ade80",
+          fontSize: "0.85rem",
+          marginBottom: "1rem",
+        }}>
+          {actionMessage}
+        </div>
+      )}
+      <div style={{ display: "flex", gap: "0.75rem", flexWrap: "wrap", marginBottom: "2rem" }}>
+        {(subscription.status === "active" || subscription.status === "trialing") && subscription.stripeCustomerId && (
+          <button
+            onClick={async () => {
+              if (!confirm("Cancel this user's subscription at period end?")) return;
+              setCancelLoading(true);
+              setActionMessage("");
+              try {
+                const res = await fetch(`/api/admin/users/${user.id}/cancel`, { method: "POST" });
+                const json = await res.json();
+                if (res.ok) {
+                  setActionMessage(json.message);
+                  setData((prev) => prev ? {
+                    ...prev,
+                    subscription: { ...prev.subscription, status: "canceled" },
+                  } : prev);
+                } else {
+                  setActionMessage(`Error: ${json.error}`);
+                }
+              } catch (e) {
+                setActionMessage(`Error: ${e instanceof Error ? e.message : "Failed"}`);
+              } finally {
+                setCancelLoading(false);
+              }
+            }}
+            disabled={cancelLoading}
+            style={{
+              padding: "0.6rem 1.25rem",
+              borderRadius: 10,
+              background: "#fbbf24",
+              color: "#000",
+              fontWeight: 700,
+              fontSize: "0.85rem",
+              border: "none",
+              cursor: cancelLoading ? "not-allowed" : "pointer",
+              opacity: cancelLoading ? 0.6 : 1,
+            }}
+          >
+            {cancelLoading ? "Cancelling..." : "Cancel Plan"}
+          </button>
+        )}
+        {subscription.stripeCustomerId && getRefundEligibility(subscription).label.includes("Eligible") && (
+          <button
+            onClick={async () => {
+              if (!confirm("Issue a full refund and cancel subscription immediately?")) return;
+              setRefundLoading(true);
+              setActionMessage("");
+              try {
+                const res = await fetch(`/api/admin/users/${user.id}/refund`, { method: "POST" });
+                const json = await res.json();
+                if (res.ok) {
+                  setActionMessage(json.message);
+                  setData((prev) => prev ? {
+                    ...prev,
+                    subscription: { ...prev.subscription, status: "canceled" },
+                  } : prev);
+                } else {
+                  setActionMessage(`Error: ${json.error}`);
+                }
+              } catch (e) {
+                setActionMessage(`Error: ${e instanceof Error ? e.message : "Failed"}`);
+              } finally {
+                setRefundLoading(false);
+              }
+            }}
+            disabled={refundLoading}
+            style={{
+              padding: "0.6rem 1.25rem",
+              borderRadius: 10,
+              background: "#f87171",
+              color: "#fff",
+              fontWeight: 700,
+              fontSize: "0.85rem",
+              border: "none",
+              cursor: refundLoading ? "not-allowed" : "pointer",
+              opacity: refundLoading ? 0.6 : 1,
+            }}
+          >
+            {refundLoading ? "Refunding..." : "Issue Refund"}
+          </button>
         )}
       </div>
 

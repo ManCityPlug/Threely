@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/terms" },
 };
 
-const LAST_UPDATED = "February 25, 2026";
+const LAST_UPDATED = "February 28, 2026";
 
 export default function TermsPage() {
   const h2Style = {
@@ -81,7 +81,7 @@ export default function TermsPage() {
             You may cancel your subscription at any time from your account settings. Upon cancellation, you retain access to paid features until the end of your current billing period.
           </p>
           <p style={pStyle}>
-            If you are unsatisfied with the Service, you may request a full refund within 14 days of your first paid subscription. Contact us at support@threely.co.
+            If you are unsatisfied with the Service, you may request a full refund within 7 days of your first paid subscription charge. Refunds are not available after this 7-day window. To request a refund, email refund@threely.co with your account email. Refunds are typically processed within 2–3 business days.
           </p>
 
           <h2 style={h2Style}>4. AI-Generated Content</h2>

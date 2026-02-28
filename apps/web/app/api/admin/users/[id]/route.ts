@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase";
 import { getAdminFromRequest } from "@/lib/admin-auth";
+import { getStripe } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
 
@@ -236,12 +237,41 @@ export async function GET(
       current: streak,
       best: bestStreak,
     },
-    subscription: {
-      status: user.subscriptionStatus,
-      stripeCustomerId: user.stripeCustomerId,
-      trialClaimedAt: user.trialClaimedAt,
-      trialEndsAt: user.trialEndsAt,
-    },
+    subscription: await (async () => {
+      let firstChargeDate: string | null = null;
+      let subscriptionStartDate: string | null = null;
+      if (user.stripeCustomerId) {
+        try {
+          const stripe = getStripe();
+          // Get first successful charge date
+          const charges = await stripe.charges.list({
+            customer: user.stripeCustomerId,
+            limit: 1,
+          });
+          if (charges.data.length > 0 && charges.data[0].status === "succeeded") {
+            firstChargeDate = new Date(charges.data[0].created * 1000).toISOString();
+          }
+          // Get subscription start date
+          const subs = await stripe.subscriptions.list({
+            customer: user.stripeCustomerId,
+            limit: 1,
+          });
+          if (subs.data.length > 0) {
+            subscriptionStartDate = new Date(subs.data[0].start_date * 1000).toISOString();
+          }
+        } catch {
+          // ignore stripe errors
+        }
+      }
+      return {
+        status: user.subscriptionStatus,
+        stripeCustomerId: user.stripeCustomerId,
+        trialClaimedAt: user.trialClaimedAt,
+        trialEndsAt: user.trialEndsAt,
+        firstChargeDate,
+        subscriptionStartDate,
+      };
+    })(),
     ai: {
       breakdown: aiCosts,
       totalCost: Math.round(totalAICost * 100) / 100,

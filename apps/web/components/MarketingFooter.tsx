@@ -48,6 +48,7 @@ export default function MarketingFooter() {
               <Link href="/about" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>About</Link>
               <Link href="/terms" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Terms of Service</Link>
               <Link href="/privacy" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Privacy Policy</Link>
+              <Link href="/refund" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Refund Policy</Link>
             </div>
           </div>
 

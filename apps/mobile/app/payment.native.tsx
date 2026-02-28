@@ -219,9 +219,13 @@ export default function PaymentScreen() {
             <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/terms")}>
               Terms
             </Text>
-            {" & "}
+            {", "}
             <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/privacy")}>
               Privacy Policy
+            </Text>
+            {" & "}
+            <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/refund")}>
+              Refund Policy
             </Text>
             . Subscription renews automatically after trial.
           </Text>

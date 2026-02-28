@@ -226,7 +226,7 @@ export default function PricingPage() {
               { q: "Do I need a credit card to start?", a: "No. The 3-day free trial requires no payment information. You'll only be asked to add a payment method when the trial ends and you choose to subscribe." },
               { q: "Can I cancel anytime?", a: "Yes. Cancel your subscription at any time from your profile settings. You'll keep access until the end of your current billing period." },
               { q: "What happens when my trial ends?", a: "You'll be prompted to choose a plan. If you don't subscribe, your account stays active — you just won't receive new AI-generated tasks until you upgrade." },
-              { q: "Is there a refund policy?", a: "If you're not happy within the first 14 days of a paid subscription, contact us for a full refund. No questions asked." },
+              { q: "Is there a refund policy?", a: "If you're not happy within the first 7 days, email refund@threely.co for a full refund. No questions asked." },
             ].map(item => (
               <div key={item.q} style={{
                 background: "#f6f9fc",
