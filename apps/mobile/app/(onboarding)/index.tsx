@@ -1097,7 +1097,14 @@ export default function OnboardingScreen() {
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.continueBtn}
-            onPress={() => router.replace("/(tabs)")}
+            onPress={async () => {
+              const { data: sessionData } = await supabase.auth.getSession();
+              const uid = sessionData.session?.user?.id;
+              if (uid) {
+                await AsyncStorage.setItem(`@threely_show_trial_paywall_${uid}`, "true");
+              }
+              router.replace("/(tabs)");
+            }}
             activeOpacity={0.85}
           >
             <Text style={styles.continueBtnText}>Let's go →</Text>

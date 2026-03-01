@@ -20,7 +20,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/lib/supabase";
-import { statsApi, accountApi, tasksApi, summaryApi, subscriptionApi, type Stats, type DailyTask, type TaskItem, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus, type SubscriptionStatus } from "@/lib/api";
+import { statsApi, accountApi, tasksApi, summaryApi, type Stats, type DailyTask, type TaskItem, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus } from "@/lib/api";
 import { TaskCard } from "@/components/TaskCard";
 
 import { WeeklySummary } from "@/components/WeeklySummary";
@@ -35,6 +35,8 @@ import {
   saveNotifPreference,
   type NotifTimePreference,
 } from "@/lib/notifications";
+import { useSubscription } from "@/lib/subscription-context";
+import { useWalkthroughRegistry } from "@/lib/walkthrough-registry";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -165,6 +167,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { colors, preference, setPreference } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { register } = useWalkthroughRegistry();
 
   const [email, setEmail] = useState("");
   const [memberSince, setMemberSince] = useState("");
@@ -175,7 +178,7 @@ export default function ProfileScreen() {
   const [nickname, setNickname] = useState("");
 
   // Subscription
-  const [subStatus, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
+  const { isLimitedMode, showBottomSheetPaywall, hasPro } = useSubscription();
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -237,8 +240,6 @@ export default function ProfileScreen() {
       setStats(statsRes);
       setNotifPref(notifRes);
       if (savedNickname) setNickname(savedNickname);
-      // Fetch subscription status (non-blocking)
-      subscriptionApi.status().then(res => setSubStatus(res.status)).catch(() => {});
     } catch {
       // silently keep previous values
     } finally {
@@ -314,8 +315,8 @@ export default function ProfileScreen() {
 
   async function handleOpenWeekly() {
     // Gate behind subscription
-    if (subStatus !== "trialing" && subStatus !== "active") {
-      router.push("/payment" as never);
+    if (isLimitedMode) {
+      showBottomSheetPaywall();
       return;
     }
     if (weeklyStatus?.status === "available" && weeklyFrozenData) {
@@ -332,7 +333,7 @@ export default function ProfileScreen() {
       setWeeklySummaryOpen(true);
     } catch (err) {
       if (err instanceof Error && err.message?.includes("pro_required")) {
-        router.push("/payment" as never);
+        showBottomSheetPaywall();
       } else {
         Alert.alert("Error", "Failed to load weekly analysis.");
       }
@@ -469,25 +470,20 @@ export default function ProfileScreen() {
           <Text style={styles.displayName}>{displayName}</Text>
           {nickname ? <Text style={styles.emailSmall}>{email}</Text> : null}
           <Text style={styles.memberSince}>Member since {memberSince}</Text>
-          {subStatus === "trialing" && (
-            <View style={{ backgroundColor: "#ecfdf5", paddingHorizontal: 12, paddingVertical: 3, borderRadius: 999, marginTop: spacing.xs }}>
-              <Text style={{ color: "#059669", fontSize: typography.xs, fontWeight: typography.semibold }}>Pro Trial</Text>
-            </View>
-          )}
-          {subStatus === "active" && (
+          {hasPro ? (
             <View style={{ backgroundColor: colors.primaryLight, paddingHorizontal: 12, paddingVertical: 3, borderRadius: 999, marginTop: spacing.xs }}>
               <Text style={{ color: colors.primary, fontSize: typography.xs, fontWeight: typography.semibold }}>Pro</Text>
             </View>
-          )}
-          {subStatus !== undefined && subStatus !== "trialing" && subStatus !== "active" && (
+          ) : (
             <View style={{ backgroundColor: "#f3f4f6", paddingHorizontal: 12, paddingVertical: 3, borderRadius: 999, marginTop: spacing.xs }}>
-              <Text style={{ color: "#6b7280", fontSize: typography.xs, fontWeight: typography.semibold }}>No plan</Text>
+              <Text style={{ color: "#6b7280", fontSize: typography.xs, fontWeight: typography.semibold }}>Free</Text>
             </View>
           )}
         </View>
 
         {/* Stats */}
         <Text style={styles.sectionLabel}>Your stats</Text>
+        <View ref={r => register("profile-stats", r)} collapsable={false}>
         {statsLoading ? (
           <>
             <View style={styles.statsRow}>
@@ -567,6 +563,7 @@ export default function ProfileScreen() {
             </View>
           </>
         )}
+        </View>
 
         {/* Weekly Analysis Card */}
         <Text style={styles.sectionLabel}>Weekly analysis</Text>
@@ -751,7 +748,7 @@ export default function ProfileScreen() {
           {/* Payments */}
           <TouchableOpacity
             style={styles.menuRow}
-            onPress={() => router.push("/payment" as never)}
+            onPress={() => showBottomSheetPaywall()}
             activeOpacity={0.7}
           >
             <View style={[styles.menuIcon, { backgroundColor: colors.successLight }]}>

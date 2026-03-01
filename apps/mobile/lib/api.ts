@@ -115,14 +115,6 @@ export interface SubscriptionStatus {
   currentPeriodEnd: string | null;
 }
 
-export interface SubscriptionSetup {
-  setupIntentClientSecret: string;
-  ephemeralKeySecret: string;
-  customerId: string;
-  subscriptionId?: string;
-  isResubscribe?: boolean;
-}
-
 export interface GoalChatMessage {
   role: "user" | "assistant";
   content: string;
@@ -417,10 +409,4 @@ export const accountApi = {
 
 export const subscriptionApi = {
   status: () => apiFetch<SubscriptionStatus>("/api/subscription"),
-
-  create: (priceId: string, deviceId: string) =>
-    apiFetch<SubscriptionSetup>("/api/subscription", {
-      method: "POST",
-      body: JSON.stringify({ priceId, deviceId }),
-    }),
 };

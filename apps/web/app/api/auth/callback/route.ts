@@ -42,8 +42,8 @@ export async function GET(request: NextRequest) {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user?.email) {
-        // Upsert Prisma User record with 3-day trial for new users
-        const trialEndsAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+        // Upsert Prisma User record with 7-day trial for new users
+        const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         const existing = await prisma.user.findUnique({ where: { id: user.id } });
 
         await prisma.user.upsert({

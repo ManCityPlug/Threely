@@ -43,13 +43,7 @@
           "sounds": []
         }
       ],
-      [
-        "@stripe/stripe-react-native",
-        {
-          "merchantIdentifier": "merchant.com.threely.app",
-          "enableGooglePay": true
-        }
-      ]
+      "react-native-purchases"
     ],
     "experiments": {
       "typedRoutes": true

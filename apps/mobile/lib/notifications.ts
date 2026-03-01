@@ -257,6 +257,45 @@ export async function sendInstantNotification(title: string, body: string): Prom
   });
 }
 
+// ─── Limited-user notification (free/limited plan) ────────────────────────────
+
+const LIMITED_VARIANTS = [
+  "Your 3 tasks are waiting — start your free trial to unlock daily AI plans",
+  "Ready to crush today? Try Threely Pro free for 7 days",
+  "Your goals aren't going to achieve themselves — unlock AI-powered tasks today",
+  "Small steps, big results. Start your Threely Pro trial to get personalized tasks",
+];
+
+const ID_LIMITED = "threely-limited";
+
+/**
+ * Schedule a single daily 9 AM reminder for free/limited users
+ * with rotating motivational copy encouraging upgrade.
+ */
+export async function scheduleNotificationsLimited(): Promise<void> {
+  if (Platform.OS === "web") return;
+  const granted = await requestNotificationPermissions();
+  if (!granted) return;
+
+  await cancelById(ID_LIMITED);
+
+  const variant = LIMITED_VARIANTS[new Date().getDate() % LIMITED_VARIANTS.length];
+
+  await Notifications.scheduleNotificationAsync({
+    identifier: ID_LIMITED,
+    content: {
+      title: "Threely",
+      body: variant,
+      sound: true,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
+      hour: 9,
+      minute: 0,
+    },
+  });
+}
+
 function formatMin(min: number): string {
   if (min < 60) return `${min}m`;
   const h = Math.floor(min / 60);

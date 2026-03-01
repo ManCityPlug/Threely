@@ -23,6 +23,7 @@ model User {
   trialClaimedAt     DateTime?    @map("trial_claimed_at")
   trialDeviceId      String?      @map("trial_device_id")
   trialEndsAt        DateTime?    @map("trial_ends_at")
+  rcSubscriptionActive Boolean   @default(false) @map("rc_subscription_active")
   goals              Goal[]
   dailyTasks         DailyTask[]
   dailyFocus         DailyFocus[]

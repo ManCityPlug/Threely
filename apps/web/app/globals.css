@@ -832,6 +832,260 @@ input, textarea, select {
   }
 }
 
+/* ─── Fullscreen Paywall ────────────────────────────────────────────────── */
+.paywall-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: linear-gradient(135deg, #1A1040 0%, #635BFF 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: #fff;
+}
+.paywall-close-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  color: rgba(255,255,255,0.7);
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+.paywall-close-btn:hover { background: rgba(255,255,255,0.25); }
+.paywall-icon-wrap {
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+.paywall-icon { font-size: 36px; }
+.paywall-heading {
+  font-size: 1.75rem;
+  font-weight: 400;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+.paywall-heading strong { font-weight: 800; }
+.paywall-subheading {
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.75);
+  text-align: center;
+  line-height: 1.5;
+  max-width: 400px;
+  margin-bottom: 2rem;
+}
+.paywall-plans {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.paywall-plan-card {
+  background: rgba(255,255,255,0.1);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 0.875rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  width: 100%;
+  text-align: left;
+  color: #fff;
+}
+.paywall-plan-card.selected {
+  border-color: #fff;
+  background: rgba(255,255,255,0.18);
+}
+.paywall-plan-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.paywall-plan-radio {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.paywall-plan-radio.active { border-color: #fff; }
+.paywall-plan-radio-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+}
+.paywall-plan-info { flex: 1; }
+.paywall-plan-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2px;
+}
+.paywall-plan-name { font-size: 0.9rem; font-weight: 600; }
+.paywall-plan-badge {
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: #fff;
+  background: #F59E0B;
+  padding: 1px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.03em;
+}
+.paywall-plan-sub { font-size: 0.75rem; color: rgba(255,255,255,0.6); }
+.paywall-plan-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+}
+.paywall-plan-trial {
+  font-size: 0.7rem;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  margin-top: 0.25rem;
+}
+.paywall-cta-btn {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  height: 52px;
+  background: #fff;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #635BFF;
+  text-align: center;
+  line-height: 52px;
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+  transition: opacity 0.15s;
+}
+.paywall-cta-btn:hover { opacity: 0.9; }
+.paywall-cta-sub {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.paywall-footer { text-align: center; }
+.paywall-legal {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+}
+.paywall-legal a {
+  color: rgba(255,255,255,0.5);
+  text-decoration: underline;
+}
+
+/* ─── Spotlight Walkthrough ────────────────────────────────────────────── */
+.spotlight-cutout {
+  position: fixed;
+  border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
+  z-index: 10000;
+  transition: all 0.4s ease;
+  pointer-events: none;
+}
+.spotlight-tooltip {
+  position: fixed;
+  z-index: 10001;
+  background: var(--card);
+  border-radius: 16px;
+  padding: 1.5rem;
+  max-width: 340px;
+  width: calc(100vw - 2rem);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+  transition: all 0.4s ease;
+}
+.spotlight-tooltip-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.25rem;
+}
+.spotlight-tooltip-desc {
+  font-size: 0.875rem;
+  color: var(--subtext);
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+.spotlight-tooltip-counter {
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+}
+.spotlight-tooltip-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+.spotlight-btn-skip {
+  padding: 0.5rem 1rem;
+  border: none;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.spotlight-btn-next {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: opacity 0.15s;
+}
+.spotlight-btn-next:hover { opacity: 0.9; }
+.spotlight-center-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+.spotlight-pulse {
+  position: fixed;
+  border-radius: 12px;
+  border: 2px solid var(--primary);
+  z-index: 10000;
+  pointer-events: none;
+  animation: spotlightPulse 2s ease-in-out infinite;
+  transition: all 0.4s ease;
+}
+@keyframes spotlightPulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.02); }
+}
+
 /* ─── Marketing: mobile responsive ──────────────────────────────────────── */
 @media (max-width: 768px) {
   .footer-grid {

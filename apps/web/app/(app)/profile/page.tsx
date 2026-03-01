@@ -393,7 +393,7 @@ export default function ProfilePage() {
       </div>
 
       {/* Stats row */}
-      <div style={{
+      <div data-walkthrough="profile-stats" style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
         gap: "0.75rem",

@@ -47,7 +47,7 @@ export function notifyNewSignup(email: string) {
     color: 0x635BFF, // Threely purple
     fields: [
       { name: "Email", value: email, inline: true },
-      { name: "Trial", value: "3-day Pro trial started", inline: true },
+      { name: "Trial", value: "7-day Pro trial started", inline: true },
     ],
   });
 }

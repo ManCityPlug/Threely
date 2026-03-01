@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { useSubscription, type PaywallVariant } from "@/lib/subscription-context";
+
 const FEATURES = [
   { icon: "\u2728", text: "AI-powered tasks tailored to your goals" },
   { icon: "\u267E\uFE0F", text: "Unlimited goals & daily task generation" },
@@ -8,13 +11,119 @@ const FEATURES = [
   { icon: "\uD83D\uDD04", text: "Generate new tasks as you complete them" },
 ];
 
-const PLANS = [
-  { name: "Yearly", price: "$59.99", sub: "$4.99/mo \u00B7 billed annually", badge: "BEST VALUE \u00B7 SAVE 58%" },
-  { name: "Quarterly", price: "$23.99", sub: "$7.99/mo \u00B7 billed quarterly", badge: "SAVE 33%" },
-  { name: "Monthly", price: "$11.99", sub: "per month" },
+type Plan = "monthly" | "yearly";
+
+const PLANS: { key: Plan; name: string; price: string; sub: string; badge?: string }[] = [
+  { key: "yearly", name: "Yearly", price: "$69.99", sub: "$5.83/mo \u00B7 billed annually", badge: "SAVE 55%" },
+  { key: "monthly", name: "Monthly", price: "$12.99", sub: "per month" },
 ];
 
-export default function PaywallModal({ onClose }: { onClose: () => void }) {
+interface PaywallModalProps {
+  variant?: PaywallVariant;
+  onClose: () => void;
+}
+
+export default function PaywallModal({ variant = "sheet", onClose }: PaywallModalProps) {
+  const [plan, setPlan] = useState<Plan>("yearly");
+  const selectedPlan = PLANS.find((p) => p.key === plan)!;
+
+  if (variant === "fullscreen") {
+    return <FullScreenPaywall plan={plan} setPlan={setPlan} selectedPlan={selectedPlan} onClose={onClose} />;
+  }
+
+  return <SheetPaywall plan={plan} setPlan={setPlan} selectedPlan={selectedPlan} onClose={onClose} />;
+}
+
+// ── Full-screen variant (post-onboarding) ─────────────────────────────────────
+function FullScreenPaywall({
+  plan, setPlan, selectedPlan, onClose,
+}: {
+  plan: Plan;
+  setPlan: (p: Plan) => void;
+  selectedPlan: (typeof PLANS)[number];
+  onClose: () => void;
+}) {
+  return (
+    <div className="paywall-fullscreen">
+      {/* Close button */}
+      <button className="paywall-close-btn" onClick={onClose} aria-label="Close">
+        {"\u2715"}
+      </button>
+
+      {/* Icon */}
+      <div className="paywall-icon-wrap">
+        <span className="paywall-icon">{"\u2726"}</span>
+      </div>
+
+      <h2 className="paywall-heading">
+        Try Threely Pro<br />
+        <strong>free for 7 days</strong>
+      </h2>
+      <p className="paywall-subheading">
+        We offer 7 days free so everyone can achieve their goals.
+        You'll get a reminder 2 days before your trial ends.
+      </p>
+
+      {/* Plan selector */}
+      <div className="paywall-plans">
+        {PLANS.map((p) => (
+          <button
+            key={p.key}
+            className={`paywall-plan-card ${plan === p.key ? "selected" : ""}`}
+            onClick={() => setPlan(p.key)}
+          >
+            <div className="paywall-plan-row">
+              <div className={`paywall-plan-radio ${plan === p.key ? "active" : ""}`}>
+                {plan === p.key && <div className="paywall-plan-radio-dot" />}
+              </div>
+              <div className="paywall-plan-info">
+                <div className="paywall-plan-name-row">
+                  <span className="paywall-plan-name">{p.name}</span>
+                  {p.badge && <span className="paywall-plan-badge">{p.badge}</span>}
+                </div>
+                <span className="paywall-plan-sub">{p.sub}</span>
+              </div>
+              <span className="paywall-plan-price">{p.price}</span>
+            </div>
+            <span className="paywall-plan-trial">7-day free trial</span>
+          </button>
+        ))}
+      </div>
+
+      {/* CTA */}
+      <a
+        href="/pricing"
+        className="paywall-cta-btn"
+      >
+        Start Free Trial
+      </a>
+      <p className="paywall-cta-sub">
+        7-day free trial &middot; then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
+      </p>
+
+      {/* Footer */}
+      <div className="paywall-footer">
+        <div className="paywall-legal">
+          <a href="https://threely.co/terms" target="_blank" rel="noopener noreferrer">Terms</a>
+          {" \u00B7 "}
+          <a href="https://threely.co/privacy" target="_blank" rel="noopener noreferrer">Privacy</a>
+          {" \u00B7 "}
+          <a href="https://threely.co/refund" target="_blank" rel="noopener noreferrer">Refund</a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Sheet variant (blocked actions) ──────────────────────────────────────────
+function SheetPaywall({
+  plan, setPlan, selectedPlan, onClose,
+}: {
+  plan: Plan;
+  setPlan: (p: Plan) => void;
+  selectedPlan: (typeof PLANS)[number];
+  onClose: () => void;
+}) {
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div
@@ -50,10 +159,10 @@ export default function PaywallModal({ onClose }: { onClose: () => void }) {
             {"\u2726"}
           </div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>
-            Your free trial has ended
+            Unlock this with Threely Pro
           </h2>
           <p style={{ fontSize: "0.875rem", color: "var(--subtext)" }}>
-            Subscribe to keep your momentum going
+            Get unlimited AI-powered tasks, coaching insights, and goal tracking.
           </p>
         </div>
 
@@ -71,49 +180,51 @@ export default function PaywallModal({ onClose }: { onClose: () => void }) {
           ))}
         </div>
 
-        {/* Plans */}
+        {/* Plan selector */}
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: "1.25rem" }}>
-          {PLANS.map((plan) => (
-            <a
-              key={plan.name}
-              href="/pricing"
+          {PLANS.map((p) => (
+            <button
+              key={p.key}
+              onClick={() => setPlan(p.key)}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
                 padding: "0.75rem 1rem",
                 borderRadius: "var(--radius)",
-                border: plan.name === "Yearly" ? "2px solid var(--primary)" : "1.5px solid var(--border)",
-                background: plan.name === "Yearly" ? "var(--primary-light)" : "var(--card)",
-                textDecoration: "none", cursor: "pointer",
+                border: plan === p.key ? "2px solid var(--primary)" : "1.5px solid var(--border)",
+                background: plan === p.key ? "var(--primary-light)" : "var(--card)",
+                cursor: "pointer",
                 transition: "border-color 0.15s, background 0.15s",
+                width: "100%",
+                textAlign: "left",
               }}
             >
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{
                     fontSize: "0.9rem", fontWeight: 600,
-                    color: plan.name === "Yearly" ? "var(--primary)" : "var(--text)",
+                    color: plan === p.key ? "var(--primary)" : "var(--text)",
                   }}>
-                    {plan.name}
+                    {p.name}
                   </span>
-                  {plan.badge && (
+                  {p.badge && (
                     <span style={{
                       fontSize: "0.6rem", fontWeight: 700, color: "#fff",
-                      background: plan.name === "Yearly" ? "var(--primary)" : "var(--success)",
+                      background: "var(--primary)",
                       padding: "1px 7px", borderRadius: 10, letterSpacing: "0.03em",
                     }}>
-                      {plan.badge}
+                      {p.badge}
                     </span>
                   )}
                 </div>
-                <span style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{plan.sub}</span>
+                <span style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{p.sub}</span>
               </div>
               <span style={{
                 fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em",
-                color: plan.name === "Yearly" ? "var(--primary)" : "var(--text)",
+                color: plan === p.key ? "var(--primary)" : "var(--text)",
               }}>
-                {plan.price}
+                {p.price}
               </span>
-            </a>
+            </button>
           ))}
         </div>
 
@@ -124,10 +235,27 @@ export default function PaywallModal({ onClose }: { onClose: () => void }) {
           style={{
             width: "100%", textAlign: "center", padding: "0.75rem",
             fontSize: "0.95rem", textDecoration: "none", display: "block",
+            marginBottom: "0.75rem",
           }}
         >
-          View plans {"\u2192"}
+          Start Free Trial
         </a>
+
+        <p style={{ fontSize: "0.75rem", color: "var(--muted)", textAlign: "center", marginBottom: "0.75rem" }}>
+          7-day free trial &middot; then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
+        </p>
+
+        {/* Dismiss */}
+        <button
+          onClick={onClose}
+          style={{
+            background: "none", border: "none", cursor: "pointer",
+            color: "var(--subtext)", fontSize: "0.875rem", fontWeight: 500,
+            display: "block", margin: "0 auto", padding: "0.5rem",
+          }}
+        >
+          Not now
+        </button>
       </div>
     </div>
   );

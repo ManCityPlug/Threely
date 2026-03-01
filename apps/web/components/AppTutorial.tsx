@@ -1,65 +1,79 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
-// ─── Tutorial step definitions ────────────────────────────────────────────────
+// ─── Spotlight step definitions ──────────────────────────────────────────────
 
-interface TutorialStep {
-  icon: string;
+interface SpotlightStep {
   title: string;
   description: string;
-  page: string;       // which page this step belongs on
-  buttonText?: string; // override for the "Next" button on the last step
+  target: string | null;      // data-walkthrough attribute value, or null for centered
+  route: string | null;       // route to navigate to, or null for no navigation
+  tooltipPosition: "above" | "below" | "center";
 }
 
-const STEPS: TutorialStep[] = [
+const STEPS: SpotlightStep[] = [
   {
-    icon: "\u26A1",
     title: "Your Daily Tasks",
     description:
-      "Every day, Threely generates 3 personalized tasks for each of your goals. Click any task to see details, refine it, or ask AI about it.",
-    page: "/dashboard",
+      "Every day, Threely generates 3 personalized tasks for each of your goals. Tap any task to see details, refine it, or ask AI about it.",
+    target: "first-task-card",
+    route: "/dashboard",
+    tooltipPosition: "below",
   },
   {
-    icon: "\uD83D\uDE80",
     title: "Want More?",
     description:
-      "Finished all your tasks? Complete them and click here to generate more. You get one extra set per goal each day.",
-    page: "/dashboard",
+      "Finished all your tasks? Tap here to generate more. You get one extra set per goal each day.",
+    target: "get-more-button",
+    route: "/dashboard",
+    tooltipPosition: "above",
   },
   {
-    icon: "\uD83C\uDFAF",
     title: "Your Goals",
     description:
-      "View and manage all your goals here. Click any goal to open its options \u2014 you'll see everything you need to manage it.",
-    page: "/goals",
+      "View and manage all your goals here. Tap any goal to open its options.",
+    target: "first-goal-card",
+    route: "/goals",
+    tooltipPosition: "below",
   },
   {
-    icon: "\u2699\uFE0F",
     title: "Goal Options",
     description:
-      "Edit goal \u2014 adjust your daily time, intensity, schedule, and deadline through an AI chat.\n\nPause goal \u2014 take a break without losing progress. Resume anytime.\n\nMark as complete \u2014 finished a goal? Celebrate and archive it.\n\nDelete goal \u2014 remove it entirely if you no longer need it.",
-    page: "/goals",
+      "Edit, pause, complete, or delete goals. Adjust your schedule, intensity, and deadline through an AI chat.",
+    target: "goal-menu-button",
+    route: "/goals",
+    tooltipPosition: "below",
   },
   {
-    icon: "\uD83D\uDC64",
     title: "Your Profile",
     description:
-      "Track your streaks, view weekly summaries, manage notifications, and adjust your subscription settings.",
-    page: "/profile",
+      "Track streaks, view weekly summaries, manage notifications, and adjust your settings.",
+    target: "profile-stats",
+    route: "/profile",
+    tooltipPosition: "below",
   },
   {
-    icon: "\uD83C\uDF89",
     title: "You\u2019re all set!",
     description:
-      "Threely learns from your progress and adapts your tasks over time. The more you use it, the better it gets. Let\u2019s crush those goals!",
-    page: "/dashboard",
-    buttonText: "Let\u2019s go!",
+      "Threely adapts to your progress and evolves your tasks over time. The more you use it, the better it gets. Let\u2019s crush those goals!",
+    target: null,
+    route: null,
+    tooltipPosition: "center",
   },
 ];
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Types ───────────────────────────────────────────────────────────────────
+
+interface Rect {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+}
+
+// ─── Component ───────────────────────────────────────────────────────────────
 
 interface AppTutorialProps {
   visible: boolean;
@@ -70,49 +84,79 @@ export default function AppTutorial({ visible, onComplete }: AppTutorialProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [step, setStep] = useState(0);
-  const [animating, setAnimating] = useState(false);
-  const [fadeClass, setFadeClass] = useState("tutorial-card-enter");
+  const [targetRect, setTargetRect] = useState<Rect | null>(null);
+  const [measuring, setMeasuring] = useState(false);
+  const measureTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Navigate to the correct page whenever the step changes
-  useEffect(() => {
-    if (!visible) return;
-    const targetPage = STEPS[step].page;
-    const currentPage = pathname === "/" ? "/dashboard" : pathname;
-    if (currentPage !== targetPage) {
-      router.push(targetPage);
+  // ─── Measure the target element ──────────────────────────────────────────
+
+  const measureTarget = useCallback((targetAttr: string | null) => {
+    if (!targetAttr) {
+      setTargetRect(null);
+      setMeasuring(false);
+      return;
     }
-  }, [step, visible, pathname, router]);
-
-  const animateTransition = useCallback((callback: () => void) => {
-    setAnimating(true);
-    setFadeClass("tutorial-card-exit");
-    setTimeout(() => {
-      callback();
-      setFadeClass("tutorial-card-enter");
-      setTimeout(() => {
-        setAnimating(false);
-      }, 300);
-    }, 250);
+    const el = document.querySelector(`[data-walkthrough="${targetAttr}"]`);
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      const padding = 10;
+      setTargetRect({
+        top: rect.top - padding,
+        left: rect.left - padding,
+        width: rect.width + padding * 2,
+        height: rect.height + padding * 2,
+      });
+      setMeasuring(false);
+    } else {
+      // Target not found — show centered fallback
+      setTargetRect(null);
+      setMeasuring(false);
+    }
   }, []);
 
+  // ─── Navigate + measure on step change ───────────────────────────────────
+
+  useEffect(() => {
+    if (!visible) return;
+
+    const current = STEPS[step];
+
+    // Navigate to the correct route if needed
+    if (current.route) {
+      const currentPage = pathname === "/" ? "/dashboard" : pathname;
+      if (currentPage !== current.route) {
+        router.push(current.route);
+      }
+    }
+
+    // Wait for render, then measure
+    setMeasuring(true);
+    if (measureTimerRef.current) clearTimeout(measureTimerRef.current);
+    measureTimerRef.current = setTimeout(() => {
+      measureTarget(current.target);
+    }, 300);
+
+    return () => {
+      if (measureTimerRef.current) clearTimeout(measureTimerRef.current);
+    };
+  }, [step, visible, pathname, router, measureTarget]);
+
+  // ─── Handlers ────────────────────────────────────────────────────────────
+
   const handleNext = useCallback(() => {
-    if (animating) return;
     if (step === STEPS.length - 1) {
-      // Last step — complete the tutorial
       onComplete();
       return;
     }
-    animateTransition(() => {
-      setStep((s) => s + 1);
-    });
-  }, [step, animating, onComplete, animateTransition]);
+    setStep((s) => s + 1);
+  }, [step, onComplete]);
 
   const handleSkip = useCallback(() => {
-    if (animating) return;
     onComplete();
-  }, [animating, onComplete]);
+  }, [onComplete]);
 
-  // Keyboard support: Enter/Right for next, Escape for skip
+  // ─── Keyboard support ────────────────────────────────────────────────────
+
   useEffect(() => {
     if (!visible) return;
     function onKeyDown(e: KeyboardEvent) {
@@ -123,75 +167,126 @@ export default function AppTutorial({ visible, onComplete }: AppTutorialProps) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [visible, handleNext, handleSkip]);
 
+  // ─── Don't render if not visible ─────────────────────────────────────────
+
   if (!visible) return null;
 
   const current = STEPS[step];
   const isLast = step === STEPS.length - 1;
+  const isCentered = current.target === null || (!targetRect && !measuring);
 
-  return (
-    <div className="tutorial-overlay" onClick={handleSkip}>
-      <div
-        className={`tutorial-card ${fadeClass}`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Step indicator dots */}
-        <div className="tutorial-dots">
-          {STEPS.map((_, i) => (
-            <span
-              key={i}
-              className={`tutorial-dot${i === step ? " active" : ""}${i < step ? " done" : ""}`}
-            />
-          ))}
-        </div>
+  // ─── Compute tooltip position ────────────────────────────────────────────
 
-        {/* Icon */}
-        <div className="tutorial-icon">{current.icon}</div>
+  let tooltipStyle: React.CSSProperties = {};
 
-        {/* Content */}
-        <h2 className="tutorial-title">{current.title}</h2>
-        <p className="tutorial-description">{current.description}</p>
+  if (!isCentered && targetRect) {
+    const tooltipWidth = 340;
+    // Center tooltip horizontally relative to the target
+    let tooltipLeft = targetRect.left + targetRect.width / 2 - tooltipWidth / 2;
+    // Clamp to viewport
+    tooltipLeft = Math.max(16, Math.min(tooltipLeft, window.innerWidth - tooltipWidth - 16));
 
-        {/* Step counter */}
-        <div className="tutorial-counter">
-          {step + 1} of {STEPS.length}
-        </div>
+    if (current.tooltipPosition === "below") {
+      tooltipStyle = {
+        left: tooltipLeft,
+        top: targetRect.top + targetRect.height + 16,
+      };
+    } else if (current.tooltipPosition === "above") {
+      tooltipStyle = {
+        left: tooltipLeft,
+        bottom: window.innerHeight - targetRect.top + 16,
+      };
+    }
+  }
 
-        {/* Buttons */}
-        <div className="tutorial-buttons">
-          {!isLast && (
-            <button
-              className="btn btn-outline tutorial-btn-skip"
-              onClick={handleSkip}
-            >
-              Skip
-            </button>
-          )}
-          <button
-            className="btn btn-primary tutorial-btn-next"
-            onClick={handleNext}
-            style={isLast ? { width: "100%" } : undefined}
-          >
-            {current.buttonText || "Next"}
-            {!isLast && (
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                style={{ marginLeft: 4 }}
-              >
-                <path
-                  d="M6 3l5 5-5 5"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            )}
+  // ─── Tooltip content ────────────────────────────────────────────────────
+
+  const tooltipContent = (
+    <>
+      <div className="spotlight-tooltip-title">{current.title}</div>
+      <div className="spotlight-tooltip-desc">{current.description}</div>
+      <div className="spotlight-tooltip-counter">
+        {step + 1} of {STEPS.length}
+      </div>
+      <div className="spotlight-tooltip-buttons">
+        {!isLast && (
+          <button className="spotlight-btn-skip" onClick={handleSkip}>
+            Skip
           </button>
+        )}
+        <button
+          className="spotlight-btn-next"
+          onClick={handleNext}
+          style={isLast ? { width: "100%" } : undefined}
+        >
+          {isLast ? "Let\u2019s go!" : "Next"}
+        </button>
+      </div>
+    </>
+  );
+
+  // ─── Centered layout (no target or target not found) ─────────────────────
+
+  if (isCentered) {
+    return (
+      <div className="spotlight-center-overlay" onClick={handleSkip}>
+        <div
+          className="spotlight-tooltip"
+          style={{ position: "relative" }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {tooltipContent}
         </div>
       </div>
-    </div>
+    );
+  }
+
+  // ─── Spotlight layout (target found) ─────────────────────────────────────
+
+  return (
+    <>
+      {/* Dark overlay with cutout */}
+      <div
+        className="spotlight-cutout"
+        style={{
+          top: targetRect!.top,
+          left: targetRect!.left,
+          width: targetRect!.width,
+          height: targetRect!.height,
+        }}
+      />
+
+      {/* Pulse ring around cutout */}
+      <div
+        className="spotlight-pulse"
+        style={{
+          top: targetRect!.top,
+          left: targetRect!.left,
+          width: targetRect!.width,
+          height: targetRect!.height,
+        }}
+      />
+
+      {/* Click-capture overlay (transparent areas around the cutout) */}
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          zIndex: 10000,
+          pointerEvents: "auto",
+          background: "transparent",
+        }}
+        onClick={handleSkip}
+      />
+
+      {/* Tooltip */}
+      <div
+        className="spotlight-tooltip"
+        style={tooltipStyle}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {tooltipContent}
+      </div>
+    </>
   );
 }

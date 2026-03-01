@@ -120,10 +120,10 @@ function PageHook({ visible }: { visible: boolean }) {
       transition: "opacity 0.6s ease, transform 0.6s ease",
     }}>
       {/* Logo with pulsing glow + sparkles */}
-      <div style={{ position: "relative", width: 80, height: 80, marginBottom: 32 }}>
+      <div style={{ position: "relative", width: 100, height: 100, marginBottom: 32 }}>
         {/* Glow */}
         <div style={{
-          position: "absolute", left: -10, top: -10,
+          position: "absolute", left: 0, top: 0,
           width: 100, height: 100, borderRadius: 50,
           backgroundColor: "rgba(99, 91, 255, 0.25)",
           animation: "pulse 3s ease-in-out infinite",
@@ -132,10 +132,11 @@ function PageHook({ visible }: { visible: boolean }) {
         <img
           src="/favicon.png"
           alt="Threely"
-          width={80}
-          height={80}
+          width={68}
+          height={68}
           style={{
-            position: "relative", borderRadius: 20,
+            position: "absolute", left: 16, top: 16,
+            borderRadius: 16,
             animation: "pulse 3s ease-in-out infinite",
             zIndex: 2,
           }}
@@ -149,8 +150,8 @@ function PageHook({ visible }: { visible: boolean }) {
               key={idx}
               style={{
                 position: "absolute",
-                left: 40 + Math.cos(rad) * dist - 3,
-                top: 40 + Math.sin(rad) * dist - 3,
+                left: 50 + Math.cos(rad) * dist - 3,
+                top: 50 + Math.sin(rad) * dist - 3,
                 width: 6, height: 6, borderRadius: 3,
                 backgroundColor: "#FFF",
                 animation: `sparkle 2s ease-in-out ${0.6 + idx * 0.08}s infinite`,
@@ -331,10 +332,10 @@ function PageAuth({ visible, onSignUp, onSignIn }: {
       transition: "opacity 0.6s ease, transform 0.6s ease",
     }}>
       {/* Logo with pulsing glow + sparkles (same as Page 1) */}
-      <div style={{ position: "relative", width: 80, height: 80, marginBottom: 0 }}>
+      <div style={{ position: "relative", width: 100, height: 100, marginBottom: 0 }}>
         {/* Glow */}
         <div style={{
-          position: "absolute", left: -10, top: -10,
+          position: "absolute", left: 0, top: 0,
           width: 100, height: 100, borderRadius: 50,
           backgroundColor: "rgba(99, 91, 255, 0.25)",
           animation: "pulse 3s ease-in-out infinite",
@@ -343,10 +344,11 @@ function PageAuth({ visible, onSignUp, onSignIn }: {
         <img
           src="/favicon.png"
           alt="Threely"
-          width={80}
-          height={80}
+          width={68}
+          height={68}
           style={{
-            position: "relative", borderRadius: 20,
+            position: "absolute", left: 16, top: 16,
+            borderRadius: 16,
             animation: "pulse 3s ease-in-out infinite",
             zIndex: 2,
           }}
@@ -360,8 +362,8 @@ function PageAuth({ visible, onSignUp, onSignIn }: {
               key={idx}
               style={{
                 position: "absolute",
-                left: 40 + Math.cos(rad) * dist - 3,
-                top: 40 + Math.sin(rad) * dist - 3,
+                left: 50 + Math.cos(rad) * dist - 3,
+                top: 50 + Math.sin(rad) * dist - 3,
                 width: 6, height: 6, borderRadius: 3,
                 backgroundColor: "#FFF",
                 animation: `sparkle 2s ease-in-out ${0.6 + idx * 0.08}s infinite`,

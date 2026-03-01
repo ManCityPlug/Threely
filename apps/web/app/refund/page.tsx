@@ -73,7 +73,7 @@ export default function RefundPage() {
 
           <h2 style={h2Style}>7-Day Refund Window</h2>
           <p style={pStyle}>
-            If you are unsatisfied with Threely for any reason, you may request a full refund within 7 days of your first paid subscription charge. This applies to all plans — monthly, quarterly, and yearly.
+            If you are unsatisfied with Threely for any reason, you may request a full refund within 7 days of your first paid subscription charge. This applies to all plans — monthly and yearly.
           </p>
           <p style={pStyle}>
             Refunds are not available after the 7-day window has passed. Your subscription start date is the date your first payment was charged, not the start of your free trial.

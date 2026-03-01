@@ -25,24 +25,18 @@ import * as Notifications from "expo-notifications";
 // import * as Clarity from "@microsoft/react-native-clarity";
 import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
-// StripeProvider uses native modules (OnrampSdk etc.) that crash in Expo Go.
-// Only import it for production/custom dev-client builds.
-let StripeProvider: React.ComponentType<{ publishableKey: string; merchantIdentifier: string; children: React.ReactNode }> | null = null;
-if (!__DEV__) {
-  try {
-    StripeProvider = require("@stripe/stripe-react-native").StripeProvider;
-  } catch {
-    // Not available (Expo Go) — leave null
-  }
-}
+import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import { supabase } from "@/lib/supabase";
-import { subscriptionApi, profileApi } from "@/lib/api";
+import { profileApi } from "@/lib/api";
 import { ThemeProvider, useTheme } from "@/lib/theme";
 import { ToastProvider } from "@/lib/toast";
+import { SubscriptionProvider, useSubscription } from "@/lib/subscription-context";
+import { WalkthroughRegistryProvider } from "@/lib/walkthrough-registry";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
+import { TrialBottomSheet } from "@/components/TrialBottomSheet";
 import { spacing, radius, typography } from "@/constants/theme";
 
-const STRIPE_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
+const REVENUECAT_IOS_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? "";
 
 if (Platform.OS !== "web") {
   Notifications.setNotificationHandler({
@@ -55,11 +49,6 @@ if (Platform.OS !== "web") {
 
   // TODO: Uncomment for production builds — not supported in Expo Go
   // Clarity.initialize("vm4n4qax20");
-}
-
-// ── Valid subscription statuses that allow app access ─────────────────────────
-function isAccessGranted(status: string | null): boolean {
-  return status === "trialing" || status === "active";
 }
 
 // ── Forced-update helpers ─────────────────────────────────────────────────────
@@ -234,6 +223,19 @@ function AppContent() {
       return;
     }
 
+    // Initialize RevenueCat and link to Supabase user
+    (async () => {
+      try {
+        if (__DEV__) {
+          Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+        }
+        Purchases.configure({ apiKey: REVENUECAT_IOS_KEY });
+        await Purchases.logIn(session.user.id);
+      } catch (e) {
+        console.warn("RevenueCat init failed:", e);
+      }
+    })();
+
     const onboardingKey = `@threely_onboarding_done_${session.user.id}`;
     AsyncStorage.getItem(onboardingKey).then(async (done) => {
       // Guard against race: another run may have resolved while we were awaiting
@@ -262,42 +264,12 @@ function AppContent() {
         return;
       }
 
-      // Onboarded — check subscription gate
-
-      // 1. Check cached subscription status
-      const cachedStatus = await AsyncStorage.getItem("@threely_subscription_status");
-
-      if (isAccessGranted(cachedStatus)) {
-        routingResolved.current = true;
-        if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
-        setReady(true);
-        return;
-      }
-
-      // 2. Re-check with backend (catches trial expiry, cancellation, etc.)
-      try {
-        const { status } = await subscriptionApi.status();
-
-        if (routingResolved.current) return;
-
-        if (isAccessGranted(status)) {
-          await AsyncStorage.setItem("@threely_subscription_status", status ?? "");
-          routingResolved.current = true;
-          if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
-          setReady(true);
-          return;
-        }
-
-        // No valid subscription — show payment screen
-        routingResolved.current = true;
-        if (!inPayment) router.replace("/payment");
-        setReady(true);
-      } catch {
-        // Backend unreachable — be lenient (don't block offline users)
-        routingResolved.current = true;
-        if (inAuthGroup || inOnboarding) router.replace("/(tabs)");
-        setReady(true);
-      }
+      // Onboarded — always route to /(tabs).
+      // Subscription state is handled by SubscriptionProvider + paywall overlays,
+      // not by route-blocking.
+      routingResolved.current = true;
+      if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
+      setReady(true);
     });
   }, [session, segments, welcomeDone]);
 
@@ -354,6 +326,9 @@ function AppContent() {
           <ActivityIndicator color="#FFFFFF" />
         </View>
       )}
+
+      {/* Bottom-sheet trial paywall (accessible from any screen) */}
+      <TrialBottomSheetGate />
 
       {/* Forced update blocking modal */}
       <Modal
@@ -440,22 +415,49 @@ function AppContent() {
   );
 }
 
+function TrialBottomSheetGate() {
+  const { paywallType, dismissPaywall, refreshSubscription } = useSubscription();
+
+  return (
+    <TrialBottomSheet
+      visible={paywallType === "bottomsheet"}
+      onDismiss={dismissPaywall}
+      onSubscribed={() => {
+        dismissPaywall();
+        refreshSubscription();
+      }}
+    />
+  );
+}
+
 export default function RootLayout() {
-  const content = (
+  return (
     <ThemeProvider>
       <ToastProvider>
-        <AppContent />
+        <AppContentWithSubscription />
       </ToastProvider>
     </ThemeProvider>
   );
+}
 
-  if (StripeProvider) {
-    return (
-      <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY} merchantIdentifier="merchant.com.threely.app">
-        {content}
-      </StripeProvider>
-    );
-  }
+function AppContentWithSubscription() {
+  const [userId, setUserId] = useState<string | null>(null);
 
-  return content;
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserId(session?.user?.id ?? null);
+    });
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUserId(session?.user?.id ?? null);
+    });
+    return () => listener.subscription.unsubscribe();
+  }, []);
+
+  return (
+    <SubscriptionProvider userId={userId}>
+      <WalkthroughRegistryProvider>
+        <AppContent />
+      </WalkthroughRegistryProvider>
+    </SubscriptionProvider>
+  );
 }

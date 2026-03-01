@@ -1198,7 +1198,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
         </div>
 
         {/* Menu button */}
-        <div ref={menuRef} style={{ position: "relative", flexShrink: 0 }}>
+        <div ref={menuRef} data-walkthrough="goal-menu-button" style={{ position: "relative", flexShrink: 0 }}>
           <button
             onClick={() => setShowMenu(v => !v)}
             style={{
@@ -1434,7 +1434,7 @@ export default function GoalsPage() {
           {/* Active goals */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "0.875rem" }}>
             {activeGoals.map((goal, i) => (
-              <div key={goal.id} className="slide-up" style={{ animationDelay: `${i * 0.08}s` }}>
+              <div key={goal.id} className="slide-up" style={{ animationDelay: `${i * 0.08}s` }} {...(i === 0 ? { "data-walkthrough": "first-goal-card" } : {})}>
                 <GoalCard
                   goal={goal}
                   onDeleted={() => handleGoalDeleted(goal.id)}

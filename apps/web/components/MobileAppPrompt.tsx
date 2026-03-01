@@ -186,7 +186,7 @@ export default function MobileAppPrompt() {
             position: "fixed",
             inset: 0,
             zIndex: 9999,
-            background: "#fff",
+            background: "linear-gradient(180deg, #ede9ff 0%, #ede9ff 15%, #ffffff 50%)",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",

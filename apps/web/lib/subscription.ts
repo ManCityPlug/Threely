@@ -8,12 +8,12 @@ export interface UserAccess {
 
 /**
  * Check whether a user has Pro access.
- * Priority: active Stripe subscription > automatic 3-day trial > expired/none.
+ * Priority: active Stripe subscription > automatic 7-day trial > expired/none.
  */
 export async function getUserAccess(userId: string): Promise<UserAccess> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { subscriptionStatus: true, trialEndsAt: true },
+    select: { subscriptionStatus: true, trialEndsAt: true, rcSubscriptionActive: true },
   });
 
   if (!user) {
@@ -25,14 +25,19 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
     return { hasPro: true, reason: "subscribed", trialEndsAt: user.trialEndsAt };
   }
 
-  // 2. Automatic 3-day free trial (no card required)
+  // 1b. Active RevenueCat subscription (mobile IAP)
+  if (user.rcSubscriptionActive) {
+    return { hasPro: true, reason: "subscribed", trialEndsAt: null };
+  }
+
+  // 2. Automatic 7-day free trial (no card required)
   if (user.trialEndsAt && new Date(user.trialEndsAt) > new Date()) {
     return { hasPro: true, reason: "trialing", trialEndsAt: user.trialEndsAt };
   }
 
-  // 3. No trial set (pre-trial-system user) — grant a 3-day trial now
+  // 3. No trial set (pre-trial-system user) — grant a 7-day trial now
   if (!user.trialEndsAt) {
-    const trialEnd = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+    const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await prisma.user.update({ where: { id: userId }, data: { trialEndsAt: trialEnd } });
     return { hasPro: true, reason: "trialing", trialEndsAt: trialEnd };
   }

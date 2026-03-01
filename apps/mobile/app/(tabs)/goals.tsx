@@ -24,7 +24,7 @@ import { SwipeNavigator } from "@/components/SwipeNavigator";
 import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { goalsApi, tasksApi, subscriptionApi, type Goal, type TaskItem, type ParsedGoal, type GoalChatMessage } from "@/lib/api";
+import { goalsApi, tasksApi, type Goal, type TaskItem, type ParsedGoal, type GoalChatMessage } from "@/lib/api";
 import { GoalCard } from "@/components/GoalCard";
 import { GoalTemplates } from "@/components/GoalTemplates";
 import { SkeletonCard } from "@/components/Skeleton";
@@ -32,6 +32,8 @@ import { Button } from "@/components/ui/Button";
 import { useToast } from "@/lib/toast";
 import { cancelAllNotifications } from "@/lib/notifications";
 import { useTheme } from "@/lib/theme";
+import { useSubscription } from "@/lib/subscription-context";
+import { useWalkthroughRegistry } from "@/lib/walkthrough-registry";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
 import type { GoalCategory } from "@/constants/goal-templates";
@@ -84,6 +86,8 @@ export default function GoalsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { showToast } = useToast();
+  const { isLimitedMode, showBottomSheetPaywall, walkthroughActive } = useSubscription();
+  const { register } = useWalkthroughRegistry();
 
   const [goals, setGoals] = useState<Goal[]>([]);
   const [pausedGoals, setPausedGoals] = useState<Goal[]>([]);
@@ -156,9 +160,6 @@ export default function GoalsScreen() {
     new Animated.Value(0),
   ]).current;
 
-  // Subscription gate
-  const [proExpired, setProExpired] = useState(false);
-
   // Action sheet
   const [actionGoal, setActionGoal] = useState<Goal | null>(null);
 
@@ -210,10 +211,6 @@ export default function GoalsScreen() {
       } else {
         loadGoals();
       }
-      // Check subscription status
-      subscriptionApi.status().then(({ status }) => {
-        setProExpired(status !== "trialing" && status !== "active");
-      }).catch(() => {});
     }, [loadGoals])
   );
 
@@ -225,7 +222,7 @@ export default function GoalsScreen() {
 
   // ── Add flow helpers ────────────────────────────────────────────────────────
   function openAddFlow() {
-    if (proExpired) { router.push("/payment" as never); return; }
+    if (isLimitedMode && !walkthroughActive) { showBottomSheetPaywall(); return; }
     // 3-goal limit
     const activeCount = goals.length;
     if (activeCount >= 3) {
@@ -373,7 +370,7 @@ export default function GoalsScreen() {
     } catch (e) {
       if (e instanceof Error && e.message?.includes("pro_required")) {
         closeAddFlow();
-        router.push("/payment" as never);
+        showBottomSheetPaywall();
       } else {
         setParseError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
       }
@@ -415,7 +412,7 @@ export default function GoalsScreen() {
       if (err instanceof Error && err.message?.includes("pro_required")) {
         setShowAiChat(false);
         closeAddFlow();
-        router.push("/payment" as never);
+        showBottomSheetPaywall();
       } else {
         setChatHistory([{ role: "assistant" as const, text: "Something went wrong. Please close and try again." }]);
       }
@@ -450,7 +447,7 @@ export default function GoalsScreen() {
       if (err instanceof Error && err.message?.includes("pro_required")) {
         setShowAiChat(false);
         closeAddFlow();
-        router.push("/payment" as never);
+        showBottomSheetPaywall();
       } else {
         setChatHistory((prev) => [
           ...prev,
@@ -569,7 +566,7 @@ export default function GoalsScreen() {
     } catch (e: unknown) {
       if (e instanceof Error && e.message?.includes("pro_required")) {
         closeAddFlow();
-        router.push("/payment" as never);
+        showBottomSheetPaywall();
       } else {
         setBuildError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
       }
@@ -1563,9 +1560,9 @@ export default function GoalsScreen() {
           </View>
         ) : (
           <>
-            {goals.map((goal) => {
+            {goals.map((goal, goalIdx) => {
               const cStats = completedByGoal[goal.id];
-              return (
+              const card = (
                 <GoalCard
                   key={goal.id}
                   goal={goal}
@@ -1576,6 +1573,11 @@ export default function GoalsScreen() {
                   onViewTasks={() => router.push("/(tabs)")}
                 />
               );
+              return goalIdx === 0 ? (
+                <View key={goal.id} ref={r => register("first-goal-card", r)} collapsable={false}>
+                  {card}
+                </View>
+              ) : card;
             })}
 
             {/* Paused goals section */}

@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         break;
       }
 
-      // Trial will end in 3 days — send Discord alert
+      // Trial will end in 7 days — send Discord alert
       case "customer.subscription.trial_will_end": {
         const sub = event.data.object as Stripe.Subscription;
         const trialUser = await prisma.user.findFirst({ where: { subscriptionId: sub.id } });

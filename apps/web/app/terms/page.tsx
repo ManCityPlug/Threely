@@ -67,10 +67,10 @@ export default function TermsPage() {
 
           <h2 style={h2Style}>2. Free Trial and Subscriptions</h2>
           <p style={pStyle}>
-            Threely offers a free 3-day trial that provides full access to all features. No payment information is required to start the trial.
+            Threely offers a free 7-day trial that provides full access to all features. Payment details are securely collected when you start your trial, but you will not be charged until the trial period ends.
           </p>
           <p style={pStyle}>
-            After the trial, continued access to AI-generated tasks and coaching features requires a paid subscription. Subscriptions are billed monthly, quarterly, or annually, depending on the plan you choose. Prices are displayed on our pricing page and may be updated with reasonable notice.
+            After the trial, continued access to AI-generated tasks and coaching features requires a paid subscription. Subscriptions are billed monthly or annually, depending on the plan you choose. Prices are displayed on our pricing page and may be updated with reasonable notice.
           </p>
           <p style={pStyle}>
             Subscriptions automatically renew at the end of each billing period unless you cancel before the renewal date.

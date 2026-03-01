@@ -29,8 +29,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    // Start automatic 3-day Pro trial (no credit card required)
-    const trialEndsAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+    // Start automatic 7-day Pro trial
+    const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
     await prisma.user.upsert({
       where: { id: data.user.id },
       update: { trialEndsAt },

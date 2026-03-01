@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Platform,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -15,16 +16,18 @@ import * as Haptics from "expo-haptics";
 import { useTheme } from "@/lib/theme";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
+import { useWalkthroughRegistry, type WalkthroughTarget, type TargetLayout } from "@/lib/walkthrough-registry";
 
-// ─── Tutorial step definitions ──────────────────────────────────────────────
+const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
+const SPOTLIGHT_PAD = 10;
 
 interface TutorialStep {
   title: string;
   description: string;
-  icon: keyof typeof Ionicons.glyphMap;
+  target: WalkthroughTarget | null;
   tabRoute: "/(tabs)" | "/(tabs)/goals" | "/(tabs)/profile" | null;
-  /** Position hint for the pointer arrow — "top" means the relevant area is above the card */
-  pointerDirection: "up" | "down" | "none";
+  tooltipPosition: "above" | "below" | "center";
+  icon: keyof typeof Ionicons.glyphMap;
   buttonLabel?: string;
 }
 
@@ -33,56 +36,60 @@ const STEPS: TutorialStep[] = [
     title: "Your Daily Tasks",
     description:
       "Every day, Threely generates 3 personalized tasks for each of your goals. Tap any task to see details, refine it, or ask AI about it.",
-    icon: "flash",
+    target: "first-task-card",
     tabRoute: "/(tabs)",
-    pointerDirection: "up",
+    tooltipPosition: "below",
+    icon: "flash",
   },
   {
     title: "Want More?",
     description:
-      "Finished all your tasks? Complete them and tap the \"Get more tasks\" button to generate more. You get one extra set per goal each day.",
-    icon: "add-circle",
+      "Finished all your tasks? Tap here to generate more. You get one extra set per goal each day.",
+    target: "get-more-button",
     tabRoute: "/(tabs)",
-    pointerDirection: "down",
+    tooltipPosition: "above",
+    icon: "add-circle",
   },
   {
     title: "Your Goals",
     description:
-      "View and manage all your goals here. Tap any goal to open its options — you'll see everything you need to manage it.",
-    icon: "disc",
+      "View and manage all your goals here. Tap any goal to open its options.",
+    target: "first-goal-card",
     tabRoute: "/(tabs)/goals",
-    pointerDirection: "up",
+    tooltipPosition: "below",
+    icon: "disc",
   },
   {
     title: "Goal Options",
     description:
-      "Edit goal — adjust your daily time, intensity, schedule, and deadline through an AI chat.\n\nPause goal — take a break without losing progress. Resume anytime.\n\nMark as complete — finished a goal? Celebrate and archive it.\n\nDelete goal — remove it entirely if you no longer need it.",
-    icon: "ellipsis-horizontal",
+      "Edit, pause, complete, or delete goals. Adjust your schedule, intensity, and deadline through an AI chat.",
+    target: "goal-menu-button",
     tabRoute: "/(tabs)/goals",
-    pointerDirection: "up",
+    tooltipPosition: "below",
+    icon: "ellipsis-horizontal",
   },
   {
     title: "Your Profile",
     description:
-      "Track your streaks, view weekly summaries, manage notifications, and adjust your subscription settings.",
-    icon: "person",
+      "Track streaks, view weekly summaries, manage notifications, and adjust your settings.",
+    target: "profile-stats",
     tabRoute: "/(tabs)/profile",
-    pointerDirection: "up",
+    tooltipPosition: "below",
+    icon: "person",
   },
   {
     title: "You're all set!",
     description:
-      "Threely learns from your progress and adapts your tasks over time. The more you use it, the better it gets. Let's crush those goals!",
-    icon: "rocket",
+      "Threely adapts to your progress and evolves your tasks over time. The more you use it, the better it gets. Let's crush those goals!",
+    target: null,
     tabRoute: null,
-    pointerDirection: "none",
+    tooltipPosition: "center",
+    icon: "rocket",
     buttonLabel: "Let's go!",
   },
 ];
 
 const TOTAL_STEPS = STEPS.length;
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 interface AppTutorialProps {
   visible: boolean;
@@ -93,129 +100,114 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { measure } = useWalkthroughRegistry();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [currentStep, setCurrentStep] = useState(0);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const cardTranslateY = useRef(new Animated.Value(30)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const [targetLayout, setTargetLayout] = useState<TargetLayout | null>(null);
+
+  // Animations
   const overlayFade = useRef(new Animated.Value(0)).current;
+  const cardFade = useRef(new Animated.Value(0)).current;
+  const cardTranslateY = useRef(new Animated.Value(30)).current;
+  const spotlightTop = useRef(new Animated.Value(0)).current;
+  const spotlightLeft = useRef(new Animated.Value(0)).current;
+  const spotlightWidth = useRef(new Animated.Value(0)).current;
+  const spotlightHeight = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   const step = STEPS[currentStep];
 
-  // Reset state when tutorial becomes visible
+  // Reset when visible
   useEffect(() => {
     if (visible) {
       setCurrentStep(0);
-      fadeAnim.setValue(0);
-      cardTranslateY.setValue(30);
+      setTargetLayout(null);
       overlayFade.setValue(0);
-
-      // Fade in overlay
+      cardFade.setValue(0);
+      cardTranslateY.setValue(30);
       Animated.timing(overlayFade, {
         toValue: 1,
         duration: 300,
-        useNativeDriver: true,
+        useNativeDriver: false,
       }).start(() => {
-        animateStepIn();
+        measureAndAnimate(0);
       });
     }
   }, [visible]);
 
-  // Navigate to the correct tab when step changes
-  useEffect(() => {
-    if (!visible) return;
-    const route = STEPS[currentStep]?.tabRoute;
-    if (route) {
-      router.navigate(route as never);
-    }
-  }, [currentStep, visible]);
-
-  // Pulsing animation for the pointer
+  // Pulse animation
   useEffect(() => {
     if (!visible) return;
     const loop = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.15,
-          duration: 800,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 800,
-          useNativeDriver: true,
-        }),
+        Animated.timing(pulseAnim, { toValue: 1.04, duration: 900, useNativeDriver: false }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 900, useNativeDriver: false }),
       ])
     );
     loop.start();
     return () => loop.stop();
   }, [visible]);
 
-  const animateStepIn = useCallback(() => {
-    fadeAnim.setValue(0);
-    cardTranslateY.setValue(30);
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 280,
-        useNativeDriver: true,
-      }),
-      Animated.spring(cardTranslateY, {
-        toValue: 0,
-        friction: 8,
-        tension: 65,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, cardTranslateY]);
+  const measureAndAnimate = useCallback(async (stepIdx: number) => {
+    const s = STEPS[stepIdx];
+    if (s.target) {
+      // Navigate first, wait for render
+      if (s.tabRoute) {
+        router.navigate(s.tabRoute as never);
+      }
+      await new Promise((r) => setTimeout(r, 400));
 
-  const animateStepOut = useCallback(
-    (onDone: () => void) => {
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 180,
-          useNativeDriver: true,
-        }),
-        Animated.timing(cardTranslateY, {
-          toValue: -20,
-          duration: 180,
-          useNativeDriver: true,
-        }),
-      ]).start(onDone);
-    },
-    [fadeAnim, cardTranslateY]
-  );
+      const layout = await measure(s.target);
+      setTargetLayout(layout);
+
+      if (layout) {
+        Animated.parallel([
+          Animated.timing(spotlightTop, { toValue: layout.y - SPOTLIGHT_PAD, duration: 350, useNativeDriver: false }),
+          Animated.timing(spotlightLeft, { toValue: layout.x - SPOTLIGHT_PAD, duration: 350, useNativeDriver: false }),
+          Animated.timing(spotlightWidth, { toValue: layout.width + SPOTLIGHT_PAD * 2, duration: 350, useNativeDriver: false }),
+          Animated.timing(spotlightHeight, { toValue: layout.height + SPOTLIGHT_PAD * 2, duration: 350, useNativeDriver: false }),
+        ]).start();
+      }
+    } else {
+      setTargetLayout(null);
+    }
+
+    // Animate card in
+    cardFade.setValue(0);
+    cardTranslateY.setValue(20);
+    Animated.parallel([
+      Animated.timing(cardFade, { toValue: 1, duration: 280, useNativeDriver: true }),
+      Animated.spring(cardTranslateY, { toValue: 0, friction: 8, tension: 65, useNativeDriver: true }),
+    ]).start();
+  }, [measure, router, spotlightTop, spotlightLeft, spotlightWidth, spotlightHeight, cardFade, cardTranslateY]);
+
+  const animateCardOut = useCallback((onDone: () => void) => {
+    Animated.parallel([
+      Animated.timing(cardFade, { toValue: 0, duration: 180, useNativeDriver: true }),
+      Animated.timing(cardTranslateY, { toValue: -20, duration: 180, useNativeDriver: true }),
+    ]).start(onDone);
+  }, [cardFade, cardTranslateY]);
 
   const goNext = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (currentStep >= TOTAL_STEPS - 1) {
-      // Last step — close tutorial
-      Animated.timing(overlayFade, {
-        toValue: 0,
-        duration: 250,
-        useNativeDriver: true,
-      }).start(() => {
-        // Navigate back to home tab
+      Animated.timing(overlayFade, { toValue: 0, duration: 250, useNativeDriver: false }).start(() => {
         router.navigate("/(tabs)" as never);
         onComplete();
       });
       return;
     }
-    animateStepOut(() => {
-      setCurrentStep((s) => s + 1);
-      animateStepIn();
+    animateCardOut(() => {
+      const next = currentStep + 1;
+      setCurrentStep(next);
+      measureAndAnimate(next);
     });
-  }, [currentStep, animateStepOut, animateStepIn, onComplete, overlayFade, router]);
+  }, [currentStep, animateCardOut, measureAndAnimate, onComplete, overlayFade, router]);
 
   const skip = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    Animated.timing(overlayFade, {
-      toValue: 0,
-      duration: 250,
-      useNativeDriver: true,
-    }).start(() => {
+    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Animated.timing(overlayFade, { toValue: 0, duration: 250, useNativeDriver: false }).start(() => {
       router.navigate("/(tabs)" as never);
       onComplete();
     });
@@ -224,194 +216,178 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
   if (!visible) return null;
 
   const isLastStep = currentStep === TOTAL_STEPS - 1;
-  const showPointer = step.pointerDirection !== "none";
+  const hasTarget = step.target !== null && targetLayout !== null;
+
+  // Calculate tooltip position
+  let tooltipTop = SCREEN_H / 2 - 100;
+  if (hasTarget && targetLayout) {
+    if (step.tooltipPosition === "below") {
+      tooltipTop = targetLayout.y + targetLayout.height + SPOTLIGHT_PAD + 16;
+    } else if (step.tooltipPosition === "above") {
+      tooltipTop = targetLayout.y - SPOTLIGHT_PAD - 220;
+    }
+  }
+  // Clamp to screen bounds
+  tooltipTop = Math.max(insets.top + 16, Math.min(tooltipTop, SCREEN_H - insets.bottom - 260));
 
   return (
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
-      <Animated.View style={[styles.overlay, { opacity: overlayFade }]}>
-        {/* Top safe area spacer */}
-        <View style={{ height: insets.top }} />
+      <Animated.View style={[StyleSheet.absoluteFill, { opacity: overlayFade }]}>
+        {hasTarget ? (
+          <>
+            {/* 4 dark rects around the spotlight cutout */}
+            {/* Top rect */}
+            <Animated.View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: spotlightTop,
+                backgroundColor: "rgba(0,0,0,0.75)",
+              }}
+            />
+            {/* Bottom rect */}
+            <Animated.View
+              style={{
+                position: "absolute",
+                top: Animated.add(spotlightTop, spotlightHeight),
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0,0,0,0.75)",
+              }}
+            />
+            {/* Left rect */}
+            <Animated.View
+              style={{
+                position: "absolute",
+                top: spotlightTop,
+                left: 0,
+                width: spotlightLeft,
+                height: spotlightHeight,
+                backgroundColor: "rgba(0,0,0,0.75)",
+              }}
+            />
+            {/* Right rect */}
+            <Animated.View
+              style={{
+                position: "absolute",
+                top: spotlightTop,
+                left: Animated.add(spotlightLeft, spotlightWidth),
+                right: 0,
+                height: spotlightHeight,
+                backgroundColor: "rgba(0,0,0,0.75)",
+              }}
+            />
 
-        {/* Pointer arrow pointing UP (area of interest is above the card) */}
-        {showPointer && step.pointerDirection === "up" && (
-          <View style={styles.pointerAreaTop}>
-            <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-              <View style={styles.pointerBubble}>
-                <Ionicons name={step.icon} size={28} color={colors.primary} />
-              </View>
-              <View style={styles.pointerArrowDown} />
-            </Animated.View>
-          </View>
+            {/* Pulsing border around spotlight */}
+            <Animated.View
+              style={{
+                position: "absolute",
+                top: spotlightTop,
+                left: spotlightLeft,
+                width: spotlightWidth,
+                height: spotlightHeight,
+                borderRadius: radius.lg,
+                borderWidth: 2,
+                borderColor: colors.primary,
+                transform: [{ scale: pulseAnim }],
+              }}
+            />
+          </>
+        ) : (
+          /* Full overlay for centered steps */
+          <View style={[StyleSheet.absoluteFill, { backgroundColor: "rgba(0,0,0,0.75)" }]} />
         )}
 
-        {/* Tooltip card — centered */}
-        <View style={styles.cardWrapper}>
-          <Animated.View
-            style={[
-              styles.card,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: cardTranslateY }],
-              },
-            ]}
-          >
-            {/* Step icon badge (for the final step or when no pointer) */}
-            {!showPointer && (
-              <View style={[styles.iconBadge, { backgroundColor: colors.primaryLight }]}>
-                <Ionicons name={step.icon} size={32} color={colors.primary} />
-              </View>
-            )}
-
-            {/* Step counter */}
-            <Text style={styles.stepCounter}>
-              Step {currentStep + 1} of {TOTAL_STEPS}
-            </Text>
-
-            {/* Dot indicators */}
-            <View style={styles.dots}>
-              {STEPS.map((_, i) => (
-                <View
-                  key={i}
-                  style={[
-                    styles.dot,
-                    i === currentStep && styles.dotActive,
-                    i < currentStep && styles.dotDone,
-                  ]}
-                />
-              ))}
+        {/* Tooltip card */}
+        <Animated.View
+          style={[
+            styles.tooltipCard,
+            {
+              top: tooltipTop,
+              opacity: cardFade,
+              transform: [{ translateY: cardTranslateY }],
+            },
+          ]}
+        >
+          {/* Icon badge for center steps */}
+          {!hasTarget && (
+            <View style={[styles.iconBadge, { backgroundColor: colors.primaryLight }]}>
+              <Ionicons name={step.icon} size={32} color={colors.primary} />
             </View>
+          )}
 
-            {/* Title */}
-            <Text style={styles.title}>{step.title}</Text>
+          {/* Step counter */}
+          <Text style={styles.stepCounter}>
+            Step {currentStep + 1} of {TOTAL_STEPS}
+          </Text>
 
-            {/* Description */}
-            <Text style={styles.description}>{step.description}</Text>
+          {/* Dot indicators */}
+          <View style={styles.dots}>
+            {STEPS.map((_, i) => (
+              <View
+                key={i}
+                style={[
+                  styles.dot,
+                  i === currentStep && styles.dotActive,
+                  i < currentStep && styles.dotDone,
+                ]}
+              />
+            ))}
+          </View>
 
-            {/* Buttons */}
-            <View style={styles.buttonRow}>
-              {!isLastStep && (
-                <TouchableOpacity
-                  onPress={skip}
-                  style={styles.skipBtn}
-                  activeOpacity={0.7}
-                  hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-                >
-                  <Text style={styles.skipText}>Skip</Text>
-                </TouchableOpacity>
-              )}
+          <Text style={styles.title}>{step.title}</Text>
+          <Text style={styles.description}>{step.description}</Text>
 
+          <View style={styles.buttonRow}>
+            {!isLastStep && (
               <TouchableOpacity
-                onPress={goNext}
-                style={[styles.nextBtn, isLastStep && styles.nextBtnFull]}
-                activeOpacity={0.85}
+                onPress={skip}
+                style={styles.skipBtn}
+                activeOpacity={0.7}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
               >
-                <Text style={styles.nextBtnText}>
-                  {step.buttonLabel ?? "Next"}
-                </Text>
-                {!isLastStep && (
-                  <Ionicons name="arrow-forward" size={18} color="#fff" style={{ marginLeft: 6 }} />
-                )}
+                <Text style={styles.skipText}>Skip</Text>
               </TouchableOpacity>
-            </View>
-          </Animated.View>
-        </View>
-
-        {/* Pointer arrow pointing DOWN (area of interest is below the card) */}
-        {showPointer && step.pointerDirection === "down" && (
-          <View style={styles.pointerAreaBottom}>
-            <Animated.View style={{ transform: [{ scale: pulseAnim }] }}>
-              <View style={styles.pointerArrowUp} />
-              <View style={styles.pointerBubble}>
-                <Ionicons name={step.icon} size={28} color={colors.primary} />
-              </View>
-            </Animated.View>
+            )}
+            <TouchableOpacity
+              onPress={goNext}
+              style={[styles.nextBtn, isLastStep && styles.nextBtnFull]}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.nextBtnText}>
+                {step.buttonLabel ?? "Next"}
+              </Text>
+              {!isLastStep && (
+                <Ionicons name="arrow-forward" size={18} color="#fff" style={{ marginLeft: 6 }} />
+              )}
+            </TouchableOpacity>
           </View>
-        )}
-
-        {/* Bottom safe area spacer */}
-        <View style={{ height: insets.bottom + 60 }} />
+        </Animated.View>
       </Animated.View>
     </Modal>
   );
 }
 
-// ─── Styles ─────────────────────────────────────────────────────────────────
-
 function createStyles(c: Colors) {
-  const { width: screenWidth } = Dimensions.get("window");
-  const isTablet = screenWidth >= 768;
-  const cardMaxWidth = isTablet ? 480 : screenWidth - spacing.lg * 2;
+  const isTablet = SCREEN_W >= 768;
+  const cardMaxWidth = isTablet ? 420 : SCREEN_W - spacing.lg * 2;
 
   return StyleSheet.create({
-    overlay: {
-      flex: 1,
-      backgroundColor: "rgba(0,0,0,0.75)",
-      justifyContent: "center",
-      alignItems: "center",
-    },
-
-    // ── Pointer areas ───────────────────────────────────────────────────────
-    pointerAreaTop: {
-      alignItems: "center",
-      paddingBottom: spacing.md,
-      flex: 1,
-      justifyContent: "flex-end",
-    },
-    pointerAreaBottom: {
-      alignItems: "center",
-      paddingTop: spacing.md,
-      flex: 1,
-      justifyContent: "flex-start",
-    },
-    pointerBubble: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      backgroundColor: c.card,
-      alignItems: "center",
-      justifyContent: "center",
-      ...shadow.md,
+    tooltipCard: {
+      position: "absolute",
+      left: spacing.lg,
+      right: spacing.lg,
+      maxWidth: cardMaxWidth,
       alignSelf: "center",
-    },
-    pointerArrowDown: {
-      width: 0,
-      height: 0,
-      borderLeftWidth: 10,
-      borderRightWidth: 10,
-      borderTopWidth: 12,
-      borderLeftColor: "transparent",
-      borderRightColor: "transparent",
-      borderTopColor: c.card,
-      alignSelf: "center",
-      marginTop: -1,
-    },
-    pointerArrowUp: {
-      width: 0,
-      height: 0,
-      borderLeftWidth: 10,
-      borderRightWidth: 10,
-      borderBottomWidth: 12,
-      borderLeftColor: "transparent",
-      borderRightColor: "transparent",
-      borderBottomColor: c.card,
-      alignSelf: "center",
-      marginBottom: -1,
-    },
-
-    // ── Card ────────────────────────────────────────────────────────────────
-    cardWrapper: {
-      width: "100%",
-      alignItems: "center",
-      paddingHorizontal: spacing.lg,
-    },
-    card: {
-      width: cardMaxWidth,
-      maxWidth: 480,
       backgroundColor: c.card,
       borderRadius: radius.xl,
       padding: spacing.xl,
       alignItems: "center",
       ...shadow.lg,
+      zIndex: 10,
     },
     iconBadge: {
       width: 64,
@@ -421,8 +397,6 @@ function createStyles(c: Colors) {
       justifyContent: "center",
       marginBottom: spacing.md,
     },
-
-    // ── Step counter + dots ─────────────────────────────────────────────────
     stepCounter: {
       fontSize: typography.xs,
       fontWeight: typography.semibold,
@@ -450,8 +424,6 @@ function createStyles(c: Colors) {
     dotDone: {
       backgroundColor: c.success,
     },
-
-    // ── Text ────────────────────────────────────────────────────────────────
     title: {
       fontSize: isTablet ? typography.xl : typography.lg,
       fontWeight: typography.bold,
@@ -469,8 +441,6 @@ function createStyles(c: Colors) {
       marginBottom: spacing.xl,
       paddingHorizontal: spacing.xs,
     },
-
-    // ── Buttons ─────────────────────────────────────────────────────────────
     buttonRow: {
       flexDirection: "row",
       alignItems: "center",

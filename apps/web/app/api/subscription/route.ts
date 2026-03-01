@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
-import { stripe, PRICE_MONTHLY, PRICE_QUARTERLY, PRICE_YEARLY, TRIAL_DAYS } from "@/lib/stripe";
+import { stripe, PRICE_MONTHLY, PRICE_YEARLY, TRIAL_DAYS } from "@/lib/stripe";
 
-const VALID_PRICES = new Set([PRICE_MONTHLY, PRICE_QUARTERLY, PRICE_YEARLY]);
+const VALID_PRICES = new Set([PRICE_MONTHLY, PRICE_YEARLY]);
 
 // ─── GET /api/subscription — return current subscription status ───────────────
 
@@ -14,7 +14,26 @@ export async function GET(request: NextRequest) {
   const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
 
   if (!dbUser?.subscriptionId) {
-    // Check automatic 3-day trial (no Stripe subscription needed)
+    // Check RevenueCat subscription (mobile IAP users)
+    if (dbUser?.rcSubscriptionActive) {
+      return NextResponse.json({
+        status: "active",
+        trialEndsAt: null,
+        currentPeriodEnd: null,
+      });
+    }
+
+    // If no Stripe sub and no RC flag, try RevenueCat REST API as fallback
+    const rcStatus = await checkRevenueCatSubscription(user.id);
+    if (rcStatus === "active" || rcStatus === "trialing") {
+      return NextResponse.json({
+        status: rcStatus,
+        trialEndsAt: null,
+        currentPeriodEnd: null,
+      });
+    }
+
+    // Check automatic 7-day trial (no Stripe subscription needed)
     const trialEnd = dbUser?.trialEndsAt;
     const isTrialing = trialEnd && new Date(trialEnd) > new Date();
     return NextResponse.json({
@@ -151,13 +170,12 @@ async function createResubscription(userId: string, customerId: string, priceId:
 
   // Create a PaymentIntent for immediate charge (no trial this time)
   const amountMap: Record<string, number> = {
-    [PRICE_MONTHLY]: 1199,
-    [PRICE_QUARTERLY]: 2399,
-    [PRICE_YEARLY]: 5999,
+    [PRICE_MONTHLY]: 1299,
+    [PRICE_YEARLY]: 6999,
   };
   const paymentIntent = await stripe.paymentIntents.create({
     customer: customerId,
-    amount: amountMap[priceId] ?? 1199,
+    amount: amountMap[priceId] ?? 1299,
     currency: "usd",
     setup_future_usage: "off_session",
     metadata: { userId, priceId, type: "resubscribe" },
@@ -169,4 +187,47 @@ async function createResubscription(userId: string, customerId: string, priceId:
     customerId,
     isResubscribe: true,
   });
+}
+
+// ─── RevenueCat REST API check ────────────────────────────────────────────────
+
+async function checkRevenueCatSubscription(userId: string): Promise<string | null> {
+  const rcSecret = process.env.REVENUECAT_SECRET_KEY;
+  if (!rcSecret) return null;
+
+  try {
+    const res = await fetch(`https://api.revenuecat.com/v1/subscribers/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${rcSecret}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!res.ok) return null;
+
+    const data = await res.json();
+    const entitlements = data?.subscriber?.entitlements;
+    if (!entitlements?.pro) return null;
+
+    const pro = entitlements.pro;
+    const expiresDate = pro.expires_date ? new Date(pro.expires_date) : null;
+
+    if (expiresDate && expiresDate > new Date()) {
+      // Check if in trial period
+      const productId = pro.product_identifier ?? "";
+      const purchaseDate = pro.purchase_date ? new Date(pro.purchase_date) : null;
+      if (purchaseDate && expiresDate) {
+        // RevenueCat sets period_type in the subscription info
+        const subInfo = data?.subscriber?.subscriptions?.[productId];
+        if (subInfo?.period_type === "trial") {
+          return "trialing";
+        }
+      }
+      return "active";
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
 }

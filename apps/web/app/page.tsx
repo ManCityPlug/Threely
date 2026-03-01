@@ -29,7 +29,7 @@ const FAQ = [
   },
   {
     q: "Is it free?",
-    a: "Threely offers a free 3-day trial so you can experience the full AI coaching loop — no credit card required. After that, choose a plan to keep your daily tasks and insights generating.",
+    a: "Threely offers a free 7-day trial so you can experience the full AI coaching loop. After that, choose a plan to keep your daily tasks and insights generating.",
   },
 ];
 
@@ -457,8 +457,8 @@ export default function LandingPage() {
             marginBottom: "3rem",
           }}>
             {[
-              { step: "01", title: "Tell Threely your goal", desc: "Just describe what you want to achieve — 'Run a 5K in 8 weeks' or 'Launch my app by April.' Threely Intelligence analyzes your goal, identifies key milestones, and builds a structured roadmap around your experience, schedule, and deadline. You don't need a plan. That's our job." },
-              { step: "02", title: "Get 3 expert-level tasks every morning", desc: "Not generic prompts. Each task is crafted by Threely Intelligence using your specific context, yesterday's progress, and your real schedule. It's like having a personal strategist who knows your project inside and out." },
+              { step: "01", title: "Describe what you want to achieve", desc: "\"I want to launch a side project in 3 months. I can spend 30 minutes a day and I'm a beginner at marketing.\" That's all Threely needs. Threely Intelligence breaks it down, identifies the critical path, and builds a personalized roadmap around your experience, timeline, and schedule. You don't need a plan — that's our job." },
+              { step: "02", title: "Wake up to 3 tasks built for today", desc: "Not 'work on marketing.' You'll get things like 'Rewrite your pricing headline to address the ROI objection from yesterday's user interviews.' Every task is crafted by Threely Intelligence — referencing your context, building on previous days, and scoped to fit your exact schedule." },
               { step: "03", title: "Review & watch it evolve", desc: "Rate the difficulty, leave a quick note. Threely Intelligence recalibrates your trajectory and generates tomorrow's plan. Struggling? It eases up. Crushing it? It pushes further. A daily coaching loop that compounds over time." },
             ].map(item => (
               <div key={item.step} style={{
@@ -661,8 +661,8 @@ export default function LandingPage() {
               },
               {
                 icon: "🎯",
-                title: "Multiple Goals, One Plan",
-                desc: "Track fitness, business, learning, and more — all at once. Threely mixes tasks across your goals so nothing falls behind.",
+                title: "All Your Goals, One Daily Plan",
+                desc: "Training for a 5K and launching a side project? Threely blends tasks from every goal into a single daily plan — balanced so each one moves forward without competing for your attention.",
               },
             ].map(f => (
               <div key={f.title} style={{
@@ -698,18 +698,18 @@ export default function LandingPage() {
           {[
             {
               num: "1",
-              title: "Tell Threely Intelligence your goal",
-              desc: "\"I want to launch a side project in 3 months. I can spend 30 minutes a day and I'm a beginner at marketing.\" — That's all we need. Threely Intelligence breaks it down, identifies the critical path, and builds a personalized roadmap around your experience, timeline, and schedule.",
+              title: "Monday: You start fresh",
+              desc: "You told Threely you want to launch a side project. Today's tasks: research 3 competitor pricing pages, outline your landing page, and draft a value prop. Each one fits your 30-minute window — no overwhelm, no guesswork.",
             },
             {
               num: "2",
-              title: "Wake up to a plan that knows your project",
-              desc: "Not 'work on marketing.' You'll get things like 'Rewrite your pricing headline to address the ROI objection from yesterday's user interviews.' Every task references your context, builds on previous days, and fits your exact schedule.",
+              title: "Wednesday: It builds on what you did",
+              desc: "You completed Monday's research but skipped the value prop. Threely noticed. Today's plan picks up where you left off: refine your value prop using the competitor insights you gathered, then write your first headline. Nothing falls through the cracks.",
             },
             {
               num: "3",
-              title: "Review, and watch Threely get smarter",
-              desc: "Rate the difficulty. Leave a quick note. Threely Intelligence generates a coaching insight, recalibrates your trajectory, and builds a sharper plan for tomorrow. The more you use it, the more it understands how you work.",
+              title: "Friday: It knows how you work",
+              desc: "You rated Wednesday as tough and left a note that copywriting feels hard. Threely adjusts — today's tasks break the writing into smaller pieces and include a framework to follow. Same goal, smarter approach. This is what compounding feels like.",
             },
           ].map((item, i) => (
             <div key={item.num} style={{
