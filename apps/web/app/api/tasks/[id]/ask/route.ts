@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
-import { askAboutTask, type TaskResource } from "@/lib/claude";
+import { askAboutTask, type TaskResource, type AskAboutTaskResult } from "@/lib/claude";
 import { getUserAccess } from "@/lib/subscription";
 
 type Params = { params: Promise<{ id: string }> };
@@ -18,6 +18,8 @@ interface TaskItem {
   isRescheduled?: boolean;
   resources?: TaskResource[];
 }
+
+export const maxDuration = 30;
 
 // POST /api/tasks/:id/ask
 // Body: { taskItemId: string, messages: { role: "user"|"assistant", content: string }[] }
@@ -68,7 +70,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       where: { userId: user.id },
     });
 
-    const answer = await askAboutTask({
+    const result = await askAboutTask({
       task: targetTask.task,
       description: targetTask.description,
       why: targetTask.why,
@@ -80,7 +82,7 @@ export async function POST(request: NextRequest, { params }: Params) {
       messages,
     });
 
-    return NextResponse.json({ answer });
+    return NextResponse.json({ answer: result.answer, options: result.options });
   } catch (e) {
     console.error("[POST /api/tasks/:id/ask]", e);
     return NextResponse.json({ error: "Failed to answer question" }, { status: 500 });

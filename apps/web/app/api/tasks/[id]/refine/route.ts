@@ -25,6 +25,8 @@ interface TaskItem {
   resources?: TaskResource[];
 }
 
+export const maxDuration = 30;
+
 // POST /api/tasks/:id/refine
 // Body: { taskItemId: string, userRequest: string }
 // Refines a single task item using AI based on user feedback.

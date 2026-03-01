@@ -5,6 +5,8 @@ import { notifyGoalCreated } from "@/lib/discord";
 import { generateRoadmap } from "@/lib/claude";
 import { getUserAccess } from "@/lib/subscription";
 
+export const maxDuration = 30;
+
 // GET /api/goals — list all active goals for the authenticated user
 export async function GET(request: NextRequest) {
   try {
@@ -40,28 +42,34 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Pro gate
-  const access = await getUserAccess(user.id);
-  if (!access.hasPro) {
-    return NextResponse.json({
-      error: "pro_required",
-      message: "Subscribe to keep your momentum going",
-      trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
-    }, { status: 403 });
-  }
+  const body = await request.json();
+  const { onboarding } = body as { onboarding?: boolean };
 
-  // 3-goal limit
+  // Count existing goals to determine if this is the user's first goal
   const activeGoalCount = await prisma.goal.count({
     where: { userId: user.id, isActive: true },
   });
+
+  // Pro gate — skip during onboarding or if this is the user's very first goal
+  const isFirstGoal = activeGoalCount === 0;
+  if (!onboarding && !isFirstGoal) {
+    const access = await getUserAccess(user.id);
+    if (!access.hasPro) {
+      return NextResponse.json({
+        error: "pro_required",
+        message: "Subscribe to keep your momentum going",
+        trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
+      }, { status: 403 });
+    }
+  }
+
+  // 3-goal limit
   if (activeGoalCount >= 3) {
     return NextResponse.json({
       error: "goal_limit_reached",
       message: "You can have up to 3 active goals. Complete or pause a goal to make room.",
     }, { status: 403 });
   }
-
-  const body = await request.json();
   const { title, description, rawInput, structuredSummary, category, deadline, dailyTimeMinutes, intensityLevel, workDays } = body as {
     title: string;
     description?: string;

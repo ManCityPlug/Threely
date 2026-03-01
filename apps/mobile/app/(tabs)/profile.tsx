@@ -167,7 +167,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { colors, preference, setPreference } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const { register } = useWalkthroughRegistry();
+  const { register, registerScroll } = useWalkthroughRegistry();
 
   const [email, setEmail] = useState("");
   const [memberSince, setMemberSince] = useState("");
@@ -178,7 +178,7 @@ export default function ProfileScreen() {
   const [nickname, setNickname] = useState("");
 
   // Subscription
-  const { isLimitedMode, showBottomSheetPaywall, hasPro } = useSubscription();
+  const { isLimitedMode, showBottomSheetPaywall, hasPro, billingDate } = useSubscription();
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -451,6 +451,7 @@ export default function ProfileScreen() {
     <SwipeNavigator currentIndex={2}>
     <SafeAreaView style={styles.container}>
       <ScrollView
+        ref={r => registerScroll("profile-scroll", r)}
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -721,11 +722,9 @@ export default function ProfileScreen() {
                       if (user) {
                         await AsyncStorage.removeItem(`@threely_tutorial_done_${user.id}`);
                       }
+                      // Set flag BEFORE navigating so Today tab picks it up on focus
+                      await AsyncStorage.setItem("@threely_restart_tutorial", "true");
                       router.push("/(tabs)" as never);
-                      // Small delay so the home tab mounts, then trigger tutorial via flag
-                      setTimeout(async () => {
-                        await AsyncStorage.setItem("@threely_restart_tutorial", "true");
-                      }, 100);
                     },
                   },
                 ]
@@ -755,8 +754,17 @@ export default function ProfileScreen() {
               <Ionicons name="card-outline" size={18} color={colors.success} />
             </View>
             <View style={styles.menuText}>
-              <Text style={styles.menuLabel}>Subscription</Text>
-              <Text style={styles.menuValue}>Manage billing</Text>
+              <Text style={styles.menuLabel}>
+                Subscription{hasPro ? "  " : ""}
+                {hasPro && (
+                  <Text style={{ fontSize: 11, fontWeight: "700", color: colors.primary }}>Pro</Text>
+                )}
+              </Text>
+              <Text style={styles.menuValue}>
+                {hasPro && billingDate
+                  ? `Billing on ${new Date(billingDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
+                  : "Manage billing"}
+              </Text>
             </View>
             <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
           </TouchableOpacity>

@@ -603,7 +603,7 @@ export async function goalChat(messages: GoalChatMessage[]): Promise<GoalChatRes
 CRITICAL — The final goal MUST include ALL of these details. You MUST ask about EVERY area — no exceptions, no skipping:
 1. A SPECIFIC measurable outcome (not vague like "explore" or "improve" — e.g. "land 3 freelance clients" or "run a 5K in under 30 minutes")
 2. Their current starting point / experience level (e.g. "complete beginner", "have 2 years experience", "already have a website")
-3. How much time per day they can dedicate — ALWAYS ask this explicitly with options like "15-30 minutes", "30-60 minutes", "1-2 hours", "2+ hours"
+3. How much time per day they can dedicate — ALWAYS ask this explicitly with options like "15 minutes", "30 minutes", "1 hour", "2 hours"
 4. Their desired pace/intensity — are they going all-in or building slowly? (e.g. "aggressive, maximum effort daily" or "steady, sustainable habit-building")
 5. A realistic deadline/timeline — ALWAYS suggest one yourself based on their goal complexity, daily time, and intensity. For example: "Based on your goal and 30 min/day, I'd recommend about 3 months — that gives you steady progress without burnout." Then offer options like "That sounds perfect", "I want to do it faster (push harder)", "I'd prefer a longer, more relaxed timeline". NEVER ask them to pick a deadline from scratch — YOU are the coach, so recommend what's realistic and let them adjust.
 6. Which days of the week they want to work on this — ALWAYS ask with presets: "Every day", "Weekdays (Mon–Fri)", "Weekends (Sat–Sun)", "Mon, Wed, Fri"
@@ -1166,11 +1166,16 @@ export interface AskAboutTaskInput {
   messages: { role: "user" | "assistant"; content: string }[];
 }
 
+export interface AskAboutTaskResult {
+  answer: string;
+  options: string[];
+}
+
 /**
  * Answer a user's question about a specific task. Multi-turn, ephemeral.
- * Returns plain text answer.
+ * Returns structured { answer, options } with follow-up suggestions.
  */
-export async function askAboutTask(input: AskAboutTaskInput): Promise<string> {
+export async function askAboutTask(input: AskAboutTaskInput): Promise<AskAboutTaskResult> {
   const { task, description, why, resources, goalTitle, goalCategory, goalSummary, intensityLevel, messages } = input;
 
   const intensity = intensityLevel ?? 2;
@@ -1200,7 +1205,14 @@ RULES:
 - YouTube channels must be REAL, well-known. Never fabricate video URLs.
 - Keep answers 2-5 sentences. Concise and helpful.
 - Do NOT modify the task itself. Just answer questions and give advice.
-- If the user wants to change the task, suggest they use the Refine feature instead.`;
+- If the user wants to change the task, suggest they use the Refine feature instead.
+- ALWAYS include 2-4 follow-up option buttons the user can tap. These should be natural next questions or actions related to your answer and the task. The UI already has a separate text input for custom questions, so do NOT include a catch-all "Something else" or "Ask another question" option.
+
+RESPONSE FORMAT — respond with ONLY valid JSON, no markdown:
+{
+  "answer": "Your helpful response text here",
+  "options": ["Follow-up option 1", "Follow-up option 2", "Follow-up option 3"]
+}`;
 
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
@@ -1213,7 +1225,29 @@ RULES:
   const content = message.content[0];
   if (content.type !== "text") throw new Error("Unexpected response from Claude");
 
-  return content.text.trim();
+  const raw = content.text.replace(/```json?\n?|```/g, "").trim();
+  let parsed: AskAboutTaskResult;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch {
+        // Fallback: treat entire response as plain text answer
+        return { answer: content.text.trim(), options: [] };
+      }
+    } else {
+      // Fallback: treat entire response as plain text answer
+      return { answer: content.text.trim(), options: [] };
+    }
+  }
+
+  return {
+    answer: parsed.answer ?? content.text.trim(),
+    options: Array.isArray(parsed.options) ? parsed.options : [],
+  };
 }
 
 // ─── generateWeeklySummary ───────────────────────────────────────────────────

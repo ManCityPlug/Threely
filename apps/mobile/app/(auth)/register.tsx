@@ -17,7 +17,6 @@ import { Link } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "@/lib/supabase";
-import { goBackToWelcome } from "@/app/_layout";
 import { spacing, typography, radius } from "@/constants/theme";
 import {
   useGoogleSignIn,
@@ -115,11 +114,6 @@ export default function RegisterScreen() {
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        {/* Back to welcome */}
-        <Pressable style={styles.backButton} onPress={goBackToWelcome}>
-          <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
-        </Pressable>
-
         <ScrollView
           contentContainerStyle={styles.inner}
           keyboardShouldPersistTaps="handled"

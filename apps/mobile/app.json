@@ -42,8 +42,7 @@
           "color": "#635BFF",
           "sounds": []
         }
-      ],
-      "react-native-purchases"
+      ]
     ],
     "experiments": {
       "typedRoutes": true

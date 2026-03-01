@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, type RefObject } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import type { Goal } from "@/lib/api";
@@ -26,6 +26,7 @@ interface GoalCardProps {
   onPress?: () => void;
   onViewTasks?: () => void;
   onMenu?: () => void;
+  menuRef?: (ref: View | null) => void;
   lifetimeCompletionPct?: number;
   isPaused?: boolean;
 }
@@ -37,7 +38,7 @@ function getStatusText(completedToday: number, totalToday: number): { text: stri
   return { text: "In progress", color: "warning" };
 }
 
-export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, onViewTasks, onMenu, lifetimeCompletionPct, isPaused }: GoalCardProps) {
+export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, onViewTasks, onMenu, menuRef, lifetimeCompletionPct, isPaused }: GoalCardProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -116,14 +117,16 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
           <ProgressRing percentage={ringPct} size={36} />
         )}
         {onMenu && (
-          <TouchableOpacity
-            onPress={(e) => { e.stopPropagation(); onMenu(); }}
-            activeOpacity={0.6}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            style={styles.menuBtn}
-          >
-            <Ionicons name="ellipsis-horizontal" size={18} color={colors.textTertiary} />
-          </TouchableOpacity>
+          <View ref={menuRef} collapsable={false}>
+            <TouchableOpacity
+              onPress={(e) => { e.stopPropagation(); onMenu(); }}
+              activeOpacity={0.6}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              style={styles.menuBtn}
+            >
+              <Ionicons name="ellipsis-horizontal" size={18} color={colors.textTertiary} />
+            </TouchableOpacity>
+          </View>
         )}
       </View>
 

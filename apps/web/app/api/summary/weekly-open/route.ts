@@ -4,6 +4,8 @@ import { getUserFromRequest } from "@/lib/supabase";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { getUserAccess } from "@/lib/subscription";
 
+export const maxDuration = 30;
+
 interface TaskItem {
   isCompleted: boolean;
   isSkipped?: boolean;

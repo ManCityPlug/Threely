@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserFromRequest } from "@/lib/supabase";
 import { parseGoal } from "@/lib/claude";
 import { getUserAccess } from "@/lib/subscription";
+import { prisma } from "@/lib/prisma";
+
+// Allow up to 30 seconds for Claude API calls
+export const maxDuration = 30;
 
 // POST /api/goals/parse
 // Body: { rawInput: string }
@@ -10,14 +14,17 @@ export async function POST(request: NextRequest) {
   const user = await getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Pro gate
-  const access = await getUserAccess(user.id);
-  if (!access.hasPro) {
-    return NextResponse.json({
-      error: "pro_required",
-      message: "Subscribe to keep your momentum going",
-      trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
-    }, { status: 403 });
+  // Pro gate — allow first goal free
+  const goalCount = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
+  if (goalCount > 0) {
+    const access = await getUserAccess(user.id);
+    if (!access.hasPro) {
+      return NextResponse.json({
+        error: "pro_required",
+        message: "Subscribe to keep your momentum going",
+        trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
+      }, { status: 403 });
+    }
   }
 
   const { checkRateLimit } = await import("@/lib/rate-limit");

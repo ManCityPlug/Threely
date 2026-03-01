@@ -16,7 +16,7 @@ import * as Haptics from "expo-haptics";
 import { useTheme } from "@/lib/theme";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
-import { useWalkthroughRegistry, type WalkthroughTarget, type TargetLayout } from "@/lib/walkthrough-registry";
+import { useWalkthroughRegistry, type TargetLayout } from "@/lib/walkthrough-registry";
 
 const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
 const SPOTLIGHT_PAD = 10;
@@ -47,7 +47,7 @@ const STEPS: TutorialStep[] = [
       "Finished all your tasks? Tap here to generate more. You get one extra set per goal each day.",
     target: "get-more-button",
     tabRoute: "/(tabs)",
-    tooltipPosition: "above",
+    tooltipPosition: "below",
     icon: "add-circle",
   },
   {
@@ -100,7 +100,7 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const { measure } = useWalkthroughRegistry();
+  const { measureWithRetry, scrollTargetIntoView, scrollToTop, scrollToOffset } = useWalkthroughRegistry();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [currentStep, setCurrentStep] = useState(0);
@@ -149,24 +149,54 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
     return () => loop.stop();
   }, [visible]);
 
+  // Map targets to their parent scroll containers
+  const TARGET_SCROLL_MAP: Record<string, string> = {
+    "first-task-card": "today-scroll",
+    "get-more-button": "today-scroll",
+    "first-goal-card": "goals-scroll",
+    "goal-menu-button": "goals-scroll",
+    "profile-stats": "profile-scroll",
+  };
+
   const measureAndAnimate = useCallback(async (stepIdx: number) => {
     const s = STEPS[stepIdx];
     if (s.target) {
-      // Navigate first, wait for render
+      // Navigate first
       if (s.tabRoute) {
         router.navigate(s.tabRoute as never);
       }
+      // Wait for tab to mount and render
       await new Promise((r) => setTimeout(r, 400));
 
-      const layout = await measure(s.target);
+      // Scroll target into view if we know its scroll container
+      const scrollKey = TARGET_SCROLL_MAP[s.target];
+      if (scrollKey) {
+        if (s.target === "first-task-card") {
+          // Scroll past the greeting header so the first task card appears
+          // near the top of the screen, leaving room for the tooltip below
+          await scrollToOffset(scrollKey, 280);
+        } else if (s.target === "get-more-button") {
+          // Get-more button is above task cards — scroll to top
+          await scrollToTop(scrollKey);
+        } else if (s.target === "profile-stats") {
+          // For profile stats, scroll down a bit so the stats section is
+          // centered and the tooltip can appear below without overlap
+          await scrollToOffset(scrollKey, 100);
+        } else {
+          await scrollTargetIntoView(s.target, scrollKey);
+        }
+      }
+
+      // Measure with retries (handles slow renders)
+      const layout = await measureWithRetry(s.target, 8, 200);
       setTargetLayout(layout);
 
       if (layout) {
         Animated.parallel([
-          Animated.timing(spotlightTop, { toValue: layout.y - SPOTLIGHT_PAD, duration: 350, useNativeDriver: false }),
-          Animated.timing(spotlightLeft, { toValue: layout.x - SPOTLIGHT_PAD, duration: 350, useNativeDriver: false }),
-          Animated.timing(spotlightWidth, { toValue: layout.width + SPOTLIGHT_PAD * 2, duration: 350, useNativeDriver: false }),
-          Animated.timing(spotlightHeight, { toValue: layout.height + SPOTLIGHT_PAD * 2, duration: 350, useNativeDriver: false }),
+          Animated.timing(spotlightTop, { toValue: layout.y - SPOTLIGHT_PAD, duration: 300, useNativeDriver: false }),
+          Animated.timing(spotlightLeft, { toValue: layout.x - SPOTLIGHT_PAD, duration: 300, useNativeDriver: false }),
+          Animated.timing(spotlightWidth, { toValue: layout.width + SPOTLIGHT_PAD * 2, duration: 300, useNativeDriver: false }),
+          Animated.timing(spotlightHeight, { toValue: layout.height + SPOTLIGHT_PAD * 2, duration: 300, useNativeDriver: false }),
         ]).start();
       }
     } else {
@@ -177,10 +207,10 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
     cardFade.setValue(0);
     cardTranslateY.setValue(20);
     Animated.parallel([
-      Animated.timing(cardFade, { toValue: 1, duration: 280, useNativeDriver: true }),
+      Animated.timing(cardFade, { toValue: 1, duration: 250, useNativeDriver: true }),
       Animated.spring(cardTranslateY, { toValue: 0, friction: 8, tension: 65, useNativeDriver: true }),
     ]).start();
-  }, [measure, router, spotlightTop, spotlightLeft, spotlightWidth, spotlightHeight, cardFade, cardTranslateY]);
+  }, [measureWithRetry, scrollTargetIntoView, scrollToTop, scrollToOffset, router, spotlightTop, spotlightLeft, spotlightWidth, spotlightHeight, cardFade, cardTranslateY]);
 
   const animateCardOut = useCallback((onDone: () => void) => {
     Animated.parallel([
@@ -218,17 +248,35 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
   const isLastStep = currentStep === TOTAL_STEPS - 1;
   const hasTarget = step.target !== null && targetLayout !== null;
 
-  // Calculate tooltip position
+  // Tab bar height (approximate)
+  const TAB_BAR_HEIGHT = 80;
+  // Estimated tooltip card height
+  const TOOLTIP_HEIGHT = 240;
+
+  // Calculate tooltip position — ensure it doesn't overlap the spotlight or hide the tab bar
   let tooltipTop = SCREEN_H / 2 - 100;
   if (hasTarget && targetLayout) {
-    if (step.tooltipPosition === "below") {
-      tooltipTop = targetLayout.y + targetLayout.height + SPOTLIGHT_PAD + 16;
-    } else if (step.tooltipPosition === "above") {
-      tooltipTop = targetLayout.y - SPOTLIGHT_PAD - 220;
+    const spotlightBottom = targetLayout.y + targetLayout.height + SPOTLIGHT_PAD;
+    const spotlightTop = targetLayout.y - SPOTLIGHT_PAD;
+    const spaceBelow = SCREEN_H - TAB_BAR_HEIGHT - spotlightBottom;
+    const spaceAbove = spotlightTop - insets.top;
+
+    if (step.tooltipPosition === "below" && spaceBelow >= TOOLTIP_HEIGHT) {
+      // Enough space below — place below spotlight
+      tooltipTop = spotlightBottom + 16;
+    } else if (step.tooltipPosition === "above" && spaceAbove >= TOOLTIP_HEIGHT) {
+      // Enough space above — place above spotlight
+      tooltipTop = spotlightTop - TOOLTIP_HEIGHT - 8;
+    } else if (spaceBelow >= spaceAbove) {
+      // More space below, even if tight
+      tooltipTop = spotlightBottom + 12;
+    } else {
+      // More space above
+      tooltipTop = Math.max(insets.top + 8, spotlightTop - TOOLTIP_HEIGHT - 8);
     }
   }
-  // Clamp to screen bounds
-  tooltipTop = Math.max(insets.top + 16, Math.min(tooltipTop, SCREEN_H - insets.bottom - 260));
+  // Clamp: don't go above safe area, don't overlap tab bar
+  tooltipTop = Math.max(insets.top + 8, Math.min(tooltipTop, SCREEN_H - TAB_BAR_HEIGHT - TOOLTIP_HEIGHT));
 
   return (
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent>

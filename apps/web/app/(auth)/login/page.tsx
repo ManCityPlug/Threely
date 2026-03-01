@@ -93,15 +93,16 @@ function LoginPageInner() {
     const supabase = getSupabase();
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
-    setLoading(false);
     if (authError) {
+      setLoading(false);
       setError(authError.message);
       return;
     }
-    if (data.user) {
+    if (data.session && data.user) {
       // Fast path: localStorage knows they're onboarded
       if (isOnboarded(data.user.id)) {
-        router.replace("/dashboard");
+        // Full page load ensures cookies are synced with middleware
+        window.location.href = "/dashboard";
         return;
       }
       // Slow path: check DB for existing profile
@@ -109,13 +110,17 @@ function LoginPageInner() {
         const { profile } = await profileApi.get();
         if (profile) {
           markOnboarded(data.user.id);
-          router.replace("/dashboard");
-        } else {
-          router.replace("/onboarding");
         }
+        // Returning user on login page — always go to dashboard
+        // (layout will redirect to onboarding if truly needed)
+        window.location.href = "/dashboard";
       } catch {
-        router.replace("/onboarding");
+        // Even on error, try dashboard — layout handles the auth gate
+        window.location.href = "/dashboard";
       }
+    } else {
+      setLoading(false);
+      setError("Sign-in failed. Please try again.");
     }
   }
 

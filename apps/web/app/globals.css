@@ -1004,7 +1004,7 @@ input, textarea, select {
   border-radius: 12px;
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
   z-index: 10000;
-  transition: all 0.4s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   pointer-events: none;
 }
 .spotlight-tooltip {
@@ -1016,7 +1016,7 @@ input, textarea, select {
   max-width: 340px;
   width: calc(100vw - 2rem);
   box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  transition: all 0.4s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .spotlight-tooltip-title {
   font-size: 1.1rem;
@@ -1079,7 +1079,7 @@ input, textarea, select {
   z-index: 10000;
   pointer-events: none;
   animation: spotlightPulse 2s ease-in-out infinite;
-  transition: all 0.4s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 @keyframes spotlightPulse {
   0%, 100% { opacity: 0.4; transform: scale(1); }

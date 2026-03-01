@@ -3,6 +3,8 @@ import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
 import { checkRateLimit } from "@/lib/rate-limit";
 
+export const maxDuration = 30;
+
 interface TaskItem {
   isCompleted: boolean;
   isSkipped?: boolean;

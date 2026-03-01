@@ -11,6 +11,7 @@ interface SubscriptionContextValue {
   walkthroughActive: boolean;
   loaded: boolean;
   paywallType: PaywallType;
+  billingDate: string | null;
   showFullScreenPaywall: () => void;
   showBottomSheetPaywall: () => void;
   dismissPaywall: () => void;
@@ -24,6 +25,7 @@ const SubscriptionContext = createContext<SubscriptionContextValue>({
   walkthroughActive: false,
   loaded: false,
   paywallType: null,
+  billingDate: null,
   showFullScreenPaywall: () => {},
   showBottomSheetPaywall: () => {},
   dismissPaywall: () => {},
@@ -45,6 +47,7 @@ export function SubscriptionProvider({ userId, children }: SubscriptionProviderP
   const [loaded, setLoaded] = useState(false);
   const [walkthroughActive, setWalkthroughActiveState] = useState(false);
   const [paywallType, setPaywallType] = useState<PaywallType>(null);
+  const [billingDate, setBillingDate] = useState<string | null>(null);
 
   const checkSubscription = useCallback(async () => {
     if (!userId) return;
@@ -74,9 +77,12 @@ export function SubscriptionProvider({ userId, children }: SubscriptionProviderP
 
       // 3. Fallback: backend check
       try {
-        const { status } = await subscriptionApi.status();
-        if (status === "trialing" || status === "active") {
-          await AsyncStorage.setItem("@threely_subscription_status", status);
+        const subRes = await subscriptionApi.status();
+        if (subRes.status === "trialing" || subRes.status === "active") {
+          await AsyncStorage.setItem("@threely_subscription_status", subRes.status);
+          // Store billing date: trialEndsAt for free period, currentPeriodEnd for paid
+          const bDate = subRes.status === "trialing" ? subRes.trialEndsAt : subRes.currentPeriodEnd;
+          if (bDate) setBillingDate(bDate);
           setHasPro(true);
           setLoaded(true);
           return;
@@ -117,6 +123,7 @@ export function SubscriptionProvider({ userId, children }: SubscriptionProviderP
         walkthroughActive,
         loaded,
         paywallType,
+        billingDate,
         showFullScreenPaywall,
         showBottomSheetPaywall,
         dismissPaywall,

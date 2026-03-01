@@ -40,7 +40,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
-    return () => subscription.unsubscribe();
+    // Refresh session when tab gains focus — keeps user logged in
+    function onFocus() {
+      supabase.auth.refreshSession().catch(() => {});
+    }
+    window.addEventListener("focus", onFocus);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener("focus", onFocus);
+    };
   }, []);
 
   async function signOut() {

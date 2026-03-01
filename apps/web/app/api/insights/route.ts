@@ -4,6 +4,8 @@ import { getUserFromRequest } from "@/lib/supabase";
 import { generateInsight, updateCoachingContext, type CoachingContext } from "@/lib/claude";
 import { getUserAccess } from "@/lib/subscription";
 
+export const maxDuration = 30;
+
 // POST /api/insights
 // Body: { dailyTaskId: string }
 // Generates a coach insight based on today's review + recent history.

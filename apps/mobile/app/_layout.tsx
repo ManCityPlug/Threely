@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Image, Linking, LogBox, Modal, Platform, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, AppState, Image, Linking, LogBox, Modal, Platform, Text, TouchableOpacity, View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 
 // Keep native splash visible until we're ready
@@ -14,6 +14,7 @@ LogBox.ignoreLogs([
   "Request failed",
   "Invalid Refresh Token",
   "AuthApiError",
+  "No native splash screen",
 ]);
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -21,8 +22,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Session } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
-// TODO: Uncomment for production builds — not supported in Expo Go
-// import * as Clarity from "@microsoft/react-native-clarity";
+import * as Clarity from "@microsoft/react-native-clarity";
 import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
@@ -47,8 +47,7 @@ if (Platform.OS !== "web") {
     }),
   });
 
-  // TODO: Uncomment for production builds — not supported in Expo Go
-  // Clarity.initialize("vm4n4qax20");
+  Clarity.initialize("vm4n4qax20");
 }
 
 // ── Forced-update helpers ─────────────────────────────────────────────────────
@@ -66,11 +65,8 @@ function isVersionLessThan(current: string, minimum: string): boolean {
   return false;
 }
 
-// Allow auth screens to navigate back to the welcome flow
-let _goBackToWelcome: (() => void) | null = null;
-export function goBackToWelcome() {
-  _goBackToWelcome?.();
-}
+// Kept as no-op export for import compatibility
+export function goBackToWelcome() {}
 
 function BrandedSplash() {
   useEffect(() => {
@@ -100,21 +96,9 @@ function AppContent() {
   const [ready, setReady] = useState(false);
   const [welcomeDone, setWelcomeDone] = useState(false);
   const [authOverlay, setAuthOverlay] = useState(false);
-  const [welcomeInitialPage, setWelcomeInitialPage] = useState(0);
   const [updateRequired, setUpdateRequired] = useState(false);
   const pendingDestination = useRef<"register" | "login" | null>(null);
   const routingResolved = useRef(false);
-
-  // Register the "go back to welcome" callback for auth screens
-  useEffect(() => {
-    _goBackToWelcome = () => {
-      setWelcomeDone(false);
-      setWelcomeInitialPage(3); // Return to auth page
-      pendingDestination.current = null;
-      setAuthOverlay(false);
-    };
-    return () => { _goBackToWelcome = null; };
-  }, []);
 
   // Listen for notification responses (deep links)
   useEffect(() => {
@@ -181,13 +165,34 @@ function AppContent() {
         setSession(session);
       }
     );
-    return () => authListener.subscription.unsubscribe();
+
+    // Refresh session when app comes to foreground — keeps the user
+    // logged in for up to 60 days of activity (each foreground resets the timer)
+    const appStateSub = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        supabase.auth.refreshSession().catch(() => {});
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+      appStateSub.remove();
+    };
   }, []);
 
-  // Reset routing when session changes (login/logout)
+  // Reset routing on actual login/logout transitions (not token refreshes)
+  const prevSessionExists = useRef<boolean | undefined>(undefined);
   useEffect(() => {
-    routingResolved.current = false;
-    setReady(false);
+    const exists = session != null;
+    if (prevSessionExists.current !== undefined && prevSessionExists.current !== exists) {
+      routingResolved.current = false;
+      setReady(false);
+      // On logout, reset welcomeDone so carousel shows again
+      if (!exists) {
+        setWelcomeDone(false);
+      }
+    }
+    prevSessionExists.current = exists;
   }, [session]);
 
   useEffect(() => {
@@ -219,6 +224,9 @@ function AppContent() {
           return;
         }
       }
+
+      // Not logged in and haven't completed welcome — show carousel
+      // (carousel is rendered by the JSX check below, just mark ready)
       setReady(true);
       return;
     }
@@ -270,6 +278,13 @@ function AppContent() {
       routingResolved.current = true;
       if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
       setReady(true);
+    }).catch(() => {
+      // AsyncStorage failure — don't leave the user stuck on the splash screen
+      if (!routingResolved.current) {
+        routingResolved.current = true;
+        router.replace("/(tabs)");
+        setReady(true);
+      }
     });
   }, [session, segments, welcomeDone]);
 
@@ -282,14 +297,14 @@ function AppContent() {
     );
   }
 
-  // Not logged in — show welcome flow, then transition to auth Stack
+  // Not logged in — always show welcome carousel until they pick sign up/login
   if (!session && !welcomeDone) {
     // Hide native splash before showing welcome screen
     SplashScreen.hideAsync().catch(() => {});
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <StatusBar style="light" />
-        <WelcomeScreen onComplete={handleWelcomeComplete} initialPage={welcomeInitialPage} />
+        <WelcomeScreen onComplete={handleWelcomeComplete} />
       </GestureHandlerRootView>
     );
   }

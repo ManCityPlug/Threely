@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import {
   Pressable,
 } from "react-native";
 import * as Haptics from "expo-haptics";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { TaskItem } from "@/lib/api";
 import { useTheme } from "@/lib/theme";
 import type { Colors } from "@/constants/theme";
@@ -35,11 +36,16 @@ interface AskMessage {
   content: string;
 }
 
+interface AskResult {
+  answer: string;
+  options: string[];
+}
+
 interface TaskCardProps {
   task: TaskItem;
   onToggle: (isCompleted: boolean) => void;
   onRefine?: (userRequest: string) => Promise<void>;
-  onAsk?: (messages: AskMessage[]) => Promise<string>;
+  onAsk?: (messages: AskMessage[]) => Promise<AskResult>;
   readonly?: boolean;
 }
 
@@ -47,11 +53,6 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false }: 
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [modalVisible, setModalVisible] = useState(false);
-
-  // Refine (AI) mode state
-  const [refineMode, setRefineMode] = useState(false);
-  const [refineInput, setRefineInput] = useState("");
-  const [refineLoading, setRefineLoading] = useState(false);
 
   const strikeAnim = useRef(new Animated.Value(task.isCompleted ? 1 : 0)).current;
   const checkScaleAnim = useRef(new Animated.Value(1)).current;
@@ -192,16 +193,10 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false }: 
           colors={colors}
           styles={styles}
           readonly={readonly}
-          onClose={() => { setModalVisible(false); setRefineMode(false); setRefineInput(""); }}
+          onClose={() => setModalVisible(false)}
           onCheckPress={() => { handleCheckPress(); setModalVisible(false); }}
           onRefine={onRefine}
           onAsk={onAsk}
-          refineMode={refineMode}
-          setRefineMode={setRefineMode}
-          refineInput={refineInput}
-          setRefineInput={setRefineInput}
-          refineLoading={refineLoading}
-          setRefineLoading={setRefineLoading}
         />
       )}
     </>
@@ -215,7 +210,6 @@ const DISMISS_THRESHOLD = 120;
 function TaskDetailModal({
   visible, task, taskTitle, colors, styles, readonly,
   onClose, onCheckPress, onRefine, onAsk,
-  refineMode, setRefineMode, refineInput, setRefineInput, refineLoading, setRefineLoading,
 }: {
   visible: boolean;
   task: TaskItem;
@@ -227,19 +221,10 @@ function TaskDetailModal({
   onCheckPress: () => void;
   onRefine?: (userRequest: string) => Promise<void>;
   onAsk?: (messages: AskMessage[]) => Promise<string>;
-  refineMode: boolean;
-  setRefineMode: (v: boolean) => void;
-  refineInput: string;
-  setRefineInput: (v: string) => void;
-  refineLoading: boolean;
-  setRefineLoading: (v: boolean) => void;
 }) {
-  // Ask mode state
-  const [askMode, setAskMode] = useState(false);
-  const [askMessages, setAskMessages] = useState<AskMessage[]>([]);
-  const [askInput, setAskInput] = useState("");
-  const [askLoading, setAskLoading] = useState(false);
-  const askScrollRef = useRef<ScrollView>(null);
+  // Full-screen chat modals
+  const [askModalOpen, setAskModalOpen] = useState(false);
+  const [refineModalOpen, setRefineModalOpen] = useState(false);
 
   const translateY = useRef(new Animated.Value(0)).current;
   const overlayOpacity = useRef(new Animated.Value(1)).current;
@@ -271,8 +256,6 @@ function TaskDetailModal({
     })
   ).current;
 
-  const inputRef = useRef<TextInput>(null);
-
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <KeyboardAvoidingView style={{ flex: 1, justifyContent: "flex-end" }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}>
@@ -283,7 +266,6 @@ function TaskDetailModal({
         <Animated.View
           style={[
             styles.modalSheet,
-            refineMode && styles.modalSheetExpanded,
             { transform: [{ translateY }] },
           ]}
           {...panResponder.panHandlers}
@@ -316,12 +298,12 @@ function TaskDetailModal({
             </Text>
 
             {/* AI action buttons — prominent, right after title */}
-            {!readonly && !refineMode && !askMode && (onRefine || onAsk) && (
+            {!readonly && (onRefine || onAsk) && (
               <View style={styles.modalActionRow}>
                 {onAsk && (
                   <TouchableOpacity
                     style={styles.modalActionBtn}
-                    onPress={() => setAskMode(true)}
+                    onPress={() => setAskModalOpen(true)}
                     activeOpacity={0.7}
                   >
                     <Text style={styles.intelligenceActionIcon}>✦</Text>
@@ -331,7 +313,7 @@ function TaskDetailModal({
                 {onRefine && (
                   <TouchableOpacity
                     style={styles.modalActionBtn}
-                    onPress={() => setRefineMode(true)}
+                    onPress={() => setRefineModalOpen(true)}
                     activeOpacity={0.7}
                   >
                     <Text style={styles.intelligenceActionIcon}>✦</Text>
@@ -374,157 +356,6 @@ function TaskDetailModal({
             ) : null}
           </ScrollView>
 
-          {/* Threely Intelligence — AI refine, pinned below ScrollView */}
-          {refineMode && onRefine && (
-            <View style={styles.refineSection}>
-              <View style={styles.intelligenceHeader}>
-                <Text style={styles.intelligenceIcon}>✦</Text>
-                <Text style={styles.intelligenceTitle}>Threely Intelligence</Text>
-              </View>
-              <TextInput
-                ref={inputRef}
-                style={styles.refineInput}
-                value={refineInput}
-                onChangeText={setRefineInput}
-                placeholder='e.g. "Make it easier" or "Add more detail"'
-                placeholderTextColor={colors.textTertiary}
-                multiline
-                autoFocus
-                editable={!refineLoading}
-              />
-              <View style={styles.editActions}>
-                <TouchableOpacity
-                  style={styles.editCancelBtn}
-                  onPress={() => { setRefineMode(false); setRefineInput(""); }}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.editCancelText}>Cancel</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.editSaveBtn, (!refineInput.trim() || refineLoading) && { opacity: 0.5 }]}
-                  onPress={async () => {
-                    if (!refineInput.trim() || refineLoading) return;
-                    setRefineLoading(true);
-                    try {
-                      await onRefine(refineInput.trim());
-                      setRefineMode(false);
-                      setRefineInput("");
-                      onClose();
-                    } catch {
-                      // handled by parent
-                    } finally {
-                      setRefineLoading(false);
-                    }
-                  }}
-                  activeOpacity={0.85}
-                  disabled={!refineInput.trim() || refineLoading}
-                >
-                  {refineLoading ? (
-                    <ActivityIndicator color="#fff" size="small" />
-                  ) : (
-                    <Text style={styles.editSaveText}>Send</Text>
-                  )}
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-
-          {/* Ask mode — chat UI */}
-          {askMode && onAsk && (
-            <View style={styles.refineSection}>
-              <View style={styles.intelligenceHeader}>
-                <Text style={styles.intelligenceIcon}>✦</Text>
-                <Text style={styles.intelligenceTitle}>Ask Threely Intelligence</Text>
-              </View>
-
-              {askMessages.length > 0 && (
-                <ScrollView
-                  ref={askScrollRef}
-                  style={styles.askChatScroll}
-                  onContentSizeChange={() => askScrollRef.current?.scrollToEnd({ animated: true })}
-                >
-                  {askMessages.map((msg, i) => (
-                    <View
-                      key={i}
-                      style={[
-                        styles.askBubble,
-                        msg.role === "user" ? styles.askBubbleUser : styles.askBubbleAI,
-                      ]}
-                    >
-                      <Text style={[
-                        styles.askBubbleText,
-                        msg.role === "user" ? styles.askBubbleTextUser : styles.askBubbleTextAI,
-                      ]}>{msg.content}</Text>
-                    </View>
-                  ))}
-                  {askLoading && (
-                    <View style={[styles.askBubble, styles.askBubbleAI]}>
-                      <ActivityIndicator size="small" color={colors.primary} />
-                    </View>
-                  )}
-                </ScrollView>
-              )}
-
-              <View style={styles.askInputRow}>
-                <TextInput
-                  style={styles.askInput}
-                  value={askInput}
-                  onChangeText={setAskInput}
-                  placeholder="Ask a question..."
-                  placeholderTextColor={colors.textTertiary}
-                  editable={!askLoading}
-                  onSubmitEditing={async () => {
-                    if (!askInput.trim() || askLoading) return;
-                    const userMsg: AskMessage = { role: "user", content: askInput.trim() };
-                    const newMessages = [...askMessages, userMsg];
-                    setAskMessages(newMessages);
-                    setAskInput("");
-                    setAskLoading(true);
-                    try {
-                      const answer = await onAsk(newMessages);
-                      setAskMessages(prev => [...prev, { role: "assistant", content: answer }]);
-                    } catch {
-                      setAskMessages(prev => [...prev, { role: "assistant", content: "Something went wrong. Try again." }]);
-                    } finally {
-                      setAskLoading(false);
-                    }
-                  }}
-                />
-                <TouchableOpacity
-                  style={[styles.askSendBtn, (!askInput.trim() || askLoading) && { opacity: 0.5 }]}
-                  onPress={async () => {
-                    if (!askInput.trim() || askLoading) return;
-                    const userMsg: AskMessage = { role: "user", content: askInput.trim() };
-                    const newMessages = [...askMessages, userMsg];
-                    setAskMessages(newMessages);
-                    setAskInput("");
-                    setAskLoading(true);
-                    try {
-                      const answer = await onAsk(newMessages);
-                      setAskMessages(prev => [...prev, { role: "assistant", content: answer }]);
-                    } catch {
-                      setAskMessages(prev => [...prev, { role: "assistant", content: "Something went wrong. Try again." }]);
-                    } finally {
-                      setAskLoading(false);
-                    }
-                  }}
-                  disabled={!askInput.trim() || askLoading}
-                  activeOpacity={0.85}
-                >
-                  <Text style={styles.askSendBtnText}>Send</Text>
-                </TouchableOpacity>
-              </View>
-
-              <TouchableOpacity
-                style={styles.editCancelBtn}
-                onPress={() => { setAskMode(false); setAskMessages([]); setAskInput(""); }}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.editCancelText}>Close chat</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-
           {/* Check off button / completed badge */}
           {readonly ? (
             task.isCompleted ? (
@@ -532,7 +363,7 @@ function TaskDetailModal({
                 <Text style={styles.modalCompletedBadgeText}>✓  Completed</Text>
               </View>
             ) : null
-          ) : !refineMode ? (
+          ) : (
             <TouchableOpacity
               style={[styles.modalCheckBtn, task.isCompleted && styles.modalCheckBtnDone]}
               onPress={onCheckPress}
@@ -542,8 +373,302 @@ function TaskDetailModal({
                 {task.isCompleted ? "Mark as incomplete" : "Mark as complete"}
               </Text>
             </TouchableOpacity>
-          ) : null}
+          )}
         </Animated.View>
+      </KeyboardAvoidingView>
+
+      {/* Full-screen Ask AI modal */}
+      {askModalOpen && onAsk && (
+        <AskChatModal
+          visible={askModalOpen}
+          taskTitle={taskTitle}
+          colors={colors}
+          onAsk={onAsk}
+          onClose={() => setAskModalOpen(false)}
+        />
+      )}
+
+      {/* Full-screen Refine modal */}
+      {refineModalOpen && onRefine && (
+        <RefineChatModal
+          visible={refineModalOpen}
+          taskTitle={taskTitle}
+          colors={colors}
+          onRefine={onRefine}
+          onClose={() => { setRefineModalOpen(false); onClose(); }}
+        />
+      )}
+    </Modal>
+  );
+}
+
+// ─── Full-screen Ask AI chat modal ────────────────────────────────────────────
+
+function AskChatModal({
+  visible, taskTitle, colors, onAsk, onClose,
+}: {
+  visible: boolean;
+  taskTitle: string;
+  colors: Colors;
+  onAsk: (messages: AskMessage[]) => Promise<AskResult>;
+  onClose: () => void;
+}) {
+  const insets = useSafeAreaInsets();
+  const [messages, setMessages] = useState<AskMessage[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [options, setOptions] = useState<string[]>([]);
+  const scrollRef = useRef<ScrollView>(null);
+  const chatStyles = useMemo(() => createChatStyles(colors), [colors]);
+
+  const sendMessage = useCallback(async (messageText?: string) => {
+    const text = messageText ?? input.trim();
+    if (!text || loading) return;
+    const userMsg: AskMessage = { role: "user", content: text };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setInput("");
+    setOptions([]);
+    setLoading(true);
+    try {
+      const result = await onAsk(newMessages);
+      setMessages(prev => [...prev, { role: "assistant", content: result.answer }]);
+      setOptions(result.options ?? []);
+    } catch {
+      setMessages(prev => [...prev, { role: "assistant", content: "Something went wrong. Try again." }]);
+      setOptions([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [input, loading, messages, onAsk]);
+
+  const handleSubmit = useCallback(() => sendMessage(), [sendMessage]);
+
+  return (
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+      <KeyboardAvoidingView
+        style={chatStyles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        {/* Header with safe area */}
+        <View style={[chatStyles.headerBlock, { paddingTop: insets.top }]}>
+          <View style={chatStyles.header}>
+            <View style={{ width: 32 }} />
+            <View style={chatStyles.headerCenter}>
+              <Text style={chatStyles.headerIcon}>✦</Text>
+              <Text style={chatStyles.headerTitle}>Ask Threely</Text>
+            </View>
+            <TouchableOpacity onPress={onClose} hitSlop={12} activeOpacity={0.7} style={chatStyles.closeBtn}>
+              <Text style={chatStyles.closeBtnText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Messages */}
+        <ScrollView
+          ref={scrollRef}
+          style={chatStyles.messageList}
+          contentContainerStyle={chatStyles.messageListContent}
+          onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+        >
+          {messages.length === 0 && (
+            <View style={chatStyles.emptyState}>
+              <Text style={chatStyles.emptyIcon}>✦</Text>
+              <Text style={chatStyles.emptyTitle}>Ask anything about this task</Text>
+              <Text style={chatStyles.emptySubtitle}>
+                Get tips, clarification, alternative approaches, or help getting started.
+              </Text>
+            </View>
+          )}
+
+          {/* Initial suggestion chips */}
+          {messages.length === 0 && (
+            <View style={chatStyles.suggestionRow}>
+              {["How do I start?", "Break it down", "Tips & resources", "Why this task?"].map(s => (
+                <TouchableOpacity
+                  key={s}
+                  style={chatStyles.suggestionChip}
+                  onPress={() => sendMessage(s)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={chatStyles.suggestionText}>{s}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
+          {messages.map((msg, i) => (
+            <View
+              key={i}
+              style={[
+                chatStyles.bubble,
+                msg.role === "user" ? chatStyles.bubbleUser : chatStyles.bubbleAI,
+              ]}
+            >
+              {msg.role === "assistant" && <Text style={chatStyles.bubbleAIIcon}>✦</Text>}
+              <Text style={[
+                chatStyles.bubbleText,
+                msg.role === "user" ? chatStyles.bubbleTextUser : chatStyles.bubbleTextAI,
+              ]}>{msg.content}</Text>
+            </View>
+          ))}
+
+          {/* Option buttons after AI response */}
+          {!loading && options.length > 0 && (
+            <View style={chatStyles.suggestionRow}>
+              {options.map(opt => (
+                <TouchableOpacity
+                  key={opt}
+                  style={chatStyles.suggestionChip}
+                  onPress={() => sendMessage(opt)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={chatStyles.suggestionText}>{opt}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
+          {loading && (
+            <View style={[chatStyles.bubble, chatStyles.bubbleAI]}>
+              <Text style={chatStyles.bubbleAIIcon}>✦</Text>
+              <ActivityIndicator size="small" color={colors.primary} />
+            </View>
+          )}
+        </ScrollView>
+
+        {/* Input bar */}
+        <View style={[chatStyles.inputBar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+          <TextInput
+            style={chatStyles.input}
+            value={input}
+            onChangeText={setInput}
+            placeholder="Ask a question..."
+            placeholderTextColor={colors.textTertiary}
+            editable={!loading}
+            onSubmitEditing={handleSubmit}
+            returnKeyType="send"
+          />
+          <TouchableOpacity
+            style={[chatStyles.sendBtn, (!input.trim() || loading) && { opacity: 0.4 }]}
+            onPress={handleSubmit}
+            disabled={!input.trim() || loading}
+            activeOpacity={0.85}
+          >
+            <Text style={chatStyles.sendBtnText}>Send</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+}
+
+// ─── Full-screen Refine modal ─────────────────────────────────────────────────
+
+function RefineChatModal({
+  visible, taskTitle, colors, onRefine, onClose,
+}: {
+  visible: boolean;
+  taskTitle: string;
+  colors: Colors;
+  onRefine: (userRequest: string) => Promise<void>;
+  onClose: () => void;
+}) {
+  const insets = useSafeAreaInsets();
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const chatStyles = useMemo(() => createChatStyles(colors), [colors]);
+
+  const handleSend = useCallback(async () => {
+    if (!input.trim() || loading) return;
+    setLoading(true);
+    try {
+      await onRefine(input.trim());
+      onClose();
+    } catch {
+      // handled by parent
+    } finally {
+      setLoading(false);
+    }
+  }, [input, loading, onRefine, onClose]);
+
+  return (
+    <Modal visible={visible} animationType="slide" onRequestClose={onClose}>
+      <KeyboardAvoidingView
+        style={chatStyles.container}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      >
+        {/* Header with safe area */}
+        <View style={[chatStyles.headerBlock, { paddingTop: insets.top }]}>
+          <View style={chatStyles.header}>
+            <View style={{ width: 32 }} />
+            <View style={chatStyles.headerCenter}>
+              <Text style={chatStyles.headerIcon}>✦</Text>
+              <Text style={chatStyles.headerTitle}>Threely Intelligence</Text>
+            </View>
+            <TouchableOpacity onPress={onClose} hitSlop={12} activeOpacity={0.7} style={chatStyles.closeBtn}>
+              <Text style={chatStyles.closeBtnText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Explanation */}
+        <ScrollView
+          style={chatStyles.messageList}
+          contentContainerStyle={chatStyles.messageListContent}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="interactive"
+        >
+          <View style={chatStyles.emptyState}>
+            <Text style={chatStyles.emptyIcon}>✦</Text>
+            <Text style={chatStyles.emptyTitle}>How should we adjust this task?</Text>
+            <Text style={chatStyles.emptySubtitle}>
+              Tell us what to change — make it easier, harder, more specific, shorter, etc. AI will regenerate the task for you.
+            </Text>
+          </View>
+
+          <View style={chatStyles.suggestionRow}>
+            {["Make it easier", "Make it harder", "More detail", "Shorter"].map((s) => (
+              <TouchableOpacity
+                key={s}
+                style={chatStyles.suggestionChip}
+                onPress={() => setInput(s)}
+                activeOpacity={0.7}
+              >
+                <Text style={chatStyles.suggestionText}>{s}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+
+        {/* Input bar */}
+        <View style={[chatStyles.inputBar, { paddingBottom: Math.max(insets.bottom, 8) }]}>
+          <TextInput
+            style={chatStyles.input}
+            value={input}
+            onChangeText={setInput}
+            placeholder='e.g. "Make it easier" or "Add more detail"'
+            placeholderTextColor={colors.textTertiary}
+            editable={!loading}
+            onSubmitEditing={handleSend}
+            returnKeyType="send"
+            autoFocus
+          />
+          <TouchableOpacity
+            style={[chatStyles.sendBtn, (!input.trim() || loading) && { opacity: 0.4 }]}
+            onPress={handleSend}
+            disabled={!input.trim() || loading}
+            activeOpacity={0.85}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={chatStyles.sendBtnText}>Send</Text>
+            )}
+          </TouchableOpacity>
+        </View>
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -799,72 +924,6 @@ function createStyles(c: Colors) {
       fontWeight: typography.bold,
       color: c.success,
     },
-    // ── Refine ──────────────────────────────────────────────────────────────
-    editActions: {
-      flexDirection: "row",
-      gap: spacing.sm,
-      marginBottom: spacing.sm,
-    },
-    editCancelBtn: {
-      flex: 1,
-      height: 44,
-      borderRadius: radius.md,
-      borderWidth: 1.5,
-      borderColor: c.border,
-      backgroundColor: c.bg,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    editCancelText: {
-      fontSize: typography.sm,
-      fontWeight: typography.semibold,
-      color: c.textSecondary,
-    },
-    editSaveBtn: {
-      flex: 1,
-      height: 44,
-      borderRadius: radius.md,
-      backgroundColor: c.primary,
-      alignItems: "center",
-      justifyContent: "center",
-      ...shadow.sm,
-    },
-    editSaveText: {
-      fontSize: typography.sm,
-      fontWeight: typography.bold,
-      color: c.primaryText,
-    },
-    refineSection: {
-      marginTop: spacing.sm,
-    },
-    refineInput: {
-      backgroundColor: c.bg,
-      borderWidth: 1.5,
-      borderColor: c.primary + "55",
-      borderRadius: radius.md,
-      padding: spacing.md,
-      fontSize: typography.base,
-      color: c.text,
-      lineHeight: 22,
-      minHeight: 60,
-      marginBottom: spacing.md,
-    },
-    intelligenceHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: spacing.xs,
-      marginBottom: spacing.sm,
-    },
-    intelligenceIcon: {
-      fontSize: 16,
-      color: c.primary,
-    },
-    intelligenceTitle: {
-      fontSize: typography.sm,
-      fontWeight: typography.bold,
-      color: c.primary,
-      letterSpacing: -0.2,
-    },
     modalActionRow: {
       flexDirection: "row",
       gap: spacing.sm,
@@ -915,65 +974,183 @@ function createStyles(c: Colors) {
       color: c.textSecondary,
       lineHeight: 19,
     },
-    // ── Ask chat ─────────────────────────────────────────────────────────────
-    askChatScroll: {
-      maxHeight: 200,
-      marginBottom: spacing.sm,
+  });
+}
+
+// ─── Full-screen chat styles ──────────────────────────────────────────────────
+
+function createChatStyles(c: Colors) {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: c.bg,
     },
-    askBubble: {
-      maxWidth: "85%",
-      borderRadius: radius.md,
-      padding: spacing.sm,
-      marginBottom: spacing.xs,
+    headerBlock: {
+      backgroundColor: c.card,
+      borderBottomLeftRadius: radius.lg,
+      borderBottomRightRadius: radius.lg,
+      overflow: "hidden",
     },
-    askBubbleUser: {
-      alignSelf: "flex-end",
-      backgroundColor: c.primary,
+    header: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
     },
-    askBubbleAI: {
-      alignSelf: "flex-start",
+    closeBtn: {
+      width: 32,
+      height: 32,
+      borderRadius: 8,
       backgroundColor: c.bg,
       borderWidth: 1,
       borderColor: c.border,
+      alignItems: "center",
+      justifyContent: "center",
     },
-    askBubbleText: {
+    closeBtnText: {
+      fontSize: 16,
+      fontWeight: typography.semibold,
+      color: c.textSecondary,
+      lineHeight: 18,
+    },
+    headerCenter: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.xs,
+    },
+    headerIcon: {
+      fontSize: 16,
+      color: c.primary,
+    },
+    headerTitle: {
+      fontSize: typography.base,
+      fontWeight: typography.bold,
+      color: c.text,
+      letterSpacing: -0.3,
+    },
+    messageList: {
+      flex: 1,
+    },
+    messageListContent: {
+      padding: spacing.md,
+      paddingBottom: spacing.lg,
+    },
+    emptyState: {
+      alignItems: "center",
+      paddingTop: 60,
+      paddingHorizontal: spacing.lg,
+    },
+    emptyIcon: {
+      fontSize: 32,
+      color: c.primary,
+      marginBottom: spacing.md,
+    },
+    emptyTitle: {
+      fontSize: typography.lg,
+      fontWeight: typography.bold,
+      color: c.text,
+      textAlign: "center",
+      marginBottom: spacing.xs,
+      letterSpacing: -0.3,
+    },
+    emptySubtitle: {
       fontSize: typography.sm,
+      color: c.textSecondary,
+      textAlign: "center",
       lineHeight: 20,
     },
-    askBubbleTextUser: {
-      color: c.primaryText,
-    },
-    askBubbleTextAI: {
-      color: c.text,
-    },
-    askInputRow: {
-      flexDirection: "row",
-      gap: spacing.sm,
+    bubble: {
+      maxWidth: "85%",
+      borderRadius: radius.lg,
+      padding: spacing.md,
       marginBottom: spacing.sm,
     },
-    askInput: {
+    bubbleUser: {
+      alignSelf: "flex-end",
+      backgroundColor: c.primary,
+      borderBottomRightRadius: 4,
+    },
+    bubbleAI: {
+      alignSelf: "flex-start",
+      backgroundColor: c.card,
+      borderWidth: 1,
+      borderColor: c.border,
+      borderBottomLeftRadius: 4,
+      flexDirection: "row",
+      gap: spacing.xs,
+    },
+    bubbleAIIcon: {
+      fontSize: 14,
+      color: c.primary,
+      marginTop: 1,
+    },
+    bubbleText: {
+      fontSize: typography.base,
+      lineHeight: 22,
+      flexShrink: 1,
+    },
+    bubbleTextUser: {
+      color: c.primaryText,
+    },
+    bubbleTextAI: {
+      color: c.text,
+      flex: 1,
+    },
+    inputBar: {
+      flexDirection: "row",
+      gap: spacing.sm,
+      paddingHorizontal: spacing.md,
+      paddingTop: spacing.sm,
+      borderTopWidth: 1,
+      borderTopColor: c.border,
+      backgroundColor: c.bg,
+    },
+    input: {
       flex: 1,
       backgroundColor: c.bg,
       borderWidth: 1.5,
-      borderColor: c.primary + "55",
-      borderRadius: radius.md,
+      borderColor: c.border,
+      borderRadius: radius.lg,
       paddingHorizontal: spacing.md,
       paddingVertical: spacing.sm,
       fontSize: typography.base,
       color: c.text,
+      maxHeight: 100,
     },
-    askSendBtn: {
+    sendBtn: {
       height: 44,
-      paddingHorizontal: spacing.md,
-      borderRadius: radius.md,
+      paddingHorizontal: spacing.lg,
+      borderRadius: radius.lg,
       backgroundColor: c.primary,
       alignItems: "center",
       justifyContent: "center",
+      ...shadow.sm,
     },
-    askSendBtnText: {
+    sendBtnText: {
       fontSize: typography.sm,
       fontWeight: typography.bold,
       color: c.primaryText,
+    },
+    suggestionRow: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: spacing.xs,
+      marginTop: spacing.xl,
+      justifyContent: "center",
+    },
+    suggestionChip: {
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.xs + 2,
+      borderRadius: radius.full,
+      borderWidth: 1.5,
+      borderColor: c.primary + "44",
+      backgroundColor: c.primaryLight,
+    },
+    suggestionText: {
+      fontSize: typography.sm,
+      fontWeight: typography.semibold,
+      color: c.primary,
     },
   });
 }

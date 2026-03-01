@@ -122,12 +122,12 @@ export function TrialFullScreen({ visible, onDismiss, onSubscribed }: TrialFullS
 
         {/* Copy */}
         <Text style={styles.heading}>
-          Try Threely Pro{"\n"}
+          Get Threely Pro{"\n"}
           <Text style={styles.headingBold}>free for 7 days</Text>
         </Text>
         <Text style={styles.subheading}>
           We offer 7 days free so everyone can achieve their goals.
-          You'll get a reminder 2 days before your trial ends.
+          You'll get a reminder 2 days before your free period ends.
         </Text>
 
         {/* Plan selector */}
@@ -156,7 +156,7 @@ export function TrialFullScreen({ visible, onDismiss, onSubscribed }: TrialFullS
                 </View>
                 <Text style={styles.planPrice}>{p.price}</Text>
               </View>
-              <Text style={styles.trialLabel}>7-day free trial</Text>
+              <Text style={styles.trialLabel}>7 days free</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -171,12 +171,12 @@ export function TrialFullScreen({ visible, onDismiss, onSubscribed }: TrialFullS
           {loading ? (
             <ActivityIndicator color="#635BFF" size="small" />
           ) : (
-            <Text style={styles.ctaBtnText}>Start Free Trial</Text>
+            <Text style={styles.ctaBtnText}>Get Pro Free</Text>
           )}
         </TouchableOpacity>
 
         <Text style={styles.ctaSub}>
-          7-day free trial · then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
+          7 days free · then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
         </Text>
 
         {/* Footer */}

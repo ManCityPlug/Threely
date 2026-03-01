@@ -200,6 +200,7 @@ export const goalsApi = {
       dailyTimeMinutes?: number;
       intensityLevel?: number;
       workDays?: number[];
+      onboarding?: boolean;
     }
   ) =>
     apiFetch<{ goal: Goal }>("/api/goals", {
@@ -222,10 +223,10 @@ export const goalsApi = {
   delete: (id: string) =>
     apiFetch<{ success: boolean }>(`/api/goals/${id}`, { method: "DELETE" }),
 
-  chat: (messages: GoalChatMessage[]) =>
+  chat: (messages: GoalChatMessage[], opts?: { onboarding?: boolean }) =>
     apiFetch<GoalChatResult>("/api/goals/chat", {
       method: "POST",
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({ messages, onboarding: opts?.onboarding }),
     }),
 };
 
@@ -252,6 +253,7 @@ export const tasksApi = {
       requestingAdditional?: boolean;
       focusShifted?: boolean;
       postReview?: boolean;
+      onboarding?: boolean;
     }
   ) => {
     const now = new Date();
@@ -293,7 +295,7 @@ export const tasksApi = {
     }),
 
   askAboutTask: (dailyTaskId: string, taskItemId: string, messages: { role: "user" | "assistant"; content: string }[]) =>
-    apiFetch<{ answer: string }>(`/api/tasks/${dailyTaskId}/ask`, {
+    apiFetch<{ answer: string; options: string[] }>(`/api/tasks/${dailyTaskId}/ask`, {
       method: "POST",
       body: JSON.stringify({ taskItemId, messages }),
     }),

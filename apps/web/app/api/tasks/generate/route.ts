@@ -4,6 +4,8 @@ import { getUserFromRequest } from "@/lib/supabase";
 import { generateTasks, type TaskItem } from "@/lib/claude";
 import { getUserAccess } from "@/lib/subscription";
 
+export const maxDuration = 30;
+
 // POST /api/tasks/generate
 // Body: { goalId?, requestingAdditional?, focusShifted?, postReview? }
 // - goalId omitted → generates for ALL active goals
@@ -14,14 +16,26 @@ export async function POST(request: NextRequest) {
   const user = await getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Pro gate — free trial or active subscription required
-  const access = await getUserAccess(user.id);
-  if (!access.hasPro) {
-    return NextResponse.json({
-      error: "pro_required",
-      message: "Subscribe to keep your momentum going",
-      trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
-    }, { status: 403 });
+  const body = await request.json().catch(() => ({}));
+  const { goalId, localDate, requestingAdditional, focusShifted, postReview, onboarding } = body as {
+    goalId?: string;
+    localDate?: string;
+    requestingAdditional?: boolean;
+    focusShifted?: boolean;
+    postReview?: boolean;
+    onboarding?: boolean;
+  };
+
+  // Pro gate — skip during onboarding so new users get their first tasks
+  if (!onboarding) {
+    const access = await getUserAccess(user.id);
+    if (!access.hasPro) {
+      return NextResponse.json({
+        error: "pro_required",
+        message: "Subscribe to keep your momentum going",
+        trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
+      }, { status: 403 });
+    }
   }
 
   const { checkRateLimit } = await import("@/lib/rate-limit");
@@ -29,15 +43,6 @@ export async function POST(request: NextRequest) {
   if (!allowed) {
     return NextResponse.json({ error: "Rate limit exceeded. Try again later." }, { status: 429 });
   }
-
-  const body = await request.json().catch(() => ({}));
-  const { goalId, localDate, requestingAdditional, focusShifted, postReview } = body as {
-    goalId?: string;
-    localDate?: string;
-    requestingAdditional?: boolean;
-    focusShifted?: boolean;
-    postReview?: boolean;
-  };
 
   // Use client's local date if provided, otherwise fall back to UTC midnight
   const today = localDate ? new Date(localDate) : new Date();

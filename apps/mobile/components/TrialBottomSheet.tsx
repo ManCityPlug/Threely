@@ -141,12 +141,12 @@ export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBott
           {loading ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text style={styles.ctaBtnText}>Start Free Trial</Text>
+            <Text style={styles.ctaBtnText}>Get Pro Free</Text>
           )}
         </TouchableOpacity>
 
         <Text style={styles.ctaSub}>
-          7-day free trial · then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
+          7 days free · then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
         </Text>
 
         {/* Dismiss */}
