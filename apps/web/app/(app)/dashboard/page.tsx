@@ -724,41 +724,50 @@ export default function DashboardPage() {
       setDailyTasks(tasksRes.dailyTasks);
       setGoals(goalsRes.goals);
       setGoalStats(statsRes.goalStats ?? []);
-      // Check if a rest-day generate is in progress (user may have closed tab)
+      // Check if any generate is in progress (user may have closed tab / switched tabs)
       const todayStr = new Date().toLocaleDateString("en-CA");
-      const genFlag = localStorage.getItem(`threely_restday_gen_${todayStr}`);
-      if (tasksRes.dailyTasks.length === 0 && genFlag && !pollingRef.current) {
-        // Tasks are still generating — show loading and poll
-        setGenerating(true);
-        setRestDay(false);
-        const startedAt = parseInt(genFlag, 10);
+      const restGenFlag = localStorage.getItem(`threely_restday_gen_${todayStr}`);
+      const moreGenFlag = localStorage.getItem(`threely_generating_${todayStr}`);
+      const activeGenFlag = restGenFlag || moreGenFlag;
+      const flagKey = restGenFlag ? `threely_restday_gen_${todayStr}` : `threely_generating_${todayStr}`;
+
+      if (activeGenFlag && !pollingRef.current) {
+        const startedAt = parseInt(activeGenFlag, 10);
         const elapsed = Date.now() - startedAt;
         if (elapsed < 90_000) {
+          // Show loading and poll for new tasks
+          setGenerating(true);
+          setRestDay(false);
+          const prevTaskCount = tasksRes.dailyTasks.length;
           pollingRef.current = setInterval(async () => {
             try {
               const poll = await tasksApi.today(false);
-              if (poll.dailyTasks.length > 0) {
+              // New tasks arrived: either more tasks than before, or tasks appeared from zero
+              if (poll.dailyTasks.length > prevTaskCount || (prevTaskCount === 0 && poll.dailyTasks.length > 0)) {
                 setDailyTasks(poll.dailyTasks);
                 setGenerating(false);
                 setRestDay(false);
-                localStorage.removeItem(`threely_restday_gen_${todayStr}`);
+                localStorage.removeItem(flagKey);
                 if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null; }
               }
             } catch { /* ignore poll errors */ }
           }, 5000);
-          // Timeout after 90s total from when generate was clicked
           setTimeout(() => {
             if (pollingRef.current) {
               clearInterval(pollingRef.current);
               pollingRef.current = null;
               setGenerating(false);
-              setRestDay(true);
-              localStorage.removeItem(`threely_restday_gen_${todayStr}`);
+              localStorage.removeItem(flagKey);
+              // Refetch final state
+              tasksApi.today(false).then(r => {
+                setDailyTasks(r.dailyTasks);
+                setRestDay(r.restDay ?? false);
+              }).catch(() => {});
             }
           }, Math.max(0, 90_000 - elapsed));
         } else {
           // Flag is stale (>90s old), clear it
-          localStorage.removeItem(`threely_restday_gen_${todayStr}`);
+          localStorage.removeItem(flagKey);
           setRestDay(tasksRes.restDay ?? false);
         }
       } else {
@@ -831,10 +840,12 @@ export default function DashboardPage() {
     }
   }, [searchParams, refreshSubscription, showToast, router]);
 
-  // Refetch when tab becomes visible (sync across devices)
+  // Refetch when tab becomes visible (sync across devices) — skip if generating
+  const generatingRef = useRef(false);
+  generatingRef.current = generating;
   useEffect(() => {
     function handleVisibility() {
-      if (document.visibilityState === "visible") load();
+      if (document.visibilityState === "visible" && !generatingRef.current) load();
     }
     document.addEventListener("visibilitychange", handleVisibility);
     return () => document.removeEventListener("visibilitychange", handleVisibility);
@@ -1047,12 +1058,15 @@ export default function DashboardPage() {
     setInsight(generatedInsight);
 
     setGenerating(true);
+    const todayStr = new Date().toLocaleDateString("en-CA");
+    localStorage.setItem(`threely_generating_${todayStr}`, String(Date.now()));
     try {
       const goalId = selectedGoalId ?? undefined;
       const res = await tasksApi.generate({ postReview: true, goalId });
       setDailyTasks(res.dailyTasks);
-
+      localStorage.removeItem(`threely_generating_${todayStr}`);
     } catch (err: unknown) {
+      localStorage.removeItem(`threely_generating_${todayStr}`);
       if (err instanceof Error && err.message?.includes("pro_required")) {
         showPaywall();
       } else if (err instanceof Error && err.message?.includes("generation_limit_reached")) {
@@ -1429,36 +1443,49 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Today's tasks */}
-          <div style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.875rem",
-            marginBottom: "1.25rem",
-          }}>
-            {displayedTasks.map(({ dt, task }, i) => (
-              <div key={task.id} className="slide-up" style={{ animationDelay: `${i * 0.08}s` }} {...(i === 0 ? { "data-walkthrough": "first-task-card" } : {})}>
-                <TaskCard
-                  task={task}
-                  onToggle={(taskItemId, isCompleted) =>
-                    handleToggle(dt.id, taskItemId, isCompleted)
-                  }
-                  onSkip={(taskItemId) =>
-                    handleSkipToday(dt.id, taskItemId)
-                  }
-                  onReschedule={(taskItemId) =>
-                    handleRescheduleToday(dt.id, taskItemId)
-                  }
-                  onRefine={(taskItemId, userRequest) =>
-                    handleRefineTask(dt.id, taskItemId, userRequest)
-                  }
-                  onAsk={(taskItemId, messages) =>
-                    handleAskAboutTask(dt.id, taskItemId, messages)
-                  }
-                />
-              </div>
-            ))}
-          </div>
+          {/* Today's tasks — show skeletons while generating next batch */}
+          {generating && allDone ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem", marginBottom: "1.25rem" }}>
+              <SkeletonCard />
+              <SkeletonCard />
+              <SkeletonCard />
+              <p style={{ textAlign: "center", marginTop: "0.5rem", color: "var(--subtext)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+                <strong>Generating your next tasks...</strong>
+                <br />
+                This can take a couple of minutes. Feel free to leave — your tasks will be ready when you come back.
+              </p>
+            </div>
+          ) : (
+            <div style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.875rem",
+              marginBottom: "1.25rem",
+            }}>
+              {displayedTasks.map(({ dt, task }, i) => (
+                <div key={task.id} className="slide-up" style={{ animationDelay: `${i * 0.08}s` }} {...(i === 0 ? { "data-walkthrough": "first-task-card" } : {})}>
+                  <TaskCard
+                    task={task}
+                    onToggle={(taskItemId, isCompleted) =>
+                      handleToggle(dt.id, taskItemId, isCompleted)
+                    }
+                    onSkip={(taskItemId) =>
+                      handleSkipToday(dt.id, taskItemId)
+                    }
+                    onReschedule={(taskItemId) =>
+                      handleRescheduleToday(dt.id, taskItemId)
+                    }
+                    onRefine={(taskItemId, userRequest) =>
+                      handleRefineTask(dt.id, taskItemId, userRequest)
+                    }
+                    onAsk={(taskItemId, messages) =>
+                      handleAskAboutTask(dt.id, taskItemId, messages)
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+          )}
 
         </>
       )}

@@ -199,23 +199,28 @@ export default function DashboardScreen() {
       setGoalStats(statsRes.goalStats ?? []);
       if (profileRes.profile) setDailyTimeMinutes(profileRes.profile.dailyTimeMinutes);
 
-      // Check if a rest-day generate is in progress (user may have closed/backgrounded app)
+      // Check if any generate is in progress (user may have closed/backgrounded app)
       const todayStr = new Date().toISOString().slice(0, 10);
-      const genFlag = await AsyncStorage.getItem(`@threely_restday_gen_${todayStr}`);
-      if (tasksRes.dailyTasks.length === 0 && genFlag && !pollingRef.current) {
-        setGenerating(true);
-        setRestDay(false);
-        const startedAt = parseInt(genFlag, 10);
+      const restGenFlag = await AsyncStorage.getItem(`@threely_restday_gen_${todayStr}`);
+      const moreGenFlag = await AsyncStorage.getItem(`@threely_generating_${todayStr}`);
+      const activeGenFlag = restGenFlag || moreGenFlag;
+      const flagKey = restGenFlag ? `@threely_restday_gen_${todayStr}` : `@threely_generating_${todayStr}`;
+
+      if (activeGenFlag && !pollingRef.current) {
+        const startedAt = parseInt(activeGenFlag, 10);
         const elapsed = Date.now() - startedAt;
         if (elapsed < 90_000) {
+          setGenerating(true);
+          setRestDay(false);
+          const prevTaskCount = tasksRes.dailyTasks.length;
           pollingRef.current = setInterval(async () => {
             try {
               const poll = await tasksApi.today(false);
-              if (poll.dailyTasks.length > 0) {
+              if (poll.dailyTasks.length > prevTaskCount || (prevTaskCount === 0 && poll.dailyTasks.length > 0)) {
                 setDailyTasks(poll.dailyTasks);
                 setGenerating(false);
                 setRestDay(false);
-                await AsyncStorage.removeItem(`@threely_restday_gen_${todayStr}`);
+                await AsyncStorage.removeItem(flagKey);
                 if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null; }
               }
             } catch { /* ignore poll errors */ }
@@ -225,12 +230,15 @@ export default function DashboardScreen() {
               clearInterval(pollingRef.current);
               pollingRef.current = null;
               setGenerating(false);
-              setRestDay(true);
-              AsyncStorage.removeItem(`@threely_restday_gen_${todayStr}`);
+              AsyncStorage.removeItem(flagKey);
+              tasksApi.today(false).then(r => {
+                setDailyTasks(r.dailyTasks);
+                setRestDay(r.restDay ?? false);
+              }).catch(() => {});
             }
           }, Math.max(0, 90_000 - elapsed));
         } else {
-          await AsyncStorage.removeItem(`@threely_restday_gen_${todayStr}`);
+          await AsyncStorage.removeItem(flagKey);
           setRestDay(tasksRes.restDay ?? false);
         }
       } else {
@@ -664,6 +672,8 @@ export default function DashboardScreen() {
 
       // Auto-generate next tasks after review
       setGenerating(true);
+      const genTodayStr = new Date().toISOString().slice(0, 10);
+      AsyncStorage.setItem(`@threely_generating_${genTodayStr}`, String(Date.now()));
       try {
         const res = await tasksApi.generate(selectedGoal || undefined, { requestingAdditional: true });
         setDailyTasks((prev) => {
@@ -673,11 +683,13 @@ export default function DashboardScreen() {
             ...res.dailyTasks,
           ];
         });
+        AsyncStorage.removeItem(`@threely_generating_${genTodayStr}`);
         sendInstantNotification(
           "Your next tasks are ready!",
           "New tasks have been generated based on your review. Keep the momentum going!"
         );
       } catch (err: unknown) {
+        AsyncStorage.removeItem(`@threely_generating_${genTodayStr}`);
         // Check if trial/subscription expired
         if (err instanceof Error && err.message?.includes("pro_required")) {
           showBottomSheetPaywall();
