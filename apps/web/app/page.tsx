@@ -29,7 +29,7 @@ const FAQ = [
   },
   {
     q: "Is it free?",
-    a: "Threely offers a free 7-day trial so you can experience the full AI coaching loop. After that, choose a plan to keep your daily tasks and insights generating.",
+    a: "Threely Pro is free for 7 days so you can experience the full AI coaching loop. After that, choose a plan to keep your daily tasks and insights generating.",
   },
 ];
 
@@ -129,7 +129,7 @@ export default function LandingPage() {
             </Link>
           )}
           {!isMobile && (
-            <Link href={loggedIn ? "/dashboard" : "/register"} style={{
+            <Link href={loggedIn ? "/dashboard" : "/welcome"} style={{
               padding: "0.4rem 1rem",
               fontSize: "0.875rem",
               fontWeight: 600,
@@ -215,7 +215,7 @@ export default function LandingPage() {
                 }}>
                   Sign in
                 </Link>
-                <Link href="/register" onClick={() => setMenuOpen(false)} style={{
+                <Link href="/welcome" onClick={() => setMenuOpen(false)} style={{
                   flex: 1, textAlign: "center",
                   padding: "0.6rem 0",
                   fontSize: "0.875rem", fontWeight: 600,
@@ -313,7 +313,7 @@ export default function LandingPage() {
 
           {/* Get started button */}
           <div style={{ marginBottom: isMobile ? "1rem" : "1.5rem" }}>
-            <Link href={loggedIn ? "/dashboard" : "/register"} style={{
+            <Link href={loggedIn ? "/dashboard" : "/welcome"} style={{
               display: "inline-block",
               padding: "0.875rem 2.5rem",
               background: "#635bff",
@@ -516,7 +516,7 @@ export default function LandingPage() {
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               {[
                 { text: "Rewrite your pricing page headline to address the #1 objection from yesterday's user interviews — frame it around ROI, not features", time: "15m", done: true },
-                { text: "Set up Stripe with 3 pricing tiers and connect the checkout webhook to /api/payments — use the test keys from Day 9", time: "10m", done: true },
+                { text: "Set up 3 pricing tiers on your payment page and connect the checkout webhook to your backend — use the test keys from Day 9", time: "10m", done: true },
                 { text: "Draft a 5-email onboarding sequence outline — email 1: welcome + quick win, email 2: core feature walkthrough", time: "5m", done: false },
               ].map(task => (
                 <div key={task.text} style={{
@@ -825,7 +825,7 @@ export default function LandingPage() {
           }}>
             Set your first goal and get 3 personalized tasks in under a minute.
           </p>
-          <Link href="/register" style={{
+          <Link href="/welcome" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#fff",
@@ -899,7 +899,7 @@ export default function LandingPage() {
           <Link href="/login" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Sign in
           </Link>
-          <Link href="/register" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
+          <Link href="/welcome" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Get started
           </Link>
           <Link href="/faq" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>

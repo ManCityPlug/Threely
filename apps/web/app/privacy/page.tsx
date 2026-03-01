@@ -71,7 +71,7 @@ export default function PrivacyPage() {
             <strong>Profile preferences:</strong> We store your selected daily time commitment, intensity level, notification preferences, and timezone to tailor the Service to you.
           </p>
           <p style={pStyle}>
-            <strong>Usage analytics:</strong> We use Microsoft Clarity to understand how users interact with the Service. This may include session recordings and heatmaps. No personally identifiable information is shared with analytics providers.
+            <strong>Usage analytics:</strong> We use analytics tools to understand how users interact with the Service. This may include session recordings and heatmaps. No personally identifiable information is shared with analytics providers.
           </p>
           <p style={pStyle}>
             <strong>Device information:</strong> We may collect basic device information such as device type, operating system, and app version to provide technical support and improve compatibility.
@@ -84,7 +84,7 @@ export default function PrivacyPage() {
 
           <h2 style={h2Style}>3. AI Processing</h2>
           <p style={pStyle}>
-            Your goals, profile preferences, and task history are sent to our AI provider (Anthropic) to generate personalized daily tasks and coaching insights. This data is processed in real-time and is not used by Anthropic to train their AI models.
+            Your goals, profile preferences, and task history are sent to our AI provider to generate personalized daily tasks and coaching insights. This data is processed in real-time and is not used to train any third-party AI models.
           </p>
           <p style={pStyle}>
             We do not sell, share, or use your personal content for AI model training.
@@ -92,7 +92,7 @@ export default function PrivacyPage() {
 
           <h2 style={h2Style}>4. Data Storage and Security</h2>
           <p style={pStyle}>
-            Your data is stored securely using Supabase (hosted on AWS) with encryption at rest and in transit. We use industry-standard security measures including TLS encryption, secure authentication tokens, and regular security reviews.
+            Your data is stored securely on cloud infrastructure with encryption at rest and in transit. We use industry-standard security measures including TLS encryption, secure authentication tokens, and regular security reviews.
           </p>
           <p style={pStyle}>
             While we take reasonable measures to protect your data, no system is completely secure. We encourage you to use a strong, unique password for your account.
@@ -116,7 +116,7 @@ export default function PrivacyPage() {
 
           <h2 style={h2Style}>7. Cookies and Local Storage</h2>
           <p style={pStyle}>
-            Our website uses essential cookies and local storage for authentication and theme preferences. We do not use advertising or tracking cookies. Analytics are handled by Microsoft Clarity, which may use its own cookies as described in their privacy policy.
+            Our website uses essential cookies and local storage for authentication and theme preferences. We do not use advertising or tracking cookies. Our analytics provider may use its own cookies to help us understand usage patterns.
           </p>
 
           <h2 style={h2Style}>8. Children&apos;s Privacy</h2>

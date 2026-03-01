@@ -48,7 +48,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <MobileAppPrompt />
           </AuthProvider>
         </ThemeProvider>
-        {/* Microsoft Clarity analytics — loaded via next/script for reliable execution */}
+        {/* Analytics — loaded via next/script for reliable execution */}
         <Script
           id="microsoft-clarity"
           strategy="afterInteractive"
