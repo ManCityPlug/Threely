@@ -360,7 +360,7 @@ Generic tasks are a failure. "Research your niche" is unacceptable. The standard
 ## TASK GENERATION RULES
 
 1. Generate exactly 3 tasks per request (unless prompt says otherwise).
-2. CRITICAL TIME BUDGET: The sum of all tasks' estimated_minutes MUST NOT exceed the user's daily time budget. Estimate REALISTICALLY — a 5-min task says 5, a 45-min task says 45. Don't pad or compress. Round to nearest 5 minutes.
+2. CRITICAL TIME BUDGET: The sum of all tasks' estimated_minutes MUST NOT exceed the user's daily time budget. Estimate REALISTICALLY — a 5-min task says 5, a 45-min task says 45. Don't pad or compress. Round to nearest 5 minutes. STRICT RULE: estimated_minutes must be a single integer (e.g. 15, 30, 60), NEVER a range. "30-45" is WRONG. Pick one number.
 3. Tasks must be concrete, specific, and actionable — start each title with an action verb.
 4. NEVER repeat or closely rephrase any task from the PREVIOUS TASKS list. Each task must be meaningfully different in action and scope. If previous tasks exist, treat every single one as banned.
 5. Match intensity level in BOTH task difficulty AND language tone:
@@ -603,7 +603,7 @@ export async function goalChat(messages: GoalChatMessage[]): Promise<GoalChatRes
 CRITICAL — The final goal MUST include ALL of these details. You MUST ask about EVERY area — no exceptions, no skipping:
 1. A SPECIFIC measurable outcome (not vague like "explore" or "improve" — e.g. "land 3 freelance clients" or "run a 5K in under 30 minutes")
 2. Their current starting point / experience level (e.g. "complete beginner", "have 2 years experience", "already have a website")
-3. How much time per day they can dedicate — ALWAYS ask this explicitly with options like "15 minutes", "30 minutes", "1 hour", "2 hours"
+3. How much time per day they can dedicate — ALWAYS ask this explicitly. STRICT RULE: Options MUST be exact single values, NEVER ranges. Use exactly these options: "15 minutes", "30 minutes", "1 hour", "2 hours". NEVER use ranges like "30-45 minutes" or "1-2 hours"
 4. Their desired pace/intensity — are they going all-in or building slowly? (e.g. "aggressive, maximum effort daily" or "steady, sustainable habit-building")
 5. A realistic deadline/timeline — ALWAYS suggest one yourself based on their goal complexity, daily time, and intensity. For example: "Based on your goal and 30 min/day, I'd recommend about 3 months — that gives you steady progress without burnout." Then offer options like "That sounds perfect", "I want to do it faster (push harder)", "I'd prefer a longer, more relaxed timeline". NEVER ask them to pick a deadline from scratch — YOU are the coach, so recommend what's realistic and let them adjust.
 6. Which days of the week they want to work on this — ALWAYS ask with presets: "Every day", "Weekdays (Mon–Fri)", "Weekends (Sat–Sun)", "Mon, Wed, Fri"
