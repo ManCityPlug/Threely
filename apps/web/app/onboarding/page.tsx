@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth-context";
-import { markOnboarded, saveNickname } from "@/lib/auth-context";
+import { useAuth, isOnboarded, markOnboarded, saveNickname } from "@/lib/auth-context";
 import { getSupabase } from "@/lib/supabase-client";
 import { goalsApi, profileApi, tasksApi, type ParsedGoal, type TaskItem, type GoalChatMessage, type GoalChatResult } from "@/lib/api-client";
 import GoalTemplatesComponent from "@/components/GoalTemplates";
@@ -130,8 +129,15 @@ function ProgressBar({ step }: { step: number }) {
 // ─── Onboarding Page ───────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
+
+  // Redirect already-onboarded users to dashboard
+  useEffect(() => {
+    if (loading) return;
+    if (!user) { router.replace("/login"); return; }
+    if (isOnboarded(user.id)) router.replace("/dashboard");
+  }, [user, loading, router]);
 
   const [step, setStep] = useState(1);
 
