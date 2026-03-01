@@ -349,17 +349,8 @@ export default function ProfilePage() {
     <div className="page-inner">
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "1.75rem" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div>
           <h1 style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.03em" }}>Profile</h1>
-          {subStatus === "trialing" && (
-            <span style={{ padding: "2px 10px", borderRadius: 999, background: "#ecfdf5", color: "#059669", fontSize: "0.75rem", fontWeight: 600 }}>Pro Trial</span>
-          )}
-          {subStatus === "active" && (
-            <span style={{ padding: "2px 10px", borderRadius: 999, background: "var(--primary-light)", color: "var(--primary)", fontSize: "0.75rem", fontWeight: 600 }}>Pro</span>
-          )}
-          {subStatus !== undefined && subStatus !== "trialing" && subStatus !== "active" && (
-            <span style={{ padding: "2px 10px", borderRadius: 999, background: "#f3f4f6", color: "#6b7280", fontSize: "0.75rem", fontWeight: 600 }}>No plan</span>
-          )}
         </div>
         {weeklyStatus?.status === "ready" ? (
           <button
