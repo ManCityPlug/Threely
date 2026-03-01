@@ -3,9 +3,9 @@ import MarketingNav from "@/components/MarketingNav";
 import MarketingFooter from "@/components/MarketingFooter";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — Threely",
+  title: "Privacy Policy",
   description:
-    "Threely Privacy Policy. Learn how we collect, use, and protect your personal information when you use the Threely AI goal coaching platform.",
+    "Learn how Threely collects, uses, and protects your personal information. Your data is encrypted, never sold, and never used to train AI models.",
   alternates: { canonical: "/privacy" },
 };
 

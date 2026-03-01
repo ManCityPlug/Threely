@@ -5,10 +5,14 @@ import MarketingFooter from "@/components/MarketingFooter";
 import CheckoutButton from "@/components/CheckoutButton";
 
 export const metadata: Metadata = {
-  title: "Pricing — Threely AI Goal Coach",
+  title: "Pricing",
   description:
-    "Threely pricing: get Pro free for 7 days, then choose monthly or yearly. AI-powered goal coaching with personalized daily tasks, coaching insights, and progress tracking.",
+    "Start free for 7 days. Threely Pro: $12.99/month or $69.99/year. AI-generated daily tasks, personalized coaching insights, progress tracking, and mobile apps included.",
   alternates: { canonical: "/pricing" },
+  openGraph: {
+    title: "Threely Pricing — Free 7-Day Trial",
+    description: "Start free for 7 days. Threely Pro: $12.99/month or $69.99/year with AI coaching, daily tasks, and progress tracking.",
+  },
 };
 
 const FEATURES = [

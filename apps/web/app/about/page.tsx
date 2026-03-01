@@ -4,10 +4,14 @@ import MarketingNav from "@/components/MarketingNav";
 import MarketingFooter from "@/components/MarketingFooter";
 
 export const metadata: Metadata = {
-  title: "About — Threely AI Goal Coach",
+  title: "About",
   description:
-    "Threely was built on a simple belief: everyone deserves a coach. Learn how Threely uses AI to deliver personalized daily tasks and coaching insights for any goal.",
+    "Threely was built on a simple belief: everyone deserves a coach. Learn how Threely uses AI to deliver 3 personalized daily tasks and adaptive coaching for any goal.",
   alternates: { canonical: "/about" },
+  openGraph: {
+    title: "About Threely",
+    description: "Everyone deserves a coach. Threely uses AI to deliver 3 personalized daily tasks and adaptive coaching for any goal.",
+  },
 };
 
 const VALUES = [
@@ -175,7 +179,7 @@ export default function AboutPage() {
           <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", marginBottom: "1.5rem" }}>
             Describe your goal. Get your first three tasks in under a minute.
           </p>
-          <Link href="/register" style={{
+          <Link href="/welcome" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#fff",

@@ -3,9 +3,9 @@ import MarketingNav from "@/components/MarketingNav";
 import MarketingFooter from "@/components/MarketingFooter";
 
 export const metadata: Metadata = {
-  title: "Refund Policy — Threely",
+  title: "Refund Policy",
   description:
-    "Threely refund policy. Request a full refund within 7 days of your paid subscription — no questions asked.",
+    "Request a full refund within 7 days of your first Threely charge — no questions asked. Email refund@threely.co.",
   alternates: { canonical: "/refund" },
 };
 
@@ -76,7 +76,7 @@ export default function RefundPage() {
             If you are unsatisfied with Threely for any reason, you may request a full refund within 7 days of your first paid subscription charge. This applies to all plans — monthly and yearly.
           </p>
           <p style={pStyle}>
-            Refunds are not available after the 7-day window has passed. Your subscription start date is the date your first payment was charged, not the start of your free trial.
+            Refunds are not available after the 7-day window has passed. Your subscription start date is the date your first payment was charged, not the start of your free period.
           </p>
 
           <h2 style={h2Style}>How to Request a Refund</h2>

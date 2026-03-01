@@ -4,10 +4,14 @@ import MarketingNav from "@/components/MarketingNav";
 import MarketingFooter from "@/components/MarketingFooter";
 
 export const metadata: Metadata = {
-  title: "FAQ — Threely AI Goal Coach",
+  title: "Frequently Asked Questions",
   description:
-    "Frequently asked questions about Threely: how the AI coaching works, what goals it supports, pricing, account management, and data privacy.",
+    "Get answers about Threely: how the AI coaching works, supported goals, pricing plans, free trial details, data privacy, and account management.",
   alternates: { canonical: "/faq" },
+  openGraph: {
+    title: "Threely FAQ",
+    description: "Everything you need to know about Threely — AI coaching, goals, pricing, free trial, and more.",
+  },
 };
 
 const CATEGORIES = [
@@ -62,11 +66,11 @@ const CATEGORIES = [
     items: [
       {
         q: "Is Threely free?",
-        a: "Threely offers a free 7-day trial with full access to all features. After that, you can choose a monthly ($12.99/mo) or yearly ($69.99/yr) subscription to keep the AI coaching active.",
+        a: "Threely Pro is free for 7 days with full access to all features. After that, you can choose a monthly ($12.99/mo) or yearly ($69.99/yr) subscription to keep the AI coaching active.",
       },
       {
         q: "Do I need a credit card to start?",
-        a: "Yes — we securely collect payment details when you start your trial, but you won't be charged during the 7-day free period. We'll send you a reminder 2 days before your trial ends so there are no surprises. You can cancel anytime.",
+        a: "Yes — we securely collect payment details when you sign up, but you won't be charged during the 7-day free period. We'll send you a reminder 2 days before it ends so there are no surprises. You can cancel anytime.",
       },
       {
         q: "Can I cancel anytime?",
@@ -77,7 +81,7 @@ const CATEGORIES = [
         a: "No guilt, no penalty. Just open Threely and pick up where you left off. Your streak resets, but your progress and goal context are preserved. The AI picks back up right where you were.",
       },
       {
-        q: "What happens if I don't subscribe after the trial?",
+        q: "What happens after my 7 free days?",
         a: "Your account stays active and your data is preserved. You just won't receive new AI-generated tasks until you upgrade. You can come back and subscribe anytime.",
       },
     ],
@@ -175,7 +179,7 @@ export default function FaqPage() {
           <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", marginBottom: "1.5rem" }}>
             Try Threely free for 7 days and see for yourself.
           </p>
-          <Link href="/register" style={{
+          <Link href="/welcome" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#fff",

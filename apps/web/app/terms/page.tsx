@@ -3,9 +3,9 @@ import MarketingNav from "@/components/MarketingNav";
 import MarketingFooter from "@/components/MarketingFooter";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — Threely",
+  title: "Terms of Service",
   description:
-    "Threely Terms of Service. Read about account usage, subscriptions, cancellation, AI-generated content, and your rights when using the Threely AI goal coaching platform.",
+    "Threely Terms of Service. Read about account usage, subscriptions, cancellation, AI-generated content, and your rights.",
   alternates: { canonical: "/terms" },
 };
 
@@ -65,12 +65,12 @@ export default function TermsPage() {
             To use Threely, you must create an account with a valid email address and password. You are responsible for maintaining the security of your account credentials and for all activity that occurs under your account. You must be at least 13 years old to use the Service.
           </p>
 
-          <h2 style={h2Style}>2. Free Trial and Subscriptions</h2>
+          <h2 style={h2Style}>2. Free Period and Subscriptions</h2>
           <p style={pStyle}>
-            Threely offers a free 7-day trial that provides full access to all features. Payment details are securely collected when you start your trial, but you will not be charged until the trial period ends.
+            Threely offers Pro free for 7 days with full access to all features. Payment details are securely collected when you sign up, but you will not be charged until the free period ends.
           </p>
           <p style={pStyle}>
-            After the trial, continued access to AI-generated tasks and coaching features requires a paid subscription. Subscriptions are billed monthly or annually, depending on the plan you choose. Prices are displayed on our pricing page and may be updated with reasonable notice.
+            After the free period, continued access to AI-generated tasks and coaching features requires a paid subscription. Subscriptions are billed monthly or annually, depending on the plan you choose. Prices are displayed on our pricing page and may be updated with reasonable notice.
           </p>
           <p style={pStyle}>
             Subscriptions automatically renew at the end of each billing period unless you cancel before the renewal date.
