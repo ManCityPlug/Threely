@@ -2,6 +2,7 @@
 
 const WEBHOOKS = {
   newSignups: process.env.DISCORD_WEBHOOK_NEW_SIGNUPS,
+  startedFreeTrial: process.env.DISCORD_WEBHOOK_STARTED_FREE_TRIAL,
   subscriptions: process.env.DISCORD_WEBHOOK_SUBSCRIPTIONS,
   cancellations: process.env.DISCORD_WEBHOOK_CANCELLATIONS,
   trialExpiring: process.env.DISCORD_WEBHOOK_TRIAL_EXPIRING,
@@ -47,15 +48,27 @@ export function notifyNewSignup(email: string) {
     color: 0x635BFF, // Threely purple
     fields: [
       { name: "Email", value: email, inline: true },
-      { name: "Trial", value: "7-day Pro trial started", inline: true },
+    ],
+  });
+}
+
+export function notifyTrialStarted(email: string, plan: string) {
+  return send("startedFreeTrial", {
+    title: "🎉 Started Free Trial",
+    color: 0xFFA726, // orange
+    description: "A user entered their card and started a 7-day free trial.",
+    fields: [
+      { name: "Email", value: email, inline: true },
+      { name: "Plan", value: plan, inline: true },
     ],
   });
 }
 
 export function notifySubscription(email: string, plan: string, status: string) {
   return send("subscriptions", {
-    title: "💰 New Subscription",
+    title: "💰 Subscription Payment",
     color: 0x00C853, // green
+    description: status === "active" ? "User is now paying for their subscription." : undefined,
     fields: [
       { name: "Email", value: email, inline: true },
       { name: "Plan", value: plan, inline: true },

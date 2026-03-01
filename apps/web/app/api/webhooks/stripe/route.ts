@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import type Stripe from "stripe";
-import { notifySubscription, notifyCancellation, notifyTrialExpiring } from "@/lib/discord";
+import { notifySubscription, notifyTrialStarted, notifyCancellation, notifyTrialExpiring } from "@/lib/discord";
 
 // Disable body parsing — Stripe needs the raw body to verify signature
 export const runtime = "nodejs";
@@ -35,11 +35,18 @@ export async function POST(request: NextRequest) {
           where: { subscriptionId: sub.id },
           data: { subscriptionStatus: sub.status },
         });
-        // Notify on new active subscription
-        if (sub.status === "active" && event.type === "customer.subscription.created") {
+        const planName = sub.items.data[0]?.price?.nickname ?? sub.items.data[0]?.price?.id ?? "Pro";
+
+        // User started a free trial (entered card info via Stripe Checkout)
+        if (sub.status === "trialing" && event.type === "customer.subscription.created") {
           const user = await prisma.user.findFirst({ where: { subscriptionId: sub.id } });
-          const planName = sub.items.data[0]?.price?.nickname ?? sub.items.data[0]?.price?.id ?? "Pro";
-          notifySubscription(user?.email ?? "unknown", planName, sub.status);
+          notifyTrialStarted(user?.email ?? "unknown", planName);
+        }
+
+        // Trial converted to paid, or resubscription — actual payment
+        if (sub.status === "active" && event.type === "customer.subscription.updated") {
+          const user = await prisma.user.findFirst({ where: { subscriptionId: sub.id } });
+          notifySubscription(user?.email ?? "unknown", planName, "active");
         }
         break;
       }
@@ -65,7 +72,7 @@ export async function POST(request: NextRequest) {
         break;
       }
 
-      // Payment succeeded — make sure status is "active"
+      // Payment succeeded — make sure status is "active" + notify on real payments
       case "invoice.paid": {
         const invoice = event.data.object as Stripe.Invoice;
         const subId = (invoice as { subscription?: string }).subscription;
@@ -74,6 +81,17 @@ export async function POST(request: NextRequest) {
             where: { subscriptionId: subId },
             data: { subscriptionStatus: "active" },
           });
+          // Notify on actual payment (not $0 trial invoices)
+          const amountPaid = (invoice as { amount_paid?: number }).amount_paid ?? 0;
+          if (amountPaid > 0) {
+            const user = await prisma.user.findFirst({ where: { subscriptionId: subId } });
+            const dollars = (amountPaid / 100).toFixed(2);
+            notifySubscription(
+              user?.email ?? "unknown",
+              `$${dollars}`,
+              "active — payment received"
+            );
+          }
         }
         break;
       }

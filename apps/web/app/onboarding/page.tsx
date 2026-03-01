@@ -848,7 +848,7 @@ export default function OnboardingPage() {
                   fontSize: "1.2rem", fontWeight: 700, letterSpacing: "-0.02em",
                   textAlign: "center", marginBottom: 6,
                 }}>
-                  {generatedTasks.length > 0 ? "Your plan is ready \u2726" : "You\u2019re all set!"}
+                  {generatedTasks.length > 0 ? "Your plan is ready ✦" : "You're all set!"}
                 </h2>
 
                 {coachNote && (
@@ -918,7 +918,7 @@ export default function OnboardingPage() {
                     onClick={() => router.replace("/dashboard")}
                     style={{ height: 50, width: "100%" }}
                   >
-                    Let's go \u2192
+                    Let&apos;s go →
                   </button>
                 </div>
               </div>
