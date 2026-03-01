@@ -130,6 +130,7 @@ export default function DashboardScreen() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [goalStats, setGoalStats] = useState<GoalStat[]>([]);
   const [restDay, setRestDay] = useState(false);
+  const [restDayPickerOpen, setRestDayPickerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -845,20 +846,28 @@ export default function DashboardScreen() {
             <TouchableOpacity
               style={[styles.primaryBtn, { marginTop: spacing.md, paddingHorizontal: spacing.xl }]}
               onPress={() => {
-                setGenerating(true);
-                tasksApi.generate(selectedGoal || undefined).then((res) => {
-                  setDailyTasks((prev) => {
-                    const newIds = new Set(res.dailyTasks.map((dt) => dt.id));
-                    return [...prev.filter((dt) => !newIds.has(dt.id) && res.dailyTasks.every((r) => r.goalId !== dt.goalId)), ...res.dailyTasks];
-                  });
-                  setRestDay(false);
-                }).catch((e) => {
-                  if (e instanceof Error && e.message?.includes("pro_required")) {
-                    showBottomSheetPaywall();
-                  } else {
-                    showToast(e instanceof Error ? e.message : "Failed to generate tasks", "error");
-                  }
-                }).finally(() => setGenerating(false));
+                if (isLimitedMode) { showBottomSheetPaywall(); return; }
+                if (goals.length === 1) {
+                  // Only 1 goal — generate directly
+                  setGenerating(true);
+                  tasksApi.generate(goals[0].id).then((res) => {
+                    setDailyTasks((prev) => {
+                      const newIds = new Set(res.dailyTasks.map((dt) => dt.id));
+                      return [...prev.filter((dt) => !newIds.has(dt.id) && res.dailyTasks.every((r) => r.goalId !== dt.goalId)), ...res.dailyTasks];
+                    });
+                    setRestDay(false);
+                    if (res.dailyTasks.length === 1) setSelectedGoal(res.dailyTasks[0].goalId);
+                  }).catch((e) => {
+                    if (e instanceof Error && e.message?.includes("pro_required")) {
+                      showBottomSheetPaywall();
+                    } else {
+                      showToast(e instanceof Error ? e.message : "Failed to generate tasks", "error");
+                    }
+                  }).finally(() => setGenerating(false));
+                } else {
+                  // Multiple goals — show picker
+                  setRestDayPickerOpen(true);
+                }
               }}
               activeOpacity={0.85}
             >
@@ -978,6 +987,67 @@ export default function DashboardScreen() {
           </>
         )}
       </ScrollView>
+
+      {/* ── Rest day goal picker ────────────────────────────────────────────── */}
+      <Modal visible={restDayPickerOpen} transparent animationType="fade">
+        <Pressable
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.45)", justifyContent: "center", alignItems: "center" }}
+          onPress={() => setRestDayPickerOpen(false)}
+        >
+          <Pressable
+            style={{
+              backgroundColor: colors.surface,
+              borderRadius: radius.lg,
+              padding: spacing.lg,
+              width: "85%",
+              maxWidth: 360,
+            }}
+            onPress={() => {}}
+          >
+            <Text style={{ fontSize: typography.lg, fontWeight: typography.bold as "700", color: colors.text, marginBottom: 4 }}>
+              Which goal?
+            </Text>
+            <Text style={{ fontSize: typography.sm, color: colors.textSecondary, marginBottom: spacing.md, lineHeight: 20 }}>
+              Pick a goal to generate tasks for today.
+            </Text>
+            {goals.map(g => (
+              <TouchableOpacity
+                key={g.id}
+                style={{
+                  paddingVertical: spacing.sm + 2,
+                  paddingHorizontal: spacing.md,
+                  borderRadius: radius.md,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  backgroundColor: colors.background,
+                  marginBottom: spacing.xs,
+                }}
+                activeOpacity={0.7}
+                onPress={() => {
+                  setRestDayPickerOpen(false);
+                  setGenerating(true);
+                  tasksApi.generate(g.id).then((res) => {
+                    setDailyTasks((prev) => {
+                      const newIds = new Set(res.dailyTasks.map((dt) => dt.id));
+                      return [...prev.filter((dt) => !newIds.has(dt.id) && res.dailyTasks.every((r) => r.goalId !== dt.goalId)), ...res.dailyTasks];
+                    });
+                    setRestDay(false);
+                    if (res.dailyTasks.length === 1) setSelectedGoal(res.dailyTasks[0].goalId);
+                  }).catch((e) => {
+                    if (e instanceof Error && e.message?.includes("pro_required")) {
+                      showBottomSheetPaywall();
+                    } else {
+                      showToast(e instanceof Error ? e.message : "Failed to generate tasks", "error");
+                    }
+                  }).finally(() => setGenerating(false));
+                }}
+              >
+                <Text style={{ fontSize: typography.md, fontWeight: "600", color: colors.text }}>{g.title}</Text>
+              </TouchableOpacity>
+            ))}
+          </Pressable>
+        </Pressable>
+      </Modal>
 
       {/* ── Review bottom sheet ─────────────────────────────────────────────── */}
       {reviewOpen && (
