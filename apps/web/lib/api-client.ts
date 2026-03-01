@@ -158,6 +158,7 @@ export const goalsApi = {
     dailyTimeMinutes?: number;
     intensityLevel?: number;
     workDays?: number[];
+    onboarding?: boolean;
   }) =>
     apiFetch<{ goal: Goal }>("/api/goals", {
       method: "POST",
@@ -201,6 +202,7 @@ export const tasksApi = {
     requestingAdditional?: boolean;
     focusShifted?: boolean;
     postReview?: boolean;
+    onboarding?: boolean;
   }) => {
     const now = new Date();
     const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
@@ -241,7 +243,7 @@ export const tasksApi = {
     }),
 
   askAboutTask: (dailyTaskId: string, taskItemId: string, messages: { role: "user" | "assistant"; content: string }[]) =>
-    apiFetch<{ answer: string }>(`/api/tasks/${dailyTaskId}/ask`, {
+    apiFetch<{ answer: string; options: string[] }>(`/api/tasks/${dailyTaskId}/ask`, {
       method: "POST",
       body: JSON.stringify({ taskItemId, messages }),
     }),
@@ -351,6 +353,17 @@ export interface SubscriptionStatus {
 
 export const subscriptionApi = {
   status: () => apiFetch<SubscriptionStatus>("/api/subscription"),
+
+  checkout: (plan: "monthly" | "yearly") =>
+    apiFetch<{ url: string }>("/api/subscription/checkout", {
+      method: "POST",
+      body: JSON.stringify({ plan }),
+    }),
+
+  portal: () =>
+    apiFetch<{ url: string }>("/api/subscription/portal", {
+      method: "POST",
+    }),
 };
 
 // ─── Account API ──────────────────────────────────────────────────────────────

@@ -150,6 +150,7 @@ export default function ProfilePage() {
   const [countdown, setCountdown] = useState("");
   const [subStatus, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
   const [subTrialEnd, setSubTrialEnd] = useState<string | null>(null);
+  const [subPeriodEnd, setSubPeriodEnd] = useState<string | null>(null);
   const [notifEnabled, setNotifEnabled] = useState(false);
   const [notifPreset, setNotifPreset] = useState<string | null>(null);
   const [notifBlocked, setNotifBlocked] = useState(false);
@@ -186,6 +187,7 @@ export default function ProfilePage() {
     subscriptionApi.status().then(res => {
       setSubStatus(res.status);
       if (res.trialEndsAt) setSubTrialEnd(res.trialEndsAt);
+      if (res.currentPeriodEnd) setSubPeriodEnd(res.currentPeriodEnd);
     }).catch(() => {});
   }, []);
 
@@ -300,7 +302,7 @@ export default function ProfilePage() {
     try {
       await accountApi.delete();
       await signOut();
-      router.replace("/register");
+      router.replace("/login");
     } catch {
       setDeleting(false);
       setShowDeleteConfirm(false);
@@ -775,13 +777,7 @@ export default function ProfilePage() {
                   <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", margin: 0 }}>
                     Subscription
                   </h3>
-                  {subStatus === "trialing" && (
-                    <span style={{
-                      display: "inline-block", padding: "2px 10px", borderRadius: 999,
-                      background: "#ecfdf5", color: "#059669", fontSize: "0.75rem", fontWeight: 600,
-                    }}>Pro Trial</span>
-                  )}
-                  {subStatus === "active" && (
+                  {(subStatus === "trialing" || subStatus === "active") && (
                     <span style={{
                       display: "inline-block", padding: "2px 10px", borderRadius: 999,
                       background: "var(--primary-light)", color: "var(--primary)", fontSize: "0.75rem", fontWeight: 600,
@@ -793,17 +789,22 @@ export default function ProfilePage() {
                       background: "#f3f4f6", color: "#6b7280", fontSize: "0.75rem", fontWeight: 600,
                     }}>No plan</span>
                   )}
-                  {subStatus === "trialing" && subTrialEnd && (
+                  {(subStatus === "trialing" || subStatus === "active") && (subTrialEnd || subPeriodEnd) && (
                     <span style={{ fontSize: "0.78rem", color: "var(--subtext)" }}>
-                      · Trial ends {new Date(subTrialEnd).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                      · Billing on {new Date(subStatus === "trialing" ? subTrialEnd! : subPeriodEnd!).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
                     </span>
                   )}
                 </div>
                 <button
                   className="btn btn-outline"
-                  onClick={() => {
+                  onClick={async () => {
                     if (hasPro) {
-                      window.open("/api/subscription?action=portal", "_blank");
+                      try {
+                        const res = await subscriptionApi.portal();
+                        if (res.url) window.open(res.url, "_blank");
+                      } catch {
+                        // No Stripe customer — may be RevenueCat/mobile subscriber
+                      }
                     } else {
                       showPaywall();
                     }

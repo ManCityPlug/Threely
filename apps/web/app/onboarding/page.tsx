@@ -363,10 +363,11 @@ export default function OnboardingPage() {
         dailyTimeMinutes: detectedTime ?? timeMinutes ?? 60,
         intensityLevel: intensityLevel ?? 2,
         workDays: detectedWorkDays,
+        onboarding: true,
       });
 
       // Generate tasks
-      const tasksResult = await tasksApi.generate({ goalId: goalResult.goal.id });
+      const tasksResult = await tasksApi.generate({ goalId: goalResult.goal.id, onboarding: true });
       const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
       setGeneratedTasks(allTasks);
       if (tasksResult.coachNote) setCoachNote(tasksResult.coachNote);
@@ -435,10 +436,11 @@ export default function OnboardingPage() {
         deadline: parsedGoal?.deadline_detected ?? getDeadlineISO() ?? null,
         dailyTimeMinutes: timeMinutes ?? undefined,
         intensityLevel: intensityLevel ?? undefined,
+        onboarding: true,
       });
 
       // Generate tasks
-      const tasksResult = await tasksApi.generate({ goalId: goalResult.goal.id });
+      const tasksResult = await tasksApi.generate({ goalId: goalResult.goal.id, onboarding: true });
 
       const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
       setGeneratedTasks(allTasks);

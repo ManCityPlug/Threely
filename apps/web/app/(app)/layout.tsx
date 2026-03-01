@@ -98,18 +98,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     subscriptionApi.status().then(res => setSubStatus(res.status)).catch(() => {});
   }, [user]);
 
-  // Show tutorial on first login (after onboarding is confirmed AND trial paywall dismissed)
+  // Show tutorial on first login (after onboarding is confirmed)
   useEffect(() => {
     if (!user || loading || checkingOnboarding) return;
     // Only show if user has completed onboarding but hasn't seen the tutorial
     if (!isOnboarded(user.id)) return;
     const tutorialKey = `threely_tutorial_done_${user.id}`;
     if (localStorage.getItem(tutorialKey)) return;
-    // Wait until the trial paywall has been shown and dismissed.
-    // The paywall flag is set during registration and removed when the paywall is displayed,
-    // so if the flag still exists the paywall hasn't been shown yet — defer the tutorial.
-    const paywallKey = `threely_show_trial_paywall_${user.id}`;
-    if (localStorage.getItem(paywallKey)) return;
     // Small delay to let the dashboard render first
     const timer = setTimeout(() => setShowTutorial(true), 600);
     return () => clearTimeout(timer);
@@ -155,7 +150,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const initials = nickname[0]?.toUpperCase() ?? "?";
 
   const subBadge = subStatus === "trialing"
-    ? { label: "Pro Trial", bg: "#ecfdf5", color: "#059669" }
+    ? { label: "Pro", bg: "#ecfdf5", color: "#059669" }
     : subStatus === "active"
     ? { label: "Pro", bg: "var(--primary-light)", color: "var(--primary)" }
     : subStatus !== undefined

@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth, getNickname } from "@/lib/auth-context";
 import { formatDisplayName } from "@/lib/format-name";
 import {
@@ -92,7 +94,7 @@ function TaskCard({
   onSkip?: (id: string) => void;
   onReschedule?: (id: string) => void;
   onRefine?: (id: string, userRequest: string) => void;
-  onAsk?: (id: string, messages: { role: "user" | "assistant"; content: string }[]) => Promise<string>;
+  onAsk?: (id: string, messages: { role: "user" | "assistant"; content: string }[]) => Promise<{ answer: string; options: string[] }>;
   readonly?: boolean;
   overdue?: boolean;
 }) {
@@ -100,12 +102,14 @@ function TaskCard({
   const [refineMode, setRefineMode] = useState(false);
   const [refineInput, setRefineInput] = useState("");
   const [refining, setRefining] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuBtnRef = useRef<HTMLButtonElement>(null);
+  const [menuPos, setMenuPos] = useState<{ top: number; right: number } | null>(null);
 
   // Ask mode state
   const [askMode, setAskMode] = useState(false);
   const [askMessages, setAskMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
   const [askInput, setAskInput] = useState("");
+  const [askOptions, setAskOptions] = useState<string[]>([]);
   const [askLoading, setAskLoading] = useState(false);
   const askEndRef = useRef<HTMLDivElement>(null);
   const askInputRef = useRef<HTMLInputElement>(null);
@@ -119,17 +123,7 @@ function TaskCard({
     if (askMode) setTimeout(() => askInputRef.current?.focus(), 100);
   }, [askMode]);
 
-  // Close menu on outside click
-  useEffect(() => {
-    if (!menuOpen) return;
-    function handleClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [menuOpen]);
+  // Menu close is handled by the portal backdrop's onClick
 
   function handleStartRefine() {
     setMenuOpen(false);
@@ -143,6 +137,7 @@ function TaskCard({
     setAskMode(true);
     setAskMessages([]);
     setAskInput("");
+    setAskOptions([]);
     setRefineMode(false);
   }
 
@@ -154,18 +149,22 @@ function TaskCard({
     setRefineMode(false);
   }
 
-  async function handleSendAsk() {
-    if (!askInput.trim() || askLoading || !onAsk) return;
-    const userMsg = { role: "user" as const, content: askInput.trim() };
+  async function handleSendAsk(messageText?: string) {
+    const text = messageText ?? askInput.trim();
+    if (!text || askLoading || !onAsk) return;
+    const userMsg = { role: "user" as const, content: text };
     const newMessages = [...askMessages, userMsg];
     setAskMessages(newMessages);
     setAskInput("");
+    setAskOptions([]);
     setAskLoading(true);
     try {
-      const answer = await onAsk(task.id, newMessages);
-      setAskMessages(prev => [...prev, { role: "assistant", content: answer }]);
+      const result = await onAsk(task.id, newMessages);
+      setAskMessages(prev => [...prev, { role: "assistant", content: result.answer }]);
+      setAskOptions(result.options ?? []);
     } catch {
       setAskMessages(prev => [...prev, { role: "assistant", content: "Something went wrong. Try again." }]);
+      setAskOptions([]);
     } finally {
       setAskLoading(false);
     }
@@ -184,6 +183,7 @@ function TaskCard({
         flexDirection: "column",
         gap: "0.5rem",
         borderColor: overdue ? "var(--warning)" : undefined,
+        position: "relative",
       }}
     >
       <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
@@ -301,9 +301,16 @@ function TaskCard({
           )}
         </div>
         {showMenu && (
-          <div ref={menuRef} data-walkthrough="task-menu-button" style={{ position: "relative", flexShrink: 0 }}>
+          <div data-walkthrough="task-menu-button" style={{ position: "relative", flexShrink: 0 }}>
             <button
-              onClick={() => setMenuOpen(o => !o)}
+              ref={menuBtnRef}
+              onClick={() => {
+                if (!menuOpen && menuBtnRef.current) {
+                  const rect = menuBtnRef.current.getBoundingClientRect();
+                  setMenuPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right });
+                }
+                setMenuOpen(o => !o);
+              }}
               style={{
                 fontSize: "1.25rem", lineHeight: 1, padding: "2px 6px",
                 color: "var(--muted)", cursor: "pointer",
@@ -312,41 +319,40 @@ function TaskCard({
             >
               {"\u22EF"}
             </button>
-            {menuOpen && (
-              <div style={{
-                position: "absolute", right: 0, top: "100%", zIndex: 50,
-                background: "var(--card)", border: "1px solid var(--border)",
-                borderRadius: "var(--radius)", boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
-                minWidth: 180, overflow: "hidden",
-              }}>
-                {onRefine && (
-                  <button onClick={handleStartRefine} style={menuItemStyle}>
-                    Ask AI to refine
-                  </button>
-                )}
-                {onAsk && (
-                  <button onClick={handleStartAsk} style={menuItemStyle}>
-                    Ask about this
-                  </button>
-                )}
-                {onReschedule && (
-                  <button onClick={() => { setMenuOpen(false); onReschedule(task.id); }} style={menuItemStyle}>
-                    Move to tomorrow
-                  </button>
-                )}
-                {onSkip && (
-                  <button onClick={() => { setMenuOpen(false); onSkip(task.id); }} style={{ ...menuItemStyle, color: "var(--danger)" }}>
-                    Remove task
-                  </button>
-                )}
-              </div>
+            {menuOpen && menuPos && typeof document !== "undefined" && createPortal(
+              <>
+                <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 9998 }} />
+                <div data-walkthrough="task-menu-dropdown" style={{
+                  position: "fixed", top: menuPos.top, right: menuPos.right, zIndex: 9999,
+                  background: "var(--card)", border: "1px solid var(--border)",
+                  borderRadius: "var(--radius)", boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
+                  minWidth: 180, overflow: "hidden",
+                }}>
+                  {onRefine && (
+                    <button onClick={handleStartRefine} style={menuItemStyle}>
+                      Ask AI to refine
+                    </button>
+                  )}
+                  {onReschedule && (
+                    <button onClick={() => { setMenuOpen(false); onReschedule(task.id); }} style={menuItemStyle}>
+                      Move to tomorrow
+                    </button>
+                  )}
+                  {onSkip && (
+                    <button onClick={() => { setMenuOpen(false); onSkip(task.id); }} style={{ ...menuItemStyle, color: "var(--danger)" }}>
+                      Remove task
+                    </button>
+                  )}
+                </div>
+              </>,
+              document.body
             )}
           </div>
         )}
       </div>
 
-      {/* Ask AI modal overlay */}
-      {askMode && onAsk && (
+      {/* Ask AI modal overlay — rendered via portal to escape transform stacking context */}
+      {askMode && onAsk && typeof document !== "undefined" && createPortal(
         <>
           {/* Backdrop */}
           <div
@@ -408,6 +414,7 @@ function TaskCard({
             <div style={{
               flex: 1, overflowY: "auto", padding: "16px 20px",
               display: "flex", flexDirection: "column", gap: 10,
+              minHeight: 0,
             }}>
               {/* AI greeting */}
               <div style={{
@@ -418,6 +425,45 @@ function TaskCard({
               }}>
                 Hey! What would you like to know about this task? I can help with approach, tips, resources, or anything else.
               </div>
+
+              {/* Suggestion chips (shown when no messages yet) */}
+              {askMessages.length === 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 4 }}>
+                  {["How do I start?", "Break it down", "Tips & resources", "Why this task?"].map(s => (
+                    <button
+                      key={s}
+                      onClick={() => handleSendAsk(s)}
+                      style={{
+                        padding: "6px 14px", borderRadius: 20,
+                        border: "1.5px solid color-mix(in srgb, var(--primary) 30%, transparent)",
+                        background: "var(--primary-light)",
+                        fontSize: "0.8rem", fontWeight: 600,
+                        color: "var(--primary)", cursor: "pointer",
+                        transition: "background 0.15s",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--primary) 12%, transparent)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "var(--primary-light)"; }}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => askInputRef.current?.focus()}
+                    style={{
+                      padding: "6px 14px", borderRadius: 20,
+                      border: "1.5px solid var(--border)",
+                      background: "var(--bg)",
+                      fontSize: "0.8rem", fontWeight: 600,
+                      color: "var(--subtext)", cursor: "pointer",
+                      transition: "background 0.15s",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "var(--card)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "var(--bg)"; }}
+                  >
+                    Type my own
+                  </button>
+                </div>
+              )}
 
               {askMessages.map((msg, i) => (
                 <div
@@ -437,6 +483,46 @@ function TaskCard({
                   {msg.content}
                 </div>
               ))}
+
+              {/* Option buttons after AI response */}
+              {!askLoading && askOptions.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 2 }}>
+                  {askOptions.map(opt => (
+                    <button
+                      key={opt}
+                      onClick={() => handleSendAsk(opt)}
+                      style={{
+                        padding: "6px 14px", borderRadius: 20,
+                        border: "1.5px solid color-mix(in srgb, var(--primary) 30%, transparent)",
+                        background: "var(--primary-light)",
+                        fontSize: "0.8rem", fontWeight: 600,
+                        color: "var(--primary)", cursor: "pointer",
+                        transition: "background 0.15s",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--primary) 12%, transparent)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "var(--primary-light)"; }}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => askInputRef.current?.focus()}
+                    style={{
+                      padding: "6px 14px", borderRadius: 20,
+                      border: "1.5px solid var(--border)",
+                      background: "var(--bg)",
+                      fontSize: "0.8rem", fontWeight: 600,
+                      color: "var(--subtext)", cursor: "pointer",
+                      transition: "background 0.15s",
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "var(--card)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "var(--bg)"; }}
+                  >
+                    Type my own
+                  </button>
+                </div>
+              )}
+
               {askLoading && (
                 <div style={{
                   alignSelf: "flex-start", padding: "10px 14px", borderRadius: 14,
@@ -468,7 +554,7 @@ function TaskCard({
               />
               <button
                 className="btn btn-primary"
-                onClick={handleSendAsk}
+                onClick={() => handleSendAsk()}
                 disabled={askLoading || !askInput.trim()}
                 style={{ fontSize: "0.85rem", padding: "8px 18px", borderRadius: 10 }}
               >
@@ -476,7 +562,8 @@ function TaskCard({
               </button>
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );
@@ -600,7 +687,9 @@ function ReviewModal({
 export default function DashboardPage() {
   const { user } = useAuth();
   const { showToast } = useToast();
-  const { hasPro, showPaywall } = useSubscription();
+  const { hasPro, showPaywall, refreshSubscription } = useSubscription();
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [goalStats, setGoalStats] = useState<GoalStat[]>([]);
@@ -691,16 +780,14 @@ export default function DashboardPage() {
     );
   }, []);
 
-  // Trial paywall (shown once after first registration)
+  // Handle successful Stripe Checkout redirect
   useEffect(() => {
-    if (loading || !user) return;
-    const key = `threely_show_trial_paywall_${user.id}`;
-    const flag = localStorage.getItem(key);
-    if (flag) {
-      localStorage.removeItem(key);
-      showPaywall("fullscreen");
+    if (searchParams.get("subscribed") === "1") {
+      refreshSubscription();
+      showToast("Welcome to Pro! Your 7-day free trial has started.", "success");
+      router.replace("/dashboard");
     }
-  }, [loading, user, showPaywall]);
+  }, [searchParams, refreshSubscription, showToast, router]);
 
   // Refetch when tab becomes visible (sync across devices)
   useEffect(() => {
@@ -821,7 +908,7 @@ export default function DashboardPage() {
 
   async function handleAskAboutTask(dailyTaskId: string, taskItemId: string, messages: { role: "user" | "assistant"; content: string }[]) {
     const res = await tasksApi.askAboutTask(dailyTaskId, taskItemId, messages);
-    return res.answer;
+    return { answer: res.answer, options: res.options ?? [] };
   }
 
   async function handleSkipToday(dailyTaskId: string, taskItemId: string) {
@@ -997,7 +1084,7 @@ export default function DashboardPage() {
               Unlock Threely Pro
             </div>
             <div style={{ fontSize: "0.825rem", color: "var(--subtext)" }}>
-              Start your free trial for AI-powered tasks
+              Get Pro free for 7 days — AI-powered tasks
             </div>
           </div>
           <span style={{

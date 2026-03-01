@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import MarketingNav from "@/components/MarketingNav";
 import MarketingFooter from "@/components/MarketingFooter";
+import CheckoutButton from "@/components/CheckoutButton";
 
 export const metadata: Metadata = {
   title: "Pricing — Threely AI Goal Coach",
   description:
-    "Threely pricing: start with a free 7-day trial, then choose monthly or yearly. AI-powered goal coaching with personalized daily tasks, coaching insights, and progress tracking.",
+    "Threely pricing: get Pro free for 7 days, then choose monthly or yearly. AI-powered goal coaching with personalized daily tasks, coaching insights, and progress tracking.",
   alternates: { canonical: "/pricing" },
 };
 
@@ -43,7 +44,7 @@ export default function PricingPage() {
             Simple, transparent pricing
           </h1>
           <p style={{ fontSize: "1.05rem", color: "#425466", lineHeight: 1.7 }}>
-            Start free for 7 days. Cancel anytime. Upgrade when you&apos;re ready.
+            Get Pro free for 7 days. Cancel anytime.
           </p>
         </div>
       </section>
@@ -73,10 +74,11 @@ export default function PricingPage() {
               <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/month</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              Monthly access.<br />7-day free trial included.
+              Monthly access.<br />7 days free included.
             </p>
-            <Link href="/register" style={{
+            <CheckoutButton plan="monthly" style={{
               display: "block",
+              width: "100%",
               textAlign: "center",
               padding: "0.75rem 1.5rem",
               background: "#fff",
@@ -85,10 +87,9 @@ export default function PricingPage() {
               borderRadius: 10,
               fontWeight: 700,
               fontSize: "0.95rem",
-              textDecoration: "none",
             }}>
-              Start Free Trial
-            </Link>
+              Get Pro Free
+            </CheckoutButton>
           </div>
 
           {/* Yearly */}
@@ -117,10 +118,11 @@ export default function PricingPage() {
               <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/year</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              $5.83/month · billed annually.<br />7-day free trial included.
+              $5.83/month · billed annually.<br />7 days free included.
             </p>
-            <Link href="/register" style={{
+            <CheckoutButton plan="yearly" style={{
               display: "block",
+              width: "100%",
               textAlign: "center",
               padding: "0.75rem 1.5rem",
               background: "#635bff",
@@ -128,11 +130,10 @@ export default function PricingPage() {
               borderRadius: 10,
               fontWeight: 700,
               fontSize: "0.95rem",
-              textDecoration: "none",
               boxShadow: "0 4px 14px rgba(99,91,255,0.3)",
             }}>
-              Start Free Trial
-            </Link>
+              Get Pro Free
+            </CheckoutButton>
           </div>
         </div>
       </section>
@@ -181,9 +182,9 @@ export default function PricingPage() {
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             {[
-              { q: "Do I need a credit card to start?", a: "Yes — we securely collect payment details when you start your trial, but you won't be charged during the 7-day free period. We'll send you a reminder 2 days before your trial ends so there are no surprises. You can cancel anytime." },
+              { q: "Do I need a credit card to start?", a: "Yes — we securely collect payment details when you sign up, but you won't be charged during the 7-day free period. We'll send you a reminder 2 days before it ends so there are no surprises. You can cancel anytime." },
               { q: "Can I cancel anytime?", a: "Yes. Cancel your subscription at any time from your profile settings. You'll keep access until the end of your current billing period." },
-              { q: "What happens when my trial ends?", a: "You'll be prompted to choose a plan. If you don't subscribe, your account stays active — you just won't receive new AI-generated tasks until you upgrade." },
+              { q: "What happens after my 7 free days?", a: "You'll be prompted to choose a plan. If you don't subscribe, your account stays active — you just won't receive new AI-generated tasks until you upgrade." },
               { q: "Is there a refund policy?", a: "Yes! We offer a 7-day, no-questions-asked refund policy. If you're not satisfied within 7 days of your first charge, just email refund@threely.co and we'll refund you in full.", link: "/refund", linkText: "View Refund Policy" },
             ].map(item => (
               <div key={item.q} style={{
@@ -224,12 +225,12 @@ export default function PricingPage() {
       }}>
         <div style={{ maxWidth: 500, margin: "0 auto" }}>
           <h2 style={{ fontSize: "clamp(1.4rem, 4vw, 2rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "0.75rem" }}>
-            Start your free trial today
+            Get Pro free for 7 days
           </h2>
           <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", marginBottom: "1.5rem" }}>
             Set your first goal and get personalized tasks in under a minute.
           </p>
-          <Link href="/register" style={{
+          <Link href="/welcome" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#fff",
