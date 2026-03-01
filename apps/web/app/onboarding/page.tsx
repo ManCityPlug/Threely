@@ -841,14 +841,14 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {/* Tasks revealed */}
-            {!building && !buildError && generatedTasks.length > 0 && (
+            {/* Build complete (tasks revealed or fallback) */}
+            {!building && !buildError && (
               <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
                 <h2 style={{
                   fontSize: "1.2rem", fontWeight: 700, letterSpacing: "-0.02em",
                   textAlign: "center", marginBottom: 6,
                 }}>
-                  Your plan is ready ✦
+                  {generatedTasks.length > 0 ? "Your plan is ready \u2726" : "You\u2019re all set!"}
                 </h2>
 
                 {coachNote && (
@@ -860,46 +860,57 @@ export default function OnboardingPage() {
                   </p>
                 )}
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
-                  {generatedTasks.map((task, i) => (
-                    <div
-                      key={task.id}
-                      style={{
-                        background: "var(--card)", borderRadius: "var(--radius-lg)",
-                        border: "1px solid var(--border)", padding: "1rem",
-                        boxShadow: "var(--shadow-sm)",
-                        opacity: revealedCount > i ? 1 : 0,
-                        transform: revealedCount > i ? "translateY(0)" : "translateY(16px)",
-                        transition: "opacity 0.4s ease, transform 0.4s ease",
-                      }}
-                    >
-                      <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                        <div style={{ flex: 1 }}>
-                          <p style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.4 }}>
-                            {task.task}
-                          </p>
+                {generatedTasks.length === 0 && (
+                  <p style={{
+                    color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.5,
+                    textAlign: "center", marginBottom: 20,
+                  }}>
+                    Your goal is saved. Head to the dashboard to see your first tasks!
+                  </p>
+                )}
+
+                {generatedTasks.length > 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
+                    {generatedTasks.map((task, i) => (
+                      <div
+                        key={task.id}
+                        style={{
+                          background: "var(--card)", borderRadius: "var(--radius-lg)",
+                          border: "1px solid var(--border)", padding: "1rem",
+                          boxShadow: "var(--shadow-sm)",
+                          opacity: revealedCount > i ? 1 : 0,
+                          transform: revealedCount > i ? "translateY(0)" : "translateY(16px)",
+                          transition: "opacity 0.4s ease, transform 0.4s ease",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                          <div style={{ flex: 1 }}>
+                            <p style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.4 }}>
+                              {task.task}
+                            </p>
+                          </div>
+                          {task.estimated_minutes > 0 && (
+                            <span style={{
+                              background: "var(--primary-light)", borderRadius: 20,
+                              padding: "2px 10px", fontSize: "0.75rem", fontWeight: 600,
+                              color: "var(--primary)", whiteSpace: "nowrap", flexShrink: 0,
+                            }}>
+                              ~{task.estimated_minutes}m
+                            </span>
+                          )}
                         </div>
-                        {task.estimated_minutes > 0 && (
-                          <span style={{
-                            background: "var(--primary-light)", borderRadius: 20,
-                            padding: "2px 10px", fontSize: "0.75rem", fontWeight: 600,
-                            color: "var(--primary)", whiteSpace: "nowrap", flexShrink: 0,
+                        {task.why && (
+                          <p style={{
+                            fontSize: "0.8rem", color: "var(--subtext)", lineHeight: 1.5,
+                            fontStyle: "italic", marginTop: 6,
                           }}>
-                            ~{task.estimated_minutes}m
-                          </span>
+                            {task.why}
+                          </p>
                         )}
                       </div>
-                      {task.why && (
-                        <p style={{
-                          fontSize: "0.8rem", color: "var(--subtext)", lineHeight: 1.5,
-                          fontStyle: "italic", marginTop: 6,
-                        }}>
-                          {task.why}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
 
                 <div style={{ marginTop: "auto" }}>
                   <button
@@ -907,7 +918,7 @@ export default function OnboardingPage() {
                     onClick={() => router.replace("/dashboard")}
                     style={{ height: 50, width: "100%" }}
                   >
-                    Let's go →
+                    Let's go \u2192
                   </button>
                 </div>
               </div>
