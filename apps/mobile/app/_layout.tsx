@@ -12,6 +12,8 @@ LogBox.ignoreLogs([
   "Goals load error",
   "Not authenticated",
   "Request failed",
+  "Invalid Refresh Token",
+  "AuthApiError",
 ]);
 import { Stack, useRouter, useSegments } from "expo-router";
 import { StatusBar } from "expo-status-bar";

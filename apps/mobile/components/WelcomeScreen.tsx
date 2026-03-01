@@ -79,11 +79,28 @@ function DotIndicators({ scrollX }: { scrollX: Animated.Value }) {
 
 function PageHook({ anim }: { anim: Animated.Value }) {
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const floatAnim = useRef(new Animated.Value(0)).current;
   const sparkleAnims = useRef(
     Array.from({ length: 6 }, () => new Animated.Value(0))
   ).current;
 
   useEffect(() => {
+    // Floating up/down
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, {
+          toValue: -8,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(floatAnim, {
+          toValue: 0,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
     // Pulsing glow
     Animated.loop(
       Animated.sequence([
@@ -139,13 +156,13 @@ function PageHook({ anim }: { anim: Animated.Value }) {
 
   return (
     <View style={styles.page}>
-      {/* Logo with glow + sparkles */}
+      {/* Logo with glow + sparkles + float */}
       <Animated.View
         style={[
           styles.hookLogoWrap,
           {
             opacity: anim,
-            transform: [{ scale: pulseAnim }],
+            transform: [{ scale: pulseAnim }, { translateY: floatAnim }],
           },
         ]}
       >
@@ -440,11 +457,29 @@ interface PageAuthProps {
 
 function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoading, appleLoading }: PageAuthProps) {
   const socialLoading = googleLoading || appleLoading;
+  const floatAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(floatAnim, { toValue: -6, duration: 2000, useNativeDriver: true }),
+        Animated.timing(floatAnim, { toValue: 0, duration: 2000, useNativeDriver: true }),
+      ])
+    ).start();
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 1.06, duration: 1500, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
+      ])
+    ).start();
+  }, []);
 
   return (
     <View style={styles.page}>
-      {/* Logo */}
-      <Animated.View style={[{ opacity: anim }]}>
+      {/* Logo with float + pulse + glow */}
+      <Animated.View style={[styles.authLogoWrap, { opacity: anim, transform: [{ scale: pulseAnim }, { translateY: floatAnim }] }]}>
+        <View style={styles.authLogoGlow} />
         <Image
           source={require("@/assets/icon.png")}
           style={styles.authLogo}
@@ -870,6 +905,19 @@ const styles = StyleSheet.create({
   },
 
   // ── Page 4: Auth ──
+  authLogoWrap: {
+    width: 56,
+    height: 56,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  authLogoGlow: {
+    position: "absolute",
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "rgba(99, 91, 255, 0.25)",
+  },
   authLogo: {
     width: 56,
     height: 56,
