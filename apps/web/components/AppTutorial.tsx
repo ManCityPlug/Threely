@@ -173,7 +173,7 @@ export default function AppTutorial({ visible, onComplete }: AppTutorialProps) {
 
   const current = STEPS[step];
   const isLast = step === STEPS.length - 1;
-  const isCentered = current.target === null || (!targetRect && !measuring);
+  const isCentered = current.target === null || !targetRect;
 
   // ─── Compute tooltip position ────────────────────────────────────────────
 
