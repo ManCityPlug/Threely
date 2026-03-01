@@ -11,27 +11,32 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
 
   if (code) {
-    const cookieStore = await cookies();
+    try {
+      const cookieStore = await cookies();
 
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll();
+      const supabase = createServerClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          cookies: {
+            getAll() {
+              return cookieStore.getAll();
+            },
+            setAll(cookiesToSet: { name: string; value: string; options?: object }[]) {
+              cookiesToSet.forEach(({ name, value, options }) =>
+                cookieStore.set(name, value, options)
+              );
+            },
           },
-          setAll(cookiesToSet: { name: string; value: string; options?: object }[]) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          },
-        },
+        }
+      );
+
+      const { error } = await supabase.auth.exchangeCodeForSession(code);
+      if (error) {
+        console.error("[auth/callback] exchangeCodeForSession error:", error.message);
+        return NextResponse.redirect(`${origin}/login?error=auth`);
       }
-    );
 
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
       // Password recovery flow — redirect to reset-password page
       const type = searchParams.get("type");
       if (type === "recovery") {
@@ -69,6 +74,9 @@ export async function GET(request: NextRequest) {
       }
 
       return NextResponse.redirect(`${origin}/dashboard`);
+    } catch (err) {
+      console.error("[auth/callback] Unhandled error:", err);
+      return NextResponse.redirect(`${origin}/login?error=auth`);
     }
   }
 

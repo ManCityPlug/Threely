@@ -7,11 +7,18 @@ export async function DELETE(request: NextRequest) {
   const user = await getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Delete the Prisma user — cascades to goals and daily_tasks
-  await prisma.user.delete({ where: { id: user.id } });
+  try {
+    // Delete the Prisma user — cascades to goals, daily_tasks, reviews, etc.
+    await prisma.user.delete({ where: { id: user.id } }).catch(() => {
+      // User may not exist in Prisma yet (e.g. never completed onboarding)
+    });
 
-  // Delete from Supabase auth.users (requires service role)
-  await supabaseAdmin.auth.admin.deleteUser(user.id);
+    // Delete from Supabase auth.users (requires service role)
+    await supabaseAdmin.auth.admin.deleteUser(user.id);
 
-  return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error("[account/delete] Error:", err);
+    return NextResponse.json({ error: "Failed to delete account" }, { status: 500 });
+  }
 }
