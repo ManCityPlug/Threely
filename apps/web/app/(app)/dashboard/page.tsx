@@ -13,6 +13,7 @@ import { SkeletonCard } from "@/components/Skeleton";
 import Confetti from "@/components/Confetti";
 import { useToast } from "@/components/ToastProvider";
 import { useSubscription } from "@/lib/subscription-context";
+import { MOCK_TUTORIAL_GOAL, MOCK_TUTORIAL_DAILY_TASK } from "@/lib/mock-tutorial-data";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -687,7 +688,7 @@ function ReviewModal({
 export default function DashboardPage() {
   const { user } = useAuth();
   const { showToast } = useToast();
-  const { hasPro, showPaywall, refreshSubscription } = useSubscription();
+  const { hasPro, showPaywall, refreshSubscription, walkthroughActive } = useSubscription();
   const searchParams = useSearchParams();
   const router = useRouter();
   const [dailyTasks, setDailyTasks] = useState<DailyTask[]>([]);
@@ -803,9 +804,16 @@ export default function DashboardPage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _sort = sortTrigger; // subscribe to sort trigger for delayed reorder
 
+  // Mock data injection for tutorial walkthrough
+  const effectiveGoals = walkthroughActive && goals.length === 0 ? [MOCK_TUTORIAL_GOAL] : goals;
+  const effectiveDailyTasks = walkthroughActive && dailyTasks.length === 0 ? [MOCK_TUTORIAL_DAILY_TASK] : dailyTasks;
+  const effectiveSelectedGoalId = walkthroughActive && goals.length === 0 && selectedGoalId === null
+    ? MOCK_TUTORIAL_GOAL.id
+    : selectedGoalId;
+
   const displayedTasks = (() => {
-    if (selectedGoalId === null) return [];
-    const dt = dailyTasks.find(d => d.goalId === selectedGoalId);
+    if (effectiveSelectedGoalId === null) return [];
+    const dt = effectiveDailyTasks.find(d => d.goalId === effectiveSelectedGoalId);
     if (!dt) return [];
     const items = dt.tasks.slice(-3).map(task => ({ dt, task }));
 
@@ -1097,7 +1105,7 @@ export default function DashboardPage() {
       )}
 
       {/* No goals — prompt to create one */}
-      {goals.length === 0 && (
+      {effectiveGoals.length === 0 && (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
           <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"🎯"}</div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
@@ -1117,7 +1125,7 @@ export default function DashboardPage() {
       )}
 
       {/* Has goals but no selection yet — auto-open picker */}
-      {goals.length > 0 && selectedGoalId === null && !goalPickerOpen && dailyTasks.length === 0 && (
+      {effectiveGoals.length > 0 && effectiveSelectedGoalId === null && !goalPickerOpen && effectiveDailyTasks.length === 0 && (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
           <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"🎯"}</div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
@@ -1137,7 +1145,7 @@ export default function DashboardPage() {
       )}
 
       {/* Rest day */}
-      {goals.length > 0 && restDay && !generating && (
+      {effectiveGoals.length > 0 && restDay && !generating && !walkthroughActive && (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
           <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"😌"}</div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
@@ -1150,7 +1158,7 @@ export default function DashboardPage() {
       )}
 
       {/* Loading skeleton during auto-generate */}
-      {goals.length > 0 && generating && dailyTasks.length === 0 && (
+      {effectiveGoals.length > 0 && generating && effectiveDailyTasks.length === 0 && (
         <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
           <SkeletonCard />
           <SkeletonCard />
@@ -1163,28 +1171,28 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {goals.length > 0 && dailyTasks.length > 0 && selectedGoalId !== null && (
+      {effectiveGoals.length > 0 && effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && (
         <>
           {/* Goal selector + progress */}
           <div className="card" style={{ padding: "1.25rem", marginBottom: "1.25rem" }}>
             {/* Goal selector row */}
             <div
-              onClick={() => { if (goals.length > 1) setGoalPickerOpen(true); }}
+              onClick={() => { if (effectiveGoals.length > 1) setGoalPickerOpen(true); }}
               style={{
                 display: "flex", alignItems: "center", gap: "0.75rem",
                 marginBottom: "0.875rem",
-                cursor: goals.length > 1 ? "pointer" : "default",
+                cursor: effectiveGoals.length > 1 ? "pointer" : "default",
                 padding: "0.5rem 0.75rem",
                 borderRadius: "var(--radius)",
-                background: goals.length > 1 ? "var(--bg)" : "transparent",
-                border: goals.length > 1 ? "1px solid var(--border)" : "none",
+                background: effectiveGoals.length > 1 ? "var(--bg)" : "transparent",
+                border: effectiveGoals.length > 1 ? "1px solid var(--border)" : "none",
                 transition: "background 0.15s, border-color 0.15s",
               }}
-              onMouseEnter={e => { if (goals.length > 1) e.currentTarget.style.borderColor = "var(--primary)"; }}
-              onMouseLeave={e => { if (goals.length > 1) e.currentTarget.style.borderColor = "var(--border)"; }}
+              onMouseEnter={e => { if (effectiveGoals.length > 1) e.currentTarget.style.borderColor = "var(--primary)"; }}
+              onMouseLeave={e => { if (effectiveGoals.length > 1) e.currentTarget.style.borderColor = "var(--border)"; }}
             >
               <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", flex: 1, minWidth: 0 }}>
-                {selectedGoalId === null ? "Select a goal" : goals.find(g => g.id === selectedGoalId)?.title ?? "Select goal"}
+                {effectiveSelectedGoalId === null ? "Select a goal" : effectiveGoals.find(g => g.id === effectiveSelectedGoalId)?.title ?? "Select goal"}
               </span>
               <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                 {totalEstimatedMinutes > 0 && (
@@ -1204,7 +1212,7 @@ export default function DashboardPage() {
                   {completedCount}/{totalCount}
                 </span>
               </div>
-              {goals.length > 1 && (
+              {effectiveGoals.length > 1 && (
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0 }}>
                   <path d="M3 4.5L6 7.5L9 4.5" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>

@@ -22,11 +22,13 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { SwipeNavigator } from "@/components/SwipeNavigator";
 import { useFocusEffect, useRouter } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { goalsApi, tasksApi, type Goal, type TaskItem, type ParsedGoal, type GoalChatMessage } from "@/lib/api";
 import { GoalCard } from "@/components/GoalCard";
 import { GoalTemplates } from "@/components/GoalTemplates";
+import { MOCK_TUTORIAL_GOAL } from "@/lib/mock-tutorial-data";
 import { SkeletonCard } from "@/components/Skeleton";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/lib/toast";
@@ -87,7 +89,7 @@ export default function GoalsScreen() {
   const router = useRouter();
   const { showToast } = useToast();
   const { isLimitedMode, showBottomSheetPaywall, walkthroughActive } = useSubscription();
-  const { register } = useWalkthroughRegistry();
+  const { register, registerScroll } = useWalkthroughRegistry();
 
   const [goals, setGoals] = useState<Goal[]>([]);
   const [pausedGoals, setPausedGoals] = useState<Goal[]>([]);
@@ -222,7 +224,8 @@ export default function GoalsScreen() {
 
   // ── Add flow helpers ────────────────────────────────────────────────────────
   function openAddFlow() {
-    if (isLimitedMode && !walkthroughActive) { showBottomSheetPaywall(); return; }
+    // Allow first goal free — only gate if user already has goals
+    if (isLimitedMode && !walkthroughActive && goals.length > 0) { showBottomSheetPaywall(); return; }
     // 3-goal limit
     const activeCount = goals.length;
     if (activeCount >= 3) {
@@ -380,6 +383,17 @@ export default function GoalsScreen() {
   }
 
   // ── Step 1: AI Plan chat ──────────────────────────────────────────────────
+  async function chatWithRetry(messages: GoalChatMessage[]): Promise<GoalChatResult> {
+    try {
+      return await goalsApi.chat(messages);
+    } catch (e) {
+      // Retry once on transient failures (timeout, network, server error)
+      const msg = e instanceof Error ? e.message : "";
+      if (msg.includes("pro_required")) throw e; // Don't retry pro gate
+      return await goalsApi.chat(messages);
+    }
+  }
+
   async function startAiChat() {
     startAiChatWithMessage("Help me define my goal.");
   }
@@ -395,7 +409,7 @@ export default function GoalsScreen() {
     setChatLoading(true);
     try {
       const seedMessages: GoalChatMessage[] = [{ role: "user", content: initialMessage }];
-      const result = await goalsApi.chat(seedMessages);
+      const result = await chatWithRetry(seedMessages);
       setChatMessages([
         { role: "user", content: initialMessage },
         { role: "assistant", content: result.raw_reply },
@@ -414,6 +428,8 @@ export default function GoalsScreen() {
         closeAddFlow();
         showBottomSheetPaywall();
       } else {
+        const msg = err instanceof Error ? err.message : "Unknown error";
+        console.warn("[goals chat]", msg);
         setChatHistory([{ role: "assistant" as const, text: "Something went wrong. Please close and try again." }]);
       }
     } finally {
@@ -432,7 +448,7 @@ export default function GoalsScreen() {
     setChatMessages(newMessages);
 
     try {
-      const result = await goalsApi.chat(newMessages);
+      const result = await chatWithRetry(newMessages);
       const assistantMsg: GoalChatMessage = { role: "assistant", content: result.raw_reply };
       setChatMessages((prev) => [...prev, assistantMsg]);
       setChatHistory((prev) => [
@@ -449,6 +465,8 @@ export default function GoalsScreen() {
         closeAddFlow();
         showBottomSheetPaywall();
       } else {
+        const msg = err instanceof Error ? err.message : "Unknown error";
+        console.warn("[goals chat]", msg);
         setChatHistory((prev) => [
           ...prev,
           { role: "assistant", text: "Something went wrong. Please try again." },
@@ -1299,31 +1317,31 @@ export default function GoalsScreen() {
         <Modal
           visible={showAiChat}
           animationType="slide"
-          presentationStyle="pageSheet"
           onRequestClose={() => { setShowAiChat(false); if (editingGoalId && addStep === 1) closeAddFlow(); }}
         >
-          <SafeAreaView style={styles.chatModal}>
+          <KeyboardAvoidingView
+            style={styles.chatModal}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
             {/* Header */}
-            <View style={styles.chatHeader}>
-              <View style={styles.chatHeaderLeft}>
-                <Text style={styles.chatHeaderIcon}>✦</Text>
-                <Text style={styles.chatHeaderTitle}>Threely Intelligence</Text>
+            <View style={[styles.chatHeaderBlock, { paddingTop: insets.top }]}>
+              <View style={styles.chatHeader}>
+                <View style={{ width: 32 }} />
+                <View style={styles.chatHeaderLeft}>
+                  <Text style={styles.chatHeaderIcon}>✦</Text>
+                  <Text style={styles.chatHeaderTitle}>Threely Intelligence</Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.chatCloseBtn}
+                  onPress={() => { setShowAiChat(false); if (editingGoalId && addStep === 1) closeAddFlow(); }}
+                  hitSlop={12}
+                >
+                  <Text style={styles.chatCloseText}>×</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={styles.chatCloseBtn}
-                onPress={() => { setShowAiChat(false); if (editingGoalId && addStep === 1) closeAddFlow(); }}
-                hitSlop={12}
-              >
-                <Text style={styles.chatCloseText}>×</Text>
-              </TouchableOpacity>
             </View>
 
             {/* Chat messages */}
-            <KeyboardAvoidingView
-              style={{ flex: 1 }}
-              behavior={Platform.OS === "ios" ? "padding" : undefined}
-              keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0}
-            >
               <FlatList
                 ref={chatListRef}
                 data={[
@@ -1423,7 +1441,7 @@ export default function GoalsScreen() {
 
               {/* Bottom: typing input */}
               {showTypingInput && !chatDone && (
-                <View style={styles.chatFooter}>
+                <View style={[styles.chatFooter, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
                   <View style={styles.chatInputRow}>
                     <TextInput
                       ref={chatInputRef}
@@ -1468,7 +1486,7 @@ export default function GoalsScreen() {
                 </View>
               )}
               {chatDone && (
-                <View style={styles.chatFooter}>
+                <View style={[styles.chatFooter, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
                   <View style={{ gap: spacing.sm }}>
                     <TouchableOpacity
                       style={styles.continueBtn}
@@ -1493,12 +1511,14 @@ export default function GoalsScreen() {
                   </View>
                 </View>
               )}
-            </KeyboardAvoidingView>
-          </SafeAreaView>
+          </KeyboardAvoidingView>
         </Modal>
       </View>
     );
   }
+
+  // ── Mock data for tutorial spotlight ─────────────────────────────────────────
+  const effectiveGoals = walkthroughActive && goals.length === 0 ? [MOCK_TUTORIAL_GOAL] : goals;
 
   // ── Main render ─────────────────────────────────────────────────────────────
 
@@ -1528,7 +1548,7 @@ export default function GoalsScreen() {
         <View>
           <Text style={styles.title}>Goals</Text>
           <Text style={styles.subtitle}>
-            {goals.length} active{pausedGoals.length > 0 ? ` · ${pausedGoals.length} paused` : ""}
+            {effectiveGoals.length} active{pausedGoals.length > 0 ? ` · ${pausedGoals.length} paused` : ""}
           </Text>
         </View>
         <TouchableOpacity style={styles.fab} onPress={openAddFlow} activeOpacity={0.85}>
@@ -1538,11 +1558,12 @@ export default function GoalsScreen() {
 
       {/* Goal list */}
       <ScrollView
+        ref={r => registerScroll("goals-scroll", r)}
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
-        {goals.length === 0 && pausedGoals.length === 0 ? (
+        {effectiveGoals.length === 0 && pausedGoals.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyIcon}>🎯</Text>
             <Text style={styles.emptyTitle}>What will you achieve?</Text>
@@ -1560,7 +1581,8 @@ export default function GoalsScreen() {
           </View>
         ) : (
           <>
-            {goals.map((goal, goalIdx) => {
+            {effectiveGoals.map((goal, goalIdx) => {
+              const isMock = goal.id === MOCK_TUTORIAL_GOAL.id;
               const cStats = completedByGoal[goal.id];
               const card = (
                 <GoalCard
@@ -1568,9 +1590,13 @@ export default function GoalsScreen() {
                   goal={goal}
                   completedToday={cStats?.completed ?? 0}
                   totalToday={cStats?.total ?? 3}
-                  onPress={() => setActionGoal(goal)}
-                  onMenu={() => setActionGoal(goal)}
-                  onViewTasks={() => router.push("/(tabs)")}
+                  onPress={() => { if (!isMock) setActionGoal(goal); }}
+                  onMenu={() => { if (!isMock) setActionGoal(goal); }}
+                  onViewTasks={isMock ? undefined : () => {
+                    AsyncStorage.setItem("@threely_switch_goal", goal.id);
+                    router.push("/(tabs)");
+                  }}
+                  {...(goalIdx === 0 ? { menuRef: (r: any) => register("goal-menu-button", r) } : {})}
                 />
               );
               return goalIdx === 0 ? (
@@ -2179,15 +2205,18 @@ function createStyles(c: Colors) {
       flex: 1,
       backgroundColor: c.bg,
     },
+    chatHeaderBlock: {
+      backgroundColor: c.card,
+      borderBottomLeftRadius: radius.lg,
+      borderBottomRightRadius: radius.lg,
+      overflow: "hidden",
+    },
     chatHeader: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
       paddingHorizontal: spacing.lg,
       paddingVertical: spacing.md,
-      borderBottomWidth: 1,
-      borderBottomColor: c.border,
-      backgroundColor: c.card,
     },
     chatHeaderLeft: {
       flexDirection: "row",
@@ -2297,7 +2326,7 @@ function createStyles(c: Colors) {
       paddingVertical: spacing.md,
       borderTopWidth: 1,
       borderTopColor: c.border,
-      backgroundColor: c.card,
+      backgroundColor: c.bg,
     },
     chatInputRow: {
       flexDirection: "row",
@@ -2306,7 +2335,7 @@ function createStyles(c: Colors) {
     chatInput: {
       flex: 1,
       height: 44,
-      backgroundColor: c.bg,
+      backgroundColor: c.card,
       borderWidth: 1,
       borderColor: c.border,
       borderRadius: radius.md,

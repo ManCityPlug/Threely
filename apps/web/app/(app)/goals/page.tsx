@@ -8,6 +8,7 @@ import GoalTemplatesComponent from "@/components/GoalTemplates";
 import type { GoalCategory } from "@/lib/goal-templates";
 import { useToast } from "@/components/ToastProvider";
 import { useSubscription } from "@/lib/subscription-context";
+import { MOCK_TUTORIAL_GOAL } from "@/lib/mock-tutorial-data";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -1085,6 +1086,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
 // ─── Goal Card ────────────────────────────────────────────────────────────────
 
 function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onDeleted: () => void; onUpdated: (goal: Goal) => void; onAddDetail: (goal: Goal) => void }) {
+  const goalRouter = useRouter();
   const [showMenu, setShowMenu] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [toggling, setToggling] = useState(false);
@@ -1212,6 +1214,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
           </button>
           {showMenu && (
             <div
+              data-walkthrough="goal-menu-dropdown"
               style={{
                 position: "absolute", right: 0, top: "100%", marginTop: 4, zIndex: 50,
                 background: "var(--card)", border: "1px solid var(--border)",
@@ -1290,17 +1293,22 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
           Added {new Date(goal.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
         </p>
         {!goal.isPaused && (
-          <a
-            href="/dashboard"
+          <button
+            onClick={() => {
+              const todayKey = `threely_focus_${new Date().toLocaleDateString("en-CA")}`;
+              localStorage.setItem(todayKey, goal.id);
+              goalRouter.push("/dashboard");
+            }}
             style={{
               fontSize: "0.78rem", fontWeight: 600, color: "#fff",
               background: "var(--primary)", textDecoration: "none",
               padding: "5px 12px", borderRadius: 6,
               display: "inline-flex", alignItems: "center",
+              border: "none", cursor: "pointer",
             }}
           >
             View tasks
-          </a>
+          </button>
         )}
       </div>
     </div>
@@ -1313,12 +1321,15 @@ export default function GoalsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { showToast } = useToast();
-  const { hasPro, showPaywall } = useSubscription();
+  const { hasPro, showPaywall, walkthroughActive } = useSubscription();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(searchParams.get("add") === "true");
   const [editGoal, setEditGoal] = useState<Goal | null>(null);
   const [showGoalLimit, setShowGoalLimit] = useState(false);
+
+  // Mock data injection for tutorial walkthrough
+  const effectiveGoals = walkthroughActive && goals.length === 0 ? [MOCK_TUTORIAL_GOAL as Goal] : goals;
 
   const load = useCallback(async () => {
     try {
@@ -1334,8 +1345,9 @@ export default function GoalsPage() {
   useEffect(() => { load(); }, [load]);
 
   function handleTryAddGoal() {
-    if (!hasPro) { showPaywall(); return; }
+    // Allow first goal free — only gate if user already has goals
     const activeCount = goals.filter(g => !g.isPaused).length;
+    if (!hasPro && activeCount > 0) { showPaywall(); return; }
     if (activeCount >= 3) { setShowGoalLimit(true); return; }
     setShowAdd(true);
   }
@@ -1368,8 +1380,8 @@ export default function GoalsPage() {
     setShowAdd(true);
   }
 
-  const activeGoals = goals.filter(g => !g.isPaused);
-  const pausedGoals = goals.filter(g => g.isPaused);
+  const activeGoals = effectiveGoals.filter(g => !g.isPaused);
+  const pausedGoals = effectiveGoals.filter(g => g.isPaused);
 
   if (loading) {
     return (
@@ -1411,7 +1423,7 @@ export default function GoalsPage() {
       </div>
 
       {/* Goals list */}
-      {goals.length === 0 ? (
+      {effectiveGoals.length === 0 ? (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
           <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"\uD83C\uDFAF"}</div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>What will you achieve?</h2>
