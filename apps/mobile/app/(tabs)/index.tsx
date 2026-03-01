@@ -312,6 +312,18 @@ export default function DashboardScreen() {
     }, [goals.length])
   );
 
+  // Restart tutorial when triggered from Profile settings
+  useFocusEffect(
+    useCallback(() => {
+      AsyncStorage.getItem("@threely_restart_tutorial").then((val) => {
+        if (val === "true") {
+          AsyncStorage.removeItem("@threely_restart_tutorial");
+          setTimeout(() => setShowTutorial(true), 350);
+        }
+      });
+    }, [])
+  );
+
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await loadData();
