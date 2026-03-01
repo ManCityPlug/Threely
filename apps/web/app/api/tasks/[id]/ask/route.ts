@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
-import { refineTask } from "@/lib/claude";
+import { askAboutTask, type TaskResource } from "@/lib/claude";
 import { getUserAccess } from "@/lib/subscription";
 
 type Params = { params: Promise<{ id: string }> };
-
-interface TaskResource {
-  type: "youtube_channel" | "tool" | "website" | "book" | "app";
-  name: string;
-  detail: string;
-}
 
 interface TaskItem {
   id: string;
@@ -25,9 +19,9 @@ interface TaskItem {
   resources?: TaskResource[];
 }
 
-// POST /api/tasks/:id/refine
-// Body: { taskItemId: string, userRequest: string }
-// Refines a single task item using AI based on user feedback.
+// POST /api/tasks/:id/ask
+// Body: { taskItemId: string, messages: { role: "user"|"assistant", content: string }[] }
+// Returns: { answer: string }
 export async function POST(request: NextRequest, { params }: Params) {
   try {
     const user = await getUserFromRequest(request);
@@ -45,13 +39,18 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     const { id } = await params;
     const body = await request.json();
-    const { taskItemId, userRequest } = body as {
+    const { taskItemId, messages } = body as {
       taskItemId: string;
-      userRequest: string;
+      messages: { role: "user" | "assistant"; content: string }[];
     };
 
-    if (!taskItemId || !userRequest?.trim()) {
-      return NextResponse.json({ error: "taskItemId and userRequest are required" }, { status: 400 });
+    if (!taskItemId || !Array.isArray(messages) || messages.length === 0) {
+      return NextResponse.json({ error: "taskItemId and messages are required" }, { status: 400 });
+    }
+
+    // Enforce 20-message conversation limit
+    if (messages.length > 20) {
+      return NextResponse.json({ error: "Conversation limit reached (20 messages)" }, { status: 400 });
     }
 
     const dailyTask = await prisma.dailyTask.findFirst({
@@ -64,29 +63,26 @@ export async function POST(request: NextRequest, { params }: Params) {
     const targetTask = tasks.find((t) => t.id === taskItemId);
     if (!targetTask) return NextResponse.json({ error: "Task item not found" }, { status: 404 });
 
-    const refined = await refineTask({
+    // Fetch user profile for intensity level
+    const profile = await prisma.userProfile.findUnique({
+      where: { userId: user.id },
+    });
+
+    const answer = await askAboutTask({
       task: targetTask.task,
       description: targetTask.description,
       why: targetTask.why,
+      resources: targetTask.resources,
       goalTitle: dailyTask.goal.title,
       goalCategory: dailyTask.goal.category,
-      userRequest: userRequest.trim(),
+      goalSummary: dailyTask.goal.structuredSummary,
+      intensityLevel: profile?.intensityLevel ?? 2,
+      messages,
     });
 
-    const updatedTasks = tasks.map((t) =>
-      t.id === taskItemId
-        ? { ...t, task: refined.task, description: refined.description, why: refined.why }
-        : t
-    );
-
-    const updated = await prisma.dailyTask.update({
-      where: { id },
-      data: { tasks: updatedTasks as never },
-    });
-
-    return NextResponse.json({ dailyTask: updated });
+    return NextResponse.json({ answer });
   } catch (e) {
-    console.error("[POST /api/tasks/:id/refine]", e);
-    return NextResponse.json({ error: "Failed to refine task" }, { status: 500 });
+    console.error("[POST /api/tasks/:id/ask]", e);
+    return NextResponse.json({ error: "Failed to answer question" }, { status: 500 });
   }
 }

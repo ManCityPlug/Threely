@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Image, LogBox, Platform, Text, View } from "react-native";
+import * as SplashScreen from "expo-splash-screen";
+
+// Keep native splash visible until we're ready
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 // Suppress network/API errors that show up in Expo Go when API points to production
 LogBox.ignoreLogs([
@@ -61,38 +65,22 @@ export function goBackToWelcome() {
 }
 
 function BrandedSplash() {
+  useEffect(() => {
+    // Hide native splash once this component is visible
+    SplashScreen.hideAsync().catch(() => {});
+  }, []);
+
   return (
-    <LinearGradient
-      colors={["#1A1040", "#2D1B69", "#635BFF"]}
-      style={{ flex: 1, alignItems: "center", justifyContent: "center" }}
-      start={{ x: 0.5, y: 0 }}
-      end={{ x: 0.5, y: 1 }}
-    >
-      {/* Outer glow */}
-      <View
+    <View style={{ flex: 1, backgroundColor: "#1A1040", alignItems: "center", justifyContent: "center" }}>
+      <Image
+        source={require("@/assets/icon.png")}
         style={{
-          width: 180,
-          height: 180,
-          borderRadius: 90,
-          backgroundColor: "rgba(99, 91, 255, 0.25)",
-          alignItems: "center",
-          justifyContent: "center",
+          width: 160,
+          height: 160,
+          borderRadius: 40,
         }}
-      >
-        <Image
-          source={require("@/assets/icon.png")}
-          style={{
-            width: 120,
-            height: 120,
-            borderRadius: 32,
-            shadowColor: "#635BFF",
-            shadowOffset: { width: 0, height: 0 },
-            shadowOpacity: 0.5,
-            shadowRadius: 30,
-          }}
-        />
-      </View>
-    </LinearGradient>
+      />
+    </View>
   );
 }
 
@@ -282,6 +270,8 @@ function AppContent() {
 
   // Not logged in — show welcome flow, then transition to auth Stack
   if (!session && !welcomeDone) {
+    // Hide native splash before showing welcome screen
+    SplashScreen.hideAsync().catch(() => {});
     return (
       <GestureHandlerRootView style={{ flex: 1 }}>
         <StatusBar style="light" />
@@ -297,6 +287,9 @@ function AppContent() {
       </GestureHandlerRootView>
     );
   }
+
+  // Hide native splash when main app is ready
+  SplashScreen.hideAsync().catch(() => {});
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

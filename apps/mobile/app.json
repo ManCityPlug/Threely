@@ -8,8 +8,6 @@
     "scheme": "threely",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
       "backgroundColor": "#1A1040"
     },
     "ios": {

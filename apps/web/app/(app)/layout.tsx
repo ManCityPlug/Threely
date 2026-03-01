@@ -249,7 +249,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className="sidebar">
         {/* Logo */}
         <div style={{
-          padding: "2rem 1.25rem 1.25rem",
+          padding: "2.5rem 1.25rem 1.25rem",
           borderBottom: "1px solid var(--border)",
           display: "flex", alignItems: "center", gap: 10,
         }}>
@@ -288,6 +288,20 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           padding: "1rem 1.25rem",
           borderTop: "1px solid var(--border)",
         }}>
+          {subBadge && (
+            <div style={{
+              display: "inline-block",
+              padding: "2px 10px",
+              borderRadius: 999,
+              background: subBadge.bg,
+              color: subBadge.color,
+              fontSize: "0.7rem",
+              fontWeight: 600,
+              marginBottom: "0.5rem",
+            }}>
+              {subBadge.label}
+            </div>
+          )}
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "0.75rem" }}>
             <div style={{
               width: 34, height: 34, borderRadius: "50%",
@@ -304,20 +318,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
           </div>
-          {subBadge && (
-            <div style={{
-              display: "inline-block",
-              padding: "2px 10px",
-              borderRadius: 999,
-              background: subBadge.bg,
-              color: subBadge.color,
-              fontSize: "0.7rem",
-              fontWeight: 600,
-              marginBottom: "0.5rem",
-            }}>
-              {subBadge.label}
-            </div>
-          )}
           <button
             onClick={handleSignOut}
             className="btn btn-outline"

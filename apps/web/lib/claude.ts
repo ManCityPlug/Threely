@@ -6,6 +6,12 @@ const anthropic = new Anthropic({
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+export interface TaskResource {
+  type: "youtube_channel" | "tool" | "website" | "book" | "app";
+  name: string;
+  detail: string;
+}
+
 export interface TaskItem {
   id: string;
   task: string;
@@ -18,6 +24,7 @@ export interface TaskItem {
   isRescheduled?: boolean;
   isCarriedOver?: boolean;
   carriedFromDate?: string;
+  resources?: TaskResource[];
 }
 
 export interface ParsedGoal {
@@ -420,6 +427,28 @@ Always name specific, real resources — never vague recommendations:
 - **Learning**: specific Udemy/Coursera courses, YouTube channels, books by name
 - **Mindfulness**: Headspace, Calm, Insight Timer, specific techniques
 
+## OPTIONAL RESOURCE RECOMMENDATIONS
+
+For each task, you MAY include a "resources" array. Include resources ONLY when they genuinely help execute THIS specific task. Zero resources is perfectly fine — most tasks won't need them.
+
+Resource types:
+- "youtube_channel": Real channel name + what to search for. NEVER include video URLs.
+  Example: { "type": "youtube_channel", "name": "Jeff Nippard", "detail": "Search 'push pull legs beginner' — his form breakdowns are the gold standard" }
+- "tool": Platform name + how to use it.
+  Example: { "type": "tool", "name": "Shopify", "detail": "shopify.com — start with free trial, use Dawn theme" }
+- "website": Specific site + what to find there.
+  Example: { "type": "website", "name": "Levels.fyi", "detail": "Research salary bands for your target role and company" }
+- "book": Title + author + relevant section.
+  Example: { "type": "book", "name": "Atomic Habits by James Clear", "detail": "Chapter 2 on identity-based habits — directly applies here" }
+- "app": Mobile/desktop app + specific use.
+  Example: { "type": "app", "name": "Strong", "detail": "Free workout tracker — log sets, reps, weight for progressive overload" }
+
+RULES:
+- Do NOT force resources. "Do 3 sets of push-ups" needs zero resources.
+- DO include when they help — "Set up a store" benefits from a tool recommendation.
+- YouTube channels must be REAL, well-known. Never fabricate video URLs.
+- 0-2 resources per task is typical. Quality over quantity.
+
 ## DEADLINE CALIBRATION
 
 - 60+ days: Steady pace, building habits.
@@ -463,11 +492,14 @@ Respond with ONLY valid JSON:
       "description": "Exactly what to do, where, how, and what done looks like",
       "estimated_minutes": 20,
       "why": "One sentence connecting to goal and current stage",
-      "goal_id": "<from prompt>"
+      "goal_id": "<from prompt>",
+      "resources": [{ "type": "tool", "name": "Example", "detail": "How it helps" }]
     }
   ],
   "coach_note": "2-4 sentences, intensity-matched, specific"
-}`;
+}
+
+Note: "resources" is optional — omit it or use an empty array when no resources genuinely help.`;
 
 // ─── generateRoadmap ──────────────────────────────────────────────────────────
 
@@ -564,7 +596,7 @@ export interface GoalChatResult {
  */
 export async function goalChat(messages: GoalChatMessage[]): Promise<GoalChatResult> {
   const turnCount = messages.filter((m) => m.role === "user").length;
-  const shouldWrapUp = turnCount >= 12;
+  const shouldWrapUp = turnCount >= 14;
 
   const systemPrompt = `${IDENTITY_BLOCK}You are Threely Intelligence, a friendly goal-definition coach. Your job is to help a user define a clear, highly specific goal through a short guided conversation.
 
@@ -576,16 +608,62 @@ CRITICAL — The final goal MUST include ALL of these details. You MUST ask abou
 5. A realistic deadline/timeline — ALWAYS suggest one yourself based on their goal complexity, daily time, and intensity. For example: "Based on your goal and 30 min/day, I'd recommend about 3 months — that gives you steady progress without burnout." Then offer options like "That sounds perfect", "I want to do it faster (push harder)", "I'd prefer a longer, more relaxed timeline". NEVER ask them to pick a deadline from scratch — YOU are the coach, so recommend what's realistic and let them adjust.
 6. Which days of the week they want to work on this — ALWAYS ask with presets: "Every day", "Weekdays (Mon–Fri)", "Weekends (Sat–Sun)", "Mon, Wed, Fri"
 
+## CATEGORY-SPECIFIC CONTEXT — MUST ASK WHEN RELEVANT
+
+Depending on the goal category, you MUST ask about these critical factors. Work them naturally into your questions — you can combine them with the 6 core areas or ask them as separate questions.
+
+**FITNESS / GYM / BODY COMPOSITION:**
+- Nutrition: "Do you have a nutrition plan or meal plan in place?" with options like "Yes, I track my meals", "I eat healthy but don't track", "No plan — I need guidance on nutrition too", "I want to focus on training only for now"
+- Equipment/access: "Where will you be training?" — "Full gym membership", "Home gym with basic equipment", "Bodyweight only / no equipment", "Mix of gym and home"
+- Injuries/limitations: "Any injuries or physical limitations to work around?" — "None, I'm good to go", "Minor issue (bad knee, tight back, etc.)", "Recovering from an injury", "Chronic condition I manage"
+
+**BUSINESS / ECOMMERCE / FREELANCE / SIDE HUSTLE:**
+- Budget: "What's your budget to invest in this?" — "$0 — bootstrapping only", "Under $500 for essentials", "$500-2000 for tools and marketing", "$2000+ to move fast"
+- Existing assets: "What do you already have set up?" — "Nothing yet, starting from scratch", "I have an idea and some research", "I have a product/service ready", "I already have customers/revenue"
+- Target market: "Who are you trying to reach?" — offer category-specific options based on their business type
+
+**INVESTING / FINANCE / SAVING / DEBT:**
+- Risk tolerance: "What's your comfort level with risk?" — "Conservative — protect what I have", "Moderate — balanced growth and safety", "Aggressive — maximize returns, I can handle volatility"
+- Current situation: "Where are you starting financially?" — "Complete beginner, no investments", "Some savings, want to invest", "Already investing, want to optimize", "Dealing with debt first"
+- Accounts/tools: "Do you have investment accounts set up?" — "No, I need to open accounts", "I have a 401k/IRA through work", "I have a brokerage account", "I use a robo-advisor"
+
+**LEARNING / EDUCATION / SKILLS / CERTIFICATIONS:**
+- Learning style: "How do you learn best?" — "Video courses and tutorials", "Reading and documentation", "Hands-on projects and practice", "Mix of everything"
+- Resources: "Do you have learning resources picked out?" — "Yes, I know which course/book I'm using", "I have some ideas but need recommendations", "No, I need guidance on where to start"
+- End use: "What will you do with this skill?" — "Career change / new job", "Improve at my current job", "Personal project / hobby", "Freelance / side income"
+
+**CREATIVE / CONTENT / WRITING / ART / MUSIC:**
+- Platform/medium: "Where will you publish or share your work?" — offer relevant options (YouTube, Instagram, blog, gallery, etc.)
+- Equipment/tools: "Do you have the tools you need?" — "Yes, fully set up", "Basic setup, need some upgrades", "Starting from scratch, need everything"
+- Audience: "Who is this for?" — "Building a public audience", "Personal fulfillment / hobby", "Professional portfolio", "Specific community or niche"
+
+**HEALTH / WELLNESS / MINDFULNESS / HABITS:**
+- Current habits: "What does your current routine look like?" — "No routine, starting fresh", "Inconsistent — I start and stop", "I have some habits, adding more", "Solid routine, optimizing"
+- Triggers/challenges: "What's been your biggest obstacle?" — "Consistency and motivation", "Time — too busy", "Don't know where to start", "Stress and overwhelm"
+
+**CAREER / JOB SEARCH / PROFESSIONAL DEVELOPMENT:**
+- Current position: "Where are you in your career?" — "Student / just starting out", "Early career (1-3 years)", "Mid-career looking to level up", "Career changer"
+- Target: "What specific outcome are you after?" — "Land a specific role", "Get promoted", "Switch industries", "Build a new skill for my job"
+- Networking: "How's your professional network?" — "Strong — I know people in the field", "Some connections", "Starting from zero"
+
+IMPORTANT: You do NOT need to ask about ALL of these for every goal. Pick the 1-2 most critical contextual factors for the specific goal type. For example:
+- Gym goal → nutrition is critical, equipment matters
+- Business goal → budget and existing assets are critical
+- Investing → risk tolerance and current situation are critical
+- If the goal doesn't fit a category, skip this section entirely
+
+These contextual questions count toward your 5-10 total questions, not on top of them.
+
 RULES:
 - Ask ONE question at a time with 3-4 multiple-choice options. NEVER include a catch-all "Something else", "Other", "None of the above", or "Tell me what" option — the UI already has a separate "Type my own" button for custom answers
 - Keep questions short and conversational (1-2 sentences max)
-- Ask 5-8 questions to cover ALL 6 areas above, then wrap up. You MUST cover every single area — this is non-negotiable.
+- Ask 5-10 questions to cover ALL 6 core areas PLUS the relevant category-specific context, then wrap up. You MUST cover every core area — this is non-negotiable.
 - CRITICAL: Every option MUST be genuinely distinct and non-overlapping. Before generating options, mentally check: "Could a user reasonably pick two of these at once?" If yes, they overlap — rewrite them. Bad example: "I have equipment" + "No major constraints" (having equipment IS having no constraints). Good example: "I have all the gear I need" vs "I need to buy equipment first" vs "I have limited space to practice"
 - Never include a generic "no constraints" or "I'm good to go" option alongside specific resource options — instead, make every option describe a specific situation
 - If the user provides a custom answer, roll with it naturally
 - You can combine areas 4+5 (intensity + timeline) into one question if natural, but NEVER skip them
 ${shouldWrapUp ? "- IMPORTANT: You have asked enough questions. You MUST wrap up NOW and produce the final goal_text." : ""}
-- Do NOT wrap up until you have covered ALL 6 areas above. If you haven't asked about daily time, deadline/timeline, or work days yet, you MUST ask before wrapping up.
+- Do NOT wrap up until you have covered ALL 6 core areas above AND at least the most critical category-specific context. If you haven't asked about daily time, deadline/timeline, or work days yet, you MUST ask before wrapping up. For fitness goals, you MUST ask about nutrition before wrapping up. For business goals, you MUST ask about budget before wrapping up.
 
 ## REALITY CHECK — AMBITIOUS GOAL DETECTION
 
@@ -634,7 +712,7 @@ When wrapping up (done: true):
   "message": "A short encouraging summary",
   "options": [],
   "done": true,
-  "goal_text": "A detailed 3-5 sentence goal description in first person. MUST include: the specific measurable outcome, where they're starting from, how much daily time they have, their preferred pace/intensity, their target timeline, their work schedule (which days), and any constraints or context discussed. Example quality: 'I want to launch my freelance web design business and land my first 3 paying clients within the next 3 months. I have 2 years of hobby experience with HTML/CSS and can dedicate about 1 hour per day on weekdays while working my full-time job. I want to take a committed, steady approach — consistent daily progress without burning out. I'll focus on building a portfolio site, reaching out to local small businesses, and pricing my services competitively with a budget of $200 for tools and hosting.'"
+  "goal_text": "A detailed 3-6 sentence goal description in first person. MUST include: the specific measurable outcome, where they're starting from, how much daily time they have, their preferred pace/intensity, their target timeline, their work schedule (which days), AND any category-specific context gathered (nutrition plans, budget, risk tolerance, equipment, etc.). Example quality for a fitness goal: 'I want to add visible muscle size to my arms, chest, and shoulders over the next 3-4 months. I'm a regular lifter with a solid routine and full gym access, dedicating 30-60 minutes per day on weekdays. I eat healthy but don't currently track macros and want guidance on nutrition to support muscle growth. I'm taking a steady, committed approach — consistent progress without burning out.' Example for a business goal: 'I want to launch an online store selling handmade jewelry and make my first 10 sales within 3 months. I'm starting from scratch with a budget of about $500 for tools and initial inventory. I can dedicate 1-2 hours per day on weekdays. I want a committed, consistent approach — building something real, not rushing.'"
 }`;
 
   // If messages is empty, inject a seed to start the conversation
@@ -872,6 +950,7 @@ ${previousTasksSection}`;
     goal_id: goal.id,
     why: t.why ?? "",
     isCompleted: false,
+    resources: Array.isArray((t as Record<string, unknown>).resources) ? (t as Record<string, unknown>).resources as TaskResource[] : undefined,
   }));
 
   return { tasks, coach_note: parsed.coach_note };
@@ -1071,6 +1150,70 @@ Return ONLY valid JSON (no markdown):
     description: parsed.description ?? description,
     why: parsed.why ?? why,
   };
+}
+
+// ─── askAboutTask ─────────────────────────────────────────────────────────────
+
+export interface AskAboutTaskInput {
+  task: string;
+  description: string;
+  why: string;
+  resources?: TaskResource[];
+  goalTitle: string;
+  goalCategory: string | null;
+  goalSummary: string | null;
+  intensityLevel: number;
+  messages: { role: "user" | "assistant"; content: string }[];
+}
+
+/**
+ * Answer a user's question about a specific task. Multi-turn, ephemeral.
+ * Returns plain text answer.
+ */
+export async function askAboutTask(input: AskAboutTaskInput): Promise<string> {
+  const { task, description, why, resources, goalTitle, goalCategory, goalSummary, intensityLevel, messages } = input;
+
+  const intensity = intensityLevel ?? 2;
+  const toneGuide = intensity === 1
+    ? "Tone: Warm, patient, encouraging."
+    : intensity === 3
+    ? "Tone: Direct, no fluff, high expectations."
+    : "Tone: Motivating, practical, focused.";
+
+  const resourcesStr = resources && resources.length > 0
+    ? `\nResources already attached:\n${resources.map(r => `- ${r.type}: ${r.name} — ${r.detail}`).join("\n")}`
+    : "";
+
+  const systemPrompt = `${IDENTITY_COMPACT}You are Threely Intelligence, a productivity coach. The user is asking questions about one of their daily tasks. Answer helpfully and specifically.
+
+TASK CONTEXT:
+- Task: ${task}
+- Description: ${description}
+- Why: ${why}${resourcesStr}
+- Goal: "${goalTitle}" (${goalCategory ?? "general"})${goalSummary ? `\n- Goal summary: ${goalSummary}` : ""}
+
+${toneGuide}
+
+RULES:
+- Answer the user's question about THIS specific task. Be practical and actionable.
+- You may recommend resources (YouTube channels, tools, websites, books, apps) when relevant.
+- YouTube channels must be REAL, well-known. Never fabricate video URLs.
+- Keep answers 2-5 sentences. Concise and helpful.
+- Do NOT modify the task itself. Just answer questions and give advice.
+- If the user wants to change the task, suggest they use the Refine feature instead.`;
+
+  const message = await anthropic.messages.create({
+    model: "claude-haiku-4-5-20251001",
+    max_tokens: 500,
+    temperature: 0.7,
+    system: systemPrompt,
+    messages: messages.map(m => ({ role: m.role, content: m.content })),
+  });
+
+  const content = message.content[0];
+  if (content.type !== "text") throw new Error("Unexpected response from Claude");
+
+  return content.text.trim();
 }
 
 // ─── generateWeeklySummary ───────────────────────────────────────────────────

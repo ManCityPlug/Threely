@@ -226,6 +226,16 @@ export default function GoalsScreen() {
   // ── Add flow helpers ────────────────────────────────────────────────────────
   function openAddFlow() {
     if (proExpired) { router.push("/payment" as never); return; }
+    // 3-goal limit
+    const activeCount = goals.length;
+    if (activeCount >= 3) {
+      Alert.alert(
+        "3 Goals. Total Focus.",
+        "Threely gives you 3 tasks per goal, per day \u2014 designed for deep focus and real progress. More than 3 active goals spreads you too thin.\n\nPause or complete a goal to make room for a new one.",
+        [{ text: "Got it", style: "default" }]
+      );
+      return;
+    }
     setEditingGoalId(null);
     setRawGoalInput("");
     setParsedGoal(null);

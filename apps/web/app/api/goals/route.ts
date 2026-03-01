@@ -50,6 +50,17 @@ export async function POST(request: NextRequest) {
     }, { status: 403 });
   }
 
+  // 3-goal limit
+  const activeGoalCount = await prisma.goal.count({
+    where: { userId: user.id, isActive: true },
+  });
+  if (activeGoalCount >= 3) {
+    return NextResponse.json({
+      error: "goal_limit_reached",
+      message: "You can have up to 3 active goals. Complete or pause a goal to make room.",
+    }, { status: 403 });
+  }
+
   const body = await request.json();
   const { title, description, rawInput, structuredSummary, category, deadline, dailyTimeMinutes, intensityLevel, workDays } = body as {
     title: string;

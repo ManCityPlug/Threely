@@ -1318,6 +1318,7 @@ export default function GoalsPage() {
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(searchParams.get("add") === "true");
   const [editGoal, setEditGoal] = useState<Goal | null>(null);
+  const [showGoalLimit, setShowGoalLimit] = useState(false);
 
   const load = useCallback(async () => {
     try {
@@ -1331,6 +1332,13 @@ export default function GoalsPage() {
   }, [showToast]);
 
   useEffect(() => { load(); }, [load]);
+
+  function handleTryAddGoal() {
+    if (!hasPro) { showPaywall(); return; }
+    const activeCount = goals.filter(g => !g.isPaused).length;
+    if (activeCount >= 3) { setShowGoalLimit(true); return; }
+    setShowAdd(true);
+  }
 
   function handleGoalAdded(goal: Goal) {
     const isEdit = editGoal !== null;
@@ -1395,7 +1403,7 @@ export default function GoalsPage() {
         </div>
         <button
           className="btn btn-primary"
-          onClick={() => hasPro ? setShowAdd(true) : showPaywall()}
+          onClick={handleTryAddGoal}
           style={{ fontSize: "0.875rem" }}
         >
           + Add goal
@@ -1417,7 +1425,7 @@ export default function GoalsPage() {
             <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{"·"}</span>
             <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>{"✦"} Progress tracking</span>
           </div>
-          <button className="btn btn-primary" onClick={() => hasPro ? setShowAdd(true) : showPaywall()} style={{ fontSize: "0.95rem", padding: "0.75rem 2rem" }}>
+          <button className="btn btn-primary" onClick={handleTryAddGoal} style={{ fontSize: "0.95rem", padding: "0.75rem 2rem" }}>
             Create your first goal {"\u2192"}
           </button>
         </div>
@@ -1470,6 +1478,30 @@ export default function GoalsPage() {
           onClose={() => { setShowAdd(false); setEditGoal(null); }}
           editGoal={editGoal}
         />
+      )}
+
+      {/* 3-goal limit modal */}
+      {showGoalLimit && (
+        <div className="modal-overlay" onClick={() => setShowGoalLimit(false)}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 420, textAlign: "center", padding: "2rem" }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>{"\uD83C\uDFAF"}</div>
+            <h2 style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 8 }}>
+              3 Goals. Total Focus.
+            </h2>
+            <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.7, marginBottom: "1.5rem" }}>
+              Threely gives you 3 tasks per goal, per day &mdash; designed for deep focus and real progress. More than 3 active goals spreads you too thin.
+              <br /><br />
+              Pause or complete a goal to make room for a new one.
+            </p>
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowGoalLimit(false)}
+              style={{ width: "100%", padding: "0.75rem", fontSize: "0.95rem" }}
+            >
+              Got it
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

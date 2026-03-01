@@ -76,14 +76,23 @@ const DIFFICULTY_OPTIONS = [
 
 // ─── Task Card ────────────────────────────────────────────────────────────────
 
+const RESOURCE_ICONS_WEB: Record<string, string> = {
+  youtube_channel: "\u25B6",
+  tool: "\u2699",
+  website: "\uD83D\uDD17",
+  book: "\uD83D\uDCD6",
+  app: "\uD83D\uDCF1",
+};
+
 function TaskCard({
-  task, onToggle, onSkip, onReschedule, onRefine, readonly = false, overdue = false,
+  task, onToggle, onSkip, onReschedule, onRefine, onAsk, readonly = false, overdue = false,
 }: {
   task: TaskItem;
   onToggle?: (id: string, done: boolean) => void;
   onSkip?: (id: string) => void;
   onReschedule?: (id: string) => void;
   onRefine?: (id: string, userRequest: string) => void;
+  onAsk?: (id: string, messages: { role: "user" | "assistant"; content: string }[]) => Promise<string>;
   readonly?: boolean;
   overdue?: boolean;
 }) {
@@ -92,6 +101,17 @@ function TaskCard({
   const [refineInput, setRefineInput] = useState("");
   const [refining, setRefining] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Ask mode state
+  const [askMode, setAskMode] = useState(false);
+  const [askMessages, setAskMessages] = useState<{ role: "user" | "assistant"; content: string }[]>([]);
+  const [askInput, setAskInput] = useState("");
+  const [askLoading, setAskLoading] = useState(false);
+  const askEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    askEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [askMessages, askLoading]);
 
   // Close menu on outside click
   useEffect(() => {
@@ -109,6 +129,15 @@ function TaskCard({
     setMenuOpen(false);
     setRefineInput("");
     setRefineMode(true);
+    setAskMode(false);
+  }
+
+  function handleStartAsk() {
+    setMenuOpen(false);
+    setAskMode(true);
+    setAskMessages([]);
+    setAskInput("");
+    setRefineMode(false);
   }
 
   async function handleSubmitRefine() {
@@ -117,6 +146,23 @@ function TaskCard({
     onRefine?.(task.id, refineInput.trim());
     setRefining(false);
     setRefineMode(false);
+  }
+
+  async function handleSendAsk() {
+    if (!askInput.trim() || askLoading || !onAsk) return;
+    const userMsg = { role: "user" as const, content: askInput.trim() };
+    const newMessages = [...askMessages, userMsg];
+    setAskMessages(newMessages);
+    setAskInput("");
+    setAskLoading(true);
+    try {
+      const answer = await onAsk(task.id, newMessages);
+      setAskMessages(prev => [...prev, { role: "assistant", content: answer }]);
+    } catch {
+      setAskMessages(prev => [...prev, { role: "assistant", content: "Something went wrong. Try again." }]);
+    } finally {
+      setAskLoading(false);
+    }
   }
 
   const showMenu = !readonly && !task.isCompleted && !task.isSkipped;
@@ -129,123 +175,236 @@ function TaskCard({
         opacity: task.isCompleted || task.isSkipped ? 0.7 : 1,
         transition: "opacity 0.2s, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
         display: "flex",
-        gap: "1rem",
-        alignItems: "flex-start",
+        flexDirection: "column",
+        gap: "0.5rem",
         borderColor: overdue ? "var(--warning)" : undefined,
       }}
     >
-      {!readonly && (
-        <button
-          className={`task-checkbox${task.isCompleted ? " checked" : ""}`}
-          onClick={() => onToggle?.(task.id, !task.isCompleted)}
-          style={{ marginTop: 2 }}
-        >
-          {task.isCompleted && "✓"}
-        </button>
-      )}
-      <div style={{ flex: 1, minWidth: 0 }}>
-        {refineMode ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <p style={{ fontSize: "0.8rem", color: "var(--subtext)", margin: 0 }}>
-              Tell AI how to adjust this task:
-            </p>
-            <input
-              className="field-input"
-              value={refineInput}
-              onChange={e => setRefineInput(e.target.value)}
-              placeholder="e.g. make it shorter, focus on X..."
-              onKeyDown={e => e.key === "Enter" && handleSubmitRefine()}
-              style={{ fontSize: "0.85rem", padding: "6px 10px" }}
-              autoFocus
-            />
-            <div style={{ display: "flex", gap: 6 }}>
-              <button
-                className="btn btn-primary"
-                onClick={handleSubmitRefine}
-                disabled={refining || !refineInput.trim()}
-                style={{ fontSize: "0.8rem", padding: "4px 12px" }}
-              >
-                {refining ? <><span className="spinner" style={{ width: 14, height: 14 }} /> Refining...</> : "Refine"}
-              </button>
-              <button className="btn btn-outline" onClick={() => setRefineMode(false)} style={{ fontSize: "0.8rem", padding: "4px 12px" }}>
-                Cancel
-              </button>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-              <div style={{
-                fontWeight: 600,
-                fontSize: "0.95rem",
-                color: task.isCompleted ? "var(--muted)" : "var(--text)",
-                textDecoration: task.isCompleted ? "line-through" : "none",
-                lineHeight: 1.4,
-              }}>
-                {task.task}
+      <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
+        {!readonly && (
+          <button
+            className={`task-checkbox${task.isCompleted ? " checked" : ""}`}
+            onClick={() => onToggle?.(task.id, !task.isCompleted)}
+            style={{ marginTop: 2 }}
+          >
+            {task.isCompleted && "\u2713"}
+          </button>
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {refineMode ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <p style={{ fontSize: "0.8rem", color: "var(--subtext)", margin: 0 }}>
+                Tell AI how to adjust this task:
+              </p>
+              <input
+                className="field-input"
+                value={refineInput}
+                onChange={e => setRefineInput(e.target.value)}
+                placeholder="e.g. make it shorter, focus on X..."
+                onKeyDown={e => e.key === "Enter" && handleSubmitRefine()}
+                style={{ fontSize: "0.85rem", padding: "6px 10px" }}
+                autoFocus
+              />
+              <div style={{ display: "flex", gap: 6 }}>
+                <button
+                  className="btn btn-primary"
+                  onClick={handleSubmitRefine}
+                  disabled={refining || !refineInput.trim()}
+                  style={{ fontSize: "0.8rem", padding: "4px 12px" }}
+                >
+                  {refining ? <><span className="spinner" style={{ width: 14, height: 14 }} /> Refining...</> : "Refine"}
+                </button>
+                <button className="btn btn-outline" onClick={() => setRefineMode(false)} style={{ fontSize: "0.8rem", padding: "4px 12px" }}>
+                  Cancel
+                </button>
               </div>
-              <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
-                <span style={{
-                  fontSize: "0.72rem", fontWeight: 600,
-                  color: "var(--muted)", background: "var(--bg)",
-                  borderRadius: 20, padding: "2px 8px",
-                  whiteSpace: "nowrap",
+            </div>
+          ) : (
+            <>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+                <div style={{
+                  fontWeight: 600,
+                  fontSize: "0.95rem",
+                  color: task.isCompleted ? "var(--muted)" : "var(--text)",
+                  textDecoration: task.isCompleted ? "line-through" : "none",
+                  lineHeight: 1.4,
                 }}>
-                  {task.estimated_minutes}m
-                </span>
-                {task.isCarriedOver && (
+                  {task.task}
+                </div>
+                <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
                   <span style={{
-                    fontSize: "0.7rem", fontWeight: 600,
-                    color: "var(--warning)", background: "var(--warning-light)",
+                    fontSize: "0.72rem", fontWeight: 600,
+                    color: "var(--muted)", background: "var(--bg)",
                     borderRadius: 20, padding: "2px 8px",
+                    whiteSpace: "nowrap",
                   }}>
-                    Overdue
+                    {task.estimated_minutes}m
                   </span>
+                  {task.isCarriedOver && (
+                    <span style={{
+                      fontSize: "0.7rem", fontWeight: 600,
+                      color: "var(--warning)", background: "var(--warning-light)",
+                      borderRadius: 20, padding: "2px 8px",
+                    }}>
+                      Overdue
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div style={{ fontSize: "0.84rem", color: "var(--subtext)", marginTop: 4, lineHeight: 1.5 }}>
+                {task.description}
+              </div>
+              {/* Resources */}
+              {task.resources && task.resources.length > 0 && (
+                <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+                  {task.resources.map((r, i) => (
+                    <div key={i} style={{ display: "flex", gap: 6, alignItems: "flex-start" }}>
+                      <span style={{ fontSize: "0.8rem", flexShrink: 0, marginTop: 1 }}>
+                        {RESOURCE_ICONS_WEB[r.type] ?? "\uD83D\uDD17"}
+                      </span>
+                      <div>
+                        <span style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--text)" }}>{r.name}</span>
+                        <span style={{ fontSize: "0.8rem", color: "var(--subtext)", marginLeft: 4 }}>{r.detail}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {/* Visible Ask AI button */}
+              {showMenu && onAsk && !askMode && (
+                <button
+                  onClick={handleStartAsk}
+                  style={{
+                    display: "inline-flex", alignItems: "center", gap: 4,
+                    marginTop: 10, padding: "5px 12px",
+                    fontSize: "0.8rem", fontWeight: 600,
+                    color: "var(--primary)", background: "var(--primary-light)",
+                    border: "1px solid color-mix(in srgb, var(--primary) 25%, transparent)",
+                    borderRadius: 20, cursor: "pointer",
+                    transition: "background 0.15s, border-color 0.15s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--primary) 15%, transparent)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "var(--primary-light)"; }}
+                >
+                  <span style={{ fontSize: "0.75rem" }}>&#10022;</span>
+                  Ask AI
+                </button>
+              )}
+            </>
+          )}
+        </div>
+        {showMenu && (
+          <div ref={menuRef} style={{ position: "relative", flexShrink: 0 }}>
+            <button
+              onClick={() => setMenuOpen(o => !o)}
+              style={{
+                fontSize: "1.25rem", lineHeight: 1, padding: "2px 6px",
+                color: "var(--muted)", cursor: "pointer",
+                borderRadius: 4, border: "none", background: "transparent",
+              }}
+            >
+              {"\u22EF"}
+            </button>
+            {menuOpen && (
+              <div style={{
+                position: "absolute", right: 0, top: "100%", zIndex: 50,
+                background: "var(--card)", border: "1px solid var(--border)",
+                borderRadius: "var(--radius)", boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+                minWidth: 180, overflow: "hidden",
+              }}>
+                {onRefine && (
+                  <button onClick={handleStartRefine} style={menuItemStyle}>
+                    Ask AI to refine
+                  </button>
+                )}
+                {onAsk && (
+                  <button onClick={handleStartAsk} style={menuItemStyle}>
+                    Ask about this
+                  </button>
+                )}
+                {onReschedule && (
+                  <button onClick={() => { setMenuOpen(false); onReschedule(task.id); }} style={menuItemStyle}>
+                    Move to tomorrow
+                  </button>
+                )}
+                {onSkip && (
+                  <button onClick={() => { setMenuOpen(false); onSkip(task.id); }} style={{ ...menuItemStyle, color: "var(--danger)" }}>
+                    Remove task
+                  </button>
                 )}
               </div>
-            </div>
-            <div style={{ fontSize: "0.84rem", color: "var(--subtext)", marginTop: 4, lineHeight: 1.5 }}>
-              {task.description}
-            </div>
-          </>
+            )}
+          </div>
         )}
       </div>
-      {showMenu && (
-        <div ref={menuRef} style={{ position: "relative", flexShrink: 0 }}>
-          <button
-            onClick={() => setMenuOpen(o => !o)}
-            style={{
-              fontSize: "1.25rem", lineHeight: 1, padding: "2px 6px",
-              color: "var(--muted)", cursor: "pointer",
-              borderRadius: 4, border: "none", background: "transparent",
-            }}
-          >
-            {"\u22EF"}
-          </button>
-          {menuOpen && (
-            <div style={{
-              position: "absolute", right: 0, top: "100%", zIndex: 50,
-              background: "var(--card)", border: "1px solid var(--border)",
-              borderRadius: "var(--radius)", boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
-              minWidth: 180, overflow: "hidden",
-            }}>
-              {onRefine && (
-                <button onClick={handleStartRefine} style={menuItemStyle}>
-                  Ask AI to refine
-                </button>
+
+      {/* Ask mode — inline chat */}
+      {askMode && onAsk && (
+        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12, marginTop: 4 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+            <span style={{ fontSize: 14, color: "var(--primary)" }}>&#10022;</span>
+            <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--primary)" }}>Ask Threely Intelligence</span>
+          </div>
+
+          {askMessages.length > 0 && (
+            <div style={{ maxHeight: 200, overflowY: "auto", marginBottom: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+              {askMessages.map((msg, i) => (
+                <div
+                  key={i}
+                  style={{
+                    alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
+                    maxWidth: "85%",
+                    padding: "8px 12px",
+                    borderRadius: 12,
+                    fontSize: "0.84rem",
+                    lineHeight: 1.5,
+                    ...(msg.role === "user"
+                      ? { background: "var(--primary)", color: "#fff" }
+                      : { background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }),
+                  }}
+                >
+                  {msg.content}
+                </div>
+              ))}
+              {askLoading && (
+                <div style={{
+                  alignSelf: "flex-start", padding: "8px 12px", borderRadius: 12,
+                  background: "var(--bg)", border: "1px solid var(--border)",
+                }}>
+                  <span className="spinner" style={{ width: 14, height: 14 }} />
+                </div>
               )}
-              {onReschedule && (
-                <button onClick={() => { setMenuOpen(false); onReschedule(task.id); }} style={menuItemStyle}>
-                  Move to tomorrow
-                </button>
-              )}
-              {onSkip && (
-                <button onClick={() => { setMenuOpen(false); onSkip(task.id); }} style={{ ...menuItemStyle, color: "var(--danger)" }}>
-                  Remove task
-                </button>
-              )}
+              <div ref={askEndRef} />
             </div>
           )}
+
+          <div style={{ display: "flex", gap: 6 }}>
+            <input
+              className="field-input"
+              value={askInput}
+              onChange={e => setAskInput(e.target.value)}
+              placeholder="Ask a question..."
+              onKeyDown={e => e.key === "Enter" && handleSendAsk()}
+              style={{ flex: 1, fontSize: "0.85rem", padding: "6px 10px" }}
+              autoFocus
+              disabled={askLoading}
+            />
+            <button
+              className="btn btn-primary"
+              onClick={handleSendAsk}
+              disabled={askLoading || !askInput.trim()}
+              style={{ fontSize: "0.8rem", padding: "4px 12px" }}
+            >
+              Send
+            </button>
+            <button
+              className="btn btn-outline"
+              onClick={() => { setAskMode(false); setAskMessages([]); setAskInput(""); }}
+              style={{ fontSize: "0.8rem", padding: "4px 12px" }}
+            >
+              Close
+            </button>
+          </div>
         </div>
       )}
     </div>
@@ -592,6 +751,11 @@ export default function DashboardPage() {
     }
   }
 
+  async function handleAskAboutTask(dailyTaskId: string, taskItemId: string, messages: { role: "user" | "assistant"; content: string }[]) {
+    const res = await tasksApi.askAboutTask(dailyTaskId, taskItemId, messages);
+    return res.answer;
+  }
+
   async function handleSkipToday(dailyTaskId: string, taskItemId: string) {
     try {
       const res = await tasksApi.skip(dailyTaskId, taskItemId);
@@ -744,7 +908,7 @@ export default function DashboardPage() {
               You&apos;ve got Pro!
             </h2>
             <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: 20 }}>
-              Enjoy full access to Threely Pro for 3 days — completely free, no credit card needed.
+              Enjoy full access to Threely Pro for 7 days — completely free, no credit card needed.
             </p>
             <div style={{ textAlign: "left", display: "inline-flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
               <span style={{ fontSize: "0.9rem", color: "var(--text)" }}>✦  AI-powered daily tasks</span>
@@ -1043,6 +1207,9 @@ export default function DashboardPage() {
                   }
                   onRefine={(taskItemId, userRequest) =>
                     handleRefineTask(dt.id, taskItemId, userRequest)
+                  }
+                  onAsk={(taskItemId, messages) =>
+                    handleAskAboutTask(dt.id, taskItemId, messages)
                   }
                 />
               </div>

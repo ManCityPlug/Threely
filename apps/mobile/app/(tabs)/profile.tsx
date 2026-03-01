@@ -849,8 +849,7 @@ export default function ProfileScreen() {
                     </Text>
                     <Text style={styles.notifSub}>{opt.rangeLabel}</Text>
                   </View>
-                  <Text style={[styles.notifTime, isSelected && { color: colors.primary }]}>{opt.time}</Text>
-                  {isSelected && <Ionicons name="checkmark-circle" size={20} color={colors.primary} style={{ marginLeft: 6 }} />}
+                  {isSelected && <Ionicons name="checkmark-circle" size={20} color={colors.primary} />}
                 </Pressable>
               );
             })}

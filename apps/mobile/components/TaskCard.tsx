@@ -22,14 +22,28 @@ import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
 import { scalePress } from "@/lib/animations";
 
+const RESOURCE_ICONS: Record<string, string> = {
+  youtube_channel: "\u25B6",
+  tool: "\u2699",
+  website: "\uD83D\uDD17",
+  book: "\uD83D\uDCD6",
+  app: "\uD83D\uDCF1",
+};
+
+interface AskMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 interface TaskCardProps {
   task: TaskItem;
   onToggle: (isCompleted: boolean) => void;
   onRefine?: (userRequest: string) => Promise<void>;
+  onAsk?: (messages: AskMessage[]) => Promise<string>;
   readonly?: boolean;
 }
 
-export function TaskCard({ task, onToggle, onRefine, readonly = false }: TaskCardProps) {
+export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false }: TaskCardProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [modalVisible, setModalVisible] = useState(false);
@@ -181,6 +195,7 @@ export function TaskCard({ task, onToggle, onRefine, readonly = false }: TaskCar
           onClose={() => { setModalVisible(false); setRefineMode(false); setRefineInput(""); }}
           onCheckPress={() => { handleCheckPress(); setModalVisible(false); }}
           onRefine={onRefine}
+          onAsk={onAsk}
           refineMode={refineMode}
           setRefineMode={setRefineMode}
           refineInput={refineInput}
@@ -199,7 +214,7 @@ const DISMISS_THRESHOLD = 120;
 
 function TaskDetailModal({
   visible, task, taskTitle, colors, styles, readonly,
-  onClose, onCheckPress, onRefine,
+  onClose, onCheckPress, onRefine, onAsk,
   refineMode, setRefineMode, refineInput, setRefineInput, refineLoading, setRefineLoading,
 }: {
   visible: boolean;
@@ -211,6 +226,7 @@ function TaskDetailModal({
   onClose: () => void;
   onCheckPress: () => void;
   onRefine?: (userRequest: string) => Promise<void>;
+  onAsk?: (messages: AskMessage[]) => Promise<string>;
   refineMode: boolean;
   setRefineMode: (v: boolean) => void;
   refineInput: string;
@@ -218,6 +234,13 @@ function TaskDetailModal({
   refineLoading: boolean;
   setRefineLoading: (v: boolean) => void;
 }) {
+  // Ask mode state
+  const [askMode, setAskMode] = useState(false);
+  const [askMessages, setAskMessages] = useState<AskMessage[]>([]);
+  const [askInput, setAskInput] = useState("");
+  const [askLoading, setAskLoading] = useState(false);
+  const askScrollRef = useRef<ScrollView>(null);
+
   const translateY = useRef(new Animated.Value(0)).current;
   const overlayOpacity = useRef(new Animated.Value(1)).current;
   const scrollRef = useRef<ScrollView>(null);
@@ -292,6 +315,32 @@ function TaskDetailModal({
               {taskTitle}
             </Text>
 
+            {/* AI action buttons — prominent, right after title */}
+            {!readonly && !refineMode && !askMode && (onRefine || onAsk) && (
+              <View style={styles.modalActionRow}>
+                {onAsk && (
+                  <TouchableOpacity
+                    style={styles.modalActionBtn}
+                    onPress={() => setAskMode(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.intelligenceActionIcon}>✦</Text>
+                    <Text style={styles.modalActionText}>Ask about this</Text>
+                  </TouchableOpacity>
+                )}
+                {onRefine && (
+                  <TouchableOpacity
+                    style={styles.modalActionBtn}
+                    onPress={() => setRefineMode(true)}
+                    activeOpacity={0.7}
+                  >
+                    <Text style={styles.intelligenceActionIcon}>✦</Text>
+                    <Text style={styles.modalActionText}>Refine</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+
             {/* Description */}
             {task.description ? (
               <>
@@ -305,6 +354,22 @@ function TaskDetailModal({
               <>
                 <Text style={styles.modalSectionLabel}>Why it matters</Text>
                 <Text style={styles.modalWhy}>{task.why}</Text>
+              </>
+            ) : null}
+
+            {/* Resources */}
+            {task.resources && task.resources.length > 0 ? (
+              <>
+                <Text style={styles.modalSectionLabel}>Resources</Text>
+                {task.resources.map((r, i) => (
+                  <View key={i} style={styles.resourceItem}>
+                    <Text style={styles.resourceIcon}>{RESOURCE_ICONS[r.type] ?? "\uD83D\uDD17"}</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.resourceName}>{r.name}</Text>
+                      <Text style={styles.resourceDetail}>{r.detail}</Text>
+                    </View>
+                  </View>
+                ))}
               </>
             ) : null}
           </ScrollView>
@@ -364,16 +429,98 @@ function TaskDetailModal({
             </View>
           )}
 
-          {/* Action button: Threely Intelligence */}
-          {!readonly && !refineMode && onRefine && (
-            <View style={styles.modalActionRow}>
+          {/* Ask mode — chat UI */}
+          {askMode && onAsk && (
+            <View style={styles.refineSection}>
+              <View style={styles.intelligenceHeader}>
+                <Text style={styles.intelligenceIcon}>✦</Text>
+                <Text style={styles.intelligenceTitle}>Ask Threely Intelligence</Text>
+              </View>
+
+              {askMessages.length > 0 && (
+                <ScrollView
+                  ref={askScrollRef}
+                  style={styles.askChatScroll}
+                  onContentSizeChange={() => askScrollRef.current?.scrollToEnd({ animated: true })}
+                >
+                  {askMessages.map((msg, i) => (
+                    <View
+                      key={i}
+                      style={[
+                        styles.askBubble,
+                        msg.role === "user" ? styles.askBubbleUser : styles.askBubbleAI,
+                      ]}
+                    >
+                      <Text style={[
+                        styles.askBubbleText,
+                        msg.role === "user" ? styles.askBubbleTextUser : styles.askBubbleTextAI,
+                      ]}>{msg.content}</Text>
+                    </View>
+                  ))}
+                  {askLoading && (
+                    <View style={[styles.askBubble, styles.askBubbleAI]}>
+                      <ActivityIndicator size="small" color={colors.primary} />
+                    </View>
+                  )}
+                </ScrollView>
+              )}
+
+              <View style={styles.askInputRow}>
+                <TextInput
+                  style={styles.askInput}
+                  value={askInput}
+                  onChangeText={setAskInput}
+                  placeholder="Ask a question..."
+                  placeholderTextColor={colors.textTertiary}
+                  editable={!askLoading}
+                  onSubmitEditing={async () => {
+                    if (!askInput.trim() || askLoading) return;
+                    const userMsg: AskMessage = { role: "user", content: askInput.trim() };
+                    const newMessages = [...askMessages, userMsg];
+                    setAskMessages(newMessages);
+                    setAskInput("");
+                    setAskLoading(true);
+                    try {
+                      const answer = await onAsk(newMessages);
+                      setAskMessages(prev => [...prev, { role: "assistant", content: answer }]);
+                    } catch {
+                      setAskMessages(prev => [...prev, { role: "assistant", content: "Something went wrong. Try again." }]);
+                    } finally {
+                      setAskLoading(false);
+                    }
+                  }}
+                />
+                <TouchableOpacity
+                  style={[styles.askSendBtn, (!askInput.trim() || askLoading) && { opacity: 0.5 }]}
+                  onPress={async () => {
+                    if (!askInput.trim() || askLoading) return;
+                    const userMsg: AskMessage = { role: "user", content: askInput.trim() };
+                    const newMessages = [...askMessages, userMsg];
+                    setAskMessages(newMessages);
+                    setAskInput("");
+                    setAskLoading(true);
+                    try {
+                      const answer = await onAsk(newMessages);
+                      setAskMessages(prev => [...prev, { role: "assistant", content: answer }]);
+                    } catch {
+                      setAskMessages(prev => [...prev, { role: "assistant", content: "Something went wrong. Try again." }]);
+                    } finally {
+                      setAskLoading(false);
+                    }
+                  }}
+                  disabled={!askInput.trim() || askLoading}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.askSendBtnText}>Send</Text>
+                </TouchableOpacity>
+              </View>
+
               <TouchableOpacity
-                style={styles.modalActionBtn}
-                onPress={() => setRefineMode(true)}
+                style={styles.editCancelBtn}
+                onPress={() => { setAskMode(false); setAskMessages([]); setAskInput(""); }}
                 activeOpacity={0.7}
               >
-                <Text style={styles.intelligenceActionIcon}>✦</Text>
-                <Text style={styles.modalActionText}>Refine with Threely Intelligence</Text>
+                <Text style={styles.editCancelText}>Close chat</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -744,6 +891,89 @@ function createStyles(c: Colors) {
       fontSize: typography.sm,
       fontWeight: typography.semibold,
       color: c.primary,
+    },
+    // ── Resources ────────────────────────────────────────────────────────────
+    resourceItem: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: spacing.sm,
+      marginBottom: spacing.sm,
+      paddingLeft: spacing.xs,
+    },
+    resourceIcon: {
+      fontSize: 16,
+      marginTop: 2,
+    },
+    resourceName: {
+      fontSize: typography.sm,
+      fontWeight: typography.semibold,
+      color: c.text,
+      lineHeight: 20,
+    },
+    resourceDetail: {
+      fontSize: typography.sm,
+      color: c.textSecondary,
+      lineHeight: 19,
+    },
+    // ── Ask chat ─────────────────────────────────────────────────────────────
+    askChatScroll: {
+      maxHeight: 200,
+      marginBottom: spacing.sm,
+    },
+    askBubble: {
+      maxWidth: "85%",
+      borderRadius: radius.md,
+      padding: spacing.sm,
+      marginBottom: spacing.xs,
+    },
+    askBubbleUser: {
+      alignSelf: "flex-end",
+      backgroundColor: c.primary,
+    },
+    askBubbleAI: {
+      alignSelf: "flex-start",
+      backgroundColor: c.bg,
+      borderWidth: 1,
+      borderColor: c.border,
+    },
+    askBubbleText: {
+      fontSize: typography.sm,
+      lineHeight: 20,
+    },
+    askBubbleTextUser: {
+      color: c.primaryText,
+    },
+    askBubbleTextAI: {
+      color: c.text,
+    },
+    askInputRow: {
+      flexDirection: "row",
+      gap: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    askInput: {
+      flex: 1,
+      backgroundColor: c.bg,
+      borderWidth: 1.5,
+      borderColor: c.primary + "55",
+      borderRadius: radius.md,
+      paddingHorizontal: spacing.md,
+      paddingVertical: spacing.sm,
+      fontSize: typography.base,
+      color: c.text,
+    },
+    askSendBtn: {
+      height: 44,
+      paddingHorizontal: spacing.md,
+      borderRadius: radius.md,
+      backgroundColor: c.primary,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    askSendBtnText: {
+      fontSize: typography.sm,
+      fontWeight: typography.bold,
+      color: c.primaryText,
     },
   });
 }

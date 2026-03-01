@@ -515,6 +515,11 @@ export default function DashboardScreen() {
     }
   }
 
+  async function handleAskAboutTask(dailyTaskId: string, taskItemId: string, messages: { role: "user" | "assistant"; content: string }[]) {
+    const res = await tasksApi.askAboutTask(dailyTaskId, taskItemId, messages);
+    return res.answer;
+  }
+
   async function handleCompleteAll() {
     const incompleteTasks = newTaskItems.filter((t) => !t.isCompleted);
     if (incompleteTasks.length === 0) return;
@@ -885,6 +890,7 @@ export default function DashboardScreen() {
                               handleToggleTask(dt.id, task.id, isCompleted)
                             }
                             onRefine={(userRequest) => handleRefineTask(dt.id, task.id, userRequest)}
+                            onAsk={(messages) => handleAskAboutTask(dt.id, task.id, messages)}
                           />
                         </Animated.View>
                       );
@@ -1078,7 +1084,7 @@ export default function DashboardScreen() {
             <Text style={{ fontSize: 40, textAlign: "center", marginBottom: spacing.md, color: colors.primary }}>✦</Text>
             <Text style={[styles.welcomeTitle, { color: colors.primary }]}>You've got Pro!</Text>
             <Text style={styles.welcomeSubtitle}>
-              Enjoy full access to Threely Pro for 3 days — completely free, no credit card needed.
+              Enjoy full access to Threely Pro for 7 days — completely free, no credit card needed.
             </Text>
             <View style={{ gap: spacing.sm, marginBottom: spacing.lg }}>
               <Text style={styles.welcomeFeature}>✦  AI-powered daily tasks</Text>

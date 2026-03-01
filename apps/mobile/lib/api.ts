@@ -22,6 +22,12 @@ export interface Goal {
   updatedAt: string;
 }
 
+export interface TaskResource {
+  type: "youtube_channel" | "tool" | "website" | "book" | "app";
+  name: string;
+  detail: string;
+}
+
 export interface TaskItem {
   id: string;
   task: string;
@@ -34,6 +40,7 @@ export interface TaskItem {
   isRescheduled?: boolean;
   isCarriedOver?: boolean;
   carriedFromDate?: string;
+  resources?: TaskResource[];
 }
 
 export interface DailyTask {
@@ -291,6 +298,12 @@ export const tasksApi = {
     apiFetch<{ dailyTask: DailyTask }>(`/api/tasks/${dailyTaskId}/refine`, {
       method: "POST",
       body: JSON.stringify({ taskItemId, userRequest }),
+    }),
+
+  askAboutTask: (dailyTaskId: string, taskItemId: string, messages: { role: "user" | "assistant"; content: string }[]) =>
+    apiFetch<{ answer: string }>(`/api/tasks/${dailyTaskId}/ask`, {
+      method: "POST",
+      body: JSON.stringify({ taskItemId, messages }),
     }),
 };
 
