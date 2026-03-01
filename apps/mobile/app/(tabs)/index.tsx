@@ -133,6 +133,7 @@ export default function DashboardScreen() {
   const [restDayPickerOpen, setRestDayPickerOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [nickname, setNickname] = useState("");
@@ -196,8 +197,45 @@ export default function DashboardScreen() {
       setDailyTasks(tasksRes.dailyTasks);
       setGoals(goalsRes.goals);
       setGoalStats(statsRes.goalStats ?? []);
-      setRestDay(tasksRes.restDay ?? false);
       if (profileRes.profile) setDailyTimeMinutes(profileRes.profile.dailyTimeMinutes);
+
+      // Check if a rest-day generate is in progress (user may have closed/backgrounded app)
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const genFlag = await AsyncStorage.getItem(`@threely_restday_gen_${todayStr}`);
+      if (tasksRes.dailyTasks.length === 0 && genFlag && !pollingRef.current) {
+        setGenerating(true);
+        setRestDay(false);
+        const startedAt = parseInt(genFlag, 10);
+        const elapsed = Date.now() - startedAt;
+        if (elapsed < 90_000) {
+          pollingRef.current = setInterval(async () => {
+            try {
+              const poll = await tasksApi.today(false);
+              if (poll.dailyTasks.length > 0) {
+                setDailyTasks(poll.dailyTasks);
+                setGenerating(false);
+                setRestDay(false);
+                await AsyncStorage.removeItem(`@threely_restday_gen_${todayStr}`);
+                if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null; }
+              }
+            } catch { /* ignore poll errors */ }
+          }, 5000);
+          setTimeout(() => {
+            if (pollingRef.current) {
+              clearInterval(pollingRef.current);
+              pollingRef.current = null;
+              setGenerating(false);
+              setRestDay(true);
+              AsyncStorage.removeItem(`@threely_restday_gen_${todayStr}`);
+            }
+          }, Math.max(0, 90_000 - elapsed));
+        } else {
+          await AsyncStorage.removeItem(`@threely_restday_gen_${todayStr}`);
+          setRestDay(tasksRes.restDay ?? false);
+        }
+      } else {
+        setRestDay(tasksRes.restDay ?? false);
+      }
 
       // Restore saved focus: prefer server, fallback to AsyncStorage
       const serverFocus = focusRes.focus?.focusGoalId;
@@ -847,9 +885,10 @@ export default function DashboardScreen() {
               style={[styles.primaryBtn, { marginTop: spacing.md, paddingHorizontal: spacing.xl }]}
               onPress={() => {
                 if (isLimitedMode) { showBottomSheetPaywall(); return; }
+                const todayStr = new Date().toISOString().slice(0, 10);
                 if (goals.length === 1) {
-                  // Only 1 goal — generate directly
                   setGenerating(true);
+                  AsyncStorage.setItem(`@threely_restday_gen_${todayStr}`, String(Date.now()));
                   tasksApi.generate(goals[0].id).then((res) => {
                     setDailyTasks((prev) => {
                       const newIds = new Set(res.dailyTasks.map((dt) => dt.id));
@@ -857,7 +896,9 @@ export default function DashboardScreen() {
                     });
                     setRestDay(false);
                     if (res.dailyTasks.length === 1) setSelectedGoal(res.dailyTasks[0].goalId);
+                    AsyncStorage.removeItem(`@threely_restday_gen_${todayStr}`);
                   }).catch((e) => {
+                    AsyncStorage.removeItem(`@threely_restday_gen_${todayStr}`);
                     if (e instanceof Error && e.message?.includes("pro_required")) {
                       showBottomSheetPaywall();
                     } else {
@@ -865,7 +906,6 @@ export default function DashboardScreen() {
                     }
                   }).finally(() => setGenerating(false));
                 } else {
-                  // Multiple goals — show picker
                   setRestDayPickerOpen(true);
                 }
               }}
@@ -1026,6 +1066,8 @@ export default function DashboardScreen() {
                 onPress={() => {
                   setRestDayPickerOpen(false);
                   setGenerating(true);
+                  const todayStr = new Date().toISOString().slice(0, 10);
+                  AsyncStorage.setItem(`@threely_restday_gen_${todayStr}`, String(Date.now()));
                   tasksApi.generate(g.id).then((res) => {
                     setDailyTasks((prev) => {
                       const newIds = new Set(res.dailyTasks.map((dt) => dt.id));
@@ -1033,7 +1075,9 @@ export default function DashboardScreen() {
                     });
                     setRestDay(false);
                     if (res.dailyTasks.length === 1) setSelectedGoal(res.dailyTasks[0].goalId);
+                    AsyncStorage.removeItem(`@threely_restday_gen_${todayStr}`);
                   }).catch((e) => {
+                    AsyncStorage.removeItem(`@threely_restday_gen_${todayStr}`);
                     if (e instanceof Error && e.message?.includes("pro_required")) {
                       showBottomSheetPaywall();
                     } else {
