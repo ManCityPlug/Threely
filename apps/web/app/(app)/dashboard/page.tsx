@@ -1370,8 +1370,43 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* Give me more bar — shown above tasks when all done */}
-          {allDone && !insight && (
+          {/* Coach note card */}
+          {insight && (
+            <div className="card fade-in" style={{
+              padding: "1.25rem",
+              background: "rgba(99,91,255,0.08)",
+              border: "1px solid rgba(99,91,255,0.2)",
+              marginBottom: "1.25rem",
+            }}>
+              <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--primary)", margin: 0, marginBottom: 6 }}>
+                ✦ Coach note
+              </p>
+              <p style={{ fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.6, margin: 0 }}>
+                {insight}
+              </p>
+              {generating && (
+                <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: 8, margin: 0 }}>
+                  <span className="spinner" style={{ marginRight: 6 }} />Generating next tasks...
+                </p>
+              )}
+              <div style={{ textAlign: "center", marginTop: "1rem" }}>
+                <button
+                  onClick={() => setInsight(null)}
+                  className="btn btn-primary"
+                  style={{
+                    fontSize: "0.85rem",
+                    fontWeight: 700,
+                    padding: "0.5rem 1.5rem",
+                  }}
+                >
+                  Got it
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Give me more bar — shown when all done */}
+          {allDone && (
             <div className="give-more-bar unlocked" data-walkthrough="get-more-button" style={{ marginBottom: "1.25rem" }}>
               <button
                 onClick={handleGiveMore}
@@ -1389,47 +1424,8 @@ export default function DashboardPage() {
                 {generating ? <><span className="spinner spinner-dark" style={{ width: 18, height: 18 }} /> Generating...</> : "🚀 Get more tasks"}
               </button>
               <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.9)", fontWeight: 500 }}>
-                {generating ? <><strong>This can take a couple of minutes.</strong> Hang tight!</> : "Great work! Review and get your next steps."}
+                {generating ? <><strong>This can take a couple of minutes.</strong> Hang tight!</> : "Great work! Ready for your next steps?"}
               </span>
-            </div>
-          )}
-
-          {/* Coach note card */}
-          {insight && (
-            <div className="card fade-in" style={{
-              padding: "1.25rem",
-              background: "rgba(99,91,255,0.08)",
-              border: "1px solid rgba(99,91,255,0.2)",
-              marginBottom: "1.25rem",
-            }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--primary)", margin: 0 }}>
-                  ✦ Coach note
-                </p>
-                <button
-                  onClick={() => setInsight(null)}
-                  style={{
-                    fontSize: "0.75rem",
-                    fontWeight: 600,
-                    color: "var(--primary)",
-                    background: "rgba(99,91,255,0.12)",
-                    border: "none",
-                    borderRadius: 6,
-                    padding: "4px 12px",
-                    cursor: "pointer",
-                  }}
-                >
-                  Got it
-                </button>
-              </div>
-              <p style={{ fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.6, margin: 0 }}>
-                {insight}
-              </p>
-              {generating && (
-                <p style={{ fontSize: "0.85rem", color: "var(--muted)", marginTop: 8, margin: 0 }}>
-                  <span className="spinner" style={{ marginRight: 6 }} />Generating next tasks...
-                </p>
-              )}
             </div>
           )}
 
