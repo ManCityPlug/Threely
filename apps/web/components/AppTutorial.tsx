@@ -1,101 +1,367 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
-// ─── Spotlight step definitions ──────────────────────────────────────────────
+// ─── Mock data ──────────────────────────────────────────────────────────────
 
-interface SpotlightStep {
-  title: string;
-  description: string;
-  target: string | null;      // data-walkthrough attribute value, or null for centered
-  route: string | null;       // route to navigate to, or null for no navigation
-  tooltipPosition: "above" | "below" | "center";
-  openMenu?: string;          // data-walkthrough of a menu button to click open
-  scrollTo?: boolean;         // scroll target into view first
-}
+const MOCK_GOAL = {
+  title: "Get in the best shape of my life",
+  category: "Health & Fitness",
+  deadline: (() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 90);
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  })(),
+  dailyTime: "30 min/day",
+  workDays: "Mon – Sat",
+};
 
-const STEPS: SpotlightStep[] = [
+const MOCK_TASKS = [
   {
-    title: "Your Daily Tasks",
-    description:
-      "Every day, Threely generates 3 personalized tasks for each of your goals. You can see the full details, estimated time, and relevant resources for every task right here.",
-    target: "first-task-card",
-    route: "/dashboard",
-    tooltipPosition: "below",
+    id: "t1",
+    task: "Complete a 20-minute full-body HIIT circuit",
+    description: "4 rounds: 40s burpees, 40s mountain climbers, 40s squat jumps, 40s plank jacks — 20s rest between exercises.",
+    estimated_minutes: 20,
+    why: "High-intensity intervals build cardiovascular endurance and metabolic conditioning faster than steady-state cardio",
+    resources: [
+      { type: "youtube_channel" as const, name: "THENX", detail: "Calisthenics HIIT routines" },
+    ],
   },
   {
-    title: "Ask AI for Help",
-    description:
-      "Have a question about your task? Tap \"Ask AI\" to get instant clarification, alternative approaches, or tips on how to get started.",
-    target: "ask-ai-button",
-    route: "/dashboard",
-    tooltipPosition: "below",
-    scrollTo: true,
+    id: "t2",
+    task: "Plan and prep tomorrow's meals around a 40/30/30 macro split",
+    description: "Map out breakfast, lunch, dinner, and one snack hitting ~2,200 cal with 40% protein, 30% carbs, 30% fat. Prep what you can tonight.",
+    estimated_minutes: 15,
+    why: "Nutrition consistency compounds — one prepped day removes decision fatigue for the next",
+    resources: [
+      { type: "app" as const, name: "MyFitnessPal", detail: "Track macros and calories" },
+    ],
   },
   {
-    title: "Task Options",
-    description:
-      "Tap the three dots (\u22EF) on any task to see more options:\n\u2022 Ask AI to refine \u2014 adjust the task if it\u2019s too easy, too hard, or unclear\n\u2022 Ask about this \u2014 get help or context for this task\n\u2022 Move to tomorrow \u2014 reschedule if you can\u2019t do it today\n\u2022 Remove task \u2014 skip this one entirely",
-    target: "task-menu-button",
-    route: "/dashboard",
-    tooltipPosition: "below",
-    openMenu: "task-menu-button",
-  },
-  {
-    title: "Complete Tasks to Unlock More",
-    description:
-      "Finish all 3 of your daily tasks to unlock extra tasks. Threely generates a fresh set of 3 tasks for you each day \u2014 but once you\u2019ve completed them all, you can generate more to keep going.",
-    target: "unlock-more-bar",
-    route: "/dashboard",
-    tooltipPosition: "below",
-    scrollTo: true,
-  },
-  {
-    title: "Your Goals",
-    description:
-      "Here are all your goals with their schedule, time commitment, and status. Tap \"View tasks\" on any goal to jump to today\u2019s tasks for that goal.",
-    target: "first-goal-card",
-    route: "/goals",
-    tooltipPosition: "below",
-  },
-  {
-    title: "Goal Options",
-    description:
-      "Tap the three dots (\u22EF) on any goal for more options:\n\u2022 Edit goal \u2014 adjust details via an AI chat\n\u2022 Pause goal \u2014 temporarily stop generating tasks\n\u2022 Mark as complete \u2014 celebrate and archive it\n\u2022 Delete goal \u2014 remove it permanently",
-    target: "goal-menu-button",
-    route: "/goals",
-    tooltipPosition: "below",
-    openMenu: "goal-menu-button",
-  },
-  {
-    title: "Your Profile & Stats",
-    description:
-      "Track your streaks, total tasks completed, time invested, and more. Check your weekly analysis for AI-powered insights, adjust your settings, and manage notifications.",
-    target: "profile-stats",
-    route: "/profile",
-    tooltipPosition: "below",
-  },
-  {
-    title: "You\u2019re all set!",
-    description:
-      "Threely adapts to your progress and evolves your tasks over time. The more you use it, the better it gets. Let\u2019s crush those goals!",
-    target: null,
-    route: null,
-    tooltipPosition: "center",
+    id: "t3",
+    task: "Do a 10-minute mobility and recovery flow before bed",
+    description: "Hip 90/90 stretch (2 min each side), thoracic spine rotation (1 min each), pigeon pose (1 min each), deep squat hold (2 min).",
+    estimated_minutes: 10,
+    why: "Active recovery between training days prevents injury and improves range of motion over time",
+    resources: [
+      { type: "youtube_channel" as const, name: "Tom Merrick", detail: "Follow-along mobility routines" },
+    ],
   },
 ];
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+const RESOURCE_ICONS: Record<string, string> = {
+  youtube_channel: "\u25B6",
+  tool: "\u2699",
+  website: "\uD83D\uDD17",
+  book: "\uD83D\uDCD6",
+  app: "\uD83D\uDCF1",
+};
 
-interface Rect {
-  top: number;
-  left: number;
-  width: number;
-  height: number;
+// ─── Slide definitions ──────────────────────────────────────────────────────
+
+interface Slide {
+  title: string;
+  description: string;
+  render: (checkedTasks: Set<string>) => React.ReactNode;
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
+function MockTaskCard({
+  task,
+  checked,
+  onCheck,
+  showAskAi,
+  showMenu,
+}: {
+  task: typeof MOCK_TASKS[number];
+  checked: boolean;
+  onCheck?: () => void;
+  showAskAi?: boolean;
+  showMenu?: boolean;
+}) {
+  return (
+    <div
+      className={`card${!checked ? " task-card-hover" : ""}`}
+      style={{
+        padding: "0.875rem 1rem",
+        opacity: checked ? 0.7 : 1,
+        transition: "opacity 0.2s",
+        display: "flex",
+        flexDirection: "column",
+        gap: "0.4rem",
+      }}
+    >
+      <div style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
+        <button
+          className={`task-checkbox${checked ? " checked" : ""}`}
+          onClick={onCheck}
+          style={{ marginTop: 2, cursor: onCheck ? "pointer" : "default" }}
+        >
+          {checked && "\u2713"}
+        </button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+            <div style={{
+              fontWeight: 600,
+              fontSize: "0.9rem",
+              color: checked ? "var(--muted)" : "var(--text)",
+              textDecoration: checked ? "line-through" : "none",
+              lineHeight: 1.4,
+            }}>
+              {task.task}
+            </div>
+            <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
+              <span style={{
+                fontSize: "0.7rem", fontWeight: 600,
+                color: "var(--muted)", background: "var(--bg)",
+                borderRadius: 20, padding: "2px 8px",
+                whiteSpace: "nowrap",
+              }}>
+                {task.estimated_minutes}m
+              </span>
+            </div>
+          </div>
+          <div style={{ fontSize: "0.8rem", color: "var(--subtext)", marginTop: 3, lineHeight: 1.5 }}>
+            {task.description}
+          </div>
+          {/* Resources */}
+          {task.resources && task.resources.length > 0 && (
+            <div style={{ marginTop: 6, display: "flex", flexDirection: "column", gap: 4 }}>
+              {task.resources.map((r, i) => (
+                <div key={i} style={{ display: "flex", gap: 5, alignItems: "center" }}>
+                  <span style={{ fontSize: "0.75rem", flexShrink: 0 }}>
+                    {RESOURCE_ICONS[r.type] ?? "\uD83D\uDD17"}
+                  </span>
+                  <span style={{ fontSize: "0.78rem", fontWeight: 600, color: "var(--text)" }}>{r.name}</span>
+                  <span style={{ fontSize: "0.75rem", color: "var(--subtext)" }}>{r.detail}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          {/* Ask AI button */}
+          {showAskAi && !checked && (
+            <div
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 4,
+                marginTop: 8, padding: "4px 10px",
+                fontSize: "0.78rem", fontWeight: 600,
+                color: "var(--primary)", background: "var(--primary-light)",
+                borderRadius: 8, border: "none",
+              }}
+            >
+              <span style={{ fontSize: "0.85rem" }}>{"\u2728"}</span> Ask AI
+            </div>
+          )}
+        </div>
+        {/* Menu button */}
+        {showMenu && !checked && (
+          <div style={{
+            width: 28, height: 28, borderRadius: 8,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            background: "var(--bg)", cursor: "default", flexShrink: 0,
+            fontSize: "0.9rem", fontWeight: 700, color: "var(--muted)", letterSpacing: 2,
+          }}>
+            {"\u22EF"}
+          </div>
+        )}
+      </div>
+      {/* Why badge */}
+      {!checked && task.why && (
+        <div style={{
+          fontSize: "0.75rem", color: "var(--subtext)", lineHeight: 1.45,
+          fontStyle: "italic", paddingLeft: "2.25rem", marginTop: 2,
+        }}>
+          {task.why}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MockGoalCard() {
+  return (
+    <div className="card" style={{ padding: "1rem 1.25rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <span style={{
+              fontSize: "0.65rem", fontWeight: 700, color: "#fff",
+              background: "var(--primary)", borderRadius: 6,
+              padding: "2px 7px", textTransform: "uppercase", letterSpacing: "0.04em",
+            }}>
+              {MOCK_GOAL.category}
+            </span>
+          </div>
+          <div style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text)", lineHeight: 1.3, marginBottom: 6 }}>
+            {MOCK_GOAL.title}
+          </div>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6, fontSize: "0.75rem", color: "var(--subtext)" }}>
+            <span style={{ background: "var(--bg)", borderRadius: 6, padding: "2px 8px" }}>
+              {MOCK_GOAL.workDays}
+            </span>
+            <span style={{ background: "var(--bg)", borderRadius: 6, padding: "2px 8px" }}>
+              {MOCK_GOAL.dailyTime}
+            </span>
+            <span style={{ background: "var(--bg)", borderRadius: 6, padding: "2px 8px" }}>
+              Deadline: {MOCK_GOAL.deadline}
+            </span>
+          </div>
+        </div>
+        <div style={{
+          width: 28, height: 28, borderRadius: 8,
+          display: "flex", alignItems: "center", justifyContent: "center",
+          background: "var(--bg)", fontSize: "0.9rem", fontWeight: 700,
+          color: "var(--muted)", letterSpacing: 2,
+        }}>
+          {"\u22EF"}
+        </div>
+      </div>
+      <div style={{
+        display: "flex", gap: 6, marginTop: 10,
+      }}>
+        <div style={{
+          fontSize: "0.78rem", fontWeight: 600, color: "var(--primary)",
+          background: "var(--primary-light)", borderRadius: 8,
+          padding: "5px 12px", cursor: "default",
+        }}>
+          View tasks
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MockMenuDropdown() {
+  const items = [
+    { icon: "\u2728", label: "Ask AI to refine", desc: "Adjust difficulty or focus" },
+    { icon: "\u2192", label: "Move to tomorrow", desc: "Reschedule for later" },
+    { icon: "\u2212", label: "Remove task", desc: "Skip this one entirely" },
+  ];
+  return (
+    <div style={{
+      background: "var(--card)", borderRadius: 12,
+      border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)",
+      padding: "0.5rem", width: "100%", maxWidth: 260,
+    }}>
+      {items.map((item, i) => (
+        <div key={i} style={{
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "0.6rem 0.75rem", borderRadius: 8,
+          cursor: "default",
+        }}>
+          <span style={{ fontSize: "1rem" }}>{item.icon}</span>
+          <div>
+            <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text)" }}>{item.label}</div>
+            <div style={{ fontSize: "0.72rem", color: "var(--subtext)" }}>{item.desc}</div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function MockStatsBar() {
+  return (
+    <div style={{
+      display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12,
+      marginBottom: 8,
+    }}>
+      {[
+        { label: "Streak", value: "3 days", icon: "\uD83D\uDD25" },
+        { label: "Completed", value: "47", icon: "\u2705" },
+        { label: "Invested", value: "12.5h", icon: "\u23F1" },
+      ].map(s => (
+        <div key={s.label} className="card" style={{
+          padding: "0.75rem", textAlign: "center",
+        }}>
+          <div style={{ fontSize: "1.25rem", marginBottom: 4 }}>{s.icon}</div>
+          <div style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)" }}>{s.value}</div>
+          <div style={{ fontSize: "0.7rem", color: "var(--muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>{s.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+const SLIDES: Slide[] = [
+  {
+    title: "Your Daily Tasks",
+    description: "Every day, Threely generates 3 personalized tasks for each of your goals \u2014 with time estimates, step-by-step instructions, and curated resources to help you execute.",
+    render: (checked) => (
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {MOCK_TASKS.map(t => (
+          <MockTaskCard key={t.id} task={t} checked={checked.has(t.id)} showAskAi={t.id === "t1"} showMenu />
+        ))}
+      </div>
+    ),
+  },
+  {
+    title: "Complete Tasks as You Go",
+    description: "Tap the circle to check off tasks. Threely tracks your progress, builds streaks, and uses your completion data to calibrate tomorrow\u2019s difficulty.",
+    render: (checked) => (
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {MOCK_TASKS.map(t => (
+          <MockTaskCard key={t.id} task={t} checked={checked.has(t.id)} showAskAi={false} showMenu={false} />
+        ))}
+      </div>
+    ),
+  },
+  {
+    title: "Ask AI & Task Options",
+    description: "Stuck on a task? Tap \u201cAsk AI\u201d for instant help, alternative approaches, or tips. Use the menu (\u22EF) to refine tasks, reschedule them, or remove them entirely.",
+    render: () => (
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <MockTaskCard task={MOCK_TASKS[0]} checked={false} showAskAi showMenu />
+        <MockMenuDropdown />
+      </div>
+    ),
+  },
+  {
+    title: "Generate More When You\u2019re Done",
+    description: "Finish all 3 tasks and a new \u201cGenerate more tasks\u201d button appears. Keep the momentum going \u2014 Threely always has more for you.",
+    render: () => (
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {MOCK_TASKS.map(t => (
+          <MockTaskCard key={t.id} task={t} checked showMenu={false} />
+        ))}
+        <div style={{
+          display: "flex", alignItems: "center", justifyContent: "center",
+          gap: 8, padding: "0.75rem 1rem",
+          background: "var(--primary)", borderRadius: "var(--radius)",
+          cursor: "default",
+        }}>
+          <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "#fff" }}>
+            {"\u2728"} Generate more tasks
+          </span>
+        </div>
+      </div>
+    ),
+  },
+  {
+    title: "Track Your Goals",
+    description: "See all your goals with their schedule, time commitment, and deadline. Tap \u201cView tasks\u201d to jump to today\u2019s tasks, or use the menu to edit, pause, or complete a goal.",
+    render: () => (
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <MockGoalCard />
+      </div>
+    ),
+  },
+  {
+    title: "Your Stats & Insights",
+    description: "Track your streaks, total tasks completed, and time invested. Threely generates AI-powered weekly insights to help you stay on track and optimize your approach.",
+    render: () => <MockStatsBar />,
+  },
+  {
+    title: "You\u2019re all set!",
+    description: "Threely adapts to your progress and evolves your tasks over time. The more you use it, the smarter it gets. Let\u2019s crush those goals!",
+    render: () => (
+      <div style={{ textAlign: "center", padding: "1.5rem 0" }}>
+        <span style={{ fontSize: 64 }}>{"\uD83D\uDE80"}</span>
+      </div>
+    ),
+  },
+];
+
+// ─── Component ──────────────────────────────────────────────────────────────
 
 interface AppTutorialProps {
   visible: boolean;
@@ -103,180 +369,39 @@ interface AppTutorialProps {
 }
 
 export default function AppTutorial({ visible, onComplete }: AppTutorialProps) {
-  const router = useRouter();
-  const pathname = usePathname();
   const [step, setStep] = useState(0);
-  const [targetRect, setTargetRect] = useState<Rect | null>(null);
-  const [animating, setAnimating] = useState(false);
-  const measureTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const openedMenuRef = useRef<string | null>(null);
+  const [checkedTasks, setCheckedTasks] = useState<Set<string>>(new Set());
 
-  // ─── Close any menu we opened ──────────────────────────────────────────
-
-  const closeOpenedMenu = useCallback(() => {
-    if (openedMenuRef.current) {
-      // Click the button again to close the menu
-      const btn = document.querySelector(`[data-walkthrough="${openedMenuRef.current}"] button`);
-      if (btn) {
-        (btn as HTMLElement).click();
-      }
-      openedMenuRef.current = null;
-    }
-  }, []);
-
-  // ─── Measure the target element ──────────────────────────────────────────
-
-  const measureTarget = useCallback((targetAttr: string | null, scrollTo?: boolean) => {
-    if (!targetAttr) {
-      setTargetRect(null);
-      setAnimating(false);
-      return;
-    }
-
-    const el = document.querySelector(`[data-walkthrough="${targetAttr}"]`);
-    if (el) {
-      // Scroll into view if needed
-      if (scrollTo) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-
-      // Small delay after scroll to get accurate rect
-      const delay = scrollTo ? 400 : 50;
-      setTimeout(() => {
-        const rect = el.getBoundingClientRect();
-        const padding = 10;
-        setTargetRect({
-          top: rect.top - padding,
-          left: rect.left - padding,
-          width: rect.width + padding * 2,
-          height: rect.height + padding * 2,
-        });
-        setAnimating(false);
-      }, delay);
-    } else {
-      // Target not found — show centered fallback
-      setTargetRect(null);
-      setAnimating(false);
-    }
-  }, []);
-
-  // ─── Open menu if step requires it ─────────────────────────────────────
-
-  const openMenuForStep = useCallback((openMenu: string | undefined, targetAttr: string | null, scrollTo?: boolean) => {
-    if (!openMenu) {
-      measureTarget(targetAttr, scrollTo);
-      return;
-    }
-
-    // Find the menu button wrapper
-    const wrapper = document.querySelector(`[data-walkthrough="${openMenu}"]`);
-    if (!wrapper) {
-      measureTarget(targetAttr, scrollTo);
-      return;
-    }
-
-    // Click the button inside to open the menu
-    const btn = wrapper.querySelector("button");
-    if (btn) {
-      (btn as HTMLElement).click();
-      openedMenuRef.current = openMenu;
-
-      // Wait for menu to render, then measure the whole wrapper (button + dropdown)
-      setTimeout(() => {
-        const rect = wrapper.getBoundingClientRect();
-        // Find the dropdown that appeared
-        const dropdown = wrapper.querySelector("div[style*='position: absolute']") as HTMLElement | null;
-        if (dropdown) {
-          const dropdownRect = dropdown.getBoundingClientRect();
-          const padding = 10;
-          // Combine button + dropdown rects
-          const combinedTop = Math.min(rect.top, dropdownRect.top) - padding;
-          const combinedLeft = Math.min(rect.left, dropdownRect.left) - padding;
-          const combinedRight = Math.max(rect.right, dropdownRect.right) + padding;
-          const combinedBottom = Math.max(rect.bottom, dropdownRect.bottom) + padding;
-          setTargetRect({
-            top: combinedTop,
-            left: combinedLeft,
-            width: combinedRight - combinedLeft,
-            height: combinedBottom - combinedTop,
-          });
-        } else {
-          // Fallback: just measure the wrapper
-          const padding = 10;
-          setTargetRect({
-            top: rect.top - padding,
-            left: rect.left - padding,
-            width: rect.width + padding * 2,
-            height: rect.height + padding * 2,
-          });
-        }
-        setAnimating(false);
-      }, 200);
-    } else {
-      measureTarget(targetAttr, scrollTo);
-    }
-  }, [measureTarget]);
-
-  // ─── Navigate + measure on step change ───────────────────────────────────
-
+  // Auto-check tasks during step 2 (complete tasks) for demo
   useEffect(() => {
-    if (!visible) return;
+    if (!visible || step !== 1) return; // step index 1 = "Complete Tasks"
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    MOCK_TASKS.forEach((t, i) => {
+      timers.push(setTimeout(() => {
+        setCheckedTasks(prev => new Set(prev).add(t.id));
+      }, 800 + i * 700));
+    });
+    return () => timers.forEach(clearTimeout);
+  }, [visible, step]);
 
-    const current = STEPS[step];
-    setAnimating(true);
-
-    // Close any previously opened menu
-    closeOpenedMenu();
-
-    // Navigate to the correct route if needed
-    if (current.route) {
-      const currentPage = pathname === "/" ? "/dashboard" : pathname;
-      if (currentPage !== current.route) {
-        router.push(current.route);
-      }
-    }
-
-    // Wait for render, then measure (longer delay for route change)
-    if (measureTimerRef.current) clearTimeout(measureTimerRef.current);
-    const currentPage = pathname === "/" ? "/dashboard" : pathname;
-    const needsNavigation = current.route && currentPage !== current.route;
-    const delay = needsNavigation ? 600 : 300;
-
-    measureTimerRef.current = setTimeout(() => {
-      openMenuForStep(current.openMenu, current.target, current.scrollTo);
-    }, delay);
-
-    return () => {
-      if (measureTimerRef.current) clearTimeout(measureTimerRef.current);
-    };
-  }, [step, visible, pathname, router, measureTarget, openMenuForStep, closeOpenedMenu]);
-
-  // ─── Clean up menus on unmount ─────────────────────────────────────────
-
+  // Reset checks when leaving step 2
   useEffect(() => {
-    return () => {
-      closeOpenedMenu();
-    };
-  }, [closeOpenedMenu]);
-
-  // ─── Handlers ────────────────────────────────────────────────────────────
+    if (step !== 1) setCheckedTasks(new Set());
+  }, [step]);
 
   const handleNext = useCallback(() => {
-    if (step === STEPS.length - 1) {
-      closeOpenedMenu();
+    if (step === SLIDES.length - 1) {
       onComplete();
       return;
     }
-    setStep((s) => s + 1);
-  }, [step, onComplete, closeOpenedMenu]);
+    setStep(s => s + 1);
+  }, [step, onComplete]);
 
   const handleSkip = useCallback(() => {
-    closeOpenedMenu();
     onComplete();
-  }, [onComplete, closeOpenedMenu]);
+  }, [onComplete]);
 
-  // ─── Keyboard support ────────────────────────────────────────────────────
-
+  // Keyboard nav
   useEffect(() => {
     if (!visible) return;
     function onKeyDown(e: KeyboardEvent) {
@@ -287,142 +412,114 @@ export default function AppTutorial({ visible, onComplete }: AppTutorialProps) {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [visible, handleNext, handleSkip]);
 
-  // ─── Don't render if not visible ─────────────────────────────────────────
+  // Lock body scroll
+  useEffect(() => {
+    if (!visible) return;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, [visible]);
 
   if (!visible) return null;
 
-  const current = STEPS[step];
-  const isLast = step === STEPS.length - 1;
-  const isCentered = current.target === null || !targetRect;
-
-  // ─── Compute tooltip position ────────────────────────────────────────────
-
-  let tooltipStyle: React.CSSProperties = {};
-
-  if (!isCentered && targetRect) {
-    const tooltipWidth = 360;
-    let tooltipLeft = targetRect.left + targetRect.width / 2 - tooltipWidth / 2;
-    tooltipLeft = Math.max(16, Math.min(tooltipLeft, window.innerWidth - tooltipWidth - 16));
-
-    if (current.tooltipPosition === "below") {
-      tooltipStyle = {
-        left: tooltipLeft,
-        top: targetRect.top + targetRect.height + 16,
-        width: tooltipWidth,
-      };
-    } else if (current.tooltipPosition === "above") {
-      tooltipStyle = {
-        left: tooltipLeft,
-        bottom: window.innerHeight - targetRect.top + 16,
-        width: tooltipWidth,
-      };
-    }
-  }
-
-  // ─── Format description with line breaks ───────────────────────────────
-
-  const descriptionLines = current.description.split("\n");
-
-  // ─── Tooltip content ────────────────────────────────────────────────────
-
-  const tooltipContent = (
-    <>
-      <div className="spotlight-tooltip-title">{current.title}</div>
-      <div className="spotlight-tooltip-desc">
-        {descriptionLines.map((line, i) => (
-          <span key={i}>
-            {line}
-            {i < descriptionLines.length - 1 && <br />}
-          </span>
-        ))}
-      </div>
-      <div className="spotlight-tooltip-counter">
-        {step + 1} of {STEPS.length}
-      </div>
-      <div className="spotlight-tooltip-buttons">
-        {!isLast && (
-          <button className="spotlight-btn-skip" onClick={handleSkip}>
-            Skip
-          </button>
-        )}
-        <button
-          className="spotlight-btn-next"
-          onClick={handleNext}
-          style={isLast ? { width: "100%" } : undefined}
-        >
-          {isLast ? "Let\u2019s go!" : "Next"}
-        </button>
-      </div>
-    </>
-  );
-
-  // ─── Centered layout (no target or target not found) ─────────────────────
-
-  if (isCentered) {
-    return (
-      <div className="spotlight-center-overlay" onClick={handleSkip}>
-        <div
-          className="spotlight-tooltip"
-          style={{ position: "relative", maxWidth: 400 }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          {tooltipContent}
-        </div>
-      </div>
-    );
-  }
-
-  // ─── Spotlight layout (target found) ─────────────────────────────────────
+  const current = SLIDES[step];
+  const isLast = step === SLIDES.length - 1;
 
   return (
-    <>
-      {/* Dark overlay with cutout */}
-      <div
-        className="spotlight-cutout"
-        style={{
-          top: targetRect!.top,
-          left: targetRect!.left,
-          width: targetRect!.width,
-          height: targetRect!.height,
-          transition: animating ? "none" : "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-      />
-
-      {/* Pulse ring around cutout */}
-      <div
-        className="spotlight-pulse"
-        style={{
-          top: targetRect!.top,
-          left: targetRect!.left,
-          width: targetRect!.width,
-          height: targetRect!.height,
-          transition: animating ? "none" : "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-      />
-
-      {/* Click-capture overlay (transparent areas around the cutout) */}
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 10000,
+      background: "rgba(0, 0, 0, 0.75)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+      padding: "1rem",
+      animation: "fadeIn 0.3s ease",
+    }}>
       <div
         style={{
-          position: "fixed",
-          inset: 0,
-          zIndex: 10000,
-          pointerEvents: "auto",
-          background: "transparent",
+          background: "var(--card)",
+          borderRadius: 20,
+          maxWidth: 440,
+          width: "100%",
+          maxHeight: "90vh",
+          display: "flex",
+          flexDirection: "column",
+          boxShadow: "0 16px 64px rgba(0,0,0,0.3)",
+          overflow: "hidden",
         }}
-        onClick={handleSkip}
-      />
-
-      {/* Tooltip */}
-      <div
-        className="spotlight-tooltip"
-        style={{
-          ...tooltipStyle,
-          transition: animating ? "none" : "all 0.35s cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
-        {tooltipContent}
+        {/* Header */}
+        <div style={{ padding: "1.5rem 1.5rem 0", flexShrink: 0 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
+            <h2 style={{
+              fontSize: "1.15rem", fontWeight: 700,
+              color: "var(--text)", letterSpacing: "-0.02em", margin: 0,
+            }}>
+              {current.title}
+            </h2>
+            <span style={{
+              fontSize: "0.7rem", fontWeight: 600,
+              color: "var(--muted)", background: "var(--bg)",
+              borderRadius: 20, padding: "3px 10px",
+            }}>
+              {step + 1}/{SLIDES.length}
+            </span>
+          </div>
+          <p style={{
+            fontSize: "0.85rem", color: "var(--subtext)",
+            lineHeight: 1.55, margin: "0.5rem 0 0",
+          }}>
+            {current.description}
+          </p>
+        </div>
+
+        {/* Progress bar */}
+        <div style={{ padding: "0.875rem 1.5rem 0", flexShrink: 0 }}>
+          <div style={{
+            height: 3, borderRadius: 2,
+            background: "var(--border)",
+            overflow: "hidden",
+          }}>
+            <div style={{
+              height: "100%",
+              width: `${((step + 1) / SLIDES.length) * 100}%`,
+              background: "var(--primary)",
+              borderRadius: 2,
+              transition: "width 0.3s ease",
+            }} />
+          </div>
+        </div>
+
+        {/* Mock content */}
+        <div style={{
+          padding: "1rem 1.5rem",
+          flex: 1,
+          overflowY: "auto",
+          minHeight: 0,
+        }}>
+          {current.render(checkedTasks)}
+        </div>
+
+        {/* Buttons */}
+        <div style={{
+          padding: "0 1.5rem 1.5rem",
+          display: "flex",
+          justifyContent: "flex-end",
+          gap: "0.75rem",
+          flexShrink: 0,
+        }}>
+          {!isLast && (
+            <button className="spotlight-btn-skip" onClick={handleSkip}>
+              Skip tutorial
+            </button>
+          )}
+          <button
+            className="spotlight-btn-next"
+            onClick={handleNext}
+            style={isLast ? { flex: 1 } : undefined}
+          >
+            {isLast ? "Let\u2019s go!" : "Next"}
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
