@@ -654,6 +654,184 @@ input, textarea, select {
   background: var(--border);
 }
 
+/* ─── Tutorial overlay ──────────────────────────────────────────────────── */
+.tutorial-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: tutorialOverlayIn 0.35s ease both;
+}
+
+@keyframes tutorialOverlayIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.tutorial-card {
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg), 0 0 0 1px rgba(255,255,255,0.06);
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem 2rem 1.75rem;
+  text-align: center;
+  position: relative;
+}
+
+/* Enter animation */
+.tutorial-card-enter {
+  animation: tutorialCardIn 0.3s ease both;
+}
+@keyframes tutorialCardIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Exit animation */
+.tutorial-card-exit {
+  animation: tutorialCardOut 0.25s ease both;
+}
+@keyframes tutorialCardOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-8px) scale(0.97); }
+}
+
+/* Step indicator dots */
+.tutorial-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 1.5rem;
+}
+
+.tutorial-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.3s ease;
+}
+
+.tutorial-dot.active {
+  width: 24px;
+  border-radius: 4px;
+  background: var(--primary);
+}
+
+.tutorial-dot.done {
+  background: var(--primary);
+  opacity: 0.4;
+}
+
+/* Icon */
+.tutorial-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+/* Title */
+.tutorial-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.625rem;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+/* Description */
+.tutorial-description {
+  font-size: 0.925rem;
+  color: var(--subtext);
+  line-height: 1.65;
+  margin-bottom: 1.25rem;
+  max-width: 340px;
+  margin-left: auto;
+  margin-right: auto;
+  white-space: pre-line;
+  text-align: left;
+}
+
+/* Step counter */
+.tutorial-counter {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* Buttons row */
+.tutorial-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.tutorial-btn-skip {
+  flex: 0 0 auto;
+  padding: 0.6rem 1.25rem;
+  font-size: 0.875rem;
+}
+
+.tutorial-btn-next {
+  flex: 1;
+  padding: 0.7rem 1.5rem;
+  font-size: 0.925rem;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .tutorial-card {
+    max-width: 360px;
+    padding: 1.75rem 1.5rem 1.5rem;
+  }
+
+  .tutorial-icon {
+    font-size: 2.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .tutorial-title {
+    font-size: 1.2rem;
+  }
+
+  .tutorial-description {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 380px) {
+  .tutorial-card {
+    max-width: 100%;
+    padding: 1.5rem 1.25rem 1.25rem;
+  }
+
+  .tutorial-dots {
+    margin-bottom: 1.25rem;
+  }
+
+  .tutorial-btn-skip {
+    padding: 0.55rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .tutorial-btn-next {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
 /* ─── Marketing: mobile responsive ──────────────────────────────────────── */
 @media (max-width: 768px) {
   .footer-grid {

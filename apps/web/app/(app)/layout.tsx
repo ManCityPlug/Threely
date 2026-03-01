@@ -9,6 +9,7 @@ import { formatDisplayName } from "@/lib/format-name";
 import ToastProvider from "@/components/ToastProvider";
 import { SubscriptionProvider, useSubscription } from "@/lib/subscription-context";
 import PaywallModal from "@/components/PaywallModal";
+import AppTutorial from "@/components/AppTutorial";
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
   today: (
@@ -57,6 +58,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const [subStatus, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
+  const [showTutorial, setShowTutorial] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -95,6 +97,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     if (!user) return;
     subscriptionApi.status().then(res => setSubStatus(res.status)).catch(() => {});
   }, [user]);
+
+  // Show tutorial on first login (after onboarding is confirmed)
+  useEffect(() => {
+    if (!user || loading || checkingOnboarding) return;
+    // Only show if user has completed onboarding but hasn't seen the tutorial
+    if (!isOnboarded(user.id)) return;
+    const tutorialKey = `threely_tutorial_done_${user.id}`;
+    if (!localStorage.getItem(tutorialKey)) {
+      // Small delay to let the dashboard render first
+      const timer = setTimeout(() => setShowTutorial(true), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [user, loading, checkingOnboarding]);
+
+  function handleTutorialComplete() {
+    if (user) {
+      localStorage.setItem(`threely_tutorial_done_${user.id}`, "true");
+    }
+    setShowTutorial(false);
+    // Navigate back to dashboard in case we're on another page
+    router.push("/dashboard");
+  }
 
   // Close menu on outside click
   useEffect(() => {
@@ -143,6 +167,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     <ToastProvider>
     <SubscriptionProvider>
     <PaywallGate />
+    <AppTutorial visible={showTutorial} onComplete={handleTutorialComplete} />
     <div className={`app-shell${isTablet ? " force-mobile" : ""}`}>
       {/* ── Mobile top bar ──────────────────────────────────────────────────── */}
       <div className="mobile-topbar" ref={menuRef}>

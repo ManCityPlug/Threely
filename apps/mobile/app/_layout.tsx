@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Image, LogBox, Platform, Text, View } from "react-native";
+import { ActivityIndicator, Image, Linking, LogBox, Modal, Platform, Text, TouchableOpacity, View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 
 // Keep native splash visible until we're ready
@@ -23,6 +23,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
 // TODO: Uncomment for production builds — not supported in Expo Go
 // import * as Clarity from "@microsoft/react-native-clarity";
+import Constants from "expo-constants";
 import { LinearGradient } from "expo-linear-gradient";
 // StripeProvider uses native modules (OnrampSdk etc.) that crash in Expo Go.
 // Only import it for production/custom dev-client builds.
@@ -39,6 +40,7 @@ import { subscriptionApi, profileApi } from "@/lib/api";
 import { ThemeProvider, useTheme } from "@/lib/theme";
 import { ToastProvider } from "@/lib/toast";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
+import { spacing, radius, typography } from "@/constants/theme";
 
 const STRIPE_PUBLISHABLE_KEY = process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? "";
 
@@ -58,6 +60,21 @@ if (Platform.OS !== "web") {
 // ── Valid subscription statuses that allow app access ─────────────────────────
 function isAccessGranted(status: string | null): boolean {
   return status === "trialing" || status === "active";
+}
+
+// ── Forced-update helpers ─────────────────────────────────────────────────────
+
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000";
+const APP_STORE_URL = "https://apps.apple.com/app/id6759625661";
+
+function isVersionLessThan(current: string, minimum: string): boolean {
+  const c = current.split(".").map(Number);
+  const m = minimum.split(".").map(Number);
+  for (let i = 0; i < 3; i++) {
+    if ((c[i] || 0) < (m[i] || 0)) return true;
+    if ((c[i] || 0) > (m[i] || 0)) return false;
+  }
+  return false;
 }
 
 // Allow auth screens to navigate back to the welcome flow
@@ -89,12 +106,13 @@ function BrandedSplash() {
 function AppContent() {
   const router = useRouter();
   const segments = useSegments();
-  const { isDark } = useTheme();
+  const { isDark, colors } = useTheme();
   const [session, setSession] = useState<Session | null | undefined>(undefined);
   const [ready, setReady] = useState(false);
   const [welcomeDone, setWelcomeDone] = useState(false);
   const [authOverlay, setAuthOverlay] = useState(false);
   const [welcomeInitialPage, setWelcomeInitialPage] = useState(0);
+  const [updateRequired, setUpdateRequired] = useState(false);
   const pendingDestination = useRef<"register" | "login" | null>(null);
   const routingResolved = useRef(false);
 
@@ -121,6 +139,28 @@ function AppContent() {
       }
     });
     return () => sub.remove();
+  }, []);
+
+  // ── Forced app update check (runs once on launch) ──────────────────────────
+  useEffect(() => {
+    // Skip version gate during development
+    if (__DEV__) return;
+
+    const appVersion = Constants.expoConfig?.version ?? "0.0.0";
+
+    (async () => {
+      try {
+        const res = await fetch(`${API_BASE_URL}/api/health`);
+        if (!res.ok) return; // Fail open — don't block if API is down
+        const data = await res.json();
+        const minVersion: string | undefined = data.minAppVersion;
+        if (minVersion && isVersionLessThan(appVersion, minVersion)) {
+          setUpdateRequired(true);
+        }
+      } catch {
+        // Network error — fail open, don't block the user
+      }
+    })();
   }, []);
 
   const handleWelcomeComplete = useCallback(
@@ -314,6 +354,88 @@ function AppContent() {
           <ActivityIndicator color="#FFFFFF" />
         </View>
       )}
+
+      {/* Forced update blocking modal */}
+      <Modal
+        visible={updateRequired}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => {
+          // Prevent Android back button from dismissing
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: colors.overlay,
+            justifyContent: "center",
+            alignItems: "center",
+            padding: spacing.lg,
+          }}
+        >
+          <View
+            style={{
+              backgroundColor: colors.bgElevated,
+              borderRadius: radius.xl,
+              padding: spacing.xl,
+              width: "100%",
+              maxWidth: 340,
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ fontSize: 48, marginBottom: spacing.md }}>
+              🚀
+            </Text>
+            <Text
+              style={{
+                fontSize: typography.xl,
+                fontWeight: typography.bold,
+                color: colors.text,
+                textAlign: "center",
+                marginBottom: spacing.sm,
+              }}
+            >
+              Update Available
+            </Text>
+            <Text
+              style={{
+                fontSize: typography.base,
+                fontWeight: typography.regular,
+                color: colors.textSecondary,
+                textAlign: "center",
+                lineHeight: 22,
+                marginBottom: spacing.lg,
+              }}
+            >
+              A new version of Threely is available with important improvements.
+              Please update to continue using the app.
+            </Text>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              onPress={() => Linking.openURL(APP_STORE_URL)}
+              style={{
+                backgroundColor: colors.primary,
+                borderRadius: radius.md,
+                paddingVertical: spacing.md,
+                paddingHorizontal: spacing.xl,
+                width: "100%",
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  color: colors.primaryText,
+                  fontSize: typography.md,
+                  fontWeight: typography.semibold,
+                }}
+              >
+                Update Now
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </GestureHandlerRootView>
   );
 }

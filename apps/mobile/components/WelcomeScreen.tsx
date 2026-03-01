@@ -507,7 +507,7 @@ function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoadi
         Ready to begin?
       </Animated.Text>
       <Animated.Text style={[styles.subtitle, { opacity: anim, marginTop: spacing.sm }]}>
-        Your goals are waiting. Let's make them happen.
+        Your goals are waiting.{"\n"}Let's make them happen.
       </Animated.Text>
 
       <Animated.View style={[styles.authButtons, { opacity: anim }]}>
