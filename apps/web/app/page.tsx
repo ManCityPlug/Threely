@@ -660,9 +660,9 @@ export default function LandingPage() {
                 desc: "Today's tasks reference what you did yesterday. Every day compounds — you're never starting from scratch.",
               },
               {
-                icon: "🎯",
-                title: "All Your Goals, One Daily Plan",
-                desc: "Training for a 5K and launching a side project? Threely blends tasks from every goal into a single daily plan — balanced so each one moves forward without competing for your attention.",
+                icon: "📊",
+                title: "See How Far You've Come",
+                desc: "Streaks, heatmaps, and weekly summaries show your real progress over time. Watch your consistency compound — and get a recap every week of what you've accomplished.",
               },
             ].map(f => (
               <div key={f.title} style={{
