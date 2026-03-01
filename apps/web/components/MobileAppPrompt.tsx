@@ -220,15 +220,15 @@ export default function MobileAppPrompt() {
             ✕
           </button>
 
-          {/* Background gradient accent */}
+          {/* Background gradient accent — fades to white before the benefit cards */}
           <div
             style={{
               position: "absolute",
               top: 0,
               left: 0,
               right: 0,
-              height: 400,
-              background: "linear-gradient(135deg, #f6f9fc 0%, #ede9ff 100%)",
+              height: 420,
+              background: "linear-gradient(180deg, #ede9ff 0%, #f2efff 60%, #ffffff 100%)",
               zIndex: 0,
             }}
           />
