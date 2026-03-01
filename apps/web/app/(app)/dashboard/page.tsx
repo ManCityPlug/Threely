@@ -279,6 +279,7 @@ function TaskCard({
               {/* Visible Ask AI button */}
               {showMenu && onAsk && !askMode && (
                 <button
+                  data-walkthrough="ask-ai-button"
                   onClick={handleStartAsk}
                   style={{
                     display: "inline-flex", alignItems: "center", gap: 4,
@@ -300,7 +301,7 @@ function TaskCard({
           )}
         </div>
         {showMenu && (
-          <div ref={menuRef} style={{ position: "relative", flexShrink: 0 }}>
+          <div ref={menuRef} data-walkthrough="task-menu-button" style={{ position: "relative", flexShrink: 0 }}>
             <button
               onClick={() => setMenuOpen(o => !o)}
               style={{
@@ -1130,7 +1131,7 @@ export default function DashboardPage() {
 
           {/* Complete all bar — shown above tasks when not all done */}
           {!allDone && !insight && totalCount > 0 && (
-            <div className="give-more-bar locked" style={{ marginBottom: "1.25rem" }}>
+            <div className="give-more-bar locked" data-walkthrough="unlock-more-bar" style={{ marginBottom: "1.25rem" }}>
               <div style={{
                 width: 36, height: 36, borderRadius: "50%",
                 background: "var(--bg)", display: "flex",
