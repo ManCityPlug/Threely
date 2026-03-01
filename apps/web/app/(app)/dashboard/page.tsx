@@ -108,10 +108,16 @@ function TaskCard({
   const [askInput, setAskInput] = useState("");
   const [askLoading, setAskLoading] = useState(false);
   const askEndRef = useRef<HTMLDivElement>(null);
+  const askInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     askEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [askMessages, askLoading]);
+
+  // Focus input when modal opens
+  useEffect(() => {
+    if (askMode) setTimeout(() => askInputRef.current?.focus(), 100);
+  }, [askMode]);
 
   // Close menu on outside click
   useEffect(() => {
@@ -338,26 +344,90 @@ function TaskCard({
         )}
       </div>
 
-      {/* Ask mode — inline chat */}
+      {/* Ask AI modal overlay */}
       {askMode && onAsk && (
-        <div style={{ borderTop: "1px solid var(--border)", paddingTop: 12, marginTop: 4 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-            <span style={{ fontSize: 14, color: "var(--primary)" }}>&#10022;</span>
-            <span style={{ fontSize: "0.8rem", fontWeight: 700, color: "var(--primary)" }}>Ask Threely Intelligence</span>
-          </div>
+        <>
+          {/* Backdrop */}
+          <div
+            onClick={() => { setAskMode(false); setAskMessages([]); setAskInput(""); }}
+            style={{
+              position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)",
+              zIndex: 1000, backdropFilter: "blur(2px)",
+            }}
+          />
+          {/* Modal */}
+          <div style={{
+            position: "fixed", top: "50%", left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "min(480px, 92vw)",
+            maxHeight: "min(600px, 80vh)",
+            background: "var(--card)",
+            borderRadius: 16,
+            boxShadow: "0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px var(--border)",
+            zIndex: 1001,
+            display: "flex", flexDirection: "column",
+            overflow: "hidden",
+          }}>
+            {/* Header */}
+            <div style={{
+              padding: "16px 20px",
+              borderBottom: "1px solid var(--border)",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 16, color: "var(--primary)" }}>&#10022;</span>
+                <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--primary)" }}>Threely Intelligence</span>
+              </div>
+              <button
+                onClick={() => { setAskMode(false); setAskMessages([]); setAskInput(""); }}
+                style={{
+                  background: "none", border: "none", cursor: "pointer",
+                  fontSize: "1.1rem", color: "var(--muted)", padding: "4px 8px",
+                  borderRadius: 6, lineHeight: 1,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = "var(--bg)"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "none"; }}
+              >
+                &#x2715;
+              </button>
+            </div>
 
-          {askMessages.length > 0 && (
-            <div style={{ maxHeight: 200, overflowY: "auto", marginBottom: 8, display: "flex", flexDirection: "column", gap: 6 }}>
+            {/* Task context pill */}
+            <div style={{
+              padding: "10px 20px",
+              background: "var(--bg)",
+              borderBottom: "1px solid var(--border)",
+            }}>
+              <span style={{ fontSize: "0.78rem", color: "var(--subtext)" }}>
+                Asking about: <strong style={{ color: "var(--text)" }}>{task.task}</strong>
+              </span>
+            </div>
+
+            {/* Chat messages */}
+            <div style={{
+              flex: 1, overflowY: "auto", padding: "16px 20px",
+              display: "flex", flexDirection: "column", gap: 10,
+            }}>
+              {/* AI greeting */}
+              <div style={{
+                alignSelf: "flex-start", maxWidth: "85%",
+                padding: "10px 14px", borderRadius: 14,
+                background: "var(--bg)", border: "1px solid var(--border)",
+                fontSize: "0.86rem", lineHeight: 1.55, color: "var(--text)",
+              }}>
+                Hey! What would you like to know about this task? I can help with approach, tips, resources, or anything else.
+              </div>
+
               {askMessages.map((msg, i) => (
                 <div
                   key={i}
                   style={{
                     alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
                     maxWidth: "85%",
-                    padding: "8px 12px",
-                    borderRadius: 12,
-                    fontSize: "0.84rem",
-                    lineHeight: 1.5,
+                    padding: "10px 14px",
+                    borderRadius: 14,
+                    fontSize: "0.86rem",
+                    lineHeight: 1.55,
                     ...(msg.role === "user"
                       ? { background: "var(--primary)", color: "#fff" }
                       : { background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }),
@@ -368,44 +438,44 @@ function TaskCard({
               ))}
               {askLoading && (
                 <div style={{
-                  alignSelf: "flex-start", padding: "8px 12px", borderRadius: 12,
+                  alignSelf: "flex-start", padding: "10px 14px", borderRadius: 14,
                   background: "var(--bg)", border: "1px solid var(--border)",
+                  display: "flex", alignItems: "center", gap: 8,
                 }}>
                   <span className="spinner" style={{ width: 14, height: 14 }} />
+                  <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>Thinking...</span>
                 </div>
               )}
               <div ref={askEndRef} />
             </div>
-          )}
 
-          <div style={{ display: "flex", gap: 6 }}>
-            <input
-              className="field-input"
-              value={askInput}
-              onChange={e => setAskInput(e.target.value)}
-              placeholder="Ask a question..."
-              onKeyDown={e => e.key === "Enter" && handleSendAsk()}
-              style={{ flex: 1, fontSize: "0.85rem", padding: "6px 10px" }}
-              autoFocus
-              disabled={askLoading}
-            />
-            <button
-              className="btn btn-primary"
-              onClick={handleSendAsk}
-              disabled={askLoading || !askInput.trim()}
-              style={{ fontSize: "0.8rem", padding: "4px 12px" }}
-            >
-              Send
-            </button>
-            <button
-              className="btn btn-outline"
-              onClick={() => { setAskMode(false); setAskMessages([]); setAskInput(""); }}
-              style={{ fontSize: "0.8rem", padding: "4px 12px" }}
-            >
-              Close
-            </button>
+            {/* Input */}
+            <div style={{
+              padding: "12px 20px 16px",
+              borderTop: "1px solid var(--border)",
+              display: "flex", gap: 8,
+            }}>
+              <input
+                ref={askInputRef}
+                className="field-input"
+                value={askInput}
+                onChange={e => setAskInput(e.target.value)}
+                placeholder="Type your question..."
+                onKeyDown={e => e.key === "Enter" && handleSendAsk()}
+                style={{ flex: 1, fontSize: "0.88rem", padding: "10px 14px", borderRadius: 10 }}
+                disabled={askLoading}
+              />
+              <button
+                className="btn btn-primary"
+                onClick={handleSendAsk}
+                disabled={askLoading || !askInput.trim()}
+                style={{ fontSize: "0.85rem", padding: "8px 18px", borderRadius: 10 }}
+              >
+                Send
+              </button>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
