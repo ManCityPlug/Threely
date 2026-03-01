@@ -100,10 +100,10 @@ export default function PrivacyPage() {
 
           <h2 style={h2Style}>5. Data Sharing</h2>
           <p style={pStyle}>
-            We do not sell your personal information. We share data only with the following third-party services, solely to operate the Service:
+            We do not sell your personal information. We share data only with trusted third-party service providers, solely to operate the Service. These include providers for:
           </p>
           <p style={pStyle}>
-            <strong>Supabase:</strong> Database hosting and authentication. <strong>Anthropic:</strong> AI task generation and coaching. <strong>Stripe:</strong> Payment processing (we do not store your payment card details). <strong>Microsoft Clarity:</strong> Usage analytics. <strong>Expo / Apple / Google:</strong> Push notifications delivery.
+            Cloud hosting and database infrastructure. Authentication and account security. AI-powered task generation and coaching. Payment processing (we do not store your payment card details). Usage analytics to improve the product. Push notification delivery on mobile devices.
           </p>
 
           <h2 style={h2Style}>6. Your Rights</h2>
