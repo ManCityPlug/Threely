@@ -48,7 +48,6 @@ import { useStaggeredEntrance } from "@/lib/animations";
 import { scheduleNotifications, onTaskCompleted, sendInstantNotification, type NotifContext } from "@/lib/notifications";
 import { useTheme } from "@/lib/theme";
 import { useSubscription } from "@/lib/subscription-context";
-import { TrialFullScreen } from "@/components/TrialFullScreen";
 import { useWalkthroughRegistry } from "@/lib/walkthrough-registry";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
@@ -158,7 +157,6 @@ export default function DashboardScreen() {
   const [showConfetti, setShowConfetti] = useState(false);
 
   // ─── Pro / trial state ────────────────────────────────────────────────────────
-  const [showTrialPaywall, setShowTrialPaywall] = useState(false);
   const [showTutorial, setShowTutorial] = useState(false);
   const [showGenLimit, setShowGenLimit] = useState(false);
   const { isLimitedMode, showBottomSheetPaywall, walkthroughActive, setWalkthroughActive, refreshSubscription } = useSubscription();
@@ -291,21 +289,21 @@ export default function DashboardScreen() {
     return () => sub.remove();
   }, [loadData]);
 
-  // ─── Trial paywall (shown once after first onboarding) ─────────────────────
+  // ─── Launch tutorial after first onboarding ─────────────────────────────────
   useEffect(() => {
-    if (loading || dailyTasks.length === 0) return;
+    if (loading) return;
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
       userIdRef.current = user.id;
-      const key = `@threely_show_trial_paywall_${user.id}`;
-      const flag = await AsyncStorage.getItem(key);
-      if (flag) {
-        await AsyncStorage.removeItem(key);
-        setShowTrialPaywall(true);
+      const tutorialKey = `@threely_tutorial_done_${user.id}`;
+      const done = await AsyncStorage.getItem(tutorialKey);
+      if (!done) {
+        setWalkthroughActive(true);
+        setTimeout(() => setShowTutorial(true), 600);
       }
     })();
-  }, [loading, dailyTasks.length]);
+  }, [loading, setWalkthroughActive]);
 
   useMemo(() => {
     if (goals.length >= 1 && !selectedGoal) setSelectedGoal(goals[0].id);
@@ -349,19 +347,6 @@ export default function DashboardScreen() {
     await loadData();
     setRefreshing(false);
   }, [loadData]);
-
-  // ─── Dismiss trial paywall + start walkthrough if not done ──────────────
-  const dismissPaywallAndStartWalkthrough = useCallback(async () => {
-    setShowTrialPaywall(false);
-    const uid = userIdRef.current;
-    if (!uid) return;
-    const tutorialKey = `@threely_tutorial_done_${uid}`;
-    const done = await AsyncStorage.getItem(tutorialKey);
-    if (!done) {
-      setWalkthroughActive(true);
-      setTimeout(() => setShowTutorial(true), 350);
-    }
-  }, [setWalkthroughActive]);
 
   // ─── Mock data injection for tutorial spotlight ────────────────────────────
   const effectiveGoals = walkthroughActive && goals.length === 0 ? [MOCK_TUTORIAL_GOAL] : goals;
@@ -1216,12 +1201,6 @@ export default function DashboardScreen() {
           </Pressable>
         </Pressable>
       </Modal>
-      {/* ── Trial paywall (post-onboarding) ─────────────────────────────── */}
-      <TrialFullScreen
-        visible={showTrialPaywall}
-        onSubscribed={dismissPaywallAndStartWalkthrough}
-        onDismiss={dismissPaywallAndStartWalkthrough}
-      />
       {/* ── App tutorial walkthrough ──────────────────────────────────────── */}
       <AppTutorial
         visible={showTutorial}

@@ -284,6 +284,17 @@ export default function OnboardingScreen() {
     startAiChatWithMessage("Help me define my goal.");
   }
 
+  async function chatWithRetry(messages: GoalChatMessage[]): Promise<GoalChatResult> {
+    try {
+      return await goalsApi.chat(messages, { onboarding: true });
+    } catch (e) {
+      // Retry once on transient failures (timeout, network, server error)
+      const msg = e instanceof Error ? e.message : "";
+      if (msg.includes("pro_required")) throw e; // Don't retry pro gate
+      return await goalsApi.chat(messages, { onboarding: true });
+    }
+  }
+
   async function startAiChatWithMessage(initialMessage: string) {
     setShowAiChat(true);
     setChatHistory([]);
@@ -295,7 +306,7 @@ export default function OnboardingScreen() {
     setChatLoading(true);
     try {
       const seedMessages: GoalChatMessage[] = [{ role: "user", content: initialMessage }];
-      const result = await goalsApi.chat(seedMessages);
+      const result = await chatWithRetry(seedMessages);
       setChatMessages([
         { role: "user", content: initialMessage },
         { role: "assistant", content: result.raw_reply },
@@ -308,7 +319,9 @@ export default function OnboardingScreen() {
         setChatDone(true);
         setChatGoalText(result.goal_text);
       }
-    } catch {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      console.warn("[onboarding chat]", msg);
       setChatHistory([{ role: "assistant", text: "Something went wrong. Please close and try again." }]);
     } finally {
       setChatLoading(false);
@@ -327,7 +340,7 @@ export default function OnboardingScreen() {
     setChatMessages(newMessages);
 
     try {
-      const result = await goalsApi.chat(newMessages);
+      const result = await chatWithRetry(newMessages);
       const assistantMsg: GoalChatMessage = { role: "assistant", content: result.raw_reply };
       setChatMessages((prev) => [...prev, assistantMsg]);
       setChatHistory((prev) => [
@@ -338,7 +351,9 @@ export default function OnboardingScreen() {
         setChatDone(true);
         setChatGoalText(result.goal_text);
       }
-    } catch {
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      console.warn("[onboarding chat]", msg);
       setChatHistory((prev) => [
         ...prev,
         { role: "assistant", text: "Something went wrong. Please try again." },
@@ -461,10 +476,11 @@ export default function OnboardingScreen() {
         dailyTimeMinutes: effectiveTime ?? 60,
         intensityLevel: 2,
         workDays: detectedWorkDays,
+        onboarding: true,
       });
 
       // Generate tasks
-      const tasksResult = await tasksApi.generate(goalResult.goal.id);
+      const tasksResult = await tasksApi.generate(goalResult.goal.id, { onboarding: true });
 
       // Get the tasks from the result
       const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
@@ -1097,12 +1113,7 @@ export default function OnboardingScreen() {
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.continueBtn}
-            onPress={async () => {
-              const { data: sessionData } = await supabase.auth.getSession();
-              const uid = sessionData.session?.user?.id;
-              if (uid) {
-                await AsyncStorage.setItem(`@threely_show_trial_paywall_${uid}`, "true");
-              }
+            onPress={() => {
               router.replace("/(tabs)");
             }}
             activeOpacity={0.85}
@@ -2069,7 +2080,7 @@ function createStyles(colors: Colors) {
     paddingVertical: spacing.md,
     borderTopWidth: 1,
     borderTopColor: colors.border,
-    backgroundColor: colors.card,
+    backgroundColor: colors.bg,
   },
   chatInputRow: {
     flexDirection: "row",
@@ -2078,7 +2089,7 @@ function createStyles(colors: Colors) {
   chatInput: {
     flex: 1,
     height: 44,
-    backgroundColor: colors.bg,
+    backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: radius.md,
