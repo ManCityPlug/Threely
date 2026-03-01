@@ -180,8 +180,8 @@ function PageHook({ anim }: { anim: Animated.Value }) {
               style={[
                 styles.sparkle,
                 {
-                  left: 40 + Math.cos(rad) * dist - 3,
-                  top: 40 + Math.sin(rad) * dist - 3,
+                  left: 52 + Math.cos(rad) * dist - 3,
+                  top: 52 + Math.sin(rad) * dist - 3,
                   opacity: sparkleAnims[idx],
                   transform: [
                     {
@@ -789,8 +789,8 @@ const styles = StyleSheet.create({
 
   // ── Page 1: Hook ──
   hookLogoWrap: {
-    width: 80,
-    height: 80,
+    width: 104,
+    height: 104,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: spacing.xl,
@@ -799,13 +799,14 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 20,
+    zIndex: 2,
   },
   hookLogoGlow: {
     position: "absolute",
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: "rgba(99, 91, 255, 0.25)",
+    width: 104,
+    height: 104,
+    borderRadius: 52,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
   },
   sparkle: {
     position: "absolute",
@@ -906,22 +907,23 @@ const styles = StyleSheet.create({
 
   // ── Page 4: Auth ──
   authLogoWrap: {
-    width: 56,
-    height: 56,
+    width: 80,
+    height: 80,
     alignItems: "center",
     justifyContent: "center",
   },
   authLogoGlow: {
     position: "absolute",
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: "rgba(99, 91, 255, 0.25)",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "rgba(255, 255, 255, 0.12)",
   },
   authLogo: {
     width: 56,
     height: 56,
     borderRadius: 14,
+    zIndex: 2,
   },
   authButtons: {
     width: "100%",
