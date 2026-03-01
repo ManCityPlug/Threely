@@ -31,8 +31,8 @@ const FUNCTIONS = [
     model: "sonnet" as const,
     inputTokens: 3500,
     outputTokens: 2000,
-    frequency: "Daily per goal",
-    description: "Generates 3 specific tasks based on context, history, schedule",
+    frequency: "Daily per goal (max 2x/day)",
+    description: "Generates 3 specific tasks; 1 extra generation allowed per goal per day",
   },
   {
     name: "goalChat",
@@ -67,6 +67,14 @@ const FUNCTIONS = [
     description: "Breaks down or adjusts a single task on request",
   },
   {
+    name: "askAboutTask",
+    model: "haiku" as const,
+    inputTokens: 600,
+    outputTokens: 300,
+    frequency: "~0.3x/day per goal",
+    description: "Task Q&A — answers questions about a specific task",
+  },
+  {
     name: "generateWeeklySummary",
     model: "haiku" as const,
     inputTokens: 1500,
@@ -81,6 +89,10 @@ function costPerCall(fn: typeof FUNCTIONS[number]): number {
   return (fn.inputTokens * p.input + fn.outputTokens * p.output) / 1_000_000;
 }
 
+// ─── Limits ─────────────────────────────────────────────────────────────────
+const MAX_GOALS = 3;
+const MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY = 2; // 1 initial + 1 extra
+
 // ─── Per-user daily/monthly cost calculator ──────────────────────────────────
 function calculateCosts(goals: number) {
   // One-time setup per goal
@@ -91,15 +103,18 @@ function calculateCosts(goals: number) {
 
   // Daily recurring per goal
   const generateTasks = costPerCall(FUNCTIONS[2]);
+  // Worst case: user generates twice per goal per day (initial + 1 extra)
+  const generateTasksDaily = generateTasks * MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY;
   const goalChat = costPerCall(FUNCTIONS[3]) * 0.5; // avg 0.5 chats/day
   const updateCoaching = costPerCall(FUNCTIONS[4]);
   const generateInsight = costPerCall(FUNCTIONS[5]);
   const refineTask = costPerCall(FUNCTIONS[6]) * 0.3; // ~10% of 3 tasks
-  const dailyPerGoal = generateTasks + goalChat + updateCoaching + generateInsight + refineTask;
+  const askAboutTask = costPerCall(FUNCTIONS[7]) * 0.3; // ~0.3x/day per goal
+  const dailyPerGoal = generateTasksDaily + goalChat + updateCoaching + generateInsight + refineTask + askAboutTask;
   const totalDaily = dailyPerGoal * goals;
 
   // Weekly (per user, not per goal)
-  const weeklySummary = costPerCall(FUNCTIONS[7]);
+  const weeklySummary = costPerCall(FUNCTIONS[8]);
   const weeklyPerDay = weeklySummary / 7;
 
   const dailyTotal = totalDaily + weeklyPerDay;
@@ -118,9 +133,8 @@ function calculateCosts(goals: number) {
 
 // ─── Revenue per plan ────────────────────────────────────────────────────────
 const PLANS = [
-  { name: "Yearly", price: 59.99, period: "year", monthly: 59.99 / 12 },
-  { name: "Quarterly", price: 23.99, period: "quarter", monthly: 23.99 / 3 },
-  { name: "Monthly", price: 11.99, period: "month", monthly: 11.99 },
+  { name: "Yearly", price: 69.99, period: "year", monthly: 69.99 / 12 },
+  { name: "Monthly", price: 12.99, period: "month", monthly: 12.99 },
 ];
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
@@ -171,6 +185,16 @@ const modelBadge = (model: string): React.CSSProperties => ({
     "#4ade80",
 });
 
+const limitBadge: React.CSSProperties = {
+  display: "inline-block",
+  padding: "2px 8px",
+  borderRadius: 6,
+  fontSize: "0.7rem",
+  fontWeight: 600,
+  background: "rgba(251, 191, 36, 0.15)",
+  color: "#fbbf24",
+};
+
 function fmt(n: number, decimals = 4): string {
   return "$" + n.toFixed(decimals);
 }
@@ -181,7 +205,7 @@ function fmtCents(n: number): string {
 }
 
 export default function CostsPage() {
-  const goalRange = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const goalRange = [1, 2, 3];
 
   return (
     <div>
@@ -191,6 +215,29 @@ export default function CostsPage() {
       <p style={{ color: "#71717a", fontSize: "0.85rem", marginBottom: "2rem" }}>
         Estimated costs based on Claude API pricing and actual token usage in Threely functions.
       </p>
+
+      {/* ─── Enforced Limits ───────────────────────────────────────────── */}
+      <div style={cardStyle}>
+        <h2 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 12 }}>
+          Enforced Limits
+        </h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 12px", background: "#1e1e21", borderRadius: 8 }}>
+            <div style={{ width: 8, height: 8, borderRadius: 4, background: "#fbbf24", marginTop: 6, flexShrink: 0 }} />
+            <div>
+              <span style={{ fontWeight: 600, fontSize: "0.85rem" }}>Max {MAX_GOALS} active goals per user: </span>
+              <span style={{ color: "#a1a1aa", fontSize: "0.85rem" }}>Enforced in backend (POST /api/goals) and frontend (mobile + web). Users must pause or complete a goal to create a new one.</span>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 12px", background: "#1e1e21", borderRadius: 8 }}>
+            <div style={{ width: 8, height: 8, borderRadius: 4, background: "#fbbf24", marginTop: 6, flexShrink: 0 }} />
+            <div>
+              <span style={{ fontWeight: 600, fontSize: "0.85rem" }}>Max {MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} task generations per goal per day: </span>
+              <span style={{ color: "#a1a1aa", fontSize: "0.85rem" }}>1 initial daily generation + 1 extra &quot;Give me more&quot; generation. After that, users see a popup guiding them to refine tasks or adjust their plan instead.</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* ─── Model Pricing Reference ──────────────────────────────────── */}
       <div style={cardStyle}>
@@ -259,13 +306,13 @@ export default function CostsPage() {
         </div>
       </div>
 
-      {/* ─── Cost Per User by Goals (1-10) ────────────────────────────── */}
+      {/* ─── Cost Per User by Goals (1-3) ────────────────────────────── */}
       <div style={cardStyle}>
         <h2 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 4 }}>
-          Cost Per User by Number of Goals
+          Cost Per User by Number of Goals <span style={limitBadge}>Max {MAX_GOALS}</span>
         </h2>
         <p style={{ color: "#71717a", fontSize: "0.78rem", marginBottom: 16 }}>
-          Assumes daily task generation, daily review, ~0.5 chats/day, ~10% task refinement, weekly summary.
+          Worst case: 2 task generations/goal/day, daily review, ~0.5 chats/day, ~10% task refinement, ~0.3 task Q&amp;A, weekly summary.
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={tableStyle}>
@@ -282,7 +329,7 @@ export default function CostsPage() {
               {goalRange.map(g => {
                 const c = calculateCosts(g);
                 return (
-                  <tr key={g} style={g === 1 || g === 2 || g === 5 || g === 10 ? { background: "#1e1e21" } : {}}>
+                  <tr key={g} style={g === MAX_GOALS ? { background: "#1e1e21" } : {}}>
                     <td style={{ ...tdStyle, fontWeight: 700 }}>{g} goal{g > 1 ? "s" : ""}</td>
                     <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.totalSetup, 2)}</td>
                     <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.dailyTotal, 3)}</td>
@@ -302,7 +349,7 @@ export default function CostsPage() {
           Profit Margins by Plan (Monthly, Ongoing)
         </h2>
         <p style={{ color: "#71717a", fontSize: "0.78rem", marginBottom: 16 }}>
-          Revenue per month minus estimated AI costs. Does not include ad spend, infrastructure, or Stripe fees (~2.9% + $0.30).
+          Revenue per month minus estimated AI costs (worst case). Does not include ad spend, infrastructure, or Stripe fees (~2.9% + $0.30).
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={tableStyle}>
@@ -321,7 +368,7 @@ export default function CostsPage() {
               {goalRange.map(g => {
                 const c = calculateCosts(g);
                 return (
-                  <tr key={g} style={g === 1 || g === 2 || g === 5 || g === 10 ? { background: "#1e1e21" } : {}}>
+                  <tr key={g} style={g === MAX_GOALS ? { background: "#1e1e21" } : {}}>
                     <td style={{ ...tdStyle, fontWeight: 700 }}>{g}</td>
                     <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.monthlyOngoing, 2)}</td>
                     {PLANS.map(plan => {
@@ -359,28 +406,33 @@ export default function CostsPage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {[
             {
+              label: "Goal cap enforced",
+              value: `Max ${MAX_GOALS} active goals per user. Prevents runaway costs from power users.`,
+              color: "#4ade80",
+            },
+            {
+              label: "Generation cap enforced",
+              value: `Max ${MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} task generations per goal per day (initial + 1 extra). Users guided to refine tasks instead of regenerating.`,
+              color: "#4ade80",
+            },
+            {
+              label: "Worst-case cost (3 goals)",
+              value: `~${fmt(calculateCosts(3).monthlyOngoing, 2)}/mo per user — both plans profitable even at max usage.`,
+              color: "#fbbf24",
+            },
+            {
               label: "Biggest cost driver",
-              value: "generateTasks (Sonnet) — runs daily per goal. ~$0.041/call.",
+              value: "generateTasks (Sonnet) — runs up to 2x/day per goal. ~$0.041/call.",
               color: "#f59e0b",
             },
             {
               label: "Setup cost",
-              value: "parseGoal + generateRoadmap (both Opus) — ~$0.16 per goal, one-time only.",
+              value: "parseGoal + generateRoadmap (both Opus) — ~$0.16 per goal, one-time only. Max $0.48 per user.",
               color: "#818cf8",
             },
             {
-              label: "Sweet spot",
-              value: "1-3 goals per user. Monthly/quarterly plans are profitable. Yearly breaks even around 3-4 goals.",
-              color: "#4ade80",
-            },
-            {
-              label: "Risk zone",
-              value: "5+ goals on yearly plan ($5/mo) — AI costs exceed revenue. Consider goal caps or tiered pricing.",
-              color: "#ef4444",
-            },
-            {
               label: "Stripe fees",
-              value: "2.9% + $0.30 per transaction. ~$0.65/mo on monthly, ~$1.00/qtr, ~$2.04/yr.",
+              value: "2.9% + $0.30 per transaction. ~$0.68/mo on monthly, ~$2.33/yr.",
               color: "#71717a",
             },
           ].map(t => (

@@ -114,6 +114,26 @@ export async function POST(request: NextRequest) {
       }));
     });
 
+  // ── Generation limit: 1 extra generation per goal per day ─────────────────
+  if (requestingAdditional) {
+    for (const goal of goals) {
+      const existing = await prisma.dailyTask.findUnique({
+        where: { goalId_date: { goalId: goal.id, date: today } },
+      });
+      if (existing) {
+        const existingTasks = Array.isArray(existing.tasks)
+          ? (existing.tasks as unknown as { id: string }[])
+          : [];
+        if (existingTasks.length > 3) {
+          return NextResponse.json({
+            error: "generation_limit_reached",
+            message: "You've already gotten extra tasks for this goal today.",
+          }, { status: 403 });
+        }
+      }
+    }
+  }
+
   try {
   const results = await Promise.all(
     goals.map(async (goal) => {
@@ -262,7 +282,6 @@ export async function POST(request: NextRequest) {
       let dailyTask;
 
       if (existing && requestingAdditional) {
-        // Append stretch tasks to existing list
         const existingTasks = Array.isArray(existing.tasks)
           ? (existing.tasks as unknown as TaskItem[])
           : [];
