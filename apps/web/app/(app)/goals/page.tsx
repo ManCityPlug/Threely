@@ -1214,7 +1214,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
           </button>
           {showMenu && (
             <div
-              data-walkthrough="goal-menu-dropdown"
+              data-walkthrough="goal-menu-button-dropdown"
               style={{
                 position: "absolute", right: 0, top: "100%", marginTop: 4, zIndex: 50,
                 background: "var(--card)", border: "1px solid var(--border)",

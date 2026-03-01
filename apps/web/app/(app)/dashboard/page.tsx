@@ -323,7 +323,7 @@ function TaskCard({
             {menuOpen && menuPos && typeof document !== "undefined" && createPortal(
               <>
                 <div onClick={() => setMenuOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 9998 }} />
-                <div data-walkthrough="task-menu-dropdown" style={{
+                <div data-walkthrough="task-menu-button-dropdown" style={{
                   position: "fixed", top: menuPos.top, right: menuPos.right, zIndex: 9999,
                   background: "var(--card)", border: "1px solid var(--border)",
                   borderRadius: "var(--radius)", boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
