@@ -751,23 +751,16 @@ export default function ProfilePage() {
 
             {/* Subscription */}
             <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
-              <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-                Subscription
-              </h3>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                  <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", margin: 0 }}>
+                    Subscription
+                  </h3>
                   {subStatus === "trialing" && (
-                    <>
-                      <span style={{
-                        display: "inline-block", padding: "2px 10px", borderRadius: 999,
-                        background: "#ecfdf5", color: "#059669", fontSize: "0.75rem", fontWeight: 600,
-                      }}>Pro Trial</span>
-                      {subTrialEnd && (
-                        <p style={{ fontSize: "0.78rem", color: "var(--subtext)", margin: "6px 0 0" }}>
-                          Trial ends {new Date(subTrialEnd).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                        </p>
-                      )}
-                    </>
+                    <span style={{
+                      display: "inline-block", padding: "2px 10px", borderRadius: 999,
+                      background: "#ecfdf5", color: "#059669", fontSize: "0.75rem", fontWeight: 600,
+                    }}>Pro Trial</span>
                   )}
                   {subStatus === "active" && (
                     <span style={{
@@ -780,6 +773,11 @@ export default function ProfilePage() {
                       display: "inline-block", padding: "2px 10px", borderRadius: 999,
                       background: "#f3f4f6", color: "#6b7280", fontSize: "0.75rem", fontWeight: 600,
                     }}>No plan</span>
+                  )}
+                  {subStatus === "trialing" && subTrialEnd && (
+                    <span style={{ fontSize: "0.78rem", color: "var(--subtext)" }}>
+                      · Trial ends {new Date(subTrialEnd).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                    </span>
                   )}
                 </div>
                 <button
