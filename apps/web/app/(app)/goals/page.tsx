@@ -1328,8 +1328,8 @@ export default function GoalsPage() {
   const [editGoal, setEditGoal] = useState<Goal | null>(null);
   const [showGoalLimit, setShowGoalLimit] = useState(false);
 
-  // Mock data injection for tutorial walkthrough
-  const effectiveGoals = walkthroughActive && goals.length === 0 ? [MOCK_TUTORIAL_GOAL as Goal] : goals;
+  // During tutorial walkthrough, always use mock data for consistent spotlight targets
+  const effectiveGoals = walkthroughActive ? [MOCK_TUTORIAL_GOAL as Goal] : goals;
 
   const load = useCallback(async () => {
     try {

@@ -804,12 +804,10 @@ export default function DashboardPage() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _sort = sortTrigger; // subscribe to sort trigger for delayed reorder
 
-  // Mock data injection for tutorial walkthrough
-  const effectiveGoals = walkthroughActive && goals.length === 0 ? [MOCK_TUTORIAL_GOAL] : goals;
-  const effectiveDailyTasks = walkthroughActive && dailyTasks.length === 0 ? [MOCK_TUTORIAL_DAILY_TASK] : dailyTasks;
-  const effectiveSelectedGoalId = walkthroughActive && goals.length === 0 && selectedGoalId === null
-    ? MOCK_TUTORIAL_GOAL.id
-    : selectedGoalId;
+  // During tutorial walkthrough, always use mock data for consistent spotlight targets
+  const effectiveGoals = walkthroughActive ? [MOCK_TUTORIAL_GOAL] : goals;
+  const effectiveDailyTasks = walkthroughActive ? [MOCK_TUTORIAL_DAILY_TASK] : dailyTasks;
+  const effectiveSelectedGoalId = walkthroughActive ? MOCK_TUTORIAL_GOAL.id : selectedGoalId;
 
   const displayedTasks = (() => {
     if (effectiveSelectedGoalId === null) return [];

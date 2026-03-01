@@ -348,15 +348,10 @@ export default function DashboardScreen() {
     setRefreshing(false);
   }, [loadData]);
 
-  // ─── Mock data injection for tutorial spotlight ────────────────────────────
-  const effectiveGoals = walkthroughActive && goals.length === 0 ? [MOCK_TUTORIAL_GOAL] : goals;
-  const effectiveDailyTasks = walkthroughActive && dailyTasks.length === 0 ? [MOCK_TUTORIAL_DAILY_TASK] : dailyTasks;
-
-  // Auto-select mock goal during tutorial so derived state works
-  const effectiveSelectedGoal =
-    walkthroughActive && goals.length === 0 && !selectedGoal
-      ? MOCK_TUTORIAL_GOAL.id
-      : selectedGoal;
+  // During tutorial walkthrough, always use mock data for consistent spotlight targets
+  const effectiveGoals = walkthroughActive ? [MOCK_TUTORIAL_GOAL] : goals;
+  const effectiveDailyTasks = walkthroughActive ? [MOCK_TUTORIAL_DAILY_TASK] : dailyTasks;
+  const effectiveSelectedGoal = walkthroughActive ? MOCK_TUTORIAL_GOAL.id : selectedGoal;
 
   // ─── Derived state ─────────────────────────────────────────────────────────
 

@@ -1517,8 +1517,8 @@ export default function GoalsScreen() {
     );
   }
 
-  // ── Mock data for tutorial spotlight ─────────────────────────────────────────
-  const effectiveGoals = walkthroughActive && goals.length === 0 ? [MOCK_TUTORIAL_GOAL] : goals;
+  // During tutorial walkthrough, always use mock data for consistent spotlight targets
+  const effectiveGoals = walkthroughActive ? [MOCK_TUTORIAL_GOAL] : goals;
 
   // ── Main render ─────────────────────────────────────────────────────────────
 
