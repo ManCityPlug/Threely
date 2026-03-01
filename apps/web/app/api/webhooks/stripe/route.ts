@@ -31,10 +31,22 @@ export async function POST(request: NextRequest) {
       case "customer.subscription.updated":
       case "customer.subscription.created": {
         const sub = event.data.object as Stripe.Subscription;
+        const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer?.id;
+
+        // Sync subscription status
         await prisma.user.updateMany({
           where: { subscriptionId: sub.id },
           data: { subscriptionStatus: sub.status },
         });
+
+        // Also persist stripeCustomerId if missing (backfill)
+        if (customerId) {
+          await prisma.user.updateMany({
+            where: { subscriptionId: sub.id, stripeCustomerId: null },
+            data: { stripeCustomerId: customerId },
+          });
+        }
+
         const planName = sub.items.data[0]?.price?.nickname ?? sub.items.data[0]?.price?.id ?? "Pro";
 
         // User started a free trial (entered card info via Stripe Checkout)

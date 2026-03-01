@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, isOnboarded, markOnboarded, saveNickname } from "@/lib/auth-context";
 import { getSupabase } from "@/lib/supabase-client";
-import { goalsApi, profileApi, tasksApi, type ParsedGoal, type TaskItem, type GoalChatMessage, type GoalChatResult } from "@/lib/api-client";
+import { goalsApi, profileApi, tasksApi, type ParsedGoal, type GoalChatMessage, type GoalChatResult } from "@/lib/api-client";
 import GoalTemplatesComponent from "@/components/GoalTemplates";
 import type { GoalCategory } from "@/lib/goal-templates";
 import { formatDisplayName } from "@/lib/format-name";
@@ -58,23 +58,7 @@ const CATEGORY_EMOJI: Record<string, string> = {
 
 // ─── Building Progress (rotating status messages) ─────────────────────────────
 
-const BUILDING_STEPS = [
-  "Analyzing your goal…",
-  "Crafting your personalized roadmap…",
-  "Generating 3 perfect tasks to start with…",
-  "Almost there — putting the finishing touches…",
-];
-
 function BuildingProgress() {
-  const [stepIdx, setStepIdx] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStepIdx((prev) => Math.min(prev + 1, BUILDING_STEPS.length - 1));
-    }, 7000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
     <div style={{
       flex: 1, display: "flex", flexDirection: "column",
@@ -83,26 +67,9 @@ function BuildingProgress() {
     }}>
       <span style={{ fontSize: 48, color: "var(--primary)", marginBottom: 20 }}>✦</span>
       <h2 style={{ fontSize: "1.2rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 8 }}>
-        Threely Intelligence is building your plan…
+        Building your plan…
       </h2>
-      <p style={{
-        color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.5,
-        transition: "opacity 0.3s ease",
-        minHeight: 44,
-      }}>
-        {BUILDING_STEPS[stepIdx]}
-      </p>
-      {/* Progress dots */}
-      <div style={{ display: "flex", gap: 6, marginTop: 20, marginBottom: 16 }}>
-        {BUILDING_STEPS.map((_, i) => (
-          <div key={i} style={{
-            width: 8, height: 8, borderRadius: 4,
-            backgroundColor: i <= stepIdx ? "var(--primary)" : "var(--border)",
-            transition: "background-color 0.3s ease",
-          }} />
-        ))}
-      </div>
-      <span className="spinner spinner-dark" />
+      <span className="spinner spinner-dark" style={{ marginTop: 12 }} />
     </div>
   );
 }
@@ -182,12 +149,9 @@ export default function OnboardingPage() {
   // Step 5 — Intensity
   const [intensityLevel, setIntensityLevel] = useState<1 | 2 | 3 | null>(null);
 
-  // Step 6 — Magic moment
-  const [generatedTasks, setGeneratedTasks] = useState<TaskItem[]>([]);
-  const [coachNote, setCoachNote] = useState("");
+  // Build state
   const [building, setBuilding] = useState(false);
   const [buildError, setBuildError] = useState("");
-  const [revealedCount, setRevealedCount] = useState(0);
 
   // ─── Navigation ────────────────────────────────────────────────────────────
 
@@ -334,7 +298,6 @@ export default function OnboardingPage() {
     // Show generating screen immediately — no flash
     setBuildError("");
     setBuilding(true);
-    setRevealedCount(0);
     advanceStep(TOTAL_STEPS + 1);
 
     try {
@@ -373,16 +336,11 @@ export default function OnboardingPage() {
       });
 
       // Generate tasks
-      const tasksResult = await tasksApi.generate({ goalId: goalResult.goal.id, onboarding: true });
-      const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
-      setGeneratedTasks(allTasks);
-      if (tasksResult.coachNote) setCoachNote(tasksResult.coachNote);
-      setBuilding(false);
+      await tasksApi.generate({ goalId: goalResult.goal.id, onboarding: true });
 
-      // Staggered reveal
-      allTasks.forEach((_, i) => {
-        setTimeout(() => setRevealedCount((c) => c + 1), 600 + i * 500);
-      });
+      // Mark onboarded and go straight to dashboard
+      if (user) markOnboarded(user.id);
+      router.replace("/dashboard");
     } catch (e) {
       setBuildError(e instanceof Error ? e.message : "Something went wrong");
       setBuilding(false);
@@ -413,7 +371,6 @@ export default function OnboardingPage() {
   async function handleBuild() {
     setBuildError("");
     setBuilding(true);
-    setRevealedCount(0);
     advanceStep(TOTAL_STEPS + 1);
 
     try {
@@ -446,20 +403,11 @@ export default function OnboardingPage() {
       });
 
       // Generate tasks
-      const tasksResult = await tasksApi.generate({ goalId: goalResult.goal.id, onboarding: true });
+      await tasksApi.generate({ goalId: goalResult.goal.id, onboarding: true });
 
-      const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
-      setGeneratedTasks(allTasks);
-      if (tasksResult.coachNote) setCoachNote(tasksResult.coachNote);
-      setBuilding(false);
-
-      // Staggered reveal
-      allTasks.forEach((_, i) => {
-        setTimeout(() => setRevealedCount((c) => Math.max(c, i + 1)), i * 350);
-      });
-
-      // Mark onboarded
+      // Mark onboarded and go straight to dashboard
       if (user) markOnboarded(user.id);
+      router.replace("/dashboard");
     } catch (e: unknown) {
       setBuildError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
       setBuilding(false);
@@ -841,88 +789,7 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {/* Build complete (tasks revealed or fallback) */}
-            {!building && !buildError && (
-              <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
-                <h2 style={{
-                  fontSize: "1.2rem", fontWeight: 700, letterSpacing: "-0.02em",
-                  textAlign: "center", marginBottom: 6,
-                }}>
-                  {generatedTasks.length > 0 ? "Your plan is ready ✦" : "You're all set!"}
-                </h2>
-
-                {coachNote && (
-                  <p style={{
-                    color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.5,
-                    fontStyle: "italic", textAlign: "center", marginBottom: 20,
-                  }}>
-                    {coachNote}
-                  </p>
-                )}
-
-                {generatedTasks.length === 0 && (
-                  <p style={{
-                    color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.5,
-                    textAlign: "center", marginBottom: 20,
-                  }}>
-                    Your goal is saved. Head to the dashboard to see your first tasks!
-                  </p>
-                )}
-
-                {generatedTasks.length > 0 && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
-                    {generatedTasks.map((task, i) => (
-                      <div
-                        key={task.id}
-                        style={{
-                          background: "var(--card)", borderRadius: "var(--radius-lg)",
-                          border: "1px solid var(--border)", padding: "1rem",
-                          boxShadow: "var(--shadow-sm)",
-                          opacity: revealedCount > i ? 1 : 0,
-                          transform: revealedCount > i ? "translateY(0)" : "translateY(16px)",
-                          transition: "opacity 0.4s ease, transform 0.4s ease",
-                        }}
-                      >
-                        <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
-                          <div style={{ flex: 1 }}>
-                            <p style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.4 }}>
-                              {task.task}
-                            </p>
-                          </div>
-                          {task.estimated_minutes > 0 && (
-                            <span style={{
-                              background: "var(--primary-light)", borderRadius: 20,
-                              padding: "2px 10px", fontSize: "0.75rem", fontWeight: 600,
-                              color: "var(--primary)", whiteSpace: "nowrap", flexShrink: 0,
-                            }}>
-                              ~{task.estimated_minutes}m
-                            </span>
-                          )}
-                        </div>
-                        {task.why && (
-                          <p style={{
-                            fontSize: "0.8rem", color: "var(--subtext)", lineHeight: 1.5,
-                            fontStyle: "italic", marginTop: 6,
-                          }}>
-                            {task.why}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                <div style={{ marginTop: "auto" }}>
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => router.replace("/dashboard")}
-                    style={{ height: 50, width: "100%" }}
-                  >
-                    Let&apos;s go →
-                  </button>
-                </div>
-              </div>
-            )}
+            {/* Build complete — redirecting to dashboard */}
           </div>
         )}
       </div>

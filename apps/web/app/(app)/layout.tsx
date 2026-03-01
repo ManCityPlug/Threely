@@ -115,6 +115,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       localStorage.setItem(`threely_tutorial_done_${user.id}`, "true");
     }
     setShowTutorial(false);
+    // Navigate to Today tab after tutorial
+    router.replace("/dashboard");
   }
 
   // Close menu on outside click

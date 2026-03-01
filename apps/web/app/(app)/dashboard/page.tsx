@@ -1150,8 +1150,15 @@ export default function DashboardPage() {
             No goals scheduled for today
           </h2>
           <p style={{ color: "var(--subtext)", marginBottom: "1.5rem", lineHeight: 1.6 }}>
-            Enjoy your rest day. You{"'"}ll be back at it tomorrow!
+            Enjoy your rest day — or keep the momentum going!
           </p>
+          <button
+            className="btn btn-primary"
+            onClick={handleGenerate}
+            style={{ height: 44, padding: "0 1.5rem", fontSize: "0.9rem" }}
+          >
+            Generate tasks anyway
+          </button>
         </div>
       )}
 

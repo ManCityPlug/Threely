@@ -840,8 +840,30 @@ export default function DashboardScreen() {
             <Text style={styles.emptyIcon}>😌</Text>
             <Text style={styles.emptyTitle}>No goals scheduled for today</Text>
             <Text style={styles.emptySubtitle}>
-              Enjoy your rest day. You'll be back at it tomorrow!
+              Enjoy your rest day — or keep the momentum going!
             </Text>
+            <TouchableOpacity
+              style={[styles.primaryBtn, { marginTop: spacing.md, paddingHorizontal: spacing.xl }]}
+              onPress={() => {
+                setGenerating(true);
+                tasksApi.generate(selectedGoal || undefined).then((res) => {
+                  setDailyTasks((prev) => {
+                    const newIds = new Set(res.dailyTasks.map((dt) => dt.id));
+                    return [...prev.filter((dt) => !newIds.has(dt.id) && res.dailyTasks.every((r) => r.goalId !== dt.goalId)), ...res.dailyTasks];
+                  });
+                  setRestDay(false);
+                }).catch((e) => {
+                  if (e instanceof Error && e.message?.includes("pro_required")) {
+                    showBottomSheetPaywall();
+                  } else {
+                    showToast(e instanceof Error ? e.message : "Failed to generate tasks", "error");
+                  }
+                }).finally(() => setGenerating(false));
+              }}
+              activeOpacity={0.85}
+            >
+              <Text style={styles.primaryBtnText}>Generate tasks anyway</Text>
+            </TouchableOpacity>
           </View>
         ) : generating && !hasVisibleTasks ? (
           <View style={styles.section}>

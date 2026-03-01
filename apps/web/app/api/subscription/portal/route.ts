@@ -10,15 +10,30 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
-  if (!dbUser?.stripeCustomerId) {
+  const stripeClient = getStripe();
+  let customerId = dbUser?.stripeCustomerId ?? null;
+
+  // If no customer ID in DB, try to find by email in Stripe
+  if (!customerId && user.email) {
+    const customers = await stripeClient.customers.list({ email: user.email, limit: 1 });
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
+      // Persist for future lookups
+      await prisma.user.update({
+        where: { id: user.id },
+        data: { stripeCustomerId: customerId },
+      });
+    }
+  }
+
+  if (!customerId) {
     return NextResponse.json({ error: "No billing account found" }, { status: 400 });
   }
 
   const origin = request.headers.get("origin") || request.headers.get("referer")?.replace(/\/[^/]*$/, "") || "https://threely.co";
 
-  const stripeClient = getStripe();
   const portalSession = await stripeClient.billingPortal.sessions.create({
-    customer: dbUser.stripeCustomerId,
+    customer: customerId,
     return_url: `${origin}/profile`,
   });
 
