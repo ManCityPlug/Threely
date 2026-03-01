@@ -88,55 +88,30 @@ function PageHook({ anim }: { anim: Animated.Value }) {
     // Floating up/down
     Animated.loop(
       Animated.sequence([
-        Animated.timing(floatAnim, {
-          toValue: -8,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
-        Animated.timing(floatAnim, {
-          toValue: 0,
-          duration: 2000,
-          useNativeDriver: true,
-        }),
+        Animated.timing(floatAnim, { toValue: -8, duration: 2000, useNativeDriver: true }),
+        Animated.timing(floatAnim, { toValue: 0, duration: 2000, useNativeDriver: true }),
       ])
     ).start();
 
-    // Pulsing glow
+    // Pulsing glow — matches web: pulse 3s ease-in-out infinite
     Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseAnim, {
-          toValue: 1.08,
-          duration: 1500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulseAnim, {
-          toValue: 1,
-          duration: 1500,
-          useNativeDriver: true,
-        }),
+        Animated.timing(pulseAnim, { toValue: 1.06, duration: 1500, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
       ])
     ).start();
 
-    // Sparkle burst
-    setTimeout(() => {
-      Animated.stagger(
-        80,
-        sparkleAnims.map((a) =>
+    // Sparkles — each loops infinitely with staggered delay (matches web: sparkle 2s infinite)
+    sparkleAnims.forEach((a, idx) => {
+      setTimeout(() => {
+        Animated.loop(
           Animated.sequence([
-            Animated.timing(a, {
-              toValue: 1,
-              duration: 400,
-              useNativeDriver: true,
-            }),
-            Animated.timing(a, {
-              toValue: 0,
-              duration: 300,
-              useNativeDriver: true,
-            }),
+            Animated.timing(a, { toValue: 1, duration: 1000, useNativeDriver: true }),
+            Animated.timing(a, { toValue: 0, duration: 1000, useNativeDriver: true }),
           ])
-        )
-      ).start();
-    }, 600);
+        ).start();
+      }, 600 + idx * 80);
+    });
   }, []);
 
   const translateY = (idx: number, base: number) =>
@@ -459,6 +434,9 @@ function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoadi
   const socialLoading = googleLoading || appleLoading;
   const floatAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
+  const sparkleAnims = useRef(
+    Array.from({ length: 6 }, () => new Animated.Value(0))
+  ).current;
 
   useEffect(() => {
     Animated.loop(
@@ -473,17 +451,56 @@ function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoadi
         Animated.timing(pulseAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
       ])
     ).start();
+    // Sparkles — loop infinitely with stagger
+    sparkleAnims.forEach((a, idx) => {
+      setTimeout(() => {
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(a, { toValue: 1, duration: 1000, useNativeDriver: true }),
+            Animated.timing(a, { toValue: 0, duration: 1000, useNativeDriver: true }),
+          ])
+        ).start();
+      }, 600 + idx * 80);
+    });
   }, []);
+
+  const authSparklePositions = [
+    { angle: 0 }, { angle: 60 }, { angle: 120 },
+    { angle: 180 }, { angle: 240 }, { angle: 300 },
+  ];
 
   return (
     <View style={styles.page}>
-      {/* Logo with float + pulse + glow */}
+      {/* Logo with float + pulse + glow + sparkles */}
       <Animated.View style={[styles.authLogoWrap, { opacity: anim, transform: [{ scale: pulseAnim }, { translateY: floatAnim }] }]}>
         <View style={styles.authLogoGlow} />
         <Image
           source={require("@/assets/icon.png")}
           style={styles.authLogo}
         />
+        {authSparklePositions.map((pos, idx) => {
+          const rad = (pos.angle * Math.PI) / 180;
+          const dist = 45;
+          return (
+            <Animated.View
+              key={idx}
+              style={[
+                styles.sparkle,
+                {
+                  left: 40 + Math.cos(rad) * dist - 3,
+                  top: 40 + Math.sin(rad) * dist - 3,
+                  opacity: sparkleAnims[idx],
+                  transform: [{
+                    scale: sparkleAnims[idx].interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, 1],
+                    }),
+                  }],
+                },
+              ]}
+            />
+          );
+        })}
       </Animated.View>
 
       <Animated.Text style={[styles.titleXXL, { opacity: anim, marginTop: spacing.lg }]}>
@@ -806,7 +823,7 @@ const styles = StyleSheet.create({
     width: 104,
     height: 104,
     borderRadius: 52,
-    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    backgroundColor: "rgba(99, 91, 255, 0.25)",
   },
   sparkle: {
     position: "absolute",
@@ -911,13 +928,14 @@ const styles = StyleSheet.create({
     height: 80,
     alignItems: "center",
     justifyContent: "center",
+    marginBottom: spacing.sm,
   },
   authLogoGlow: {
     position: "absolute",
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: "rgba(255, 255, 255, 0.12)",
+    backgroundColor: "rgba(99, 91, 255, 0.25)",
   },
   authLogo: {
     width: 56,
