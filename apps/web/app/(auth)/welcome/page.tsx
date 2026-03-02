@@ -752,9 +752,7 @@ export default function WelcomePage() {
           fontSize: "1.5rem", fontWeight: 800,
           letterSpacing: "-0.03em", marginBottom: 8, lineHeight: 1.2,
         }}>
-          10x your productivity.
-          <br />
-          <span style={{ color: "#635bff" }}>Reach your goals.</span>
+          Threely is built for {deviceLabel(device)}
         </h1>
 
         <p style={{
@@ -762,8 +760,19 @@ export default function WelcomePage() {
           lineHeight: 1.6, marginBottom: "1.75rem",
           maxWidth: 320, margin: "0 auto 1.75rem",
         }}>
-          Get the full experience — daily reminders, task tracking, and AI coaching — all in the app.
+          The #1 AI app that turns any goal into reality. Just tell us what you want — we&apos;ll get you there.
         </p>
+
+        <div style={{
+          display: "inline-flex", alignItems: "center", gap: 8,
+          padding: "8px 20px",
+          background: "#ede9ff",
+          borderRadius: 20,
+          marginBottom: "1.25rem",
+        }}>
+          <span style={{ fontSize: "0.95rem" }}>📱</span>
+          <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
+        </div>
 
         <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: "1.25rem" }}>
           {!isAndroidDevice && (

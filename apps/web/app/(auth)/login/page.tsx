@@ -73,15 +73,7 @@ function LoginPageInner() {
   const [forgotCooldown, setForgotCooldown] = useState(0);
 
   useEffect(() => {
-    const d = detectDevice();
-    setDevice(d);
-
-    // Mobile users: redirect to /welcome
-    if (d !== "desktop") {
-      router.replace("/welcome");
-      return;
-    }
-
+    setDevice(detectDevice());
     // Show error banner if redirected from failed OAuth
     if (searchParams.get("error") === "auth") {
       setError("Sign-in failed. Please try again.");
@@ -149,12 +141,103 @@ function LoginPageInner() {
   }
 
   const isMobileDevice = device !== "desktop";
+  const isAppleDevice = device === "iphone" || device === "ipad";
+  const isAndroidDevice = device === "android_phone" || device === "android_tablet";
 
-  // Mobile users get redirected in useEffect, show spinner while that happens
+  // Mobile/tablet: show "get the app" screen
   if (isMobileDevice) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <span className="spinner spinner-dark" style={{ width: 28, height: 28 }} />
+      <div className="card fade-in" style={{ padding: "2.5rem 2rem", textAlign: "center" }}>
+        <div style={{ width: 80, height: 80, margin: "0 auto 1.25rem", position: "relative" }}>
+          <div style={{
+            position: "absolute", left: -12, top: -12, width: 104, height: 104, borderRadius: 52,
+            backgroundColor: "rgba(99, 91, 255, 0.25)", animation: "pulse 3s ease-in-out infinite",
+          }} />
+          <img src="/favicon.png" alt="Threely" width={80} height={80} style={{
+            position: "relative", borderRadius: 20, animation: "pulse 3s ease-in-out infinite", zIndex: 2,
+          }} />
+          {[0, 60, 120, 180, 240, 300].map((angle, idx) => {
+            const rad = (angle * Math.PI) / 180;
+            return (
+              <div key={idx} style={{
+                position: "absolute", left: 40 + Math.cos(rad) * 55 - 3, top: 40 + Math.sin(rad) * 55 - 3,
+                width: 6, height: 6, borderRadius: 3, backgroundColor: "#635bff",
+                animation: `sparkle 2s ease-in-out ${0.6 + idx * 0.08}s infinite`, zIndex: 3,
+              }} />
+            );
+          })}
+        </div>
+
+        <h1 style={{
+          fontSize: "1.5rem", fontWeight: 800,
+          letterSpacing: "-0.03em", marginBottom: 8, lineHeight: 1.2,
+        }}>
+          Threely is built for {deviceLabel(device)}
+        </h1>
+
+        <p style={{
+          color: "var(--subtext)", fontSize: "0.9rem",
+          lineHeight: 1.6, marginBottom: "1.75rem",
+          maxWidth: 320, margin: "0 auto 1.75rem",
+        }}>
+          The #1 AI app that turns any goal into reality. Just tell us what you want — we&apos;ll get you there.
+        </p>
+
+        <div style={{
+          display: "inline-flex", alignItems: "center", gap: 8,
+          padding: "8px 20px",
+          background: "#ede9ff",
+          borderRadius: 20,
+          marginBottom: "1.25rem",
+        }}>
+          <span style={{ fontSize: "0.95rem" }}>📱</span>
+          <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
+        </div>
+
+        <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: "1.25rem" }}>
+          {!isAndroidDevice && (
+            <a
+              href="#"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "10px 18px", background: "#0a2540", color: "#fff",
+                borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
+                textDecoration: "none", position: "relative",
+              }}
+            >
+              <span className="new-badge" style={{ position: "absolute", top: -14, right: -6 }}>New</span>
+              <AppleIcon />
+              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
+                <span>App Store</span>
+              </span>
+            </a>
+          )}
+          {!isAppleDevice && (
+            <a
+              href="#"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "10px 18px", background: "#0a2540", color: "#fff",
+                borderRadius: 10, fontSize: "0.8rem", fontWeight: 600,
+                textDecoration: "none", position: "relative",
+              }}
+            >
+              <span className="new-badge" style={{ position: "absolute", top: -14, right: -6 }}>New</span>
+              <PlayIcon />
+              <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
+                <span>Google Play</span>
+              </span>
+            </a>
+          )}
+        </div>
+
+        <p style={{ color: "var(--subtext)", fontSize: "0.95rem", lineHeight: 1.5, marginBottom: "1.25rem" }}>
+          On a computer? Use the web version at{" "}
+          <a href="https://threely.co" style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "none" }}>threely.co</a>
+        </p>
+
       </div>
     );
   }
