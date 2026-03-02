@@ -53,15 +53,7 @@ export function SubscriptionProvider({ userId, children }: SubscriptionProviderP
     if (!userId) return;
 
     try {
-      // 1. Check cached status
-      const cached = await AsyncStorage.getItem("@threely_subscription_status");
-      if (cached === "trialing" || cached === "active") {
-        setHasPro(true);
-        setLoaded(true);
-        return;
-      }
-
-      // 2. Check RevenueCat entitlements
+      // 1. Check RevenueCat entitlements (always fresh, not cached)
       try {
         const customerInfo = await Purchases.getCustomerInfo();
         const isPro = typeof customerInfo.entitlements.active["pro"] !== "undefined";

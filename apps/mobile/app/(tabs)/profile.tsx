@@ -38,6 +38,7 @@ import {
 } from "@/lib/notifications";
 import { useSubscription } from "@/lib/subscription-context";
 import { useWalkthroughRegistry } from "@/lib/walkthrough-registry";
+import * as Haptics from "expo-haptics";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -609,6 +610,10 @@ export default function ProfileScreen() {
             style={[styles.weeklyCard, { opacity: 0.7 }]}
             activeOpacity={0.7}
             onPress={() => {
+              if (isLimitedMode) {
+                showBottomSheetPaywall();
+                return;
+              }
               if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
               Alert.alert(
                 "Weekly Analysis",
@@ -670,6 +675,13 @@ export default function ProfileScreen() {
           <TouchableOpacity
             style={styles.menuRow}
             onPress={async () => {
+              if ((stats?.activeGoals ?? 0) <= 1) {
+                Alert.alert(
+                  "Only One Goal",
+                  "You need at least 2 goals to change focus. Add another goal first!"
+                );
+                return;
+              }
               const today = new Date().toISOString().slice(0, 10);
               await AsyncStorage.removeItem(`@threely_focus_${today}`);
               await AsyncStorage.setItem("@threely_open_focus_picker", "1");

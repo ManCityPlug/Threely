@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
   Modal,
 } from "react-native";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 import { supabase } from "@/lib/supabase";
@@ -27,6 +27,7 @@ import {
 const PRIMARY = "#635BFF";
 
 export default function LoginScreen() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -76,7 +77,32 @@ export default function LoginScreen() {
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-    if (error) Alert.alert("Login failed", error.message);
+    if (error) {
+      // Check if the email exists to show a more helpful message
+      try {
+        const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000";
+        const res = await fetch(`${BASE_URL}/api/auth/check-email`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: email.trim() }),
+        });
+        const { exists } = await res.json();
+        if (!exists) {
+          Alert.alert(
+            "Account not found",
+            "We couldn't find an account with this email. Would you like to sign up?",
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "Sign up", onPress: () => router.push("/(auth)/register") },
+            ]
+          );
+          return;
+        }
+      } catch {
+        // If check fails, fall through to generic error
+      }
+      Alert.alert("Login failed", "Invalid login credentials");
+    }
   }
 
   return (
