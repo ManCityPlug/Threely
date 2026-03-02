@@ -356,13 +356,17 @@ export default function AppTutorial({ visible, onComplete }: AppTutorialProps) {
         {/* Block clicks everywhere */}
         <div
           className="spotlight-center-overlay"
-          onClick={e => e.stopPropagation()}
+          onClick={e => { e.preventDefault(); e.stopPropagation(); }}
+          onMouseDown={e => { e.preventDefault(); e.stopPropagation(); }}
+          onPointerDown={e => { e.preventDefault(); e.stopPropagation(); }}
           style={{ cursor: "default" }}
         >
           <div
             className="spotlight-tooltip"
             style={{ position: "relative" }}
             onClick={e => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
+            onPointerDown={e => e.stopPropagation()}
           >
             <div className="spotlight-tooltip-title">{current.title}</div>
             <div className="spotlight-tooltip-desc">{current.description}</div>
@@ -406,16 +410,19 @@ export default function AppTutorial({ visible, onComplete }: AppTutorialProps) {
 
   return (
     <>
-      {/* Click blocker — full screen overlay that blocks all interaction outside tooltip */}
+      {/* Full-screen click blocker — sits ABOVE everything to prevent ALL interaction */}
       <div
         style={{
-          position: "fixed", inset: 0, zIndex: 9999,
+          position: "fixed", inset: 0, zIndex: 10002,
           cursor: "default",
+          background: "transparent",
         }}
-        onClick={e => e.stopPropagation()}
+        onClick={e => { e.preventDefault(); e.stopPropagation(); }}
+        onMouseDown={e => { e.preventDefault(); e.stopPropagation(); }}
+        onPointerDown={e => { e.preventDefault(); e.stopPropagation(); }}
       />
 
-      {/* Spotlight cutout */}
+      {/* Spotlight cutout (visual only) */}
       {rect && (
         <>
           <div
@@ -439,15 +446,18 @@ export default function AppTutorial({ visible, onComplete }: AppTutorialProps) {
         </>
       )}
 
-      {/* Tooltip */}
+      {/* Tooltip — must be above the click blocker so buttons work */}
       {tooltipPos && (
         <div
           className="spotlight-tooltip"
           style={{
             top: tooltipPos.top,
             left: tooltipPos.left,
+            zIndex: 10003,
           }}
           onClick={e => e.stopPropagation()}
+          onMouseDown={e => e.stopPropagation()}
+          onPointerDown={e => e.stopPropagation()}
         >
           <div className="spotlight-tooltip-title">{current.title}</div>
           <div className="spotlight-tooltip-desc">{current.description}</div>
