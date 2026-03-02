@@ -13,6 +13,7 @@ import {
   Platform,
   Modal,
   KeyboardAvoidingView,
+  Linking,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SwipeNavigator } from "@/components/SwipeNavigator";
@@ -747,7 +748,18 @@ export default function ProfileScreen() {
           {/* Payments */}
           <TouchableOpacity
             style={styles.menuRow}
-            onPress={() => showBottomSheetPaywall()}
+            onPress={() => {
+              if (hasPro) {
+                // Open device subscription settings for IAP management
+                if (Platform.OS === "ios") {
+                  Linking.openURL("https://apps.apple.com/account/subscriptions");
+                } else {
+                  Linking.openURL("https://play.google.com/store/account/subscriptions");
+                }
+              } else {
+                showBottomSheetPaywall();
+              }
+            }}
             activeOpacity={0.7}
           >
             <View style={[styles.menuIcon, { backgroundColor: colors.successLight }]}>

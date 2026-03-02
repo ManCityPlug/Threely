@@ -409,6 +409,56 @@ export const accountApi = {
 
 // ─── Subscription API ─────────────────────────────────────────────────────────
 
+export interface SubscriptionDetails {
+  managedExternally?: boolean;
+  status: SubscriptionStatus["status"];
+  cancelAtPeriodEnd?: boolean;
+  trialEnd: string | null;
+  currentPeriodEnd: string | null;
+  plan: {
+    name: string;
+    priceId: string;
+    amount: number;
+    interval: string;
+  } | null;
+  paymentMethod: {
+    brand: string;
+    last4: string;
+    expMonth: number;
+    expYear: number;
+  } | null;
+  customerEmail?: string;
+  invoices: {
+    id: string;
+    date: string | null;
+    amount: number;
+    currency: string;
+    status: string | null;
+    hostedUrl: string | null;
+  }[];
+  trialEligible?: boolean;
+}
+
 export const subscriptionApi = {
   status: () => apiFetch<SubscriptionStatus>("/api/subscription"),
+
+  details: () => apiFetch<SubscriptionDetails>("/api/subscription/details"),
+
+  cancel: () =>
+    apiFetch<{ cancelAtPeriodEnd: boolean; currentPeriodEnd: string }>(
+      "/api/subscription/cancel",
+      { method: "POST" }
+    ),
+
+  reactivate: () =>
+    apiFetch<{ cancelAtPeriodEnd: boolean; status: string }>(
+      "/api/subscription/reactivate",
+      { method: "POST" }
+    ),
+
+  changePlan: (plan: "monthly" | "yearly") =>
+    apiFetch<{ plan: SubscriptionDetails["plan"]; status: string }>(
+      "/api/subscription/change-plan",
+      { method: "POST", body: JSON.stringify({ plan }) }
+    ),
 };
