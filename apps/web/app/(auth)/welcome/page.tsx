@@ -255,11 +255,10 @@ function PagePayoff({ visible }: { visible: boolean }) {
       transition: "opacity 0.6s ease, transform 0.6s ease",
     }}>
       <div style={{
-        width: 88, height: 88, borderRadius: 44,
-        backgroundColor: "#635BFF",
         display: "flex", alignItems: "center", justifyContent: "center",
         animation: visible ? "bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both" : "none",
-        fontSize: 44,
+        fontSize: 88,
+        lineHeight: 1,
       }}>
         {"\u{1F680}"}
       </div>

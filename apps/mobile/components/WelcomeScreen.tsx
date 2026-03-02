@@ -353,14 +353,14 @@ function PagePayoff({ anim, isVisible }: { anim: Animated.Value; isVisible: bool
       {/* Animated rocket */}
       <Animated.View
         style={[
-          styles.checkCircle,
           {
-            backgroundColor: "#635BFF",
+            alignItems: "center",
+            justifyContent: "center",
             transform: [{ scale: checkScale }],
           },
         ]}
       >
-        <Text style={{ fontSize: 44 }}>{"\u{1F680}"}</Text>
+        <Text style={{ fontSize: 88, lineHeight: 100 }}>{"\u{1F680}"}</Text>
       </Animated.View>
 
       <Animated.Text
