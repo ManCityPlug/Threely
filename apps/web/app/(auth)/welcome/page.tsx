@@ -183,10 +183,10 @@ function PageHook({ visible }: { visible: boolean }) {
 /* -- Page 2: How It Works ---------------------------------------------------- */
 
 const STEPS = [
-  { icon: "\u{1F4AC}", title: "Share your ambition", desc: "Describe any goal in your own words \u2014 no templates, no limits" },
-  { icon: "\u2728", title: "AI crafts your path", desc: "Personalized daily tasks shaped by your schedule, pace, and priorities" },
-  { icon: "\u2705", title: "Take action daily", desc: "Complete focused tasks that compound into real progress" },
-  { icon: "\u{1F4CA}", title: "Grow with insights", desc: "Weekly AI analysis adapts your plan as you evolve" },
+  { icon: "\u{1F3AF}", title: "Set any goal" },
+  { icon: "\u{1F4CB}", title: "Get your daily plan" },
+  { icon: "\u2705", title: "Just do the 3 tasks" },
+  { icon: "\u{1F680}", title: "See real results" },
 ];
 
 function PageHowItWorks({ visible }: { visible: boolean }) {
@@ -201,13 +201,13 @@ function PageHowItWorks({ visible }: { visible: boolean }) {
         fontSize: "clamp(1.75rem, 4vw, 2.5rem)", fontWeight: 800, color: "#FFF",
         textAlign: "center", letterSpacing: "-0.03em", marginBottom: 8,
       }}>
-        Your AI coach
+        How it works
       </h2>
       <p style={{
         color: "rgba(255,255,255,0.7)", fontSize: "1rem",
         textAlign: "center", marginBottom: 32, maxWidth: 340,
       }}>
-        Personalized to your life, your pace, your goals.
+        Three steps. Zero effort.
       </p>
 
       <div style={{ width: "100%", maxWidth: 380, position: "relative" }}>
@@ -236,10 +236,7 @@ function PageHowItWorks({ visible }: { visible: boolean }) {
             }}>
               {step.icon}
             </div>
-            <div>
-              <div style={{ color: "#FFF", fontSize: "1.05rem", fontWeight: 600 }}>{step.title}</div>
-              <div style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.875rem", marginTop: 2 }}>{step.desc}</div>
-            </div>
+            <div style={{ color: "#FFF", fontSize: "1.05rem", fontWeight: 600 }}>{step.title}</div>
           </div>
         ))}
       </div>

@@ -216,24 +216,20 @@ function PageHook({ anim }: { anim: Animated.Value }) {
 
 const STEPS = [
   {
-    icon: "chatbubble-ellipses-outline" as const,
-    title: "Share your ambition",
-    desc: "Describe any goal in your own words — no templates, no limits",
+    icon: "flag-outline" as const,
+    title: "Set any goal",
   },
   {
-    icon: "sparkles-outline" as const,
-    title: "AI crafts your path",
-    desc: "Personalized daily tasks shaped by your schedule, pace, and priorities",
+    icon: "clipboard-outline" as const,
+    title: "Get your daily plan",
   },
   {
     icon: "checkmark-done-outline" as const,
-    title: "Take action daily",
-    desc: "Complete focused tasks that compound into real progress",
+    title: "Just do the 3 tasks",
   },
   {
-    icon: "analytics-outline" as const,
-    title: "Grow with insights",
-    desc: "Weekly AI analysis adapts your plan as you evolve",
+    icon: "rocket-outline" as const,
+    title: "See real results",
   },
 ];
 
@@ -273,7 +269,7 @@ function PageHowItWorks({ anim }: { anim: Animated.Value }) {
   return (
     <View style={styles.page}>
       <Animated.Text style={[styles.titleXXL, { opacity: anim }]}>
-        Your AI coach
+        How it works
       </Animated.Text>
       <Animated.Text
         style={[
@@ -281,7 +277,7 @@ function PageHowItWorks({ anim }: { anim: Animated.Value }) {
           { opacity: anim, marginTop: spacing.sm, marginBottom: spacing.md },
         ]}
       >
-        Personalized to your life, your pace, your goals.
+        Three steps. Zero effort.
       </Animated.Text>
 
       <View style={styles.stepsContainer}>
@@ -316,7 +312,6 @@ function PageHowItWorks({ anim }: { anim: Animated.Value }) {
             </View>
             <View style={styles.stepText}>
               <Text style={styles.stepTitle}>{step.title}</Text>
-              <Text style={styles.stepDesc}>{step.desc}</Text>
             </View>
           </Animated.View>
         ))}

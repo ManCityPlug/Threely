@@ -332,6 +332,7 @@ export default function MobileAppPrompt() {
                   style={{
                     display: "flex",
                     alignItems: "center",
+                    justifyContent: "center",
                     gap: 14,
                     padding: "0.875rem 1rem",
                     background: "#f6f9fc",
