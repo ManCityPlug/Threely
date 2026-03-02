@@ -343,6 +343,20 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
                 transform: [{ scale: pulseAnim }],
               }}
             />
+
+            {/* Invisible touch blocker over spotlight — prevents interacting with content behind */}
+            <Animated.View
+              style={{
+                position: "absolute",
+                top: spotlightTop,
+                left: spotlightLeft,
+                width: spotlightWidth,
+                height: spotlightHeight,
+                backgroundColor: "transparent",
+              }}
+              onStartShouldSetResponder={() => true}
+              onResponderRelease={() => {}}
+            />
           </>
         ) : (
           /* Full overlay for centered steps */
