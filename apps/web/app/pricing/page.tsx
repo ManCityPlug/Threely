@@ -45,7 +45,7 @@ export default function PricingPage() {
             lineHeight: 1.1,
             marginBottom: "1rem",
           }}>
-            Simple, transparent pricing
+            Pricing
           </h1>
           <p style={{ fontSize: "1.05rem", color: "#425466", lineHeight: 1.7 }}>
             Get Pro free for 7 days. Cancel anytime.
