@@ -59,7 +59,7 @@ export default function MarketingFooter() {
             </h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               <Link href="/welcome" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Create account</Link>
-              <Link href="/login" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Sign in</Link>
+              <Link href="/welcome" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Sign in</Link>
             </div>
           </div>
         </div>

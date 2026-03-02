@@ -7,7 +7,7 @@ import MobileAppPrompt from "@/components/MobileAppPrompt";
 
 export const metadata: Metadata = {
   title: {
-    default: "Threely — AI-Powered Daily Tasks for Any Goal",
+    default: "Threely | Do Less. Achieve More.",
     template: "%s | Threely",
   },
   description:
@@ -16,13 +16,13 @@ export const metadata: Metadata = {
     siteName: "Threely",
     type: "website",
     url: "https://threely.co",
-    title: "Threely — AI-Powered Daily Tasks for Any Goal",
+    title: "Threely | Do Less. Achieve More.",
     description: "Describe your goal, get 3 personalized tasks every day. Threely adapts to your schedule, skill level, and progress.",
     images: [{ url: "https://threely.co/favicon.png" }],
   },
   twitter: {
     card: "summary",
-    title: "Threely — AI-Powered Daily Tasks for Any Goal",
+    title: "Threely | Do Less. Achieve More.",
     description: "Describe your goal, get 3 personalized tasks every day. Threely adapts to your schedule, skill level, and progress.",
   },
   icons: {

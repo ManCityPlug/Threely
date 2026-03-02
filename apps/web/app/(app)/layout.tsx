@@ -68,7 +68,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      router.replace("/login");
+      router.replace("/welcome");
       return;
     }
     // Fast path: localStorage says onboarded
@@ -159,7 +159,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   async function handleSignOut() {
     await signOut();
-    router.replace("/login");
+    router.replace("/welcome");
   }
 
   return (
