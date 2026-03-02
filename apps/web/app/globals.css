@@ -637,6 +637,11 @@ input, textarea, select {
   background: #f0f0f0;
 }
 
+/* Theme-conditional visibility */
+.dark-only { display: none; }
+[data-theme="dark"] .light-only { display: none; }
+[data-theme="dark"] .dark-only { display: block; }
+
 .auth-divider {
   display: flex;
   align-items: center;

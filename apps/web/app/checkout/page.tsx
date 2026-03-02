@@ -22,10 +22,13 @@ const PLAN_INFO: Record<Plan, { name: string; price: string; period: string; per
 
 const FEATURES = [
   "AI-powered daily tasks",
+  "Ask AI chat",
   "Unlimited goals",
-  "Progress tracking",
-  "Daily reminders",
+  "Weekly AI analysis",
+  "Smart task refinement",
   "Coaching insights",
+  "Progress heatmap",
+  "Daily focus goal",
 ];
 
 let stripePromise: Promise<Stripe | null> | null = null;
@@ -69,16 +72,25 @@ function CheckoutInner() {
   );
 }
 
-const ELEMENT_STYLE = {
-  base: {
-    fontSize: "16px",
-    color: "#0a2540",
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-    fontSmoothing: "antialiased",
-    "::placeholder": { color: "#8898aa" },
-  },
-  invalid: { color: "#ff4d4f" },
-};
+function getElementStyle(): Record<string, unknown> {
+  const isDark = typeof window !== "undefined" && document.documentElement.getAttribute("data-theme") === "dark";
+  return {
+    base: {
+      fontSize: "16px",
+      color: isDark ? "#e4e8ee" : "#0a2540",
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      fontSmoothing: "antialiased",
+      "::placeholder": { color: isDark ? "#6b7280" : "#8898aa" },
+    },
+    invalid: { color: "#ff4d4f" },
+  };
+}
+
+async function safeJson(res: Response) {
+  const text = await res.text();
+  if (!text) return {};
+  try { return JSON.parse(text); } catch { return { error: text.slice(0, 200) }; }
+}
 
 function CheckoutContent({ plan }: { plan: Plan }) {
   const router = useRouter();
@@ -120,7 +132,7 @@ function CheckoutContent({ plan }: { plan: Plan }) {
         });
 
         if (!res.ok) {
-          const data = await res.json();
+          const data = await safeJson(res);
           if (data.error === "Subscription already active") {
             router.replace("/dashboard");
             return;
@@ -128,7 +140,7 @@ function CheckoutContent({ plan }: { plan: Plan }) {
           throw new Error(data.error || "Failed to initialize checkout");
         }
 
-        const data = await res.json();
+        const data = await safeJson(res);
         setClientSecret(data.clientSecret);
         setTrialEligible(data.trialEligible);
       } catch (err) {
@@ -184,7 +196,7 @@ function CheckoutContent({ plan }: { plan: Plan }) {
       });
 
       if (!res.ok) {
-        const data = await res.json();
+        const data = await safeJson(res);
         throw new Error(data.error || "Failed to create subscription");
       }
 
@@ -213,25 +225,28 @@ function CheckoutContent({ plan }: { plan: Plan }) {
         padding: "0.875rem 1.5rem",
         borderBottom: "1px solid var(--border)",
         background: "var(--card)",
-        display: "flex",
+        display: "grid",
+        gridTemplateColumns: "1fr auto 1fr",
         alignItems: "center",
-        justifyContent: "space-between",
       }}>
+        <div />
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <img src="/favicon.png" alt="Threely" width={30} height={30} style={{ borderRadius: 8 }} />
           <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.02em", color: "var(--text)" }}>
             Threely
           </span>
         </div>
-        <button
-          onClick={() => router.back()}
-          style={{
-            background: "none", border: "none", cursor: "pointer",
-            color: "var(--subtext)", fontSize: "0.85rem", fontWeight: 500,
-          }}
-        >
-          Cancel
-        </button>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <button
+            onClick={() => router.back()}
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              color: "var(--subtext)", fontSize: "0.85rem", fontWeight: 500,
+            }}
+          >
+            Cancel
+          </button>
+        </div>
       </header>
 
       {/* Content */}
@@ -253,17 +268,10 @@ function CheckoutContent({ plan }: { plan: Plan }) {
             display: "flex", alignItems: "center", justifyContent: "space-between",
             marginBottom: 10,
           }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{
-                width: 38, height: 38, borderRadius: 10,
-                background: "var(--primary-light)", color: "var(--primary)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 18, fontWeight: 700,
-              }}>
-                &#x2726;
-              </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <img src="/favicon.png" alt="Threely" width={38} height={38} style={{ borderRadius: 10, flexShrink: 0 }} />
               <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, lineHeight: 1.2 }}>
                   <span style={{ fontWeight: 700, fontSize: "1rem", color: "var(--text)", letterSpacing: "-0.02em" }}>
                     Threely Pro — {info.name}
                   </span>
@@ -277,7 +285,7 @@ function CheckoutContent({ plan }: { plan: Plan }) {
                     </span>
                   )}
                 </div>
-                <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>
+                <span style={{ fontSize: "0.8rem", color: "var(--subtext)", lineHeight: 1.2, marginTop: 1, display: "block" }}>
                   {info.perMonth} billed {plan === "yearly" ? "annually" : "monthly"}
                 </span>
               </div>
@@ -302,22 +310,41 @@ function CheckoutContent({ plan }: { plan: Plan }) {
 
         {/* ── Trial info banner ────────────────────────────────────────── */}
         {trialEligible && (
-          <div style={{
-            background: "linear-gradient(135deg, var(--primary-light), #e8f5e9)",
-            border: "1px solid var(--border)",
-            borderRadius: "var(--radius)",
-            padding: "1rem 1.25rem",
-            marginBottom: "1.25rem",
-            textAlign: "center",
-          }}>
-            <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>
-              7 days free
+          <>
+            {/* Light mode banner */}
+            <div className="light-only" style={{
+              background: "linear-gradient(135deg, var(--primary-light), #e8f5e9)",
+              border: "1px solid var(--border)",
+              borderRadius: "var(--radius)",
+              padding: "1rem 1.25rem",
+              marginBottom: "1.25rem",
+              textAlign: "center",
+            }}>
+              <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>
+                7 days free
+              </div>
+              <div style={{ fontSize: "0.82rem", color: "var(--subtext)", lineHeight: 1.5 }}>
+                Your trial starts today. You won&apos;t be charged until <strong>{getTrialEndDate()}</strong>.
+                <br />Cancel anytime in Settings — no questions asked.
+              </div>
             </div>
-            <div style={{ fontSize: "0.82rem", color: "var(--subtext)", lineHeight: 1.5 }}>
-              Your trial starts today. You won&apos;t be charged until <strong>{getTrialEndDate()}</strong>.
-              <br />Cancel anytime in Settings — no questions asked.
+            {/* Dark mode banner */}
+            <div className="dark-only" style={{
+              background: "linear-gradient(135deg, #4338ca, #635BFF, #7c6fff)",
+              borderRadius: "var(--radius)",
+              padding: "1rem 1.25rem",
+              marginBottom: "1.25rem",
+              textAlign: "center",
+            }}>
+              <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>
+                7 days free
+              </div>
+              <div style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>
+                Your trial starts today. You won&apos;t be charged until <strong style={{ color: "#fff" }}>{getTrialEndDate()}</strong>.
+                <br />Cancel anytime in Settings — no questions asked.
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* ── Payment form card ────────────────────────────────────────── */}
@@ -383,7 +410,7 @@ function CheckoutContent({ plan }: { plan: Plan }) {
                 transition: "border-color 0.15s",
               }}>
                 <CardNumberElement
-                  options={{ style: ELEMENT_STYLE, showIcon: true }}
+                  options={{ style: getElementStyle(), showIcon: true }}
                   onChange={(e) => {
                     setCardNumberComplete(e.complete);
                     if (e.error) setError(e.error.message);
@@ -410,7 +437,7 @@ function CheckoutContent({ plan }: { plan: Plan }) {
                   transition: "border-color 0.15s",
                 }}>
                   <CardExpiryElement
-                    options={{ style: ELEMENT_STYLE }}
+                    options={{ style: getElementStyle() }}
                     onChange={(e) => {
                       setCardExpiryComplete(e.complete);
                       if (e.error) setError(e.error.message);
@@ -434,7 +461,7 @@ function CheckoutContent({ plan }: { plan: Plan }) {
                   transition: "border-color 0.15s",
                 }}>
                   <CardCvcElement
-                    options={{ style: ELEMENT_STYLE }}
+                    options={{ style: getElementStyle() }}
                     onChange={(e) => {
                       setCardCvcComplete(e.complete);
                       if (e.error) setError(e.error.message);

@@ -186,11 +186,12 @@ function AppContent() {
     const exists = session != null;
     if (prevSessionExists.current !== undefined && prevSessionExists.current !== exists) {
       routingResolved.current = false;
-      setReady(false);
-      // On logout, reset welcomeDone so carousel shows again
+      // On logout, unmount Stack and reset welcome so carousel shows again
       if (!exists) {
+        setReady(false);
         setWelcomeDone(false);
       }
+      // On login, do NOT setReady(false) — keep Stack mounted so router.replace works
     }
     prevSessionExists.current = exists;
   }, [session]);
