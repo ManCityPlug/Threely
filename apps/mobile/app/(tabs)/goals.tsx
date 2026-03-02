@@ -643,6 +643,7 @@ export default function GoalsScreen() {
 
   function handleDeletePress() {
     if (!actionGoal) return;
+    if (isLimitedMode && !walkthroughActive) { setActionGoal(null); showBottomSheetPaywall(); return; }
     const goal = actionGoal;
     setActionGoal(null);
     Alert.alert(

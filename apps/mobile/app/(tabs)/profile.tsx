@@ -778,12 +778,7 @@ export default function ProfileScreen() {
               <Ionicons name="card-outline" size={18} color={colors.success} />
             </View>
             <View style={styles.menuText}>
-              <Text style={styles.menuLabel}>
-                Subscription{hasPro ? "  " : ""}
-                {hasPro && (
-                  <Text style={{ fontSize: 11, fontWeight: "700", color: colors.primary }}>Pro</Text>
-                )}
-              </Text>
+              <Text style={styles.menuLabel}>Subscription</Text>
               <Text style={styles.menuValue}>
                 {hasPro && billingDate
                   ? `Billing on ${new Date(billingDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`

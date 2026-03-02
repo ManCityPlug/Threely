@@ -1087,6 +1087,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
 
 function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onDeleted: () => void; onUpdated: (goal: Goal) => void; onAddDetail: (goal: Goal) => void }) {
   const goalRouter = useRouter();
+  const { hasPro, showPaywall } = useSubscription();
   const [showMenu, setShowMenu] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [toggling, setToggling] = useState(false);
@@ -1107,6 +1108,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
 
   async function handleDelete() {
     setShowMenu(false);
+    if (!hasPro) { showPaywall(); return; }
     if (!confirm("Delete this goal and all its tasks?")) return;
     setDeleting(true);
     try {
