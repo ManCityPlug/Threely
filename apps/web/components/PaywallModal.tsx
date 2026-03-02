@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useSubscription, type PaywallVariant } from "@/lib/subscription-context";
-import { subscriptionApi } from "@/lib/api-client";
+import { type PaywallVariant } from "@/lib/subscription-context";
 
 const FEATURES = [
   { icon: "\u2728", text: "AI-powered tasks tailored to your goals" },
@@ -44,16 +43,8 @@ function FullScreenPaywall({
   selectedPlan: (typeof PLANS)[number];
   onClose: () => void;
 }) {
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-
-  async function handleCheckout() {
-    setCheckoutLoading(true);
-    try {
-      const res = await subscriptionApi.checkout(plan);
-      if (res.url) window.location.href = res.url;
-    } catch {
-      setCheckoutLoading(false);
-    }
+  function handleCheckout() {
+    window.location.href = `/checkout?plan=${plan}`;
   }
 
   return (
@@ -107,10 +98,8 @@ function FullScreenPaywall({
       <button
         className="paywall-cta-btn"
         onClick={handleCheckout}
-        disabled={checkoutLoading}
-        style={{ cursor: checkoutLoading ? "wait" : "pointer" }}
       >
-        {checkoutLoading ? "Redirecting..." : "Get Pro Free"}
+        Get Pro Free
       </button>
       <p className="paywall-cta-sub">
         7 days free &middot; then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
@@ -139,16 +128,8 @@ function SheetPaywall({
   selectedPlan: (typeof PLANS)[number];
   onClose: () => void;
 }) {
-  const [checkoutLoading, setCheckoutLoading] = useState(false);
-
-  async function handleCheckout() {
-    setCheckoutLoading(true);
-    try {
-      const res = await subscriptionApi.checkout(plan);
-      if (res.url) window.location.href = res.url;
-    } catch {
-      setCheckoutLoading(false);
-    }
+  function handleCheckout() {
+    window.location.href = `/checkout?plan=${plan}`;
   }
 
   return (
@@ -259,15 +240,13 @@ function SheetPaywall({
         <button
           className="btn btn-primary"
           onClick={handleCheckout}
-          disabled={checkoutLoading}
           style={{
             width: "100%", textAlign: "center", padding: "0.75rem",
             fontSize: "0.95rem", display: "block",
             marginBottom: "0.75rem",
-            cursor: checkoutLoading ? "wait" : "pointer",
           }}
         >
-          {checkoutLoading ? "Redirecting..." : "Get Pro Free"}
+          Get Pro Free
         </button>
 
         <p style={{ fontSize: "0.75rem", color: "var(--muted)", textAlign: "center", marginBottom: "0.75rem" }}>

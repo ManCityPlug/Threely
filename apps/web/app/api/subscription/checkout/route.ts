@@ -1,15 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest } from "@/lib/supabase";
-import { getStripe, PRICE_MONTHLY, PRICE_YEARLY, TRIAL_DAYS } from "@/lib/stripe";
+import { getStripe, PRICE_MONTHLY, PRICE_YEARLY } from "@/lib/stripe";
 
 const PRICE_MAP: Record<string, string> = {
   monthly: PRICE_MONTHLY,
   yearly: PRICE_YEARLY,
 };
 
-// ─── POST /api/subscription/checkout — create Stripe Checkout session ────────
+// ─── POST /api/subscription/checkout — create SetupIntent for card collection ─
 
 export async function POST(request: NextRequest) {
   const user = await getUserFromRequest(request);
@@ -47,36 +46,18 @@ export async function POST(request: NextRequest) {
   }
 
   // ── Determine trial eligibility ───────────────────────────────────────────
-  const alreadyClaimedTrial = !!dbUser?.trialClaimedAt;
+  const trialEligible = !dbUser?.trialClaimedAt;
 
-  // ── Build Checkout Session ────────────────────────────────────────────────
-  const origin = request.headers.get("origin") || request.headers.get("referer")?.replace(/\/[^/]*$/, "") || "https://threely.co";
-
-  const params: Stripe.Checkout.SessionCreateParams = {
-    mode: "subscription",
+  // ── Create SetupIntent — collect card without charging ────────────────────
+  const setupIntent = await stripeClient.setupIntents.create({
     customer: customerId,
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${origin}/dashboard?subscribed=1`,
-    cancel_url: `${origin}/pricing`,
-    payment_method_types: ["card"],
-  };
+    usage: "off_session",
+    metadata: { userId: user.id, plan: body.plan },
+  });
 
-  // Only add trial if they haven't claimed one before
-  if (!alreadyClaimedTrial) {
-    params.subscription_data = {
-      trial_period_days: TRIAL_DAYS,
-    };
-  }
-
-  const session = await stripeClient.checkout.sessions.create(params);
-
-  // ── Mark trial as claimed ─────────────────────────────────────────────────
-  if (!alreadyClaimedTrial) {
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { trialClaimedAt: new Date() },
-    });
-  }
-
-  return NextResponse.json({ url: session.url });
+  return NextResponse.json({
+    clientSecret: setupIntent.client_secret,
+    customerId,
+    trialEligible,
+  });
 }

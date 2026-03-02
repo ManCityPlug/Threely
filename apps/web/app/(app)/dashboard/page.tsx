@@ -88,7 +88,7 @@ const RESOURCE_ICONS_WEB: Record<string, string> = {
 };
 
 function TaskCard({
-  task, onToggle, onSkip, onReschedule, onRefine, onAsk, readonly = false, overdue = false,
+  task, onToggle, onSkip, onReschedule, onRefine, onAsk, readonly = false, overdue = false, hasPro = true, onPaywall,
 }: {
   task: TaskItem;
   onToggle?: (id: string, done: boolean) => void;
@@ -98,6 +98,8 @@ function TaskCard({
   onAsk?: (id: string, messages: { role: "user" | "assistant"; content: string }[]) => Promise<{ answer: string; options: string[] }>;
   readonly?: boolean;
   overdue?: boolean;
+  hasPro?: boolean;
+  onPaywall?: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [refineMode, setRefineMode] = useState(false);
@@ -127,6 +129,7 @@ function TaskCard({
   // Menu close is handled by the portal backdrop's onClick
 
   function handleStartRefine() {
+    if (!hasPro) { onPaywall?.(); return; }
     setMenuOpen(false);
     setRefineInput("");
     setRefineMode(true);
@@ -134,6 +137,7 @@ function TaskCard({
   }
 
   function handleStartAsk() {
+    if (!hasPro) { onPaywall?.(); return; }
     setMenuOpen(false);
     setAskMode(true);
     setAskMessages([]);
@@ -785,9 +789,9 @@ export default function DashboardPage() {
         setSelectedGoalId(onlyGoalId);
         localStorage.setItem(todayKey, onlyGoalId);
       } else if (goalsRes.goals.length > 1) {
-        // Multiple goals, no saved pick — prompt user to choose
+        // Multiple goals, no saved pick — prompt user to choose (skip during tutorial)
         setSelectedGoalId(null);
-        setGoalPickerOpen(true);
+        if (!walkthroughActive) setGoalPickerOpen(true);
       }
 
       // Auto-generate tasks if none exist and user has goals
@@ -820,7 +824,7 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }, [showToast]);
+  }, [showToast, walkthroughActive]);
 
   useEffect(() => { load(); return () => { if (pollingRef.current) clearInterval(pollingRef.current); }; }, [load]);
 
@@ -1481,6 +1485,8 @@ export default function DashboardPage() {
                     onAsk={(taskItemId, messages) =>
                       handleAskAboutTask(dt.id, taskItemId, messages)
                     }
+                    hasPro={hasPro}
+                    onPaywall={() => showPaywall()}
                   />
                 </div>
               ))}
@@ -1582,8 +1588,8 @@ export default function DashboardPage() {
         />
       )}
 
-      {/* Goal picker modal (with metadata) */}
-      {goalPickerOpen && (
+      {/* Goal picker modal (with metadata) — hidden during tutorial */}
+      {goalPickerOpen && !walkthroughActive && (
         <div className="modal-overlay" onClick={() => { if (selectedGoalId !== null) setGoalPickerOpen(false); }}>
           <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 460 }}>
             <h2 style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>

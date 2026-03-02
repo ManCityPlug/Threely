@@ -113,30 +113,21 @@ export async function POST(request: NextRequest) {
   const activeGoals = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
   notifyGoalCreated(user.email ?? "unknown", goal.title, goal.category, { total: totalGoals, active: activeGoals });
 
-  // Generate roadmap with Opus (async — don't block the response)
-  // Load user profile for context
+  // Generate roadmap async — don't block the response
   const profile = await prisma.userProfile.findUnique({ where: { userId: user.id } });
-  try {
-    const roadmap = await generateRoadmap({
-      title: goal.title,
-      rawInput: goal.rawInput,
-      structuredSummary: goal.structuredSummary ?? null,
-      category: goal.category ?? null,
-      deadline: goal.deadline ?? null,
-      dailyTimeMinutes: goal.dailyTimeMinutes ?? profile?.dailyTimeMinutes ?? 60,
-      intensityLevel: goal.intensityLevel ?? profile?.intensityLevel ?? 2,
-    });
-
-    await prisma.goal.update({
-      where: { id: goal.id },
-      data: { roadmap },
-    });
-
-    // Return goal with roadmap
-    return NextResponse.json({ goal: { ...goal, roadmap } }, { status: 201 });
-  } catch (e) {
+  generateRoadmap({
+    title: goal.title,
+    rawInput: goal.rawInput,
+    structuredSummary: goal.structuredSummary ?? null,
+    category: goal.category ?? null,
+    deadline: goal.deadline ?? null,
+    dailyTimeMinutes: goal.dailyTimeMinutes ?? profile?.dailyTimeMinutes ?? 60,
+    intensityLevel: goal.intensityLevel ?? profile?.intensityLevel ?? 2,
+  }).then(async (roadmap) => {
+    await prisma.goal.update({ where: { id: goal.id }, data: { roadmap } });
+  }).catch((e) => {
     console.error("[POST /api/goals] Roadmap generation failed:", e);
-    // Return goal without roadmap — task generation still works, just without the master plan
-    return NextResponse.json({ goal }, { status: 201 });
-  }
+  });
+
+  return NextResponse.json({ goal }, { status: 201 });
 }

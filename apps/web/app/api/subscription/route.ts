@@ -33,12 +33,10 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Check automatic 7-day trial (no Stripe subscription needed)
-    const trialEnd = dbUser?.trialEndsAt;
-    const isTrialing = trialEnd && new Date(trialEnd) > new Date();
+    // No Stripe subscription and no RevenueCat — no pro access
     return NextResponse.json({
-      status: isTrialing ? "trialing" : null,
-      trialEndsAt: trialEnd?.toISOString() ?? null,
+      status: null,
+      trialEndsAt: null,
       currentPeriodEnd: null,
     });
   }

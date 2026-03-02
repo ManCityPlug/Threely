@@ -8,7 +8,8 @@ export interface UserAccess {
 
 /**
  * Check whether a user has Pro access.
- * Priority: active Stripe subscription > automatic 7-day trial > expired/none.
+ * Pro requires an active Stripe subscription, Stripe trial (card on file), or RevenueCat subscription.
+ * No automatic free trial — trial only starts when user subscribes via Stripe Checkout.
  */
 export async function getUserAccess(userId: string): Promise<UserAccess> {
   const user = await prisma.user.findUnique({
@@ -20,28 +21,16 @@ export async function getUserAccess(userId: string): Promise<UserAccess> {
     return { hasPro: false, reason: "none", trialEndsAt: null };
   }
 
-  // 1. Active Stripe subscription (paid or Stripe-managed trial)
+  // 1. Active Stripe subscription (paid or Stripe-managed trial with card on file)
   if (user.subscriptionStatus === "active" || user.subscriptionStatus === "trialing") {
-    return { hasPro: true, reason: "subscribed", trialEndsAt: user.trialEndsAt };
+    return { hasPro: true, reason: user.subscriptionStatus === "trialing" ? "trialing" : "subscribed", trialEndsAt: user.trialEndsAt };
   }
 
-  // 1b. Active RevenueCat subscription (mobile IAP)
+  // 2. Active RevenueCat subscription (mobile IAP)
   if (user.rcSubscriptionActive) {
     return { hasPro: true, reason: "subscribed", trialEndsAt: null };
   }
 
-  // 2. Automatic 7-day free trial (no card required)
-  if (user.trialEndsAt && new Date(user.trialEndsAt) > new Date()) {
-    return { hasPro: true, reason: "trialing", trialEndsAt: user.trialEndsAt };
-  }
-
-  // 3. No trial set (pre-trial-system user) — grant a 7-day trial now
-  if (!user.trialEndsAt) {
-    const trialEnd = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    await prisma.user.update({ where: { id: userId }, data: { trialEndsAt: trialEnd } });
-    return { hasPro: true, reason: "trialing", trialEndsAt: trialEnd };
-  }
-
-  // 4. Trial expired
-  return { hasPro: false, reason: "expired", trialEndsAt: user.trialEndsAt };
+  // 3. No active subscription
+  return { hasPro: false, reason: "none", trialEndsAt: null };
 }

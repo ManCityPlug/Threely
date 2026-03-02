@@ -26,8 +26,9 @@ export async function POST(request: NextRequest) {
     onboarding?: boolean;
   };
 
-  // Pro gate — skip during onboarding so new users get their first tasks
-  if (!onboarding) {
+  // Pro gate — free users can generate daily tasks for existing goals,
+  // but pro features (more tasks, post-review regen) require subscription
+  if (!onboarding && (requestingAdditional || postReview)) {
     const access = await getUserAccess(user.id);
     if (!access.hasPro) {
       return NextResponse.json({

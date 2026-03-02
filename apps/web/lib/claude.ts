@@ -563,7 +563,7 @@ PHASE 2: [Name]
 End with a brief note about what success looks like when ALL phases are complete.`;
 
   const message = await anthropic.messages.create({
-    model: "claude-opus-4-6",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 2048,
     temperature: 0.5,
     messages: [{ role: "user", content: prompt }],

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { subscriptionApi } from "@/lib/api-client";
 import { getSupabase } from "@/lib/supabase-client";
 
 type Plan = "monthly" | "yearly";
@@ -25,13 +24,7 @@ export default function CheckoutButton({ plan, style, children }: CheckoutButton
     }
 
     setLoading(true);
-    try {
-      const res = await subscriptionApi.checkout(plan);
-      if (res.url) window.location.href = res.url;
-    } catch {
-      // If checkout fails (e.g. already subscribed), redirect to dashboard
-      window.location.href = "/dashboard";
-    }
+    window.location.href = `/checkout?plan=${plan}`;
   }
 
   return (

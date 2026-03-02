@@ -8,12 +8,48 @@ export async function DELETE(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
-    // Delete the Prisma user — cascades to goals, daily_tasks, reviews, etc.
+    // Explicitly delete all user data in dependency order to guarantee cleanup.
+    // Even though schema has onDelete: Cascade, we do explicit deletes as a safety net.
+
+    // 1. Delete daily reviews (depend on daily_tasks)
+    await prisma.dailyReview.deleteMany({ where: { userId: user.id } });
+
+    // 2. Delete daily tasks (depend on goals + users)
+    await prisma.dailyTask.deleteMany({ where: { userId: user.id } });
+
+    // 3. Delete daily focus records
+    await prisma.dailyFocus.deleteMany({ where: { userId: user.id } });
+
+    // 4. Delete weekly summaries
+    await prisma.weeklySummary.deleteMany({ where: { userId: user.id } });
+
+    // 5. Delete goals
+    await prisma.goal.deleteMany({ where: { userId: user.id } });
+
+    // 6. Delete user profile
+    await prisma.userProfile.deleteMany({ where: { userId: user.id } });
+
+    // 7. Delete the user record itself
     await prisma.user.delete({ where: { id: user.id } }).catch(() => {
-      // User may not exist in Prisma yet (e.g. never completed onboarding)
+      // User may not exist in Prisma (e.g. OAuth-only, never completed onboarding)
     });
 
-    // Delete from Supabase auth.users (requires service role)
+    // 8. Also clean up any orphaned data by email (in case IDs changed between signups)
+    const orphanedUsers = await prisma.user.findMany({
+      where: { email: { equals: user.email, mode: "insensitive" } },
+      select: { id: true },
+    });
+    for (const orphan of orphanedUsers) {
+      await prisma.dailyReview.deleteMany({ where: { userId: orphan.id } });
+      await prisma.dailyTask.deleteMany({ where: { userId: orphan.id } });
+      await prisma.dailyFocus.deleteMany({ where: { userId: orphan.id } });
+      await prisma.weeklySummary.deleteMany({ where: { userId: orphan.id } });
+      await prisma.goal.deleteMany({ where: { userId: orphan.id } });
+      await prisma.userProfile.deleteMany({ where: { userId: orphan.id } });
+      await prisma.user.delete({ where: { id: orphan.id } }).catch(() => {});
+    }
+
+    // 9. Delete from Supabase auth (requires service role)
     await supabaseAdmin.auth.admin.deleteUser(user.id);
 
     return NextResponse.json({ success: true });

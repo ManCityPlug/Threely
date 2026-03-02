@@ -29,12 +29,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    // Start automatic 7-day Pro trial
-    const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    // Create user record (no trial — trial starts via Stripe Checkout with card)
     await prisma.user.upsert({
       where: { id: data.user.id },
-      update: { trialEndsAt },
-      create: { id: data.user.id, email, trialEndsAt },
+      update: {},
+      create: { id: data.user.id, email },
     });
 
     // Discord notification (fire and forget)
