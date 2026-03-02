@@ -263,6 +263,7 @@ function UpdateCardForm({
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fullName, setFullName] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -279,7 +280,10 @@ function UpdateCardForm({
       if (!cardElement) throw new Error("Card element not found");
 
       const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(clientSecret, {
-        payment_method: { card: cardElement },
+        payment_method: {
+          card: cardElement,
+          billing_details: { name: fullName.trim() || undefined },
+        },
       });
 
       if (stripeError) {
@@ -319,6 +323,30 @@ function UpdateCardForm({
   return (
     <form onSubmit={handleSubmit}>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div>
+          <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--subtext)", display: "block", marginBottom: 4 }}>
+            Name on card
+          </label>
+          <input
+            type="text"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            placeholder="John Smith"
+            autoComplete="cc-name"
+            style={{
+              width: "100%",
+              padding: "0.6rem 0.75rem",
+              borderRadius: "var(--radius-sm)",
+              border: "1px solid var(--border)",
+              background: "var(--card)",
+              fontSize: "14px",
+              fontFamily: 'var(--font)',
+              color: "var(--text)",
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
         <div>
           <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--subtext)", display: "block", marginBottom: 4 }}>
             Card number

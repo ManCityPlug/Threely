@@ -91,10 +91,11 @@ function CheckoutContent({ plan }: { plan: Plan }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [fullName, setFullName] = useState("");
   const [cardNumberComplete, setCardNumberComplete] = useState(false);
   const [cardExpiryComplete, setCardExpiryComplete] = useState(false);
   const [cardCvcComplete, setCardCvcComplete] = useState(false);
-  const allComplete = cardNumberComplete && cardExpiryComplete && cardCvcComplete;
+  const allComplete = fullName.trim().length > 0 && cardNumberComplete && cardExpiryComplete && cardCvcComplete;
 
   const info = PLAN_INFO[plan] || PLAN_INFO.yearly;
 
@@ -156,7 +157,10 @@ function CheckoutContent({ plan }: { plan: Plan }) {
 
     // Step 1: Confirm card setup (no charge)
     const { error: setupError } = await stripe.confirmCardSetup(clientSecret, {
-      payment_method: { card: cardNumber },
+      payment_method: {
+        card: cardNumber,
+        billing_details: { name: fullName.trim() },
+      },
     });
 
     if (setupError) {
@@ -331,6 +335,38 @@ function CheckoutContent({ plan }: { plan: Plan }) {
           </h3>
 
           <form onSubmit={handleSubmit}>
+            {/* Full name */}
+            <div style={{ marginBottom: "1rem" }}>
+              <label style={{
+                display: "block", fontSize: "0.8rem", fontWeight: 600,
+                color: "var(--subtext)", marginBottom: 6,
+              }}>
+                Name on card
+              </label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="John Smith"
+                autoComplete="cc-name"
+                style={{
+                  width: "100%",
+                  border: "1.5px solid var(--border)",
+                  borderRadius: "var(--radius)",
+                  padding: "0.75rem 0.875rem",
+                  background: "var(--bg)",
+                  fontSize: "16px",
+                  fontFamily: 'var(--font)',
+                  color: "var(--text)",
+                  outline: "none",
+                  transition: "border-color 0.15s",
+                  boxSizing: "border-box",
+                }}
+                onFocus={(e) => e.currentTarget.style.borderColor = "var(--primary)"}
+                onBlur={(e) => e.currentTarget.style.borderColor = "var(--border)"}
+              />
+            </div>
+
             {/* Card number */}
             <div style={{ marginBottom: "1rem" }}>
               <label style={{
