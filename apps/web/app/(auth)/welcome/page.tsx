@@ -173,8 +173,8 @@ function PageHook({ visible }: { visible: boolean }) {
         color: "rgba(255,255,255,0.7)", fontSize: "clamp(1rem, 2vw, 1.15rem)",
         textAlign: "center", lineHeight: 1.6, maxWidth: 340, marginTop: 24,
       }}>
-        Set a goal. Get 3 daily tasks.<br />
-        Make progress every single day.
+        Tell us your goal.<br />
+        We&apos;ll get you there.
       </p>
     </div>
   );
@@ -210,9 +210,9 @@ function PageHowItWorks({ visible }: { visible: boolean }) {
         Three steps. Zero effort.
       </p>
 
-      <div style={{ width: "100%", maxWidth: 380, position: "relative" }}>
+      <div style={{ width: "100%", maxWidth: 300, position: "relative", margin: "0 auto" }}>
         <div style={{
-          position: "absolute", left: 23, top: 48, width: 2, bottom: 24,
+          position: "absolute", left: "50%", marginLeft: -1, top: 48, width: 2, bottom: 24,
           background: "rgba(255,255,255,0.15)", borderRadius: 1,
           animation: visible ? "lineGrow 1s ease-out 0.2s both" : "none",
         }} />
@@ -221,10 +221,10 @@ function PageHowItWorks({ visible }: { visible: boolean }) {
           <div
             key={i}
             style={{
-              display: "flex", alignItems: "flex-start", gap: 16,
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 10,
               marginBottom: i < STEPS.length - 1 ? 28 : 0,
               opacity: visible ? 1 : 0,
-              transform: visible ? "none" : "translateX(-30px)",
+              transform: visible ? "none" : "translateY(20px)",
               transition: `opacity 0.4s ease ${i * 0.18}s, transform 0.4s ease ${i * 0.18}s`,
             }}
           >
@@ -232,11 +232,11 @@ function PageHowItWorks({ visible }: { visible: boolean }) {
               width: 48, height: 48, borderRadius: 24,
               backgroundColor: "rgba(255,255,255,0.12)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 22, flexShrink: 0,
+              fontSize: 22, flexShrink: 0, position: "relative", zIndex: 2,
             }}>
               {step.icon}
             </div>
-            <div style={{ color: "#FFF", fontSize: "1.05rem", fontWeight: 600 }}>{step.title}</div>
+            <div style={{ color: "#FFF", fontSize: "1.05rem", fontWeight: 600, textAlign: "center" }}>{step.title}</div>
           </div>
         ))}
       </div>
@@ -256,13 +256,12 @@ function PagePayoff({ visible }: { visible: boolean }) {
     }}>
       <div style={{
         width: 88, height: 88, borderRadius: 44,
-        backgroundColor: "#3ECF8E",
+        backgroundColor: "#635BFF",
         display: "flex", alignItems: "center", justifyContent: "center",
         animation: visible ? "bounceIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both" : "none",
+        fontSize: 44,
       }}>
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none">
-          <path d="M5 13l4 4L19 7" stroke="#FFF" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        {"\u{1F680}"}
       </div>
 
       <h1 style={{
@@ -270,21 +269,21 @@ function PagePayoff({ visible }: { visible: boolean }) {
         textAlign: "center", letterSpacing: "-0.03em", lineHeight: 1.05,
         marginTop: 32, marginBottom: 0,
       }}>
-        Stay on <span style={{ color: "#3ECF8E" }}>track.</span>
+        10x faster
       </h1>
       <h1 style={{
         fontSize: "clamp(2.5rem, 5vw, 3.5rem)", fontWeight: 800, color: "#FFF",
         textAlign: "center", letterSpacing: "-0.03em", lineHeight: 1.05, margin: 0,
       }}>
-        Every day.
+        <span style={{ color: "#635BFF" }}>progress.</span>
       </h1>
 
       <p style={{
         color: "rgba(255,255,255,0.7)", fontSize: "clamp(1rem, 2vw, 1.15rem)",
         textAlign: "center", lineHeight: 1.6, maxWidth: 340, marginTop: 24,
       }}>
-        Complete 3 focused tasks daily.<br />
-        Watch your goals come to life.
+        No planning. No thinking.<br />
+        Just 3 tasks a day and real results.
       </p>
 
       <div style={{
@@ -298,7 +297,7 @@ function PagePayoff({ visible }: { visible: boolean }) {
           color: "rgba(255,255,255,0.85)", fontSize: "1rem",
           fontWeight: 500, textAlign: "center", margin: 0,
         }}>
-          Small steps. Big results. AI keeps you moving.
+          AI keeps you moving.
         </p>
       </div>
     </div>

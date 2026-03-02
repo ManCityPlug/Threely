@@ -206,7 +206,7 @@ function PageHook({ anim }: { anim: Animated.Value }) {
           },
         ]}
       >
-        The #1 AI app that turns any goal into reality.{"\n"}Just tell us what you want — we'll get you there.
+        Tell us your goal.{"\n"}We'll get you there.
       </Animated.Text>
     </View>
   );
@@ -280,12 +280,12 @@ function PageHowItWorks({ anim }: { anim: Animated.Value }) {
         Three steps. Zero effort.
       </Animated.Text>
 
-      <View style={styles.stepsContainer}>
+      <View style={[styles.stepsContainer, { alignItems: "center" }]}>
         {/* Connecting line */}
         <Animated.View
           style={[
             styles.connectingLine,
-            { height: lineHeight },
+            { height: lineHeight, left: "50%", marginLeft: -1 },
           ]}
         />
 
@@ -293,26 +293,27 @@ function PageHowItWorks({ anim }: { anim: Animated.Value }) {
           <Animated.View
             key={i}
             style={[
-              styles.stepRow,
+              {
+                alignItems: "center",
+                gap: spacing.sm,
+              },
               {
                 opacity: stepAnims[i],
                 transform: [
                   {
-                    translateX: stepAnims[i].interpolate({
+                    translateY: stepAnims[i].interpolate({
                       inputRange: [0, 1],
-                      outputRange: [-30, 0],
+                      outputRange: [20, 0],
                     }),
                   },
                 ],
               },
             ]}
           >
-            <View style={styles.stepBadge}>
+            <View style={[styles.stepBadge, { zIndex: 2 }]}>
               <Ionicons name={step.icon} size={22} color="#FFFFFF" />
             </View>
-            <View style={styles.stepText}>
-              <Text style={styles.stepTitle}>{step.title}</Text>
-            </View>
+            <Text style={[styles.stepTitle, { textAlign: "center" }]}>{step.title}</Text>
           </Animated.View>
         ))}
       </View>
@@ -349,16 +350,17 @@ function PagePayoff({ anim, isVisible }: { anim: Animated.Value; isVisible: bool
 
   return (
     <View style={styles.page}>
-      {/* Animated checkmark */}
+      {/* Animated rocket */}
       <Animated.View
         style={[
           styles.checkCircle,
           {
+            backgroundColor: "#635BFF",
             transform: [{ scale: checkScale }],
           },
         ]}
       >
-        <Ionicons name="checkmark" size={48} color="#FFFFFF" />
+        <Text style={{ fontSize: 44 }}>{"\u{1F680}"}</Text>
       </Animated.View>
 
       <Animated.Text
@@ -367,8 +369,7 @@ function PagePayoff({ anim, isVisible }: { anim: Animated.Value; isVisible: bool
           { opacity: anim, transform: [{ translateY: translateY(30) }], marginTop: spacing.xl },
         ]}
       >
-        Stay on{" "}
-        <Text style={{ color: "#3ECF8E" }}>track.</Text>
+        10x faster
       </Animated.Text>
       <Animated.Text
         style={[
@@ -377,10 +378,11 @@ function PagePayoff({ anim, isVisible }: { anim: Animated.Value; isVisible: bool
             opacity: anim,
             transform: [{ translateY: translateY(40) }],
             marginTop: -4,
+            color: "#635BFF",
           },
         ]}
       >
-        Every day.
+        progress.
       </Animated.Text>
 
       <Animated.Text
@@ -393,7 +395,7 @@ function PagePayoff({ anim, isVisible }: { anim: Animated.Value; isVisible: bool
           },
         ]}
       >
-        Complete 3 focused tasks daily.{"\n"}Watch your goals come to life.
+        No planning. No thinking.{"\n"}Just 3 tasks a day and real results.
       </Animated.Text>
 
       {/* Frosted stat card */}
@@ -407,7 +409,7 @@ function PagePayoff({ anim, isVisible }: { anim: Animated.Value; isVisible: bool
         ]}
       >
         <Text style={styles.statText}>
-          Small steps. Big results. AI keeps you moving.
+          AI keeps you moving.
         </Text>
       </Animated.View>
     </View>

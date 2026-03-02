@@ -284,7 +284,7 @@ export default function MobileAppPrompt() {
             >
               10x your productivity.
               <br />
-              Reach your goals.
+              <span style={{ color: "#635bff" }}>Reach your goals.</span>
             </h1>
 
             {/* Subtitle — slides up */}
