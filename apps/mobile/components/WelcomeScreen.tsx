@@ -206,7 +206,7 @@ function PageHook({ anim }: { anim: Animated.Value }) {
           },
         ]}
       >
-        Set a goal. Get 3 daily tasks.{"\n"}Make progress every single day.
+        The #1 AI app that turns any goal into reality.{"\n"}Just tell us what you want — we'll get you there.
       </Animated.Text>
     </View>
   );

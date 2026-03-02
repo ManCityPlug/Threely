@@ -282,9 +282,9 @@ export default function MobileAppPrompt() {
                 animation: "mobilePromptSlideUp 0.5s ease 0.25s both",
               }}
             >
-              Your goal.
+              10x your productivity.
               <br />
-              Your plan. Every day.
+              Actually reach your goals.
             </h1>
 
             {/* Subtitle — slides up */}
@@ -298,9 +298,9 @@ export default function MobileAppPrompt() {
                 animation: "mobilePromptSlideUp 0.5s ease 0.35s both",
               }}
             >
-              Tell us what you want to achieve.
+              The #1 AI app that turns any goal into reality.
               <br />
-              We&apos;ll map out the path.
+              Just tell us what you want — we&apos;ll get you there.
             </p>
 
             {/* Benefits — staggered slide up */}
@@ -316,18 +316,15 @@ export default function MobileAppPrompt() {
               {[
                 {
                   icon: "\u{1F3AF}",
-                  title: "Know exactly what to do today",
-                  desc: "A personalized plan that fits your schedule",
+                  title: "Achieve any goal",
                 },
                 {
-                  icon: "\u2705",
-                  title: "A real path to get there",
-                  desc: "Structured daily steps that actually move you forward",
+                  icon: "\u{1F680}",
+                  title: "10x faster progress",
                 },
                 {
-                  icon: "\u{1F9E0}",
-                  title: "Your plan gets smarter over time",
-                  desc: "It adapts based on your real progress",
+                  icon: "\u2728",
+                  title: "Results on autopilot",
                 },
               ].map((b, i) => (
                 <div
@@ -344,20 +341,14 @@ export default function MobileAppPrompt() {
                   }}
                 >
                   <span style={{ fontSize: 24, flexShrink: 0 }}>{b.icon}</span>
-                  <div>
-                    <div
-                      style={{
-                        fontSize: "0.9rem",
-                        fontWeight: 700,
-                        color: "#0a2540",
-                        marginBottom: 1,
-                      }}
-                    >
-                      {b.title}
-                    </div>
-                    <div style={{ fontSize: "0.8rem", color: "#8898aa" }}>
-                      {b.desc}
-                    </div>
+                  <div
+                    style={{
+                      fontSize: "0.95rem",
+                      fontWeight: 700,
+                      color: "#0a2540",
+                    }}
+                  >
+                    {b.title}
                   </div>
                 </div>
               ))}

@@ -297,8 +297,8 @@ export default function LandingPage() {
             lineHeight: 1.05,
             marginBottom: isMobile ? "1rem" : "1.25rem",
           }}>
-            Tell us your goal.<br />
-            <span style={{ color: "#635bff" }}>Wake up knowing exactly what to do.</span>
+            10x your productivity.<br />
+            <span style={{ color: "#635bff" }}>Actually reach your goals.</span>
           </h1>
 
           <p style={{
@@ -308,7 +308,7 @@ export default function LandingPage() {
             maxWidth: 540,
             margin: isMobile ? "0 auto 1.5rem" : "0 auto 2.5rem",
           }}>
-            Not sure where to start? Don't have a plan? That's the whole point. Tell us your goal — Threely figures out your next steps and gives you a clear path forward, every single day.
+            The #1 AI app that turns any goal into reality. Just tell us what you want — we&apos;ll get you there.
           </p>
 
           {/* Get started button */}
