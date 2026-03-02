@@ -399,7 +399,7 @@ export default function LandingPage() {
               ★★★★★
             </div>
             <p style={{ fontSize: "0.85rem", color: "#8898aa", fontWeight: 500 }}>
-              Join 200+ people achieving their goals every day
+              Join 2,000+ people achieving their goals every day
             </p>
           </div>
         </div>
