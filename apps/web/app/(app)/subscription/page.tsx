@@ -448,25 +448,13 @@ function InvoiceHistory({ invoices }: { invoices: SubscriptionDetails["invoices"
                   {formatCurrency(inv.amount, inv.currency)}
                 </span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{
-                  display: "inline-block", padding: "1px 8px", borderRadius: 999,
-                  background: s.bg, color: s.color,
-                  fontSize: "0.7rem", fontWeight: 600,
-                }}>
-                  {capitalize(inv.status ?? "unknown")}
-                </span>
-                {inv.hostedUrl && (
-                  <a
-                    href={inv.hostedUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{ fontSize: "0.8rem", color: "var(--primary)", fontWeight: 500 }}
-                  >
-                    View
-                  </a>
-                )}
-              </div>
+              <span style={{
+                display: "inline-block", padding: "1px 8px", borderRadius: 999,
+                background: s.bg, color: s.color,
+                fontSize: "0.7rem", fontWeight: 600,
+              }}>
+                {capitalize(inv.status ?? "unknown")}
+              </span>
             </div>
           );
         })}

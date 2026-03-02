@@ -594,6 +594,7 @@ export default function GoalsScreen() {
   // ── Edit / action handlers ──────────────────────────────────────────────────
   function handleEditPress() {
     if (!actionGoal) return;
+    if (isLimitedMode && !walkthroughActive) { setActionGoal(null); showBottomSheetPaywall(); return; }
     const goal = actionGoal;
     setActionGoal(null);
     // Set editing context so save flow updates the existing goal

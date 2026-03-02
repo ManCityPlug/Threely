@@ -141,12 +141,15 @@ export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBott
           {loading ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text style={styles.ctaBtnText}>Get Pro Free</Text>
+            <Text style={styles.ctaBtnText}>Start Free Trial</Text>
           )}
         </TouchableOpacity>
 
+        <Text style={styles.trialNote}>
+          No charge for 7 days. Cancel anytime in Settings.
+        </Text>
         <Text style={styles.ctaSub}>
-          7 days free · then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
+          Then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
         </Text>
 
         {/* Dismiss */}
@@ -300,6 +303,13 @@ function createStyles(c: Colors) {
       fontWeight: typography.bold,
       color: "#fff",
       letterSpacing: -0.2,
+    },
+    trialNote: {
+      fontSize: typography.sm,
+      fontWeight: typography.semibold,
+      color: c.success,
+      textAlign: "center",
+      marginBottom: 4,
     },
     ctaSub: {
       fontSize: typography.xs,

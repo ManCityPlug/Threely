@@ -383,10 +383,11 @@ export default function DashboardScreen() {
       AsyncStorage.getItem("@threely_restart_tutorial").then((val) => {
         if (val === "true") {
           AsyncStorage.removeItem("@threely_restart_tutorial");
+          setWalkthroughActive(true);
           setTimeout(() => setShowTutorial(true), 350);
         }
       });
-    }, [])
+    }, [setWalkthroughActive])
   );
 
   const onRefresh = useCallback(async () => {
