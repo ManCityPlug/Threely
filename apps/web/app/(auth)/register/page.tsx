@@ -241,6 +241,17 @@ export default function RegisterPage() {
           The #1 AI app that turns any goal into reality. Just tell us what you want — we&apos;ll get you there.
         </p>
 
+        <div style={{
+          display: "inline-flex", alignItems: "center", gap: 8,
+          padding: "8px 20px",
+          background: "#ede9ff",
+          borderRadius: 20,
+          marginBottom: "1.25rem",
+        }}>
+          <span style={{ fontSize: "0.95rem" }}>📱</span>
+          <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
+        </div>
+
         <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: "1.25rem" }}>
           {!isAndroidDevice && (
             <a
