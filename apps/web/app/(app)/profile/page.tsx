@@ -379,7 +379,10 @@ export default function ProfilePage() {
         ) : (
           <button
             className="btn btn-outline"
-            onClick={() => alert("Your weekly analysis is generated every Monday. Check back then to see your progress report and personalized insights!")}
+            onClick={() => {
+              if (!hasPro) { showPaywall(); return; }
+              alert("Your weekly analysis is generated every Monday. Check back then to see your progress report and personalized insights!");
+            }}
             style={{
               fontSize: "0.85rem",
               opacity: 0.5,
@@ -797,14 +800,9 @@ export default function ProfilePage() {
                 </div>
                 <button
                   className="btn btn-outline"
-                  onClick={async () => {
+                  onClick={() => {
                     if (hasPro) {
-                      try {
-                        const res = await subscriptionApi.portal();
-                        if (res.url) window.open(res.url, "_blank");
-                      } catch {
-                        // No Stripe customer — may be RevenueCat/mobile subscriber
-                      }
+                      router.push("/subscription");
                     } else {
                       showPaywall();
                     }

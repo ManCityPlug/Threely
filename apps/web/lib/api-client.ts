@@ -351,6 +351,36 @@ export interface SubscriptionStatus {
   currentPeriodEnd: string | null;
 }
 
+export interface SubscriptionDetails {
+  managedExternally?: boolean;
+  status: "trialing" | "active" | "past_due" | "canceled" | null;
+  cancelAtPeriodEnd?: boolean;
+  trialEnd: string | null;
+  currentPeriodEnd: string | null;
+  plan: {
+    name: string;
+    priceId: string;
+    amount: number;
+    interval: string;
+  } | null;
+  paymentMethod: {
+    brand: string;
+    last4: string;
+    expMonth: number;
+    expYear: number;
+  } | null;
+  customerEmail?: string;
+  invoices: {
+    id: string;
+    date: string | null;
+    amount: number;
+    currency: string;
+    status: string | null;
+    hostedUrl: string | null;
+  }[];
+  trialEligible?: boolean;
+}
+
 export const subscriptionApi = {
   status: () => apiFetch<SubscriptionStatus>("/api/subscription"),
 
@@ -364,6 +394,37 @@ export const subscriptionApi = {
     apiFetch<{ url: string }>("/api/subscription/portal", {
       method: "POST",
     }),
+
+  details: () => apiFetch<SubscriptionDetails>("/api/subscription/details"),
+
+  cancel: () =>
+    apiFetch<{ cancelAtPeriodEnd: boolean; currentPeriodEnd: string }>(
+      "/api/subscription/cancel",
+      { method: "POST" }
+    ),
+
+  reactivate: () =>
+    apiFetch<{ cancelAtPeriodEnd: boolean; status: string }>(
+      "/api/subscription/reactivate",
+      { method: "POST" }
+    ),
+
+  updatePayment: () =>
+    apiFetch<{ clientSecret: string }>("/api/subscription/update-payment", {
+      method: "POST",
+    }),
+
+  confirmPaymentUpdate: (paymentMethodId: string) =>
+    apiFetch<{ paymentMethod: SubscriptionDetails["paymentMethod"] }>(
+      "/api/subscription/update-payment",
+      { method: "PUT", body: JSON.stringify({ paymentMethodId }) }
+    ),
+
+  changePlan: (plan: "monthly" | "yearly") =>
+    apiFetch<{ plan: SubscriptionDetails["plan"]; status: string }>(
+      "/api/subscription/change-plan",
+      { method: "POST", body: JSON.stringify({ plan }) }
+    ),
 };
 
 // ─── Account API ──────────────────────────────────────────────────────────────
