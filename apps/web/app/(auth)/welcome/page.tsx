@@ -239,12 +239,6 @@ function WelcomePageInner() {
           <a href="https://threely.co" style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "none" }}>threely.co</a>
         </p>
 
-        <p style={{ color: "var(--subtext)", fontSize: "0.875rem" }}>
-          Don{"'"}t have an account?{" "}
-          <Link href="/register" style={{ color: "var(--primary)", fontWeight: 600 }}>
-            Sign up
-          </Link>
-        </p>
       </div>
     );
   }
