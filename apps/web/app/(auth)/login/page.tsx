@@ -195,6 +195,7 @@ function LoginPageInner() {
                 textDecoration: "none", position: "relative",
               }}
             >
+              <span className="new-badge" style={{ position: "absolute", top: -14, right: -6 }}>New</span>
               <AppleIcon />
               <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
                 <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
@@ -212,6 +213,7 @@ function LoginPageInner() {
                 textDecoration: "none", position: "relative",
               }}
             >
+              <span className="new-badge" style={{ position: "absolute", top: -14, right: -6 }}>New</span>
               <PlayIcon />
               <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
                 <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
