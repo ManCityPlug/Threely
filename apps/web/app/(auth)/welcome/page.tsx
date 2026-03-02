@@ -757,7 +757,9 @@ export default function WelcomePage() {
           fontSize: "1.5rem", fontWeight: 800,
           letterSpacing: "-0.03em", marginBottom: 8, lineHeight: 1.2,
         }}>
-          Threely is built for {deviceLabel(device)}
+          10x your productivity.
+          <br />
+          <span style={{ color: "#635bff" }}>Actually reach your goals.</span>
         </h1>
 
         <p style={{
@@ -765,8 +767,20 @@ export default function WelcomePage() {
           lineHeight: 1.6, marginBottom: "1.75rem",
           maxWidth: 320, margin: "0 auto 1.75rem",
         }}>
-          Get the full experience — daily reminders, task tracking, and AI coaching — all in the app.
+          The #1 AI app that turns any goal into reality. Just tell us what you want — we&apos;ll get you there.
         </p>
+
+        {/* Now available on mobile */}
+        <div style={{
+          display: "inline-flex", alignItems: "center", gap: 8,
+          padding: "8px 20px",
+          background: "#ede9ff",
+          borderRadius: 20,
+          marginBottom: "1.25rem",
+        }}>
+          <span style={{ fontSize: "0.95rem" }}>📱</span>
+          <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
+        </div>
 
         <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: "1.25rem" }}>
           {!isAndroidDevice && (
@@ -806,11 +820,6 @@ export default function WelcomePage() {
             </a>
           )}
         </div>
-
-        <p style={{ color: "var(--subtext)", fontSize: "0.95rem", lineHeight: 1.5, marginBottom: "1.25rem" }}>
-          On a computer? Use the web version at{" "}
-          <a href="https://threely.co" style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "none" }}>threely.co</a>
-        </p>
 
         <p style={{ color: "var(--subtext)", fontSize: "0.875rem" }}>
           Already have an account?{" "}

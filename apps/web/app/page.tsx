@@ -329,66 +329,66 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          {/* Platform availability banner */}
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 10,
-            padding: isMobile ? "8px 20px" : "10px 24px",
-            background: "#ede9ff",
-            borderRadius: 24,
-            marginBottom: isMobile ? "1rem" : "1.25rem",
-          }}>
-            <span style={{ fontSize: isMobile ? "0.95rem" : "1.05rem" }}>{isMobile ? "📱" : "📱"}</span>
-            <span style={{ fontSize: isMobile ? "0.9rem" : "0.95rem", fontWeight: 600, color: "#635bff" }}>
-              {isMobile ? "Now available on mobile" : "Now available on mobile"}
-            </span>
-          </div>
+          {/* Platform availability banner + store buttons — desktop only */}
+          {!isMobile && (
+            <>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 10,
+                padding: "10px 24px",
+                background: "#ede9ff",
+                borderRadius: 24,
+                marginBottom: "1.25rem",
+              }}>
+                <span style={{ fontSize: "1.05rem" }}>📱</span>
+                <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#635bff" }}>
+                  Now available on mobile
+                </span>
+              </div>
 
-          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            {platform !== "android" && (
-              <Link href="/" style={{
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                padding: "14px 28px 14px 18px",
-                minWidth: 190,
-                background: "#0a2540",
-                color: "#fff",
-                borderRadius: 12,
-                fontSize: "0.95rem",
-                fontWeight: 600,
-                textDecoration: "none",
-                position: "relative" as const,
-                border: "1.5px solid rgba(10,37,64,0.25)",
-              }}>
-                <span className="new-badge" style={{ position: "absolute" as const, top: -14, right: -10 }}>New</span>
-                <AppleIcon />
-                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                  <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
-                  <span style={{ fontSize: "1.05rem" }}>App Store</span>
-                </span>
-              </Link>
-            )}
-            {platform !== "ios" && (
-              <Link href="/" style={{
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                padding: "14px 28px 14px 18px",
-                minWidth: 190,
-                background: "#0a2540",
-                color: "#fff",
-                borderRadius: 12,
-                fontSize: "0.95rem",
-                fontWeight: 600,
-                textDecoration: "none",
-                position: "relative" as const,
-                border: "1.5px solid rgba(10,37,64,0.25)",
-              }}>
-                <span className="new-badge" style={{ position: "absolute" as const, top: -14, right: -10 }}>New</span>
-                <PlayIcon />
-                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                  <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
-                  <span style={{ fontSize: "1.05rem" }}>Google Play</span>
-                </span>
-              </Link>
-            )}
-          </div>
+              <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+                <Link href="/" style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                  padding: "14px 28px 14px 18px",
+                  minWidth: 190,
+                  background: "#0a2540",
+                  color: "#fff",
+                  borderRadius: 12,
+                  fontSize: "0.95rem",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  position: "relative" as const,
+                  border: "1.5px solid rgba(10,37,64,0.25)",
+                }}>
+                  <span className="new-badge" style={{ position: "absolute" as const, top: -14, right: -10 }}>New</span>
+                  <AppleIcon />
+                  <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
+                    <span style={{ fontSize: "1.05rem" }}>App Store</span>
+                  </span>
+                </Link>
+                <Link href="/" style={{
+                  display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
+                  padding: "14px 28px 14px 18px",
+                  minWidth: 190,
+                  background: "#0a2540",
+                  color: "#fff",
+                  borderRadius: 12,
+                  fontSize: "0.95rem",
+                  fontWeight: 600,
+                  textDecoration: "none",
+                  position: "relative" as const,
+                  border: "1.5px solid rgba(10,37,64,0.25)",
+                }}>
+                  <span className="new-badge" style={{ position: "absolute" as const, top: -14, right: -10 }}>New</span>
+                  <PlayIcon />
+                  <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
+                    <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
+                    <span style={{ fontSize: "1.05rem" }}>Google Play</span>
+                  </span>
+                </Link>
+              </div>
+            </>
+          )}
 
           {/* Social proof */}
           <div style={{
