@@ -118,7 +118,7 @@ export default function LandingPage() {
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           {!isMobile && !loggedIn && (
-            <Link href="/welcome" style={{
+            <Link href="/login" style={{
               padding: "0.4rem 0.875rem",
               fontSize: "0.875rem",
               fontWeight: 600,
@@ -204,7 +204,7 @@ export default function LandingPage() {
               </Link>
             ) : (
               <>
-                <Link href="/welcome" onClick={() => setMenuOpen(false)} style={{
+                <Link href="/login" onClick={() => setMenuOpen(false)} style={{
                   flex: 1, textAlign: "center",
                   padding: "0.6rem 0",
                   fontSize: "0.875rem", fontWeight: 600,
@@ -215,7 +215,7 @@ export default function LandingPage() {
                 }}>
                   Sign in
                 </Link>
-                <Link href="/welcome" onClick={() => setMenuOpen(false)} style={{
+                <Link href="/login" onClick={() => setMenuOpen(false)} style={{
                   flex: 1, textAlign: "center",
                   padding: "0.6rem 0",
                   fontSize: "0.875rem", fontWeight: 600,
@@ -825,7 +825,7 @@ export default function LandingPage() {
           }}>
             Set your first goal and get 3 personalized tasks in under a minute.
           </p>
-          <Link href="/welcome" style={{
+          <Link href="/login" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#fff",
@@ -896,10 +896,10 @@ export default function LandingPage() {
           <span style={{ color: "#fff", fontWeight: 600 }}>Threely</span>
         </div>
         <div style={{ display: "flex", justifyContent: "center", gap: 20, flexWrap: "wrap", marginBottom: 16 }}>
-          <Link href="/welcome" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
+          <Link href="/login" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Sign in
           </Link>
-          <Link href="/welcome" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
+          <Link href="/login" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Get started
           </Link>
           <Link href="/faq" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>

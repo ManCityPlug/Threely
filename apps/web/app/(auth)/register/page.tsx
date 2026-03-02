@@ -88,7 +88,7 @@ function RegistrationForm() {
       if (signInError) {
         setError("Account created! Please sign in.");
         setLoading(false);
-        router.push("/welcome");
+        router.push("/login");
         return;
       }
 
@@ -163,7 +163,7 @@ function RegistrationForm() {
 
       <p style={{ textAlign: "center", marginTop: "1.5rem", color: "var(--subtext)", fontSize: "0.875rem" }}>
         Already have an account?{" "}
-        <Link href="/welcome" style={{ color: "var(--primary)", fontWeight: 600 }}>
+        <Link href="/login" style={{ color: "var(--primary)", fontWeight: 600 }}>
           Sign in
         </Link>
       </p>
@@ -298,7 +298,7 @@ export default function RegisterPage() {
 
         <p style={{ color: "var(--subtext)", fontSize: "0.875rem" }}>
           Already have an account?{" "}
-          <Link href="/welcome" style={{ color: "var(--primary)", fontWeight: 600 }}>
+          <Link href="/login" style={{ color: "var(--primary)", fontWeight: 600 }}>
             Sign in
           </Link>
         </p>

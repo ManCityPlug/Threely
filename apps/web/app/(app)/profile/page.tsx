@@ -302,7 +302,7 @@ export default function ProfilePage() {
     try {
       await accountApi.delete();
       await signOut();
-      router.replace("/welcome");
+      router.replace("/login");
     } catch {
       setDeleting(false);
       setShowDeleteConfirm(false);
@@ -947,7 +947,7 @@ export default function ProfilePage() {
                 onClick={async () => {
                   if (!window.confirm("Are you sure you want to sign out?")) return;
                   await signOut();
-                  router.replace("/welcome");
+                  router.replace("/login");
                 }}
                 style={{ fontSize: "0.825rem" }}
               >

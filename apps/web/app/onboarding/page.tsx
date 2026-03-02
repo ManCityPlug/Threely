@@ -102,7 +102,7 @@ export default function OnboardingPage() {
   // Redirect already-onboarded users to dashboard
   useEffect(() => {
     if (loading) return;
-    if (!user) { router.replace("/welcome"); return; }
+    if (!user) { router.replace("/login"); return; }
     if (isOnboarded(user.id)) router.replace("/dashboard");
   }, [user, loading, router]);
 

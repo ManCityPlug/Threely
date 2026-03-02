@@ -112,7 +112,7 @@ function CheckoutContent({ plan }: { plan: Plan }) {
         const supabase = getSupabase();
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
-          router.replace("/welcome");
+          router.replace("/login");
           return;
         }
 

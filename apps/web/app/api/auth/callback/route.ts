@@ -34,7 +34,7 @@ export async function GET(request: NextRequest) {
       const { error } = await supabase.auth.exchangeCodeForSession(code);
       if (error) {
         console.error("[auth/callback] exchangeCodeForSession error:", error.message);
-        return NextResponse.redirect(`${origin}/welcome?error=auth`);
+        return NextResponse.redirect(`${origin}/login?error=auth`);
       }
 
       // Password recovery flow — redirect to reset-password page
@@ -76,9 +76,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${origin}/dashboard`);
     } catch (err) {
       console.error("[auth/callback] Unhandled error:", err);
-      return NextResponse.redirect(`${origin}/welcome?error=auth`);
+      return NextResponse.redirect(`${origin}/login?error=auth`);
     }
   }
 
-  return NextResponse.redirect(`${origin}/welcome?error=auth`);
+  return NextResponse.redirect(`${origin}/login?error=auth`);
 }
