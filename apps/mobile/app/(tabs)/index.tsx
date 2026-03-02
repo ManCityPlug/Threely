@@ -777,7 +777,7 @@ export default function DashboardScreen() {
           >
             <View style={{ flex: 1 }}>
               <Text style={styles.expiredTitle}>Unlock Threely Pro</Text>
-              <Text style={styles.expiredSubtitle}>Get Pro free for 7 days — AI-powered tasks</Text>
+              <Text style={styles.expiredSubtitle}>Get Pro free for 7 days — Achieve your goals</Text>
             </View>
             <Text style={styles.expiredCta}>Try Free</Text>
           </TouchableOpacity>

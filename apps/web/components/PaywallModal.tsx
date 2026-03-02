@@ -3,14 +3,6 @@
 import { useState } from "react";
 import { type PaywallVariant } from "@/lib/subscription-context";
 
-const FEATURES = [
-  { icon: "\u2728", text: "AI-powered tasks tailored to your goals" },
-  { icon: "\u267E\uFE0F", text: "Unlimited goals & daily task generation" },
-  { icon: "\uD83D\uDCCA", text: "Progress tracking & full history" },
-  { icon: "\uD83D\uDD14", text: "Daily reminders at your chosen time" },
-  { icon: "\uD83D\uDD04", text: "Generate new tasks as you complete them" },
-];
-
 type Plan = "monthly" | "yearly";
 
 const PLANS: { key: Plan; name: string; price: string; sub: string; badge?: string }[] = [
@@ -170,22 +162,8 @@ function SheetPaywall({
             Unlock this with Threely Pro
           </h2>
           <p style={{ fontSize: "0.875rem", color: "var(--subtext)" }}>
-            Get unlimited AI-powered tasks, coaching insights, and goal tracking.
+            10x your productivity and actually reach your goals.
           </p>
-        </div>
-
-        {/* Features */}
-        <div style={{
-          background: "var(--bg)", borderRadius: "var(--radius)",
-          padding: "0.875rem 1rem", marginBottom: "1.25rem",
-          display: "flex", flexDirection: "column", gap: 8,
-        }}>
-          {FEATURES.map(({ icon, text }) => (
-            <div key={text} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.825rem", color: "var(--text)" }}>
-              <span style={{ fontSize: 14, flexShrink: 0, width: 20, textAlign: "center" }}>{icon}</span>
-              <span>{text}</span>
-            </div>
-          ))}
         </div>
 
         {/* Plan selector */}

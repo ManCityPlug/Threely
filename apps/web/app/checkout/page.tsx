@@ -21,14 +21,8 @@ const PLAN_INFO: Record<Plan, { name: string; price: string; period: string; per
 };
 
 const FEATURES = [
-  "AI-powered daily tasks",
-  "Ask AI chat",
-  "Unlimited goals",
-  "Weekly AI analysis",
-  "Smart task refinement",
-  "Coaching insights",
-  "Progress heatmap",
-  "Daily focus goal",
+  "10x your productivity",
+  "Actually reach your goals",
 ];
 
 let stripePromise: Promise<Stripe | null> | null = null;

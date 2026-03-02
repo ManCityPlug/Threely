@@ -100,7 +100,7 @@ export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBott
         <Text style={styles.icon}>✦</Text>
         <Text style={styles.heading}>Unlock this with Threely Pro</Text>
         <Text style={styles.subheading}>
-          Get unlimited AI-powered tasks, coaching insights, and goal tracking.
+          10x your productivity and actually reach your goals.
         </Text>
 
         {/* Plan selector */}

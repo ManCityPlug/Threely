@@ -1173,7 +1173,7 @@ export default function DashboardPage() {
               Unlock Threely Pro
             </div>
             <div style={{ fontSize: "0.825rem", color: "var(--subtext)" }}>
-              Get Pro free for 7 days — AI-powered tasks
+              Get Pro free for 7 days — Achieve your goals
             </div>
           </div>
           <span style={{
