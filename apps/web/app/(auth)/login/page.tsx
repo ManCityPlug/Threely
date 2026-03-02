@@ -181,7 +181,7 @@ function LoginPageInner() {
           lineHeight: 1.6, marginBottom: "1.75rem",
           maxWidth: 320, margin: "0 auto 1.75rem",
         }}>
-          Get the full experience — daily reminders, task tracking, and AI coaching — all in the app.
+          The #1 AI app that turns any goal into reality. Just tell us what you want — we&apos;ll get you there.
         </p>
 
         <div style={{ display: "flex", gap: 10, justifyContent: "center", marginBottom: "1.25rem" }}>
