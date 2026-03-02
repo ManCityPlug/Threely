@@ -162,7 +162,7 @@ function SheetPaywall({
             Unlock this with Threely Pro
           </h2>
           <p style={{ fontSize: "0.875rem", color: "var(--subtext)" }}>
-            10x your productivity and actually reach your goals.
+            10x your productivity and Reach your goals.
           </p>
         </div>
 

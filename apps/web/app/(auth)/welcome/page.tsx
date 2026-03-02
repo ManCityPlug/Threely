@@ -759,7 +759,7 @@ export default function WelcomePage() {
         }}>
           10x your productivity.
           <br />
-          <span style={{ color: "#635bff" }}>Actually reach your goals.</span>
+          <span style={{ color: "#635bff" }}>Reach your goals.</span>
         </h1>
 
         <p style={{

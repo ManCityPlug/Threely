@@ -284,7 +284,7 @@ export default function MobileAppPrompt() {
             >
               10x your productivity.
               <br />
-              Actually reach your goals.
+              Reach your goals.
             </h1>
 
             {/* Subtitle — slides up */}

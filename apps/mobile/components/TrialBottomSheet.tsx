@@ -100,7 +100,7 @@ export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBott
         <Text style={styles.icon}>✦</Text>
         <Text style={styles.heading}>Unlock this with Threely Pro</Text>
         <Text style={styles.subheading}>
-          10x your productivity and actually reach your goals.
+          10x your productivity and Reach your goals.
         </Text>
 
         {/* Plan selector */}

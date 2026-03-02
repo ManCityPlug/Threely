@@ -22,7 +22,7 @@ const PLAN_INFO: Record<Plan, { name: string; price: string; period: string; per
 
 const FEATURES = [
   "10x your productivity",
-  "Actually reach your goals",
+  "Reach your goals",
 ];
 
 let stripePromise: Promise<Stripe | null> | null = null;
