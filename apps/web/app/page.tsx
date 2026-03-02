@@ -235,7 +235,7 @@ export default function LandingPage() {
       {/* ─── Hero ──────────────────────────────────────────────────────────────── */}
       <section style={{
         background: "linear-gradient(135deg, #f6f9fc 0%, #ede9ff 100%)",
-        padding: isMobile ? "1.5rem 1.5rem 2.5rem" : "5rem 1.5rem 3.5rem",
+        padding: isMobile ? "2rem 1.5rem 2.5rem" : "5rem 1.5rem 3.5rem",
         textAlign: "center",
       }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
@@ -244,7 +244,7 @@ export default function LandingPage() {
             position: "relative",
             width: isMobile ? 72 : 80,
             height: isMobile ? 72 : 80,
-            margin: isMobile ? "0 auto 1rem" : "0 auto 1.5rem",
+            margin: isMobile ? "0 auto 1.75rem" : "0 auto 1.5rem",
           }}>
             <div style={{
               position: "absolute",
@@ -399,7 +399,7 @@ export default function LandingPage() {
               ★★★★★
             </div>
             <p style={{ fontSize: "0.85rem", color: "#8898aa", fontWeight: 500 }}>
-              Join 2,000+ people making real progress every day
+              Join 200+ people achieving their goals every day
             </p>
           </div>
         </div>
