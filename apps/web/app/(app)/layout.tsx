@@ -309,8 +309,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           display: "flex", alignItems: "center", gap: 10,
         }}>
           <img src="/favicon.png" alt="Threely" width={36} height={36} style={{ borderRadius: 10, flexShrink: 0 }} />
-          <div style={{ marginTop: 2 }}>
-            <span style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--text)", display: "block" }}>
+          <div>
+            <span style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--text)", display: "block", marginTop: 3 }}>
               Threely
             </span>
             <span style={{ fontSize: "0.7rem", color: "var(--muted)", fontWeight: 500 }}>
