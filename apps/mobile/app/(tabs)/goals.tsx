@@ -25,7 +25,7 @@ import { useFocusEffect, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { goalsApi, tasksApi, type Goal, type TaskItem, type ParsedGoal, type GoalChatMessage } from "@/lib/api";
+import { goalsApi, tasksApi, type Goal, type TaskItem, type ParsedGoal, type GoalChatMessage, type GoalChatResult } from "@/lib/api";
 import { GoalCard } from "@/components/GoalCard";
 import { GoalTemplates } from "@/components/GoalTemplates";
 import { MOCK_TUTORIAL_GOAL } from "@/lib/mock-tutorial-data";
@@ -156,6 +156,12 @@ export default function GoalsScreen() {
   const [builtTasks, setBuiltTasks] = useState<TaskItem[]>([]);
   const [coachNote, setCoachNote] = useState("");
   const [offDayMessage, setOffDayMessage] = useState<string | null>(null);
+  const [buildRetrying, setBuildRetrying] = useState(false);
+  const buildProgressAnim = useRef(new Animated.Value(0)).current;
+  const [buildStageText, setBuildStageText] = useState("Analyzing your goal...");
+  const buildStageTimers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const createdGoalIdRef = useRef<string | null>(null);
+  const buildInProgressRef = useRef(false);
   const taskRevealAnims = useRef([
     new Animated.Value(0),
     new Animated.Value(0),
@@ -251,6 +257,9 @@ export default function GoalsScreen() {
     setBuildError("");
     setBuiltTasks([]);
     setCoachNote("");
+    setOffDayMessage(null);
+    createdGoalIdRef.current = null;
+    buildInProgressRef.current = false;
     taskRevealAnims.forEach((a) => a.setValue(0));
     setShowFreeText(false);
     advanceAddStep(1);
@@ -264,6 +273,8 @@ export default function GoalsScreen() {
     setBuildError("");
     setBuiltTasks([]);
     setCoachNote("");
+    createdGoalIdRef.current = null;
+    buildInProgressRef.current = false;
     taskRevealAnims.forEach((a) => a.setValue(0));
     if (goal.deadline) {
       const d = new Date(goal.deadline);
@@ -299,6 +310,8 @@ export default function GoalsScreen() {
   function closeAddFlow() {
     setAddStep(0);
     setEditingGoalId(null);
+    createdGoalIdRef.current = null;
+    buildInProgressRef.current = false;
     progressAnim.setValue(0);
   }
 
@@ -499,96 +512,181 @@ export default function GoalsScreen() {
     }
   }
 
+  // ── Progress bar helpers ────────────────────────────────────────────────────
+  function startBuildProgress(isRetry?: boolean) {
+    // Clear previous timers
+    buildStageTimers.current.forEach(clearTimeout);
+    buildStageTimers.current = [];
+    setBuildRetrying(!!isRetry);
+
+    if (isRetry) {
+      buildProgressAnim.setValue(0.30);
+      setBuildStageText("Sorry, taking longer than usual — lots of traffic right now");
+      buildStageTimers.current.push(setTimeout(() => {
+        setBuildStageText("Still working on it...");
+        Animated.timing(buildProgressAnim, { toValue: 0.55, duration: 5000, useNativeDriver: false }).start();
+      }, 4000));
+      buildStageTimers.current.push(setTimeout(() => {
+        setBuildStageText("Almost there...");
+        Animated.timing(buildProgressAnim, { toValue: 0.80, duration: 8000, useNativeDriver: false }).start();
+      }, 10000));
+    } else {
+      buildProgressAnim.setValue(0);
+      setBuildStageText("Analyzing your goal...");
+      Animated.timing(buildProgressAnim, { toValue: 0.25, duration: 3000, useNativeDriver: false }).start();
+      buildStageTimers.current.push(setTimeout(() => {
+        setBuildStageText("Creating your roadmap...");
+        Animated.timing(buildProgressAnim, { toValue: 0.55, duration: 5000, useNativeDriver: false }).start();
+      }, 3000));
+      buildStageTimers.current.push(setTimeout(() => {
+        setBuildStageText("Generating your first tasks...");
+        Animated.timing(buildProgressAnim, { toValue: 0.85, duration: 7000, useNativeDriver: false }).start();
+      }, 8000));
+      buildStageTimers.current.push(setTimeout(() => {
+        setBuildStageText("Almost there...");
+        Animated.timing(buildProgressAnim, { toValue: 0.95, duration: 10000, useNativeDriver: false }).start();
+      }, 15000));
+    }
+  }
+
+  function finishBuildProgress() {
+    buildStageTimers.current.forEach(clearTimeout);
+    buildStageTimers.current = [];
+    Animated.timing(buildProgressAnim, { toValue: 1, duration: 300, useNativeDriver: false }).start();
+  }
+
   // ── Step 4: Build (save goal + generate tasks) ────────────────────────────
   async function handleBuild(overrides?: {
     goalText?: string;
     parsed?: ParsedGoal;
     dailyMinutes?: number;
   }) {
+    // Prevent double-taps while build is in progress
+    if (buildInProgressRef.current) return;
+    buildInProgressRef.current = true;
     setBuildError("");
+    setBuildRetrying(false);
     advanceAddStep(TOTAL_ADD_STEPS);
+    startBuildProgress();
 
     // Use overrides if provided (when called directly from handleUseGoal before state updates)
     const effectiveGoalText = overrides?.goalText ?? rawGoalInput.trim();
     const effectiveParsed = overrides?.parsed ?? parsedGoal;
     const effectiveTime = overrides?.dailyMinutes ?? timeMinutes;
 
-    try {
-      const goalTitle =
-        effectiveParsed?.short_title ??
-        effectiveGoalText.slice(0, 40);
+    const MAX_RETRIES = 2;
+    let lastError: unknown = null;
 
-      const deadlineISO = hasDeadline ? getDeadlineISO(deadlineMonth, deadlineDay, deadlineYear) : undefined;
-      const deadline = effectiveParsed?.deadline_detected ?? deadlineISO ?? null;
-      const effectiveWorkDays = (effectiveParsed?.work_days_detected && effectiveParsed.work_days_detected.length > 0)
-        ? effectiveParsed.work_days_detected : workDays;
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        if (attempt > 0) {
+          startBuildProgress(true);
+          await new Promise(r => setTimeout(r, 2000));
+        }
 
-      let goalId: string;
+        const goalTitle =
+          effectiveParsed?.short_title ??
+          effectiveGoalText.slice(0, 40);
 
-      if (editingGoalId) {
-        const goalResult = await goalsApi.update(editingGoalId, {
-          title: goalTitle,
-          rawInput: effectiveGoalText,
-          structuredSummary: effectiveParsed?.structured_summary ?? undefined,
-          category: effectiveParsed?.category ?? undefined,
-          deadline: deadline ?? null,
-          dailyTimeMinutes: effectiveTime ?? 60,
-          intensityLevel: 2,
-          workDays: effectiveWorkDays,
-        });
-        setGoals((prev) => prev.map((g) => g.id === editingGoalId ? goalResult.goal : g));
-        goalId = editingGoalId;
-      } else {
-        const goalResult = await goalsApi.create(goalTitle, {
-          rawInput: effectiveGoalText,
-          structuredSummary: effectiveParsed?.structured_summary ?? undefined,
-          category: effectiveParsed?.category ?? undefined,
-          deadline,
-          dailyTimeMinutes: effectiveTime ?? 60,
-          intensityLevel: 2,
-          workDays: effectiveWorkDays,
-        });
-        setGoals((prev) => [goalResult.goal, ...prev]);
-        goalId = goalResult.goal.id;
-      }
+        const deadlineISO = hasDeadline ? getDeadlineISO(deadlineMonth, deadlineDay, deadlineYear) : undefined;
+        const deadline = effectiveParsed?.deadline_detected ?? deadlineISO ?? null;
+        const effectiveWorkDays = (effectiveParsed?.work_days_detected && effectiveParsed.work_days_detected.length > 0)
+          ? effectiveParsed.work_days_detected : workDays;
 
-      // Check if today is a work day for this goal
-      const todayJs = new Date().getDay();
-      const todayIsoDay = todayJs === 0 ? 7 : todayJs;
-      const isTodayWorkDay = effectiveWorkDays.length === 0 || effectiveWorkDays.length === 7 || effectiveWorkDays.includes(todayIsoDay);
+        let goalId: string;
 
-      if (isTodayWorkDay) {
-        const tasksResult = await tasksApi.generate(goalId);
-        const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
-        setBuiltTasks(allTasks);
-        if (tasksResult.coachNote) setCoachNote(tasksResult.coachNote);
+        if (editingGoalId) {
+          const goalResult = await goalsApi.update(editingGoalId, {
+            title: goalTitle,
+            rawInput: effectiveGoalText,
+            structuredSummary: effectiveParsed?.structured_summary ?? undefined,
+            category: effectiveParsed?.category ?? undefined,
+            deadline: deadline ?? null,
+            dailyTimeMinutes: effectiveTime ?? 60,
+            intensityLevel: 2,
+            workDays: effectiveWorkDays,
+          });
+          setGoals((prev) => prev.map((g) => g.id === editingGoalId ? goalResult.goal : g));
+          goalId = editingGoalId;
+        } else if (createdGoalIdRef.current) {
+          goalId = createdGoalIdRef.current;
+          const goalResult = await goalsApi.update(goalId, {
+            title: goalTitle,
+            rawInput: effectiveGoalText,
+            structuredSummary: effectiveParsed?.structured_summary ?? undefined,
+            category: effectiveParsed?.category ?? undefined,
+            deadline: deadline ?? null,
+            dailyTimeMinutes: effectiveTime ?? 60,
+            intensityLevel: 2,
+            workDays: effectiveWorkDays,
+          });
+          setGoals((prev) => prev.map((g) => g.id === goalId ? goalResult.goal : g));
+        } else {
+          const goalResult = await goalsApi.create(goalTitle, {
+            rawInput: effectiveGoalText,
+            structuredSummary: effectiveParsed?.structured_summary ?? undefined,
+            category: effectiveParsed?.category ?? undefined,
+            deadline,
+            dailyTimeMinutes: effectiveTime ?? 60,
+            intensityLevel: 2,
+            workDays: effectiveWorkDays,
+          });
+          setGoals((prev) => [goalResult.goal, ...prev]);
+          goalId = goalResult.goal.id;
+          createdGoalIdRef.current = goalId;
+        }
 
-        // Staggered reveal
-        allTasks.forEach((_, i) => {
-          setTimeout(() => {
-            Animated.spring(taskRevealAnims[i], {
-              toValue: 1,
-              useNativeDriver: true,
-              tension: 120,
-              friction: 8,
-            }).start();
-          }, i * 300);
-        });
-      } else {
-        // Off-day: show message about next work day
-        const dayNames = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-        const sorted = [...effectiveWorkDays].sort((a, b) => a - b);
-        const nextDay = sorted.find(d => d > todayIsoDay) ?? sorted[0];
-        setOffDayMessage(`Your first tasks will appear on ${dayNames[nextDay]}!`);
-      }
-    } catch (e: unknown) {
-      if (e instanceof Error && e.message?.includes("pro_required")) {
-        closeAddFlow();
-        showBottomSheetPaywall();
-      } else {
-        setBuildError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+        // Check if today is a work day for this goal
+        const todayJs = new Date().getDay();
+        const todayIsoDay = todayJs === 0 ? 7 : todayJs;
+        const isTodayWorkDay = effectiveWorkDays.length === 0 || effectiveWorkDays.length === 7 || effectiveWorkDays.includes(todayIsoDay);
+
+        if (isTodayWorkDay) {
+          const tasksResult = await tasksApi.generate(goalId);
+          const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
+          finishBuildProgress();
+          setBuiltTasks(allTasks);
+          if (tasksResult.coachNote) setCoachNote(tasksResult.coachNote);
+
+          allTasks.forEach((_, i) => {
+            setTimeout(() => {
+              Animated.spring(taskRevealAnims[i], {
+                toValue: 1,
+                useNativeDriver: true,
+                tension: 120,
+                friction: 8,
+              }).start();
+            }, i * 300);
+          });
+        } else {
+          const dayNames = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+          const sorted = [...effectiveWorkDays].sort((a, b) => a - b);
+          const nextDay = sorted.find(d => d > todayIsoDay) ?? sorted[0];
+          finishBuildProgress();
+          setOffDayMessage(`Your first tasks will appear on ${dayNames[nextDay]}!`);
+        }
+
+        // Success — break out of retry loop
+        lastError = null;
+        break;
+      } catch (e: unknown) {
+        lastError = e;
+        if (e instanceof Error && e.message?.includes("pro_required")) {
+          closeAddFlow();
+          showBottomSheetPaywall();
+          lastError = null;
+          break;
+        }
+        // If not last attempt, continue to next retry
+        if (attempt < MAX_RETRIES) continue;
       }
     }
+
+    if (lastError) {
+      setBuildError(lastError instanceof Error ? lastError.message : "Something went wrong. Please try again.");
+    }
+    setBuildRetrying(false);
+    buildInProgressRef.current = false;
   }
 
   // ── Edit / action handlers ──────────────────────────────────────────────────
@@ -1179,10 +1277,38 @@ export default function GoalsScreen() {
     if (!tasksReady && !buildError && !isOffDay) {
       return (
         <View style={styles.buildingCenter}>
-          <Text style={styles.buildIcon}>✦</Text>
-          <Text style={styles.buildTitle}>Threely Intelligence is building your plan…</Text>
-          <Text style={styles.buildSubtitle}>Crafting 3 personalized tasks to get you started.</Text>
-          <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.lg }} />
+          <Text style={styles.buildIcon}>{"\u2726"}</Text>
+          <Text style={styles.buildTitle}>
+            {buildRetrying ? "Still working on it..." : "Threely Intelligence is building your plan\u2026"}
+          </Text>
+          <Text style={styles.buildSubtitle}>{buildStageText}</Text>
+          {/* Progress bar */}
+          <View style={{
+            width: "80%",
+            height: 6,
+            backgroundColor: colors.border,
+            borderRadius: 3,
+            marginTop: spacing.lg,
+            overflow: "hidden",
+          }}>
+            <Animated.View style={{
+              height: "100%",
+              backgroundColor: colors.primary,
+              borderRadius: 3,
+              width: buildProgressAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: ["0%", "100%"],
+              }),
+            }} />
+          </View>
+          <Text style={{
+            fontSize: 12,
+            color: colors.textSecondary,
+            marginTop: spacing.sm,
+            textAlign: "center",
+          }}>
+            {buildRetrying ? "Lots of traffic right now — hang tight" : "This can take up to 30 seconds"}
+          </Text>
         </View>
       );
     }
@@ -1190,7 +1316,7 @@ export default function GoalsScreen() {
     if (buildError) {
       return (
         <View style={styles.buildingCenter}>
-          <Text style={styles.buildIcon}>⚠</Text>
+          <Text style={styles.buildIcon}>{"\u26A0"}</Text>
           <Text style={styles.buildTitle}>Something went wrong</Text>
           <Text style={styles.buildError}>{buildError}</Text>
           <TouchableOpacity style={styles.retryBtn} onPress={handleBuild} activeOpacity={0.85}>
@@ -1526,7 +1652,7 @@ export default function GoalsScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={["top"]}>
         <View style={styles.headerRow}>
           <View>
             <Text style={styles.title}>Goals</Text>
@@ -1544,7 +1670,7 @@ export default function GoalsScreen() {
 
   return (
     <SwipeNavigator currentIndex={1}>
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       {/* Header */}
       <View style={styles.headerRow}>
         <View>
@@ -1807,6 +1933,7 @@ function GoalActionSheet({
 function createStyles(c: Colors) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: c.bg },
+    stepContainer: { flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.sm },
     center: { alignItems: "center", justifyContent: "center" },
     headerRow: {
       flexDirection: "row",

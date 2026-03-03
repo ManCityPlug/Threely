@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 
 const SIDEBAR_ITEMS = [
-  { label: "Overview", href: "/admin", icon: "📊" },
-  { label: "Users", href: "/admin/users", icon: "👥" },
-  { label: "Costs", href: "/admin/costs", icon: "💰" },
+  { label: "Overview", href: "/admin", icon: "\u{1F4CA}" },
+  { label: "Users", href: "/admin/users", icon: "\u{1F465}" },
+  { label: "Costs", href: "/admin/costs", icon: "\u{1F4B0}" },
+  { label: "Notifications", href: "/admin/notifications", icon: "\u{1F514}" },
 ];
 
 export default function AdminLayout({
@@ -17,6 +18,7 @@ export default function AdminLayout({
   const router = useRouter();
   const pathname = usePathname();
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (pathname === "/admin/login") {
@@ -37,6 +39,9 @@ export default function AdminLayout({
         setAuthenticated(false);
       });
   }, [pathname, router]);
+
+  // Close menu on route change
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
 
   const handleLogout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -78,6 +83,14 @@ export default function AdminLayout({
     );
   }
 
+  const navLinks = SIDEBAR_ITEMS.map((item) => {
+    const isActive =
+      item.href === "/admin"
+        ? pathname === "/admin"
+        : pathname.startsWith(item.href);
+    return { ...item, isActive };
+  });
+
   return (
     <div
       data-theme="dark"
@@ -90,14 +103,144 @@ export default function AdminLayout({
         display: "flex",
       }}
     >
-      {/* Sidebar */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .admin-sidebar { display: flex; }
+        .admin-mobile-topbar { display: none; }
+        .admin-mobile-spacer { display: none; }
+        @media (max-width: 768px) {
+          .admin-sidebar { display: none !important; }
+          .admin-mobile-topbar { display: flex !important; }
+          .admin-mobile-spacer { display: block !important; height: 52px; }
+          .admin-main { padding: 1rem !important; }
+        }
+      `}} />
+
+      {/* Mobile top bar */}
+      <div
+        className="admin-mobile-topbar"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          background: "#18181b",
+          borderBottom: "1px solid #27272a",
+          padding: "0.75rem 1rem",
+          display: "none",
+          alignItems: "center",
+          justifyContent: "space-between",
+        }}
+      >
+        <span style={{ fontWeight: 700, fontSize: "1rem", color: "#fff" }}>
+          Threely Admin
+        </span>
+        <button
+          onClick={() => setMenuOpen((o) => !o)}
+          style={{
+            background: "none",
+            border: "none",
+            cursor: "pointer",
+            padding: 6,
+            display: "flex",
+            flexDirection: "column",
+            gap: 4,
+          }}
+          aria-label="Menu"
+        >
+          {menuOpen ? (
+            <span style={{ fontSize: 20, color: "#e4e4e7", lineHeight: 1 }}>{"\u2715"}</span>
+          ) : (
+            <>
+              <span style={{ width: 20, height: 2, background: "#e4e4e7", borderRadius: 1, display: "block" }} />
+              <span style={{ width: 20, height: 2, background: "#e4e4e7", borderRadius: 1, display: "block" }} />
+              <span style={{ width: 20, height: 2, background: "#e4e4e7", borderRadius: 1, display: "block" }} />
+            </>
+          )}
+        </button>
+      </div>
+
+      {/* Mobile drawer */}
+      {menuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 99,
+            background: "rgba(0,0,0,0.5)",
+          }}
+          onClick={() => setMenuOpen(false)}
+        >
+          <div
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: 260,
+              background: "#18181b",
+              borderRight: "1px solid #27272a",
+              padding: "1.5rem 0",
+              display: "flex",
+              flexDirection: "column",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ padding: "0 1.25rem 1.5rem", borderBottom: "1px solid #27272a", marginBottom: "0.75rem" }}>
+              <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "#fff" }}>
+                Threely Admin
+              </span>
+            </div>
+            <nav style={{ flex: 1 }}>
+              {navLinks.map((item) => (
+                <a
+                  key={item.href}
+                  href={item.href}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "0.75rem 1.25rem",
+                    fontSize: "0.95rem",
+                    fontWeight: item.isActive ? 600 : 400,
+                    color: item.isActive ? "#fff" : "#a1a1aa",
+                    background: item.isActive ? "#27272a" : "transparent",
+                    textDecoration: "none",
+                    borderLeft: item.isActive ? "3px solid #635bff" : "3px solid transparent",
+                  }}
+                >
+                  <span>{item.icon}</span>
+                  {item.label}
+                </a>
+              ))}
+            </nav>
+            <button
+              onClick={handleLogout}
+              style={{
+                margin: "0 1.25rem",
+                padding: "0.6rem 0",
+                background: "none",
+                border: "1px solid #27272a",
+                borderRadius: 8,
+                color: "#a1a1aa",
+                fontSize: "0.85rem",
+                cursor: "pointer",
+              }}
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Desktop sidebar */}
       <aside
+        className="admin-sidebar"
         style={{
           width: 220,
           background: "#18181b",
           borderRight: "1px solid #27272a",
           padding: "1.5rem 0",
-          display: "flex",
           flexDirection: "column",
           flexShrink: 0,
           position: "sticky",
@@ -118,35 +261,29 @@ export default function AdminLayout({
         </div>
 
         <nav style={{ flex: 1 }}>
-          {SIDEBAR_ITEMS.map((item) => {
-            const isActive =
-              item.href === "/admin"
-                ? pathname === "/admin"
-                : pathname.startsWith(item.href);
-            return (
-              <a
-                key={item.href}
-                href={item.href}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: "0.6rem 1.25rem",
-                  fontSize: "0.9rem",
-                  fontWeight: isActive ? 600 : 400,
-                  color: isActive ? "#fff" : "#a1a1aa",
-                  background: isActive ? "#27272a" : "transparent",
-                  textDecoration: "none",
-                  borderLeft: isActive
-                    ? "3px solid #635bff"
-                    : "3px solid transparent",
-                }}
-              >
-                <span>{item.icon}</span>
-                {item.label}
-              </a>
-            );
-          })}
+          {navLinks.map((item) => (
+            <a
+              key={item.href}
+              href={item.href}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "0.6rem 1.25rem",
+                fontSize: "0.9rem",
+                fontWeight: item.isActive ? 600 : 400,
+                color: item.isActive ? "#fff" : "#a1a1aa",
+                background: item.isActive ? "#27272a" : "transparent",
+                textDecoration: "none",
+                borderLeft: item.isActive
+                  ? "3px solid #635bff"
+                  : "3px solid transparent",
+              }}
+            >
+              <span>{item.icon}</span>
+              {item.label}
+            </a>
+          ))}
         </nav>
 
         <button
@@ -167,7 +304,8 @@ export default function AdminLayout({
       </aside>
 
       {/* Main content */}
-      <main style={{ flex: 1, padding: "2rem", overflowY: "auto" }}>
+      <main className="admin-main" style={{ flex: 1, padding: "2rem", overflowY: "auto" }}>
+        <div className="admin-mobile-spacer" />
         {children}
       </main>
     </div>
