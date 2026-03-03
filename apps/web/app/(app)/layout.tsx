@@ -304,7 +304,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className="sidebar">
         {/* Logo */}
         <div style={{
-          padding: "2.5rem 1.25rem 1.25rem",
+          padding: "1.25rem 1.25rem 1.25rem",
           borderBottom: "1px solid var(--border)",
           display: "flex", alignItems: "center", gap: 10,
         }}>
