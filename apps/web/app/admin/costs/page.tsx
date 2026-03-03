@@ -20,7 +20,7 @@ const FUNCTIONS = [
   },
   {
     name: "generateRoadmap",
-    model: "haiku" as const,
+    model: "sonnet" as const,
     inputTokens: 1300,
     outputTokens: 1500,
     frequency: "Once per goal",
@@ -427,7 +427,7 @@ export default function CostsPage() {
             },
             {
               label: "Setup cost",
-              value: "parseGoal (Opus) + generateRoadmap (Haiku) — one-time per goal. Max 3 goals per user.",
+              value: "parseGoal (Opus) + generateRoadmap (Sonnet) — one-time per goal. Max 3 goals per user.",
               color: "#818cf8",
             },
             {

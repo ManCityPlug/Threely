@@ -67,6 +67,259 @@ function StatCard({
   );
 }
 
+// ── Per-User Cost Estimator ──────────────────────────────────────────────────
+// Haiku 4.5: $1/M input, $5/M output
+// Sonnet 4.6: $3/M input, $15/M output
+// Opus 4.6: $15/M input, $75/M output
+//
+// Estimated tokens per call (input/output) based on prompt lengths:
+const AI_FUNCTIONS = [
+  { name: "parseGoal",            model: "Opus",   frequency: "Once per goal",          inputTok: 400,  outputTok: 200,  inputRate: 15, outputRate: 75 },
+  { name: "generateRoadmap",      model: "Sonnet", frequency: "Once per goal",          inputTok: 1200, outputTok: 800,  inputRate: 3,  outputRate: 15 },
+  { name: "goalChat (per turn)",  model: "Haiku",  frequency: "5-10× during goal setup",inputTok: 2000, outputTok: 200,  inputRate: 1,  outputRate: 5 },
+  { name: "generateTasks",        model: "Sonnet", frequency: "1-2×/day per goal",      inputTok: 2500, outputTok: 600,  inputRate: 3,  outputRate: 15 },
+  { name: "generateInsight",      model: "Haiku",  frequency: "1×/day (after review)",  inputTok: 800,  outputTok: 150,  inputRate: 1,  outputRate: 5 },
+  { name: "updateCoachingContext", model: "Haiku",  frequency: "1×/day (after review)",  inputTok: 600,  outputTok: 200,  inputRate: 1,  outputRate: 5 },
+  { name: "refineTask",           model: "Haiku",  frequency: "On demand (0-3×/day)",   inputTok: 400,  outputTok: 150,  inputRate: 1,  outputRate: 5 },
+  { name: "askAboutTask",         model: "Haiku",  frequency: "On demand (0-5×/day)",   inputTok: 1000, outputTok: 250,  inputRate: 1,  outputRate: 5 },
+  { name: "generateWeeklySummary",model: "Haiku",  frequency: "1×/week",                inputTok: 600,  outputTok: 150,  inputRate: 1,  outputRate: 5 },
+];
+
+// Cost per call in USD
+function costPerCall(f: typeof AI_FUNCTIONS[number]) {
+  return (f.inputTok * f.inputRate + f.outputTok * f.outputRate) / 1_000_000;
+}
+
+// Pricing
+const MONTHLY_PRICE = 12.99;
+const YEARLY_PRICE = 99.99;
+const YEARLY_MONTHLY = YEARLY_PRICE / 12;
+const STRIPE_PCT = 0.029;
+const STRIPE_FIXED = 0.30;
+
+function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
+  const costs = AI_FUNCTIONS.map((f) => ({ ...f, cost: costPerCall(f) }));
+
+  // ── Scenario builder ──
+  // For each goal count (1, 2, 3) calculate monthly AI cost
+  function monthlyAiCost(goals: number) {
+    const parseGoal = costs.find((c) => c.name === "parseGoal")!;
+    const roadmap = costs.find((c) => c.name === "generateRoadmap")!;
+    const goalChat = costs.find((c) => c.name === "goalChat (per turn)")!;
+    const genTasks = costs.find((c) => c.name === "generateTasks")!;
+    const insight = costs.find((c) => c.name === "generateInsight")!;
+    const coaching = costs.find((c) => c.name === "updateCoachingContext")!;
+    const refine = costs.find((c) => c.name === "refineTask")!;
+    const askAi = costs.find((c) => c.name === "askAboutTask")!;
+    const weekly = costs.find((c) => c.name === "generateWeeklySummary")!;
+
+    // One-time per goal (amortised over month)
+    const oneTime = goals * (parseGoal.cost + roadmap.cost + goalChat.cost * 8);
+
+    // Daily recurring (30 days)
+    const dailyTasks = goals * 1.5 * genTasks.cost; // avg 1.5 generations/day/goal
+    const dailyInsight = insight.cost; // 1 per day
+    const dailyCoaching = coaching.cost; // 1 per day
+    const dailyRefine = refine.cost * 1; // avg 1 refine/day
+    const dailyAskAi = askAi.cost * 2; // avg 2 ask-ai/day
+    const daily = dailyTasks + dailyInsight + dailyCoaching + dailyRefine + dailyAskAi;
+
+    const weeklyCost = weekly.cost * 4.3; // ~4.3 weeks/month
+
+    return oneTime + daily * 30 + weeklyCost;
+  }
+
+  // Worst case: max usage
+  function monthlyAiCostMax(goals: number) {
+    const parseGoal = costs.find((c) => c.name === "parseGoal")!;
+    const roadmap = costs.find((c) => c.name === "generateRoadmap")!;
+    const goalChat = costs.find((c) => c.name === "goalChat (per turn)")!;
+    const genTasks = costs.find((c) => c.name === "generateTasks")!;
+    const insight = costs.find((c) => c.name === "generateInsight")!;
+    const coaching = costs.find((c) => c.name === "updateCoachingContext")!;
+    const refine = costs.find((c) => c.name === "refineTask")!;
+    const askAi = costs.find((c) => c.name === "askAboutTask")!;
+    const weekly = costs.find((c) => c.name === "generateWeeklySummary")!;
+
+    const oneTime = goals * (parseGoal.cost + roadmap.cost + goalChat.cost * 10);
+    const dailyTasks = goals * 2 * genTasks.cost; // 2 gens/day/goal (max)
+    const dailyInsight = insight.cost;
+    const dailyCoaching = coaching.cost;
+    const dailyRefine = refine.cost * 3; // 3 refines/day
+    const dailyAskAi = askAi.cost * 5; // 5 ask-ai/day
+    const daily = dailyTasks + dailyInsight + dailyCoaching + dailyRefine + dailyAskAi;
+    const weeklyCost = weekly.cost * 4.3;
+
+    return oneTime + daily * 30 + weeklyCost;
+  }
+
+  const scenarios = [1, 2, 3].map((goals) => {
+    const avg = monthlyAiCost(goals);
+    const max = monthlyAiCostMax(goals);
+    const stripeMonthly = MONTHLY_PRICE * STRIPE_PCT + STRIPE_FIXED;
+    const stripeYearly = (YEARLY_PRICE * STRIPE_PCT + STRIPE_FIXED) / 12;
+    return {
+      goals,
+      avgCost: avg,
+      maxCost: max,
+      yearlyProfitAvg: YEARLY_MONTHLY - avg - stripeYearly,
+      yearlyProfitMax: YEARLY_MONTHLY - max - stripeYearly,
+      monthlyProfitAvg: MONTHLY_PRICE - avg - stripeMonthly,
+      monthlyProfitMax: MONTHLY_PRICE - max - stripeMonthly,
+    };
+  });
+
+  const totalAvg = monthlyAiCost(2) * activeUsers; // assume avg 2 goals
+  const totalMax = monthlyAiCostMax(3) * activeUsers;
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginBottom: "2rem" }}>
+      {/* Per-Call Cost Reference */}
+      <div style={cardStyle}>
+        <h3 style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff", marginBottom: "0.75rem" }}>
+          AI Cost Per Call
+        </h3>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
+          <thead>
+            <tr style={{ borderBottom: "1px solid #27272a" }}>
+              <th style={{ textAlign: "left", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>Function</th>
+              <th style={{ textAlign: "center", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>Model</th>
+              <th style={{ textAlign: "center", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>Frequency</th>
+              <th style={{ textAlign: "right", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>$/Call</th>
+            </tr>
+          </thead>
+          <tbody>
+            {costs.map((c) => (
+              <tr key={c.name} style={{ borderBottom: "1px solid #1e1e21" }}>
+                <td style={{ padding: "0.4rem 0", color: "#e4e4e7", fontFamily: "monospace", fontSize: "0.75rem" }}>{c.name}</td>
+                <td style={{ padding: "0.4rem 0", textAlign: "center" }}>
+                  <span style={{
+                    fontSize: "0.65rem",
+                    fontWeight: 600,
+                    padding: "1px 6px",
+                    borderRadius: 4,
+                    background: c.model === "Opus" ? "#7c3aed22" : c.model === "Sonnet" ? "#635bff22" : "#27272a",
+                    color: c.model === "Opus" ? "#a78bfa" : c.model === "Sonnet" ? "#818cf8" : "#a1a1aa",
+                  }}>
+                    {c.model}
+                  </span>
+                </td>
+                <td style={{ padding: "0.4rem 0", textAlign: "center", color: "#71717a", fontSize: "0.7rem" }}>{c.frequency}</td>
+                <td style={{ padding: "0.4rem 0", textAlign: "right", color: "#e4e4e7", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+                  ${c.cost.toFixed(4)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Profit Margins by Plan */}
+      <div style={cardStyle}>
+        <h3 style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff", marginBottom: 2 }}>
+          Profit Margins by Plan (Monthly, Ongoing)
+        </h3>
+        <div style={{ fontSize: "0.7rem", color: "#71717a", marginBottom: "1rem" }}>
+          Revenue per month minus estimated AI costs (avg &amp; worst case). Includes Stripe fees (~2.9% + $0.30).
+        </div>
+
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
+          <thead>
+            <tr style={{ borderBottom: "1px solid #27272a" }}>
+              <th style={{ textAlign: "left", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Goals</th>
+              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>AI Cost/mo (avg)</th>
+              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>AI Cost/mo (max)</th>
+              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Yearly ($8.33/mo)</th>
+              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Monthly ($12.99/mo)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {scenarios.map((s) => (
+              <tr key={s.goals} style={{ borderBottom: "1px solid #1e1e21" }}>
+                <td style={{ padding: "0.6rem 0", color: "#635bff", fontWeight: 700, fontSize: "1rem" }}>{s.goals}</td>
+                <td style={{ padding: "0.6rem 0", textAlign: "center", color: "#a1a1aa", fontWeight: 600 }}>
+                  ${s.avgCost.toFixed(2)}
+                </td>
+                <td style={{ padding: "0.6rem 0", textAlign: "center", color: "#a1a1aa", fontWeight: 600 }}>
+                  ${s.maxCost.toFixed(2)}
+                </td>
+                <td style={{ padding: "0.6rem 0", textAlign: "center" }}>
+                  <div style={{ color: s.yearlyProfitAvg >= 0 ? "#3ecf8e" : "#ef4444", fontWeight: 700 }}>
+                    {s.yearlyProfitAvg >= 0 ? "+" : ""}${s.yearlyProfitAvg.toFixed(2)}
+                  </div>
+                  <div style={{ fontSize: "0.65rem", color: "#71717a" }}>
+                    avg · {Math.round((s.yearlyProfitAvg / YEARLY_MONTHLY) * 100)}% margin
+                  </div>
+                  <div style={{ color: s.yearlyProfitMax >= 0 ? "#3ecf8e" : "#ef4444", fontWeight: 600, fontSize: "0.75rem", marginTop: 2 }}>
+                    {s.yearlyProfitMax >= 0 ? "+" : ""}${s.yearlyProfitMax.toFixed(2)}
+                    <span style={{ color: "#71717a", fontWeight: 400 }}> worst</span>
+                  </div>
+                </td>
+                <td style={{ padding: "0.6rem 0", textAlign: "center" }}>
+                  <div style={{ color: s.monthlyProfitAvg >= 0 ? "#3ecf8e" : "#ef4444", fontWeight: 700 }}>
+                    {s.monthlyProfitAvg >= 0 ? "+" : ""}${s.monthlyProfitAvg.toFixed(2)}
+                  </div>
+                  <div style={{ fontSize: "0.65rem", color: "#71717a" }}>
+                    avg · {Math.round((s.monthlyProfitAvg / MONTHLY_PRICE) * 100)}% margin
+                  </div>
+                  <div style={{ color: s.monthlyProfitMax >= 0 ? "#3ecf8e" : "#ef4444", fontWeight: 600, fontSize: "0.75rem", marginTop: 2 }}>
+                    {s.monthlyProfitMax >= 0 ? "+" : ""}${s.monthlyProfitMax.toFixed(2)}
+                    <span style={{ color: "#71717a", fontWeight: 400 }}> worst</span>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Key Takeaways */}
+      <div style={cardStyle}>
+        <h3 style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff", marginBottom: "0.75rem" }}>
+          Key Takeaways
+        </h3>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.8rem" }}>
+          {[
+            { color: "#3ecf8e", label: "Goal cap enforced", text: "Max 3 active goals per user. Prevents runaway costs from power users." },
+            { color: "#3ecf8e", label: "Generation cap enforced", text: "Max 2 task generations per goal per day (initial + 1 extra)." },
+            { color: "#f59e0b", label: "Biggest cost driver", text: `generateTasks (Sonnet) — runs up to 2×/day per goal. ~$${costs.find(c => c.name === "generateTasks")!.cost.toFixed(4)}/call.` },
+            { color: "#f59e0b", label: "Ask AI + Refine", text: `askAboutTask ~$${costs.find(c => c.name === "askAboutTask")!.cost.toFixed(4)}/call, refineTask ~$${costs.find(c => c.name === "refineTask")!.cost.toFixed(4)}/call. Both Haiku — cheap per call but usage varies.` },
+            { color: "#818cf8", label: "Setup cost", text: `parseGoal (Opus) + generateRoadmap + goalChat — ~$${(costs.find(c => c.name === "parseGoal")!.cost + costs.find(c => c.name === "generateRoadmap")!.cost + costs.find(c => c.name === "goalChat (per turn)")!.cost * 8).toFixed(2)} per goal, one-time only.` },
+            { color: "#71717a", label: "Stripe fees", text: `2.9% + $0.30 per transaction. ~$${(MONTHLY_PRICE * STRIPE_PCT + STRIPE_FIXED).toFixed(2)}/mo on monthly, ~$${(YEARLY_PRICE * STRIPE_PCT + STRIPE_FIXED).toFixed(2)}/yr on yearly.` },
+          ].map((item) => (
+            <div key={item.label} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
+              <div style={{ width: 8, height: 8, borderRadius: "50%", background: item.color, marginTop: 5, flexShrink: 0 }} />
+              <div>
+                <span style={{ fontWeight: 600, color: "#e4e4e7" }}>{item.label}:</span>{" "}
+                <span style={{ color: "#a1a1aa" }}>{item.text}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Fleet Estimate */}
+      <div style={cardStyle}>
+        <h3 style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff", marginBottom: "0.75rem" }}>
+          Fleet Cost Estimate ({activeUsers} active users)
+        </h3>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+          <div style={{ background: "#27272a", borderRadius: 8, padding: "1rem", textAlign: "center" }}>
+            <div style={{ fontSize: "0.7rem", color: "#71717a", marginBottom: 4 }}>Avg usage (2 goals)</div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#3ecf8e" }}>${totalAvg.toFixed(2)}</div>
+            <div style={{ fontSize: "0.7rem", color: "#71717a" }}>per month</div>
+          </div>
+          <div style={{ background: "#27272a", borderRadius: 8, padding: "1rem", textAlign: "center" }}>
+            <div style={{ fontSize: "0.7rem", color: "#71717a", marginBottom: 4 }}>Worst case (3 goals, max)</div>
+            <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#f59e0b" }}>${totalMax.toFixed(2)}</div>
+            <div style={{ fontSize: "0.7rem", color: "#71717a" }}>per month</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminOverviewPage() {
   const [data, setData] = useState<OverviewData | null>(null);
   const [error, setError] = useState("");
@@ -210,6 +463,21 @@ export default function AdminOverviewPage() {
         />
       </div>
 
+      {/* Per-User Cost Estimator */}
+      <h2
+        style={{
+          fontSize: "0.85rem",
+          fontWeight: 600,
+          color: "#a1a1aa",
+          textTransform: "uppercase",
+          letterSpacing: "0.05em",
+          marginBottom: "0.75rem",
+        }}
+      >
+        Per-User Cost Estimator
+      </h2>
+      <CostEstimatorSection activeUsers={data.users.active7d} />
+
       {/* AI Costs */}
       <h2
         style={{
@@ -221,7 +489,7 @@ export default function AdminOverviewPage() {
           marginBottom: "0.75rem",
         }}
       >
-        AI Costs (Estimated)
+        AI Costs (Actual)
       </h2>
       <div
         style={{

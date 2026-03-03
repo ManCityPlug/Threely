@@ -563,7 +563,7 @@ PHASE 2: [Name]
 End with a brief note about what success looks like when ALL phases are complete.`;
 
   const message = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-sonnet-4-6",
     max_tokens: 2048,
     temperature: 0.5,
     messages: [{ role: "user", content: prompt }],
@@ -598,7 +598,10 @@ export async function goalChat(messages: GoalChatMessage[]): Promise<GoalChatRes
   const turnCount = messages.filter((m) => m.role === "user").length;
   const shouldWrapUp = turnCount >= 14;
 
+  const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
   const systemPrompt = `${IDENTITY_BLOCK}You are Threely Intelligence, a friendly goal-definition coach. Your job is to help a user define a clear, highly specific goal through a short guided conversation.
+
+TODAY'S DATE: ${today}. Use this when calculating timelines, deadlines, and recommending realistic timeframes.
 
 CRITICAL — The final goal MUST include ALL of these details. You MUST ask about EVERY area — no exceptions, no skipping:
 1. A SPECIFIC measurable outcome (not vague like "explore" or "improve" — e.g. "land 3 freelance clients" or "run a 5K in under 30 minutes")
@@ -897,8 +900,10 @@ ${previousTasks.map((t, i) => {
     ? `\nROADMAP (your master plan — determine current phase from completion stats + previous tasks):\n${goal.roadmap}`
     : "";
 
+  const todayStr = new Date().toISOString().split("T")[0];
   const userPrompt = `Generate ${taskCountLabel}.
 
+TODAY'S DATE: ${todayStr}
 GOAL: ${goal.title} | ${goal.category ?? "general"} | ${deadlineStr}
 ${goal.structuredSummary ? `Summary: ${goal.structuredSummary}` : `Input: "${goal.rawInput}"`}
 goal_id: ${goal.id}
