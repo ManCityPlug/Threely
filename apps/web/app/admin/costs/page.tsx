@@ -20,7 +20,7 @@ const FUNCTIONS = [
   },
   {
     name: "generateRoadmap",
-    model: "opus" as const,
+    model: "haiku" as const,
     inputTokens: 1300,
     outputTokens: 1500,
     frequency: "Once per goal",
@@ -133,7 +133,7 @@ function calculateCosts(goals: number) {
 
 // ─── Revenue per plan ────────────────────────────────────────────────────────
 const PLANS = [
-  { name: "Yearly", price: 69.99, period: "year", monthly: 69.99 / 12 },
+  { name: "Yearly", price: 99.99, period: "year", monthly: 99.99 / 12 },
   { name: "Monthly", price: 12.99, period: "month", monthly: 12.99 },
 ];
 
@@ -427,7 +427,7 @@ export default function CostsPage() {
             },
             {
               label: "Setup cost",
-              value: "parseGoal + generateRoadmap (both Opus) — ~$0.16 per goal, one-time only. Max $0.48 per user.",
+              value: "parseGoal (Opus) + generateRoadmap (Haiku) — one-time per goal. Max 3 goals per user.",
               color: "#818cf8",
             },
             {

@@ -29,6 +29,7 @@ interface GoalItem {
   isPaused: boolean;
   createdAt: string;
   todayTasks: TaskItem[] | null;
+  todayTasksDate: string | null;
 }
 
 interface UserDetail {
@@ -189,6 +190,11 @@ function GoalCard({ goal }: { goal: GoalItem }) {
             <div style={{ marginBottom: "1.25rem" }}>
               <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#635bff", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
                 Today&apos;s Tasks
+                {goal.todayTasksDate && (
+                  <span style={{ color: "#52525b", fontWeight: 500, marginLeft: 8, textTransform: "none" }}>
+                    {new Date(goal.todayTasksDate + "T00:00:00").toLocaleDateString()}
+                  </span>
+                )}
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {goal.todayTasks.map((t) => (

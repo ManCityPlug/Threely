@@ -193,13 +193,28 @@ export async function GET(
       completed: goals.filter((g) => !g.isActive).length,
       last30d: goalsLast30d,
       list: goals.map((g) => {
-        // Find today's tasks for this goal
-        const todayKey = new Date().toISOString().split("T")[0];
-        const todayDailyTask = allDailyTasks.find(
-          (dt) =>
-            dt.goalId === g.id &&
-            new Date(dt.date).toISOString().split("T")[0] === todayKey
-        );
+        // Find today's tasks for this goal.
+        // Tasks are stored with the user's local date, but the server runs in UTC,
+        // so check both today and yesterday (UTC) to handle timezone differences.
+        const now = new Date();
+        const todayKey = now.toISOString().split("T")[0];
+        const yesterday = new Date(now);
+        yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+        const yesterdayKey = yesterday.toISOString().split("T")[0];
+
+        const goalDailyTasks = allDailyTasks
+          .filter((dt) => {
+            if (dt.goalId !== g.id) return false;
+            const dateKey = new Date(dt.date).toISOString().split("T")[0];
+            return dateKey === todayKey || dateKey === yesterdayKey;
+          })
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+        const latestDailyTask = goalDailyTasks[0] ?? null;
+        const latestDateKey = latestDailyTask
+          ? new Date(latestDailyTask.date).toISOString().split("T")[0]
+          : null;
+
         return {
           id: g.id,
           title: g.title,
@@ -214,9 +229,10 @@ export async function GET(
           isActive: g.isActive,
           isPaused: g.isPaused,
           createdAt: g.createdAt,
-          todayTasks: todayDailyTask
-            ? (todayDailyTask.tasks as unknown as TaskItem[])
+          todayTasks: latestDailyTask
+            ? (latestDailyTask.tasks as unknown as TaskItem[])
             : null,
+          todayTasksDate: latestDateKey,
         };
       }),
     },
