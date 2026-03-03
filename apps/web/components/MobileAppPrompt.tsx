@@ -127,6 +127,9 @@ export default function MobileAppPrompt() {
   useEffect(() => {
     if (!isMobileDevice()) return;
 
+    // Never show on admin pages
+    if (window.location.pathname.startsWith("/admin")) return;
+
     // Only show interstitial on the homepage (/)
     if (window.location.pathname === "/") {
       const t = setTimeout(() => setView("interstitial"), 600);
@@ -284,7 +287,7 @@ export default function MobileAppPrompt() {
             >
               10x your productivity.
               <br />
-              <span style={{ color: "#635bff" }}>Reach your goals.</span>
+              <span style={{ background: "linear-gradient(135deg, #635bff, #9b59b6, #635bff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Reach your goals.</span>
             </h1>
 
             {/* Subtitle — slides up */}
