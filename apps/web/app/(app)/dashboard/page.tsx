@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth, getNickname } from "@/lib/auth-context";
 import { formatDisplayName } from "@/lib/format-name";
 import {
-  tasksApi, goalsApi, reviewsApi, insightsApi, statsApi,
+  tasksApi, goalsApi, reviewsApi, insightsApi, statsApi, focusApi,
   type DailyTask, type TaskItem, type Goal, type GoalStat,
 } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/Skeleton";
@@ -720,10 +720,11 @@ export default function DashboardPage() {
 
   const load = useCallback(async () => {
     try {
-      const [tasksRes, goalsRes, statsRes] = await Promise.all([
+      const [tasksRes, goalsRes, statsRes, focusRes] = await Promise.all([
         tasksApi.today(false),
         goalsApi.list(),
         statsApi.get(),
+        focusApi.get().catch(() => ({ focus: null })),
       ]);
       setDailyTasks(tasksRes.dailyTasks);
       setGoals(goalsRes.goals);
@@ -778,12 +779,19 @@ export default function DashboardPage() {
         setRestDay(tasksRes.restDay ?? false);
       }
 
-      // Restore saved focus or auto-select
+      // Restore saved focus: prefer server, fallback to localStorage
       const todayKey = `threely_focus_${new Date().toLocaleDateString("en-CA")}`;
-      const saved = localStorage.getItem(todayKey);
-      const savedIsValid = saved !== null && saved !== "all" && goalsRes.goals.some(g => g.id === saved);
-      if (saved && savedIsValid) {
-        setSelectedGoalId(saved);
+      const serverFocus = focusRes.focus?.focusGoalId ?? null;
+      const localFocus = localStorage.getItem(todayKey);
+      const restoredFocus = serverFocus ?? localFocus;
+      const activeGoalIds = new Set(goalsRes.goals.map(g => g.id));
+      const isValidFocus = restoredFocus && restoredFocus !== "all" && activeGoalIds.has(restoredFocus);
+      if (isValidFocus) {
+        setSelectedGoalId(restoredFocus);
+        // Sync localStorage with server if server had focus but local didn't
+        if (serverFocus && !localFocus) {
+          localStorage.setItem(todayKey, serverFocus);
+        }
       } else if (goalsRes.goals.length === 1) {
         const onlyGoalId = goalsRes.goals[0].id;
         setSelectedGoalId(onlyGoalId);
@@ -839,7 +847,11 @@ export default function DashboardPage() {
   useEffect(() => {
     if (searchParams.get("subscribed") === "1") {
       refreshSubscription();
-      showToast("Welcome to Pro! Your 7-day free trial has started.", "success");
+      if (searchParams.get("trial") === "denied") {
+        showToast("Welcome to Pro! This card was already used for a free trial, so your subscription starts today.", "success");
+      } else {
+        showToast("Welcome to Pro! Your 7-day free trial has started.", "success");
+      }
       router.replace("/dashboard");
     }
   }, [searchParams, refreshSubscription, showToast, router]);
@@ -891,6 +903,7 @@ export default function DashboardPage() {
     setSelectedGoalId(val);
     setGoalPickerOpen(false);
     localStorage.setItem(`threely_focus_${new Date().toLocaleDateString("en-CA")}`, val);
+    focusApi.save(val).catch(() => {});
   }
 
   function handlePickGoalWithOffDayCheck(goalId: string) {
@@ -1033,6 +1046,11 @@ export default function DashboardPage() {
       // Reload to get fresh state
       const tasksRes = await tasksApi.today(false);
       setDailyTasks(tasksRes.dailyTasks);
+      // Clear any stale generation state so completed tasks show properly (not skeletons)
+      setGenerating(false);
+      const todayStr = new Date().toLocaleDateString("en-CA");
+      localStorage.removeItem(`threely_generating_${todayStr}`);
+      if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null; }
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
       showToast("All tasks completed!", "success");
@@ -1045,6 +1063,15 @@ export default function DashboardPage() {
 
   function handleGiveMore() {
     if (!hasPro) { showPaywall(); return; }
+    // Pre-check: if tasks already have > 3 items, this goal already got extra tasks today
+    const dt = dailyTasks.find(d => d.goalId === selectedGoalId);
+    if (dt) {
+      const taskCount = Array.isArray(dt.tasks) ? dt.tasks.length : 0;
+      if (taskCount > 3) {
+        setShowGenLimit(true);
+        return;
+      }
+    }
     setShowWorkAhead(true);
   }
 

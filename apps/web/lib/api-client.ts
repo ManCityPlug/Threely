@@ -349,6 +349,7 @@ export interface SubscriptionStatus {
   status: "trialing" | "active" | "past_due" | "canceled" | null;
   trialEndsAt: string | null;
   currentPeriodEnd: string | null;
+  trialEligible?: boolean;
 }
 
 export interface SubscriptionDetails {
@@ -432,4 +433,45 @@ export const subscriptionApi = {
 export const accountApi = {
   delete: () =>
     apiFetch<{ success: boolean }>("/api/account", { method: "DELETE" }),
+};
+
+// ─── Focus API ───────────────────────────────────────────────────────────────
+
+export const focusApi = {
+  get: (date?: string) => {
+    const now = new Date();
+    const localDate = date ?? `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    return apiFetch<{ focus: { focusGoalId: string } | null }>(`/api/focus?date=${localDate}`);
+  },
+
+  save: (focusGoalId: string) => {
+    const now = new Date();
+    const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    return apiFetch<{ focus: { focusGoalId: string } }>("/api/focus", {
+      method: "POST",
+      body: JSON.stringify({ focusGoalId, localDate }),
+    });
+  },
+};
+
+// ─── Notifications API ───────────────────────────────────────────────────────
+
+export interface AppNotification {
+  id: string;
+  heading: string;
+  subheading: string;
+  linkUrl: string | null;
+  createdAt: string;
+}
+
+export const notificationsApi = {
+  list: () =>
+    apiFetch<{ notifications: AppNotification[]; unreadCount: number }>(
+      "/api/notifications"
+    ),
+
+  dismiss: (id: string) =>
+    apiFetch<{ success: boolean }>(`/api/notifications/${id}/dismiss`, {
+      method: "POST",
+    }),
 };
