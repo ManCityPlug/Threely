@@ -304,12 +304,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <aside className="sidebar">
         {/* Logo */}
         <div style={{
-          padding: "4.5rem 1.25rem 1.25rem",
+          padding: "2.5rem 1.25rem 1.25rem",
           borderBottom: "1px solid var(--border)",
           display: "flex", alignItems: "center", gap: 10,
         }}>
           <img src="/favicon.png" alt="Threely" width={36} height={36} style={{ borderRadius: 10, flexShrink: 0 }} />
-          <div>
+          <div style={{ marginTop: 2 }}>
             <span style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--text)", display: "block" }}>
               Threely
             </span>
