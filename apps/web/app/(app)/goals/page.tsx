@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { goalsApi, tasksApi, type Goal, type ParsedGoal, type GoalChatMessage, type GoalChatResult, type TaskItem } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/Skeleton";
@@ -1044,7 +1044,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
   // ─── Main render ───────────────────────────────────────────────────────────
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={() => { if (!showAiChat) onClose(); }}>
       {/* Hide the modal box entirely when AI chat is open (edit mode) */}
       {!showAiChat && (
         <div
@@ -1320,6 +1320,14 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
 // ─── Goals Page ───────────────────────────────────────────────────────────────
 
 export default function GoalsPage() {
+  return (
+    <Suspense>
+      <GoalsPageInner />
+    </Suspense>
+  );
+}
+
+function GoalsPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { showToast } = useToast();

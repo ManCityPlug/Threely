@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: "/pricing", label: "Pricing" },
   { href: "/faq", label: "FAQ" },
   { href: "/about", label: "About" },
+  { href: "/support", label: "Support" },
 ];
 
 export default function MarketingNav() {
@@ -95,7 +96,7 @@ export default function MarketingNav() {
               }}>
                 Sign in
               </Link>
-              <Link href="/login" style={{
+              <Link href="/welcome" style={{
                 padding: "0.4rem 1rem",
                 fontSize: "0.875rem",
                 fontWeight: 600,
@@ -174,7 +175,7 @@ export default function MarketingNav() {
                 }}>
                   Sign in
                 </Link>
-                <Link href="/login" onClick={() => setMenuOpen(false)} style={{
+                <Link href="/welcome" onClick={() => setMenuOpen(false)} style={{
                   flex: 1, textAlign: "center",
                   padding: "0.6rem 0",
                   fontSize: "0.875rem", fontWeight: 600,

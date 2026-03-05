@@ -41,7 +41,8 @@ const REVENUECAT_IOS_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? "";
 if (Platform.OS !== "web") {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
-      shouldShowAlert: true,
+      shouldShowBanner: true,
+      shouldShowList: true,
       shouldPlaySound: true,
       shouldSetBadge: false,
     }),
@@ -123,7 +124,12 @@ function AppContent() {
 
     (async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/api/health`);
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10_000);
+        const res = await fetch(`${API_BASE_URL}/api/health`, {
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
         if (!res.ok) return; // Fail open — don't block if API is down
         const data = await res.json();
         const minVersion: string | undefined = data.minAppVersion;
@@ -131,7 +137,7 @@ function AppContent() {
           setUpdateRequired(true);
         }
       } catch {
-        // Network error — fail open, don't block the user
+        // Network error or timeout — fail open, don't block the user
       }
     })();
   }, []);
@@ -161,8 +167,15 @@ function AppContent() {
     });
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      (event, session) => {
         setSession(session);
+        // Explicitly reset routing on fresh sign-in so the routing effect
+        // re-evaluates and navigates to /(tabs) or /(onboarding).
+        // Without this, routingResolved can stay true from the welcome→login
+        // routing and block post-OAuth navigation.
+        if (event === "SIGNED_IN") {
+          routingResolved.current = false;
+        }
       }
     );
 
@@ -288,6 +301,33 @@ function AppContent() {
       }
     });
   }, [session, segments, welcomeDone]);
+
+  // Safety net: if user has a session but is stuck on the auth page,
+  // force-navigate them away. Covers edge cases where the main routing
+  // effect's async chain doesn't complete (OAuth redirect, timing issues).
+  useEffect(() => {
+    if (!session || !ready || segments[0] !== "(auth)") return;
+
+    const timer = setTimeout(async () => {
+      // Still on auth page with active session — force navigate
+      try {
+        const key = `@threely_onboarding_done_${session.user.id}`;
+        const done = await AsyncStorage.getItem(key);
+        if (done) {
+          routingResolved.current = true;
+          router.replace("/(tabs)");
+        } else {
+          routingResolved.current = true;
+          router.replace("/(onboarding)");
+        }
+      } catch {
+        routingResolved.current = true;
+        router.replace("/(tabs)");
+      }
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [session, ready, segments]);
 
   // Still loading auth state
   if (session === undefined) {

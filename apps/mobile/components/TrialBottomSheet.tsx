@@ -8,11 +8,11 @@ import {
   Alert,
   ActivityIndicator,
   Linking,
-  Dimensions,
   Platform,
+  useWindowDimensions,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Purchases, { PurchasesOffering } from "react-native-purchases";
+import Purchases, { PurchasesOffering, INTRO_ELIGIBILITY_STATUS } from "react-native-purchases";
 import * as Haptics from "expo-haptics";
 import { useTheme } from "@/lib/theme";
 import type { Colors } from "@/constants/theme";
@@ -21,9 +21,9 @@ import { useSubscription } from "@/lib/subscription-context";
 
 type Plan = "monthly" | "yearly";
 
-const PLANS: { key: Plan; name: string; price: string; sub: string; badge?: string }[] = [
-  { key: "yearly", name: "Yearly", price: "$69.99", sub: "$5.83/mo · billed annually", badge: "SAVE 55%" },
-  { key: "monthly", name: "Monthly", price: "$12.99", sub: "per month" },
+const PLANS: { key: Plan; name: string; price: string; sub: string; trialSub: string; badge?: string }[] = [
+  { key: "yearly", name: "Yearly", price: "$99.99", sub: "$8.33/mo · billed annually", trialSub: "7 Day Free Trial · $8.33/mo · billed annually", badge: "SAVE 36%" },
+  { key: "monthly", name: "Monthly", price: "$12.99", sub: "per month", trialSub: "7 Day Free Trial · per month" },
 ];
 
 interface TrialBottomSheetProps {
@@ -32,14 +32,20 @@ interface TrialBottomSheetProps {
   onSubscribed: () => void;
 }
 
+const SHEET_MAX_WIDTH = 500;
+
 export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBottomSheetProps) {
   const { colors } = useTheme();
   const { refreshSubscription } = useSubscription();
+  const { width: windowWidth } = useWindowDimensions();
+  const isWideScreen = windowWidth > 600;
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   const [plan, setPlan] = useState<Plan>("yearly");
   const [loading, setLoading] = useState(false);
+  const [restoring, setRestoring] = useState(false);
   const [offerings, setOfferings] = useState<PurchasesOffering | null>(null);
+  const [trialEligible, setTrialEligible] = useState(true);
 
   useEffect(() => {
     if (!visible) return;
@@ -47,6 +53,27 @@ export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBott
       try {
         const off = await Purchases.getOfferings();
         setOfferings(off.current);
+
+        // Check trial eligibility
+        if (off.current) {
+          const productIds = [
+            off.current.annual?.product?.identifier,
+            off.current.monthly?.product?.identifier,
+          ].filter(Boolean) as string[];
+
+          if (productIds.length > 0) {
+            try {
+              const eligibility = await Purchases.checkTrialOrIntroductoryPriceEligibility(productIds);
+              const isEligible = Object.values(eligibility).some(
+                (e) => e.status === INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE
+              );
+              setTrialEligible(isEligible);
+            } catch {
+              // If eligibility check fails, default to eligible
+              setTrialEligible(true);
+            }
+          }
+        }
       } catch (e) {
         console.warn("Failed to load offerings:", e);
       }
@@ -63,7 +90,14 @@ export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBott
     setLoading(true);
     try {
       if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      const { customerInfo } = await Purchases.purchasePackage(pkg);
+
+      // Add a timeout so the purchase flow cannot hang indefinitely
+      const purchasePromise = Purchases.purchasePackage(pkg);
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Purchase timed out")), 120000)
+      );
+
+      const { customerInfo } = await Promise.race([purchasePromise, timeoutPromise]);
       if (typeof customerInfo.entitlements.active["pro"] !== "undefined") {
         await AsyncStorage.setItem("@threely_subscription_status", "active");
         await refreshSubscription();
@@ -71,10 +105,31 @@ export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBott
       }
     } catch (e: any) {
       if (!e.userCancelled) {
-        Alert.alert("Purchase failed", "Something went wrong. Please try again.");
+        const message = e.message === "Purchase timed out"
+          ? "The purchase is taking too long. Please check your connection and try again."
+          : "Something went wrong. Please try again.";
+        Alert.alert("Purchase failed", message);
       }
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleRestore() {
+    setRestoring(true);
+    try {
+      const customerInfo = await Purchases.restorePurchases();
+      if (typeof customerInfo.entitlements.active["pro"] !== "undefined") {
+        await AsyncStorage.setItem("@threely_subscription_status", "active");
+        await refreshSubscription();
+        onSubscribed();
+      } else {
+        Alert.alert("No Purchases Found", "We couldn't find any previous purchases for this account.");
+      }
+    } catch {
+      Alert.alert("Error", "Failed to restore purchases. Please try again.");
+    } finally {
+      setRestoring(false);
     }
   }
 
@@ -90,7 +145,10 @@ export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBott
       />
 
       {/* Sheet */}
-      <View style={styles.sheet}>
+      <View style={[
+        styles.sheet,
+        isWideScreen && { maxWidth: SHEET_MAX_WIDTH, alignSelf: "center", width: "100%", borderRadius: radius.xl },
+      ]}>
         {/* Handle bar */}
         <View style={styles.handleWrap}>
           <View style={styles.handle} />
@@ -100,7 +158,7 @@ export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBott
         <Text style={styles.icon}>✦</Text>
         <Text style={styles.heading}>Unlock this with Threely Pro</Text>
         <Text style={styles.subheading}>
-          10x your productivity and Reach your goals.
+          The #1 AI app that turns any goal into reality.{"\n"}Just tell us what you want — we'll get you there.
         </Text>
 
         {/* Plan selector */}
@@ -124,12 +182,20 @@ export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBott
                     </View>
                   )}
                 </View>
-                <Text style={styles.planSub}>{p.sub}</Text>
+                <Text style={styles.planSub}>{trialEligible ? p.trialSub : p.sub}</Text>
               </View>
               <Text style={[styles.planPrice, plan === p.key && { color: colors.primary }]}>{p.price}</Text>
             </View>
           </TouchableOpacity>
         ))}
+
+        {/* Total due today */}
+        {trialEligible && (
+          <View style={[styles.totalDueRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.totalDueLabel, { color: colors.textSecondary }]}>Total due today</Text>
+            <Text style={styles.totalDueAmount}>$0.00</Text>
+          </View>
+        )}
 
         {/* CTA */}
         <TouchableOpacity
@@ -141,20 +207,37 @@ export function TrialBottomSheet({ visible, onDismiss, onSubscribed }: TrialBott
           {loading ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text style={styles.ctaBtnText}>Start Free Trial</Text>
+            <Text style={styles.ctaBtnText}>{trialEligible ? "Start Free Trial" : "Subscribe"}</Text>
           )}
         </TouchableOpacity>
 
-        <Text style={styles.trialNote}>
-          No charge for 7 days. Cancel anytime in Settings.
-        </Text>
-        <Text style={styles.ctaSub}>
-          Then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
-        </Text>
+        {trialEligible ? (
+          <>
+            <Text style={styles.trialNote}>
+              No charge for 7 days. Cancel anytime in Settings.
+            </Text>
+            <Text style={styles.ctaSub}>
+              Then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
+            </Text>
+          </>
+        ) : (
+          <Text style={styles.ctaSub}>
+            Cancel anytime in Settings.
+          </Text>
+        )}
 
         {/* Dismiss */}
         <TouchableOpacity onPress={onDismiss} style={styles.dismissBtn}>
           <Text style={styles.dismissText}>Not now</Text>
+        </TouchableOpacity>
+
+        {/* Restore purchases */}
+        <TouchableOpacity onPress={handleRestore} disabled={restoring} style={styles.restoreBtn}>
+          {restoring ? (
+            <ActivityIndicator color={colors.textTertiary} size="small" />
+          ) : (
+            <Text style={styles.restoreText}>Restore purchases</Text>
+          )}
         </TouchableOpacity>
 
         {/* Legal */}
@@ -288,6 +371,25 @@ function createStyles(c: Colors) {
       color: c.text,
       letterSpacing: -0.3,
     },
+    totalDueRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: spacing.md,
+      paddingVertical: 10,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      marginBottom: spacing.xs,
+    },
+    totalDueLabel: {
+      fontSize: typography.sm,
+      fontWeight: typography.medium,
+    },
+    totalDueAmount: {
+      fontSize: typography.md,
+      fontWeight: typography.bold,
+      color: "#3ecf8e",
+    },
     ctaBtn: {
       height: 56,
       backgroundColor: c.primary,
@@ -320,11 +422,21 @@ function createStyles(c: Colors) {
     dismissBtn: {
       alignSelf: "center",
       paddingVertical: spacing.sm,
-      marginBottom: spacing.sm,
+      marginBottom: spacing.xs,
     },
     dismissText: {
       fontSize: typography.sm,
       color: c.textSecondary,
+      fontWeight: typography.medium,
+    },
+    restoreBtn: {
+      alignSelf: "center",
+      paddingVertical: spacing.xs,
+      marginBottom: spacing.sm,
+    },
+    restoreText: {
+      fontSize: typography.xs,
+      color: c.textTertiary,
       fontWeight: typography.medium,
     },
     legalText: {

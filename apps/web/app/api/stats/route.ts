@@ -25,6 +25,7 @@ interface GoalStat {
 
 // GET /api/stats — returns aggregate stats for the authenticated user
 export async function GET(request: NextRequest) {
+  try {
   const user = await getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -177,4 +178,8 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(result, {
     headers: { "Cache-Control": "no-store, max-age=0" },
   });
+  } catch (e) {
+    console.error("[GET /api/stats]", e);
+    return NextResponse.json({ error: "Failed to fetch stats" }, { status: 500 });
+  }
 }

@@ -12,6 +12,7 @@ import {
   Pressable,
   ActivityIndicator,
   Modal,
+  useWindowDimensions,
 } from "react-native";
 import { Link, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -26,8 +27,12 @@ import {
 
 const PRIMARY = "#635BFF";
 
+const FORM_MAX_WIDTH = 420;
+
 export default function LoginScreen() {
   const router = useRouter();
+  const { width: windowWidth } = useWindowDimensions();
+  const isWideScreen = windowWidth > 600;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,13 +64,22 @@ export default function LoginScreen() {
     const trimmed = (forgotEmail || email).trim();
     if (!trimmed) return;
     setForgotLoading(true);
-    await supabase.auth.resetPasswordForEmail(trimmed, {
-      redirectTo: "https://threely.co/api/auth/callback?type=recovery",
-    });
-    setForgotLoading(false);
-    setForgotSent(true);
-    setForgotEmail(trimmed);
-    startCooldown();
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(trimmed, {
+        redirectTo: "https://threely.co/api/auth/callback?type=recovery",
+      });
+      if (error) {
+        Alert.alert("Reset failed", error.message);
+        return;
+      }
+      setForgotSent(true);
+      setForgotEmail(trimmed);
+      startCooldown();
+    } catch {
+      Alert.alert("Reset failed", "Something went wrong. Please try again.");
+    } finally {
+      setForgotLoading(false);
+    }
   }
 
   const { promptAsync: googlePromptAsync, loading: googleLoading } = useGoogleSignIn();
@@ -75,33 +89,46 @@ export default function LoginScreen() {
   async function handleLogin() {
     if (!email || !password) return;
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      // Check if the email exists to show a more helpful message
-      try {
-        const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000";
-        const res = await fetch(`${BASE_URL}/api/auth/check-email`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: email.trim() }),
-        });
-        const { exists } = await res.json();
-        if (!exists) {
-          Alert.alert(
-            "Account not found",
-            "We couldn't find an account with this email. Would you like to sign up?",
-            [
-              { text: "Cancel", style: "cancel" },
-              { text: "Sign up", onPress: () => router.push("/(auth)/register") },
-            ]
-          );
-          return;
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        // Check if the email exists to show a more helpful message
+        try {
+          const BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:3000";
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 10_000);
+          const res = await fetch(`${BASE_URL}/api/auth/check-email`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email.trim() }),
+            signal: controller.signal,
+          });
+          clearTimeout(timeout);
+          if (res.ok) {
+            const text = await res.text();
+            let data: { exists?: boolean };
+            try { data = JSON.parse(text); } catch { data = {}; }
+            if (data.exists === false) {
+              Alert.alert(
+                "Account not found",
+                "We couldn't find an account with this email. Would you like to sign up?",
+                [
+                  { text: "Cancel", style: "cancel" },
+                  { text: "Sign up", onPress: () => router.push("/(auth)/register") },
+                ]
+              );
+              return;
+            }
+          }
+        } catch {
+          // If check fails (timeout, network error), fall through to generic error
         }
-      } catch {
-        // If check fails, fall through to generic error
+        Alert.alert("Login failed", "Invalid login credentials");
       }
-      Alert.alert("Login failed", "Invalid login credentials");
+    } catch {
+      Alert.alert("Login failed", "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -119,7 +146,10 @@ export default function LoginScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
-          contentContainerStyle={styles.inner}
+          contentContainerStyle={[
+            styles.inner,
+            isWideScreen && { maxWidth: FORM_MAX_WIDTH, alignSelf: "center", width: "100%" },
+          ]}
           keyboardShouldPersistTaps="handled"
         >
           {/* Logo */}
@@ -170,6 +200,7 @@ export default function LoginScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
+                returnKeyType="next"
                 placeholder="you@example.com"
                 placeholderTextColor="rgba(255,255,255,0.35)"
                 onFocus={() => setEmailFocused(true)}
@@ -192,6 +223,8 @@ export default function LoginScreen() {
                 onChangeText={setPassword}
                 secureTextEntry
                 autoComplete="password"
+                returnKeyType="go"
+                onSubmitEditing={handleLogin}
                 placeholder="••••••••"
                 placeholderTextColor="rgba(255,255,255,0.35)"
                 onFocus={() => setPasswordFocused(true)}
@@ -200,9 +233,9 @@ export default function LoginScreen() {
             </View>
 
             <Pressable
-              style={[styles.button, loading && { opacity: 0.6 }]}
+              style={[styles.button, (loading || socialLoading) && { opacity: 0.6 }]}
               onPress={handleLogin}
-              disabled={loading}
+              disabled={loading || socialLoading}
             >
               {loading ? (
                 <ActivityIndicator color="#FFFFFF" size="small" />
@@ -326,6 +359,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.xxl,
+    maxWidth: 500,
+    alignSelf: "center",
+    width: "100%",
   },
   logo: {
     width: 56,

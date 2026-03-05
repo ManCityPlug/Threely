@@ -4,7 +4,7 @@
  */
 
 import { useEffect } from "react";
-import { View } from "react-native";
+import { ActivityIndicator, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSubscription } from "@/lib/subscription-context";
 
@@ -13,9 +13,17 @@ export default function PaymentScreen() {
   const { showBottomSheetPaywall } = useSubscription();
 
   useEffect(() => {
+    // Navigate first, then show paywall after navigation settles
     router.replace("/(tabs)");
-    showBottomSheetPaywall();
+    const timer = setTimeout(() => {
+      showBottomSheetPaywall();
+    }, 300);
+    return () => clearTimeout(timer);
   }, [router, showBottomSheetPaywall]);
 
-  return <View />;
+  return (
+    <View style={{ flex: 1, backgroundColor: "#1A1040", alignItems: "center", justifyContent: "center" }}>
+      <ActivityIndicator color="#FFFFFF" size="large" />
+    </View>
+  );
 }

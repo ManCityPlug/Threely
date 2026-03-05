@@ -19,9 +19,10 @@ import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { TaskItem } from "@/lib/api";
 import { useTheme } from "@/lib/theme";
+import { useSubscription } from "@/lib/subscription-context";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
-import { scalePress } from "@/lib/animations";
+import { useScalePress } from "@/lib/animations";
 
 const RESOURCE_ICONS: Record<string, string> = {
   youtube_channel: "\u25B6",
@@ -47,26 +48,31 @@ interface TaskCardProps {
   onRefine?: (userRequest: string) => Promise<void>;
   onAsk?: (messages: AskMessage[]) => Promise<AskResult>;
   readonly?: boolean;
+  paywalled?: boolean;
 }
 
-export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false }: TaskCardProps) {
+export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, paywalled = false }: TaskCardProps) {
   const { colors } = useTheme();
+  const { showBottomSheetPaywall } = useSubscription();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [modalVisible, setModalVisible] = useState(false);
+  const pendingPaywallRef = useRef(false);
 
   const strikeAnim = useRef(new Animated.Value(task.isCompleted ? 1 : 0)).current;
   const checkScaleAnim = useRef(new Animated.Value(1)).current;
 
   // Card-level scale press micro-interaction
-  const cardPress = useRef(scalePress()).current;
+  const cardPress = useScalePress();
 
   useEffect(() => {
-    Animated.spring(strikeAnim, {
+    const anim = Animated.spring(strikeAnim, {
       toValue: task.isCompleted ? 1 : 0,
       useNativeDriver: false,
       tension: 120,
       friction: 8,
-    }).start();
+    });
+    anim.start();
+    return () => anim.stop();
   }, [task.isCompleted]);
 
   function handleCheckPress() {
@@ -185,20 +191,47 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false }: 
       </Animated.View>
 
       {/* Detail modal */}
-      {modalVisible && (
-        <TaskDetailModal
-          visible={modalVisible}
-          task={task}
-          taskTitle={taskTitle}
-          colors={colors}
-          styles={styles}
-          readonly={readonly}
-          onClose={() => setModalVisible(false)}
-          onCheckPress={() => { handleCheckPress(); setModalVisible(false); }}
-          onRefine={onRefine}
-          onAsk={onAsk}
-        />
-      )}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+        onDismiss={() => {
+          // Fires AFTER modal is fully off-screen (iOS)
+          if (pendingPaywallRef.current) {
+            pendingPaywallRef.current = false;
+            showBottomSheetPaywall();
+          }
+        }}
+      >
+        {modalVisible && (
+          <TaskDetailContent
+            task={task}
+            taskTitle={taskTitle}
+            colors={colors}
+            styles={styles}
+            readonly={readonly}
+            onClose={() => setModalVisible(false)}
+            onCheckPress={() => { handleCheckPress(); setModalVisible(false); }}
+            onRefine={onRefine}
+            onAsk={onAsk}
+            paywalled={paywalled}
+            onPaywall={() => {
+              pendingPaywallRef.current = true;
+              setModalVisible(false);
+              // Android: onDismiss doesn't fire, so trigger paywall after animation
+              if (Platform.OS !== "ios") {
+                setTimeout(() => {
+                  if (pendingPaywallRef.current) {
+                    pendingPaywallRef.current = false;
+                    showBottomSheetPaywall();
+                  }
+                }, 350);
+              }
+            }}
+          />
+        )}
+      </Modal>
     </>
   );
 }
@@ -207,11 +240,10 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false }: 
 
 const DISMISS_THRESHOLD = 120;
 
-function TaskDetailModal({
-  visible, task, taskTitle, colors, styles, readonly,
-  onClose, onCheckPress, onRefine, onAsk,
+function TaskDetailContent({
+  task, taskTitle, colors, styles, readonly,
+  onClose, onCheckPress, onRefine, onAsk, paywalled, onPaywall,
 }: {
-  visible: boolean;
   task: TaskItem;
   taskTitle: string;
   colors: Colors;
@@ -220,7 +252,9 @@ function TaskDetailModal({
   onClose: () => void;
   onCheckPress: () => void;
   onRefine?: (userRequest: string) => Promise<void>;
-  onAsk?: (messages: AskMessage[]) => Promise<string>;
+  onAsk?: (messages: AskMessage[]) => Promise<AskResult>;
+  paywalled?: boolean;
+  onPaywall?: () => void;
 }) {
   // Full-screen chat modals
   const [askModalOpen, setAskModalOpen] = useState(false);
@@ -257,7 +291,7 @@ function TaskDetailModal({
   ).current;
 
   return (
-    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    <>
       <KeyboardAvoidingView style={{ flex: 1, justifyContent: "flex-end" }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}>
         <Animated.View style={[styles.modalOverlay, { opacity: overlayOpacity }]}>
           <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
@@ -303,17 +337,23 @@ function TaskDetailModal({
                 {onAsk && (
                   <TouchableOpacity
                     style={styles.modalActionBtn}
-                    onPress={() => setAskModalOpen(true)}
+                    onPress={() => {
+                      if (paywalled && onPaywall) { onPaywall(); return; }
+                      setAskModalOpen(true);
+                    }}
                     activeOpacity={0.7}
                   >
                     <Text style={styles.intelligenceActionIcon}>✦</Text>
-                    <Text style={styles.modalActionText}>Ask about this</Text>
+                    <Text style={styles.modalActionText}>Ask AI</Text>
                   </TouchableOpacity>
                 )}
                 {onRefine && (
                   <TouchableOpacity
                     style={styles.modalActionBtn}
-                    onPress={() => setRefineModalOpen(true)}
+                    onPress={() => {
+                      if (paywalled && onPaywall) { onPaywall(); return; }
+                      setRefineModalOpen(true);
+                    }}
                     activeOpacity={0.7}
                   >
                     <Text style={styles.intelligenceActionIcon}>✦</Text>
@@ -398,7 +438,7 @@ function TaskDetailModal({
           onClose={() => { setRefineModalOpen(false); onClose(); }}
         />
       )}
-    </Modal>
+    </>
   );
 }
 
@@ -439,6 +479,8 @@ function AskChatModal({
       setOptions([]);
     } finally {
       setLoading(false);
+      // Delayed scroll to ensure suggestion chips are rendered
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 150);
     }
   }, [input, loading, messages, onAsk]);
 
@@ -698,6 +740,10 @@ function createStyles(c: Colors) {
     checkboxHitArea: {
       paddingTop: 1,
       flexShrink: 0,
+      minWidth: 44,
+      minHeight: 44,
+      alignItems: "center" as const,
+      justifyContent: "center" as const,
     },
     checkbox: {
       width: 24,
@@ -784,10 +830,12 @@ function createStyles(c: Colors) {
     },
     viewTaskBtn: {
       marginTop: 0,
-      paddingVertical: spacing.xs + 2,
+      paddingVertical: spacing.sm + 2,
+      minHeight: 44,
       borderTopWidth: 1,
       borderTopColor: c.border,
       alignItems: "center",
+      justifyContent: "center",
     },
     viewTaskBtnText: {
       fontSize: typography.sm,
@@ -826,11 +874,11 @@ function createStyles(c: Colors) {
     },
     modalCloseBtn: {
       position: "absolute",
-      right: 0,
-      top: -4,
-      width: 32,
-      height: 32,
-      borderRadius: 16,
+      right: -6,
+      top: -10,
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       backgroundColor: c.bg,
       alignItems: "center",
       justifyContent: "center",
@@ -999,9 +1047,9 @@ function createChatStyles(c: Colors) {
       paddingVertical: spacing.sm,
     },
     closeBtn: {
-      width: 32,
-      height: 32,
-      borderRadius: 8,
+      width: 44,
+      height: 44,
+      borderRadius: 10,
       backgroundColor: c.bg,
       borderWidth: 1,
       borderColor: c.border,
@@ -1034,7 +1082,7 @@ function createChatStyles(c: Colors) {
     },
     messageListContent: {
       padding: spacing.md,
-      paddingBottom: spacing.lg,
+      paddingBottom: 100,
     },
     emptyState: {
       alignItems: "center",

@@ -122,6 +122,7 @@ export default function OnboardingScreen() {
   const [chatMessages, setChatMessages] = useState<GoalChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [chatDone, setChatDone] = useState(false);
+  const [chatError, setChatError] = useState("");
   const [chatGoalText, setChatGoalText] = useState<string | null>(null);
   const [customInput, setCustomInput] = useState("");
   const [showTypingInput, setShowTypingInput] = useState(false);
@@ -289,17 +290,27 @@ export default function OnboardingScreen() {
       return await goalsApi.chat(messages, { onboarding: true });
     } catch (e) {
       // Retry once on transient failures (timeout, network, server error)
-      const msg = e instanceof Error ? e.message : "";
-      if (msg.includes("pro_required")) throw e; // Don't retry pro gate
-      return await goalsApi.chat(messages, { onboarding: true });
+      const msg = e instanceof Error ? e.message : String(e);
+      if (msg.includes("pro_required") || msg.includes("cancelled")) throw e; // Don't retry pro gate or user cancellation
+      try {
+        return await goalsApi.chat(messages, { onboarding: true });
+      } catch (retryErr) {
+        // If retry also fails, throw a user-friendly error
+        throw retryErr instanceof Error ? retryErr : new Error("Unable to reach Threely. Please check your connection.");
+      }
     }
   }
 
+  // Track the initial message so we can retry from the error state
+  const lastInitialMessageRef = useRef<string>("");
+
   async function startAiChatWithMessage(initialMessage: string) {
+    lastInitialMessageRef.current = initialMessage;
     setShowAiChat(true);
     setChatHistory([]);
     setChatMessages([]);
     setChatDone(false);
+    setChatError("");
     setChatGoalText(null);
     setCustomInput("");
     setShowTypingInput(false);
@@ -322,7 +333,8 @@ export default function OnboardingScreen() {
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Unknown error";
       console.warn("[onboarding chat]", msg);
-      setChatHistory([{ role: "assistant", text: "Something went wrong. Please close and try again." }]);
+      // Set chatError so the UI shows a retry button instead of a dead-end
+      setChatError("Something went wrong. Please try again.");
     } finally {
       setChatLoading(false);
     }
@@ -335,6 +347,7 @@ export default function OnboardingScreen() {
     setShowTypingInput(false);
     setSelectedOptions(new Set());
     setChatLoading(true);
+    setChatError("");
 
     const newMessages: GoalChatMessage[] = [...chatMessages, { role: "user", content: answer }];
     setChatMessages(newMessages);
@@ -356,8 +369,9 @@ export default function OnboardingScreen() {
       console.warn("[onboarding chat]", msg);
       setChatHistory((prev) => [
         ...prev,
-        { role: "assistant", text: "Something went wrong. Please try again." },
+        { role: "assistant", text: "Something went wrong. Tap the retry button below to try again." },
       ]);
+      setChatError("retry_send");
     } finally {
       setChatLoading(false);
     }
@@ -432,6 +446,8 @@ export default function OnboardingScreen() {
 
   // ─── Build ─────────────────────────────────────────────────────────────────
 
+  const buildTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   async function handleBuild(overrides?: {
     goalText?: string;
     parsed?: ParsedGoal;
@@ -441,6 +457,13 @@ export default function OnboardingScreen() {
     setBuildError("");
     setBuilding(true);
     if (!overrides?.skipAdvance) advanceStep(TOTAL_STEPS + 1);
+
+    // Safety timeout: if the build takes longer than 90s, show an error
+    if (buildTimeoutRef.current) clearTimeout(buildTimeoutRef.current);
+    buildTimeoutRef.current = setTimeout(() => {
+      setBuilding(false);
+      setBuildError("This is taking longer than expected. Please check your connection and try again.");
+    }, 90_000);
 
     // Use overrides if provided (when called directly from handleUseGoal before state updates)
     const effectiveGoalText = overrides?.goalText ?? rawGoalInput.trim();
@@ -505,6 +528,11 @@ export default function OnboardingScreen() {
     } catch (e: unknown) {
       setBuildError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
       setBuilding(false);
+    } finally {
+      if (buildTimeoutRef.current) {
+        clearTimeout(buildTimeoutRef.current);
+        buildTimeoutRef.current = null;
+      }
     }
   }
 
@@ -972,7 +1000,7 @@ export default function OnboardingScreen() {
     }
 
     return (
-      <View style={styles.stepContainer}>
+      <View style={{ flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.lg }}>
         <Text style={styles.stepTitle}>Which days will you work on this?</Text>
         <Text style={styles.stepSubtitle}>Pick a schedule that fits your routine.</Text>
 
@@ -1060,7 +1088,7 @@ export default function OnboardingScreen() {
           <Text style={styles.buildIcon}>⚠</Text>
           <Text style={styles.buildTitle}>Something went wrong</Text>
           <Text style={styles.buildError}>{buildError}</Text>
-          <TouchableOpacity style={styles.retryBtn} onPress={handleBuild} activeOpacity={0.85}>
+          <TouchableOpacity style={styles.retryBtn} onPress={() => handleBuild()} activeOpacity={0.85}>
             <Text style={styles.retryBtnText}>Try again</Text>
           </TouchableOpacity>
         </View>
@@ -1194,9 +1222,10 @@ export default function OnboardingScreen() {
       <Modal
         visible={showAiChat}
         animationType="slide"
-        presentationStyle="pageSheet"
-        onRequestClose={() => setShowAiChat(false)}
+        presentationStyle="fullScreen"
+        onRequestClose={() => { setChatError(""); setShowAiChat(false); }}
       >
+        <View style={{ flex: 1, backgroundColor: colors.bg }}>
         <SafeAreaView style={styles.chatModal}>
           {/* Header */}
           <View style={styles.chatHeader}>
@@ -1206,7 +1235,7 @@ export default function OnboardingScreen() {
             </View>
             <TouchableOpacity
               style={styles.chatCloseBtn}
-              onPress={() => setShowAiChat(false)}
+              onPress={() => { setChatError(""); setShowAiChat(false); }}
               hitSlop={12}
             >
               <Text style={styles.chatCloseText}>×</Text>
@@ -1227,9 +1256,14 @@ export default function OnboardingScreen() {
                 ...(chatDone && chatGoalText ? [{ role: "goal" as const, text: chatGoalText }] : []),
               ]}
               keyExtractor={(_, i) => String(i)}
-              contentContainerStyle={styles.chatList}
-              onContentSizeChange={() => setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 100)}
-              onLayout={() => setTimeout(() => chatListRef.current?.scrollToEnd({ animated: false }), 100)}
+              keyboardShouldPersistTaps="handled"
+              contentContainerStyle={[styles.chatList, { flexGrow: 1 }]}
+              onContentSizeChange={() => {
+                requestAnimationFrame(() => chatListRef.current?.scrollToEnd({ animated: true }));
+              }}
+              onLayout={() => {
+                requestAnimationFrame(() => chatListRef.current?.scrollToEnd({ animated: false }));
+              }}
               renderItem={({ item, index }) => {
                 if (item.role === "loading") {
                   return (
@@ -1316,14 +1350,76 @@ export default function OnboardingScreen() {
               }}
             />
 
+            {/* Error state with retry button -- initial chat load failure */}
+            {!!chatError && chatError !== "retry_send" && !chatLoading && (
+              <View style={styles.chatFooter}>
+                <Text style={{ fontSize: typography.sm, color: colors.danger, textAlign: "center", marginBottom: spacing.sm }}>
+                  {chatError}
+                </Text>
+                <TouchableOpacity
+                  style={styles.continueBtn}
+                  onPress={() => {
+                    setChatError("");
+                    if (lastInitialMessageRef.current) {
+                      startAiChatWithMessage(lastInitialMessageRef.current);
+                    }
+                  }}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.continueBtnText}>Retry</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Retry button after a send failure mid-conversation */}
+            {chatError === "retry_send" && !chatLoading && (
+              <View style={styles.chatFooter}>
+                <TouchableOpacity
+                  style={styles.continueBtn}
+                  onPress={async () => {
+                    setChatError("");
+                    // Remove the error message from chat history
+                    setChatHistory((prev) => prev.slice(0, -1));
+                    setChatLoading(true);
+                    // Retry the API call with existing chatMessages (already includes the user message)
+                    try {
+                      const result = await chatWithRetry(chatMessages);
+                      const assistantMsg: GoalChatMessage = { role: "assistant", content: result.raw_reply };
+                      setChatMessages((prev) => [...prev, assistantMsg]);
+                      setChatHistory((prev) => [
+                        ...prev,
+                        { role: "assistant", text: result.message, options: result.done ? [] : result.options },
+                      ]);
+                      if (result.done) {
+                        setChatDone(true);
+                        setChatGoalText(result.goal_text);
+                      }
+                    } catch (retryErr) {
+                      console.warn("[onboarding chat retry]", retryErr);
+                      setChatHistory((prev) => [
+                        ...prev,
+                        { role: "assistant", text: "Still having trouble. Please check your connection and try again." },
+                      ]);
+                      setChatError("retry_send");
+                    } finally {
+                      setChatLoading(false);
+                    }
+                  }}
+                  activeOpacity={0.85}
+                >
+                  <Text style={styles.continueBtnText}>Retry</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
             {/* Bottom: typing input */}
-            {showTypingInput && !chatDone && (
+            {showTypingInput && !chatDone && !chatError && (
               <View style={styles.chatFooter}>
                 <View style={styles.chatInputRow}>
                   <TextInput
                     ref={chatInputRef}
                     style={styles.chatInput}
-                    placeholder="Type your answer…"
+                    placeholder="Type your answer..."
                     placeholderTextColor={colors.textTertiary}
                     value={customInput}
                     onChangeText={setCustomInput}
@@ -1386,6 +1482,7 @@ export default function OnboardingScreen() {
             )}
           </KeyboardAvoidingView>
         </SafeAreaView>
+        </View>
       </Modal>
     </SafeAreaView>
   );
@@ -1961,6 +2058,9 @@ function createStyles(colors: Colors) {
   chatModal: {
     flex: 1,
     backgroundColor: colors.bg,
+    maxWidth: 700,
+    width: "100%",
+    alignSelf: "center",
   },
   chatHeader: {
     flexDirection: "row",

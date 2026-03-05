@@ -96,6 +96,11 @@ export function SubscriptionProvider({ userId, children }: SubscriptionProviderP
   useEffect(() => {
     if (userId) {
       checkSubscription();
+    } else {
+      // No user — mark as loaded with default (generous) state
+      setHasPro(true);
+      setLoaded(true);
+      setBillingDate(null);
     }
   }, [userId, checkSubscription]);
 

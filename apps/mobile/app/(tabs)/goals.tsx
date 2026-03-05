@@ -18,6 +18,7 @@ import {
   FlatList,
   PanResponder,
   Dimensions,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { SwipeNavigator } from "@/components/SwipeNavigator";
@@ -80,12 +81,17 @@ function getDeadlineISO(month: number, day: number, year: number) {
   return new Date(year, month, day).toISOString();
 }
 
+// iPad-friendly max content width
+const MAX_CONTENT_WIDTH = 600;
+
 // ─── Main screen ─────────────────────────────────────────────────────────────
 
 export default function GoalsScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const insets = useSafeAreaInsets();
+  const { width: screenWidth } = useWindowDimensions();
+  const isWide = screenWidth >= 768;
   const router = useRouter();
   const { showToast } = useToast();
   const { isLimitedMode, showBottomSheetPaywall, walkthroughActive } = useSubscription();
@@ -402,8 +408,15 @@ export default function GoalsScreen() {
     } catch (e) {
       // Retry once on transient failures (timeout, network, server error)
       const msg = e instanceof Error ? e.message : "";
-      if (msg.includes("pro_required")) throw e; // Don't retry pro gate
-      return await goalsApi.chat(messages);
+      if (msg.includes("pro_required") || msg.includes("cancelled")) throw e;
+      try {
+        return await goalsApi.chat(messages);
+      } catch (retryErr) {
+        // If retry also fails, throw a user-friendly message
+        const retryMsg = retryErr instanceof Error ? retryErr.message : "";
+        if (retryMsg.includes("pro_required")) throw retryErr;
+        throw new Error("Unable to reach the server. Please check your connection and try again.");
+      }
     }
   }
 
@@ -556,6 +569,8 @@ export default function GoalsScreen() {
   }
 
   // ── Step 4: Build (save goal + generate tasks) ────────────────────────────
+  const buildTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   async function handleBuild(overrides?: {
     goalText?: string;
     parsed?: ParsedGoal;
@@ -568,6 +583,14 @@ export default function GoalsScreen() {
     setBuildRetrying(false);
     advanceAddStep(TOTAL_ADD_STEPS);
     startBuildProgress();
+
+    // Safety timeout: if the entire build (incl. retries) takes longer than 90s,
+    // surface an error so the user is never stuck on a frozen screen.
+    if (buildTimeoutRef.current) clearTimeout(buildTimeoutRef.current);
+    buildTimeoutRef.current = setTimeout(() => {
+      buildInProgressRef.current = false;
+      setBuildError("This is taking longer than expected. Please check your connection and try again.");
+    }, 90_000);
 
     // Use overrides if provided (when called directly from handleUseGoal before state updates)
     const effectiveGoalText = overrides?.goalText ?? rawGoalInput.trim();
@@ -589,7 +612,7 @@ export default function GoalsScreen() {
           effectiveGoalText.slice(0, 40);
 
         const deadlineISO = hasDeadline ? getDeadlineISO(deadlineMonth, deadlineDay, deadlineYear) : undefined;
-        const deadline = effectiveParsed?.deadline_detected ?? deadlineISO ?? null;
+        const deadline = effectiveParsed?.deadline_detected ?? deadlineISO ?? undefined;
         const effectiveWorkDays = (effectiveParsed?.work_days_detected && effectiveParsed.work_days_detected.length > 0)
           ? effectiveParsed.work_days_detected : workDays;
 
@@ -680,6 +703,12 @@ export default function GoalsScreen() {
         // If not last attempt, continue to next retry
         if (attempt < MAX_RETRIES) continue;
       }
+    }
+
+    // Clear the safety timeout
+    if (buildTimeoutRef.current) {
+      clearTimeout(buildTimeoutRef.current);
+      buildTimeoutRef.current = null;
     }
 
     if (lastError) {
@@ -1319,7 +1348,7 @@ export default function GoalsScreen() {
           <Text style={styles.buildIcon}>{"\u26A0"}</Text>
           <Text style={styles.buildTitle}>Something went wrong</Text>
           <Text style={styles.buildError}>{buildError}</Text>
-          <TouchableOpacity style={styles.retryBtn} onPress={handleBuild} activeOpacity={0.85}>
+          <TouchableOpacity style={styles.retryBtn} onPress={() => handleBuild()} activeOpacity={0.85}>
             <Text style={styles.retryBtnText}>Try again</Text>
           </TouchableOpacity>
         </View>
@@ -1342,7 +1371,7 @@ export default function GoalsScreen() {
             }}>
               <Text style={{ fontSize: 40, marginBottom: spacing.sm }}>📅</Text>
               <Text style={{
-                fontSize: typography.lg.fontSize,
+                fontSize: typography.lg,
                 fontWeight: "700" as const,
                 color: colors.text,
                 textAlign: "center",
@@ -1351,7 +1380,7 @@ export default function GoalsScreen() {
                 {offDayMessage}
               </Text>
               <Text style={{
-                fontSize: typography.sm.fontSize,
+                fontSize: typography.sm,
                 color: colors.textSecondary,
                 textAlign: "center",
                 lineHeight: 20,
@@ -1650,16 +1679,18 @@ export default function GoalsScreen() {
 
   // ── Main render ─────────────────────────────────────────────────────────────
 
+  const wideContentStyle = isWide ? { maxWidth: MAX_CONTENT_WIDTH, alignSelf: "center" as const, width: "100%" as const } : undefined;
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={["top"]}>
-        <View style={styles.headerRow}>
+        <View style={[styles.headerRow, wideContentStyle]}>
           <View>
             <Text style={styles.title}>Goals</Text>
             <Text style={styles.subtitle}>Loading...</Text>
           </View>
         </View>
-        <View style={{ paddingHorizontal: spacing.lg, gap: spacing.sm }}>
+        <View style={[{ paddingHorizontal: spacing.lg, gap: spacing.sm }, wideContentStyle]}>
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
@@ -1672,7 +1703,7 @@ export default function GoalsScreen() {
     <SwipeNavigator currentIndex={1}>
     <SafeAreaView style={styles.container} edges={["top"]}>
       {/* Header */}
-      <View style={styles.headerRow}>
+      <View style={[styles.headerRow, wideContentStyle]}>
         <View>
           <Text style={styles.title}>Goals</Text>
           <Text style={styles.subtitle}>
@@ -1687,7 +1718,7 @@ export default function GoalsScreen() {
       {/* Goal list */}
       <ScrollView
         ref={r => registerScroll("goals-scroll", r)}
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, wideContentStyle]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
       >
@@ -1982,6 +2013,9 @@ function createStyles(c: Colors) {
       borderTopRightRadius: radius.xl,
       padding: spacing.lg,
       paddingBottom: spacing.xxl,
+      maxWidth: 600,
+      alignSelf: "center" as const,
+      width: "100%",
       ...shadow.lg,
     },
     handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: c.border, alignSelf: "center", marginBottom: spacing.lg },
@@ -2060,14 +2094,14 @@ function createStyles(c: Colors) {
     confirmDeadline: { fontSize: typography.sm, color: c.textSecondary, marginBottom: spacing.sm },
     warningCard: {
       marginTop: spacing.md,
-      backgroundColor: "#FFF8EC",
+      backgroundColor: c.warningLight,
       borderRadius: radius.md,
       borderWidth: 1,
-      borderColor: "#F5A623" + "55",
+      borderColor: c.warning + "55",
       padding: spacing.md,
     },
-    warningTitle: { fontSize: typography.sm, fontWeight: typography.semibold, color: "#B45309", marginBottom: spacing.xs },
-    warningBody: { fontSize: typography.sm, color: "#92400E", lineHeight: 20 },
+    warningTitle: { fontSize: typography.sm, fontWeight: typography.semibold, color: c.warning, marginBottom: spacing.xs },
+    warningBody: { fontSize: typography.sm, color: c.textSecondary, lineHeight: 20 },
 
     footerStack: { gap: spacing.sm },
     footer: { paddingHorizontal: spacing.lg, paddingBottom: spacing.lg, paddingTop: spacing.sm },

@@ -4,6 +4,8 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  ScrollView,
+  useWindowDimensions,
 } from "react-native";
 import {
   goalCategories,
@@ -22,14 +24,24 @@ interface GoalTemplatesProps {
 
 export function GoalTemplates({ onSelect, onClose, onOther, closeLabel = "Back" }: GoalTemplatesProps) {
   const { colors } = useTheme();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { width: screenWidth } = useWindowDimensions();
+
+  // On iPad/wider screens, use 3 columns; on phones, use 2
+  const numColumns = screenWidth >= 600 ? 3 : 2;
+  const styles = useMemo(() => createStyles(colors, numColumns), [colors, numColumns]);
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.headerRow}>
         <Text style={styles.title}>What is your goal?</Text>
-        <TouchableOpacity onPress={onClose} hitSlop={12}>
+        <TouchableOpacity
+          onPress={onClose}
+          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+          style={styles.closeBtnWrap}
+          accessibilityRole="button"
+          accessibilityLabel="Close"
+        >
           <Text style={styles.closeBtn}>{closeLabel}</Text>
         </TouchableOpacity>
       </View>
@@ -38,8 +50,12 @@ export function GoalTemplates({ onSelect, onClose, onOther, closeLabel = "Back" 
         to build your perfect plan.
       </Text>
 
-      {/* Category grid */}
-      <View style={styles.gridContent}>
+      {/* Category grid -- ScrollView ensures it works on all screen sizes including iPad */}
+      <ScrollView
+        contentContainerStyle={styles.gridContent}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.grid}>
           {goalCategories.map((cat) => (
             <TouchableOpacity
@@ -71,12 +87,14 @@ export function GoalTemplates({ onSelect, onClose, onOther, closeLabel = "Back" 
             </TouchableOpacity>
           )}
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
 
-function createStyles(c: Colors) {
+function createStyles(c: Colors, numColumns: number) {
+  const cardWidthPct = numColumns === 3 ? "31%" : "47.5%";
+
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -92,6 +110,11 @@ function createStyles(c: Colors) {
       fontWeight: typography.bold as "700",
       color: c.text,
       letterSpacing: -0.3,
+    },
+    closeBtnWrap: {
+      minHeight: 44,
+      justifyContent: "center" as const,
+      paddingHorizontal: spacing.xs,
     },
     closeBtn: {
       fontSize: typography.base,
@@ -113,7 +136,7 @@ function createStyles(c: Colors) {
       gap: spacing.sm,
     },
     categoryCard: {
-      width: "47.5%" as any,
+      width: cardWidthPct as any,
       backgroundColor: c.card,
       borderRadius: radius.lg,
       borderWidth: 1,

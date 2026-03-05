@@ -6,8 +6,8 @@ import {
   Modal,
   TouchableOpacity,
   Animated,
-  Dimensions,
   Platform,
+  useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -16,9 +16,8 @@ import * as Haptics from "expo-haptics";
 import { useTheme } from "@/lib/theme";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
-import { useWalkthroughRegistry, type TargetLayout } from "@/lib/walkthrough-registry";
+import { useWalkthroughRegistry, type TargetLayout, type WalkthroughTarget } from "@/lib/walkthrough-registry";
 
-const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get("window");
 const SPOTLIGHT_PAD = 10;
 
 interface TutorialStep {
@@ -100,8 +99,9 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { width: screenW, height: screenH } = useWindowDimensions();
   const { measureWithRetry, scrollTargetIntoView, scrollToTop, scrollToOffset } = useWalkthroughRegistry();
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, screenW), [colors, screenW]);
 
   const [currentStep, setCurrentStep] = useState(0);
   const [targetLayout, setTargetLayout] = useState<TargetLayout | null>(null);
@@ -254,29 +254,29 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
   const TOOLTIP_HEIGHT = 240;
 
   // Calculate tooltip position — ensure it doesn't overlap the spotlight or hide the tab bar
-  let tooltipTop = SCREEN_H / 2 - 100;
+  let tooltipTop = screenH / 2 - 100;
   if (hasTarget && targetLayout) {
     const spotlightBottom = targetLayout.y + targetLayout.height + SPOTLIGHT_PAD;
-    const spotlightTop = targetLayout.y - SPOTLIGHT_PAD;
-    const spaceBelow = SCREEN_H - TAB_BAR_HEIGHT - spotlightBottom;
-    const spaceAbove = spotlightTop - insets.top;
+    const spotlightTopEdge = targetLayout.y - SPOTLIGHT_PAD;
+    const spaceBelow = screenH - TAB_BAR_HEIGHT - spotlightBottom;
+    const spaceAbove = spotlightTopEdge - insets.top;
 
     if (step.tooltipPosition === "below" && spaceBelow >= TOOLTIP_HEIGHT) {
       // Enough space below — place below spotlight
       tooltipTop = spotlightBottom + 16;
     } else if (step.tooltipPosition === "above" && spaceAbove >= TOOLTIP_HEIGHT) {
       // Enough space above — place above spotlight
-      tooltipTop = spotlightTop - TOOLTIP_HEIGHT - 8;
+      tooltipTop = spotlightTopEdge - TOOLTIP_HEIGHT - 8;
     } else if (spaceBelow >= spaceAbove) {
       // More space below, even if tight
       tooltipTop = spotlightBottom + 12;
     } else {
       // More space above
-      tooltipTop = Math.max(insets.top + 8, spotlightTop - TOOLTIP_HEIGHT - 8);
+      tooltipTop = Math.max(insets.top + 8, spotlightTopEdge - TOOLTIP_HEIGHT - 8);
     }
   }
   // Clamp: don't go above safe area, don't overlap tab bar
-  tooltipTop = Math.max(insets.top + 8, Math.min(tooltipTop, SCREEN_H - TAB_BAR_HEIGHT - TOOLTIP_HEIGHT));
+  tooltipTop = Math.max(insets.top + 8, Math.min(tooltipTop, screenH - TAB_BAR_HEIGHT - TOOLTIP_HEIGHT));
 
   return (
     <Modal visible={visible} transparent animationType="none" statusBarTranslucent>
@@ -433,9 +433,9 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
   );
 }
 
-function createStyles(c: Colors) {
-  const isTablet = SCREEN_W >= 768;
-  const cardMaxWidth = isTablet ? 420 : SCREEN_W - spacing.lg * 2;
+function createStyles(c: Colors, screenW: number) {
+  const isTablet = screenW >= 768;
+  const cardMaxWidth = isTablet ? 420 : screenW - spacing.lg * 2;
 
   return StyleSheet.create({
     tooltipCard: {

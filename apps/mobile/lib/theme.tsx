@@ -36,13 +36,33 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // useColorScheme automatically listens to OS appearance changes
   const systemColorScheme = useColorScheme();
 
-  // Load saved preference on startup
+  // Load saved preference on startup (with timeout to prevent blank screen on iPad)
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then((v) => {
-      const saved = v === "light" || v === "dark" || v === "system" ? v : "system";
-      setPreferenceState(saved);
-      setLoaded(true);
-    });
+    let settled = false;
+    const timeout = setTimeout(() => {
+      if (!settled) {
+        settled = true;
+        setLoaded(true); // Fall through with default "system" preference
+      }
+    }, 2000);
+
+    AsyncStorage.getItem(STORAGE_KEY)
+      .then((v) => {
+        if (!settled) {
+          settled = true;
+          const saved = v === "light" || v === "dark" || v === "system" ? v : "system";
+          setPreferenceState(saved);
+          setLoaded(true);
+        }
+      })
+      .catch(() => {
+        if (!settled) {
+          settled = true;
+          setLoaded(true);
+        }
+      });
+
+    return () => clearTimeout(timeout);
   }, []);
 
   // Determine dark mode from preference + system scheme
@@ -52,7 +72,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       ? false
       : systemColorScheme === "dark";
 
-  const colors: Colors = isDark ? darkColors : lightColors;
+  const colors = (isDark ? darkColors : lightColors) as Colors;
 
   const setPreference = useCallback(async (pref: ColorSchemePreference) => {
     setPreferenceState(pref);
@@ -64,9 +84,10 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     [colors, isDark, preference, setPreference]
   );
 
-  // Don't render until we've loaded the preference to avoid flash
-  if (!loaded) return null;
-
+  // Render children immediately — the `useMemo` already defaults to a valid
+  // color set ("system" → light or dark), so there's no flash.  Returning null
+  // here previously caused the entire app to render nothing while AsyncStorage
+  // loaded, which appeared as a freeze on iPad (slower storage access).
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 

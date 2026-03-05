@@ -162,11 +162,14 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     marginBottom: spacing.xs,
     width: "100%",
+    maxWidth: 480,
     overflow: "hidden",
   },
   toastInner: {
     paddingHorizontal: spacing.md,
-    paddingVertical: 12,
+    paddingVertical: 14,
+    minHeight: 44,
+    justifyContent: "center" as const,
   },
   toastText: {
     fontSize: typography.sm,

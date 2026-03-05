@@ -37,97 +37,105 @@ export async function GET(request: NextRequest) {
 // POST /api/goals — create a new goal
 // Body: { title, description?, rawInput?, structuredSummary?, category?, deadline? }
 export async function POST(request: NextRequest) {
-  const user = await getUserFromRequest(request);
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  try {
+    const user = await getUserFromRequest(request);
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-  const body = await request.json();
-  const { onboarding } = body as { onboarding?: boolean };
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
+    const { onboarding } = body as { onboarding?: boolean };
 
-  // Count existing goals to determine if this is the user's first goal
-  const activeGoalCount = await prisma.goal.count({
-    where: { userId: user.id, isActive: true },
-  });
+    // Count existing goals to determine if this is the user's first goal
+    const activeGoalCount = await prisma.goal.count({
+      where: { userId: user.id, isActive: true },
+    });
 
-  // Pro gate — skip during onboarding or if this is the user's very first goal
-  const isFirstGoal = activeGoalCount === 0;
-  if (!onboarding && !isFirstGoal) {
-    const access = await getUserAccess(user.id);
-    if (!access.hasPro) {
+    // Pro gate — skip during onboarding or if this is the user's very first goal
+    const isFirstGoal = activeGoalCount === 0;
+    if (!onboarding && !isFirstGoal) {
+      const access = await getUserAccess(user.id);
+      if (!access.hasPro) {
+        return NextResponse.json({
+          error: "pro_required",
+          message: "Subscribe to keep your momentum going",
+          trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
+        }, { status: 403 });
+      }
+    }
+
+    // 3-goal limit
+    if (activeGoalCount >= 3) {
       return NextResponse.json({
-        error: "pro_required",
-        message: "Subscribe to keep your momentum going",
-        trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
+        error: "goal_limit_reached",
+        message: "You can have up to 3 active goals. Complete or pause a goal to make room.",
       }, { status: 403 });
     }
+    const { title, description, rawInput, structuredSummary, category, deadline, dailyTimeMinutes, intensityLevel, workDays } = body as {
+      title: string;
+      description?: string;
+      rawInput?: string;
+      structuredSummary?: string;
+      category?: string;
+      deadline?: string; // ISO date string
+      dailyTimeMinutes?: number;
+      intensityLevel?: number;
+      workDays?: number[];
+    };
+
+    if (!title?.trim()) {
+      return NextResponse.json({ error: "Title is required" }, { status: 400 });
+    }
+
+    // Ensure user record exists (upsert in case they just registered)
+    await prisma.user.upsert({
+      where: { id: user.id },
+      create: { id: user.id, email: user.email },
+      update: {},
+    });
+
+    const goal = await prisma.goal.create({
+      data: {
+        userId: user.id,
+        title: title.trim(),
+        description: description?.trim() ?? null,
+        rawInput: rawInput?.trim() ?? title.trim(),
+        structuredSummary: structuredSummary?.trim() ?? null,
+        category: category?.trim() ?? null,
+        deadline: deadline ? new Date(deadline) : null,
+        dailyTimeMinutes: dailyTimeMinutes ?? null,
+        intensityLevel: intensityLevel ?? null,
+        ...(workDays ? { workDays } : {}),
+      },
+    });
+
+    // Discord notification with goal counts (fire-and-forget)
+    const totalGoals = await prisma.goal.count({ where: { userId: user.id } });
+    const activeGoals = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
+    notifyGoalCreated(user.email ?? "unknown", goal.title, goal.category, { total: totalGoals, active: activeGoals });
+
+    // Generate roadmap async — don't block the response
+    const profile = await prisma.userProfile.findUnique({ where: { userId: user.id } });
+    generateRoadmap({
+      title: goal.title,
+      rawInput: goal.rawInput,
+      structuredSummary: goal.structuredSummary ?? null,
+      category: goal.category ?? null,
+      deadline: goal.deadline ?? null,
+      dailyTimeMinutes: goal.dailyTimeMinutes ?? profile?.dailyTimeMinutes ?? 60,
+      intensityLevel: goal.intensityLevel ?? profile?.intensityLevel ?? 2,
+    }, user.id).then(async (roadmap) => {
+      await prisma.goal.update({ where: { id: goal.id }, data: { roadmap } });
+    }).catch((e) => {
+      console.error("[POST /api/goals] Roadmap generation failed:", e);
+    });
+
+    return NextResponse.json({ goal }, { status: 201 });
+  } catch (e) {
+    console.error("[POST /api/goals]", e);
+    return NextResponse.json({ error: "Failed to create goal" }, { status: 500 });
   }
-
-  // 3-goal limit
-  if (activeGoalCount >= 3) {
-    return NextResponse.json({
-      error: "goal_limit_reached",
-      message: "You can have up to 3 active goals. Complete or pause a goal to make room.",
-    }, { status: 403 });
-  }
-  const { title, description, rawInput, structuredSummary, category, deadline, dailyTimeMinutes, intensityLevel, workDays } = body as {
-    title: string;
-    description?: string;
-    rawInput?: string;
-    structuredSummary?: string;
-    category?: string;
-    deadline?: string; // ISO date string
-    dailyTimeMinutes?: number;
-    intensityLevel?: number;
-    workDays?: number[];
-  };
-
-  if (!title?.trim()) {
-    return NextResponse.json({ error: "Title is required" }, { status: 400 });
-  }
-
-  // Ensure user record exists (upsert in case they just registered)
-  await prisma.user.upsert({
-    where: { id: user.id },
-    create: { id: user.id, email: user.email },
-    update: {},
-  });
-
-  const goal = await prisma.goal.create({
-    data: {
-      userId: user.id,
-      title: title.trim(),
-      description: description?.trim() ?? null,
-      rawInput: rawInput?.trim() ?? title.trim(),
-      structuredSummary: structuredSummary?.trim() ?? null,
-      category: category?.trim() ?? null,
-      deadline: deadline ? new Date(deadline) : null,
-      dailyTimeMinutes: dailyTimeMinutes ?? null,
-      intensityLevel: intensityLevel ?? null,
-      ...(workDays ? { workDays } : {}),
-    },
-  });
-
-  // Discord notification with goal counts
-  const totalGoals = await prisma.goal.count({ where: { userId: user.id } });
-  const activeGoals = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
-  notifyGoalCreated(user.email ?? "unknown", goal.title, goal.category, { total: totalGoals, active: activeGoals });
-
-  // Generate roadmap async — don't block the response
-  const profile = await prisma.userProfile.findUnique({ where: { userId: user.id } });
-  generateRoadmap({
-    title: goal.title,
-    rawInput: goal.rawInput,
-    structuredSummary: goal.structuredSummary ?? null,
-    category: goal.category ?? null,
-    deadline: goal.deadline ?? null,
-    dailyTimeMinutes: goal.dailyTimeMinutes ?? profile?.dailyTimeMinutes ?? 60,
-    intensityLevel: goal.intensityLevel ?? profile?.intensityLevel ?? 2,
-  }).then(async (roadmap) => {
-    await prisma.goal.update({ where: { id: goal.id }, data: { roadmap } });
-  }).catch((e) => {
-    console.error("[POST /api/goals] Roadmap generation failed:", e);
-  });
-
-  return NextResponse.json({ goal }, { status: 201 });
 }

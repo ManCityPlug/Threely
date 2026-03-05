@@ -92,7 +92,8 @@ function RegistrationForm() {
         return;
       }
 
-      router.push("/onboarding");
+      // Full page load ensures cookies are synced with middleware
+      window.location.href = "/onboarding";
     } catch {
       setError("Something went wrong. Please try again.");
       setLoading(false);
@@ -238,7 +239,7 @@ export default function RegisterPage() {
           lineHeight: 1.6, marginBottom: "1.75rem",
           maxWidth: 320, margin: "0 auto 1.75rem",
         }}>
-          The #1 AI app that turns any goal into reality. Just tell us what you want — we&apos;ll get you there.
+          The #1 AI app that turns any goal into reality.<br />Just tell us what you want — we&apos;ll get you there.
         </p>
 
         <div style={{

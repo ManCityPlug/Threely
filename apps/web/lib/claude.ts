@@ -2,7 +2,42 @@ import Anthropic from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY!,
+  timeout: 25_000, // 25s — fail fast before Vercel's maxDuration (30s) kills the function
 });
+
+// ─── AI Call Logging ─────────────────────────────────────────────────────────
+
+async function logAICall(params: {
+  userId: string;
+  functionName: string;
+  modelUsed: string;
+  inputData: any;
+  outputData: any;
+  inputTokens?: number;
+  outputTokens?: number;
+  responseTimeMs?: number;
+  goalId?: string;
+}) {
+  try {
+    const { prisma } = await import('./prisma');
+    await prisma.aICallLog.create({
+      data: {
+        userId: params.userId,
+        functionName: params.functionName,
+        modelUsed: params.modelUsed,
+        inputData: JSON.stringify(params.inputData),
+        outputData: JSON.stringify(params.outputData),
+        inputTokens: params.inputTokens ?? null,
+        outputTokens: params.outputTokens ?? null,
+        responseTimeMs: params.responseTimeMs ?? null,
+        goalId: params.goalId ?? null,
+      },
+    });
+  } catch (e) {
+    // Silent fail - logging should never break the app
+    console.error('[AICallLog] Failed to log:', e);
+  }
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -515,7 +550,7 @@ export async function generateRoadmap(input: {
   deadline: Date | null;
   dailyTimeMinutes: number;
   intensityLevel: number;
-}): Promise<string> {
+}, userId?: string): Promise<string> {
   const { title, rawInput, structuredSummary, category, deadline, dailyTimeMinutes, intensityLevel } = input;
 
   const categoryKey = (category?.toLowerCase() ?? "other");
@@ -562,17 +597,34 @@ PHASE 2: [Name]
 
 End with a brief note about what success looks like when ALL phases are complete.`;
 
+  const startTime = Date.now();
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 2048,
     temperature: 0.5,
     messages: [{ role: "user", content: prompt }],
   });
+  const responseTimeMs = Date.now() - startTime;
 
   const content = message.content[0];
   if (content.type !== "text") throw new Error("Unexpected response from Claude");
 
-  return content.text.trim();
+  const result = content.text.trim();
+
+  if (userId) {
+    logAICall({
+      userId,
+      functionName: 'generateRoadmap',
+      modelUsed: 'claude-sonnet-4-6',
+      inputData: { title, rawInput, category, deadline: deadline?.toISOString() ?? null, dailyTimeMinutes, intensityLevel },
+      outputData: result,
+      inputTokens: message.usage?.input_tokens,
+      outputTokens: message.usage?.output_tokens,
+      responseTimeMs,
+    }).catch(() => {});
+  }
+
+  return result;
 }
 
 // ─── goalChat ─────────────────────────────────────────────────────────────────
@@ -594,7 +646,7 @@ export interface GoalChatResult {
  * Guided goal-definition chat. Claude asks one multiple-choice question at a time
  * and after 3-5 questions produces a final goal_text for the user.
  */
-export async function goalChat(messages: GoalChatMessage[]): Promise<GoalChatResult> {
+export async function goalChat(messages: GoalChatMessage[], userId?: string): Promise<GoalChatResult> {
   const turnCount = messages.filter((m) => m.role === "user").length;
   const shouldWrapUp = turnCount >= 14;
 
@@ -735,6 +787,7 @@ When wrapping up (done: true):
     }
   }
 
+  const startTime = Date.now();
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 512,
@@ -742,6 +795,7 @@ When wrapping up (done: true):
     system: systemPrompt,
     messages: cleanMessages.map((m) => ({ role: m.role, content: m.content })),
   });
+  const responseTimeMs = Date.now() - startTime;
 
   const content = message.content[0];
   if (content.type !== "text") throw new Error("Unexpected response from Claude");
@@ -766,13 +820,28 @@ When wrapping up (done: true):
     }
   }
 
-  return {
+  const result = {
     message: parsed.message ?? "",
     options: Array.isArray(parsed.options) ? parsed.options : [],
     done: parsed.done ?? false,
     goal_text: parsed.goal_text ?? null,
     raw_reply: content.text,
   };
+
+  if (userId) {
+    logAICall({
+      userId,
+      functionName: 'goalChat',
+      modelUsed: 'claude-haiku-4-5-20251001',
+      inputData: { turnCount, messageCount: messages.length },
+      outputData: { message: result.message, done: result.done, goal_text: result.goal_text },
+      inputTokens: message.usage?.input_tokens,
+      outputTokens: message.usage?.output_tokens,
+      responseTimeMs,
+    }).catch(() => {});
+  }
+
+  return result;
 }
 
 // ─── parseGoal ────────────────────────────────────────────────────────────────
@@ -781,7 +850,7 @@ When wrapping up (done: true):
  * Parse raw free-text goal input into a structured summary.
  * Used in onboarding Step 1 after user types their goal.
  */
-export async function parseGoal(rawInput: string): Promise<ParsedGoal> {
+export async function parseGoal(rawInput: string, userId?: string): Promise<ParsedGoal> {
   const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
   const prompt = `${IDENTITY_COMPACT}You are Threely Intelligence, a goal-setting assistant. Today's date is ${today}. Parse the following goal text and return structured JSON.
 
@@ -799,12 +868,14 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
   "recommendations": "If needs_more_context is true: 2-4 short personalized bullet points (each on its own line starting with •) telling the user exactly what to add, referencing what they wrote. Think: their starting point or experience level, a specific measurable target, any constraints or context (tools, budget, schedule), what they've already tried or have in place. Keep it encouraging and specific to their goal — not generic advice. If needs_more_context is false: null"
 }`;
 
+  const startTime = Date.now();
   const message = await anthropic.messages.create({
     model: "claude-opus-4-6",
     max_tokens: 400,
     temperature: 0.3,
     messages: [{ role: "user", content: prompt }],
   });
+  const responseTimeMs = Date.now() - startTime;
 
   const content = message.content[0];
   if (content.type !== "text") throw new Error("Unexpected response from Claude");
@@ -817,7 +888,7 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
     throw new Error("Claude returned invalid JSON for goal parse");
   }
 
-  return {
+  const result = {
     short_title: parsed.short_title ?? rawInput.slice(0, 30),
     structured_summary: parsed.structured_summary ?? rawInput,
     category: parsed.category ?? "other",
@@ -827,6 +898,21 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
     needs_more_context: parsed.needs_more_context ?? false,
     recommendations: parsed.recommendations ?? null,
   };
+
+  if (userId) {
+    logAICall({
+      userId,
+      functionName: 'parseGoal',
+      modelUsed: 'claude-opus-4-6',
+      inputData: { rawInput },
+      outputData: result,
+      inputTokens: message.usage?.input_tokens,
+      outputTokens: message.usage?.output_tokens,
+      responseTimeMs,
+    }).catch(() => {});
+  }
+
+  return result;
 }
 
 // ─── generateTasks ────────────────────────────────────────────────────────────
@@ -836,7 +922,7 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
  * Optionally generates stretch tasks (requestingAdditional) or
  * post-review tasks (postReview).
  */
-export async function generateTasks(input: GenerateTasksInput): Promise<GenerateTasksResult> {
+export async function generateTasks(input: GenerateTasksInput & { userId?: string }): Promise<GenerateTasksResult> {
   const {
     goal,
     profile,
@@ -851,6 +937,7 @@ export async function generateTasks(input: GenerateTasksInput): Promise<Generate
     newTaskCount = 3,
     previousTasks,
     goalCompletionStats,
+    userId,
   } = input;
 
   const deadlineStr = goal.deadline
@@ -922,6 +1009,7 @@ ${previousTasksSection}`;
   const playbook = CATEGORY_PLAYBOOKS[categoryKey] ?? CATEGORY_PLAYBOOKS.other;
   const fullSystemPrompt = `${TASK_GEN_SYSTEM_PROMPT}\n\n## CATEGORY PLAYBOOK\n\n${playbook}`;
 
+  const startTime = Date.now();
   const message = await anthropic.messages.create({
     model: "claude-sonnet-4-6",
     max_tokens: 8192,
@@ -929,6 +1017,7 @@ ${previousTasksSection}`;
     system: [{ type: "text", text: fullSystemPrompt, cache_control: { type: "ephemeral" } }],
     messages: [{ role: "user", content: userPrompt }],
   });
+  const responseTimeMs = Date.now() - startTime;
 
   const content = message.content[0];
   if (content.type !== "text") throw new Error("Unexpected response from Claude");
@@ -958,7 +1047,23 @@ ${previousTasksSection}`;
     resources: Array.isArray((t as Record<string, unknown>).resources) ? (t as Record<string, unknown>).resources as TaskResource[] : undefined,
   }));
 
-  return { tasks, coach_note: parsed.coach_note };
+  const result = { tasks, coach_note: parsed.coach_note };
+
+  if (userId) {
+    logAICall({
+      userId,
+      functionName: 'generateTasks',
+      modelUsed: 'claude-sonnet-4-6',
+      inputData: { goalId: goal.id, goalTitle: goal.title, requestingAdditional, focusShifted, postReview, newTaskCount, daysActive, tasksCompletedTotal },
+      outputData: result,
+      inputTokens: message.usage?.input_tokens,
+      outputTokens: message.usage?.output_tokens,
+      responseTimeMs,
+      goalId: goal.id,
+    }).catch(() => {});
+  }
+
+  return result;
 }
 
 // ─── updateCoachingContext ────────────────────────────────────────────────────
@@ -968,7 +1073,8 @@ ${previousTasksSection}`;
  * Called once per daily review, after insight generation.
  */
 export async function updateCoachingContext(
-  input: UpdateCoachingContextInput
+  input: UpdateCoachingContextInput,
+  userId?: string
 ): Promise<CoachingContext> {
   const { currentContext, difficultyRating, completionStatus, userNote, tasksCompletedToday, tasksTotalToday, goalTitle, insight, todaysTasks } = input;
 
@@ -1000,12 +1106,14 @@ Return ONLY valid JSON matching this exact shape:
   "lastUpdated": "${today}"
 }`;
 
+  const startTime = Date.now();
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 300,
     temperature: 0.3,
     messages: [{ role: "user", content: prompt }],
   });
+  const responseTimeMs = Date.now() - startTime;
 
   const content = message.content[0];
   if (content.type !== "text") throw new Error("Unexpected response from Claude");
@@ -1028,6 +1136,19 @@ Return ONLY valid JSON matching this exact shape:
     parsed.recent_task_themes = currentContext?.recent_task_themes ?? [];
   }
 
+  if (userId) {
+    logAICall({
+      userId,
+      functionName: 'updateCoachingContext',
+      modelUsed: 'claude-haiku-4-5-20251001',
+      inputData: { goalTitle, tasksCompletedToday, tasksTotalToday, difficultyRating, completionStatus },
+      outputData: parsed,
+      inputTokens: message.usage?.input_tokens,
+      outputTokens: message.usage?.output_tokens,
+      responseTimeMs,
+    }).catch(() => {});
+  }
+
   return parsed;
 }
 
@@ -1037,8 +1158,8 @@ Return ONLY valid JSON matching this exact shape:
  * Generate a 2-3 sentence coach insight after a daily review.
  * Returns plain text.
  */
-export async function generateInsight(input: GenerateInsightInput): Promise<string> {
-  const { difficultyRating, completionStatus, userNote, goalTitle, goalSummary, tasksCompletedToday, tasksTotalToday, last7Days, intensityLevel, daysActive, tasksCompletedTotal, streak } = input;
+export async function generateInsight(input: GenerateInsightInput & { userId?: string; goalId?: string }): Promise<string> {
+  const { difficultyRating, completionStatus, userNote, goalTitle, goalSummary, tasksCompletedToday, tasksTotalToday, last7Days, intensityLevel, daysActive, tasksCompletedTotal, streak, userId, goalId } = input;
 
   const recentStr =
     last7Days.length > 0
@@ -1082,17 +1203,35 @@ Write 2-4 sentences that:
 
 Keep it under 60 words. Punchy, direct, specific. No bullet points — just prose. Return plain text only.`;
 
+  const startTime = Date.now();
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 200,
     temperature: 0.8,
     messages: [{ role: "user", content: prompt }],
   });
+  const responseTimeMs = Date.now() - startTime;
 
   const content = message.content[0];
   if (content.type !== "text") throw new Error("Unexpected response from Claude");
 
-  return content.text.trim();
+  const result = content.text.trim();
+
+  if (userId) {
+    logAICall({
+      userId,
+      functionName: 'generateInsight',
+      modelUsed: 'claude-haiku-4-5-20251001',
+      inputData: { goalTitle, difficultyRating, completionStatus, tasksCompletedToday, tasksTotalToday, daysActive },
+      outputData: result,
+      inputTokens: message.usage?.input_tokens,
+      outputTokens: message.usage?.output_tokens,
+      responseTimeMs,
+      goalId,
+    }).catch(() => {});
+  }
+
+  return result;
 }
 
 // ─── refineTask ──────────────────────────────────────────────────────────────
@@ -1116,8 +1255,9 @@ export interface RefineTaskResult {
  * Refine a single task based on user feedback / request.
  * Returns updated task, description, and why fields.
  */
-export async function refineTask(input: RefineTaskInput): Promise<RefineTaskResult> {
-  const { task, description, why, goalTitle, goalCategory, userRequest } = input;
+export async function refineTask(input: RefineTaskInput & { userId?: string; goalId?: string }): Promise<RefineTaskResult> {
+  const { task, description, why, goalTitle, goalCategory, userRequest, userId, goalId } = input;
+  const startTime = Date.now();
 
   const prompt = `${IDENTITY_BLOCK}You are Threely Intelligence, a productivity coach. The user wants to refine one of their daily tasks.
 
@@ -1150,11 +1290,28 @@ Return ONLY valid JSON (no markdown):
   const raw = content.text.replace(/```json?\n?|```/g, "").trim();
   const parsed: RefineTaskResult = JSON.parse(raw);
 
-  return {
+  const result = {
     task: parsed.task ?? task,
     description: parsed.description ?? description,
     why: parsed.why ?? why,
   };
+
+  if (userId) {
+    const responseTimeMs = Date.now() - startTime;
+    logAICall({
+      userId,
+      functionName: 'refineTask',
+      modelUsed: 'claude-haiku-4-5-20251001',
+      inputData: { task, goalTitle, goalCategory, userRequest },
+      outputData: result,
+      inputTokens: message.usage?.input_tokens,
+      outputTokens: message.usage?.output_tokens,
+      responseTimeMs,
+      goalId: goalId ?? undefined,
+    }).catch(() => {});
+  }
+
+  return result;
 }
 
 // ─── askAboutTask ─────────────────────────────────────────────────────────────
@@ -1180,8 +1337,9 @@ export interface AskAboutTaskResult {
  * Answer a user's question about a specific task. Multi-turn, ephemeral.
  * Returns structured { answer, options } with follow-up suggestions.
  */
-export async function askAboutTask(input: AskAboutTaskInput): Promise<AskAboutTaskResult> {
-  const { task, description, why, resources, goalTitle, goalCategory, goalSummary, intensityLevel, messages } = input;
+export async function askAboutTask(input: AskAboutTaskInput & { userId?: string; goalId?: string }): Promise<AskAboutTaskResult> {
+  const { task, description, why, resources, goalTitle, goalCategory, goalSummary, intensityLevel, messages, userId, goalId } = input;
+  const startTime = Date.now();
 
   const intensity = intensityLevel ?? 2;
   const toneGuide = intensity === 1
@@ -1249,10 +1407,27 @@ RESPONSE FORMAT — respond with ONLY valid JSON, no markdown:
     }
   }
 
-  return {
+  const result = {
     answer: parsed.answer ?? content.text.trim(),
     options: Array.isArray(parsed.options) ? parsed.options : [],
   };
+
+  if (userId) {
+    const responseTimeMs = Date.now() - startTime;
+    logAICall({
+      userId,
+      functionName: 'askAboutTask',
+      modelUsed: 'claude-haiku-4-5-20251001',
+      inputData: { task, goalTitle, goalCategory, messageCount: messages.length },
+      outputData: result,
+      inputTokens: message.usage?.input_tokens,
+      outputTokens: message.usage?.output_tokens,
+      responseTimeMs,
+      goalId: goalId ?? undefined,
+    }).catch(() => {});
+  }
+
+  return result;
 }
 
 // ─── generateWeeklySummary ───────────────────────────────────────────────────
@@ -1269,7 +1444,7 @@ export interface WeeklySummaryInput {
 /**
  * Generate a 3-4 sentence weekly coaching note summarizing the past week.
  */
-export async function generateWeeklySummary(input: WeeklySummaryInput): Promise<string> {
+export async function generateWeeklySummary(input: WeeklySummaryInput & { userId?: string }): Promise<string> {
   const {
     goalsWorkedOn,
     totalTasksCompleted,
@@ -1277,7 +1452,9 @@ export async function generateWeeklySummary(input: WeeklySummaryInput): Promise<
     totalMinutesInvested,
     currentStreak,
     dailyBreakdown,
+    userId,
   } = input;
+  const startTime = Date.now();
 
   const completionRate =
     totalTasksGenerated > 0
@@ -1322,5 +1499,21 @@ Keep it under 80 words. Conversational, warm, specific. No bullet points — jus
   const content = message.content[0];
   if (content.type !== "text") throw new Error("Unexpected response from Claude");
 
-  return content.text.trim();
+  const result = content.text.trim();
+
+  if (userId) {
+    const responseTimeMs = Date.now() - startTime;
+    logAICall({
+      userId,
+      functionName: 'generateWeeklySummary',
+      modelUsed: 'claude-haiku-4-5-20251001',
+      inputData: { totalTasksCompleted, totalTasksGenerated, totalMinutesInvested, currentStreak, goalsCount: goalsWorkedOn.length },
+      outputData: result,
+      inputTokens: message.usage?.input_tokens,
+      outputTokens: message.usage?.output_tokens,
+      responseTimeMs,
+    }).catch(() => {});
+  }
+
+  return result;
 }

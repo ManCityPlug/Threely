@@ -23,12 +23,6 @@ export async function POST(request: NextRequest) {
       }, { status: 403 });
     }
 
-    const { checkRateLimit } = await import("@/lib/rate-limit");
-    const { allowed } = checkRateLimit(user.id);
-    if (!allowed) {
-      return NextResponse.json({ error: "Rate limit exceeded. Try again later." }, { status: 429 });
-    }
-
     const body = await request.json().catch(() => ({}));
     const { dailyTaskId } = body as { dailyTaskId?: string };
 
@@ -46,9 +40,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No review found — submit a review first" }, { status: 400 });
     }
 
-    // Return cached insight if already generated
+    // Return cached insight if already generated (no rate limit consumed)
     if (dailyTask.review.insight) {
       return NextResponse.json({ insight: dailyTask.review.insight });
+    }
+
+    // Rate limit check — only consumed when we actually need to call the AI
+    const { checkRateLimit } = await import("@/lib/rate-limit");
+    const { allowed } = checkRateLimit(user.id);
+    if (!allowed) {
+      return NextResponse.json({ error: "Rate limit exceeded. Try again later." }, { status: 429 });
     }
 
     // Load last 7 days of history for this goal (excluding today)
@@ -117,6 +118,8 @@ export async function POST(request: NextRequest) {
         daysActive: daysActiveOnGoal,
         tasksCompletedTotal: totalCompletedOnGoal,
         streak: coachingCtx?.streak,
+        userId: user.id,
+        goalId: dailyTask.goalId,
       });
 
       // Save insight to review
@@ -141,7 +144,7 @@ export async function POST(request: NextRequest) {
           goalTitle: dailyTask.goal.title,
           insight,
           todaysTasks,
-        })
+        }, user.id)
           .then((updatedContext) =>
             prisma.userProfile.update({
               where: { id: profileRecord.id },
@@ -153,7 +156,12 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({ insight });
     } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      const isTimeout = msg.includes("timeout") || msg.includes("ETIMEDOUT") || msg.includes("Request timed out");
       console.error("[/api/insights]", e);
+      if (isTimeout) {
+        return NextResponse.json({ error: "The AI took too long to respond. Please try again." }, { status: 504 });
+      }
       return NextResponse.json({ error: "Failed to generate insight" }, { status: 500 });
     }
   } catch (e) {

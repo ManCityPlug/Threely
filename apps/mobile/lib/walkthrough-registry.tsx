@@ -66,13 +66,25 @@ export function WalkthroughRegistryProvider({ children }: { children: React.Reac
         resolve(null);
         return;
       }
-      ref.measureInWindow((x, y, width, height) => {
-        if (width === 0 && height === 0) {
-          resolve(null);
-          return;
-        }
-        resolve({ x, y, width, height });
-      });
+      try {
+        ref.measureInWindow((x, y, width, height) => {
+          if (!x && !y && !width && !height) {
+            resolve(null);
+            return;
+          }
+          if (isNaN(x) || isNaN(y) || isNaN(width) || isNaN(height)) {
+            resolve(null);
+            return;
+          }
+          if (width === 0 && height === 0) {
+            resolve(null);
+            return;
+          }
+          resolve({ x, y, width, height });
+        });
+      } catch {
+        resolve(null);
+      }
     });
   }, []);
 

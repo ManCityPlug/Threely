@@ -9,24 +9,22 @@ import {
   ActivityIndicator,
   Linking,
   Image,
-  Dimensions,
   Platform,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import Purchases, { PurchasesOffering } from "react-native-purchases";
+import Purchases, { PurchasesOffering, INTRO_ELIGIBILITY_STATUS } from "react-native-purchases";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Haptics from "expo-haptics";
 import { spacing, typography, radius } from "@/constants/theme";
 import { useSubscription } from "@/lib/subscription-context";
 
-const { width: SCREEN_W } = Dimensions.get("window");
-
 type Plan = "monthly" | "yearly";
 
-const PLANS: { key: Plan; name: string; price: string; sub: string; badge?: string }[] = [
-  { key: "yearly", name: "Yearly", price: "$69.99", sub: "$5.83/mo · billed annually", badge: "SAVE 55%" },
-  { key: "monthly", name: "Monthly", price: "$12.99", sub: "per month" },
+const PLANS: { key: Plan; name: string; price: string; sub: string; trialSub: string; badge?: string }[] = [
+  { key: "yearly", name: "Yearly", price: "$99.99", sub: "$8.33/mo · billed annually", trialSub: "7 Day Free Trial · $8.33/mo · billed annually", badge: "SAVE 36%" },
+  { key: "monthly", name: "Monthly", price: "$12.99", sub: "per month", trialSub: "7 Day Free Trial · per month" },
 ];
 
 interface TrialFullScreenProps {
@@ -41,6 +39,7 @@ export function TrialFullScreen({ visible, onDismiss, onSubscribed }: TrialFullS
   const [loading, setLoading] = useState(false);
   const [restoring, setRestoring] = useState(false);
   const [offerings, setOfferings] = useState<PurchasesOffering | null>(null);
+  const [trialEligible, setTrialEligible] = useState(true);
 
   useEffect(() => {
     if (!visible) return;
@@ -48,6 +47,26 @@ export function TrialFullScreen({ visible, onDismiss, onSubscribed }: TrialFullS
       try {
         const off = await Purchases.getOfferings();
         setOfferings(off.current);
+
+        // Check trial eligibility
+        if (off.current) {
+          const productIds = [
+            off.current.annual?.product?.identifier,
+            off.current.monthly?.product?.identifier,
+          ].filter(Boolean) as string[];
+
+          if (productIds.length > 0) {
+            try {
+              const eligibility = await Purchases.checkTrialOrIntroductoryPriceEligibility(productIds);
+              const isEligible = Object.values(eligibility).some(
+                (e) => e.status === INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE
+              );
+              setTrialEligible(isEligible);
+            } catch {
+              setTrialEligible(true);
+            }
+          }
+        }
       } catch (e) {
         console.warn("Failed to load offerings:", e);
       }
@@ -64,7 +83,11 @@ export function TrialFullScreen({ visible, onDismiss, onSubscribed }: TrialFullS
     setLoading(true);
     try {
       if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-      const { customerInfo } = await Purchases.purchasePackage(pkg);
+      const purchasePromise = Purchases.purchasePackage(pkg);
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Purchase timed out")), 120_000)
+      );
+      const { customerInfo } = await Promise.race([purchasePromise, timeoutPromise]);
       if (typeof customerInfo.entitlements.active["pro"] !== "undefined") {
         await AsyncStorage.setItem("@threely_subscription_status", "active");
         await refreshSubscription();
@@ -112,99 +135,125 @@ export function TrialFullScreen({ visible, onDismiss, onSubscribed }: TrialFullS
           <Ionicons name="close" size={22} color="rgba(255,255,255,0.7)" />
         </TouchableOpacity>
 
-        {/* App icon */}
-        <View style={styles.iconWrap}>
-          <Image
-            source={require("@/assets/icon.png")}
-            style={styles.appIcon}
-          />
-        </View>
-
-        {/* Copy */}
-        <Text style={styles.heading}>
-          Get Threely Pro{"\n"}
-          <Text style={styles.headingBold}>free for 7 days</Text>
-        </Text>
-        <Text style={styles.subheading}>
-          We offer 7 days free so everyone can achieve their goals.
-          You'll get a reminder 2 days before your free period ends.
-        </Text>
-
-        {/* Plan selector */}
-        <View style={styles.planContainer}>
-          {PLANS.map((p) => (
-            <TouchableOpacity
-              key={p.key}
-              style={[styles.planCard, plan === p.key && styles.planCardSelected]}
-              onPress={() => setPlan(p.key)}
-              activeOpacity={0.8}
-            >
-              <View style={styles.planRow}>
-                <View style={[styles.planRadio, plan === p.key && styles.planRadioSelected]}>
-                  {plan === p.key && <View style={styles.planRadioDot} />}
-                </View>
-                <View style={{ flex: 1 }}>
-                  <View style={styles.planNameRow}>
-                    <Text style={styles.planName}>{p.name}</Text>
-                    {p.badge && (
-                      <View style={styles.planBadge}>
-                        <Text style={styles.planBadgeText}>{p.badge}</Text>
-                      </View>
-                    )}
-                  </View>
-                  <Text style={styles.planSub}>{p.sub}</Text>
-                </View>
-                <Text style={styles.planPrice}>{p.price}</Text>
-              </View>
-              <Text style={styles.trialLabel}>7 days free</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* CTA */}
-        <TouchableOpacity
-          style={[styles.ctaBtn, (loading || !offerings) && { opacity: 0.7 }]}
-          activeOpacity={0.85}
-          onPress={handleSubscribe}
-          disabled={loading || !offerings}
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          bounces={false}
         >
-          {loading ? (
-            <ActivityIndicator color="#635BFF" size="small" />
-          ) : (
-            <Text style={styles.ctaBtnText}>Start Free Trial</Text>
-          )}
-        </TouchableOpacity>
+          {/* App icon */}
+          <View style={styles.iconWrap}>
+            <Image
+              source={require("@/assets/icon.png")}
+              style={styles.appIcon}
+            />
+          </View>
 
-        <Text style={styles.trialNote}>
-          No charge for 7 days. Cancel anytime in Settings.
-        </Text>
-        <Text style={styles.ctaSub}>
-          Then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
-        </Text>
-
-        {/* Footer */}
-        <View style={styles.footer}>
-          <TouchableOpacity onPress={handleRestore} disabled={restoring} style={styles.restoreBtn}>
-            {restoring ? (
-              <ActivityIndicator color="rgba(255,255,255,0.5)" size="small" />
+          {/* Copy */}
+          <Text style={styles.heading}>
+            {trialEligible ? (
+              <>Get Threely Pro{"\n"}<Text style={styles.headingBold}>free for 7 days</Text></>
             ) : (
-              <Text style={styles.restoreText}>Restore purchases</Text>
+              <>Get <Text style={styles.headingBold}>Threely Pro</Text></>
+            )}
+          </Text>
+          <Text style={styles.subheading}>
+            {trialEligible
+              ? "We offer 7 days free so everyone can achieve their goals. You'll get a reminder 2 days before your free period ends."
+              : `The #1 AI app that turns any goal into reality.\nJust tell us what you want — we'll get you there.`}
+          </Text>
+
+          {/* Plan selector */}
+          <View style={styles.planContainer}>
+            {PLANS.map((p) => (
+              <TouchableOpacity
+                key={p.key}
+                style={[styles.planCard, plan === p.key && styles.planCardSelected]}
+                onPress={() => setPlan(p.key)}
+                activeOpacity={0.8}
+              >
+                <View style={styles.planRow}>
+                  <View style={[styles.planRadio, plan === p.key && styles.planRadioSelected]}>
+                    {plan === p.key && <View style={styles.planRadioDot} />}
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <View style={styles.planNameRow}>
+                      <Text style={styles.planName}>{p.name}</Text>
+                      {p.badge && (
+                        <View style={styles.planBadge}>
+                          <Text style={styles.planBadgeText}>{p.badge}</Text>
+                        </View>
+                      )}
+                    </View>
+                    <Text style={styles.planSub}>{trialEligible ? p.trialSub : p.sub}</Text>
+                  </View>
+                  <Text style={styles.planPrice}>{p.price}</Text>
+                </View>
+                {trialEligible && <Text style={styles.trialLabel}>7 days free</Text>}
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Total due today */}
+          {trialEligible && (
+            <View style={styles.totalDueRow}>
+              <Text style={styles.totalDueLabel}>Total due today</Text>
+              <Text style={styles.totalDueAmount}>$0.00</Text>
+            </View>
+          )}
+
+          {/* CTA */}
+          <TouchableOpacity
+            style={[styles.ctaBtn, (loading || !offerings) && { opacity: 0.7 }]}
+            activeOpacity={0.85}
+            onPress={handleSubscribe}
+            disabled={loading || !offerings}
+          >
+            {loading ? (
+              <ActivityIndicator color="#635BFF" size="small" />
+            ) : (
+              <Text style={styles.ctaBtnText}>{trialEligible ? "Start Free Trial" : "Subscribe"}</Text>
             )}
           </TouchableOpacity>
-          <Text style={styles.legalText}>
-            <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/terms")}>
-              Terms
+
+          {trialEligible ? (
+            <>
+              <Text style={styles.trialNote}>
+                No charge for 7 days. Cancel anytime in Settings.
+              </Text>
+              <Text style={styles.ctaSub}>
+                Then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
+              </Text>
+            </>
+          ) : (
+            <Text style={styles.ctaSub}>
+              Cancel anytime in Settings.
             </Text>
-            {"  ·  "}
-            <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/privacy")}>
-              Privacy
+          )}
+
+          {/* Footer */}
+          <View style={styles.footer}>
+            <TouchableOpacity onPress={handleRestore} disabled={restoring} style={styles.restoreBtn}>
+              {restoring ? (
+                <ActivityIndicator color="rgba(255,255,255,0.5)" size="small" />
+              ) : (
+                <Text style={styles.restoreText}>Restore purchases</Text>
+              )}
+            </TouchableOpacity>
+            <Text style={styles.legalText}>
+              <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/terms")}>
+                Terms
+              </Text>
+              {"  ·  "}
+              <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/privacy")}>
+                Privacy
+              </Text>
+              {"  ·  "}
+              <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/refund")}>
+                Refund
+              </Text>
             </Text>
-            {"  ·  "}
-            <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/refund")}>
-              Refund
-            </Text>
-          </Text>
-        </View>
+          </View>
+        </ScrollView>
       </LinearGradient>
     </Modal>
   );
@@ -213,11 +262,17 @@ export function TrialFullScreen({ visible, onDismiss, onSubscribed }: TrialFullS
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: spacing.lg,
     paddingTop: 60,
     paddingBottom: 40,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: spacing.lg,
+    maxWidth: 500,
+    alignSelf: "center",
+    width: "100%",
   },
   closeBtn: {
     position: "absolute",
@@ -256,7 +311,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     lineHeight: 22,
     marginBottom: spacing.xl,
-    maxWidth: SCREEN_W * 0.85,
+    maxWidth: 400,
   },
   planContainer: {
     width: "100%",
@@ -335,6 +390,27 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.5)",
     marginTop: spacing.xs,
     textAlign: "center",
+  },
+  totalDueRow: {
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    borderRadius: radius.md,
+    backgroundColor: "rgba(255,255,255,0.08)",
+    marginBottom: spacing.sm,
+  },
+  totalDueLabel: {
+    fontSize: typography.sm,
+    fontWeight: typography.medium,
+    color: "rgba(255,255,255,0.7)",
+  },
+  totalDueAmount: {
+    fontSize: typography.md,
+    fontWeight: typography.bold,
+    color: "#3ecf8e",
   },
   ctaBtn: {
     width: "100%",

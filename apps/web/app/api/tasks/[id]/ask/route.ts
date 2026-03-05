@@ -80,11 +80,18 @@ export async function POST(request: NextRequest, { params }: Params) {
       goalSummary: dailyTask.goal.structuredSummary,
       intensityLevel: profile?.intensityLevel ?? 2,
       messages,
+      userId: user.id,
+      goalId: dailyTask.goalId,
     });
 
     return NextResponse.json({ answer: result.answer, options: result.options });
   } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    const isTimeout = msg.includes("timeout") || msg.includes("ETIMEDOUT") || msg.includes("Request timed out");
     console.error("[POST /api/tasks/:id/ask]", e);
+    if (isTimeout) {
+      return NextResponse.json({ error: "The AI took too long to respond. Please try again." }, { status: 504 });
+    }
     return NextResponse.json({ error: "Failed to answer question" }, { status: 500 });
   }
 }

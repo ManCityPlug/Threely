@@ -19,6 +19,7 @@ import {
   Pressable,
   LayoutAnimation,
   UIManager,
+  useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SwipeNavigator } from "@/components/SwipeNavigator";
@@ -118,10 +119,15 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
+// iPad-friendly max content width
+const MAX_CONTENT_WIDTH = 600;
+
 export default function DashboardScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { width: screenWidth } = useWindowDimensions();
+  const isWide = screenWidth >= 768;
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { showToast } = useToast();
   const { register, registerScroll } = useWalkthroughRegistry();
@@ -747,11 +753,13 @@ export default function DashboardScreen() {
   // Staggered entrance animations for task cards
   const staggerAnims = useStaggeredEntrance(loading ? 0 : newTaskItems.length);
 
+  const wideContentStyle = isWide ? { maxWidth: MAX_CONTENT_WIDTH, alignSelf: "center" as const, width: "100%" as const } : undefined;
+
   if (loading) {
     return (
       <View style={styles.container}>
         <View style={[styles.header, { paddingTop: insets.top }]}>
-          <View style={styles.headerRow}>
+          <View style={[styles.headerRow, wideContentStyle]}>
             <View>
               <Text style={styles.date}>{formatDate(today)}</Text>
               <Text style={styles.greeting}>
@@ -760,7 +768,7 @@ export default function DashboardScreen() {
             </View>
           </View>
         </View>
-        <View style={{ paddingHorizontal: spacing.lg, paddingTop: spacing.sm }}>
+        <View style={[{ paddingHorizontal: spacing.lg, paddingTop: spacing.sm }, wideContentStyle]}>
           <SkeletonCard />
           <SkeletonCard />
           <SkeletonCard />
@@ -775,7 +783,7 @@ export default function DashboardScreen() {
       <Confetti active={showConfetti} />
       {/* Fixed header — outside ScrollView so it never hides under Dynamic Island */}
       <View style={[styles.header, { paddingTop: insets.top }]}>
-        <View style={styles.headerRow}>
+        <View style={[styles.headerRow, wideContentStyle]}>
           <View>
             <Text style={styles.date}>{formatDate(today)}</Text>
             <Text style={styles.greeting}>
@@ -787,7 +795,7 @@ export default function DashboardScreen() {
 
       <ScrollView
         ref={r => registerScroll("today-scroll", r)}
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, wideContentStyle]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
@@ -956,10 +964,10 @@ export default function DashboardScreen() {
         ) : generating && !hasVisibleTasks ? (
           <View style={{ alignItems: "center", paddingVertical: spacing.xl * 2, paddingHorizontal: spacing.lg }}>
             <Text style={{ fontSize: 36, marginBottom: spacing.md }}>{"\u2726"}</Text>
-            <Text style={{ fontSize: typography.lg.fontSize || 18, fontWeight: "700", color: colors.text, textAlign: "center", marginBottom: spacing.sm }}>
+            <Text style={{ fontSize: typography.lg, fontWeight: "700", color: colors.text, textAlign: "center", marginBottom: spacing.sm }}>
               Your tasks are being generated...
             </Text>
-            <View style={{ width: "70%", height: 5, backgroundColor: colors.border, borderRadius: 3, marginBottom: spacing.md, overflow: "hidden" }}>
+            <View style={{ width: "70%", maxWidth: 300, height: 5, backgroundColor: colors.border, borderRadius: 3, marginBottom: spacing.md, overflow: "hidden" }}>
               <View style={{ height: "100%", width: "60%", backgroundColor: colors.primary, borderRadius: 3 }} />
             </View>
             <Text style={{ textAlign: "center", fontSize: typography.sm, color: colors.textSecondary, lineHeight: 20 }}>
@@ -1079,11 +1087,11 @@ export default function DashboardScreen() {
         >
           <Pressable
             style={{
-              backgroundColor: colors.surface,
+              backgroundColor: colors.card,
               borderRadius: radius.lg,
               padding: spacing.lg,
               width: "85%",
-              maxWidth: 360,
+              maxWidth: 420,
             }}
             onPress={() => {}}
           >
@@ -1102,7 +1110,7 @@ export default function DashboardScreen() {
                   borderRadius: radius.md,
                   borderWidth: 1,
                   borderColor: colors.border,
-                  backgroundColor: colors.background,
+                  backgroundColor: colors.bg,
                   marginBottom: spacing.xs,
                 }}
                 activeOpacity={0.7}
@@ -1579,6 +1587,18 @@ function createStyles(c: Colors) {
       fontWeight: typography.bold,
       color: c.primaryText,
     },
+    primaryBtn: {
+      backgroundColor: c.primary,
+      borderRadius: radius.lg,
+      paddingVertical: 14,
+      alignItems: "center" as const,
+      justifyContent: "center" as const,
+    },
+    primaryBtnText: {
+      fontSize: typography.base,
+      fontWeight: typography.bold,
+      color: c.primaryText,
+    },
     section: { marginBottom: 0 },
     empty: { alignItems: "center", paddingVertical: spacing.xxl },
     emptyIcon: { fontSize: 40, marginBottom: spacing.md, color: c.primary },
@@ -1683,6 +1703,7 @@ function createStyles(c: Colors) {
     },
     pickerCard: {
       width: "100%",
+      maxWidth: 500,
       backgroundColor: c.card,
       borderRadius: radius.xl,
       padding: spacing.lg,
@@ -1789,6 +1810,9 @@ function createStyles(c: Colors) {
       borderTopRightRadius: radius.xl,
       padding: spacing.lg,
       paddingBottom: spacing.xxl,
+      maxWidth: 600,
+      alignSelf: "center" as const,
+      width: "100%",
       ...shadow.lg,
     },
     reviewHeaderRow: {
@@ -1884,6 +1908,9 @@ function createStyles(c: Colors) {
       padding: spacing.lg,
       paddingBottom: spacing.xxl,
       maxHeight: "80%",
+      maxWidth: 600,
+      alignSelf: "center" as const,
+      width: "100%",
       ...shadow.lg,
     },
     historyHandle: {
@@ -1969,6 +1996,7 @@ function createStyles(c: Colors) {
     },
     welcomeBox: {
       width: "100%",
+      maxWidth: 500,
       backgroundColor: c.card,
       borderRadius: radius.xl,
       padding: spacing.xl,

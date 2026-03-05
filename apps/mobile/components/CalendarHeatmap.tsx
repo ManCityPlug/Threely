@@ -131,7 +131,9 @@ export function CalendarHeatmap({ data }: CalendarHeatmapProps) {
       })
     );
 
-    Animated.stagger(15, animations).start();
+    const composite = Animated.stagger(15, animations);
+    composite.start();
+    return () => composite.stop();
   }, [currentMonth, totalCells]);
 
   function navigateMonth(delta: number) {
@@ -142,7 +144,12 @@ export function CalendarHeatmap({ data }: CalendarHeatmapProps) {
     <View style={styles.container}>
       {/* Month navigation header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigateMonth(-1)} style={styles.navButton}>
+        <TouchableOpacity
+          onPress={() => navigateMonth(-1)}
+          style={styles.navButton}
+          accessibilityLabel="Previous month"
+          accessibilityRole="button"
+        >
           <Text style={styles.navText}>{"\u2039"}</Text>
         </TouchableOpacity>
         <Text style={styles.monthTitle}>
@@ -152,6 +159,8 @@ export function CalendarHeatmap({ data }: CalendarHeatmapProps) {
           onPress={() => navigateMonth(1)}
           style={[styles.navButton, isCurrentMonth && styles.navButtonDisabled]}
           disabled={isCurrentMonth}
+          accessibilityLabel="Next month"
+          accessibilityRole="button"
         >
           <Text style={[styles.navText, isCurrentMonth && styles.navTextDisabled]}>{"\u203A"}</Text>
         </TouchableOpacity>
@@ -234,8 +243,8 @@ function createStyles(c: Colors) {
       marginBottom: spacing.sm,
     },
     navButton: {
-      width: 32,
-      height: 32,
+      width: 44,
+      height: 44,
       borderRadius: radius.sm,
       justifyContent: "center",
       alignItems: "center",

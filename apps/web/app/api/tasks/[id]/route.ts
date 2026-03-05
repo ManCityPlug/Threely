@@ -28,7 +28,10 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { id } = await params;
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== "object") {
+      return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+    }
     const { taskItemId, isCompleted, action, editData } = body as {
       taskItemId: string;
       isCompleted?: boolean;
@@ -36,12 +39,19 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       editData?: { task?: string; description?: string };
     };
 
+    if (!taskItemId) {
+      return NextResponse.json({ error: "taskItemId is required" }, { status: 400 });
+    }
+
     const dailyTask = await prisma.dailyTask.findFirst({
       where: { id, userId: user.id },
     });
     if (!dailyTask) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
-    const tasks = dailyTask.tasks as unknown as TaskItem[];
+    const tasks = Array.isArray(dailyTask.tasks) ? (dailyTask.tasks as unknown as TaskItem[]) : [];
+    if (tasks.length === 0) {
+      return NextResponse.json({ error: "No tasks found in this daily task" }, { status: 404 });
+    }
     let updatedTasks: TaskItem[];
 
     if (action === "skip") {
@@ -79,14 +89,32 @@ export async function PATCH(request: NextRequest, { params }: Params) {
             data: { tasks: [...tomorrowTasks, rescheduledTask] as never },
           });
         } else {
-          await prisma.dailyTask.create({
-            data: {
-              userId: user.id,
-              goalId: dailyTask.goalId,
-              date: tomorrow,
-              tasks: [rescheduledTask] as never,
-            },
-          });
+          try {
+            await prisma.dailyTask.create({
+              data: {
+                userId: user.id,
+                goalId: dailyTask.goalId,
+                date: tomorrow,
+                tasks: [rescheduledTask] as never,
+              },
+            });
+          } catch (createErr: unknown) {
+            // Unique constraint race — another request created tomorrow's record first
+            if (createErr instanceof Error && createErr.message.includes("Unique constraint")) {
+              const justCreated = await prisma.dailyTask.findUnique({
+                where: { goalId_date: { goalId: dailyTask.goalId, date: tomorrow } },
+              });
+              if (justCreated) {
+                const existingItems = justCreated.tasks as unknown as TaskItem[];
+                await prisma.dailyTask.update({
+                  where: { goalId_date: { goalId: dailyTask.goalId, date: tomorrow } },
+                  data: { tasks: [...existingItems, rescheduledTask] as never },
+                });
+              }
+            } else {
+              throw createErr;
+            }
+          }
         }
       }
     } else if (action === "edit") {
@@ -117,6 +145,22 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     });
 
     clearStatsCache(user.id);
+
+    // Update AI call log with feedback (fire-and-forget)
+    const feedbackValue = action || (isCompleted !== undefined ? (body.isCompleted ? 'completed' : 'uncompleted') : null);
+    if (feedbackValue) {
+      prisma.aICallLog.updateMany({
+        where: {
+          goalId: dailyTask.goalId,
+          functionName: 'generateTasks',
+          userId: user.id,
+        },
+        data: {
+          taskFeedback: feedbackValue,
+          feedbackAt: new Date(),
+        },
+      }).catch(() => {});
+    }
 
     // Check for first-ever task completion
     if (!action && isCompleted) {

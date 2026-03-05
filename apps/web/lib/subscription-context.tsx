@@ -10,6 +10,7 @@ interface SubscriptionContextValue {
   isLimitedMode: boolean;
   walkthroughActive: boolean;
   loaded: boolean;
+  trialEligible: boolean;
   paywallOpen: boolean;
   paywallVariant: PaywallVariant;
   showPaywall: (variant?: PaywallVariant) => void;
@@ -24,6 +25,7 @@ const SubscriptionContext = createContext<SubscriptionContextValue>({
   isLimitedMode: false,
   walkthroughActive: false,
   loaded: false,
+  trialEligible: true,
   paywallOpen: false,
   paywallVariant: "sheet",
   showPaywall: () => {},
@@ -40,6 +42,7 @@ export function useSubscription() {
 export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
   const [hasPro, setHasPro] = useState(true);
   const [loaded, setLoaded] = useState(false);
+  const [trialEligible, setTrialEligible] = useState(true);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [paywallVariant, setPaywallVariant] = useState<PaywallVariant>("sheet");
   const [walkthroughActive, setWalkthroughActiveState] = useState(false);
@@ -49,6 +52,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
       const res = await subscriptionApi.status();
       const status = res.status;
       setHasPro(status === "trialing" || status === "active");
+      setTrialEligible(res.trialEligible !== false);
       if (!status || (status !== "trialing" && status !== "active")) {
         localStorage.setItem("threely_limited_mode", "true");
       } else {
@@ -99,6 +103,7 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         isLimitedMode,
         walkthroughActive,
         loaded,
+        trialEligible,
         paywallOpen,
         paywallVariant,
         showPaywall,

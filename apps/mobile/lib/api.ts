@@ -130,10 +130,33 @@ export interface GoalChatResult {
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
+const DEFAULT_TIMEOUT_MS = 15_000;
+const AI_TIMEOUT_MS = 45_000;
+const AUTH_TIMEOUT_MS = 10_000;
+
+const AI_PATHS = [
+  "/api/goals/parse",
+  "/api/goals/chat",
+  "/api/tasks/generate",
+  "/api/insights",
+  "/api/summary/weekly",
+  "/api/summary/weekly-open",
+];
+
+function isAiPath(path: string): boolean {
+  if (path.includes("/refine") || path.includes("/ask")) return true;
+  return AI_PATHS.some((p) => path.startsWith(p));
+}
+
 async function getAuthHeaders(): Promise<Record<string, string>> {
+  const sessionPromise = supabase.auth.getSession();
+  const timeoutPromise = new Promise<never>((_, reject) =>
+    setTimeout(() => reject(new Error("Auth session retrieval timed out")), AUTH_TIMEOUT_MS)
+  );
+
   const {
     data: { session },
-  } = await supabase.auth.getSession();
+  } = await Promise.race([sessionPromise, timeoutPromise]);
 
   if (!session) throw new Error("Not authenticated");
 
@@ -145,12 +168,55 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 
 async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
   const headers = await getAuthHeaders();
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...options,
-    headers: { ...headers, ...(options.headers as Record<string, string>) },
-  });
 
-  const text = await res.text();
+  const timeoutMs = isAiPath(path) ? AI_TIMEOUT_MS : DEFAULT_TIMEOUT_MS;
+  const controller = new AbortController();
+  // If the caller already provided a signal (e.g. for unmount cancellation),
+  // forward its abort to our internal controller so both can cancel the request.
+  if (options.signal) {
+    const externalSignal = options.signal;
+    if (externalSignal.aborted) {
+      controller.abort();
+    } else {
+      externalSignal.addEventListener("abort", () => controller.abort(), { once: true });
+    }
+  }
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  let res: Response;
+  try {
+    res = await fetch(`${BASE_URL}${path}`, {
+      ...options,
+      headers: { ...headers, ...(options.headers as Record<string, string>) },
+      signal: controller.signal,
+    });
+  } catch (e: unknown) {
+    clearTimeout(timeoutId);
+    if (e instanceof Error && e.name === "AbortError") {
+      // Distinguish caller-initiated cancellation from timeout
+      if (options.signal?.aborted) {
+        throw new Error("Request was cancelled");
+      }
+      throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
+    }
+    throw new Error("Network error: unable to reach the server");
+  }
+
+  // Keep the timeout running while we read the response body — a slow body
+  // stream could otherwise hang the app indefinitely.
+  let text: string;
+  try {
+    text = await res.text();
+  } catch (e: unknown) {
+    clearTimeout(timeoutId);
+    if (e instanceof Error && e.name === "AbortError") {
+      throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
+    }
+    throw new Error("Network error: connection lost while reading response");
+  } finally {
+    clearTimeout(timeoutId);
+  }
+
   let json: Record<string, unknown>;
   try {
     json = JSON.parse(text);
@@ -438,6 +504,30 @@ export interface SubscriptionDetails {
   }[];
   trialEligible?: boolean;
 }
+
+// ─── Notifications API ───────────────────────────────────────────────────────
+
+export interface AppNotification {
+  id: string;
+  heading: string;
+  subheading: string;
+  linkUrl: string | null;
+  createdAt: string;
+}
+
+export const notificationsApi = {
+  list: () =>
+    apiFetch<{ notifications: AppNotification[]; unreadCount: number }>(
+      "/api/notifications"
+    ),
+
+  dismiss: (id: string) =>
+    apiFetch<{ success: boolean }>(`/api/notifications/${id}/dismiss`, {
+      method: "POST",
+    }),
+};
+
+// ─── Subscription API ─────────────────────────────────────────────────────────
 
 export const subscriptionApi = {
   status: () => apiFetch<SubscriptionStatus>("/api/subscription"),

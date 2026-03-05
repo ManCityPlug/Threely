@@ -46,13 +46,24 @@ export async function POST(request: NextRequest) {
   }
 
   const defaultPaymentMethod = paymentMethods.data[0].id;
+  const cardFingerprint = paymentMethods.data[0].card?.fingerprint ?? null;
 
   await stripeClient.customers.update(customerId, {
     invoice_settings: { default_payment_method: defaultPaymentMethod },
   });
 
   // ── Determine trial eligibility ───────────────────────────────────────────
-  const trialEligible = !dbUser.trialClaimedAt;
+  let trialEligible = !dbUser.trialClaimedAt;
+
+  // Check card fingerprint — block trial if this card was already used
+  if (trialEligible && cardFingerprint) {
+    const existingFingerprint = await prisma.trialCardFingerprint.findUnique({
+      where: { fingerprint: cardFingerprint },
+    });
+    if (existingFingerprint) {
+      trialEligible = false;
+    }
+  }
 
   // ── Create subscription ───────────────────────────────────────────────────
   const subscriptionParams: Stripe.SubscriptionCreateParams = {
@@ -85,8 +96,16 @@ export async function POST(request: NextRequest) {
     data: updateData,
   });
 
+  // Save card fingerprint so this card can't claim another trial
+  if (trialEligible && cardFingerprint) {
+    await prisma.trialCardFingerprint.create({
+      data: { fingerprint: cardFingerprint, email: dbUser.email },
+    });
+  }
+
   return NextResponse.json({
     status: "success",
     subscriptionStatus: subscription.status,
+    trialGranted: trialEligible,
   });
 }

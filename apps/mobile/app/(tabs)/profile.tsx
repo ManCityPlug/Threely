@@ -14,6 +14,7 @@ import {
   Modal,
   KeyboardAvoidingView,
   Linking,
+  useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { SwipeNavigator } from "@/components/SwipeNavigator";
@@ -37,6 +38,7 @@ import {
   type NotifTimePreference,
 } from "@/lib/notifications";
 import { useSubscription } from "@/lib/subscription-context";
+import { useNotifications } from "@/lib/notification-context";
 import { useWalkthroughRegistry } from "@/lib/walkthrough-registry";
 import * as Haptics from "expo-haptics";
 
@@ -163,12 +165,17 @@ function PickerCol<T>({
   );
 }
 
+// iPad-friendly max content width
+const MAX_CONTENT_WIDTH = 600;
+
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
 export default function ProfileScreen() {
   const router = useRouter();
   const { colors, preference, setPreference } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { width: screenWidth } = useWindowDimensions();
+  const isWide = screenWidth >= 768;
   const { register, registerScroll } = useWalkthroughRegistry();
 
   const [email, setEmail] = useState("");
@@ -220,6 +227,10 @@ export default function ProfileScreen() {
   const [pwError, setPwError] = useState("");
   const [authProvider, setAuthProvider] = useState<"email" | "google" | "apple" | "other">("email");
 
+  // In-app notifications — shared context (synced with tab badge)
+  const { notifications: appNotifications, unreadCount: notifUnreadCount, refresh: refreshNotifications, dismiss: dismissNotification } = useNotifications();
+  const [notifCenterOpen, setNotifCenterOpen] = useState(false);
+
   const loadProfileData = useCallback(async () => {
     try {
       const [{ data: { user } }, statsRes, notifRes, savedNickname] = await Promise.all([
@@ -242,12 +253,14 @@ export default function ProfileScreen() {
       setStats(statsRes);
       setNotifPref(notifRes);
       if (savedNickname) setNickname(savedNickname);
+      // Refresh notifications via shared context
+      await refreshNotifications();
     } catch {
       // silently keep previous values
     } finally {
       setStatsLoading(false);
     }
-  }, []);
+  }, [refreshNotifications]);
 
   useFocusEffect(
     useCallback(() => {
@@ -449,20 +462,41 @@ export default function ProfileScreen() {
 
   const schemeCurrent = SCHEME_OPTIONS.find((s) => s.value === preference) ?? SCHEME_OPTIONS[2];
 
+  const wideContentStyle = isWide ? { maxWidth: MAX_CONTENT_WIDTH, alignSelf: "center" as const, width: "100%" as const } : undefined;
+
   return (
     <SwipeNavigator currentIndex={2}>
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <ScrollView
         ref={r => registerScroll("profile-scroll", r)}
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, wideContentStyle]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
         {/* Header */}
-        <View style={styles.header}>
+        <View style={[styles.header, { flexDirection: "row", justifyContent: "space-between", alignItems: "center" }]}>
           <Text style={styles.title}>Profile</Text>
+          <TouchableOpacity
+            onPress={() => setNotifCenterOpen(true)}
+            style={{ position: "relative", padding: spacing.xs }}
+          >
+            <Ionicons name="notifications-outline" size={24} color={colors.text} />
+            {appNotifications.length > 0 && (
+              <View style={{
+                position: "absolute", top: 2, right: 2,
+                minWidth: 16, height: 16, borderRadius: 8,
+                backgroundColor: "#ef4444",
+                alignItems: "center", justifyContent: "center",
+                paddingHorizontal: 3,
+              }}>
+                <Text style={{ color: "#fff", fontSize: 9, fontWeight: "700" }}>
+                  {appNotifications.length > 9 ? "9+" : appNotifications.length}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
         </View>
 
         {/* Avatar + email */}
@@ -478,8 +512,8 @@ export default function ProfileScreen() {
               <Text style={{ color: colors.primary, fontSize: typography.xs, fontWeight: typography.semibold }}>Pro</Text>
             </View>
           ) : (
-            <View style={{ backgroundColor: "#f3f4f6", paddingHorizontal: 12, paddingVertical: 3, borderRadius: 999, marginTop: spacing.xs }}>
-              <Text style={{ color: "#6b7280", fontSize: typography.xs, fontWeight: typography.semibold }}>Free</Text>
+            <View style={{ backgroundColor: colors.bg, paddingHorizontal: 12, paddingVertical: 3, borderRadius: 999, marginTop: spacing.xs }}>
+              <Text style={{ color: colors.textTertiary, fontSize: typography.xs, fontWeight: typography.semibold }}>Free</Text>
             </View>
           )}
         </View>
@@ -1148,6 +1182,125 @@ export default function ProfileScreen() {
         onClose={() => setWeeklySummaryOpen(false)}
         frozenData={weeklyFrozenData}
       />
+
+      {/* ── Notification Center Modal ──────────────────────────────────────────── */}
+      <Modal
+        visible={notifCenterOpen}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setNotifCenterOpen(false)}
+      >
+        <Pressable style={{ flex: 1, backgroundColor: colors.overlay, justifyContent: "flex-end" }} onPress={() => setNotifCenterOpen(false)}>
+          <Pressable onPress={() => {}} style={{
+            backgroundColor: colors.bgElevated,
+            borderTopLeftRadius: radius.xl,
+            borderTopRightRadius: radius.xl,
+            maxHeight: "70%",
+            maxWidth: 600,
+            alignSelf: "center" as const,
+            width: "100%",
+            paddingTop: spacing.lg,
+            paddingHorizontal: spacing.lg,
+            paddingBottom: spacing.xl,
+          }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: spacing.md }}>
+              <Text style={{ fontSize: typography.lg, fontWeight: typography.bold as "700", color: colors.text }}>
+                Notifications
+              </Text>
+              <TouchableOpacity onPress={() => setNotifCenterOpen(false)}>
+                <Ionicons name="close" size={24} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView showsVerticalScrollIndicator={false}>
+              {appNotifications.length === 0 ? (
+                <View style={{ paddingVertical: spacing.xl * 1.5, alignItems: "center" }}>
+                  <Ionicons name="notifications-off-outline" size={44} color={colors.textTertiary} style={{ opacity: 0.4 }} />
+                  <Text style={{ color: colors.textSecondary, marginTop: spacing.md, fontSize: typography.base, fontWeight: "600" }}>
+                    No new notifications
+                  </Text>
+                  <Text style={{ color: colors.textTertiary, marginTop: 4, fontSize: typography.sm }}>
+                    You're all caught up
+                  </Text>
+                </View>
+              ) : (
+                appNotifications.map(n => (
+                  <View key={n.id} style={{
+                    backgroundColor: colors.card,
+                    borderRadius: radius.lg,
+                    padding: spacing.md,
+                    marginBottom: spacing.sm,
+                    borderWidth: 1,
+                    borderColor: colors.border,
+                  }}>
+                    <View style={{ flexDirection: "row", gap: spacing.sm, marginBottom: spacing.sm }}>
+                      <View style={{
+                        width: 36, height: 36, borderRadius: radius.md,
+                        backgroundColor: colors.primaryLight,
+                        alignItems: "center", justifyContent: "center",
+                      }}>
+                        <Ionicons name="notifications-outline" size={18} color={colors.primary} />
+                      </View>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ fontWeight: "700", fontSize: typography.base, color: colors.text, marginBottom: 2 }}>
+                          {n.heading}
+                        </Text>
+                        <Text style={{ fontSize: typography.sm, color: colors.textSecondary, lineHeight: 20 }}>
+                          {n.subheading}
+                        </Text>
+                      </View>
+                    </View>
+                    <View style={{ flexDirection: "row", gap: spacing.sm, paddingLeft: 36 + spacing.sm }}>
+                      {n.linkUrl && n.linkUrl.trim() !== "" && n.linkUrl.trim() !== "/" && (
+                        <TouchableOpacity
+                          onPress={async () => {
+                            const url = n.linkUrl!.trim();
+                            try {
+                              // Always use Linking.openURL — opens in Safari for https, handles all URL schemes
+                              const canOpen = await Linking.canOpenURL(url);
+                              if (canOpen) {
+                                await Linking.openURL(url);
+                              } else {
+                                Alert.alert("Cannot open link", url);
+                              }
+                            } catch {
+                              Alert.alert("Error", "Could not open link.");
+                            }
+                          }}
+                          style={{
+                            backgroundColor: colors.primary,
+                            paddingHorizontal: spacing.md,
+                            paddingVertical: spacing.xs + 2,
+                            borderRadius: radius.md,
+                          }}
+                        >
+                          <Text style={{ color: "#fff", fontSize: typography.sm, fontWeight: "600" }}>
+                            Open Link
+                          </Text>
+                        </TouchableOpacity>
+                      )}
+                      <TouchableOpacity
+                        onPress={() => dismissNotification(n.id)}
+                        style={{
+                          paddingHorizontal: spacing.md,
+                          paddingVertical: spacing.xs + 2,
+                          borderRadius: radius.md,
+                          borderWidth: 1,
+                          borderColor: colors.border,
+                        }}
+                      >
+                        <Text style={{ color: colors.textSecondary, fontSize: typography.sm, fontWeight: "500" }}>
+                          Dismiss
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))
+              )}
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
     </SwipeNavigator>
   );
@@ -1175,9 +1328,9 @@ function createStyles(c: Colors) {
       ...shadow.sm,
     },
     avatar: {
-      width: 72,
-      height: 72,
-      borderRadius: 36,
+      width: Platform.OS === "ios" && Platform.isPad ? 96 : 72,
+      height: Platform.OS === "ios" && Platform.isPad ? 96 : 72,
+      borderRadius: Platform.OS === "ios" && Platform.isPad ? 48 : 36,
       backgroundColor: c.primaryLight,
       alignItems: "center",
       justifyContent: "center",
@@ -1186,7 +1339,7 @@ function createStyles(c: Colors) {
       borderColor: c.primary,
     },
     avatarText: {
-      fontSize: typography.xxl,
+      fontSize: Platform.OS === "ios" && Platform.isPad ? typography.xxxl : typography.xxl,
       fontWeight: typography.bold,
       color: c.primary,
     },
@@ -1324,6 +1477,9 @@ function createStyles(c: Colors) {
       borderTopRightRadius: radius.xl,
       padding: spacing.lg,
       paddingBottom: spacing.xxl,
+      maxWidth: 600,
+      alignSelf: "center" as const,
+      width: "100%",
       ...shadow.lg,
     },
     handle: {
@@ -1379,6 +1535,9 @@ function createStyles(c: Colors) {
       padding: spacing.lg,
       paddingBottom: spacing.xxl,
       maxHeight: "80%",
+      maxWidth: 600,
+      alignSelf: "center" as const,
+      width: "100%",
       ...shadow.lg,
     },
     historyHeaderRow: {

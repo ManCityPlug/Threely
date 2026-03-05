@@ -58,7 +58,23 @@ const CATEGORY_EMOJI: Record<string, string> = {
 
 // ─── Building Progress (rotating status messages) ─────────────────────────────
 
+const BUILDING_STEPS = [
+  "Analyzing your goal…",
+  "Crafting your personalized roadmap…",
+  "Generating 3 perfect tasks to start with…",
+  "Almost there — putting the finishing touches…",
+];
+
 function BuildingProgress() {
+  const [stepIdx, setStepIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStepIdx((prev) => Math.min(prev + 1, BUILDING_STEPS.length - 1));
+    }, 7000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div style={{
       flex: 1, display: "flex", flexDirection: "column",
@@ -67,9 +83,21 @@ function BuildingProgress() {
     }}>
       <span style={{ fontSize: 48, color: "var(--primary)", marginBottom: 20 }}>✦</span>
       <h2 style={{ fontSize: "1.2rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 8 }}>
-        Building your plan…
+        Threely Intelligence is building your plan…
       </h2>
-      <span className="spinner spinner-dark" style={{ marginTop: 12 }} />
+      <p style={{ fontSize: "0.9rem", color: "#8898aa", marginBottom: 16, minHeight: 24, transition: "opacity 0.3s" }}>
+        {BUILDING_STEPS[stepIdx]}
+      </p>
+      <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
+        {BUILDING_STEPS.map((_, i) => (
+          <div key={i} style={{
+            width: 8, height: 8, borderRadius: 4,
+            backgroundColor: i <= stepIdx ? "#635bff" : "#e3e8ef",
+            transition: "background-color 0.3s",
+          }} />
+        ))}
+      </div>
+      <span className="spinner spinner-dark" />
     </div>
   );
 }

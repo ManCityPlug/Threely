@@ -78,17 +78,18 @@ export function WeeklyBarChart({ data }: WeeklyBarChartProps) {
     // Reset
     barAnims.forEach((v) => v.setValue(0));
 
-    const animations = barAnims.map((animVal, i) =>
+    const animations = barAnims.map((animVal) =>
       Animated.spring(animVal, {
         toValue: 1,
         useNativeDriver: false, // height can't use native driver
         tension: 60,
         friction: 10,
-        delay: i * 60,
       })
     );
 
-    Animated.stagger(60, animations).start();
+    const composite = Animated.stagger(60, animations);
+    composite.start();
+    return () => composite.stop();
   }, [data]);
 
   return (

@@ -7,6 +7,7 @@ const SIDEBAR_ITEMS = [
   { label: "Overview", href: "/admin", icon: "\u{1F4CA}" },
   { label: "Users", href: "/admin/users", icon: "\u{1F465}" },
   { label: "Costs", href: "/admin/costs", icon: "\u{1F4B0}" },
+  { label: "LLM Training", href: "/admin/llm-training", icon: "\u{1F9E0}" },
   { label: "Notifications", href: "/admin/notifications", icon: "\u{1F514}" },
 ];
 

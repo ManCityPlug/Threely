@@ -36,13 +36,15 @@ export function WeeklySummary({ visible, onClose, frozenData }: WeeklySummaryPro
       setData(frozenData);
       return;
     }
+    let cancelled = false;
     setLoading(true);
     setError("");
     summaryApi
       .weekly(true)
-      .then((res) => setData(res))
-      .catch((e) => setError(e instanceof Error ? e.message : "Failed to load summary"))
-      .finally(() => setLoading(false));
+      .then((res) => { if (!cancelled) setData(res); })
+      .catch((e) => { if (!cancelled) setError(e instanceof Error ? e.message : "Failed to load summary"); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [visible, frozenData]);
 
   return (
@@ -243,7 +245,8 @@ function createStyles(c: Colors) {
       marginBottom: spacing.lg,
     },
     statCard: {
-      width: "47%",
+      flexBasis: "47%",
+      flexGrow: 1,
       backgroundColor: c.bg,
       borderRadius: radius.lg,
       padding: spacing.md,
@@ -282,7 +285,7 @@ function createStyles(c: Colors) {
     breakdownDate: {
       fontSize: typography.xs,
       color: c.textSecondary,
-      width: 80,
+      minWidth: 80,
     },
     breakdownBar: {
       flex: 1,

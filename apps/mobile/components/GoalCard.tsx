@@ -31,7 +31,7 @@ interface GoalCardProps {
   isPaused?: boolean;
 }
 
-function getStatusText(completedToday: number, totalToday: number): { text: string; color: "success" | "warning" | "textTertiary" } | null {
+function getStatusText(completedToday: number, totalToday: number): { text: string; color: "success" | "warning" | "danger" | "textTertiary" } | null {
   if (totalToday === 0) return null;
   if (completedToday === 0) return { text: "Not started", color: "danger" };
   if (completedToday >= totalToday) return { text: "Done for today", color: "success" };
@@ -239,6 +239,10 @@ function createStyles(c: Colors) {
     menuBtn: {
       padding: 4,
       marginLeft: 2,
+      minWidth: 44,
+      minHeight: 44,
+      alignItems: "center" as const,
+      justifyContent: "center" as const,
     },
     addedDate: {
       fontSize: typography.xs - 1,
@@ -247,10 +251,12 @@ function createStyles(c: Colors) {
     },
     viewTasksBtn: {
       marginTop: spacing.sm,
-      paddingVertical: spacing.xs + 2,
+      paddingVertical: spacing.sm + 2,
+      minHeight: 44,
       borderTopWidth: 1,
       borderTopColor: c.border,
       alignItems: "center",
+      justifyContent: "center",
     },
     viewTasksText: {
       fontSize: typography.sm,

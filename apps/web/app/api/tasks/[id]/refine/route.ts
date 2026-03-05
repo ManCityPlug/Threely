@@ -73,6 +73,8 @@ export async function POST(request: NextRequest, { params }: Params) {
       goalTitle: dailyTask.goal.title,
       goalCategory: dailyTask.goal.category,
       userRequest: userRequest.trim(),
+      userId: user.id,
+      goalId: dailyTask.goalId,
     });
 
     const updatedTasks = tasks.map((t) =>
@@ -88,7 +90,12 @@ export async function POST(request: NextRequest, { params }: Params) {
 
     return NextResponse.json({ dailyTask: updated });
   } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    const isTimeout = msg.includes("timeout") || msg.includes("ETIMEDOUT") || msg.includes("Request timed out");
     console.error("[POST /api/tasks/:id/refine]", e);
+    if (isTimeout) {
+      return NextResponse.json({ error: "The AI took too long to respond. Please try again." }, { status: 504 });
+    }
     return NextResponse.json({ error: "Failed to refine task" }, { status: 500 });
   }
 }

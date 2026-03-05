@@ -66,7 +66,7 @@ const CATEGORIES = [
     items: [
       {
         q: "Is Threely free?",
-        a: "Threely Pro is free for 7 days with full access to all features. After that, you can choose a monthly ($12.99/mo) or yearly ($69.99/yr) subscription to keep the AI coaching active.",
+        a: "Threely Pro is free for 7 days with full access to all features. After that, you can choose a monthly ($12.99/mo) or yearly ($99.99/yr) subscription to keep the AI coaching active.",
       },
       {
         q: "Do I need a credit card to start?",

@@ -166,3 +166,79 @@ model WeeklySummary {
   @@index([userId])
   @@map("weekly_summaries")
 }
+
+// ─── Notification ──────────────────────────────────────────────────────────
+// Admin-created notifications. If targetUserIds is empty, goes to all users.
+// If populated, only those users see it.
+model Notification {
+  id            String   @id @default(cuid())
+  heading       String
+  subheading    String
+  linkUrl       String?  @map("link_url")
+  targetUserIds String[] @default([]) @map("target_user_ids")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  dismissals NotificationDismissal[]
+
+  @@map("notifications")
+}
+
+// ─── NotificationDismissal ─────────────────────────────────────────────────
+// Tracks which users have read/dismissed which notifications.
+model NotificationDismissal {
+  id             String       @id @default(cuid())
+  userId         String       @map("user_id")
+  notificationId String       @map("notification_id")
+  dismissedAt    DateTime     @default(now()) @map("dismissed_at")
+
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, notificationId])
+  @@index([userId])
+  @@map("notification_dismissals")
+}
+
+// ─── TrialCardFingerprint ─────────────────────────────────────────────────
+// Survives account deletion. Prevents the same credit card from claiming
+// multiple free trials across different accounts.
+model TrialCardFingerprint {
+  id          String   @id @default(cuid())
+  fingerprint String   @unique
+  email       String
+  claimedAt   DateTime @default(now()) @map("claimed_at")
+
+  @@map("trial_card_fingerprints")
+}
+
+// ─── SystemConfig ──────────────────────────────────────────────────────────
+// Key-value store for admin-configurable system settings (e.g. minAppVersion).
+model SystemConfig {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_config")
+}
+
+// ─── AICallLog ───────────────────────────────────────────────────────────────
+// Silent log of every Claude API call for future LLM fine-tuning.
+model AICallLog {
+  id              String   @id @default(cuid())
+  userId          String
+  functionName    String   // "parseGoal" | "generateTasks" | "generateInsight" | "generateRoadmap" | "updateCoachingContext" | "goalChat"
+  modelUsed       String   // "claude-opus-4-6" | "claude-sonnet-4-6" | "claude-haiku-4-5-20251001"
+  inputData       String   @db.Text  // JSON string of the input parameters
+  outputData      String   @db.Text  // JSON string of Claude's response
+  inputTokens     Int?
+  outputTokens    Int?
+  responseTimeMs  Int?     // how long the call took
+  goalId          String?  // nullable, links to which goal this was for
+  taskFeedback    String?  // nullable, updated later: "completed" | "skipped" | "rescheduled" | "edited"
+  feedbackAt      DateTime?
+  createdAt       DateTime @default(now())
+
+  @@index([userId])
+  @@index([functionName])
+  @@index([goalId])
+  @@index([createdAt])
+}

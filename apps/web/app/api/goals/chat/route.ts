@@ -32,12 +32,6 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const { checkRateLimit } = await import("@/lib/rate-limit");
-  const { allowed } = checkRateLimit(user.id);
-  if (!allowed) {
-    return NextResponse.json({ error: "Rate limit exceeded. Try again later." }, { status: 429 });
-  }
-
   if (!Array.isArray(messages)) {
     return NextResponse.json({ error: "messages array is required" }, { status: 400 });
   }
@@ -46,12 +40,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "ANTHROPIC_API_KEY not configured" }, { status: 500 });
   }
 
+  const { checkRateLimit } = await import("@/lib/rate-limit");
+  const { allowed } = checkRateLimit(user.id);
+  if (!allowed) {
+    return NextResponse.json({ error: "Rate limit exceeded. Try again later." }, { status: 429 });
+  }
+
   try {
-    const result = await goalChat(messages);
+    const result = await goalChat(messages, user.id);
     return NextResponse.json(result);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    const isTimeout = msg.includes("timeout") || msg.includes("ETIMEDOUT") || msg.includes("Request timed out");
     console.error("[/api/goals/chat]", msg, "| messages count:", messages.length);
+    if (isTimeout) {
+      return NextResponse.json({ error: "The AI took too long to respond. Please try again." }, { status: 504 });
+    }
     return NextResponse.json({ error: msg }, { status: 500 });
   }
 }

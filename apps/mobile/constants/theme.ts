@@ -89,23 +89,23 @@ export const typography = {
 
 export const shadow = {
   sm: {
-    shadowColor: lightColors.shadow,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 1,
+    shadowOpacity: 0.08,
     shadowRadius: 3,
     elevation: 2,
   },
   md: {
-    shadowColor: lightColors.shadow,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 1,
+    shadowOpacity: 0.12,
     shadowRadius: 12,
     elevation: 5,
   },
   lg: {
-    shadowColor: lightColors.shadow,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 1,
+    shadowOpacity: 0.15,
     shadowRadius: 24,
     elevation: 10,
   },

@@ -12,6 +12,8 @@ import {
   Pressable,
   ActivityIndicator,
   Animated,
+  Linking,
+  useWindowDimensions,
 } from "react-native";
 import { Link } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -25,8 +27,11 @@ import {
 } from "@/lib/auth-providers";
 
 const PRIMARY = "#635BFF";
+const FORM_MAX_WIDTH = 420;
 
 export default function RegisterScreen() {
+  const { width: windowWidth } = useWindowDimensions();
+  const isWideScreen = windowWidth > 600;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -71,12 +76,17 @@ export default function RegisterScreen() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({ email, password });
-    setLoading(false);
-    if (error) {
-      Alert.alert("Sign up failed", error.message);
-    } else {
-      setDone(true);
+    try {
+      const { error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        Alert.alert("Sign up failed", error.message);
+      } else {
+        setDone(true);
+      }
+    } catch {
+      Alert.alert("Sign up failed", "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -89,14 +99,16 @@ export default function RegisterScreen() {
           start={{ x: 0.5, y: 0 }}
           end={{ x: 0.5, y: 1 }}
         />
-        <View style={styles.checkCircle}>
-          <Ionicons name="checkmark" size={40} color="#FFFFFF" />
+        <View style={isWideScreen ? { maxWidth: FORM_MAX_WIDTH, alignItems: "center" } : undefined}>
+          <View style={styles.checkCircle}>
+            <Ionicons name="checkmark" size={40} color="#FFFFFF" />
+          </View>
+          <Text style={styles.title}>Check your email</Text>
+          <Text style={styles.subtitle}>
+            We sent a confirmation link to{"\n"}
+            <Text style={{ color: "#FFFFFF", fontWeight: typography.semibold }}>{email}</Text>
+          </Text>
         </View>
-        <Text style={styles.title}>Check your email</Text>
-        <Text style={styles.subtitle}>
-          We sent a confirmation link to{"\n"}
-          <Text style={{ color: "#FFFFFF", fontWeight: typography.semibold }}>{email}</Text>
-        </Text>
       </View>
     );
   }
@@ -115,7 +127,10 @@ export default function RegisterScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
-          contentContainerStyle={styles.inner}
+          contentContainerStyle={[
+            styles.inner,
+            isWideScreen && { maxWidth: FORM_MAX_WIDTH, alignSelf: "center", width: "100%" },
+          ]}
           keyboardShouldPersistTaps="handled"
         >
           {/* Animated logo with pulsing glow + sparkles */}
@@ -203,6 +218,7 @@ export default function RegisterScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
+                returnKeyType="next"
                 placeholder="you@example.com"
                 placeholderTextColor="rgba(255,255,255,0.35)"
                 onFocus={() => setEmailFocused(true)}
@@ -218,6 +234,8 @@ export default function RegisterScreen() {
                 onChangeText={setPassword}
                 secureTextEntry
                 autoComplete="new-password"
+                returnKeyType="go"
+                onSubmitEditing={handleRegister}
                 placeholder="Min. 8 characters"
                 placeholderTextColor="rgba(255,255,255,0.35)"
                 onFocus={() => setPasswordFocused(true)}
@@ -226,9 +244,9 @@ export default function RegisterScreen() {
             </View>
 
             <Pressable
-              style={[styles.button, loading && { opacity: 0.6 }]}
+              style={[styles.button, (loading || socialLoading) && { opacity: 0.6 }]}
               onPress={handleRegister}
-              disabled={loading}
+              disabled={loading || socialLoading}
             >
               {loading ? (
                 <ActivityIndicator color="#1A1040" size="small" />
@@ -244,6 +262,19 @@ export default function RegisterScreen() {
               <Text style={styles.footerLink}>Sign in</Text>
             </Link>
           </View>
+
+          {/* Legal — Apple requires Terms & Privacy links on sign-up */}
+          <Text style={styles.legalText}>
+            By creating an account, you agree to our{" "}
+            <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/terms")}>
+              Terms of Service
+            </Text>{" "}
+            and{" "}
+            <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/privacy")}>
+              Privacy Policy
+            </Text>
+            .
+          </Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -276,6 +307,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.xxl,
+    maxWidth: 500,
+    alignSelf: "center",
+    width: "100%",
   },
   logoContainer: {
     width: 80,
@@ -429,5 +463,17 @@ const styles = StyleSheet.create({
   dividerText: {
     color: "rgba(255,255,255,0.5)",
     fontSize: typography.sm,
+  },
+  legalText: {
+    fontSize: typography.xs,
+    color: "rgba(255,255,255,0.45)",
+    textAlign: "center",
+    lineHeight: 18,
+    marginTop: spacing.lg,
+    paddingHorizontal: spacing.md,
+  },
+  legalLink: {
+    color: "rgba(255,255,255,0.7)",
+    textDecorationLine: "underline",
   },
 });

@@ -16,7 +16,7 @@ import { getSupabase } from "@/lib/supabase-client";
 type Plan = "monthly" | "yearly";
 
 const PLAN_INFO: Record<Plan, { name: string; price: string; period: string; perMonth: string; badge?: string }> = {
-  yearly: { name: "Yearly", price: "$69.99", period: "year", perMonth: "$5.83/mo", badge: "SAVE 55%" },
+  yearly: { name: "Yearly", price: "$99.99", period: "year", perMonth: "$8.33/mo", badge: "SAVE 36%" },
   monthly: { name: "Monthly", price: "$12.99", period: "month", perMonth: "$12.99/mo" },
 };
 
@@ -194,7 +194,14 @@ function CheckoutContent({ plan }: { plan: Plan }) {
         throw new Error(data.error || "Failed to create subscription");
       }
 
-      router.replace("/dashboard?subscribed=1");
+      const confirmData = await safeJson(res);
+
+      // If user expected a trial but card fingerprint blocked it, let them know
+      if (trialEligible && confirmData.trialGranted === false) {
+        router.replace("/dashboard?subscribed=1&trial=denied");
+      } else {
+        router.replace("/dashboard?subscribed=1");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create subscription");
       setSubmitting(false);
@@ -465,6 +472,19 @@ function CheckoutContent({ plan }: { plan: Plan }) {
                 </div>
               </div>
             </div>
+
+            {/* Total due today */}
+            {trialEligible && (
+              <div style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                padding: "0.7rem 1rem", marginBottom: "1.25rem",
+                borderRadius: "var(--radius)", background: "var(--bg)",
+                border: "1px solid var(--border)",
+              }}>
+                <span style={{ fontSize: "0.85rem", color: "var(--subtext)", fontWeight: 500 }}>Total due today</span>
+                <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3ecf8e" }}>$0.00</span>
+              </div>
+            )}
 
             {/* Error */}
             {error && (

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, Platform } from "react-native";
 
 // ─── Staggered entrance ──────────────────────────────────────────────────────
@@ -28,7 +28,12 @@ export function useStaggeredEntrance(itemCount: number, delay = 80) {
       })
     );
 
-    Animated.stagger(delay, animations).start();
+    const composite = Animated.stagger(delay, animations);
+    composite.start();
+
+    return () => {
+      composite.stop();
+    };
   }, [itemCount, delay]);
 
   return anims.current.slice(0, itemCount);
@@ -52,13 +57,15 @@ export function useCountUp(target: number, duration = 800): number {
       setDisplayValue(Math.round(value));
     });
 
-    Animated.timing(anim, {
+    const timing = Animated.timing(anim, {
       toValue: target,
       duration,
       useNativeDriver: false, // value listener requires JS-driven
-    }).start();
+    });
+    timing.start();
 
     return () => {
+      timing.stop();
       anim.removeListener(listener);
     };
   }, [target, duration]);
@@ -69,8 +76,44 @@ export function useCountUp(target: number, duration = 800): number {
 // ─── Scale press ─────────────────────────────────────────────────────────────
 
 /**
- * Returns onPressIn / onPressOut handlers and an Animated.Value for scale.
+ * Hook that returns onPressIn / onPressOut handlers and an Animated.Value for scale.
  * Apply the scale via transform: [{ scale: scaleValue }].
+ *
+ * Must be called as a hook (stable across renders). Replaces the old
+ * `scalePress()` factory which required wrapping in useRef.
+ */
+export function useScalePress() {
+  const scaleValue = useRef(new Animated.Value(1)).current;
+
+  const handlers = useMemo(
+    () => ({
+      onPressIn: () => {
+        Animated.spring(scaleValue, {
+          toValue: 0.97,
+          useNativeDriver: true,
+          tension: 200,
+          friction: 10,
+        }).start();
+      },
+      onPressOut: () => {
+        Animated.spring(scaleValue, {
+          toValue: 1,
+          useNativeDriver: true,
+          tension: 200,
+          friction: 10,
+        }).start();
+      },
+    }),
+    [scaleValue]
+  );
+
+  return { scaleValue, ...handlers };
+}
+
+/**
+ * @deprecated Use `useScalePress()` hook instead. This factory function
+ * creates a new Animated.Value on every call and must be wrapped in useRef
+ * to avoid re-creating it each render.
  */
 export function scalePress() {
   const scaleValue = new Animated.Value(1);

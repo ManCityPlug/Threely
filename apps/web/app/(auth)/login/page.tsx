@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getSupabase } from "@/lib/supabase-client";
@@ -71,6 +71,14 @@ function LoginPageInner() {
   const [forgotLoading, setForgotLoading] = useState(false);
   const [forgotSent, setForgotSent] = useState(false);
   const [forgotCooldown, setForgotCooldown] = useState(0);
+  const forgotTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Clean up forgot-password cooldown timer on unmount
+  useEffect(() => {
+    return () => {
+      if (forgotTimerRef.current) clearInterval(forgotTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     setDevice(detectDevice());
@@ -180,7 +188,7 @@ function LoginPageInner() {
           lineHeight: 1.6, marginBottom: "1.75rem",
           maxWidth: 320, margin: "0 auto 1.75rem",
         }}>
-          The #1 AI app that turns any goal into reality. Just tell us what you want — we&apos;ll get you there.
+          The #1 AI app that turns any goal into reality.<br />Just tell us what you want — we&apos;ll get you there.
         </p>
 
         <div style={{
@@ -399,9 +407,10 @@ function LoginPageInner() {
                     });
                     setForgotLoading(false);
                     setForgotCooldown(60);
-                    const timer = setInterval(() => {
+                    if (forgotTimerRef.current) clearInterval(forgotTimerRef.current);
+                    forgotTimerRef.current = setInterval(() => {
                       setForgotCooldown((prev) => {
-                        if (prev <= 1) { clearInterval(timer); return 0; }
+                        if (prev <= 1) { if (forgotTimerRef.current) { clearInterval(forgotTimerRef.current); forgotTimerRef.current = null; } return 0; }
                         return prev - 1;
                       });
                     }, 1000);
@@ -436,9 +445,10 @@ function LoginPageInner() {
                   setForgotLoading(false);
                   setForgotSent(true);
                   setForgotCooldown(60);
-                  const timer = setInterval(() => {
+                  if (forgotTimerRef.current) clearInterval(forgotTimerRef.current);
+                  forgotTimerRef.current = setInterval(() => {
                     setForgotCooldown((prev) => {
-                      if (prev <= 1) { clearInterval(timer); return 0; }
+                      if (prev <= 1) { if (forgotTimerRef.current) { clearInterval(forgotTimerRef.current); forgotTimerRef.current = null; } return 0; }
                       return prev - 1;
                     });
                   }, 1000);

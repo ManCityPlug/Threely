@@ -1,8 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Dimensions, StyleSheet, View } from "react-native";
-import { useTheme } from "@/lib/theme";
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+import { Animated, StyleSheet, useWindowDimensions, View } from "react-native";
 
 const PARTICLE_COUNT = 45;
 const CONFETTI_COLORS = [
@@ -21,7 +18,8 @@ interface ConfettiProps {
 }
 
 interface Particle {
-  x: number;
+  /** Fraction of screen width (0..1) so position adapts to dimension changes */
+  xFraction: number;
   width: number;
   height: number;
   color: string;
@@ -32,7 +30,7 @@ interface Particle {
 
 function generateParticles(): Particle[] {
   return Array.from({ length: PARTICLE_COUNT }, () => ({
-    x: Math.random() * SCREEN_WIDTH,
+    xFraction: Math.random(),
     width: 6 + Math.random() * 6,
     height: 10 + Math.random() * 8,
     color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)],
@@ -43,6 +41,7 @@ function generateParticles(): Particle[] {
 }
 
 export function Confetti({ active }: ConfettiProps) {
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const fallAnims = useRef(
     Array.from({ length: PARTICLE_COUNT }, () => new Animated.Value(0))
   ).current;
@@ -69,7 +68,7 @@ export function Confetti({ active }: ConfettiProps) {
     fallAnims.forEach((a) => a.setValue(0));
 
     // Stagger start for each particle
-    const animations = fallAnims.map((anim, i) =>
+    const animations = fallAnims.map((anim) =>
       Animated.timing(anim, {
         toValue: 1,
         duration: 1800 + Math.random() * 600,
@@ -78,7 +77,12 @@ export function Confetti({ active }: ConfettiProps) {
       })
     );
 
-    Animated.parallel(animations).start();
+    const composite = Animated.parallel(animations);
+    composite.start();
+
+    return () => {
+      composite.stop();
+    };
   }, [active]);
 
   if (!active) return null;
@@ -88,7 +92,7 @@ export function Confetti({ active }: ConfettiProps) {
       {particles.map((p, i) => {
         const translateY = fallAnims[i].interpolate({
           inputRange: [0, 1],
-          outputRange: [-20, SCREEN_HEIGHT + 50],
+          outputRange: [-20, screenHeight + 50],
         });
 
         const translateX = fallAnims[i].interpolate({
@@ -118,7 +122,7 @@ export function Confetti({ active }: ConfettiProps) {
             style={[
               styles.particle,
               {
-                left: p.x,
+                left: p.xFraction * screenWidth,
                 width: p.width,
                 height: p.height,
                 backgroundColor: p.color,

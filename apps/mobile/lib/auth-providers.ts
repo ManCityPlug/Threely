@@ -35,8 +35,13 @@ export function useGoogleSignIn() {
         supabase.auth
           .signInWithIdToken({ provider: "google", token: id_token })
           .then(({ error }) => {
-            setLoading(false);
             if (error) Alert.alert("Sign-in failed", error.message);
+          })
+          .catch((e) => {
+            Alert.alert("Sign-in failed", e?.message ?? "An unexpected error occurred");
+          })
+          .finally(() => {
+            setLoading(false);
           });
       }
     }

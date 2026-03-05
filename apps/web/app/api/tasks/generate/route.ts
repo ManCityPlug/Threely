@@ -39,6 +39,10 @@ export async function POST(request: NextRequest) {
     }
   }
 
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json({ error: "ANTHROPIC_API_KEY not configured" }, { status: 500 });
+  }
+
   const { checkRateLimit } = await import("@/lib/rate-limit");
   const { allowed } = checkRateLimit(user.id);
   if (!allowed) {
@@ -121,7 +125,7 @@ export async function POST(request: NextRequest) {
     });
 
   // ── Generation limit: 1 extra generation per goal per day ─────────────────
-  if (requestingAdditional) {
+  if (requestingAdditional || postReview) {
     for (const goal of goals) {
       const existing = await prisma.dailyTask.findUnique({
         where: { goalId_date: { goalId: goal.id, date: today } },
@@ -276,6 +280,7 @@ export async function POST(request: NextRequest) {
             totalCompleted: goalTotalCompleted,
             completionRate: goalCompletionRate,
           },
+          userId: user.id,
         });
 
         aiTasks = result.tasks;
@@ -344,7 +349,11 @@ export async function POST(request: NextRequest) {
   );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
+    const isTimeout = msg.includes("timeout") || msg.includes("ETIMEDOUT") || msg.includes("Request timed out");
     console.error("[/api/tasks/generate]", msg, e);
+    if (isTimeout) {
+      return NextResponse.json({ error: "The AI took too long to respond. Please try again." }, { status: 504 });
+    }
     return NextResponse.json({ error: msg || "Failed to generate tasks" }, { status: 500 });
   }
 }

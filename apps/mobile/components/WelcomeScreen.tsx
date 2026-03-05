@@ -2,12 +2,13 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   Animated,
   BackHandler,
-  Dimensions,
   Image,
+  Linking,
   Platform,
   Pressable,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
@@ -23,7 +24,6 @@ import {
   isAppleSignInAvailable,
 } from "@/lib/auth-providers";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const WELCOME_KEY = "@threely_welcome_seen";
 const PRIMARY = "#635BFF";
 const TOTAL_PAGES = 4;
@@ -42,14 +42,14 @@ interface WelcomeScreenProps {
 
 // ── Dot Indicators ────────────────────────────────────────────────────────────
 
-function DotIndicators({ scrollX }: { scrollX: Animated.Value }) {
+function DotIndicators({ scrollX, screenWidth }: { scrollX: Animated.Value; screenWidth: number }) {
   return (
     <View style={styles.dotsRow}>
       {GRADIENTS.map((_, i) => {
         const inputRange = [
-          (i - 1) * SCREEN_WIDTH,
-          i * SCREEN_WIDTH,
-          (i + 1) * SCREEN_WIDTH,
+          (i - 1) * screenWidth,
+          i * screenWidth,
+          (i + 1) * screenWidth,
         ];
 
         const width = scrollX.interpolate({
@@ -77,7 +77,7 @@ function DotIndicators({ scrollX }: { scrollX: Animated.Value }) {
 
 // ── Page 1: The Hook ──────────────────────────────────────────────────────────
 
-function PageHook({ anim }: { anim: Animated.Value }) {
+function PageHook({ anim, screenWidth }: { anim: Animated.Value; screenWidth: number }) {
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const floatAnim = useRef(new Animated.Value(0)).current;
   const sparkleAnims = useRef(
@@ -85,33 +85,48 @@ function PageHook({ anim }: { anim: Animated.Value }) {
   ).current;
 
   useEffect(() => {
+    const loops: Animated.CompositeAnimation[] = [];
+
     // Floating up/down
-    Animated.loop(
+    const floatLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(floatAnim, { toValue: -8, duration: 2000, useNativeDriver: true }),
         Animated.timing(floatAnim, { toValue: 0, duration: 2000, useNativeDriver: true }),
       ])
-    ).start();
+    );
+    loops.push(floatLoop);
+    floatLoop.start();
 
     // Pulsing glow — matches web: pulse 3s ease-in-out infinite
-    Animated.loop(
+    const pulseLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, { toValue: 1.06, duration: 1500, useNativeDriver: true }),
         Animated.timing(pulseAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
       ])
-    ).start();
+    );
+    loops.push(pulseLoop);
+    pulseLoop.start();
 
     // Sparkles — each loops infinitely with staggered delay (matches web: sparkle 2s infinite)
+    const timers: ReturnType<typeof setTimeout>[] = [];
     sparkleAnims.forEach((a, idx) => {
-      setTimeout(() => {
-        Animated.loop(
+      const timer = setTimeout(() => {
+        const sparkleLoop = Animated.loop(
           Animated.sequence([
             Animated.timing(a, { toValue: 1, duration: 1000, useNativeDriver: true }),
             Animated.timing(a, { toValue: 0, duration: 1000, useNativeDriver: true }),
           ])
-        ).start();
+        );
+        loops.push(sparkleLoop);
+        sparkleLoop.start();
       }, 600 + idx * 80);
+      timers.push(timer);
     });
+
+    return () => {
+      timers.forEach(clearTimeout);
+      loops.forEach((l) => l.stop());
+    };
   }, []);
 
   const translateY = (idx: number, base: number) =>
@@ -130,7 +145,7 @@ function PageHook({ anim }: { anim: Animated.Value }) {
   ];
 
   return (
-    <View style={styles.page}>
+    <View style={[styles.page, { width: screenWidth }]}>
       {/* Logo with glow + sparkles + float */}
       <Animated.View
         style={[
@@ -233,7 +248,7 @@ const STEPS = [
   },
 ];
 
-function PageHowItWorks({ anim }: { anim: Animated.Value }) {
+function PageHowItWorks({ anim, screenWidth }: { anim: Animated.Value; screenWidth: number }) {
   const stepAnims = useRef(
     Array.from({ length: 4 }, () => new Animated.Value(0))
   ).current;
@@ -241,7 +256,7 @@ function PageHowItWorks({ anim }: { anim: Animated.Value }) {
 
   useEffect(() => {
     // Stagger step entrances
-    Animated.stagger(
+    const stagger = Animated.stagger(
       180,
       stepAnims.map((a) =>
         Animated.timing(a, {
@@ -250,15 +265,22 @@ function PageHowItWorks({ anim }: { anim: Animated.Value }) {
           useNativeDriver: true,
         })
       )
-    ).start();
+    );
+    stagger.start();
 
     // Line draw
-    Animated.timing(lineAnim, {
+    const lineTiming = Animated.timing(lineAnim, {
       toValue: 1,
       duration: 1000,
       delay: 200,
       useNativeDriver: false,
-    }).start();
+    });
+    lineTiming.start();
+
+    return () => {
+      stagger.stop();
+      lineTiming.stop();
+    };
   }, []);
 
   const lineHeight = lineAnim.interpolate({
@@ -267,7 +289,7 @@ function PageHowItWorks({ anim }: { anim: Animated.Value }) {
   });
 
   return (
-    <View style={styles.page}>
+    <View style={[styles.page, { width: screenWidth }]}>
       <Animated.Text style={[styles.titleXXL, { opacity: anim }]}>
         How it works
       </Animated.Text>
@@ -323,7 +345,7 @@ function PageHowItWorks({ anim }: { anim: Animated.Value }) {
 
 // ── Page 3: The Payoff ────────────────────────────────────────────────────────
 
-function PagePayoff({ anim, isVisible }: { anim: Animated.Value; isVisible: boolean }) {
+function PagePayoff({ anim, isVisible, screenWidth }: { anim: Animated.Value; isVisible: boolean; screenWidth: number }) {
   const checkScale = useRef(new Animated.Value(0)).current;
   const hasTriggered = useRef(false);
 
@@ -349,7 +371,7 @@ function PagePayoff({ anim, isVisible }: { anim: Animated.Value; isVisible: bool
     });
 
   return (
-    <View style={styles.page}>
+    <View style={[styles.page, { width: screenWidth }]}>
       {/* Animated rocket */}
       <Animated.View
         style={[
@@ -425,9 +447,10 @@ interface PageAuthProps {
   onAppleSignIn: () => void;
   googleLoading: boolean;
   appleLoading: boolean;
+  screenWidth: number;
 }
 
-function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoading, appleLoading }: PageAuthProps) {
+function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoading, appleLoading, screenWidth }: PageAuthProps) {
   const socialLoading = googleLoading || appleLoading;
   const floatAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -436,29 +459,46 @@ function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoadi
   ).current;
 
   useEffect(() => {
-    Animated.loop(
+    const loops: Animated.CompositeAnimation[] = [];
+
+    const floatLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(floatAnim, { toValue: -6, duration: 2000, useNativeDriver: true }),
         Animated.timing(floatAnim, { toValue: 0, duration: 2000, useNativeDriver: true }),
       ])
-    ).start();
-    Animated.loop(
+    );
+    loops.push(floatLoop);
+    floatLoop.start();
+
+    const pulseLoop = Animated.loop(
       Animated.sequence([
         Animated.timing(pulseAnim, { toValue: 1.06, duration: 1500, useNativeDriver: true }),
         Animated.timing(pulseAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
       ])
-    ).start();
+    );
+    loops.push(pulseLoop);
+    pulseLoop.start();
+
     // Sparkles — loop infinitely with stagger
+    const timers: ReturnType<typeof setTimeout>[] = [];
     sparkleAnims.forEach((a, idx) => {
-      setTimeout(() => {
-        Animated.loop(
+      const timer = setTimeout(() => {
+        const sparkleLoop = Animated.loop(
           Animated.sequence([
             Animated.timing(a, { toValue: 1, duration: 1000, useNativeDriver: true }),
             Animated.timing(a, { toValue: 0, duration: 1000, useNativeDriver: true }),
           ])
-        ).start();
+        );
+        loops.push(sparkleLoop);
+        sparkleLoop.start();
       }, 600 + idx * 80);
+      timers.push(timer);
     });
+
+    return () => {
+      timers.forEach(clearTimeout);
+      loops.forEach((l) => l.stop());
+    };
   }, []);
 
   const authSparklePositions = [
@@ -467,7 +507,7 @@ function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoadi
   ];
 
   return (
-    <View style={styles.page}>
+    <View style={[styles.page, { width: screenWidth }]}>
       {/* Logo with float + pulse + glow + sparkles */}
       <Animated.View style={[styles.authLogoWrap, { opacity: anim, transform: [{ scale: pulseAnim }, { translateY: floatAnim }] }]}>
         <View style={styles.authLogoGlow} />
@@ -549,6 +589,21 @@ function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoadi
           </Text>
         </Pressable>
       </Animated.View>
+
+      {/* Legal — Apple requires Terms & Privacy links on sign-up */}
+      <Animated.View style={{ opacity: anim, marginTop: spacing.lg }}>
+        <Text style={styles.legalText}>
+          By continuing, you agree to our{" "}
+          <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/terms")}>
+            Terms
+          </Text>{" "}
+          and{" "}
+          <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/privacy")}>
+            Privacy Policy
+          </Text>
+          .
+        </Text>
+      </Animated.View>
     </View>
   );
 }
@@ -556,6 +611,10 @@ function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoadi
 // ── Main WelcomeScreen ────────────────────────────────────────────────────────
 
 export function WelcomeScreen({ onComplete, initialPage = 0 }: WelcomeScreenProps) {
+  const { width: SCREEN_WIDTH } = useWindowDimensions();
+  const screenWidthRef = useRef(SCREEN_WIDTH);
+  screenWidthRef.current = SCREEN_WIDTH;
+
   const scrollX = useRef(new Animated.Value(initialPage * SCREEN_WIDTH)).current;
   const flatListRef = useRef<Animated.FlatList>(null);
   const [currentPage, setCurrentPage] = useState(initialPage);
@@ -613,7 +672,7 @@ export function WelcomeScreen({ onComplete, initialPage = 0 }: WelcomeScreenProp
   const scrollToPage = useCallback(
     (page: number) => {
       flatListRef.current?.scrollToOffset({
-        offset: page * SCREEN_WIDTH,
+        offset: page * screenWidthRef.current,
         animated: true,
       });
     },
@@ -633,7 +692,7 @@ export function WelcomeScreen({ onComplete, initialPage = 0 }: WelcomeScreenProp
 
   const onMomentumScrollEnd = useCallback(
     (e: any) => {
-      const page = Math.round(e.nativeEvent.contentOffset.x / SCREEN_WIDTH);
+      const page = Math.round(e.nativeEvent.contentOffset.x / screenWidthRef.current);
       setCurrentPage(page);
     },
     []
@@ -643,10 +702,10 @@ export function WelcomeScreen({ onComplete, initialPage = 0 }: WelcomeScreenProp
     ({ index }: { item: number; index: number }) => {
       return (
         <View style={{ width: SCREEN_WIDTH, backgroundColor: "transparent" }}>
-          {index === 0 && <PageHook anim={pageAnims[0]} />}
-          {index === 1 && <PageHowItWorks anim={pageAnims[1]} />}
+          {index === 0 && <PageHook anim={pageAnims[0]} screenWidth={SCREEN_WIDTH} />}
+          {index === 1 && <PageHowItWorks anim={pageAnims[1]} screenWidth={SCREEN_WIDTH} />}
           {index === 2 && (
-            <PagePayoff anim={pageAnims[2]} isVisible={currentPage === 2} />
+            <PagePayoff anim={pageAnims[2]} isVisible={currentPage === 2} screenWidth={SCREEN_WIDTH} />
           )}
           {index === 3 && (
             <PageAuth
@@ -656,12 +715,13 @@ export function WelcomeScreen({ onComplete, initialPage = 0 }: WelcomeScreenProp
               onAppleSignIn={appleSignIn}
               googleLoading={googleLoading}
               appleLoading={appleLoading}
+              screenWidth={SCREEN_WIDTH}
             />
           )}
         </View>
       );
     },
-    [currentPage, onComplete, pageAnims]
+    [currentPage, onComplete, pageAnims, SCREEN_WIDTH]
   );
 
   // Per-page opacity for cross-fading background gradients
@@ -671,6 +731,16 @@ export function WelcomeScreen({ onComplete, initialPage = 0 }: WelcomeScreenProp
       outputRange: [0, 1, 0],
       extrapolate: "clamp",
     })
+  );
+
+  // Dynamic getItemLayout — uses current screen width for proper iPad paging
+  const getItemLayout = useCallback(
+    (_: any, index: number) => ({
+      length: SCREEN_WIDTH,
+      offset: SCREEN_WIDTH * index,
+      index,
+    }),
+    [SCREEN_WIDTH]
   );
 
   return (
@@ -707,17 +777,13 @@ export function WelcomeScreen({ onComplete, initialPage = 0 }: WelcomeScreenProp
           onScroll={onScroll}
           scrollEventThrottle={16}
           onMomentumScrollEnd={onMomentumScrollEnd}
-          getItemLayout={(_: any, index: number) => ({
-            length: SCREEN_WIDTH,
-            offset: SCREEN_WIDTH * index,
-            index,
-          })}
+          getItemLayout={getItemLayout}
           style={{ backgroundColor: "transparent" }}
         />
 
         {/* Bottom area: dots + next button */}
         <Animated.View style={styles.bottomBar}>
-          <DotIndicators scrollX={scrollX} />
+          <DotIndicators scrollX={scrollX} screenWidth={SCREEN_WIDTH} />
 
           <Animated.View
             style={{
@@ -792,9 +858,9 @@ const styles = StyleSheet.create({
     fontWeight: typography.semibold,
   },
 
-  // Page shared
+  // Page shared — width is overridden at runtime via inline style with
+  // useWindowDimensions for proper iPad / multitasking support
   page: {
-    width: SCREEN_WIDTH,
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
@@ -998,5 +1064,16 @@ const styles = StyleSheet.create({
   signInLink: {
     color: "rgba(255,255,255,0.95)",
     fontWeight: typography.semibold,
+  },
+  legalText: {
+    fontSize: typography.xs,
+    color: "rgba(255,255,255,0.4)",
+    textAlign: "center",
+    lineHeight: 18,
+    paddingHorizontal: spacing.md,
+  },
+  legalLink: {
+    textDecorationLine: "underline",
+    color: "rgba(255,255,255,0.6)",
   },
 });

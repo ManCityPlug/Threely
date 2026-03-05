@@ -162,6 +162,7 @@ export async function POST(request: NextRequest) {
           totalMinutesInvested: totalMinutes,
           currentStreak: 0,
           dailyBreakdown,
+          userId: user.id,
         });
       } catch (e) {
         console.error("[weekly-open insight]", e);

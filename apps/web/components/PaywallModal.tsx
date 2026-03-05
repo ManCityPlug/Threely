@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { type PaywallVariant } from "@/lib/subscription-context";
+import { type PaywallVariant, useSubscription } from "@/lib/subscription-context";
 
 type Plan = "monthly" | "yearly";
 
-const PLANS: { key: Plan; name: string; price: string; sub: string; badge?: string }[] = [
-  { key: "yearly", name: "Yearly", price: "$69.99", sub: "$5.83/mo \u00B7 billed annually", badge: "SAVE 55%" },
-  { key: "monthly", name: "Monthly", price: "$12.99", sub: "per month" },
+const PLANS: { key: Plan; name: string; price: string; sub: string; trialSub: string; badge?: string }[] = [
+  { key: "yearly", name: "Yearly", price: "$99.99", sub: "$8.33/mo \u00B7 billed annually", trialSub: "7 Day Free Trial \u00B7 $8.33/mo \u00B7 billed annually", badge: "SAVE 36%" },
+  { key: "monthly", name: "Monthly", price: "$12.99", sub: "per month", trialSub: "7 Day Free Trial \u00B7 per month" },
 ];
 
 interface PaywallModalProps {
@@ -17,23 +17,25 @@ interface PaywallModalProps {
 
 export default function PaywallModal({ variant = "sheet", onClose }: PaywallModalProps) {
   const [plan, setPlan] = useState<Plan>("yearly");
+  const { trialEligible } = useSubscription();
   const selectedPlan = PLANS.find((p) => p.key === plan)!;
 
   if (variant === "fullscreen") {
-    return <FullScreenPaywall plan={plan} setPlan={setPlan} selectedPlan={selectedPlan} onClose={onClose} />;
+    return <FullScreenPaywall plan={plan} setPlan={setPlan} selectedPlan={selectedPlan} onClose={onClose} trialEligible={trialEligible} />;
   }
 
-  return <SheetPaywall plan={plan} setPlan={setPlan} selectedPlan={selectedPlan} onClose={onClose} />;
+  return <SheetPaywall plan={plan} setPlan={setPlan} selectedPlan={selectedPlan} onClose={onClose} trialEligible={trialEligible} />;
 }
 
 // ── Full-screen variant (post-onboarding) ─────────────────────────────────────
 function FullScreenPaywall({
-  plan, setPlan, selectedPlan, onClose,
+  plan, setPlan, selectedPlan, onClose, trialEligible,
 }: {
   plan: Plan;
   setPlan: (p: Plan) => void;
   selectedPlan: (typeof PLANS)[number];
   onClose: () => void;
+  trialEligible: boolean;
 }) {
   function handleCheckout() {
     window.location.href = `/checkout?plan=${plan}`;
@@ -52,12 +54,16 @@ function FullScreenPaywall({
       </div>
 
       <h2 className="paywall-heading">
-        Get Threely Pro<br />
-        <strong>free for 7 days</strong>
+        {trialEligible ? (
+          <>Get Threely Pro<br /><strong>free for 7 days</strong></>
+        ) : (
+          <>Get Threely Pro</>
+        )}
       </h2>
       <p className="paywall-subheading">
-        We offer 7 days free so everyone can achieve their goals.
-        You'll get a reminder 2 days before your free period ends.
+        {trialEligible
+          ? "We offer 7 days free so everyone can achieve their goals. You'll get a reminder 2 days before your free period ends."
+          : <>The #1 AI app that turns any goal into reality.<br />Just tell us what you want — we&apos;ll get you there.</>}
       </p>
 
       {/* Plan selector */}
@@ -77,24 +83,34 @@ function FullScreenPaywall({
                   <span className="paywall-plan-name">{p.name}</span>
                   {p.badge && <span className="paywall-plan-badge">{p.badge}</span>}
                 </div>
-                <span className="paywall-plan-sub">{p.sub}</span>
+                <span className="paywall-plan-sub">{trialEligible ? p.trialSub : p.sub}</span>
               </div>
               <span className="paywall-plan-price">{p.price}</span>
             </div>
-            <span className="paywall-plan-trial">7 days free</span>
+            {trialEligible && <span className="paywall-plan-trial">7 days free</span>}
           </button>
         ))}
       </div>
+
+      {/* Total due today */}
+      {trialEligible && (
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.6rem 1rem", marginBottom: "0.75rem", borderRadius: 10, background: "rgba(255,255,255,0.08)" }}>
+          <span style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.7)", fontWeight: 500 }}>Total due today</span>
+          <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3ecf8e" }}>$0.00</span>
+        </div>
+      )}
 
       {/* CTA */}
       <button
         className="paywall-cta-btn"
         onClick={handleCheckout}
       >
-        Get Pro Free
+        {trialEligible ? "Start Free Trial" : "Subscribe"}
       </button>
       <p className="paywall-cta-sub">
-        7 days free &middot; then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
+        {trialEligible
+          ? <>No charge for 7 days. Cancel anytime in Settings.<br />Then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}</>
+          : <>Cancel anytime in Settings.</>}
       </p>
 
       {/* Footer */}
@@ -113,12 +129,13 @@ function FullScreenPaywall({
 
 // ── Sheet variant (blocked actions) ──────────────────────────────────────────
 function SheetPaywall({
-  plan, setPlan, selectedPlan, onClose,
+  plan, setPlan, selectedPlan, onClose, trialEligible,
 }: {
   plan: Plan;
   setPlan: (p: Plan) => void;
   selectedPlan: (typeof PLANS)[number];
   onClose: () => void;
+  trialEligible: boolean;
 }) {
   function handleCheckout() {
     window.location.href = `/checkout?plan=${plan}`;
@@ -162,7 +179,7 @@ function SheetPaywall({
             Unlock this with Threely Pro
           </h2>
           <p style={{ fontSize: "0.875rem", color: "var(--subtext)" }}>
-            10x your productivity and Reach your goals.
+            The #1 AI app that turns any goal into reality.<br />Just tell us what you want — we&apos;ll get you there.
           </p>
         </div>
 
@@ -202,7 +219,7 @@ function SheetPaywall({
                     </span>
                   )}
                 </div>
-                <span style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{p.sub}</span>
+                <span style={{ fontSize: "0.75rem", color: "var(--muted)" }}>{trialEligible ? p.trialSub : p.sub}</span>
               </div>
               <span style={{
                 fontSize: "1rem", fontWeight: 700, letterSpacing: "-0.02em",
@@ -214,6 +231,19 @@ function SheetPaywall({
           ))}
         </div>
 
+        {/* Total due today */}
+        {trialEligible && (
+          <div style={{
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            padding: "0.6rem 1rem", marginBottom: "0.75rem",
+            borderRadius: 10, background: "var(--bg)",
+            border: "1px solid var(--border)",
+          }}>
+            <span style={{ fontSize: "0.85rem", color: "var(--subtext)", fontWeight: 500 }}>Total due today</span>
+            <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3ecf8e" }}>$0.00</span>
+          </div>
+        )}
+
         {/* CTA */}
         <button
           className="btn btn-primary"
@@ -224,11 +254,13 @@ function SheetPaywall({
             marginBottom: "0.75rem",
           }}
         >
-          Get Pro Free
+          {trialEligible ? "Start Free Trial" : "Subscribe"}
         </button>
 
         <p style={{ fontSize: "0.75rem", color: "var(--muted)", textAlign: "center", marginBottom: "0.75rem" }}>
-          7 days free &middot; then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}
+          {trialEligible
+            ? <>No charge for 7 days. Cancel anytime in Settings.<br />Then {selectedPlan.price}/{plan === "yearly" ? "year" : "month"}</>
+            : <>Cancel anytime in Settings.</>}
         </p>
 
         {/* Dismiss */}

@@ -105,6 +105,7 @@ export async function GET(request: NextRequest) {
             totalMinutesInvested: totalMinutes,
             currentStreak: 0,
             dailyBreakdown,
+            userId: user.id,
           });
           summary.insight = insight;
         } catch (e) {

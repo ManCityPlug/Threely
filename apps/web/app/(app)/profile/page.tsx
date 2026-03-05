@@ -222,7 +222,7 @@ export default function ProfilePage() {
 
   // Load focus goal name
   useEffect(() => {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = new Date().toLocaleDateString("en-CA");
     const focusId = localStorage.getItem(`threely_focus_${today}`);
     if (focusId) {
       goalsApi.list().then(res => {
@@ -756,7 +756,7 @@ export default function ProfilePage() {
                   <button
                     className="btn btn-outline"
                     onClick={() => {
-                      const today = new Date().toISOString().slice(0, 10);
+                      const today = new Date().toLocaleDateString("en-CA");
                       localStorage.removeItem(`threely_focus_${today}`);
                       setFocusGoalName(null);
                       router.push("/dashboard");

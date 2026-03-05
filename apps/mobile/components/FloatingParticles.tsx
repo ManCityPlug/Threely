@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from "react";
-import { Animated, Dimensions, StyleSheet, View } from "react-native";
+import { Animated, StyleSheet, useWindowDimensions, View } from "react-native";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 const PARTICLE_COUNT = 20;
 
 interface ParticleData {
-  x: number;
-  y: number;
+  /** 0-1 fraction of screen width */
+  xFrac: number;
+  /** 0-1 fraction of screen height (capped at 80%) */
+  yFrac: number;
   size: number;
   opacity: number;
   floatRange: number;
@@ -15,11 +16,9 @@ interface ParticleData {
 }
 
 function generateParticles(): ParticleData[] {
-  // Keep particles in the upper 80% of the screen to avoid the bottom bar
-  const maxY = SCREEN_HEIGHT * 0.8;
   return Array.from({ length: PARTICLE_COUNT }, () => ({
-    x: Math.random() * SCREEN_WIDTH,
-    y: Math.random() * maxY,
+    xFrac: Math.random(),
+    yFrac: Math.random() * 0.8,
     size: 3 + Math.random() * 5,
     opacity: 0.1 + Math.random() * 0.3,
     floatRange: 15 + Math.random() * 25,
@@ -29,12 +28,15 @@ function generateParticles(): ParticleData[] {
 }
 
 export function FloatingParticles() {
+  const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = useWindowDimensions();
   const particles = useRef(generateParticles()).current;
   const anims = useRef(
     Array.from({ length: PARTICLE_COUNT }, () => new Animated.Value(0))
   ).current;
 
   useEffect(() => {
+    const loops: Animated.CompositeAnimation[] = [];
+
     anims.forEach((anim, i) => {
       const { duration, delay } = particles[i];
 
@@ -54,8 +56,13 @@ export function FloatingParticles() {
         ])
       );
 
+      loops.push(loop);
       loop.start();
     });
+
+    return () => {
+      loops.forEach((l) => l.stop());
+    };
   }, []);
 
   return (
@@ -71,8 +78,8 @@ export function FloatingParticles() {
             key={i}
             style={{
               position: "absolute",
-              left: p.x,
-              top: p.y,
+              left: p.xFrac * SCREEN_WIDTH,
+              top: p.yFrac * SCREEN_HEIGHT,
               transform: [{ translateY }],
             }}
           >
@@ -96,9 +103,5 @@ const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 1,
-  },
-  particle: {
-    position: "absolute",
-    backgroundColor: "#FFFFFF",
   },
 });

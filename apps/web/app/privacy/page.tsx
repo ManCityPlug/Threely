@@ -5,7 +5,7 @@ import MarketingFooter from "@/components/MarketingFooter";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
-    "Learn how Threely collects, uses, and protects your personal information. Your data is encrypted, never sold, and never used to train AI models.",
+    "Learn how Threely collects, uses, and protects your personal information. Your data is encrypted, never sold, and never shared with third parties for AI training.",
   alternates: { canonical: "/privacy" },
 };
 
@@ -84,10 +84,10 @@ export default function PrivacyPage() {
 
           <h2 style={h2Style}>3. AI Processing</h2>
           <p style={pStyle}>
-            Your goals, profile preferences, and task history are sent to our AI provider to generate personalized daily tasks and coaching insights. This data is processed in real-time and is not used to train any third-party AI models.
+            Your goals, profile preferences, and task history are sent to our AI provider to generate personalized daily tasks and coaching insights. This data is not shared with or used to train any third-party AI models.
           </p>
           <p style={pStyle}>
-            We do not sell, share, or use your personal content for AI model training.
+            We may use anonymized and aggregated interaction data to improve and personalize our AI-powered features, including training our own internal models to provide a better coaching experience. We do not sell or share your personal content with external parties for AI training purposes.
           </p>
 
           <h2 style={h2Style}>4. Data Storage and Security</h2>

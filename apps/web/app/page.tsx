@@ -101,6 +101,7 @@ export default function LandingPage() {
                 { label: "Pricing", href: "/pricing" },
                 { label: "FAQ", href: "/faq" },
                 { label: "About", href: "/about" },
+                { label: "Support", href: "/support" },
               ].map(item => (
                 <Link key={item.label} href={item.href} style={{
                   padding: "0.35rem 0.75rem",
@@ -174,6 +175,7 @@ export default function LandingPage() {
             { label: "FAQ", href: "/faq" },
             { label: "Pricing", href: "/pricing" },
             { label: "About", href: "/about" },
+            { label: "Support", href: "/support" },
           ].map(item => (
             <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{
               padding: "0.6rem 0",
@@ -215,7 +217,7 @@ export default function LandingPage() {
                 }}>
                   Sign in
                 </Link>
-                <Link href="/login" onClick={() => setMenuOpen(false)} style={{
+                <Link href="/welcome" onClick={() => setMenuOpen(false)} style={{
                   flex: 1, textAlign: "center",
                   padding: "0.6rem 0",
                   fontSize: "0.875rem", fontWeight: 600,
@@ -298,7 +300,7 @@ export default function LandingPage() {
             marginBottom: isMobile ? "1rem" : "1.25rem",
           }}>
             10x your productivity.<br />
-            <span style={{ color: "#635bff" }}>Reach your goals.</span>
+            <span style={{ background: "linear-gradient(135deg, #635bff, #9b59b6, #635bff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Reach your goals.</span>
           </h1>
 
           <p style={{
@@ -308,7 +310,7 @@ export default function LandingPage() {
             maxWidth: 540,
             margin: isMobile ? "0 auto 1.5rem" : "0 auto 2.5rem",
           }}>
-            The #1 AI app that turns any goal into reality. Just tell us what you want — we&apos;ll get you there.
+            The #1 AI app that turns any goal into reality.<br />Just tell us what you want — we&apos;ll get you there.
           </p>
 
           {/* Get started button */}
@@ -825,7 +827,7 @@ export default function LandingPage() {
           }}>
             Set your first goal and get 3 personalized tasks in under a minute.
           </p>
-          <Link href="/login" style={{
+          <Link href="/welcome" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#fff",
@@ -899,7 +901,7 @@ export default function LandingPage() {
           <Link href="/login" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Sign in
           </Link>
-          <Link href="/login" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
+          <Link href="/welcome" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Get started
           </Link>
           <Link href="/faq" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
@@ -910,6 +912,9 @@ export default function LandingPage() {
           </Link>
           <Link href="/about" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             About
+          </Link>
+          <Link href="/support" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
+            Support
           </Link>
         </div>
         <div style={{ display: "flex", justifyContent: "center", gap: 20, flexWrap: "wrap", marginBottom: 16 }}>

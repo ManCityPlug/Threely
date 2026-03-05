@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth, getNickname } from "@/lib/auth-context";
@@ -690,6 +690,14 @@ function ReviewModal({
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
+  return (
+    <Suspense>
+      <DashboardPageInner />
+    </Suspense>
+  );
+}
+
+function DashboardPageInner() {
   const { user } = useAuth();
   const { showToast } = useToast();
   const { hasPro, showPaywall, refreshSubscription, walkthroughActive } = useSubscription();

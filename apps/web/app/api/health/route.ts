@@ -1,10 +1,21 @@
 import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
+  let minAppVersion = "1.0.0";
+  try {
+    const config = await prisma.systemConfig.findUnique({
+      where: { key: "minAppVersion" },
+    });
+    if (config?.value) minAppVersion = config.value;
+  } catch {
+    // DB failure — fall back to safe default so the app doesn't block anyone
+  }
+
   return NextResponse.json({
     status: "ok",
     service: "threely-api",
-    minAppVersion: "1.0.0", // Bump this when a breaking update is released
+    minAppVersion,
     timestamp: new Date().toISOString(),
   });
 }
