@@ -194,11 +194,13 @@ function TaskCard({
       <div style={{ display: "flex", gap: "1rem", alignItems: "flex-start" }}>
         {!readonly && (
           <button
-            className={`task-checkbox${task.isCompleted ? " checked" : ""}`}
-            onClick={() => onToggle?.(task.id, !task.isCompleted)}
-            style={{ marginTop: 2 }}
+            className={`task-checkbox${task.isCompleted ? " checked" : ""}${task.isSkipped ? " skipped" : ""}`}
+            onClick={() => !task.isSkipped && onToggle?.(task.id, !task.isCompleted)}
+            style={{ marginTop: 2, cursor: task.isSkipped ? "not-allowed" : undefined }}
+            disabled={task.isSkipped}
           >
             {task.isCompleted && "\u2713"}
+            {task.isSkipped && "\u2715"}
           </button>
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -899,12 +901,12 @@ function DashboardPageInner() {
 
   const displayedItems = displayedTasks.map(x => x.task);
   const allDisplayedItems = displayedItems;
-  const completedCount = allDisplayedItems.filter(t => t.isCompleted).length;
+  const completedCount = allDisplayedItems.filter(t => t.isCompleted || t.isSkipped).length;
   const totalCount = allDisplayedItems.length;
   const allDone = totalCount > 0 && completedCount === totalCount;
   const progress = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   const totalEstimatedMinutes = allDisplayedItems
-    .filter(t => !t.isCompleted)
+    .filter(t => !t.isCompleted && !t.isSkipped)
     .reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
 
   function pickGoal(val: string) {

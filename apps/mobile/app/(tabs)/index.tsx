@@ -446,14 +446,14 @@ export default function DashboardScreen() {
   const hasVisibleTasks = visibleTasks.length > 0;
 
   const allDisplayedItems = newTaskItems;
-  const allDone = allDisplayedItems.length > 0 && allDisplayedItems.every((t) => t.isCompleted);
-  const completedCount = allDisplayedItems.filter((t) => t.isCompleted).length;
+  const allDone = allDisplayedItems.length > 0 && allDisplayedItems.every((t) => t.isCompleted || t.isSkipped);
+  const completedCount = allDisplayedItems.filter((t) => t.isCompleted || t.isSkipped).length;
   const totalCount = allDisplayedItems.length;
 
   const totalEstimatedMinutes = (() => {
     const displayed = displayVisibleTasks.flatMap(dt => Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []);
     return displayed
-      .filter(t => !t.isCompleted)
+      .filter(t => !t.isCompleted && !t.isSkipped)
       .reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
   })();
 
