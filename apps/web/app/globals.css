@@ -445,10 +445,11 @@ input, textarea, select {
 
 /* ─── Responsive breakpoints ─────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .sidebar { display: none; }
-  .mobile-topbar { display: flex; }
-  .main-content { margin-left: 0; padding-bottom: 70px; padding-top: 0; }
-  .bottom-nav { display: flex; }
+  .app-shell { flex-direction: column; }
+  .sidebar { display: none !important; }
+  .mobile-topbar { display: flex !important; width: 100%; }
+  .main-content { margin-left: 0 !important; padding-bottom: 70px; padding-top: 0; }
+  .bottom-nav { display: flex !important; }
   .page-inner { padding: 1.25rem 1rem; }
   .modal-box { padding: 1.5rem; border-radius: var(--radius-lg); max-width: calc(100vw - 2rem); }
   .desktop-only { display: none !important; }
@@ -484,8 +485,9 @@ input, textarea, select {
 }
 
 /* ─── Force mobile layout for tablets (iPad/Android tablets) ─────────────── */
+.force-mobile { flex-direction: column !important; }
 .force-mobile .sidebar { display: none !important; }
-.force-mobile .mobile-topbar { display: flex !important; }
+.force-mobile .mobile-topbar { display: flex !important; width: 100%; }
 .force-mobile .main-content { margin-left: 0 !important; padding-bottom: 70px !important; padding-top: 0 !important; }
 .force-mobile .bottom-nav { display: flex !important; }
 .force-mobile .page-inner { padding: 1.25rem 1rem !important; }
