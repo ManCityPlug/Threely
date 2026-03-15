@@ -130,7 +130,7 @@ export default function LandingPage() {
             </Link>
           )}
           {!isMobile && (
-            <Link href={loggedIn ? "/dashboard" : "/welcome"} style={{
+            <Link href={loggedIn ? "/dashboard" : "/start"} style={{
               padding: "0.4rem 1rem",
               fontSize: "0.875rem",
               fontWeight: 600,
@@ -217,7 +217,7 @@ export default function LandingPage() {
                 }}>
                   Sign in
                 </Link>
-                <Link href="/welcome" onClick={() => setMenuOpen(false)} style={{
+                <Link href="/start" onClick={() => setMenuOpen(false)} style={{
                   flex: 1, textAlign: "center",
                   padding: "0.6rem 0",
                   fontSize: "0.875rem", fontWeight: 600,
@@ -314,8 +314,8 @@ export default function LandingPage() {
           </p>
 
           {/* Get started button */}
-          <div style={{ marginBottom: isMobile ? "1rem" : "1.5rem" }}>
-            <Link href={loggedIn ? "/dashboard" : "/welcome"} style={{
+          <div style={{ marginBottom: isMobile ? "0.5rem" : "1.5rem", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
+            <Link href={loggedIn ? "/dashboard" : "/start"} style={{
               display: "inline-block",
               padding: "0.875rem 2.5rem",
               background: "#635bff",
@@ -329,6 +329,16 @@ export default function LandingPage() {
             }}>
               {loggedIn ? "Go to dashboard" : "Get started \u2192"}
             </Link>
+            {isMobile && !loggedIn && (
+              <Link href="/login" style={{
+                fontSize: "0.9rem",
+                fontWeight: 600,
+                color: "#425466",
+                textDecoration: "none",
+              }}>
+                Already have an account? <span style={{ color: "#635bff" }}>Sign in</span>
+              </Link>
+            )}
           </div>
 
           {/* Platform availability banner + store buttons — desktop only */}
@@ -827,7 +837,7 @@ export default function LandingPage() {
           }}>
             Set your first goal and get 3 personalized tasks in under a minute.
           </p>
-          <Link href="/welcome" style={{
+          <Link href="/start" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#fff",
@@ -901,7 +911,7 @@ export default function LandingPage() {
           <Link href="/login" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Sign in
           </Link>
-          <Link href="/welcome" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
+          <Link href="/start" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
             Get started
           </Link>
           <Link href="/faq" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>

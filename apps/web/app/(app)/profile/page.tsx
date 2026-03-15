@@ -127,7 +127,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { showToast } = useToast();
   const { mode, setMode } = useTheme();
-  const { hasPro, showPaywall } = useSubscription();
+  const { hasPro } = useSubscription();
   const [stats, setStats] = useState<Stats | null>(null);
   const [history, setHistory] = useState<DailyTask[]>([]);
   const [loading, setLoading] = useState(true);
@@ -275,7 +275,7 @@ export default function ProfilePage() {
   }, [weeklyStatus]);
 
   async function handleOpenWeekly() {
-    if (!hasPro) { showPaywall(); return; }
+    if (!hasPro) { return; }
     if (weeklyStatus?.status === "available" && weeklyFrozenData) {
       setShowWeeklySummary(true);
       return;
@@ -288,10 +288,8 @@ export default function ProfilePage() {
       setWeeklyFrozenData(data);
       setWeeklyStatus({ status: "available", summary: data });
       setShowWeeklySummary(true);
-    } catch (err) {
-      if (err instanceof Error && err.message?.includes("pro_required")) {
-        showPaywall();
-      }
+    } catch {
+      // Silently fail — user can retry
     } finally {
       setWeeklyOpening(false);
     }
@@ -380,7 +378,7 @@ export default function ProfilePage() {
           <button
             className="btn btn-outline"
             onClick={() => {
-              if (!hasPro) { showPaywall(); return; }
+              if (!hasPro) { return; }
               alert("Your weekly analysis is generated every Monday. Check back then to see your progress report and personalized insights!");
             }}
             style={{
@@ -397,33 +395,33 @@ export default function ProfilePage() {
         )}
       </div>
 
-      {/* Stats row */}
+      {/* Stats row — 3 top + 2 bottom centered */}
       <div data-walkthrough="profile-stats" style={{
         display: "grid",
-        gridTemplateColumns: "repeat(auto-fill, minmax(130px, 1fr))",
+        gridTemplateColumns: "repeat(6, 1fr)",
         gap: "0.75rem",
         marginBottom: "1.75rem",
       }}>
-        <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0s" }}>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--warning)" }}>
+        <div className="card slide-up" style={{ gridColumn: "1 / 3", padding: "1.25rem 1rem", textAlign: "center", animationDelay: "0s" }}>
+          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--warning)" }}>
             🔥 <AnimatedNumber value={stats?.streak ?? 0} />
           </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Current streak</div>
+          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 4 }}>Current streak</div>
         </div>
-        <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.08s" }}>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--success)" }}>
+        <div className="card slide-up" style={{ gridColumn: "3 / 5", padding: "1.25rem 1rem", textAlign: "center", animationDelay: "0.08s" }}>
+          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--success)" }}>
             ✓ <AnimatedNumber value={stats?.totalCompleted ?? 0} />
           </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Total tasks done</div>
+          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 4 }}>Total tasks done</div>
         </div>
-        <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.16s" }}>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "#3B82F6" }}>
+        <div className="card slide-up" style={{ gridColumn: "5 / 7", padding: "1.25rem 1rem", textAlign: "center", animationDelay: "0.16s" }}>
+          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#3B82F6" }}>
             <AnimatedNumber value={stats?.activeGoals ?? 0} />
           </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Active goals</div>
+          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 4 }}>Active goals</div>
         </div>
-        <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.24s" }}>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "#0891B2" }}>
+        <div className="card slide-up" style={{ gridColumn: "1 / 4", padding: "1.25rem 1rem", textAlign: "center", animationDelay: "0.24s" }}>
+          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#0891B2" }}>
             {(() => {
               const totalMin = stats?.totalMinutesInvested ?? (stats?.totalHoursInvested ? Math.round(stats.totalHoursInvested * 60) : 0);
               const h = Math.floor(totalMin / 60);
@@ -433,13 +431,13 @@ export default function ProfilePage() {
               return <>{h}h {m}m</>;
             })()}
           </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Time invested</div>
+          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 4 }}>Time invested</div>
         </div>
-        <div className="card slide-up" style={{ padding: "1rem", textAlign: "center", animationDelay: "0.32s" }}>
-          <div style={{ fontSize: "1.75rem", fontWeight: 700, color: "var(--primary)" }}>
+        <div className="card slide-up" style={{ gridColumn: "4 / 7", padding: "1.25rem 1rem", textAlign: "center", animationDelay: "0.32s" }}>
+          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--primary)" }}>
             <AnimatedNumber value={stats?.bestStreak ?? 0} suffix="d" />
           </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 2 }}>Best streak</div>
+          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 4 }}>Best streak</div>
         </div>
       </div>
 
@@ -672,14 +670,14 @@ export default function ProfilePage() {
                       {/* Start time */}
                       <div>
                         <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text)", display: "block", marginBottom: 6 }}>Start time</label>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                           <select value={customStartHour} onChange={e => setCustomStartHour(Number(e.target.value))}
-                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer" }}>
+                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer", minWidth: 0 }}>
                             {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (<option key={h} value={h}>{h}</option>))}
                           </select>
                           <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)" }}>:</span>
                           <select value={customStartMinute} onChange={e => setCustomStartMinute(Number(e.target.value))}
-                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer" }}>
+                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer", minWidth: 0 }}>
                             {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map(m => (<option key={m} value={m}>{String(m).padStart(2, "0")}</option>))}
                           </select>
                           <div style={{ display: "flex", gap: 0, borderRadius: "var(--radius)", overflow: "hidden", border: "1.5px solid var(--border)" }}>
@@ -696,14 +694,14 @@ export default function ProfilePage() {
                       {/* End time */}
                       <div>
                         <label style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--text)", display: "block", marginBottom: 6 }}>End time</label>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
                           <select value={customEndHour} onChange={e => setCustomEndHour(Number(e.target.value))}
-                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer" }}>
+                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer", minWidth: 0 }}>
                             {Array.from({ length: 12 }, (_, i) => i + 1).map(h => (<option key={h} value={h}>{h}</option>))}
                           </select>
                           <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "var(--text)" }}>:</span>
                           <select value={customEndMinute} onChange={e => setCustomEndMinute(Number(e.target.value))}
-                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer" }}>
+                            style={{ padding: "0.45rem 0.6rem", borderRadius: "var(--radius)", border: "1.5px solid var(--border)", background: "var(--card)", color: "var(--text)", fontSize: "0.85rem", fontWeight: 500, cursor: "pointer", minWidth: 0 }}>
                             {[0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55].map(m => (<option key={m} value={m}>{String(m).padStart(2, "0")}</option>))}
                           </select>
                           <div style={{ display: "flex", gap: 0, borderRadius: "var(--radius)", overflow: "hidden", border: "1.5px solid var(--border)" }}>
@@ -798,19 +796,19 @@ export default function ProfilePage() {
                     </span>
                   )}
                 </div>
-                <button
-                  className="btn btn-outline"
-                  onClick={() => {
-                    if (hasPro) {
-                      router.push("/subscription");
-                    } else {
-                      showPaywall();
-                    }
-                  }}
-                  style={{ fontSize: "0.8rem", padding: "0.35rem 0.75rem" }}
-                >
-                  {hasPro ? "Manage subscription" : "Upgrade to Pro"}
-                </button>
+                {hasPro ? (
+                  <button
+                    className="btn btn-outline"
+                    onClick={() => router.push("/subscription")}
+                    style={{ fontSize: "0.8rem", padding: "0.35rem 0.75rem" }}
+                  >
+                    Manage subscription
+                  </button>
+                ) : (
+                  <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
+                    Manage your subscription at threely.co
+                  </span>
+                )}
               </div>
             </div>
 

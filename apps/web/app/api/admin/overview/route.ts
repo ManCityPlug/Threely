@@ -11,15 +11,18 @@ interface TaskItem {
   estimated_minutes?: number;
 }
 
-// AI cost estimates per call (USD)
+// AI cost estimates per call (USD) — based on actual token usage
+// Sonnet 4.6: $3/$15 per 1M tokens (input/output)
+// Haiku 4.5: $0.80/$4 per 1M tokens (input/output)
 const AI_COSTS = {
-  parseGoal: 0.027,
-  generateRoadmap: 0.093,
-  generateTasks: 0.02,
-  goalChat: 0.001,
-  generateInsight: 0.001,
-  refineTask: 0.001,
-  generateWeeklySummary: 0.001,
+  parseGoal: 0.002,           // Haiku — ~1.5K in, ~300 out
+  generateRoadmap: 0.03,      // Sonnet — ~2.5K in, ~1.5K out
+  generateTasks: 0.005,       // Haiku (cached) — ~5K in, ~3K out
+  goalChat: 0.002,            // Haiku — ~800 in, ~400 out
+  generateInsight: 0.001,     // Haiku — ~500 in, ~150 out
+  refineTask: 0.001,          // Haiku — ~500 in, ~250 out
+  askAboutTask: 0.002,        // Haiku — ~1K in, ~400 out
+  generateWeeklySummary: 0.002, // Haiku — ~800 in, ~200 out
 };
 
 export async function GET(request: NextRequest) {
@@ -75,8 +78,8 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // Revenue estimates
-  const estimatedMRR = activeSubCount * 9.99;
+  // Revenue estimates (blended: ~$12.99 monthly + ~$8.33/mo yearly)
+  const estimatedMRR = activeSubCount * 10.66;
 
   // AI cost estimates
   const goalCount = totalGoals;

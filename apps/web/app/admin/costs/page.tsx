@@ -2,7 +2,6 @@
 
 // ─── Model Pricing (per million tokens) ──────────────────────────────────────
 const PRICING = {
-  opus:   { input: 15.00, output: 75.00, label: "Opus 4.6" },
   sonnet: { input:  3.00, output: 15.00, label: "Sonnet 4.6" },
   haiku:  { input:  0.80, output:  4.00, label: "Haiku 4.5" },
 };
@@ -12,7 +11,7 @@ const PRICING = {
 const FUNCTIONS = [
   {
     name: "parseGoal",
-    model: "opus" as const,
+    model: "haiku" as const,
     inputTokens: 600,
     outputTokens: 300,
     frequency: "Once per goal",
@@ -28,7 +27,7 @@ const FUNCTIONS = [
   },
   {
     name: "generateTasks",
-    model: "sonnet" as const,
+    model: "haiku" as const,
     inputTokens: 3500,
     outputTokens: 2000,
     frequency: "Daily per goal (max 2x/day)",
@@ -132,6 +131,7 @@ function calculateCosts(goals: number) {
 }
 
 // ─── Revenue per plan ────────────────────────────────────────────────────────
+const APPLE_COMMISSION = 0.15; // Apple Small Business Program (under $1M/yr)
 const PLANS = [
   { name: "Yearly", price: 99.99, period: "year", monthly: 99.99 / 12 },
   { name: "Monthly", price: 12.99, period: "month", monthly: 12.99 },
@@ -176,11 +176,9 @@ const modelBadge = (model: string): React.CSSProperties => ({
   fontSize: "0.7rem",
   fontWeight: 600,
   background:
-    model === "opus" ? "rgba(239, 68, 68, 0.15)" :
     model === "sonnet" ? "rgba(99, 91, 255, 0.15)" :
     "rgba(74, 222, 128, 0.15)",
   color:
-    model === "opus" ? "#ef4444" :
     model === "sonnet" ? "#818cf8" :
     "#4ade80",
 });
@@ -349,7 +347,7 @@ export default function CostsPage() {
           Profit Margins by Plan (Monthly, Ongoing)
         </h2>
         <p style={{ color: "#71717a", fontSize: "0.78rem", marginBottom: 16 }}>
-          Revenue per month minus estimated AI costs (worst case). Does not include ad spend, infrastructure, or Stripe fees (~2.9% + $0.30).
+          Revenue per month after Apple&apos;s {(APPLE_COMMISSION * 100).toFixed(0)}% commission (Small Business Program) minus AI costs. Does not include ad spend or infrastructure.
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={tableStyle}>
@@ -357,11 +355,14 @@ export default function CostsPage() {
               <tr>
                 <th style={thStyle}>Goals</th>
                 <th style={thStyle}>AI Cost/mo</th>
-                {PLANS.map(p => (
-                  <th key={p.name} style={thStyle}>
-                    {p.name} ({fmtCents(p.monthly)}/mo)
-                  </th>
-                ))}
+                {PLANS.map(p => {
+                  const afterApple = p.monthly * (1 - APPLE_COMMISSION);
+                  return (
+                    <th key={p.name} style={thStyle}>
+                      {p.name} ({fmtCents(afterApple)}/mo after Apple)
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody>
@@ -372,9 +373,8 @@ export default function CostsPage() {
                     <td style={{ ...tdStyle, fontWeight: 700 }}>{g}</td>
                     <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.monthlyOngoing, 2)}</td>
                     {PLANS.map(plan => {
-                      const profit = plan.monthly - c.monthlyOngoing;
-                      const stripeFee = plan.monthly * 0.029 + 0.30;
-                      const netProfit = profit - stripeFee;
+                      const revenueAfterApple = plan.monthly * (1 - APPLE_COMMISSION);
+                      const netProfit = revenueAfterApple - c.monthlyOngoing;
                       const isNeg = netProfit < 0;
                       return (
                         <td key={plan.name} style={{
@@ -416,24 +416,24 @@ export default function CostsPage() {
               color: "#4ade80",
             },
             {
-              label: "Worst-case cost (3 goals)",
-              value: `~${fmt(calculateCosts(3).monthlyOngoing, 2)}/mo per user — both plans profitable even at max usage.`,
+              label: "All functions on Haiku (except roadmap)",
+              value: "parseGoal, generateTasks, goalChat, insight, refine, askAboutTask, weeklySummary all run on Haiku 4.5 ($0.80/$4 per 1M tokens). Only generateRoadmap uses Sonnet.",
+              color: "#4ade80",
+            },
+            {
+              label: "Worst-case profit (3 goals, yearly)",
+              value: `AI cost ~${fmt(calculateCosts(3).monthlyOngoing, 2)}/mo per user. After Apple's 15% cut, yearly plan profit: ~$${(PLANS[0].monthly * (1 - APPLE_COMMISSION) - calculateCosts(3).monthlyOngoing).toFixed(2)}/mo. Monthly plan: ~$${(PLANS[1].monthly * (1 - APPLE_COMMISSION) - calculateCosts(3).monthlyOngoing).toFixed(2)}/mo.`,
               color: "#fbbf24",
             },
             {
               label: "Biggest cost driver",
-              value: "generateTasks (Sonnet) — runs up to 2x/day per goal. ~$0.041/call.",
+              value: "generateTasks (Haiku) — runs up to 2x/day per goal. Cheap per call but highest frequency of any function.",
               color: "#f59e0b",
             },
             {
-              label: "Setup cost",
-              value: "parseGoal (Opus) + generateRoadmap (Sonnet) — one-time per goal. Max 3 goals per user.",
-              color: "#818cf8",
-            },
-            {
-              label: "Stripe fees",
-              value: "2.9% + $0.30 per transaction. ~$0.68/mo on monthly, ~$2.33/yr.",
-              color: "#71717a",
+              label: "Apple commission",
+              value: `${(APPLE_COMMISSION * 100).toFixed(0)}% via Small Business Program (under $1M/yr). ~$${(PLANS[1].monthly * APPLE_COMMISSION).toFixed(2)}/mo on monthly plan, ~$${(PLANS[0].price * APPLE_COMMISSION).toFixed(2)}/yr on yearly plan.`,
+              color: "#ef4444",
             },
           ].map(t => (
             <div key={t.label} style={{

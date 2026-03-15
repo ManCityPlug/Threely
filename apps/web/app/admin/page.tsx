@@ -68,21 +68,20 @@ function StatCard({
 }
 
 // ── Per-User Cost Estimator ──────────────────────────────────────────────────
-// Haiku 4.5: $1/M input, $5/M output
+// Haiku 4.5: $0.80/M input, $4/M output
 // Sonnet 4.6: $3/M input, $15/M output
-// Opus 4.6: $15/M input, $75/M output
 //
 // Estimated tokens per call (input/output) based on prompt lengths:
 const AI_FUNCTIONS = [
-  { name: "parseGoal",            model: "Opus",   frequency: "Once per goal",          inputTok: 400,  outputTok: 200,  inputRate: 15, outputRate: 75 },
-  { name: "generateRoadmap",      model: "Sonnet", frequency: "Once per goal",          inputTok: 1200, outputTok: 800,  inputRate: 3,  outputRate: 15 },
-  { name: "goalChat (per turn)",  model: "Haiku",  frequency: "5-10× during goal setup",inputTok: 2000, outputTok: 200,  inputRate: 1,  outputRate: 5 },
-  { name: "generateTasks",        model: "Sonnet", frequency: "1-2×/day per goal",      inputTok: 2500, outputTok: 600,  inputRate: 3,  outputRate: 15 },
-  { name: "generateInsight",      model: "Haiku",  frequency: "1×/day (after review)",  inputTok: 800,  outputTok: 150,  inputRate: 1,  outputRate: 5 },
-  { name: "updateCoachingContext", model: "Haiku",  frequency: "1×/day (after review)",  inputTok: 600,  outputTok: 200,  inputRate: 1,  outputRate: 5 },
-  { name: "refineTask",           model: "Haiku",  frequency: "On demand (0-3×/day)",   inputTok: 400,  outputTok: 150,  inputRate: 1,  outputRate: 5 },
-  { name: "askAboutTask",         model: "Haiku",  frequency: "On demand (0-5×/day)",   inputTok: 1000, outputTok: 250,  inputRate: 1,  outputRate: 5 },
-  { name: "generateWeeklySummary",model: "Haiku",  frequency: "1×/week",                inputTok: 600,  outputTok: 150,  inputRate: 1,  outputRate: 5 },
+  { name: "parseGoal",            model: "Haiku",  frequency: "Once per goal",          inputTok: 600,  outputTok: 300,  inputRate: 0.80, outputRate: 4 },
+  { name: "generateRoadmap",      model: "Sonnet", frequency: "Once per goal",          inputTok: 1300, outputTok: 1500, inputRate: 3,    outputRate: 15 },
+  { name: "goalChat (per turn)",  model: "Haiku",  frequency: "5-10× during goal setup",inputTok: 800,  outputTok: 400,  inputRate: 0.80, outputRate: 4 },
+  { name: "generateTasks",        model: "Haiku",  frequency: "1-2×/day per goal",      inputTok: 3500, outputTok: 2000, inputRate: 0.80, outputRate: 4 },
+  { name: "generateInsight",      model: "Haiku",  frequency: "1×/day (after review)",  inputTok: 800,  outputTok: 150,  inputRate: 0.80, outputRate: 4 },
+  { name: "updateCoachingContext", model: "Haiku",  frequency: "1×/day (after review)",  inputTok: 1000, outputTok: 250,  inputRate: 0.80, outputRate: 4 },
+  { name: "refineTask",           model: "Haiku",  frequency: "On demand (0-3×/day)",   inputTok: 500,  outputTok: 250,  inputRate: 0.80, outputRate: 4 },
+  { name: "askAboutTask",         model: "Haiku",  frequency: "On demand (0-5×/day)",   inputTok: 600,  outputTok: 300,  inputRate: 0.80, outputRate: 4 },
+  { name: "generateWeeklySummary",model: "Haiku",  frequency: "1×/week",                inputTok: 1500, outputTok: 200,  inputRate: 0.80, outputRate: 4 },
 ];
 
 // Cost per call in USD
@@ -94,8 +93,7 @@ function costPerCall(f: typeof AI_FUNCTIONS[number]) {
 const MONTHLY_PRICE = 12.99;
 const YEARLY_PRICE = 99.99;
 const YEARLY_MONTHLY = YEARLY_PRICE / 12;
-const STRIPE_PCT = 0.029;
-const STRIPE_FIXED = 0.30;
+const APPLE_COMMISSION = 0.15; // Apple Small Business Program (under $1M/yr)
 
 function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
   const costs = AI_FUNCTIONS.map((f) => ({ ...f, cost: costPerCall(f) }));
@@ -156,16 +154,16 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
   const scenarios = [1, 2, 3].map((goals) => {
     const avg = monthlyAiCost(goals);
     const max = monthlyAiCostMax(goals);
-    const stripeMonthly = MONTHLY_PRICE * STRIPE_PCT + STRIPE_FIXED;
-    const stripeYearly = (YEARLY_PRICE * STRIPE_PCT + STRIPE_FIXED) / 12;
+    const yearlyAfterApple = YEARLY_MONTHLY * (1 - APPLE_COMMISSION);
+    const monthlyAfterApple = MONTHLY_PRICE * (1 - APPLE_COMMISSION);
     return {
       goals,
       avgCost: avg,
       maxCost: max,
-      yearlyProfitAvg: YEARLY_MONTHLY - avg - stripeYearly,
-      yearlyProfitMax: YEARLY_MONTHLY - max - stripeYearly,
-      monthlyProfitAvg: MONTHLY_PRICE - avg - stripeMonthly,
-      monthlyProfitMax: MONTHLY_PRICE - max - stripeMonthly,
+      yearlyProfitAvg: yearlyAfterApple - avg,
+      yearlyProfitMax: yearlyAfterApple - max,
+      monthlyProfitAvg: monthlyAfterApple - avg,
+      monthlyProfitMax: monthlyAfterApple - max,
     };
   });
 
@@ -198,8 +196,8 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
                     fontWeight: 600,
                     padding: "1px 6px",
                     borderRadius: 4,
-                    background: c.model === "Opus" ? "#7c3aed22" : c.model === "Sonnet" ? "#635bff22" : "#27272a",
-                    color: c.model === "Opus" ? "#a78bfa" : c.model === "Sonnet" ? "#818cf8" : "#a1a1aa",
+                    background: c.model === "Sonnet" ? "#635bff22" : "#27272a",
+                    color: c.model === "Sonnet" ? "#818cf8" : "#a1a1aa",
                   }}>
                     {c.model}
                   </span>
@@ -220,7 +218,7 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
           Profit Margins by Plan (Monthly, Ongoing)
         </h3>
         <div style={{ fontSize: "0.7rem", color: "#71717a", marginBottom: "1rem" }}>
-          Revenue per month minus estimated AI costs (avg &amp; worst case). Includes Stripe fees (~2.9% + $0.30).
+          Revenue per month after Apple&apos;s 15% commission minus estimated AI costs (avg &amp; worst case).
         </div>
 
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
@@ -229,8 +227,8 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
               <th style={{ textAlign: "left", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Goals</th>
               <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>AI Cost/mo (avg)</th>
               <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>AI Cost/mo (max)</th>
-              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Yearly ($8.33/mo)</th>
-              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Monthly ($12.99/mo)</th>
+              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Yearly (${(YEARLY_MONTHLY * (1 - APPLE_COMMISSION)).toFixed(2)}/mo)</th>
+              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Monthly (${(MONTHLY_PRICE * (1 - APPLE_COMMISSION)).toFixed(2)}/mo)</th>
             </tr>
           </thead>
           <tbody>
@@ -282,10 +280,10 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
           {[
             { color: "#3ecf8e", label: "Goal cap enforced", text: "Max 3 active goals per user. Prevents runaway costs from power users." },
             { color: "#3ecf8e", label: "Generation cap enforced", text: "Max 2 task generations per goal per day (initial + 1 extra)." },
-            { color: "#f59e0b", label: "Biggest cost driver", text: `generateTasks (Sonnet) — runs up to 2×/day per goal. ~$${costs.find(c => c.name === "generateTasks")!.cost.toFixed(4)}/call.` },
-            { color: "#f59e0b", label: "Ask AI + Refine", text: `askAboutTask ~$${costs.find(c => c.name === "askAboutTask")!.cost.toFixed(4)}/call, refineTask ~$${costs.find(c => c.name === "refineTask")!.cost.toFixed(4)}/call. Both Haiku — cheap per call but usage varies.` },
-            { color: "#818cf8", label: "Setup cost", text: `parseGoal (Opus) + generateRoadmap + goalChat — ~$${(costs.find(c => c.name === "parseGoal")!.cost + costs.find(c => c.name === "generateRoadmap")!.cost + costs.find(c => c.name === "goalChat (per turn)")!.cost * 8).toFixed(2)} per goal, one-time only.` },
-            { color: "#71717a", label: "Stripe fees", text: `2.9% + $0.30 per transaction. ~$${(MONTHLY_PRICE * STRIPE_PCT + STRIPE_FIXED).toFixed(2)}/mo on monthly, ~$${(YEARLY_PRICE * STRIPE_PCT + STRIPE_FIXED).toFixed(2)}/yr on yearly.` },
+            { color: "#3ecf8e", label: "Almost all Haiku", text: "8/9 AI functions run on Haiku 4.5. Only generateRoadmap uses Sonnet." },
+            { color: "#f59e0b", label: "Biggest cost driver", text: `generateTasks (Haiku) — runs up to 2×/day per goal. ~$${costs.find(c => c.name === "generateTasks")!.cost.toFixed(4)}/call.` },
+            { color: "#818cf8", label: "Setup cost", text: `parseGoal (Haiku) + generateRoadmap (Sonnet) + goalChat — ~$${(costs.find(c => c.name === "parseGoal")!.cost + costs.find(c => c.name === "generateRoadmap")!.cost + costs.find(c => c.name === "goalChat (per turn)")!.cost * 8).toFixed(2)} per goal, one-time only.` },
+            { color: "#ef4444", label: "Apple commission", text: `15% via Small Business Program (under $1M/yr). ~$${(MONTHLY_PRICE * APPLE_COMMISSION).toFixed(2)}/mo on monthly, ~$${(YEARLY_PRICE * APPLE_COMMISSION / 12).toFixed(2)}/mo on yearly.` },
           ].map((item) => (
             <div key={item.label} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: item.color, marginTop: 5, flexShrink: 0 }} />

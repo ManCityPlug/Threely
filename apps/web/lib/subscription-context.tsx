@@ -3,19 +3,12 @@
 import { createContext, useContext, useCallback, useEffect, useState } from "react";
 import { subscriptionApi } from "@/lib/api-client";
 
-export type PaywallVariant = "fullscreen" | "sheet";
-
 interface SubscriptionContextValue {
   hasPro: boolean;
   isLimitedMode: boolean;
   walkthroughActive: boolean;
   loaded: boolean;
   trialEligible: boolean;
-  paywallOpen: boolean;
-  paywallVariant: PaywallVariant;
-  showPaywall: (variant?: PaywallVariant) => void;
-  showTrialPaywall: () => void;
-  closePaywall: () => void;
   setWalkthroughActive: (v: boolean) => void;
   refreshSubscription: () => Promise<void>;
 }
@@ -26,11 +19,6 @@ const SubscriptionContext = createContext<SubscriptionContextValue>({
   walkthroughActive: false,
   loaded: false,
   trialEligible: true,
-  paywallOpen: false,
-  paywallVariant: "sheet",
-  showPaywall: () => {},
-  showTrialPaywall: () => {},
-  closePaywall: () => {},
   setWalkthroughActive: () => {},
   refreshSubscription: async () => {},
 });
@@ -43,8 +31,6 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
   const [hasPro, setHasPro] = useState(true);
   const [loaded, setLoaded] = useState(false);
   const [trialEligible, setTrialEligible] = useState(true);
-  const [paywallOpen, setPaywallOpen] = useState(false);
-  const [paywallVariant, setPaywallVariant] = useState<PaywallVariant>("sheet");
   const [walkthroughActive, setWalkthroughActiveState] = useState(false);
 
   const checkSubscription = useCallback(async () => {
@@ -69,23 +55,6 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     checkSubscription();
   }, [checkSubscription]);
 
-  const showPaywall = useCallback((variant: PaywallVariant = "sheet") => {
-    setPaywallVariant(variant);
-    setPaywallOpen(true);
-  }, []);
-
-  const showTrialPaywall = useCallback(() => {
-    setPaywallVariant("fullscreen");
-    setPaywallOpen(true);
-  }, []);
-
-  const closePaywall = useCallback(() => {
-    setPaywallOpen(false);
-    if (!hasPro) {
-      localStorage.setItem("threely_limited_mode", "true");
-    }
-  }, [hasPro]);
-
   const setWalkthroughActive = useCallback((v: boolean) => {
     setWalkthroughActiveState(v);
   }, []);
@@ -104,11 +73,6 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         walkthroughActive,
         loaded,
         trialEligible,
-        paywallOpen,
-        paywallVariant,
-        showPaywall,
-        showTrialPaywall,
-        closePaywall,
         setWalkthroughActive,
         refreshSubscription,
       }}

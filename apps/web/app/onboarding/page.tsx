@@ -368,8 +368,8 @@ export default function OnboardingPage() {
 
       // Mark onboarded and go straight to dashboard
       if (user) markOnboarded(user.id);
-      router.replace("/dashboard");
-    } catch (e) {
+      router.replace("/dashboard?welcome=1");
+} catch (e) {
       setBuildError(e instanceof Error ? e.message : "Something went wrong");
       setBuilding(false);
     }
@@ -435,8 +435,8 @@ export default function OnboardingPage() {
 
       // Mark onboarded and go straight to dashboard
       if (user) markOnboarded(user.id);
-      router.replace("/dashboard");
-    } catch (e: unknown) {
+      router.replace("/dashboard?welcome=1");
+} catch (e: unknown) {
       setBuildError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
       setBuilding(false);
     }
@@ -466,20 +466,20 @@ export default function OnboardingPage() {
         minHeight: isMagicMoment ? 420 : undefined,
       }}>
         {/* Logo */}
-        <div style={{ textAlign: "center", padding: "2rem 2rem 0" }}>
+        <div style={{ textAlign: "center", padding: "1.5rem clamp(1rem, 5vw, 2rem) 0" }}>
           <img src="/favicon.png" alt="Threely" width={44} height={44} style={{ borderRadius: 12 }} />
         </div>
 
         {/* Progress bar */}
         {!isMagicMoment && (
-          <div style={{ padding: "12px 2rem 0" }}>
+          <div style={{ padding: "12px clamp(1rem, 5vw, 2rem) 0" }}>
             <ProgressBar step={step} />
           </div>
         )}
 
         {/* Back button */}
         {step > 1 && !isMagicMoment && (
-          <div style={{ padding: "8px 2rem 0" }}>
+          <div style={{ padding: "8px clamp(1rem, 5vw, 2rem) 0" }}>
             <button
               onClick={() => advanceStep(step - 1)}
               style={{
@@ -494,7 +494,7 @@ export default function OnboardingPage() {
 
         {/* ── Step 1: Name ── */}
         {step === 1 && (
-          <div className="fade-in" style={{ padding: "1.5rem 2rem 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          <div className="fade-in" style={{ padding: "1.5rem clamp(1rem, 5vw, 2rem) 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             <div>
               <h2 style={{ fontSize: "1.4rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>
                 What should we call you?
@@ -522,7 +522,7 @@ export default function OnboardingPage() {
 
         {/* ── Step 2: Goal ── */}
         {step === 2 && (
-          <div className="fade-in" style={{ padding: "1.5rem 2rem 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          <div className="fade-in" style={{ padding: "1.5rem clamp(1rem, 5vw, 2rem) 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             {showTemplates ? (
               <GoalTemplatesComponent
                 onSelect={handleCategorySelect}
@@ -542,7 +542,7 @@ export default function OnboardingPage() {
 
         {/* ── Step 3: Deadline (legacy — skipped by AI chat) ── */}
         {step === 3 && !isMagicMoment && (
-          <div className="fade-in" style={{ padding: "1.5rem 2rem 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          <div className="fade-in" style={{ padding: "1.5rem clamp(1rem, 5vw, 2rem) 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             <div>
               <h2 style={{ fontSize: "1.4rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>
                 Do you have a deadline?
@@ -646,7 +646,7 @@ export default function OnboardingPage() {
 
         {/* ── Step 4: Time (legacy — skipped by AI chat) ── */}
         {step === 4 && !isMagicMoment && (
-          <div className="fade-in" style={{ padding: "1.5rem 2rem 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          <div className="fade-in" style={{ padding: "1.5rem clamp(1rem, 5vw, 2rem) 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             <div>
               <h2 style={{ fontSize: "1.4rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>
                 How much time can you dedicate daily?
@@ -728,7 +728,7 @@ export default function OnboardingPage() {
 
         {/* ── Step 5: Intensity (legacy — skipped by AI chat) ── */}
         {step === 5 && !isMagicMoment && (
-          <div className="fade-in" style={{ padding: "1.5rem 2rem 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+          <div className="fade-in" style={{ padding: "1.5rem clamp(1rem, 5vw, 2rem) 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             <div>
               <h2 style={{ fontSize: "1.4rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 4 }}>
                 What's your pace?
@@ -787,7 +787,7 @@ export default function OnboardingPage() {
 
         {/* ── Magic Moment ── */}
         {isMagicMoment && (
-          <div style={{ padding: "2rem", flex: 1, display: "flex", flexDirection: "column" }}>
+          <div style={{ padding: "clamp(1rem, 5vw, 2rem)", flex: 1, display: "flex", flexDirection: "column" }}>
             {/* Building state with rotating progress messages */}
             {building && !buildError && (
               <BuildingProgress />
@@ -857,7 +857,7 @@ export default function OnboardingPage() {
 
             {/* Chat area */}
             <div style={{
-              flex: 1, overflowY: "auto", padding: "1.25rem 1.5rem 2rem",
+              flex: 1, overflowY: "auto", padding: "1.25rem clamp(1rem, 4vw, 1.5rem) 2rem",
               display: "flex", flexDirection: "column", gap: 12,
             }}>
               {chatHistory.map((entry, i) => (
@@ -865,7 +865,7 @@ export default function OnboardingPage() {
                   {entry.role === "assistant" ? (
                     <div style={{
                       background: "var(--primary-light)", borderRadius: "14px 14px 14px 4px",
-                      padding: "0.75rem 1rem", maxWidth: "85%",
+                      padding: "0.75rem 1rem", maxWidth: "90%",
                       fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.5,
                     }}>
                       {entry.text}
@@ -876,7 +876,7 @@ export default function OnboardingPage() {
                     }}>
                       <div style={{
                         background: "var(--primary)", borderRadius: "14px 14px 4px 14px",
-                        padding: "0.75rem 1rem", maxWidth: "85%",
+                        padding: "0.75rem 1rem", maxWidth: "90%",
                         fontSize: "0.9rem", color: "#fff", lineHeight: 1.5,
                       }}>
                         {entry.text}

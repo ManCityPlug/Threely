@@ -450,13 +450,37 @@ input, textarea, select {
   .main-content { margin-left: 0; padding-bottom: 70px; padding-top: 0; }
   .bottom-nav { display: flex; }
   .page-inner { padding: 1.25rem 1rem; }
-  .modal-box { padding: 1.5rem; border-radius: var(--radius-lg); }
+  .modal-box { padding: 1.5rem; border-radius: var(--radius-lg); max-width: calc(100vw - 2rem); }
   .desktop-only { display: none !important; }
+  .paywall-heading { font-size: 1.5rem; }
+  .paywall-icon-wrap { width: 64px; height: 64px; margin-bottom: 1rem; }
+  .paywall-icon { font-size: 28px; }
+  .paywall-subheading { font-size: 0.85rem; margin-bottom: 1.5rem; }
+  .paywall-fullscreen { padding: 1.5rem; }
+}
+
+/* ─── Narrow mobile (≤400px) ────────────────────────────────────────────────── */
+@media (max-width: 400px) {
+  .page-inner { padding: 1rem 0.75rem; }
+  .modal-box { padding: 1.25rem; max-width: calc(100vw - 1.5rem); }
+  .btn { padding: 0.6rem 1rem; font-size: 0.85rem; }
+  .give-more-bar { padding: 0.75rem 1rem; gap: 10px; }
+  .paywall-heading { font-size: 1.35rem; }
+  .paywall-plans { gap: 0.375rem; }
+  .paywall-plan-card { padding: 0.75rem; }
+  .paywall-cta-btn { height: 48px; line-height: 48px; font-size: 0.9rem; }
 }
 
 @media (min-width: 769px) {
   .bottom-nav { display: none; }
   .mobile-topbar { display: none; }
+}
+
+/* ─── Small desktop / tablet landscape ─────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1100px) {
+  .sidebar { width: 200px; }
+  .main-content { margin-left: 200px; }
+  .page-inner { padding: 2rem 1.25rem; }
 }
 
 /* ─── Force mobile layout for tablets (iPad/Android tablets) ─────────────── */
@@ -815,10 +839,10 @@ input, textarea, select {
   }
 }
 
-/* Very small screens */
-@media (max-width: 380px) {
+/* Small mobile screens */
+@media (max-width: 420px) {
   .tutorial-card {
-    max-width: 100%;
+    max-width: calc(100vw - 2rem);
     padding: 1.5rem 1.25rem 1.25rem;
   }
 
@@ -834,6 +858,39 @@ input, textarea, select {
   .tutorial-btn-next {
     padding: 0.6rem 1rem;
     font-size: 0.85rem;
+  }
+
+  .tutorial-description {
+    font-size: 0.85rem;
+    max-width: 100%;
+  }
+}
+
+/* Very narrow screens */
+@media (max-width: 340px) {
+  .tutorial-card {
+    padding: 1.25rem 1rem 1rem;
+  }
+
+  .tutorial-title {
+    font-size: 1.1rem;
+  }
+
+  .tutorial-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tutorial-buttons {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .tutorial-btn-skip,
+  .tutorial-btn-next {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
   }
 }
 
@@ -1067,6 +1124,14 @@ input, textarea, select {
   transition: opacity 0.15s;
 }
 .spotlight-btn-next:hover { opacity: 0.9; }
+@media (max-width: 400px) {
+  .spotlight-tooltip {
+    max-width: calc(100vw - 2rem);
+    padding: 1.25rem;
+  }
+  .spotlight-tooltip-title { font-size: 1rem; }
+  .spotlight-tooltip-desc { font-size: 0.825rem; }
+}
 .spotlight-center-overlay {
   position: fixed;
   inset: 0;

@@ -870,7 +870,7 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
 
   const startTime = Date.now();
   const message = await anthropic.messages.create({
-    model: "claude-opus-4-6",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 400,
     temperature: 0.3,
     messages: [{ role: "user", content: prompt }],
@@ -903,7 +903,7 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
     logAICall({
       userId,
       functionName: 'parseGoal',
-      modelUsed: 'claude-opus-4-6',
+      modelUsed: 'claude-haiku-4-5-20251001',
       inputData: { rawInput },
       outputData: result,
       inputTokens: message.usage?.input_tokens,
@@ -1011,7 +1011,7 @@ ${previousTasksSection}`;
 
   const startTime = Date.now();
   const message = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 8192,
     temperature: 0.7,
     system: [{ type: "text", text: fullSystemPrompt, cache_control: { type: "ephemeral" } }],
@@ -1053,7 +1053,7 @@ ${previousTasksSection}`;
     logAICall({
       userId,
       functionName: 'generateTasks',
-      modelUsed: 'claude-sonnet-4-6',
+      modelUsed: 'claude-haiku-4-5-20251001',
       inputData: { goalId: goal.id, goalTitle: goal.title, requestingAdditional, focusShifted, postReview, newTaskCount, daysActive, tasksCompletedTotal },
       outputData: result,
       inputTokens: message.usage?.input_tokens,

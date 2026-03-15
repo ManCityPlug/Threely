@@ -1,10 +1,13 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 // TODO: Replace these with actual App Store / Play Store URLs
 const APP_STORE_URL = "#";
 const PLAY_STORE_URL = "#";
+
+const DISMISS_KEY = "threely_banner_dismissed";
 
 function isMobileDevice(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -42,138 +45,48 @@ function PlayIcon() {
 
 /* Inline keyframes so we don't depend on globals.css names */
 const KEYFRAMES_STYLE = `
-@keyframes mobilePromptFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes mobilePromptSlideUp {
-  from { opacity: 0; transform: translateY(30px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes mobilePromptScaleIn {
-  from { opacity: 0; transform: scale(0.8); }
-  to { opacity: 1; transform: scale(1); }
-}
 @keyframes mobilePromptBannerIn {
   from { transform: translateY(100%); }
   to { transform: translateY(0); }
 }
-@keyframes pulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.06); }
-}
-@keyframes sparkle {
-  0%, 100% { opacity: 0; transform: scale(0); }
-  50% { opacity: 1; transform: scale(1); }
-}
 `;
 
-function AnimatedLogo({ size, glowSize, sparkleDistance, sparkleColor = "#635bff" }: { size: number; glowSize: number; sparkleDistance: number; sparkleColor?: string }) {
-  const center = size / 2;
-  return (
-    <div style={{ position: "relative", width: size, height: size }}>
-      {/* Glow */}
-      <div style={{
-        position: "absolute",
-        left: (size - glowSize) / 2,
-        top: (size - glowSize) / 2,
-        width: glowSize,
-        height: glowSize,
-        borderRadius: "50%",
-        backgroundColor: "rgba(99, 91, 255, 0.25)",
-        animation: "pulse 3s ease-in-out infinite",
-      }} />
-      {/* Logo */}
-      <img
-        src="/favicon.png"
-        alt="Threely"
-        width={size}
-        height={size}
-        style={{
-          position: "relative",
-          borderRadius: size * 0.22,
-          animation: "pulse 3s ease-in-out infinite",
-          zIndex: 2,
-        }}
-      />
-      {/* Sparkles */}
-      {[0, 60, 120, 180, 240, 300].map((angle, idx) => {
-        const rad = (angle * Math.PI) / 180;
-        return (
-          <div
-            key={idx}
-            style={{
-              position: "absolute",
-              left: center + Math.cos(rad) * sparkleDistance - 3,
-              top: center + Math.sin(rad) * sparkleDistance - 3,
-              width: 6,
-              height: 6,
-              borderRadius: 3,
-              backgroundColor: sparkleColor,
-              animation: `sparkle 2s ease-in-out ${0.6 + idx * 0.08}s infinite`,
-              zIndex: 3,
-            }}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
 export default function MobileAppPrompt() {
-  const [view, setView] = useState<"none" | "interstitial" | "banner">("none");
-  const [animatingOut, setAnimatingOut] = useState(false);
+  const [view, setView] = useState<"none" | "banner">("none");
+  const pathname = usePathname();
 
   useEffect(() => {
     if (!isMobileDevice()) return;
 
-    // Never show on admin pages
-    if (window.location.pathname.startsWith("/admin")) return;
+    // Only show banner on the marketing/landing page (/)
+    if (pathname !== "/") return;
 
-    // Only show interstitial on the homepage (/)
-    if (window.location.pathname === "/") {
-      const t = setTimeout(() => setView("interstitial"), 600);
-      return () => clearTimeout(t);
-    } else {
-      // On other pages, just show the bottom banner
-      const t = setTimeout(() => setView("banner"), 600);
-      return () => clearTimeout(t);
+    // Don't show if previously dismissed this session
+    try {
+      if (sessionStorage.getItem(DISMISS_KEY) === "1") return;
+    } catch {
+      // sessionStorage unavailable — proceed
     }
-  }, []);
 
-  const dismissInterstitial = useCallback(() => {
-    setAnimatingOut(true);
-    setTimeout(() => {
-      setView("none");
-      setAnimatingOut(false);
-      setTimeout(() => setView("banner"), 150);
-    }, 350);
-  }, []);
+    const t = setTimeout(() => setView("banner"), 600);
+    return () => clearTimeout(t);
+  }, [pathname]);
 
-  // Lock body scroll when interstitial is open
+  // Hide banner when navigating away from /
   useEffect(() => {
-    if (view === "interstitial") {
-      document.body.style.overflow = "hidden";
-      document.body.style.position = "fixed";
-      document.body.style.width = "100%";
-      document.body.style.top = `-${window.scrollY}px`;
-    } else {
-      const scrollY = document.body.style.top;
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
-      if (scrollY) {
-        window.scrollTo(0, parseInt(scrollY || "0") * -1);
-      }
+    if (pathname !== "/") {
+      setView("none");
     }
-    return () => {
-      document.body.style.overflow = "";
-      document.body.style.position = "";
-      document.body.style.width = "";
-      document.body.style.top = "";
-    };
-  }, [view]);
+  }, [pathname]);
+
+  const dismissBanner = () => {
+    setView("none");
+    try {
+      sessionStorage.setItem(DISMISS_KEY, "1");
+    } catch {
+      // sessionStorage unavailable — just hide for current render
+    }
+  };
 
   if (view === "none") return null;
 
@@ -182,335 +95,6 @@ export default function MobileAppPrompt() {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: KEYFRAMES_STYLE }} />
-
-      {view === "interstitial" && (
-        <div
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 9999,
-            background: "linear-gradient(180deg, #ede9ff 0%, #ede9ff 15%, #ffffff 50%)",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            fontFamily: font,
-            animation: animatingOut ? undefined : "mobilePromptFadeIn 0.4s ease both",
-            opacity: animatingOut ? 0 : undefined,
-            transition: animatingOut ? "opacity 0.35s ease" : undefined,
-            overflow: "hidden",
-          }}
-        >
-          {/* Close X button */}
-          <button
-            onClick={dismissInterstitial}
-            style={{
-              position: "fixed",
-              top: 16,
-              right: 16,
-              zIndex: 10000,
-              background: "none",
-              border: "none",
-              color: "#8898aa",
-              fontSize: 28,
-              cursor: "pointer",
-              padding: 8,
-              lineHeight: 1,
-              fontFamily: "inherit",
-              animation: "mobilePromptFadeIn 0.4s ease 0.85s both",
-            }}
-            aria-label="Close"
-          >
-            ✕
-          </button>
-
-          {/* Background gradient accent — fades to white before the benefit cards */}
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              height: 420,
-              background: "linear-gradient(180deg, #ede9ff 0%, #f2efff 60%, #ffffff 100%)",
-              zIndex: 0,
-            }}
-          />
-
-          <div
-            style={{
-              position: "relative",
-              zIndex: 1,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              maxWidth: 380,
-              width: "100%",
-              padding: "2.5rem 1.5rem 2rem",
-            }}
-          >
-            {/* App icon — animated with glow + sparkles */}
-            <div style={{
-              marginBottom: "1.5rem",
-              animation: "mobilePromptScaleIn 0.5s cubic-bezier(0.34,1.56,0.64,1) 0.15s both",
-            }}>
-              <AnimatedLogo size={72} glowSize={96} sparkleDistance={50} />
-            </div>
-
-            {/* Tagline */}
-            <p
-              style={{
-                fontSize: "0.75rem",
-                fontWeight: 700,
-                letterSpacing: "0.08em",
-                color: "#635bff",
-                textTransform: "uppercase" as const,
-                textAlign: "center",
-                marginBottom: "0.5rem",
-                animation: "mobilePromptSlideUp 0.5s ease 0.2s both",
-              }}
-            >
-              Do Less. Achieve More.
-            </p>
-
-            {/* Heading — slides up */}
-            <h1
-              style={{
-                fontSize: "1.75rem",
-                fontWeight: 800,
-                letterSpacing: "-0.03em",
-                color: "#0a2540",
-                textAlign: "center",
-                marginBottom: "0.5rem",
-                lineHeight: 1.2,
-                animation: "mobilePromptSlideUp 0.5s ease 0.25s both",
-              }}
-            >
-              10x your productivity.
-              <br />
-              <span style={{ background: "linear-gradient(135deg, #635bff, #9b59b6, #635bff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Reach your goals.</span>
-            </h1>
-
-            {/* Subtitle — slides up */}
-            <p
-              style={{
-                fontSize: "0.95rem",
-                color: "#425466",
-                textAlign: "center",
-                lineHeight: 1.6,
-                marginBottom: "2rem",
-                animation: "mobilePromptSlideUp 0.5s ease 0.35s both",
-              }}
-            >
-              The #1 AI app that turns any goal into reality.
-              <br />
-              Just tell us what you want — we&apos;ll get you there.
-            </p>
-
-            {/* Benefits — staggered slide up */}
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 12,
-                width: "100%",
-                marginBottom: "1.75rem",
-              }}
-            >
-              {[
-                {
-                  icon: "\u{1F3AF}",
-                  title: "Achieve any goal",
-                },
-                {
-                  icon: "\u{1F680}",
-                  title: "10x faster progress",
-                },
-                {
-                  icon: "\u2728",
-                  title: "Results on autopilot",
-                },
-              ].map((b, i) => (
-                <div
-                  key={b.title}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 14,
-                    padding: "0.875rem 1rem",
-                    background: "#f6f9fc",
-                    borderRadius: 12,
-                    border: "1px solid #e3e8ef",
-                    animation: `mobilePromptSlideUp 0.45s ease ${0.4 + i * 0.1}s both`,
-                  }}
-                >
-                  <span style={{ fontSize: 24, flexShrink: 0 }}>{b.icon}</span>
-                  <div
-                    style={{
-                      fontSize: "0.95rem",
-                      fontWeight: 700,
-                      color: "#0a2540",
-                    }}
-                  >
-                    {b.title}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Now available on mobile banner */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                width: "100%",
-                marginTop: "0.25rem",
-                marginBottom: "1.25rem",
-                animation: "mobilePromptSlideUp 0.45s ease 0.65s both",
-              }}
-            >
-              <div style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 8,
-                padding: "8px 20px",
-                background: "#ede9ff",
-                borderRadius: 20,
-              }}>
-                <span style={{ fontSize: "0.95rem" }}>📱</span>
-                <span style={{ fontSize: "0.9rem", fontWeight: 600, color: "#635bff" }}>Now available on mobile</span>
-              </div>
-            </div>
-
-            {/* Store button — platform-specific */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: 10,
-                width: "100%",
-                marginBottom: "0.75rem",
-                animation: "mobilePromptSlideUp 0.45s ease 0.7s both",
-              }}
-            >
-              {getMobilePlatform() !== "android" && (
-                <a
-                  href={APP_STORE_URL}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 10,
-                    padding: "14px 28px 14px 18px",
-                    minWidth: 190,
-                    background: "#0a2540",
-                    color: "#fff",
-                    borderRadius: 12,
-                    fontSize: "0.95rem",
-                    fontWeight: 600,
-                    textDecoration: "none",
-                    position: "relative",
-                  }}
-                >
-                  <span style={{
-                    position: "absolute",
-                    top: -9,
-                    right: -10,
-                    background: "#635bff",
-                    color: "#fff",
-                    fontSize: "0.65rem",
-                    fontWeight: 700,
-                    padding: "4px 10px",
-                    borderRadius: 10,
-                    letterSpacing: "0.03em",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  }}>New</span>
-                  <AppleIcon />
-                  <span
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>
-                      Download on the
-                    </span>
-                    <span style={{ fontSize: "1.05rem", fontWeight: 700 }}>App Store</span>
-                  </span>
-                </a>
-              )}
-              {getMobilePlatform() !== "ios" && (
-                <a
-                  href={PLAY_STORE_URL}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 10,
-                    padding: "14px 28px 14px 18px",
-                    minWidth: 190,
-                    background: "#0a2540",
-                    color: "#fff",
-                    borderRadius: 12,
-                    fontSize: "0.95rem",
-                    fontWeight: 600,
-                    textDecoration: "none",
-                    position: "relative",
-                  }}
-                >
-                  <span style={{
-                    position: "absolute",
-                    top: -9,
-                    right: -10,
-                    background: "#635bff",
-                    color: "#fff",
-                    fontSize: "0.65rem",
-                    fontWeight: 700,
-                    padding: "4px 10px",
-                    borderRadius: 10,
-                    letterSpacing: "0.03em",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  }}>New</span>
-                  <PlayIcon />
-                  <span
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "flex-start",
-                      lineHeight: 1.2,
-                    }}
-                  >
-                    <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>
-                      Get it on
-                    </span>
-                    <span style={{ fontSize: "1.05rem", fontWeight: 700 }}>Google Play</span>
-                  </span>
-                </a>
-              )}
-            </div>
-
-            {/* Continue to website — fade in */}
-            <button
-              onClick={dismissInterstitial}
-              style={{
-                background: "none",
-                border: "none",
-                color: "#8898aa",
-                fontSize: "0.875rem",
-                fontWeight: 500,
-                cursor: "pointer",
-                padding: "0.5rem 1rem",
-                fontFamily: "inherit",
-                animation: "mobilePromptFadeIn 0.4s ease 0.85s both",
-              }}
-            >
-              Continue to website
-            </button>
-          </div>
-        </div>
-      )}
 
       {view === "banner" && (
         <div
@@ -531,6 +115,24 @@ export default function MobileAppPrompt() {
             animation: "mobilePromptBannerIn 0.35s ease both",
           }}
         >
+          {/* Close / dismiss button */}
+          <button
+            onClick={dismissBanner}
+            style={{
+              background: "none",
+              border: "none",
+              color: "#8898aa",
+              fontSize: 18,
+              cursor: "pointer",
+              padding: 4,
+              lineHeight: 1,
+              flexShrink: 0,
+            }}
+            aria-label="Dismiss"
+          >
+            &#10005;
+          </button>
+
           {/* App icon */}
           <img
             src="/favicon.png"

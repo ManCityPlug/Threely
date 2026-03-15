@@ -684,11 +684,18 @@ export default function SubscriptionPage() {
             </svg>
           </div>
           <h3 style={{ fontSize: "1rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-            Managed through App Store / Google Play
+            Manage your subscription at threely.co
           </h3>
-          <p style={{ fontSize: "0.85rem", color: "var(--subtext)" }}>
-            Your subscription is managed through the app store where you originally subscribed. To make changes, open your device&apos;s subscription settings.
+          <p style={{ fontSize: "0.85rem", color: "var(--subtext)", marginBottom: 16 }}>
+            Your subscription can be managed on the web. Visit threely.co to update your plan, payment method, or cancel.
           </p>
+          <a
+            href="https://threely.co/subscription"
+            className="btn btn-primary"
+            style={{ fontSize: "0.85rem", padding: "0.5rem 1.5rem", textDecoration: "none" }}
+          >
+            Manage subscription
+          </a>
         </div>
       </div>
     );

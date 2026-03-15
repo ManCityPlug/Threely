@@ -7,8 +7,7 @@ import { useAuth, isOnboarded, markOnboarded, getNickname } from "@/lib/auth-con
 import { profileApi, subscriptionApi, notificationsApi, type SubscriptionStatus, type AppNotification } from "@/lib/api-client";
 import { formatDisplayName } from "@/lib/format-name";
 import ToastProvider from "@/components/ToastProvider";
-import { SubscriptionProvider, useSubscription } from "@/lib/subscription-context";
-import PaywallModal from "@/components/PaywallModal";
+import { SubscriptionProvider } from "@/lib/subscription-context";
 import AppTutorial from "@/components/AppTutorial";
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
@@ -101,11 +100,13 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     subscriptionApi.status().then(res => setSubStatus(res.status)).catch(() => {});
   }, [user]);
 
-  // Show tutorial on first login (after onboarding is confirmed)
+  // Show tutorial only right after onboarding (welcome=1 query param)
   useEffect(() => {
     if (!user || loading || checkingOnboarding) return;
-    // Only show if user has completed onboarding but hasn't seen the tutorial
     if (!isOnboarded(user.id)) return;
+    // Only trigger tutorial when coming directly from onboarding
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has("welcome")) return;
     const tutorialKey = `threely_tutorial_done_${user.id}`;
     if (localStorage.getItem(tutorialKey)) return;
     // Small delay to let the dashboard render first
@@ -196,7 +197,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ToastProvider>
     <SubscriptionProvider>
-    <PaywallGate />
     <AppTutorial visible={showTutorial} onComplete={handleTutorialComplete} />
     <div className={`app-shell${isTablet ? " force-mobile" : ""}`}>
       {/* ── Mobile top bar ──────────────────────────────────────────────────── */}
@@ -564,10 +564,4 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </SubscriptionProvider>
     </ToastProvider>
   );
-}
-
-function PaywallGate() {
-  const { paywallOpen, paywallVariant, closePaywall } = useSubscription();
-  if (!paywallOpen) return null;
-  return <PaywallModal variant={paywallVariant} onClose={closePaywall} />;
 }

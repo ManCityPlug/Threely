@@ -80,7 +80,6 @@ const INTENSITY_OPTIONS_WEB = [
 ];
 
 function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => void; onClose: () => void; editGoal?: Goal | null }) {
-  const { showPaywall } = useSubscription();
   const [step, setStep] = useState<FlowStep>("goal");
   const [showTemplates, setShowTemplates] = useState(!editGoal);
 
@@ -215,7 +214,6 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
     } catch (err) {
       if (err instanceof Error && err.message?.includes("pro_required")) {
         onClose();
-        showPaywall();
       } else {
         setChatHistory([{ role: "assistant", text: "Something went wrong. Please close and try again." }]);
       }
@@ -247,7 +245,6 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
     } catch (err) {
       if (err instanceof Error && err.message?.includes("pro_required")) {
         onClose();
-        showPaywall();
       } else {
         setChatHistory(prev => [...prev, { role: "assistant", text: "Something went wrong. Please try again." }]);
       }
@@ -279,7 +276,6 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
     } catch (err) {
       if (err instanceof Error && err.message?.includes("pro_required")) {
         onClose();
-        showPaywall();
       } else {
         setBuildError("Failed to analyze goal. Try again.");
         setStep("goal");
@@ -353,7 +349,6 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
     } catch (e) {
       if (e instanceof Error && e.message?.includes("pro_required")) {
         onClose();
-        showPaywall();
       } else {
         setBuildError(e instanceof Error ? e.message : "Something went wrong.");
         setStep("goal");
@@ -897,7 +892,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
               return (
                 <div key={i}>
                   <div style={{
-                    maxWidth: "85%", padding: "0.65rem 1rem", borderRadius: 14,
+                    maxWidth: "90%", padding: "0.65rem 1rem", borderRadius: 14,
                     ...(isAssistant
                       ? { background: "var(--primary-light)", borderBottomLeftRadius: 4, alignSelf: "flex-start" }
                       : { background: "var(--primary)", color: "#fff", borderBottomRightRadius: 4, alignSelf: "flex-end", marginLeft: "auto" }),
@@ -1050,11 +1045,11 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
         <div
           className="modal-box"
           onClick={e => e.stopPropagation()}
-          style={{ maxWidth: 560, padding: 0, overflow: "hidden" }}
+          style={{ maxWidth: 560, width: "100%", padding: 0, overflow: "hidden" }}
         >
           {/* Close button */}
           {step !== "building" && step !== "done" && (
-            <div style={{ padding: "1rem 1.5rem 0", display: "flex", justifyContent: "flex-end" }}>
+            <div style={{ padding: "1rem 1.25rem 0", display: "flex", justifyContent: "flex-end" }}>
               <button
                 onClick={onClose}
                 style={{ fontSize: 18, color: "var(--muted)", padding: 4, cursor: "pointer", background: "none", border: "none" }}
@@ -1065,7 +1060,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
           )}
 
           {/* Content */}
-          <div style={{ padding: "1.25rem 2rem 2rem" }}>
+          <div style={{ padding: "1.25rem clamp(1rem, 5vw, 2rem) 2rem" }}>
             {step === "goal" && renderGoalStep()}
             {step === "confirm" && renderConfirmStep()}
             {step === "deadline" && renderDeadlineStep()}
@@ -1087,7 +1082,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
 
 function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onDeleted: () => void; onUpdated: (goal: Goal) => void; onAddDetail: (goal: Goal) => void }) {
   const goalRouter = useRouter();
-  const { hasPro, showPaywall } = useSubscription();
+  const { hasPro } = useSubscription();
   const [showMenu, setShowMenu] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [toggling, setToggling] = useState(false);
@@ -1108,7 +1103,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
 
   async function handleDelete() {
     setShowMenu(false);
-    if (!hasPro) { showPaywall(); return; }
+    if (!hasPro) { return; }
     if (!confirm("Delete this goal and all its tasks?")) return;
     setDeleting(true);
     try {
@@ -1221,7 +1216,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
                 position: "absolute", right: 0, top: "100%", marginTop: 4, zIndex: 50,
                 background: "var(--card)", border: "1px solid var(--border)",
                 borderRadius: "var(--radius)", boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
-                minWidth: 180, overflow: "hidden",
+                minWidth: 160, maxWidth: "calc(100vw - 3rem)", overflow: "hidden",
               }}
             >
               <button
@@ -1331,7 +1326,7 @@ function GoalsPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { showToast } = useToast();
-  const { hasPro, showPaywall, walkthroughActive } = useSubscription();
+  const { hasPro, walkthroughActive } = useSubscription();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(searchParams.get("add") === "true");
@@ -1357,7 +1352,10 @@ function GoalsPageInner() {
   function handleTryAddGoal() {
     // Allow first goal free — only gate if user already has goals
     const activeCount = goals.filter(g => !g.isPaused).length;
-    if (!hasPro && activeCount > 0) { showPaywall(); return; }
+    if (!hasPro && activeCount > 0) {
+      showToast("Manage your subscription at threely.co", "info");
+      return;
+    }
     if (activeCount >= 3) { setShowGoalLimit(true); return; }
     setShowAdd(true);
   }
