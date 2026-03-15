@@ -1158,7 +1158,7 @@ function DashboardPageInner() {
                 Threely is available on mobile
               </span>
               <span style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.4 }}>
-                Faster native experience, works offline, and push notifications to keep you on track.
+                Faster experience, works offline, and push notifications to keep you on track.
               </span>
             </div>
             <button
