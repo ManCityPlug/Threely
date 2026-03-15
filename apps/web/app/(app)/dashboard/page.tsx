@@ -1143,25 +1143,52 @@ function DashboardPageInner() {
     <div className="page-inner">
       <Confetti active={showConfetti} />
 
-      {/* Mobile app tip banner */}
+      {/* Mobile app banner */}
       {isMobile && !appNudgeDismissed && (
         <div className="card fade-in" style={{
-          padding: "0.75rem 1rem",
+          padding: "1rem",
           background: "var(--primary-light)",
           border: "1px solid rgba(99,91,255,0.2)",
           marginBottom: "1.25rem",
-          display: "flex", alignItems: "center", gap: 10,
         }}>
-          <span style={{ fontSize: 18, flexShrink: 0 }}>📱</span>
-          <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)", flex: 1 }}>
-            Threely is available on mobile — faster experience, works offline, and push notifications to keep you on track
-          </span>
-          <button
-            onClick={() => setAppNudgeDismissed(true)}
-            style={{ fontSize: 16, color: "var(--muted)", padding: "2px 4px", lineHeight: 1, background: "none", border: "none", cursor: "pointer", flexShrink: 0 }}
+          <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 10 }}>
+            <span style={{ fontSize: 20, flexShrink: 0 }}>📱</span>
+            <div style={{ flex: 1 }}>
+              <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text)", display: "block", marginBottom: 2 }}>
+                Threely is available on mobile
+              </span>
+              <span style={{ fontSize: "0.78rem", color: "var(--text-secondary)", lineHeight: 1.4 }}>
+                Faster native experience, works offline, and push notifications to keep you on track.
+              </span>
+            </div>
+            <button
+              onClick={() => setAppNudgeDismissed(true)}
+              style={{ fontSize: 16, color: "var(--muted)", padding: "2px 4px", lineHeight: 1, background: "none", border: "none", cursor: "pointer", flexShrink: 0 }}
+            >
+              {"✕"}
+            </button>
+          </div>
+          <a
+            href={/Android/i.test(navigator.userAgent) ? "https://play.google.com/store/apps/details?id=com.threely" : "https://apps.apple.com/app/threely/id6759625661"}
+            style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              padding: "10px 16px",
+              background: "var(--primary)", color: "#fff",
+              borderRadius: 10, fontSize: "0.85rem", fontWeight: 700,
+              textDecoration: "none", width: "100%",
+            }}
           >
-            {"✕"}
-          </button>
+            <span style={{ position: "relative" }}>
+              Download App
+              <span style={{
+                position: "absolute", top: -8, right: -28,
+                background: "#F59E0B", color: "#fff",
+                fontSize: "0.55rem", fontWeight: 700,
+                padding: "1px 5px", borderRadius: 6,
+                letterSpacing: "0.03em",
+              }}>NEW</span>
+            </span>
+          </a>
         </div>
       )}
 

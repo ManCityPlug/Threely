@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 const APP_STORE_URL = "https://apps.apple.com/app/threely/id6759625661";
+const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.threely";
 
 function getTrialEndDate(): string {
   const d = new Date();
@@ -10,13 +12,26 @@ function getTrialEndDate(): string {
   return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 }
 
+function getMobilePlatform(): "ios" | "android" | "desktop" {
+  if (typeof navigator === "undefined") return "desktop";
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
+  if (/Android/i.test(ua)) return "android";
+  return "desktop";
+}
+
 export default function SuccessPage() {
   const [show, setShow] = useState(false);
+  const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
 
   useEffect(() => {
-    // Trigger animation on mount
+    setPlatform(getMobilePlatform());
     requestAnimationFrame(() => setShow(true));
   }, []);
+
+  const isMobile = platform !== "desktop";
+  const storeUrl = platform === "android" ? PLAY_STORE_URL : APP_STORE_URL;
+  const storeName = platform === "android" ? "Google Play" : "App Store";
 
   return (
     <main
@@ -90,14 +105,14 @@ export default function SuccessPage() {
         You won&apos;t be charged until {getTrialEndDate()}.
       </p>
 
-      {/* Download App button */}
-      <a
-        href={APP_STORE_URL}
+      {/* Continue on Web — primary action */}
+      <Link
+        href="/onboarding"
         style={{
           display: "block",
           width: "100%",
           maxWidth: 300,
-          margin: "0 auto 16px",
+          margin: "0 auto 12px",
           padding: "16px 0",
           background: "#fff",
           color: "#635BFF",
@@ -113,21 +128,93 @@ export default function SuccessPage() {
           transition: "all 0.5s ease 0.4s",
         }}
       >
-        Download the App
-      </a>
+        Continue on Web
+      </Link>
 
-      {/* Desktop hint */}
+      {/* Download App — secondary action (mobile only) or primary for desktop */}
+      {isMobile ? (
+        <a
+          href={storeUrl}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 8,
+            width: "100%",
+            maxWidth: 300,
+            margin: "0 auto 16px",
+            padding: "16px 0",
+            background: "rgba(255,255,255,0.12)",
+            color: "#fff",
+            fontSize: "1rem",
+            fontWeight: 700,
+            letterSpacing: "-0.2px",
+            borderRadius: 16,
+            textDecoration: "none",
+            textAlign: "center",
+            border: "1.5px solid rgba(255,255,255,0.2)",
+            opacity: show ? 1 : 0,
+            transform: show ? "translateY(0)" : "translateY(16px)",
+            transition: "all 0.5s ease 0.5s",
+            position: "relative",
+          }}
+        >
+          <span>Download App</span>
+          <span style={{
+            background: "#F59E0B",
+            color: "#fff",
+            fontSize: "0.55rem",
+            fontWeight: 700,
+            padding: "2px 6px",
+            borderRadius: 6,
+            letterSpacing: "0.03em",
+            position: "absolute",
+            top: -8,
+            right: 40,
+          }}>NEW</span>
+        </a>
+      ) : (
+        <a
+          href={APP_STORE_URL}
+          style={{
+            display: "block",
+            width: "100%",
+            maxWidth: 300,
+            margin: "0 auto 16px",
+            padding: "16px 0",
+            background: "rgba(255,255,255,0.12)",
+            color: "#fff",
+            fontSize: "1rem",
+            fontWeight: 700,
+            letterSpacing: "-0.2px",
+            borderRadius: 16,
+            textDecoration: "none",
+            textAlign: "center",
+            border: "1.5px solid rgba(255,255,255,0.2)",
+            opacity: show ? 1 : 0,
+            transform: show ? "translateY(0)" : "translateY(16px)",
+            transition: "all 0.5s ease 0.5s",
+          }}
+        >
+          Download the App
+        </a>
+      )}
+
+      {/* Helper text */}
       <p
         style={{
-          fontSize: "0.8rem",
-          color: "rgba(255,255,255,0.45)",
-          margin: "16px 0 0",
+          fontSize: "0.78rem",
+          color: "rgba(255,255,255,0.4)",
+          margin: "8px 0 0",
           fontWeight: 500,
           opacity: show ? 1 : 0,
-          transition: "opacity 0.5s ease 0.5s",
+          transition: "opacity 0.5s ease 0.6s",
         }}
       >
-        Or use a computer to access threely.co
+        {isMobile
+          ? `Available on the ${storeName}. Works offline with push notifications.`
+          : "Also available on iOS and Android for the best experience."
+        }
       </p>
     </main>
   );
