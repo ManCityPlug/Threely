@@ -1154,7 +1154,7 @@ function DashboardPageInner() {
         }}>
           <span style={{ fontSize: 18, flexShrink: 0 }}>📱</span>
           <span style={{ fontSize: "0.8rem", color: "var(--text-secondary)", flex: 1 }}>
-            Tip: Download our iOS app for push notifications and offline access
+            Threely is available on mobile — faster experience, works offline, and push notifications to keep you on track
           </span>
           <button
             onClick={() => setAppNudgeDismissed(true)}

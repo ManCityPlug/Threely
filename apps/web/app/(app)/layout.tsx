@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { useAuth, isOnboarded, markOnboarded, getNickname } from "@/lib/auth-context";
+import { useAuth, isOnboarded, markOnboarded, getNickname, saveNickname } from "@/lib/auth-context";
 import { profileApi, subscriptionApi, notificationsApi, type SubscriptionStatus, type AppNotification } from "@/lib/api-client";
 import { formatDisplayName } from "@/lib/format-name";
 import ToastProvider from "@/components/ToastProvider";
@@ -100,6 +100,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     subscriptionApi.status().then(res => setSubStatus(res.status)).catch(() => {});
   }, [user]);
 
+  // Sync display name from Supabase metadata to localStorage
+  useEffect(() => {
+    if (!user) return;
+    if (!getNickname() && user.user_metadata?.display_name) {
+      saveNickname(user.user_metadata.display_name as string);
+    }
+  }, [user]);
+
   // Show tutorial only right after onboarding (welcome=1 query param)
   useEffect(() => {
     if (!user || loading || checkingOnboarding) return;
@@ -177,7 +185,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const nicknameRaw = getNickname() || user.email?.split("@")[0] || "You";
+  const nicknameRaw = getNickname() || (user.user_metadata?.display_name as string) || user.email?.split("@")[0] || "You";
   const nickname = formatDisplayName(nicknameRaw);
   const initials = nickname[0]?.toUpperCase() ?? "?";
 
