@@ -845,7 +845,7 @@ export default function OnboardingPage() {
               <button
                 onClick={() => { setShowAiChat(false); setShowTemplates(true); }}
                 style={{
-                  width: 32, height: 32, borderRadius: 8,
+                  width: 40, height: 40, minHeight: 44, borderRadius: 8,
                   display: "flex", alignItems: "center", justifyContent: "center",
                   background: "var(--bg)", border: "1px solid var(--border)",
                   cursor: "pointer", fontSize: 16, color: "var(--subtext)",
@@ -904,7 +904,7 @@ export default function OnboardingPage() {
                                 });
                               }}
                               style={{
-                                padding: "8px 16px", borderRadius: 20,
+                                padding: "10px 16px", borderRadius: 20,
                                 border: `1.5px solid ${isSelected ? "var(--primary)" : "rgba(99,91,255,0.25)"}`,
                                 background: isSelected ? "var(--primary)" : "var(--card)",
                                 color: isSelected ? "#fff" : "var(--primary)",
@@ -920,7 +920,7 @@ export default function OnboardingPage() {
                         <button
                           onClick={() => chatInputRef.current?.focus()}
                           style={{
-                            padding: "8px 16px", borderRadius: 20,
+                            padding: "10px 16px", borderRadius: 20,
                             border: "1px solid var(--border)",
                             background: "var(--bg)", color: "var(--subtext)",
                             fontSize: "0.85rem", fontWeight: 600,

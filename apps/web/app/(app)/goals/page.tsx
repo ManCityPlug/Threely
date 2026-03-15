@@ -859,7 +859,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
       >
         <div style={{
           background: "var(--card)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-lg)",
-          width: "100%", maxWidth: 520, maxHeight: "85vh", display: "flex", flexDirection: "column",
+          width: "100%", maxWidth: "min(520px, calc(100vw - 1.5rem))", maxHeight: "85vh", display: "flex", flexDirection: "column",
           overflow: "hidden",
         }}>
           {/* Header */}
@@ -1045,7 +1045,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
         <div
           className="modal-box"
           onClick={e => e.stopPropagation()}
-          style={{ maxWidth: 560, width: "100%", padding: 0, overflow: "hidden" }}
+          style={{ maxWidth: "min(560px, calc(100vw - 2rem))", width: "100%", padding: 0, overflow: "hidden" }}
         >
           {/* Close button */}
           {step !== "building" && step !== "done" && (

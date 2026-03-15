@@ -318,7 +318,7 @@ function TaskCard({
                 setMenuOpen(o => !o);
               }}
               style={{
-                fontSize: "1.25rem", lineHeight: 1, padding: "2px 6px",
+                fontSize: "1.25rem", lineHeight: 1, padding: "8px 10px",
                 color: "var(--muted)", cursor: "pointer",
                 borderRadius: 4, border: "none", background: "transparent",
               }}
@@ -332,7 +332,7 @@ function TaskCard({
                   position: "fixed", top: menuPos.top, right: menuPos.right, zIndex: 9999,
                   background: "var(--card)", border: "1px solid var(--border)",
                   borderRadius: "var(--radius)", boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
-                  minWidth: 180, overflow: "hidden",
+                  minWidth: 180, maxWidth: "calc(100vw - 20px)", overflow: "hidden",
                 }}>
                   {onRefine && (
                     <button onClick={handleStartRefine} style={menuItemStyle}>
@@ -372,7 +372,7 @@ function TaskCard({
           <div style={{
             position: "fixed", top: "50%", left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "min(480px, 92vw)",
+            width: "calc(100vw - 2rem)", maxWidth: 480,
             maxHeight: "min(600px, 80vh)",
             background: "var(--card)",
             borderRadius: 16,
@@ -440,7 +440,7 @@ function TaskCard({
                       key={s}
                       onClick={() => handleSendAsk(s)}
                       style={{
-                        padding: "6px 14px", borderRadius: 20,
+                        padding: "10px 16px", borderRadius: 20,
                         border: "1.5px solid color-mix(in srgb, var(--primary) 30%, transparent)",
                         background: "var(--primary-light)",
                         fontSize: "0.8rem", fontWeight: 600,
@@ -456,7 +456,7 @@ function TaskCard({
                   <button
                     onClick={() => askInputRef.current?.focus()}
                     style={{
-                      padding: "6px 14px", borderRadius: 20,
+                      padding: "10px 16px", borderRadius: 20,
                       border: "1.5px solid var(--border)",
                       background: "var(--bg)",
                       fontSize: "0.8rem", fontWeight: 600,
@@ -498,7 +498,7 @@ function TaskCard({
                       key={opt}
                       onClick={() => handleSendAsk(opt)}
                       style={{
-                        padding: "6px 14px", borderRadius: 20,
+                        padding: "10px 16px", borderRadius: 20,
                         border: "1.5px solid color-mix(in srgb, var(--primary) 30%, transparent)",
                         background: "var(--primary-light)",
                         fontSize: "0.8rem", fontWeight: 600,
@@ -514,7 +514,7 @@ function TaskCard({
                   <button
                     onClick={() => askInputRef.current?.focus()}
                     style={{
-                      padding: "6px 14px", borderRadius: 20,
+                      padding: "10px 16px", borderRadius: 20,
                       border: "1.5px solid var(--border)",
                       background: "var(--bg)",
                       fontSize: "0.8rem", fontWeight: 600,
@@ -1264,7 +1264,7 @@ function DashboardPageInner() {
         >
           <div
             className="card"
-            style={{ padding: "1.5rem", width: "90%", maxWidth: 400 }}
+            style={{ padding: "1.5rem", width: "calc(100vw - 2rem)", maxWidth: 400 }}
             onClick={e => e.stopPropagation()}
           >
             <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 4, letterSpacing: "-0.02em" }}>
