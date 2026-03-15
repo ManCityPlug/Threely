@@ -212,7 +212,7 @@ export default function SuccessPage() {
         }}
       >
         {isMobile
-          ? `Available on the ${storeName}. Works offline with push notifications.`
+          ? `Available on the ${storeName}. Faster experience with daily reminders.`
           : "Also available on iOS and Android for the best experience."
         }
       </p>
