@@ -814,9 +814,10 @@ export default function DashboardScreen() {
         {isLimitedMode && (
           <Pressable style={styles.expiredBanner} onPress={() => setShowPaywall(true)}>
             <View style={{ flex: 1 }}>
-              <Text style={styles.expiredTitle}>Subscription Required</Text>
-              <Text style={styles.expiredSubtitle}>Tap to subscribe</Text>
+              <Text style={styles.expiredTitle}>Unlock Threely Pro</Text>
+              <Text style={styles.expiredSubtitle}>Get Pro free for 7 days — Achieve your goals</Text>
             </View>
+            <Text style={{ color: colors.primary, fontSize: typography.sm, fontWeight: typography.semibold }}>Try Free</Text>
           </Pressable>
         )}
 

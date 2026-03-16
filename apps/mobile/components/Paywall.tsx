@@ -1,259 +1,395 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  Pressable,
-  ActivityIndicator,
-  Alert,
+  TouchableOpacity,
   Modal,
+  Alert,
+  ActivityIndicator,
+  Linking,
+  Platform,
+  useWindowDimensions,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useSubscription } from "@/lib/subscription-context";
-import { spacing, typography, radius } from "@/constants/theme";
+import Purchases, { PurchasesOffering, INTRO_ELIGIBILITY_STATUS } from "react-native-purchases";
+import * as Haptics from "expo-haptics";
 import { useTheme } from "@/lib/theme";
+import type { Colors } from "@/constants/theme";
+import { spacing, typography, radius, shadow } from "@/constants/theme";
+import { useSubscription } from "@/lib/subscription-context";
 
-const FEATURES = [
-  { icon: "checkmark-circle" as const, text: "3 personalized daily tasks" },
-  { icon: "sparkles" as const, text: "AI-powered goal coaching" },
-  { icon: "bar-chart" as const, text: "Progress tracking & insights" },
-  { icon: "refresh" as const, text: "Daily task generation" },
-];
+interface PaywallProps {
+  visible: boolean;
+  onDismiss: () => void;
+}
 
-export default function Paywall({ visible, onDismiss }: { visible: boolean; onDismiss?: () => void }) {
+const SHEET_MAX_WIDTH = 500;
+
+export default function Paywall({ visible, onDismiss }: PaywallProps) {
   const { colors } = useTheme();
-  const { purchasePro, restorePurchases, currentPackage } = useSubscription();
-  const [purchasing, setPurchasing] = useState(false);
+  const { refreshSubscription } = useSubscription();
+  const { width: windowWidth } = useWindowDimensions();
+  const isWideScreen = windowWidth > 600;
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
+  const [loading, setLoading] = useState(false);
   const [restoring, setRestoring] = useState(false);
+  const [offerings, setOfferings] = useState<PurchasesOffering | null>(null);
+  const [trialEligible, setTrialEligible] = useState(true);
 
-  const priceString = currentPackage?.product?.priceString ?? "$15.99";
-  const introPrice = currentPackage?.product?.introPrice;
-  const hasFreeTrial = introPrice?.price === 0;
-  const trialDays = introPrice?.periodNumberOfUnits ?? 7;
+  useEffect(() => {
+    if (!visible) return;
+    (async () => {
+      try {
+        const off = await Purchases.getOfferings();
+        setOfferings(off.current);
 
-  async function handlePurchase() {
-    setPurchasing(true);
-    try {
-      const success = await purchasePro();
-      if (success) {
-        onDismiss?.();
+        if (off.current) {
+          const productIds = [
+            off.current.monthly?.product?.identifier,
+          ].filter(Boolean) as string[];
+
+          if (productIds.length > 0) {
+            try {
+              const eligibility = await Purchases.checkTrialOrIntroductoryPriceEligibility(productIds);
+              const isEligible = Object.values(eligibility).some(
+                (e) => e.status === INTRO_ELIGIBILITY_STATUS.INTRO_ELIGIBILITY_STATUS_ELIGIBLE
+              );
+              setTrialEligible(isEligible);
+            } catch {
+              setTrialEligible(true);
+            }
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to load offerings:", e);
       }
-    } catch {
-      Alert.alert("Purchase failed", "Something went wrong. Please try again.");
+    })();
+  }, [visible]);
+
+  const priceString = offerings?.monthly?.product?.priceString ?? "$15.99";
+
+  async function handleSubscribe() {
+    const pkg = offerings?.monthly;
+    if (!pkg) {
+      Alert.alert("Error", "Unable to load subscription options. Please try again.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
+      const purchasePromise = Purchases.purchasePackage(pkg);
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error("Purchase timed out")), 120000)
+      );
+
+      const { customerInfo } = await Promise.race([purchasePromise, timeoutPromise]);
+      if (
+        customerInfo.entitlements.active["pro"] !== undefined ||
+        customerInfo.entitlements.active["threely Pro"] !== undefined
+      ) {
+        await refreshSubscription();
+        onDismiss();
+      }
+    } catch (e: unknown) {
+      const err = e as { userCancelled?: boolean; message?: string };
+      if (!err.userCancelled) {
+        const message = err.message === "Purchase timed out"
+          ? "The purchase is taking too long. Please check your connection and try again."
+          : "Something went wrong. Please try again.";
+        Alert.alert("Purchase failed", message);
+      }
     } finally {
-      setPurchasing(false);
+      setLoading(false);
     }
   }
 
   async function handleRestore() {
     setRestoring(true);
     try {
-      const success = await restorePurchases();
-      if (success) {
-        Alert.alert("Restored", "Your subscription has been restored.");
-        onDismiss?.();
+      const customerInfo = await Purchases.restorePurchases();
+      if (
+        customerInfo.entitlements.active["pro"] !== undefined ||
+        customerInfo.entitlements.active["threely Pro"] !== undefined
+      ) {
+        await refreshSubscription();
+        onDismiss();
       } else {
-        Alert.alert("No subscription found", "We couldn't find an active subscription for this account.");
+        Alert.alert("No Purchases Found", "We couldn't find any previous purchases for this account.");
       }
     } catch {
-      Alert.alert("Restore failed", "Something went wrong. Please try again.");
+      Alert.alert("Error", "Failed to restore purchases. Please try again.");
     } finally {
       setRestoring(false);
     }
   }
 
   return (
-    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
-      <View style={[styles.container, { backgroundColor: colors.bg }]}>
-        {/* Header */}
-        <View style={styles.header}>
-          {onDismiss && (
-            <Pressable onPress={onDismiss} style={styles.closeBtn}>
-              <Ionicons name="close" size={22} color={colors.textSecondary} />
-            </Pressable>
-          )}
+    <Modal visible={visible} animationType="slide" transparent statusBarTranslucent>
+      {/* Backdrop */}
+      <TouchableOpacity
+        style={styles.backdrop}
+        activeOpacity={1}
+        onPress={onDismiss}
+      />
+
+      {/* Sheet */}
+      <View style={[
+        styles.sheet,
+        isWideScreen && { maxWidth: SHEET_MAX_WIDTH, alignSelf: "center", width: "100%", borderRadius: radius.xl },
+      ]}>
+        {/* Handle bar */}
+        <View style={styles.handleWrap}>
+          <View style={styles.handle} />
         </View>
 
-        {/* Content */}
-        <View style={styles.content}>
-          <View style={[styles.iconBadge, { backgroundColor: colors.primary + "15" }]}>
-            <Ionicons name="star" size={32} color={colors.primary} />
-          </View>
+        {/* Icon + heading */}
+        <Text style={styles.icon}>✦</Text>
+        <Text style={styles.heading}>Unlock this with Threely Pro</Text>
+        <Text style={styles.subheading}>
+          The #1 AI app that turns any goal into reality.{"\n"}Just tell us what you want — we'll get you there.
+        </Text>
 
-          <Text style={[styles.title, { color: colors.text }]}>
-            Unlock Threely Pro
-          </Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            Get the most out of your goals with personalized AI coaching.
-          </Text>
-
-          {/* Features */}
-          <View style={styles.features}>
-            {FEATURES.map((f, i) => (
-              <View key={i} style={styles.featureRow}>
-                <Ionicons name={f.icon} size={20} color={colors.primary} />
-                <Text style={[styles.featureText, { color: colors.text }]}>{f.text}</Text>
-              </View>
-            ))}
-          </View>
-
-          {/* Price */}
-          <View style={[styles.priceCard, { backgroundColor: colors.bgElevated, borderColor: colors.border }]}>
-            <Text style={[styles.priceLabel, { color: colors.text }]}>Monthly</Text>
-            <Text style={[styles.priceAmount, { color: colors.primary }]}>{priceString}/mo</Text>
-            {hasFreeTrial && (
-              <Text style={[styles.trialNote, { color: colors.success }]}>
-                {trialDays}-day free trial included
+        {/* Monthly plan card — always selected */}
+        <View style={[styles.planCard, styles.planCardSelected]}>
+          <View style={styles.planRow}>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.planName, { color: colors.primary }]}>Monthly</Text>
+              <Text style={styles.planSub}>
+                {trialEligible ? "7 Day Free Trial · per month" : "per month"}
               </Text>
-            )}
+            </View>
+            <Text style={[styles.planPrice, { color: colors.primary }]}>{priceString}</Text>
           </View>
         </View>
+
+        {/* Total due today */}
+        {trialEligible && (
+          <View style={[styles.totalDueRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.totalDueLabel, { color: colors.textSecondary }]}>Total due today</Text>
+            <Text style={styles.totalDueAmount}>$0.00</Text>
+          </View>
+        )}
 
         {/* CTA */}
-        <View style={styles.footer}>
-          <Pressable
-            style={[styles.purchaseBtn, { backgroundColor: colors.primary }, (purchasing || restoring) && { opacity: 0.6 }]}
-            onPress={handlePurchase}
-            disabled={purchasing || restoring}
-          >
-            {purchasing ? (
-              <ActivityIndicator color="#FFFFFF" />
-            ) : (
-              <Text style={styles.purchaseBtnText}>
-                {hasFreeTrial ? "Start Free Trial" : "Subscribe Now"}
-              </Text>
-            )}
-          </Pressable>
+        <TouchableOpacity
+          style={[styles.ctaBtn, (loading || !offerings) && { opacity: 0.7 }]}
+          activeOpacity={0.85}
+          onPress={handleSubscribe}
+          disabled={loading || !offerings}
+        >
+          {loading ? (
+            <ActivityIndicator color="#fff" size="small" />
+          ) : (
+            <Text style={styles.ctaBtnText}>{trialEligible ? "Start Free Trial" : "Subscribe"}</Text>
+          )}
+        </TouchableOpacity>
 
-          <Pressable
-            style={styles.restoreBtn}
-            onPress={handleRestore}
-            disabled={purchasing || restoring}
-          >
-            {restoring ? (
-              <ActivityIndicator color={colors.textSecondary} size="small" />
-            ) : (
-              <Text style={[styles.restoreBtnText, { color: colors.textSecondary }]}>
-                Restore purchase
-              </Text>
-            )}
-          </Pressable>
-
-          <Text style={[styles.legal, { color: colors.textTertiary }]}>
-            Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews unless canceled at least 24 hours before the end of the current period.
+        {trialEligible ? (
+          <>
+            <Text style={styles.trialNote}>
+              No charge for 7 days. Cancel anytime in Settings.
+            </Text>
+            <Text style={styles.ctaSub}>
+              Then {priceString}/month
+            </Text>
+          </>
+        ) : (
+          <Text style={styles.ctaSub}>
+            Cancel anytime in Settings.
           </Text>
-        </View>
+        )}
+
+        {/* Dismiss */}
+        <TouchableOpacity onPress={onDismiss} style={styles.dismissBtn}>
+          <Text style={styles.dismissText}>Not now</Text>
+        </TouchableOpacity>
+
+        {/* Restore purchases */}
+        <TouchableOpacity onPress={handleRestore} disabled={restoring} style={styles.restoreBtn}>
+          {restoring ? (
+            <ActivityIndicator color={colors.textTertiary} size="small" />
+          ) : (
+            <Text style={styles.restoreText}>Restore purchases</Text>
+          )}
+        </TouchableOpacity>
+
+        {/* Legal */}
+        <Text style={styles.legalText}>
+          <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/terms")}>
+            Terms
+          </Text>
+          {"  ·  "}
+          <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/privacy")}>
+            Privacy
+          </Text>
+          {"  ·  "}
+          <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/refund")}>
+            Refund
+          </Text>
+        </Text>
       </View>
     </Modal>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-  },
-  closeBtn: {
-    width: 36, height: 36, borderRadius: 18,
-    alignItems: "center", justifyContent: "center",
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: spacing.lg,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  iconBadge: {
-    width: 64, height: 64, borderRadius: 20,
-    alignItems: "center", justifyContent: "center",
-    marginBottom: spacing.lg,
-  },
-  title: {
-    fontSize: typography.xl,
-    fontWeight: typography.bold,
-    letterSpacing: -0.5,
-    textAlign: "center",
-    marginBottom: spacing.xs,
-  },
-  subtitle: {
-    fontSize: typography.base,
-    textAlign: "center",
-    lineHeight: 22,
-    marginBottom: spacing.xl,
-    paddingHorizontal: spacing.md,
-  },
-  features: {
-    alignSelf: "stretch",
-    gap: spacing.md,
-    marginBottom: spacing.xl,
-  },
-  featureRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.sm,
-    paddingHorizontal: spacing.sm,
-  },
-  featureText: {
-    fontSize: typography.base,
-    fontWeight: typography.medium,
-  },
-  priceCard: {
-    alignSelf: "stretch",
-    borderRadius: radius.lg,
-    borderWidth: 1.5,
-    padding: spacing.lg,
-    alignItems: "center",
-  },
-  priceLabel: {
-    fontSize: typography.sm,
-    fontWeight: typography.medium,
-    marginBottom: spacing.xs,
-  },
-  priceAmount: {
-    fontSize: typography.xxl,
-    fontWeight: typography.bold,
-    letterSpacing: -0.5,
-  },
-  trialNote: {
-    fontSize: typography.sm,
-    fontWeight: typography.semibold,
-    marginTop: spacing.xs,
-  },
-  footer: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.xxl,
-    gap: spacing.sm,
-  },
-  purchaseBtn: {
-    height: 52,
-    borderRadius: radius.md,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  purchaseBtnText: {
-    color: "#FFFFFF",
-    fontSize: typography.md,
-    fontWeight: typography.semibold,
-    letterSpacing: -0.2,
-  },
-  restoreBtn: {
-    height: 40,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  restoreBtnText: {
-    fontSize: typography.sm,
-    fontWeight: typography.medium,
-  },
-  legal: {
-    fontSize: 10,
-    textAlign: "center",
-    lineHeight: 14,
-    paddingHorizontal: spacing.sm,
-  },
-});
+function createStyles(c: Colors) {
+  return StyleSheet.create({
+    backdrop: {
+      flex: 1,
+      backgroundColor: "rgba(0,0,0,0.5)",
+    },
+    sheet: {
+      backgroundColor: c.bgElevated,
+      borderTopLeftRadius: radius.xl,
+      borderTopRightRadius: radius.xl,
+      paddingHorizontal: spacing.lg,
+      paddingBottom: 40,
+      ...shadow.lg,
+    },
+    handleWrap: {
+      alignItems: "center",
+      paddingTop: spacing.sm,
+      paddingBottom: spacing.md,
+    },
+    handle: {
+      width: 36,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: c.border,
+    },
+    icon: {
+      fontSize: 36,
+      color: c.primary,
+      textAlign: "center",
+      marginBottom: spacing.sm,
+    },
+    heading: {
+      fontSize: typography.xl,
+      fontWeight: typography.bold,
+      color: c.text,
+      textAlign: "center",
+      letterSpacing: -0.5,
+      marginBottom: spacing.xs,
+    },
+    subheading: {
+      fontSize: typography.sm,
+      color: c.textSecondary,
+      textAlign: "center",
+      lineHeight: 20,
+      marginBottom: spacing.lg,
+    },
+    planCard: {
+      backgroundColor: c.card,
+      borderRadius: radius.lg,
+      borderWidth: 2,
+      borderColor: c.border,
+      padding: spacing.md,
+      marginBottom: spacing.sm,
+    },
+    planCardSelected: {
+      borderColor: c.primary,
+      backgroundColor: c.primaryLight,
+    },
+    planRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: spacing.md,
+    },
+    planName: {
+      fontSize: typography.base,
+      fontWeight: typography.semibold,
+      color: c.text,
+      marginBottom: 2,
+    },
+    planSub: {
+      fontSize: typography.xs,
+      color: c.textTertiary,
+    },
+    planPrice: {
+      fontSize: typography.lg,
+      fontWeight: typography.bold,
+      color: c.text,
+      letterSpacing: -0.3,
+    },
+    totalDueRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: spacing.md,
+      paddingVertical: 10,
+      borderRadius: radius.md,
+      borderWidth: 1,
+      marginBottom: spacing.xs,
+    },
+    totalDueLabel: {
+      fontSize: typography.sm,
+      fontWeight: typography.medium,
+    },
+    totalDueAmount: {
+      fontSize: typography.md,
+      fontWeight: typography.bold,
+      color: "#3ecf8e",
+    },
+    ctaBtn: {
+      height: 56,
+      backgroundColor: c.primary,
+      borderRadius: radius.lg,
+      alignItems: "center",
+      justifyContent: "center",
+      marginTop: spacing.md,
+      marginBottom: spacing.sm,
+      ...shadow.md,
+    },
+    ctaBtnText: {
+      fontSize: typography.md,
+      fontWeight: typography.bold,
+      color: "#fff",
+      letterSpacing: -0.2,
+    },
+    trialNote: {
+      fontSize: typography.sm,
+      fontWeight: typography.semibold,
+      color: c.success,
+      textAlign: "center",
+      marginBottom: 4,
+    },
+    ctaSub: {
+      fontSize: typography.xs,
+      color: c.textTertiary,
+      textAlign: "center",
+      marginBottom: spacing.md,
+    },
+    dismissBtn: {
+      alignSelf: "center",
+      paddingVertical: spacing.sm,
+      marginBottom: spacing.xs,
+    },
+    dismissText: {
+      fontSize: typography.sm,
+      color: c.textSecondary,
+      fontWeight: typography.medium,
+    },
+    restoreBtn: {
+      alignSelf: "center",
+      paddingVertical: spacing.xs,
+      marginBottom: spacing.sm,
+    },
+    restoreText: {
+      fontSize: typography.xs,
+      color: c.textTertiary,
+      fontWeight: typography.medium,
+    },
+    legalText: {
+      fontSize: typography.xs,
+      color: c.textTertiary,
+      textAlign: "center",
+    },
+    legalLink: {
+      color: c.primary,
+      textDecorationLine: "underline",
+    },
+  });
+}
