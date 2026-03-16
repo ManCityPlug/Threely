@@ -20,7 +20,7 @@ export default function PlanPage() {
     requestAnimationFrame(() => setShow(true));
   }, []);
 
-  async function handleConfirm() {
+  async function handleConfirm(plan: "yearly" | "monthly") {
     setSubmitting(true);
     setError(null);
 
@@ -40,7 +40,7 @@ export default function PlanPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ plan: "yearly" }),
+        body: JSON.stringify({ plan }),
       });
 
       if (!res.ok) {
@@ -89,7 +89,7 @@ export default function PlanPage() {
           transition: "all 0.4s ease",
         }}
       >
-        Try Threely free for 7 days?
+        Would you like the yearly plan?
       </h2>
 
       <p
@@ -156,9 +156,9 @@ export default function PlanPage() {
         $99.99/year after trial ends on {getTrialEndDate()}
       </p>
 
-      {/* Yes button */}
+      {/* Yes — Yearly */}
       <button
-        onClick={handleConfirm}
+        onClick={() => handleConfirm("yearly")}
         disabled={submitting}
         style={{
           width: "100%",
@@ -181,12 +181,12 @@ export default function PlanPage() {
           transitionDelay: "0.3s",
         }}
       >
-        {submitting ? "Starting trial..." : "Yes, Start Free Trial"}
+        {submitting ? "Starting..." : "Yes, Go Yearly"}
       </button>
 
-      {/* No thanks link */}
+      {/* No — Monthly */}
       <button
-        onClick={() => router.back()}
+        onClick={() => handleConfirm("monthly")}
         disabled={submitting}
         style={{
           background: "none",
@@ -200,7 +200,7 @@ export default function PlanPage() {
           transition: "opacity 0.4s ease 0.35s",
         }}
       >
-        No thanks
+        No, Keep Monthly
       </button>
 
       {/* Error */}
