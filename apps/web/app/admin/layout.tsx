@@ -104,6 +104,10 @@ export default function AdminLayout({
         display: "flex",
       }}
     >
+      {/* Hide Crisp chat on admin pages */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        #crisp-chatbox { display: none !important; }
+      `}} />
       <style dangerouslySetInnerHTML={{ __html: `
         .admin-sidebar { display: flex; }
         .admin-mobile-topbar { display: none; }
