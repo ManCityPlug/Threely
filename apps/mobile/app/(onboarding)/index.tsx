@@ -1272,8 +1272,8 @@ export default function OnboardingScreen() {
             const totalExpected = 5;
             const progress = chatDone ? 1 : Math.min(userMsgCount / totalExpected, 0.95);
             return (
-              <View style={{ height: 3, backgroundColor: colors.border, marginHorizontal: spacing.md }}>
-                <View style={{ height: 3, backgroundColor: colors.primary, borderRadius: 2, width: `${Math.round(progress * 100)}%` }} />
+              <View style={{ height: 4, backgroundColor: colors.border, marginHorizontal: spacing.md, borderRadius: 2, marginTop: spacing.xs }}>
+                <View style={{ height: 4, backgroundColor: colors.primary, borderRadius: 2, width: `${Math.round(progress * 100)}%` }} />
               </View>
             );
           })()}

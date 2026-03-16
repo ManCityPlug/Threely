@@ -1509,6 +1509,18 @@ export default function GoalsScreen() {
               </View>
             </View>
 
+            {/* Chat progress bar */}
+            {(() => {
+              const userMsgCount = chatHistory.filter((m) => m.role === "user").length;
+              const totalExpected = 5;
+              const progress = chatDone ? 1 : Math.min(userMsgCount / totalExpected, 0.95);
+              return (
+                <View style={{ height: 4, backgroundColor: colors.border, borderRadius: 2, marginTop: spacing.xs }}>
+                  <View style={{ height: 4, backgroundColor: colors.primary, borderRadius: 2, width: `${Math.round(progress * 100)}%` }} />
+                </View>
+              );
+            })()}
+
             {/* Chat messages */}
               <FlatList
                 ref={chatListRef}
