@@ -580,10 +580,13 @@ function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoadi
         </Pressable>
       </Animated.View>
 
-      {/* New to Threely hint */}
+      {/* Create account link */}
       <Animated.View style={{ opacity: anim, marginTop: spacing.xl }}>
         <Text style={styles.signInText}>
-          New to Threely? Visit threely.co to create your account
+          New here?{" "}
+          <Text style={{ color: "rgba(255,255,255,0.9)", fontWeight: "600" }} onPress={() => onComplete("login")}>
+            Create an account
+          </Text>
         </Text>
       </Animated.View>
 

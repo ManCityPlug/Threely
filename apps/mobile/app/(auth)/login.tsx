@@ -111,7 +111,7 @@ export default function LoginScreen() {
             if (data.exists === false) {
               Alert.alert(
                 "Account not found",
-                "We couldn't find an account with this email. Visit threely.co to create your account.",
+                "We couldn't find an account with this email. Try creating an account instead.",
                 [{ text: "OK" }]
               );
               return;
