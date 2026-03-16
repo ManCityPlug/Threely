@@ -800,7 +800,7 @@ export default function ProfileScreen() {
               if (isLimitedMode) {
                 setShowPaywall(true);
               } else {
-                Linking.openURL("https://threely.co");
+                Linking.openURL("https://apps.apple.com/account/subscriptions");
               }
             }}
             activeOpacity={0.7}
