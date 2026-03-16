@@ -1512,7 +1512,7 @@ export default function GoalsScreen() {
             {/* Chat progress bar */}
             {(() => {
               const userMsgCount = chatHistory.filter((m) => m.role === "user").length;
-              const totalExpected = 5;
+              const totalExpected = 10;
               const progress = chatDone ? 1 : Math.min(userMsgCount / totalExpected, 0.95);
               return (
                 <View style={{ height: 4, backgroundColor: colors.border, borderRadius: 2, marginTop: spacing.xs }}>
