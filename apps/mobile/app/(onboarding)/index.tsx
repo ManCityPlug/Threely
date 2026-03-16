@@ -1227,21 +1227,6 @@ export default function OnboardingScreen() {
         {isMagicMoment && renderMagicMoment()}
       </View>
 
-      {/* DEV ONLY — skip onboarding */}
-      {__DEV__ && !isMagicMoment && (
-        <TouchableOpacity
-          onPress={async () => {
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-              await AsyncStorage.setItem(`@threely_onboarding_done_${session.user.id}`, "true");
-            }
-            router.replace("/(tabs)");
-          }}
-          style={{ alignSelf: "center", paddingVertical: spacing.sm, marginBottom: spacing.md }}
-        >
-          <Text style={{ color: colors.textTertiary, fontSize: typography.sm }}>Skip (dev only)</Text>
-        </TouchableOpacity>
-      )}
       {/* ── AI Plan Chat Modal ── */}
       <Modal
         visible={showAiChat}
