@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import {
   View,
   Text,
@@ -11,13 +11,11 @@ import {
   Alert,
   Pressable,
   ActivityIndicator,
-  Animated,
-  Linking,
   useWindowDimensions,
 } from "react-native";
-import { Link } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { spacing, typography, radius } from "@/constants/theme";
 import {
@@ -30,12 +28,12 @@ const PRIMARY = "#635BFF";
 const FORM_MAX_WIDTH = 420;
 
 export default function RegisterScreen() {
+  const router = useRouter();
   const { width: windowWidth } = useWindowDimensions();
   const isWideScreen = windowWidth > 600;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [done, setDone] = useState(false);
   const [emailFocused, setEmailFocused] = useState(false);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
@@ -43,74 +41,27 @@ export default function RegisterScreen() {
   const { signIn: appleSignIn, loading: appleLoading } = useAppleSignIn();
   const socialLoading = googleLoading || appleLoading;
 
-  // Animated logo — pulsing glow + sparkles
-  const glowAnim = useRef(new Animated.Value(0)).current;
-  const sparkleAnims = useRef([0, 1, 2, 3, 4, 5].map(() => new Animated.Value(0))).current;
-
-  useEffect(() => {
-    // Pulsing glow loop
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(glowAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
-        Animated.timing(glowAnim, { toValue: 0, duration: 1500, useNativeDriver: true }),
-      ])
-    ).start();
-
-    // Sparkle loops — staggered
-    sparkleAnims.forEach((anim, idx) => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.delay(idx * 150),
-          Animated.timing(anim, { toValue: 1, duration: 800, useNativeDriver: true }),
-          Animated.timing(anim, { toValue: 0, duration: 800, useNativeDriver: true }),
-          Animated.delay(400),
-        ])
-      ).start();
-    });
-  }, []);
-
   async function handleRegister() {
     if (!email || !password) return;
-    if (password.length < 8) {
-      Alert.alert("Password too short", "Use at least 8 characters.");
+    if (password.length < 6) {
+      Alert.alert("Password too short", "Password must be at least 6 characters.");
       return;
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signUp({ email, password });
+      const { error } = await supabase.auth.signUp({ email: email.trim(), password });
       if (error) {
-        Alert.alert("Sign up failed", error.message);
-      } else {
-        setDone(true);
+        if (error.message.includes("already registered")) {
+          Alert.alert("Account exists", "This email is already registered. Try signing in instead.");
+        } else {
+          Alert.alert("Sign up failed", error.message);
+        }
       }
     } catch {
       Alert.alert("Sign up failed", "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
-  }
-
-  if (done) {
-    return (
-      <View style={[styles.container, styles.center]}>
-        <LinearGradient
-          colors={["#1A1040", "#2D1B69", "#635BFF"]}
-          style={StyleSheet.absoluteFillObject}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-        />
-        <View style={isWideScreen ? { maxWidth: FORM_MAX_WIDTH, alignItems: "center" } : undefined}>
-          <View style={styles.checkCircle}>
-            <Ionicons name="checkmark" size={40} color="#FFFFFF" />
-          </View>
-          <Text style={styles.title}>Check your email</Text>
-          <Text style={styles.subtitle}>
-            We sent a confirmation link to{"\n"}
-            <Text style={{ color: "#FFFFFF", fontWeight: typography.semibold }}>{email}</Text>
-          </Text>
-        </View>
-      </View>
-    );
   }
 
   return (
@@ -133,51 +84,10 @@ export default function RegisterScreen() {
           ]}
           keyboardShouldPersistTaps="handled"
         >
-          {/* Animated logo with pulsing glow + sparkles */}
-          <View style={styles.logoContainer}>
-            {/* Glow */}
-            <Animated.View
-              style={[
-                styles.logoGlow,
-                {
-                  opacity: glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.2, 0.5] }),
-                  transform: [{ scale: glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.9, 1.15] }) }],
-                },
-              ]}
-            />
-            {/* Logo */}
-            <Animated.Image
-              source={require("@/assets/icon.png")}
-              style={[
-                styles.logo,
-                {
-                  transform: [{ scale: glowAnim.interpolate({ inputRange: [0, 1], outputRange: [0.97, 1.03] }) }],
-                },
-              ]}
-            />
-            {/* Sparkles */}
-            {sparkleAnims.map((anim, idx) => {
-              const angle = (idx * 60 * Math.PI) / 180;
-              const dist = 50;
-              return (
-                <Animated.View
-                  key={idx}
-                  style={[
-                    styles.sparkle,
-                    {
-                      left: 37 + Math.cos(angle) * dist,
-                      top: 37 + Math.sin(angle) * dist,
-                      opacity: anim,
-                      transform: [{ scale: anim.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] }) }],
-                    },
-                  ]}
-                />
-              );
-            })}
-          </View>
+          <Image source={require("@/assets/icon.png")} style={styles.logo} />
 
-          <Text style={styles.title}>Create account</Text>
-          <Text style={styles.subtitle}>Start turning your goals into action</Text>
+          <Text style={styles.title}>Create your account</Text>
+          <Text style={styles.subtitle}>Start your free 7-day trial</Text>
 
           {/* Social sign-in buttons */}
           <View style={styles.socialButtons}>
@@ -236,7 +146,7 @@ export default function RegisterScreen() {
                 autoComplete="new-password"
                 returnKeyType="go"
                 onSubmitEditing={handleRegister}
-                placeholder="Min. 8 characters"
+                placeholder="At least 6 characters"
                 placeholderTextColor="rgba(255,255,255,0.35)"
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}
@@ -257,24 +167,12 @@ export default function RegisterScreen() {
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Already have an account? </Text>
-            <Link href="/(auth)/login">
-              <Text style={styles.footerLink}>Sign in</Text>
-            </Link>
+            <Pressable onPress={() => router.replace("/(auth)/login")}>
+              <Text style={styles.footerText}>
+                Already have an account? <Text style={{ color: "rgba(255,255,255,0.8)", fontWeight: "600" as const }}>Sign in</Text>
+              </Text>
+            </Pressable>
           </View>
-
-          {/* Legal — Apple requires Terms & Privacy links on sign-up */}
-          <Text style={styles.legalText}>
-            By creating an account, you agree to our{" "}
-            <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/terms")}>
-              Terms of Service
-            </Text>{" "}
-            and{" "}
-            <Text style={styles.legalLink} onPress={() => Linking.openURL("https://threely.co/privacy")}>
-              Privacy Policy
-            </Text>
-            .
-          </Text>
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -282,26 +180,7 @@ export default function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  backButton: {
-    position: "absolute",
-    top: Platform.OS === "ios" ? 56 : 24,
-    left: spacing.md,
-    zIndex: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "rgba(255,255,255,0.12)",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  center: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: spacing.lg,
-  },
+  container: { flex: 1 },
   inner: {
     flexGrow: 1,
     justifyContent: "center",
@@ -311,78 +190,32 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     width: "100%",
   },
-  logoContainer: {
-    width: 80,
-    height: 80,
-    alignSelf: "center",
-    marginBottom: spacing.xl,
-  },
-  logoGlow: {
-    position: "absolute",
-    left: -12,
-    top: -12,
-    width: 104,
-    height: 104,
-    borderRadius: 52,
-    backgroundColor: "rgba(99, 91, 255, 0.35)",
-  },
   logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 20,
-    zIndex: 2,
-  },
-  sparkle: {
-    position: "absolute",
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#FFFFFF",
-    zIndex: 3,
-  },
-  checkCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "#3ECF8E",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: spacing.lg,
+    width: 56, height: 56, borderRadius: 14,
+    marginBottom: spacing.xl, alignSelf: "center",
+    shadowColor: PRIMARY, shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4, shadowRadius: 16, elevation: 8,
   },
   title: {
-    fontSize: typography.xxl,
-    fontWeight: typography.bold,
-    color: "#FFFFFF",
-    letterSpacing: -0.5,
-    textAlign: "center",
-    marginBottom: spacing.xs,
+    fontSize: typography.xxl, fontWeight: typography.bold,
+    color: "#FFFFFF", letterSpacing: -0.5,
+    textAlign: "center", marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: typography.base,
-    color: "rgba(255,255,255,0.6)",
-    textAlign: "center",
-    marginBottom: spacing.xl,
-    lineHeight: 22,
+    fontSize: typography.base, color: "rgba(255,255,255,0.6)",
+    textAlign: "center", marginBottom: spacing.xl,
   },
-  form: {
-    gap: spacing.md,
-  },
-  fieldGroup: {
-    gap: spacing.xs,
-  },
+  form: { gap: spacing.md },
+  fieldGroup: { gap: spacing.xs },
   label: {
-    fontSize: typography.sm,
-    fontWeight: typography.medium,
+    fontSize: typography.sm, fontWeight: typography.medium,
     color: "rgba(255,255,255,0.8)",
   },
   input: {
     backgroundColor: "rgba(255,255,255,0.1)",
-    borderWidth: 1.5,
-    borderColor: "rgba(255,255,255,0.15)",
-    borderRadius: radius.md,
-    height: 48,
-    paddingHorizontal: spacing.md,
-    fontSize: typography.base,
+    borderWidth: 1.5, borderColor: "rgba(255,255,255,0.15)",
+    borderRadius: radius.md, height: 48,
+    paddingHorizontal: spacing.md, fontSize: typography.base,
     color: "#FFFFFF",
   },
   inputFocused: {
@@ -390,90 +223,41 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.14)",
   },
   button: {
-    height: 48,
-    borderRadius: radius.md,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-    marginTop: spacing.sm,
+    height: 48, borderRadius: radius.md,
+    alignItems: "center", justifyContent: "center",
+    backgroundColor: "#FFFFFF", marginTop: spacing.sm,
   },
   buttonText: {
-    color: "#1A1040",
-    fontSize: typography.base,
-    fontWeight: typography.semibold,
-    letterSpacing: -0.2,
+    color: "#1A1040", fontSize: typography.base,
+    fontWeight: typography.semibold, letterSpacing: -0.2,
   },
   footer: {
-    flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "center", alignItems: "center",
     marginTop: spacing.xl,
   },
   footerText: {
-    color: "rgba(255,255,255,0.6)",
-    fontSize: typography.sm,
+    color: "rgba(255,255,255,0.5)", fontSize: typography.sm,
+    textAlign: "center",
   },
-  footerLink: {
-    color: "rgba(255,255,255,0.95)",
-    fontSize: typography.sm,
-    fontWeight: typography.semibold,
-  },
-  socialButtons: {
-    gap: 12,
-    marginBottom: spacing.md,
-  },
+  socialButtons: { gap: 12, marginBottom: spacing.md },
   appleButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#000000",
-    height: 48,
-    borderRadius: radius.md,
-    gap: spacing.sm,
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    backgroundColor: "#000000", height: 48, borderRadius: radius.md, gap: spacing.sm,
   },
   appleButtonText: {
-    color: "#FFFFFF",
-    fontSize: typography.base,
-    fontWeight: typography.semibold,
+    color: "#FFFFFF", fontSize: typography.base, fontWeight: typography.semibold,
   },
   googleButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-    height: 48,
-    borderRadius: radius.md,
-    gap: spacing.sm,
+    flexDirection: "row", alignItems: "center", justifyContent: "center",
+    backgroundColor: "#FFFFFF", height: 48, borderRadius: radius.md, gap: spacing.sm,
   },
   googleButtonText: {
-    color: "#1F2937",
-    fontSize: typography.base,
-    fontWeight: typography.semibold,
+    color: "#1F2937", fontSize: typography.base, fontWeight: typography.semibold,
   },
   divider: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: spacing.md,
-    marginBottom: spacing.md,
+    flexDirection: "row", alignItems: "center",
+    gap: spacing.md, marginBottom: spacing.md,
   },
-  dividerLine: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "rgba(255,255,255,0.15)",
-  },
-  dividerText: {
-    color: "rgba(255,255,255,0.5)",
-    fontSize: typography.sm,
-  },
-  legalText: {
-    fontSize: typography.xs,
-    color: "rgba(255,255,255,0.45)",
-    textAlign: "center",
-    lineHeight: 18,
-    marginTop: spacing.lg,
-    paddingHorizontal: spacing.md,
-  },
-  legalLink: {
-    color: "rgba(255,255,255,0.7)",
-    textDecorationLine: "underline",
-  },
+  dividerLine: { flex: 1, height: 1, backgroundColor: "rgba(255,255,255,0.15)" },
+  dividerText: { color: "rgba(255,255,255,0.5)", fontSize: typography.sm },
 });

@@ -14,9 +14,9 @@ import {
   Modal,
   useWindowDimensions,
 } from "react-native";
-import { Link, useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import { spacing, typography, radius } from "@/constants/theme";
 import {
@@ -111,11 +111,8 @@ export default function LoginScreen() {
             if (data.exists === false) {
               Alert.alert(
                 "Account not found",
-                "We couldn't find an account with this email. Would you like to sign up?",
-                [
-                  { text: "Cancel", style: "cancel" },
-                  { text: "Sign up", onPress: () => router.push("/(auth)/register") },
-                ]
+                "We couldn't find an account with this email. Visit threely.co to create your account.",
+                [{ text: "OK" }]
               );
               return;
             }
@@ -246,10 +243,11 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.footer}>
-            <Text style={styles.footerText}>Don't have an account? </Text>
-            <Link href="/(auth)/register">
-              <Text style={styles.footerLink}>Sign up</Text>
-            </Link>
+            <Pressable onPress={() => router.replace("/(auth)/register")}>
+              <Text style={styles.footerText}>
+                Don't have an account? <Text style={{ color: "rgba(255,255,255,0.8)", fontWeight: "600" as const }}>Create one</Text>
+              </Text>
+            </Pressable>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -429,18 +427,14 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   footer: {
-    flexDirection: "row",
     justifyContent: "center",
+    alignItems: "center",
     marginTop: spacing.xl,
   },
   footerText: {
-    color: "rgba(255,255,255,0.6)",
-    fontSize: typography.sm,
-  },
-  footerLink: {
-    color: "rgba(255,255,255,0.95)",
-    fontSize: typography.sm,
-    fontWeight: typography.semibold,
+    color: "rgba(255,255,255,0.5)",
+    fontSize: typography.xs,
+    textAlign: "center",
   },
   socialButtons: {
     gap: 12,

@@ -3,6 +3,7 @@ import { Platform, Alert } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "./supabase";
 
 // Complete any pending auth sessions (required for expo-auth-session)
@@ -75,12 +76,27 @@ export function useAppleSignIn() {
         throw new Error("No identity token received from Apple");
       }
 
+      // Apple only provides the name on the FIRST sign-in — capture it now
+      const givenName = credential.fullName?.givenName;
+      const familyName = credential.fullName?.familyName;
+      const appleName = [givenName, familyName].filter(Boolean).join(" ");
+      if (appleName) {
+        await AsyncStorage.setItem("@threely_nickname", appleName);
+      }
+
       const { error } = await supabase.auth.signInWithIdToken({
         provider: "apple",
         token: credential.identityToken,
       });
 
       if (error) throw error;
+
+      // Also update Supabase user metadata with the name
+      if (appleName) {
+        await supabase.auth.updateUser({
+          data: { full_name: appleName, display_name: appleName },
+        });
+      }
     } catch (e: any) {
       // Don't show error if user cancelled
       if (e.code !== "ERR_CANCELED") {

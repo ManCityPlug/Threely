@@ -37,6 +37,7 @@ import { cancelAllNotifications } from "@/lib/notifications";
 import { useTheme } from "@/lib/theme";
 import { useSubscription } from "@/lib/subscription-context";
 import { useWalkthroughRegistry } from "@/lib/walkthrough-registry";
+import Paywall from "@/components/Paywall";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
 import type { GoalCategory } from "@/constants/goal-templates";
@@ -94,7 +95,8 @@ export default function GoalsScreen() {
   const isWide = screenWidth >= 768;
   const router = useRouter();
   const { showToast } = useToast();
-  const { isLimitedMode, showBottomSheetPaywall, walkthroughActive } = useSubscription();
+  const { isLimitedMode, walkthroughActive, refreshSubscription } = useSubscription();
+  const [showPaywall, setShowPaywall] = useState(false);
   const { register, registerScroll } = useWalkthroughRegistry();
 
   const [goals, setGoals] = useState<Goal[]>([]);
@@ -132,6 +134,15 @@ export default function GoalsScreen() {
   const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
   const chatInputRef = useRef<TextInput>(null);
   const chatListRef = useRef<FlatList>(null);
+
+  // Auto-scroll chat when new messages arrive or chat completes
+  useEffect(() => {
+    if (chatHistory.length > 0 || chatDone) {
+      // Double-fire: immediate for content, delayed for options/goal card layout
+      requestAnimationFrame(() => chatListRef.current?.scrollToEnd({ animated: true }));
+      setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 400);
+    }
+  }, [chatHistory.length, chatDone]);
 
   // Step 3 — Deadline (default: 1 month from today)
   const now = new Date();
@@ -237,7 +248,7 @@ export default function GoalsScreen() {
   // ── Add flow helpers ────────────────────────────────────────────────────────
   function openAddFlow() {
     // Allow first goal free — only gate if user already has goals
-    if (isLimitedMode && !walkthroughActive && goals.length > 0) { showBottomSheetPaywall(); return; }
+    if (isLimitedMode && !walkthroughActive && goals.length > 0) { setShowPaywall(true); return; }
     // 3-goal limit
     const activeCount = goals.length;
     if (activeCount >= 3) {
@@ -392,7 +403,7 @@ export default function GoalsScreen() {
     } catch (e) {
       if (e instanceof Error && e.message?.includes("pro_required")) {
         closeAddFlow();
-        showBottomSheetPaywall();
+        setShowPaywall(true);
       } else {
         setParseError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
       }
@@ -452,7 +463,7 @@ export default function GoalsScreen() {
       if (err instanceof Error && err.message?.includes("pro_required")) {
         setShowAiChat(false);
         closeAddFlow();
-        showBottomSheetPaywall();
+        setShowPaywall(true);
       } else {
         const msg = err instanceof Error ? err.message : "Unknown error";
         console.warn("[goals chat]", msg);
@@ -489,7 +500,7 @@ export default function GoalsScreen() {
       if (err instanceof Error && err.message?.includes("pro_required")) {
         setShowAiChat(false);
         closeAddFlow();
-        showBottomSheetPaywall();
+        setShowPaywall(true);
       } else {
         const msg = err instanceof Error ? err.message : "Unknown error";
         console.warn("[goals chat]", msg);
@@ -696,7 +707,7 @@ export default function GoalsScreen() {
         lastError = e;
         if (e instanceof Error && e.message?.includes("pro_required")) {
           closeAddFlow();
-          showBottomSheetPaywall();
+          setShowPaywall(true);
           lastError = null;
           break;
         }
@@ -721,7 +732,7 @@ export default function GoalsScreen() {
   // ── Edit / action handlers ──────────────────────────────────────────────────
   function handleEditPress() {
     if (!actionGoal) return;
-    if (isLimitedMode && !walkthroughActive) { setActionGoal(null); showBottomSheetPaywall(); return; }
+    if (isLimitedMode && !walkthroughActive) { setActionGoal(null); setShowPaywall(true); return; }
     const goal = actionGoal;
     setActionGoal(null);
     // Set editing context so save flow updates the existing goal
@@ -770,7 +781,7 @@ export default function GoalsScreen() {
 
   function handleDeletePress() {
     if (!actionGoal) return;
-    if (isLimitedMode && !walkthroughActive) { setActionGoal(null); showBottomSheetPaywall(); return; }
+    if (isLimitedMode && !walkthroughActive) { setActionGoal(null); setShowPaywall(true); return; }
     const goal = actionGoal;
     setActionGoal(null);
     Alert.alert(
@@ -1507,9 +1518,14 @@ export default function GoalsScreen() {
                   ...(chatDone && chatGoalText ? [{ role: "goal" as const, text: chatGoalText }] : []),
                 ]}
                 keyExtractor={(_, i) => String(i)}
-                contentContainerStyle={styles.chatList}
-                onContentSizeChange={() => setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 100)}
-                onLayout={() => setTimeout(() => chatListRef.current?.scrollToEnd({ animated: false }), 100)}
+                contentContainerStyle={[styles.chatList, { paddingBottom: spacing.xl }]}
+                onContentSizeChange={() => {
+                  requestAnimationFrame(() => chatListRef.current?.scrollToEnd({ animated: true }));
+                  setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 300);
+                }}
+                onLayout={() => {
+                  requestAnimationFrame(() => chatListRef.current?.scrollToEnd({ animated: false }));
+                }}
                 renderItem={({ item, index }) => {
                   if (item.role === "loading") {
                     return (
@@ -1802,6 +1818,7 @@ export default function GoalsScreen() {
 
       {/* ── Add / Edit goal full-screen flow ─────────────────────────────────────────── */}
       {renderAddFlow()}
+      <Paywall visible={showPaywall} onDismiss={() => { setShowPaywall(false); refreshSubscription(); }} />
     </SafeAreaView>
     </SwipeNavigator>
   );

@@ -130,6 +130,14 @@ export default function OnboardingScreen() {
   const chatInputRef = useRef<TextInput>(null);
   const chatListRef = useRef<FlatList>(null);
 
+  // Auto-scroll chat when new messages arrive or chat completes
+  useEffect(() => {
+    if (chatHistory.length > 0 || chatDone) {
+      requestAnimationFrame(() => chatListRef.current?.scrollToEnd({ animated: true }));
+      setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 400);
+    }
+  }, [chatHistory.length, chatDone]);
+
   // Step 3 — Deadline (default: 1 month from today)
   const now = new Date();
   const defaultDeadline = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
@@ -1257,9 +1265,10 @@ export default function OnboardingScreen() {
               ]}
               keyExtractor={(_, i) => String(i)}
               keyboardShouldPersistTaps="handled"
-              contentContainerStyle={[styles.chatList, { flexGrow: 1 }]}
+              contentContainerStyle={[styles.chatList, { flexGrow: 1, paddingBottom: spacing.xl }]}
               onContentSizeChange={() => {
                 requestAnimationFrame(() => chatListRef.current?.scrollToEnd({ animated: true }));
+                setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 300);
               }}
               onLayout={() => {
                 requestAnimationFrame(() => chatListRef.current?.scrollToEnd({ animated: false }));

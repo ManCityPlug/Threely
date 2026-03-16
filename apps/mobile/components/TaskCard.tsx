@@ -19,7 +19,6 @@ import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { TaskItem } from "@/lib/api";
 import { useTheme } from "@/lib/theme";
-import { useSubscription } from "@/lib/subscription-context";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
 import { useScalePress } from "@/lib/animations";
@@ -53,10 +52,8 @@ interface TaskCardProps {
 
 export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, paywalled = false }: TaskCardProps) {
   const { colors } = useTheme();
-  const { showBottomSheetPaywall } = useSubscription();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [modalVisible, setModalVisible] = useState(false);
-  const pendingPaywallRef = useRef(false);
 
   const strikeAnim = useRef(new Animated.Value(task.isCompleted ? 1 : 0)).current;
   const checkScaleAnim = useRef(new Animated.Value(1)).current;
@@ -196,13 +193,6 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, pa
         transparent
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
-        onDismiss={() => {
-          // Fires AFTER modal is fully off-screen (iOS)
-          if (pendingPaywallRef.current) {
-            pendingPaywallRef.current = false;
-            showBottomSheetPaywall();
-          }
-        }}
       >
         {modalVisible && (
           <TaskDetailContent
@@ -216,19 +206,6 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, pa
             onRefine={onRefine}
             onAsk={onAsk}
             paywalled={paywalled}
-            onPaywall={() => {
-              pendingPaywallRef.current = true;
-              setModalVisible(false);
-              // Android: onDismiss doesn't fire, so trigger paywall after animation
-              if (Platform.OS !== "ios") {
-                setTimeout(() => {
-                  if (pendingPaywallRef.current) {
-                    pendingPaywallRef.current = false;
-                    showBottomSheetPaywall();
-                  }
-                }, 350);
-              }
-            }}
           />
         )}
       </Modal>

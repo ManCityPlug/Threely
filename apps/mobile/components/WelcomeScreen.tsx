@@ -36,7 +36,7 @@ const GRADIENTS: [string, string, string][] = [
 ];
 
 interface WelcomeScreenProps {
-  onComplete: (destination?: "register" | "login") => void;
+  onComplete: (destination?: "login") => void;
   initialPage?: number;
 }
 
@@ -570,27 +570,24 @@ function PageAuth({ anim, onComplete, onGoogleSignIn, onAppleSignIn, googleLoadi
           <Text style={styles.googleButtonText}>Continue with Google</Text>
         </Pressable>
 
-        {/* Sign up with email */}
+        {/* Sign in with email */}
         <Pressable
           style={styles.emailButton}
-          onPress={() => onComplete("register")}
+          onPress={() => onComplete("login")}
         >
           <Ionicons name="mail-outline" size={20} color="#FFFFFF" />
-          <Text style={styles.emailButtonText}>Sign up with email</Text>
+          <Text style={styles.emailButtonText}>Sign in with email</Text>
         </Pressable>
       </Animated.View>
 
-      {/* Sign in link */}
+      {/* New to Threely hint */}
       <Animated.View style={{ opacity: anim, marginTop: spacing.xl }}>
-        <Pressable onPress={() => onComplete("login")}>
-          <Text style={styles.signInText}>
-            Already have an account?{" "}
-            <Text style={styles.signInLink}>Sign in</Text>
-          </Text>
-        </Pressable>
+        <Text style={styles.signInText}>
+          New to Threely? Visit threely.co to create your account
+        </Text>
       </Animated.View>
 
-      {/* Legal — Apple requires Terms & Privacy links on sign-up */}
+      {/* Legal — Terms & Privacy links */}
       <Animated.View style={{ opacity: anim, marginTop: spacing.lg }}>
         <Text style={styles.legalText}>
           By continuing, you agree to our{" "}
@@ -1060,10 +1057,6 @@ const styles = StyleSheet.create({
     color: "rgba(255,255,255,0.75)",
     fontSize: typography.sm,
     textAlign: "center",
-  },
-  signInLink: {
-    color: "rgba(255,255,255,0.95)",
-    fontWeight: typography.semibold,
   },
   legalText: {
     fontSize: typography.xs,

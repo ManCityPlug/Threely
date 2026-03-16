@@ -30,6 +30,7 @@ import { SkeletonStatCard } from "@/components/Skeleton";
 import { useCountUp } from "@/lib/animations";
 import { useTheme } from "@/lib/theme";
 import type { ColorSchemePreference } from "@/lib/theme";
+import Paywall from "@/components/Paywall";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
 import {
@@ -187,7 +188,8 @@ export default function ProfileScreen() {
   const [nickname, setNickname] = useState("");
 
   // Subscription
-  const { isLimitedMode, showBottomSheetPaywall, hasPro, billingDate } = useSubscription();
+  const { isLimitedMode, hasPro, billingDate, refreshSubscription } = useSubscription();
+  const [showPaywall, setShowPaywall] = useState(false);
 
   const [refreshing, setRefreshing] = useState(false);
 
@@ -331,7 +333,7 @@ export default function ProfileScreen() {
   async function handleOpenWeekly() {
     // Gate behind subscription
     if (isLimitedMode) {
-      showBottomSheetPaywall();
+      setShowPaywall(true);
       return;
     }
     if (weeklyStatus?.status === "available" && weeklyFrozenData) {
@@ -348,7 +350,7 @@ export default function ProfileScreen() {
       setWeeklySummaryOpen(true);
     } catch (err) {
       if (err instanceof Error && err.message?.includes("pro_required")) {
-        showBottomSheetPaywall();
+        setShowPaywall(true);
       } else {
         Alert.alert("Error", "Failed to load weekly analysis.");
       }
@@ -645,7 +647,7 @@ export default function ProfileScreen() {
             activeOpacity={0.7}
             onPress={() => {
               if (isLimitedMode) {
-                showBottomSheetPaywall();
+                setShowPaywall(true);
                 return;
               }
               if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -795,15 +797,10 @@ export default function ProfileScreen() {
           <TouchableOpacity
             style={styles.menuRow}
             onPress={() => {
-              if (hasPro) {
-                // Open device subscription settings for IAP management
-                if (Platform.OS === "ios") {
-                  Linking.openURL("https://apps.apple.com/account/subscriptions");
-                } else {
-                  Linking.openURL("https://play.google.com/store/account/subscriptions");
-                }
+              if (isLimitedMode) {
+                setShowPaywall(true);
               } else {
-                showBottomSheetPaywall();
+                Linking.openURL("https://threely.co");
               }
             }}
             activeOpacity={0.7}
@@ -816,7 +813,7 @@ export default function ProfileScreen() {
               <Text style={styles.menuValue}>
                 {hasPro && billingDate
                   ? `Billing on ${new Date(billingDate).toLocaleDateString("en-US", { month: "short", day: "numeric" })}`
-                  : "Manage billing"}
+                  : "Subscribe"}
               </Text>
             </View>
             <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
@@ -1301,6 +1298,7 @@ export default function ProfileScreen() {
           </Pressable>
         </Pressable>
       </Modal>
+      <Paywall visible={showPaywall} onDismiss={() => { setShowPaywall(false); refreshSubscription(); }} />
     </SafeAreaView>
     </SwipeNavigator>
   );

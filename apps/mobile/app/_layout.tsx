@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, AppState, Image, Linking, LogBox, Modal, Platform, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, AppState, Linking, LogBox, Modal, Platform, Text, TouchableOpacity, View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
 
 // Keep native splash visible until we're ready
@@ -22,21 +22,15 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Session } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Notifications from "expo-notifications";
-import * as Clarity from "@microsoft/react-native-clarity";
 import Constants from "expo-constants";
-import { LinearGradient } from "expo-linear-gradient";
-import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import { supabase } from "@/lib/supabase";
 import { profileApi } from "@/lib/api";
 import { ThemeProvider, useTheme } from "@/lib/theme";
 import { ToastProvider } from "@/lib/toast";
-import { SubscriptionProvider, useSubscription } from "@/lib/subscription-context";
+import { SubscriptionProvider } from "@/lib/subscription-context";
 import { WalkthroughRegistryProvider } from "@/lib/walkthrough-registry";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
-import { TrialBottomSheet } from "@/components/TrialBottomSheet";
 import { spacing, radius, typography } from "@/constants/theme";
-
-const REVENUECAT_IOS_KEY = process.env.EXPO_PUBLIC_REVENUECAT_IOS_KEY ?? "";
 
 if (Platform.OS !== "web") {
   Notifications.setNotificationHandler({
@@ -48,7 +42,12 @@ if (Platform.OS !== "web") {
     }),
   });
 
-  Clarity.initialize("vm4n4qax20");
+  try {
+    const Clarity = require("@microsoft/react-native-clarity");
+    Clarity.initialize("vm4n4qax20");
+  } catch {
+    // Clarity requires a native build — skip in Expo Go
+  }
 }
 
 // ── Forced-update helpers ─────────────────────────────────────────────────────
@@ -76,16 +75,7 @@ function BrandedSplash() {
   }, []);
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#1A1040", alignItems: "center", justifyContent: "center" }}>
-      <Image
-        source={require("@/assets/icon.png")}
-        style={{
-          width: 160,
-          height: 160,
-          borderRadius: 40,
-        }}
-      />
-    </View>
+    <View style={{ flex: 1, backgroundColor: "#000000" }} />
   );
 }
 
@@ -98,7 +88,7 @@ function AppContent() {
   const [welcomeDone, setWelcomeDone] = useState(false);
   const [authOverlay, setAuthOverlay] = useState(false);
   const [updateRequired, setUpdateRequired] = useState(false);
-  const pendingDestination = useRef<"register" | "login" | null>(null);
+  const pendingDestination = useRef<"login" | null>(null);
   const routingResolved = useRef(false);
 
   // Listen for notification responses (deep links)
@@ -143,7 +133,7 @@ function AppContent() {
   }, []);
 
   const handleWelcomeComplete = useCallback(
-    (destination?: "register" | "login") => {
+    (destination?: "login") => {
       if (destination) {
         pendingDestination.current = destination;
         setAuthOverlay(true); // Dark overlay prevents flash of default route
@@ -216,7 +206,6 @@ function AppContent() {
 
     const inAuthGroup   = segments[0] === "(auth)";
     const inOnboarding  = segments[0] === "(onboarding)";
-    const inPayment     = segments[0] === "payment";
 
     if (!session) {
       if (welcomeDone) {
@@ -224,7 +213,7 @@ function AppContent() {
         if (dest) {
           pendingDestination.current = null;
           routingResolved.current = true;
-          const route = dest === "register" ? "/(auth)/register" : "/(auth)/login";
+          const route = "/(auth)/login";
           if (!inAuthGroup) {
             setTimeout(() => {
               router.replace(route);
@@ -244,19 +233,6 @@ function AppContent() {
       setReady(true);
       return;
     }
-
-    // Initialize RevenueCat and link to Supabase user
-    (async () => {
-      try {
-        if (__DEV__) {
-          Purchases.setLogLevel(LOG_LEVEL.DEBUG);
-        }
-        Purchases.configure({ apiKey: REVENUECAT_IOS_KEY });
-        await Purchases.logIn(session.user.id);
-      } catch (e) {
-        console.warn("RevenueCat init failed:", e);
-      }
-    })();
 
     const onboardingKey = `@threely_onboarding_done_${session.user.id}`;
     AsyncStorage.getItem(onboardingKey).then(async (done) => {
@@ -290,7 +266,7 @@ function AppContent() {
       // Subscription state is handled by SubscriptionProvider + paywall overlays,
       // not by route-blocking.
       routingResolved.current = true;
-      if (inAuthGroup || inOnboarding || inPayment) router.replace("/(tabs)");
+      if (inAuthGroup || inOnboarding) router.replace("/(tabs)");
       setReady(true);
     }).catch(() => {
       // AsyncStorage failure — don't leave the user stuck on the splash screen
@@ -338,7 +314,7 @@ function AppContent() {
     );
   }
 
-  // Not logged in — always show welcome carousel until they pick sign up/login
+  // Not logged in — always show welcome carousel until they pick login
   if (!session && !welcomeDone) {
     // Hide native splash before showing welcome screen
     SplashScreen.hideAsync().catch(() => {});
@@ -373,7 +349,7 @@ function AppContent() {
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: "#1A1040",
+            backgroundColor: "#000000",
             justifyContent: "center",
             alignItems: "center",
             zIndex: 999,
@@ -382,9 +358,6 @@ function AppContent() {
           <ActivityIndicator color="#FFFFFF" />
         </View>
       )}
-
-      {/* Bottom-sheet trial paywall (accessible from any screen) */}
-      <TrialBottomSheetGate />
 
       {/* Forced update blocking modal */}
       <Modal
@@ -468,21 +441,6 @@ function AppContent() {
         </View>
       </Modal>
     </GestureHandlerRootView>
-  );
-}
-
-function TrialBottomSheetGate() {
-  const { paywallType, dismissPaywall, refreshSubscription } = useSubscription();
-
-  return (
-    <TrialBottomSheet
-      visible={paywallType === "bottomsheet"}
-      onDismiss={dismissPaywall}
-      onSubscribed={() => {
-        dismissPaywall();
-        refreshSubscription();
-      }}
-    />
   );
 }
 
