@@ -15,9 +15,30 @@ export default function PlanPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [show, setShow] = useState(false);
+  const [trialEligible, setTrialEligible] = useState(true);
+  const [checking, setChecking] = useState(true);
 
+  // Check trial eligibility
   useEffect(() => {
-    requestAnimationFrame(() => setShow(true));
+    async function check() {
+      try {
+        const supabase = getSupabase();
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { setChecking(false); return; }
+
+        const res = await fetch("/api/start/trial-check", {
+          headers: { Authorization: `Bearer ${session.access_token}` },
+        });
+        const data = await res.json();
+        setTrialEligible(data.eligible !== false);
+      } catch {
+        // fail open
+      } finally {
+        setChecking(false);
+        requestAnimationFrame(() => setShow(true));
+      }
+    }
+    check();
   }, []);
 
   async function handleConfirm(plan: "yearly" | "monthly") {
@@ -55,6 +76,14 @@ export default function PlanPage() {
     }
   }
 
+  if (checking) {
+    return (
+      <main style={{ maxWidth: 440, margin: "0 auto", padding: "24px 16px 60px", textAlign: "center" }}>
+        <p style={{ color: "rgba(255,255,255,0.5)", marginTop: 60 }}>Loading...</p>
+      </main>
+    );
+  }
+
   return (
     <main
       style={{
@@ -74,7 +103,7 @@ export default function PlanPage() {
         <div style={{ width: 8, height: 8, borderRadius: 4, background: "#fff" }} />
       </div>
 
-      {/* Simple question */}
+      {/* Heading */}
       <h2
         style={{
           fontSize: "1.7rem",
@@ -103,16 +132,19 @@ export default function PlanPage() {
           transition: "opacity 0.4s ease 0.1s",
         }}
       >
-        No charge until your trial ends. Cancel anytime.
+        {trialEligible
+          ? "No charge until your trial ends. Cancel anytime."
+          : "This card has already been used for a free trial."}
       </p>
-
 
       {/* Total due today card */}
       <div
         style={{
           width: "100%",
-          background: "rgba(62,207,142,0.1)",
-          border: "1.5px solid rgba(62,207,142,0.25)",
+          background: trialEligible ? "rgba(62,207,142,0.1)" : "rgba(255,180,0,0.1)",
+          border: trialEligible
+            ? "1.5px solid rgba(62,207,142,0.25)"
+            : "1.5px solid rgba(255,180,0,0.25)",
           borderRadius: 16,
           padding: "20px 24px",
           marginBottom: 12,
@@ -125,21 +157,21 @@ export default function PlanPage() {
       >
         <div>
           <div style={{ fontSize: "1rem", fontWeight: 700, color: "#fff" }}>
-            Total due today
+            {trialEligible ? "Total due today" : "Due today"}
           </div>
           <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)", marginTop: 3 }}>
-            Free for 7 days
+            {trialEligible ? "Free for 7 days" : "No free trial available"}
           </div>
         </div>
         <div
           style={{
             fontSize: "1.8rem",
             fontWeight: 800,
-            color: "#3ecf8e",
+            color: trialEligible ? "#3ecf8e" : "#ffb400",
             letterSpacing: "-0.5px",
           }}
         >
-          $0.00
+          {trialEligible ? "$0.00" : "—"}
         </div>
       </div>
 
@@ -154,7 +186,9 @@ export default function PlanPage() {
           transition: "opacity 0.4s ease 0.25s",
         }}
       >
-        $99.99/yr or $12.99/mo after your trial ends on {getTrialEndDate()}
+        {trialEligible
+          ? `$99.99/yr or $12.99/mo after your trial ends on ${getTrialEndDate()}`
+          : "Yearly: $99.99/yr · Monthly: $12.99/mo"}
       </p>
 
       {/* Yes — Yearly */}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import BlockBack from "./BlockBack";
 
 export const metadata: Metadata = {
   title: "Start Free Trial | Threely",
@@ -8,6 +9,7 @@ export const metadata: Metadata = {
 export default function StartLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
+      <BlockBack />
       {/* Override body/html background so no white bleeds through the gradient */}
       <style>{`
         html { height: 100% !important; }
