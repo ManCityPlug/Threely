@@ -53,6 +53,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           id="microsoft-clarity"
           strategy="afterInteractive"
         >{`(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y)})(window,document,"clarity","script","vn46r6mmmo");`}</Script>
+        {/* Crisp live chat */}
+        <Script
+          id="crisp-chat"
+          strategy="afterInteractive"
+        >{`window.$crisp=[];window.CRISP_WEBSITE_ID="498b2c8b-bec0-4790-a2bb-795f9c295898";(function(){var d=document,s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s)})();`}</Script>
       </body>
     </html>
   );
