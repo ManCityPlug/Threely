@@ -1227,6 +1227,31 @@ export default function OnboardingScreen() {
         {isMagicMoment && renderMagicMoment()}
       </View>
 
+      {/* Skip for now — only on goal step (step 2) */}
+      {step === 2 && !showConfirmation && !isMagicMoment && (
+        <TouchableOpacity
+          onPress={async () => {
+            // Save name
+            if (nameInput.trim()) {
+              const formatted = nameInput.trim().replace(/\s+/g, " ").split(" ").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
+              await AsyncStorage.setItem("@threely_nickname", formatted);
+              supabase.auth.updateUser({ data: { display_name: formatted } }).catch(() => {});
+            }
+            // Save default profile
+            await profileApi.save({ dailyTimeMinutes: 60, intensityLevel: 2 }).catch(() => {});
+            // Mark onboarding done
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+              await AsyncStorage.setItem(`@threely_onboarding_done_${session.user.id}`, "true");
+            }
+            router.replace("/(tabs)");
+          }}
+          style={{ alignSelf: "center", paddingVertical: spacing.sm, marginBottom: spacing.md }}
+        >
+          <Text style={{ color: colors.textTertiary, fontSize: typography.sm }}>Skip for now</Text>
+        </TouchableOpacity>
+      )}
+
       {/* ── AI Plan Chat Modal ── */}
       <Modal
         visible={showAiChat}
