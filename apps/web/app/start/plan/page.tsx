@@ -97,7 +97,7 @@ export default function PlanPage() {
           fontSize: "0.95rem",
           color: "rgba(255,255,255,0.6)",
           textAlign: "center",
-          margin: "0 0 36px",
+          margin: "0 0 32px",
           lineHeight: 1.5,
           opacity: show ? 1 : 0,
           transition: "opacity 0.4s ease 0.1s",
@@ -105,6 +105,7 @@ export default function PlanPage() {
       >
         No charge until your trial ends. Cancel anytime.
       </p>
+
 
       {/* Total due today card */}
       <div
@@ -142,7 +143,7 @@ export default function PlanPage() {
         </div>
       </div>
 
-      {/* Price in small print */}
+      {/* Pricing + trial end note */}
       <p
         style={{
           fontSize: "0.75rem",
@@ -153,7 +154,7 @@ export default function PlanPage() {
           transition: "opacity 0.4s ease 0.25s",
         }}
       >
-        $99.99/year after trial ends on {getTrialEndDate()}
+        $99.99/yr or $12.99/mo after your trial ends on {getTrialEndDate()}
       </p>
 
       {/* Yes — Yearly */}
