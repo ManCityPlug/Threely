@@ -128,7 +128,7 @@ function TaskCard({
   // Menu close is handled by the portal backdrop's onClick
 
   function handleStartRefine() {
-    if (!hasPro) { return; }
+    if (!hasPro) { router.push("/start/plan"); return; }
     setMenuOpen(false);
     setRefineInput("");
     setRefineMode(true);
@@ -136,7 +136,7 @@ function TaskCard({
   }
 
   function handleStartAsk() {
-    if (!hasPro) { return; }
+    if (!hasPro) { router.push("/start/plan"); return; }
     setMenuOpen(false);
     setAskMode(true);
     setAskMessages([]);
@@ -928,7 +928,7 @@ function DashboardPageInner() {
   // ── Handlers ─────────────────────────────────────────────────────────────────
 
   async function handleGenerate(goalId?: string, isRestDayGen = false) {
-    if (!hasPro) { return; }
+    if (!hasPro) { router.push("/start/plan"); return; }
     setGenerating(true);
     // Set a flag so if user closes tab / refreshes, we know to poll on return
     const todayStr = new Date().toLocaleDateString("en-CA");
@@ -958,7 +958,7 @@ function DashboardPageInner() {
   }
 
   function handleRestDayGenerate() {
-    if (!hasPro) { return; }
+    if (!hasPro) { router.push("/start/plan"); return; }
     if (goals.length === 1) {
       handleGenerate(goals[0].id, true);
     } else {
@@ -1068,7 +1068,7 @@ function DashboardPageInner() {
   }
 
   function handleGiveMore() {
-    if (!hasPro) { return; }
+    if (!hasPro) { router.push("/start/plan"); return; }
     // Pre-check: if tasks already have > 3 items, this goal already got extra tasks today
     const dt = dailyTasks.find(d => d.goalId === selectedGoalId);
     if (dt) {
@@ -1207,17 +1207,30 @@ function DashboardPageInner() {
 
       {/* Limited mode banner */}
       {!hasPro && (
-        <div className="card fade-in" style={{
-          padding: "1rem 1.25rem",
-          background: "var(--primary-light)",
-          border: "1.5px solid var(--primary)",
-          marginBottom: "1.25rem",
-          textAlign: "center",
-        }}>
-          <div style={{ fontSize: "0.875rem", color: "var(--muted)" }}>
-            Manage your subscription at threely.co
+        <a href="/start/plan" style={{ textDecoration: "none" }}>
+          <div className="card fade-in" style={{
+            padding: "1rem 1.25rem",
+            background: "var(--primary-light)",
+            border: "1.5px solid var(--primary)",
+            marginBottom: "1.25rem",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            cursor: "pointer",
+          }}>
+            <div>
+              <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)" }}>
+                Unlock Threely Pro
+              </div>
+              <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
+                Get Pro free for 7 days — Achieve your goals
+              </div>
+            </div>
+            <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--primary)" }}>
+              Try Free →
+            </div>
           </div>
-        </div>
+        </a>
       )}
 
       {/* No goals — prompt to create one */}

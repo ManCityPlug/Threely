@@ -1353,7 +1353,7 @@ function GoalsPageInner() {
     // Allow first goal free — only gate if user already has goals
     const activeCount = goals.filter(g => !g.isPaused).length;
     if (!hasPro && activeCount > 0) {
-      showToast("Manage your subscription at threely.co", "info");
+      router.push("/start/plan");
       return;
     }
     if (activeCount >= 3) { setShowGoalLimit(true); return; }
