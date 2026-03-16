@@ -100,6 +100,7 @@ function TaskCard({
   overdue?: boolean;
   hasPro?: boolean;
 }) {
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [refineMode, setRefineMode] = useState(false);
   const [refineInput, setRefineInput] = useState("");
