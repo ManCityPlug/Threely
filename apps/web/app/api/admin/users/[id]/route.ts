@@ -256,6 +256,13 @@ export async function GET(
     subscription: await (async () => {
       let firstChargeDate: string | null = null;
       let subscriptionStartDate: string | null = null;
+      let stripeStatus: string | null = null;
+      let cancelAtPeriodEnd = false;
+      let currentPeriodEnd: string | null = null;
+      let plan: string | null = null;
+      let trialStart: string | null = null;
+      let trialEnd: string | null = null;
+
       if (user.stripeCustomerId) {
         try {
           const stripe = getStripe();
@@ -267,25 +274,46 @@ export async function GET(
           if (charges.data.length > 0 && charges.data[0].status === "succeeded") {
             firstChargeDate = new Date(charges.data[0].created * 1000).toISOString();
           }
-          // Get subscription start date
+          // Get live subscription data
           const subs = await stripe.subscriptions.list({
             customer: user.stripeCustomerId,
             limit: 1,
           });
           if (subs.data.length > 0) {
-            subscriptionStartDate = new Date(subs.data[0].start_date * 1000).toISOString();
+            const sub = subs.data[0];
+            subscriptionStartDate = new Date(sub.start_date * 1000).toISOString();
+            stripeStatus = sub.status; // active, trialing, canceled, past_due, etc.
+            cancelAtPeriodEnd = sub.cancel_at_period_end;
+            currentPeriodEnd = new Date(sub.current_period_end * 1000).toISOString();
+            if (sub.trial_start) trialStart = new Date(sub.trial_start * 1000).toISOString();
+            if (sub.trial_end) trialEnd = new Date(sub.trial_end * 1000).toISOString();
+            // Get plan info
+            const item = sub.items.data[0];
+            if (item) {
+              const interval = item.price.recurring?.interval;
+              const amount = (item.price.unit_amount ?? 0) / 100;
+              plan = `$${amount}/${interval}`;
+            }
           }
         } catch {
           // ignore stripe errors
         }
       }
+
       return {
         status: user.subscriptionStatus,
+        stripeStatus,
         stripeCustomerId: user.stripeCustomerId,
         trialClaimedAt: user.trialClaimedAt,
         trialEndsAt: user.trialEndsAt,
         firstChargeDate,
         subscriptionStartDate,
+        cancelAtPeriodEnd,
+        currentPeriodEnd,
+        plan,
+        trialStart,
+        trialEnd,
+        rcSubscriptionActive: user.rcSubscriptionActive,
       };
     })(),
     ai: {

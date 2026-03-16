@@ -63,11 +63,18 @@ interface UserDetail {
   streaks: { current: number; best: number };
   subscription: {
     status: string | null;
+    stripeStatus: string | null;
     stripeCustomerId: string | null;
     trialClaimedAt: string | null;
     trialEndsAt: string | null;
     firstChargeDate: string | null;
     subscriptionStartDate: string | null;
+    cancelAtPeriodEnd: boolean;
+    currentPeriodEnd: string | null;
+    plan: string | null;
+    trialStart: string | null;
+    trialEnd: string | null;
+    rcSubscriptionActive: boolean;
   };
   ai: {
     breakdown: Record<string, { calls: number; cost: number }>;
@@ -489,18 +496,52 @@ export default function AdminUserDetailPage() {
         }}
       >
         <div style={cardStyle}>
-          <Stat label="Status" value={subscription.status || "none"} />
+          <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "#71717a", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>
+            Status
+          </div>
+          {(() => {
+            const live = subscription.stripeStatus || subscription.status;
+            const isCanceling = subscription.cancelAtPeriodEnd;
+            let color = "#71717a";
+            let bg = "#27272a";
+            let label = live || "none";
+
+            if (live === "trialing") { color = "#60a5fa"; bg = "#172554"; label = "Trialing"; }
+            else if (live === "active" && !isCanceling) { color = "#4ade80"; bg = "#052e16"; label = "Active"; }
+            else if (live === "active" && isCanceling) { color = "#fbbf24"; bg = "#422006"; label = "Canceling"; }
+            else if (live === "canceled") { color = "#f87171"; bg = "#450a0a"; label = "Canceled"; }
+            else if (live === "past_due") { color = "#fb923c"; bg = "#431407"; label = "Past Due"; }
+
+            return (
+              <span style={{ display: "inline-block", padding: "4px 10px", borderRadius: 8, fontSize: "0.85rem", fontWeight: 700, color, background: bg, marginTop: 4 }}>
+                {label}
+              </span>
+            );
+          })()}
         </div>
+        {subscription.plan && (
+          <div style={cardStyle}>
+            <Stat label="Plan" value={subscription.plan} />
+          </div>
+        )}
         {subscription.stripeCustomerId && (
           <div style={cardStyle}>
             <Stat label="Stripe ID" value={subscription.stripeCustomerId} />
           </div>
         )}
-        {subscription.trialEndsAt && (
+        {(subscription.trialEnd || subscription.trialEndsAt) && (
           <div style={cardStyle}>
             <Stat
               label="Trial Ends"
-              value={new Date(subscription.trialEndsAt).toLocaleDateString()}
+              value={new Date(subscription.trialEnd || subscription.trialEndsAt!).toLocaleDateString()}
+            />
+          </div>
+        )}
+        {subscription.currentPeriodEnd && (
+          <div style={cardStyle}>
+            <Stat
+              label={subscription.cancelAtPeriodEnd ? "Cancels On" : "Next Billing"}
+              value={new Date(subscription.currentPeriodEnd).toLocaleDateString()}
             />
           </div>
         )}
@@ -512,26 +553,24 @@ export default function AdminUserDetailPage() {
             />
           </div>
         )}
+        {subscription.rcSubscriptionActive && (
+          <div style={cardStyle}>
+            <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "#71717a", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>
+              RevenueCat
+            </div>
+            <span style={{ display: "inline-block", padding: "4px 10px", borderRadius: 8, fontSize: "0.85rem", fontWeight: 700, color: "#4ade80", background: "#052e16", marginTop: 4 }}>
+              Active (IAP)
+            </span>
+          </div>
+        )}
         <div style={cardStyle}>
-          <div style={{
-            fontSize: "0.72rem", fontWeight: 600, color: "#71717a",
-            textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2,
-          }}>
+          <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "#71717a", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 2 }}>
             Refund Eligibility
           </div>
           {(() => {
             const elig = getRefundEligibility(subscription);
             return (
-              <span style={{
-                display: "inline-block",
-                padding: "4px 10px",
-                borderRadius: 8,
-                fontSize: "0.85rem",
-                fontWeight: 700,
-                color: elig.color,
-                background: elig.bg,
-                marginTop: 4,
-              }}>
+              <span style={{ display: "inline-block", padding: "4px 10px", borderRadius: 8, fontSize: "0.85rem", fontWeight: 700, color: elig.color, background: elig.bg, marginTop: 4 }}>
                 {elig.label}
               </span>
             );
