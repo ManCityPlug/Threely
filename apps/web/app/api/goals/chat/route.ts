@@ -36,6 +36,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "messages array is required" }, { status: 400 });
   }
 
+  if (messages.length > 50) {
+    return NextResponse.json({ error: "Too many messages" }, { status: 400 });
+  }
+
+  const totalContentLength = messages.reduce((sum: number, m: GoalChatMessage) => sum + (m.content?.length ?? 0), 0);
+  if (totalContentLength > 50000) {
+    return NextResponse.json({ error: "Message content too large" }, { status: 400 });
+  }
+
   if (!process.env.ANTHROPIC_API_KEY) {
     return NextResponse.json({ error: "ANTHROPIC_API_KEY not configured" }, { status: 500 });
   }
@@ -56,6 +65,6 @@ export async function POST(request: NextRequest) {
     if (isTimeout) {
       return NextResponse.json({ error: "The AI took too long to respond. Please try again." }, { status: 504 });
     }
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ error: "Failed to process chat request" }, { status: 500 });
   }
 }
