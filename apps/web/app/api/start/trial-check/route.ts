@@ -45,6 +45,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ eligible: true });
   } catch (err: unknown) {
     console.error("[start/trial-check] Error:", err);
-    return NextResponse.json({ eligible: true }); // fail open — don't block signups
+    return NextResponse.json({ error: "Unable to check trial eligibility. Please try again." }, { status: 500 });
   }
 }
