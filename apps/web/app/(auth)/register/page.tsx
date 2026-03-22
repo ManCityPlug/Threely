@@ -8,6 +8,14 @@ import { SocialAuthButtons, AuthDivider } from "@/components/SocialAuthButtons";
 
 /* -- Registration Form ------------------------------------------------------- */
 
+function validatePassword(pw: string): string | null {
+  if (pw.length < 8) return "Password must be at least 8 characters.";
+  if (!/[a-z]/.test(pw)) return "Password must include a lowercase letter.";
+  if (!/[A-Z]/.test(pw)) return "Password must include an uppercase letter.";
+  if (!/[0-9]/.test(pw)) return "Password must include a number.";
+  return null;
+}
+
 function RegistrationForm() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -18,8 +26,9 @@ function RegistrationForm() {
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
     if (!email || !password) return;
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
+    const pwErr = validatePassword(password);
+    if (pwErr) {
+      setError(pwErr);
       return;
     }
     setLoading(true);
