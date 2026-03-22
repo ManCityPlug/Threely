@@ -52,6 +52,23 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  if (linkUrl) {
+    try {
+      const parsed = new URL(linkUrl);
+      if (!["http:", "https:"].includes(parsed.protocol)) {
+        return NextResponse.json(
+          { error: "linkUrl must use https:// or http://" },
+          { status: 400 }
+        );
+      }
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid linkUrl format" },
+        { status: 400 }
+      );
+    }
+  }
+
   // Resolve emails to user IDs if targeting specific users
   let targetUserIds: string[] = [];
   if (targetEmails && Array.isArray(targetEmails) && targetEmails.length > 0) {
