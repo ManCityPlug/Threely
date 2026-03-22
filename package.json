@@ -22,7 +22,7 @@
   },
   "pnpm": {
     "overrides": {
-      "tar": ">=7.5.10"
+      "undici": ">=6.24.0"
     }
   },
   "packageManager": "pnpm@9.15.0",
