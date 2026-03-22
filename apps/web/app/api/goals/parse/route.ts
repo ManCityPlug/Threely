@@ -54,6 +54,6 @@ export async function POST(request: NextRequest) {
     if (isTimeout) {
       return NextResponse.json({ error: "The AI took too long to respond. Please try again." }, { status: 504 });
     }
-    return NextResponse.json({ error: msg }, { status: 500 });
+    return NextResponse.json({ error: "Failed to parse goal" }, { status: 500 });
   }
 }
