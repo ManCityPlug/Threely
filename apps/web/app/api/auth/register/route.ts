@@ -13,20 +13,22 @@ export async function POST(request: Request) {
     if (password.length < 8) {
       return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
     }
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+      return NextResponse.json({ error: "Password must include uppercase, lowercase, and a number." }, { status: 400 });
+    }
 
-    // Create user with email already confirmed (skips verification email)
+    // Create user (requires email verification)
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true,
     });
 
     if (error) {
-      // Supabase returns a specific message for duplicate emails
       if (error.message?.includes("already been registered")) {
-        return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
+        // Return same shape as success to prevent user enumeration
+        return NextResponse.json({ user: { id: "redacted", email } });
       }
-      return NextResponse.json({ error: error.message }, { status: 400 });
+      return NextResponse.json({ error: "Registration failed. Please try again." }, { status: 400 });
     }
 
     // Create user record (no trial — trial starts via Stripe Checkout with card)
