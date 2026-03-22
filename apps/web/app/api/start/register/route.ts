@@ -3,6 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { prisma } from "@/lib/prisma";
 import { getStripe } from "@/lib/stripe";
 import { notifyNewSignup } from "@/lib/discord";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 // ─── POST /api/start/register — create user + Stripe customer + SetupIntent ──
 
@@ -16,6 +17,16 @@ export async function POST(request: Request) {
     if (password.length < 8) {
       return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
     }
+    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+      return NextResponse.json({ error: "Password must include uppercase, lowercase, and a number." }, { status: 400 });
+    }
+
+    // ── Rate limit by IP ────────────────────────────────────────────────────
+    const clientIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    const { allowed } = checkRateLimit(`register:${clientIp}`);
+    if (!allowed) {
+      return NextResponse.json({ error: "Too many requests. Try again later." }, { status: 429 });
+    }
 
     // ── Create Supabase user ────────────────────────────────────────────────
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
@@ -26,7 +37,7 @@ export async function POST(request: Request) {
 
     if (error) {
       if (error.message?.includes("already been registered")) {
-        return NextResponse.json({ error: "An account with this email already exists." }, { status: 409 });
+        return NextResponse.json({ error: "Unable to create account. If you already have an account, please sign in." }, { status: 400 });
       }
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
