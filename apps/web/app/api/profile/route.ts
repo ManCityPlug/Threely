@@ -33,6 +33,16 @@ export async function POST(request: NextRequest) {
       theme?: string;
     };
 
+    if (dailyTimeMinutes != null && (dailyTimeMinutes < 5 || dailyTimeMinutes > 480)) {
+      return NextResponse.json({ error: "dailyTimeMinutes must be between 5 and 480" }, { status: 400 });
+    }
+    if (intensityLevel != null && (intensityLevel < 1 || intensityLevel > 3)) {
+      return NextResponse.json({ error: "intensityLevel must be 1, 2, or 3" }, { status: 400 });
+    }
+    if (theme != null && !["light", "dark"].includes(theme)) {
+      return NextResponse.json({ error: "Invalid theme" }, { status: 400 });
+    }
+
     // Ensure user record exists
     await prisma.user.upsert({
       where: { id: user.id },
