@@ -8,6 +8,10 @@ interface TaskItem {
   isSkipped?: boolean;
 }
 
+const VALID_DIFFICULTY_RATINGS = ["too_easy", "just_right", "too_hard"] as const;
+const VALID_COMPLETION_STATUSES = ["completed_all", "completed_some", "completed_none"] as const;
+const MAX_USER_NOTE_LENGTH = 2000;
+
 // POST /api/reviews
 // Body: { dailyTaskId, difficultyRating, completionStatus?, userNote? }
 // completionStatus is optional — when omitted, auto-computed from task items.
@@ -28,6 +32,27 @@ export async function POST(request: NextRequest) {
     if (!dailyTaskId || !difficultyRating) {
       return NextResponse.json(
         { error: "dailyTaskId and difficultyRating are required" },
+        { status: 400 }
+      );
+    }
+
+    if (!(VALID_DIFFICULTY_RATINGS as readonly string[]).includes(difficultyRating)) {
+      return NextResponse.json(
+        { error: `difficultyRating must be one of: ${VALID_DIFFICULTY_RATINGS.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    if (providedStatus && !(VALID_COMPLETION_STATUSES as readonly string[]).includes(providedStatus)) {
+      return NextResponse.json(
+        { error: `completionStatus must be one of: ${VALID_COMPLETION_STATUSES.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    if (userNote && userNote.length > MAX_USER_NOTE_LENGTH) {
+      return NextResponse.json(
+        { error: `userNote must not exceed ${MAX_USER_NOTE_LENGTH} characters` },
         { status: 400 }
       );
     }
