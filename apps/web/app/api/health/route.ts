@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { formatDate } from "@/lib/dateUtils";
 
 export async function GET() {
   let minAppVersion = "1.0.0";
@@ -16,6 +17,6 @@ export async function GET() {
     status: "ok",
     service: "threely-api",
     minAppVersion,
-    timestamp: new Date().toISOString(),
+    timestamp: formatDate(new Date()),
   });
 }
