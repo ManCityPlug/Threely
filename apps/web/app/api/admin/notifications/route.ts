@@ -78,6 +78,7 @@ export async function POST(request: NextRequest) {
   let targetUserIds: string[] = [];
   if (targetEmails && Array.isArray(targetEmails) && targetEmails.length > 0) {
     const emails = targetEmails
+      .filter((e: unknown) => typeof e === 'string')
       .map((e: string) => e.trim().toLowerCase())
       .filter(Boolean);
 
