@@ -7,6 +7,7 @@ const WEBHOOKS = {
   cancellations: process.env.DISCORD_WEBHOOK_CANCELLATIONS,
   trialExpiring: process.env.DISCORD_WEBHOOK_TRIAL_EXPIRING,
   goalCreated: process.env.DISCORD_WEBHOOK_GOAL_CREATED,
+  goalDeleted: process.env.DISCORD_WEBHOOK_GOAL_DELETED,
   firstTaskComplete: process.env.DISCORD_WEBHOOK_FIRST_TASK_COMPLETE,
 } as const;
 
@@ -114,7 +115,7 @@ export function notifyGoalCreated(email: string, goalTitle: string, category: st
 }
 
 export function notifyGoalDeleted(email: string, goalTitle: string, counts: { total: number; active: number }) {
-  return send("goalCreated", {
+  return send("goalDeleted", {
     title: "🗑️ Goal Deleted",
     color: 0xFF1744,
     fields: [
