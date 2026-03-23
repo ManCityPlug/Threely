@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest, supabaseAdmin } from "@/lib/supabase";
 
@@ -6,6 +7,38 @@ import { getUserFromRequest, supabaseAdmin } from "@/lib/supabase";
 export async function DELETE(request: NextRequest) {
   const user = await getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  // Require password re-authentication before irreversible deletion
+  let body: { password?: string };
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Request body required" }, { status: 400 });
+  }
+
+  if (!body.password || typeof body.password !== "string") {
+    return NextResponse.json({ error: "Password is required to delete your account" }, { status: 400 });
+  }
+
+  // Verify password using an ephemeral client with anon key (not admin)
+  // to avoid bypassing auth policies and to isolate the session
+  const verifyClient = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { persistSession: false } }
+  );
+
+  const { error: signInError } = await verifyClient.auth.signInWithPassword({
+    email: user.email,
+    password: body.password,
+  });
+
+  if (signInError) {
+    return NextResponse.json({ error: "Incorrect password" }, { status: 403 });
+  }
+
+  // Immediately revoke the session created during password verification
+  await verifyClient.auth.signOut();
 
   try {
     // Explicitly delete all user data in dependency order to guarantee cleanup.
@@ -34,22 +67,7 @@ export async function DELETE(request: NextRequest) {
       // User may not exist in Prisma (e.g. OAuth-only, never completed onboarding)
     });
 
-    // 8. Also clean up any orphaned data by email (in case IDs changed between signups)
-    const orphanedUsers = await prisma.user.findMany({
-      where: { email: { equals: user.email, mode: "insensitive" } },
-      select: { id: true },
-    });
-    for (const orphan of orphanedUsers) {
-      await prisma.dailyReview.deleteMany({ where: { userId: orphan.id } });
-      await prisma.dailyTask.deleteMany({ where: { userId: orphan.id } });
-      await prisma.dailyFocus.deleteMany({ where: { userId: orphan.id } });
-      await prisma.weeklySummary.deleteMany({ where: { userId: orphan.id } });
-      await prisma.goal.deleteMany({ where: { userId: orphan.id } });
-      await prisma.userProfile.deleteMany({ where: { userId: orphan.id } });
-      await prisma.user.delete({ where: { id: orphan.id } }).catch(() => {});
-    }
-
-    // 9. Delete from Supabase auth (requires service role)
+    // 8. Delete from Supabase auth (requires service role)
     await supabaseAdmin.auth.admin.deleteUser(user.id);
 
     return NextResponse.json({ success: true });
