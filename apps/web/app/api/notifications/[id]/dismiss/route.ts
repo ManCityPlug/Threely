@@ -15,6 +15,13 @@ export async function POST(
 
   const { id } = await params;
 
+  const notification = await prisma.notification.findUnique({
+    where: { id },
+  });
+  if (!notification) {
+    return NextResponse.json({ error: "Not found" }, { status: 404 });
+  }
+
   await prisma.notificationDismissal.upsert({
     where: {
       userId_notificationId: {
