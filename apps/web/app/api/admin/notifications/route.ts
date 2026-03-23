@@ -50,9 +50,9 @@ export async function POST(request: NextRequest) {
   }
   const { heading, subheading, linkUrl, targetEmails } = body;
 
-  if (!heading || !subheading) {
+  if (!heading || !subheading || typeof heading !== 'string' || typeof subheading !== 'string') {
     return NextResponse.json(
-      { error: "Heading and subheading are required" },
+      { error: "Heading and subheading are required and must be strings" },
       { status: 400 }
     );
   }
