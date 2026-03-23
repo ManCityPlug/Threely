@@ -78,7 +78,6 @@ export async function POST(request: Request) {
     });
   } catch (err: unknown) {
     console.error("[start/register] Error:", err);
-    const message = err instanceof Error ? err.message : "Something went wrong.";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Something went wrong." }, { status: 500 });
   }
 }
