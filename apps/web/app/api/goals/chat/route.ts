@@ -40,6 +40,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Too many messages" }, { status: 400 });
   }
 
+  const validRoles = new Set(["user", "assistant"]);
+  for (const msg of messages) {
+    if (!msg || typeof msg.content !== "string" || !validRoles.has(msg.role)) {
+      return NextResponse.json({ error: "Invalid message format" }, { status: 400 });
+    }
+  }
+
   const totalContentLength = messages.reduce((sum: number, m: GoalChatMessage) => sum + (m.content?.length ?? 0), 0);
   if (totalContentLength > 50000) {
     return NextResponse.json({ error: "Message content too large" }, { status: 400 });
