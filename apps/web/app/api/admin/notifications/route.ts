@@ -42,12 +42,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await request.json();
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+  }
   const { heading, subheading, linkUrl, targetEmails } = body;
 
-  if (!heading || !subheading) {
+  if (!heading || !subheading || typeof heading !== 'string' || typeof subheading !== 'string') {
     return NextResponse.json(
-      { error: "Heading and subheading are required" },
+      { error: "Heading and subheading are required and must be strings" },
       { status: 400 }
     );
   }
@@ -73,6 +78,7 @@ export async function POST(request: NextRequest) {
   let targetUserIds: string[] = [];
   if (targetEmails && Array.isArray(targetEmails) && targetEmails.length > 0) {
     const emails = targetEmails
+      .filter((e: unknown) => typeof e === 'string')
       .map((e: string) => e.trim().toLowerCase())
       .filter(Boolean);
 
