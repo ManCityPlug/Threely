@@ -87,25 +87,15 @@ export default function MobileAppPrompt() {
     }
   }, [pathname]);
 
-  // Push Crisp chat widget above the banner when it's visible
+  // Hide Crisp chat widget while the banner is visible so it doesn't block "Get App"
   useEffect(() => {
     if (view === "banner") {
       try {
-        window.$crisp?.push(["config", "position:reverse", [true]]);
+        window.$crisp?.push(["do", "chat:hide"]);
       } catch {}
-      // Fallback: inject CSS to shift the Crisp button up
-      const style = document.createElement("style");
-      style.id = "crisp-banner-offset";
-      style.textContent = `
-        #crisp-chatbox { bottom: ${BANNER_HEIGHT}px !important; }
-        .crisp-client .cc-52lo .cc-kxkl { bottom: ${BANNER_HEIGHT}px !important; }
-        .crisp-client .cc-52lo .cc-1s2l { bottom: ${BANNER_HEIGHT}px !important; }
-      `;
-      document.head.appendChild(style);
       return () => {
-        style.remove();
         try {
-          window.$crisp?.push(["config", "position:reverse", [false]]);
+          window.$crisp?.push(["do", "chat:show"]);
         } catch {}
       };
     }
