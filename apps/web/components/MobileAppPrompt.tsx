@@ -3,6 +3,12 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 
+declare global {
+  interface Window {
+    $crisp?: Array<unknown[]>;
+  }
+}
+
 // TODO: Replace these with actual App Store / Play Store URLs
 const APP_STORE_URL = "#";
 const PLAY_STORE_URL = "#";
@@ -43,7 +49,9 @@ function PlayIcon() {
   );
 }
 
-/* Inline keyframes so we don't depend on globals.css names */
+/* Inline keyframes + push Crisp widget above banner on mobile */
+const BANNER_HEIGHT = 62; // approximate banner height in px
+
 const KEYFRAMES_STYLE = `
 @keyframes mobilePromptBannerIn {
   from { transform: translateY(100%); }
@@ -78,6 +86,30 @@ export default function MobileAppPrompt() {
       setView("none");
     }
   }, [pathname]);
+
+  // Push Crisp chat widget above the banner when it's visible
+  useEffect(() => {
+    if (view === "banner") {
+      try {
+        window.$crisp?.push(["config", "position:reverse", [true]]);
+      } catch {}
+      // Fallback: inject CSS to shift the Crisp button up
+      const style = document.createElement("style");
+      style.id = "crisp-banner-offset";
+      style.textContent = `
+        #crisp-chatbox { bottom: ${BANNER_HEIGHT}px !important; }
+        .crisp-client .cc-52lo .cc-kxkl { bottom: ${BANNER_HEIGHT}px !important; }
+        .crisp-client .cc-52lo .cc-1s2l { bottom: ${BANNER_HEIGHT}px !important; }
+      `;
+      document.head.appendChild(style);
+      return () => {
+        style.remove();
+        try {
+          window.$crisp?.push(["config", "position:reverse", [false]]);
+        } catch {}
+      };
+    }
+  }, [view]);
 
   const dismissBanner = () => {
     setView("none");
