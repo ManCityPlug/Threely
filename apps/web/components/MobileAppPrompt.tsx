@@ -87,20 +87,6 @@ export default function MobileAppPrompt() {
     }
   }, [pathname]);
 
-  // Hide Crisp chat widget while the banner is visible so it doesn't block "Get App"
-  useEffect(() => {
-    if (view === "banner") {
-      try {
-        window.$crisp?.push(["do", "chat:hide"]);
-      } catch {}
-      return () => {
-        try {
-          window.$crisp?.push(["do", "chat:show"]);
-        } catch {}
-      };
-    }
-  }, [view]);
-
   const dismissBanner = () => {
     setView("none");
     try {
@@ -125,7 +111,7 @@ export default function MobileAppPrompt() {
             bottom: 0,
             left: 0,
             right: 0,
-            zIndex: 9998,
+            zIndex: 1000001,
             background: "#fff",
             borderTop: "1px solid #e3e8ef",
             padding: "10px 12px",
