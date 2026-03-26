@@ -87,6 +87,29 @@ export default function MobileAppPrompt() {
     }
   }, [pathname]);
 
+  // Shift Crisp bubble up above banner when visible, reset when dismissed/hidden
+  useEffect(() => {
+    const style = document.getElementById("crisp-banner-offset") || document.createElement("style");
+    style.id = "crisp-banner-offset";
+
+    if (view === "banner") {
+      style.textContent = `
+        .crisp-client .cc-1brb6,
+        .crisp-client .cc-tlyw,
+        .crisp-client .cc-7doi,
+        .crisp-client [class*="cc-"] > a[data-csp-channel],
+        #crisp-chatbox {
+          bottom: ${BANNER_HEIGHT + 8}px !important;
+        }
+      `;
+      if (!style.parentNode) document.head.appendChild(style);
+    } else {
+      style.remove();
+    }
+
+    return () => { style.remove(); };
+  }, [view]);
+
   const dismissBanner = () => {
     setView("none");
     try {
@@ -111,7 +134,7 @@ export default function MobileAppPrompt() {
             bottom: 0,
             left: 0,
             right: 0,
-            zIndex: 1000001,
+            zIndex: 9998,
             background: "#fff",
             borderTop: "1px solid #e3e8ef",
             padding: "10px 12px",
