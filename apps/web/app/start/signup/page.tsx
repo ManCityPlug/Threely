@@ -135,7 +135,7 @@ function SignupForm() {
       const { error: oauthError } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
-          redirectTo: `${window.location.origin}/start/payment`,
+          redirectTo: `${window.location.origin}/onboarding`,
         },
       });
       if (oauthError) {
@@ -174,7 +174,7 @@ function SignupForm() {
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) throw new Error("Account created but sign-in failed. Please try again.");
 
-      router.push("/start/payment");
+      router.push("/onboarding");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
       setSubmitting(false);
@@ -183,12 +183,6 @@ function SignupForm() {
 
   return (
     <main className="signup-main" style={{ padding: "24px 16px 60px", margin: "0 auto", flex: 1 }}>
-      {/* Progress dots */}
-      <div style={{ display: "flex", justifyContent: "center", gap: 8, marginBottom: 24 }}>
-        <div style={{ width: 8, height: 8, borderRadius: 4, background: "#fff" }} />
-        <div style={{ width: 8, height: 8, borderRadius: 4, background: "rgba(255,255,255,0.3)" }} />
-        <div style={{ width: 8, height: 8, borderRadius: 4, background: "rgba(255,255,255,0.3)" }} />
-      </div>
 
       {/* White card */}
       <div className="signup-card" style={CARD_STYLE}>

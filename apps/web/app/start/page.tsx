@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 const BULLETS = [
-  "10x your productivity.",
-  "Achieve your goals.",
   "Finally become the person you keep saying you'll be.",
+  "Achieve your goals.",
+  "10x your productivity.",
 ];
 
 export default function StartPage() {
