@@ -129,7 +129,7 @@ function TaskCard({
   // Menu close is handled by the portal backdrop's onClick
 
   function handleStartRefine() {
-    if (!hasPro) { router.push("/start/plan"); return; }
+    if (!hasPro) { router.push("/checkout?plan=yearly"); return; }
     setMenuOpen(false);
     setRefineInput("");
     setRefineMode(true);
@@ -137,7 +137,7 @@ function TaskCard({
   }
 
   function handleStartAsk() {
-    if (!hasPro) { router.push("/start/plan"); return; }
+    if (!hasPro) { router.push("/checkout?plan=yearly"); return; }
     setMenuOpen(false);
     setAskMode(true);
     setAskMessages([]);
@@ -929,7 +929,7 @@ function DashboardPageInner() {
   // ── Handlers ─────────────────────────────────────────────────────────────────
 
   async function handleGenerate(goalId?: string, isRestDayGen = false) {
-    if (!hasPro) { router.push("/start/plan"); return; }
+    if (!hasPro) { router.push("/checkout?plan=yearly"); return; }
     setGenerating(true);
     // Set a flag so if user closes tab / refreshes, we know to poll on return
     const todayStr = new Date().toLocaleDateString("en-CA");
@@ -959,7 +959,7 @@ function DashboardPageInner() {
   }
 
   function handleRestDayGenerate() {
-    if (!hasPro) { router.push("/start/plan"); return; }
+    if (!hasPro) { router.push("/checkout?plan=yearly"); return; }
     if (goals.length === 1) {
       handleGenerate(goals[0].id, true);
     } else {
@@ -1069,7 +1069,7 @@ function DashboardPageInner() {
   }
 
   function handleGiveMore() {
-    if (!hasPro) { router.push("/start/plan"); return; }
+    if (!hasPro) { router.push("/checkout?plan=yearly"); return; }
     // Pre-check: if tasks already have > 3 items, this goal already got extra tasks today
     const dt = dailyTasks.find(d => d.goalId === selectedGoalId);
     if (dt) {
@@ -1208,7 +1208,7 @@ function DashboardPageInner() {
 
       {/* Limited mode banner */}
       {!hasPro && (
-        <a href="/start/plan" style={{ textDecoration: "none" }}>
+        <a href="/checkout?plan=yearly" style={{ textDecoration: "none" }}>
           <div className="card fade-in" style={{
             padding: "1rem 1.25rem",
             background: "var(--primary-light)",
