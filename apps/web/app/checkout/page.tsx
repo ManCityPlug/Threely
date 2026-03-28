@@ -57,11 +57,11 @@ export default function CheckoutPage() {
 
 function CheckoutInner() {
   const searchParams = useSearchParams();
-  const plan = (searchParams.get("plan") as Plan) || "yearly";
+  const [plan, setPlan] = useState<Plan>((searchParams.get("plan") as Plan) || "yearly");
 
   return (
     <Elements stripe={getStripePromise()}>
-      <CheckoutContent plan={plan} />
+      <CheckoutContent plan={plan} onChangePlan={setPlan} />
     </Elements>
   );
 }
@@ -86,7 +86,7 @@ async function safeJson(res: Response) {
   try { return JSON.parse(text); } catch { return { error: text.slice(0, 200) }; }
 }
 
-function CheckoutContent({ plan }: { plan: Plan }) {
+function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p: Plan) => void }) {
   const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
@@ -307,6 +307,46 @@ function CheckoutContent({ plan }: { plan: Plan }) {
               </span>
             ))}
           </div>
+        </div>
+
+        {/* ── Plan toggle ────────────────────────────────────────────── */}
+        <div style={{
+          display: "flex", gap: 8, marginBottom: "1.25rem",
+        }}>
+          {(["yearly", "monthly"] as const).map((p) => {
+            const active = plan === p;
+            const label = p === "yearly" ? "Yearly — $99.99/yr" : "Monthly — $12.99/mo";
+            return (
+              <button
+                key={p}
+                onClick={() => onChangePlan(p)}
+                style={{
+                  flex: 1,
+                  padding: "0.75rem 0.5rem",
+                  borderRadius: "var(--radius)",
+                  border: `1.5px solid ${active ? "var(--primary)" : "var(--border)"}`,
+                  background: active ? "var(--primary-light)" : "var(--card)",
+                  color: active ? "var(--primary)" : "var(--subtext)",
+                  fontSize: "0.82rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  textAlign: "center",
+                }}
+              >
+                {label}
+                {p === "yearly" && (
+                  <span style={{
+                    display: "block", fontSize: "0.68rem", fontWeight: 500,
+                    color: active ? "var(--primary)" : "var(--muted)",
+                    marginTop: 2,
+                  }}>
+                    Save 36%
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </div>
 
         {/* ── Trial info banner ────────────────────────────────────────── */}
