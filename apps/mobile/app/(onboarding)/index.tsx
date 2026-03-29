@@ -402,23 +402,33 @@ export default function OnboardingScreen() {
     setBuilding(true);
     advanceStep(TOTAL_STEPS + 1);
 
-    try {
-      const result = await goalsApi.parse(goalText);
-      setParsedGoal(result);
+    // Retry parse up to 3 times silently before showing error
+    const MAX_RETRIES = 3;
+    let lastError: unknown;
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        const result = await goalsApi.parse(goalText);
+        setParsedGoal(result);
 
-      // Build with parsed data directly (avoid stale state)
-      handleBuild({
-        goalText,
-        parsed: result,
-        dailyMinutes: result.daily_time_detected && result.daily_time_detected > 0
-          ? result.daily_time_detected
-          : undefined,
-        skipAdvance: true, // already advanced above
-      });
-    } catch (e) {
-      setBuildError(e instanceof Error ? e.message : "Failed to analyze goal. Try again.");
-      setBuilding(false);
+        // Build with parsed data directly (avoid stale state)
+        handleBuild({
+          goalText,
+          parsed: result,
+          dailyMinutes: result.daily_time_detected && result.daily_time_detected > 0
+            ? result.daily_time_detected
+            : undefined,
+          skipAdvance: true, // already advanced above
+        });
+        return; // success — exit
+      } catch (e) {
+        lastError = e;
+        if (attempt < MAX_RETRIES - 1) {
+          await new Promise((r) => setTimeout(r, 2000 * (attempt + 1)));
+        }
+      }
     }
+    setBuildError(lastError instanceof Error ? lastError.message : "Failed to analyze goal. Try again.");
+    setBuilding(false);
   }
 
   // ─── Step 3: Deadline helpers ───────────────────────────────────────────────
@@ -478,6 +488,24 @@ export default function OnboardingScreen() {
     const effectiveParsed = overrides?.parsed ?? parsedGoal;
     const effectiveTime = overrides?.dailyMinutes ?? timeMinutes;
 
+    const MAX_RETRIES = 3;
+    const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+    // Retry a single async step up to MAX_RETRIES times, staying on the
+    // building screen between attempts so the user never sees an error flash.
+    async function withRetry<T>(fn: () => Promise<T>): Promise<T> {
+      let lastError: unknown;
+      for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+        try {
+          return await fn();
+        } catch (e) {
+          lastError = e;
+          if (attempt < MAX_RETRIES - 1) await delay(2000 * (attempt + 1));
+        }
+      }
+      throw lastError;
+    }
+
     try {
       const goalTitle =
         effectiveParsed?.short_title ??
@@ -490,16 +518,15 @@ export default function OnboardingScreen() {
         supabase.auth.updateUser({ data: { display_name: formatted } }).catch(() => {});
       }
 
-      // Save profile (intensity defaults to 2 — committed; AI chat handles pace context)
-      await profileApi.save({
+      // Each step retries independently so we never redo a step that already succeeded
+      await withRetry(() => profileApi.save({
         dailyTimeMinutes: effectiveTime ?? 60,
         intensityLevel: 2,
-      });
+      }));
 
-      // Create the goal with all parsed data + sensible defaults
       const detectedWorkDays = (effectiveParsed?.work_days_detected && effectiveParsed.work_days_detected.length > 0)
         ? effectiveParsed.work_days_detected : workDays;
-      const goalResult = await goalsApi.create(goalTitle, {
+      const goalResult = await withRetry(() => goalsApi.create(goalTitle, {
         rawInput: effectiveGoalText,
         structuredSummary: effectiveParsed?.structured_summary ?? undefined,
         category: effectiveParsed?.category ?? undefined,
@@ -508,10 +535,9 @@ export default function OnboardingScreen() {
         intensityLevel: 2,
         workDays: detectedWorkDays,
         onboarding: true,
-      });
+      }));
 
-      // Generate tasks
-      const tasksResult = await tasksApi.generate(goalResult.goal.id, { onboarding: true });
+      const tasksResult = await withRetry(() => tasksApi.generate(goalResult.goal.id, { onboarding: true }));
 
       // Get the tasks from the result
       const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
@@ -1259,8 +1285,8 @@ export default function OnboardingScreen() {
         presentationStyle="fullScreen"
         onRequestClose={() => { setChatError(""); setShowAiChat(false); }}
       >
-        <View style={{ flex: 1, backgroundColor: colors.bg }}>
-        <SafeAreaView style={styles.chatModal}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
+        <View style={styles.chatModal}>
           {/* Header */}
           <View style={styles.chatHeader}>
             <View style={styles.chatHeaderLeft}>
@@ -1303,7 +1329,7 @@ export default function OnboardingScreen() {
               ]}
               keyExtractor={(_, i) => String(i)}
               keyboardShouldPersistTaps="handled"
-              contentContainerStyle={[styles.chatList, { flexGrow: 1, paddingBottom: spacing.xl }]}
+              contentContainerStyle={[styles.chatList, { flexGrow: 1, paddingBottom: spacing.xxl + spacing.md }]}
               onContentSizeChange={() => {
                 requestAnimationFrame(() => chatListRef.current?.scrollToEnd({ animated: true }));
                 setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 300);
@@ -1528,8 +1554,8 @@ export default function OnboardingScreen() {
               </View>
             )}
           </KeyboardAvoidingView>
-        </SafeAreaView>
         </View>
+        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
@@ -2224,7 +2250,8 @@ function createStyles(colors: Colors) {
   },
   chatFooter: {
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.lg,
     borderTopWidth: 1,
     borderTopColor: colors.border,
     backgroundColor: colors.bg,

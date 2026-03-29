@@ -1,5 +1,5 @@
 import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
+import { AppState, Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const NOTIF_TIME_KEY = "@threely_notif_time";
@@ -21,6 +21,10 @@ export interface NotifContext {
   allDone: boolean;
   staleGoals: { name: string; daysSince: number }[];
   isRestDay?: boolean;
+  /** Number of goals that have tasks today (not off-day) */
+  activeGoalCountToday: number;
+  /** Total time across ALL active goals today */
+  totalTimeAllGoals: number;
 }
 
 // ─── Notification identifiers ─────────────────────────────────────────────────
@@ -80,7 +84,8 @@ export async function scheduleDailyReminder(_hour: number, _minute: number): Pro
 
 export async function cancelAllNotifications(): Promise<void> {
   if (Platform.OS === "web") return;
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  await cancelById(ID_PRIMARY);
+  await cancelById(ID_EVENING);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -91,13 +96,6 @@ async function cancelById(id: string): Promise<void> {
   } catch {
     // notification may not exist — safe to ignore
   }
-}
-
-function formatMin(min: number): string {
-  if (min < 60) return `${min}m`;
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
 // ─── Cooldown check ───────────────────────────────────────────────────────────
@@ -129,7 +127,7 @@ async function setCooldown(): Promise<void> {
  * Has a 30-minute cooldown to prevent re-scheduling spam when state updates
  * rapidly (e.g. multiple task completions in quick succession).
  *
- * Always cancels ALL scheduled notifications first to prevent duplicates.
+ * Cancels existing notifications by ID before rescheduling to prevent duplicates.
  */
 export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
   if (Platform.OS === "web") return;
@@ -140,21 +138,22 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
   // from rapid state changes like multiple task completions)
   if (await isCooldownActive()) return;
 
-  // Cancel ALL existing scheduled notifications to prevent duplicates
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  // Cancel existing scheduled notifications by ID to prevent duplicates
+  // (targeted cancellation avoids wiping unrelated notifications)
+  await cancelById(ID_PRIMARY);
+  await cancelById(ID_EVENING);
 
   // Record cooldown timestamp
   await setCooldown();
 
-  // Skip task notifications on rest days
-  if (ctx.isRestDay) return;
+  // Skip ALL notifications if no goals are active today (all off-day)
+  if (ctx.activeGoalCountToday === 0) return;
 
   // Read user's preferred notification time
   const pref = await getNotifPreference();
   const prefHour = pref?.hour ?? DEFAULT_HOUR;
   const prefMinute = pref?.minute ?? DEFAULT_MINUTE;
 
-  const goalName = ctx.focusGoalName ?? "your goals";
   const now = new Date();
 
   const todayAt = (h: number, m: number) => {
@@ -163,25 +162,37 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
     return d;
   };
 
-  // 1. PRIMARY reminder at user's chosen time — focus goal only
-  const primaryTime = todayAt(prefHour, prefMinute);
-  if (now < primaryTime) {
-    const timeLabel = ctx.totalTimeMinutes > 0
-      ? ` You have ${formatMin(ctx.totalTimeMinutes)} of tasks today.`
-      : "";
-    await Notifications.scheduleNotificationAsync({
-      identifier: ID_PRIMARY,
-      content: {
-        title: `Time to work on "${goalName}"`,
-        body: `Your daily tasks are waiting.${timeLabel}`,
-        sound: true,
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: primaryTime,
-      },
-    });
+  // Build notification content based on active goal count
+  const totalMin = ctx.totalTimeAllGoals;
+  const timeStr = totalMin >= 60
+    ? `${Math.floor(totalMin / 60)}h ${totalMin % 60 ? `${totalMin % 60}m` : ""}`
+    : `${totalMin} min`;
+
+  let primaryTitle: string;
+  let primaryBody: string;
+  if (ctx.activeGoalCountToday === 1) {
+    primaryTitle = "Your tasks are ready";
+    primaryBody = `${timeStr} today — let's go!`;
+  } else {
+    primaryTitle = "Your tasks are ready";
+    primaryBody = `${timeStr} across ${ctx.activeGoalCountToday} goals today`;
   }
+
+  // 1. PRIMARY reminder — recurring DAILY at user's chosen time
+  //    Uses DAILY trigger so it fires every day even if the app isn't opened.
+  await Notifications.scheduleNotificationAsync({
+    identifier: ID_PRIMARY,
+    content: {
+      title: primaryTitle,
+      body: primaryBody,
+      sound: true,
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DAILY,
+      hour: prefHour,
+      minute: prefMinute,
+    },
+  });
 
   // 2. EVENING nudge at 8 PM — only if primary time is before 6 PM and tasks incomplete
   const eveningTime = todayAt(20, 0);
@@ -190,7 +201,7 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
       identifier: ID_EVENING,
       content: {
         title: `You still have ${ctx.incompleteCount} task${ctx.incompleteCount > 1 ? "s" : ""} left`,
-        body: `Finish strong on "${goalName}"!`,
+        body: "Finish strong — you're almost there!",
         sound: true,
       },
       trigger: {
@@ -203,51 +214,66 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
 
 /**
  * Call after task completion to update evening notification.
- * Bypasses cooldown since this is a direct user action.
+ * Debounced (3 s) so rapid toggling doesn't spam cancel+reschedule cycles.
  */
-export async function onTaskCompleted(ctx: NotifContext): Promise<void> {
+let _taskCompletedTimer: ReturnType<typeof setTimeout> | null = null;
+
+export function onTaskCompleted(ctx: NotifContext): void {
   if (Platform.OS === "web") return;
 
-  // If all done, cancel evening nudge (no need to nag)
+  // If all done, cancel evening nudge immediately (no need to nag)
   if (ctx.allDone) {
-    await cancelById(ID_EVENING);
+    if (_taskCompletedTimer) { clearTimeout(_taskCompletedTimer); _taskCompletedTimer = null; }
+    cancelById(ID_EVENING);
     return;
   }
 
-  // Update evening with new incomplete count
-  const pref = await getNotifPreference();
-  const prefHour = pref?.hour ?? DEFAULT_HOUR;
+  // Debounce: wait 3 s before rescheduling so rapid completions coalesce
+  if (_taskCompletedTimer) clearTimeout(_taskCompletedTimer);
+  _taskCompletedTimer = setTimeout(async () => {
+    _taskCompletedTimer = null;
+    try {
+      const pref = await getNotifPreference();
+      const prefHour = pref?.hour ?? DEFAULT_HOUR;
 
-  // Only reschedule if primary time is before 6 PM
-  if (prefHour >= 18) return;
+      // Only reschedule if primary time is before 6 PM
+      if (prefHour >= 18) return;
 
-  await cancelById(ID_EVENING);
-  const now = new Date();
-  const eveningTime = new Date(now);
-  eveningTime.setHours(20, 0, 0, 0);
+      await cancelById(ID_EVENING);
+      const now = new Date();
+      const eveningTime = new Date(now);
+      eveningTime.setHours(20, 0, 0, 0);
 
-  if (now < eveningTime && ctx.incompleteCount > 0) {
-    const goalName = ctx.focusGoalName ?? "your goals";
-    await Notifications.scheduleNotificationAsync({
-      identifier: ID_EVENING,
-      content: {
-        title: `You still have ${ctx.incompleteCount} task${ctx.incompleteCount > 1 ? "s" : ""} left`,
-        body: `Finish strong on "${goalName}"!`,
-        sound: true,
-      },
-      trigger: {
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: eveningTime,
-      },
-    });
-  }
+      if (now < eveningTime && ctx.incompleteCount > 0) {
+        const goalName = ctx.focusGoalName ?? "your goals";
+        await Notifications.scheduleNotificationAsync({
+          identifier: ID_EVENING,
+          content: {
+            title: `You still have ${ctx.incompleteCount} task${ctx.incompleteCount > 1 ? "s" : ""} left`,
+            body: `Finish strong on "${goalName}"!`,
+            sound: true,
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date: eveningTime,
+          },
+        });
+      }
+    } catch {
+      // safe to ignore — notification scheduling is best-effort
+    }
+  }, 3000);
 }
 
 /**
  * Send an immediate local notification (e.g. when tasks finish generating).
+ * Skips when the app is in the foreground — the user is already looking at
+ * the result, so a banner is just noise.
  */
 export async function sendInstantNotification(title: string, body: string): Promise<void> {
   if (Platform.OS === "web") return;
+  // Don't fire while the user is actively in the app
+  if (AppState.currentState === "active") return;
   const granted = await requestNotificationPermissions();
   if (!granted) return;
   await Notifications.scheduleNotificationAsync({
@@ -256,46 +282,3 @@ export async function sendInstantNotification(title: string, body: string): Prom
   });
 }
 
-// ─── Limited-user notification (free/limited plan) ────────────────────────────
-
-const LIMITED_VARIANTS = [
-  "Your 3 tasks are waiting — get Pro free to unlock daily AI plans",
-  "Ready to crush today? Get Threely Pro free for 7 days",
-  "Your goals aren't going to achieve themselves — unlock AI-powered tasks today",
-  "Small steps, big results. Get Threely Pro free for personalized tasks",
-];
-
-const ID_LIMITED = "threely-limited";
-
-/**
- * Schedule a single daily reminder for free/limited users
- * at their preferred time (default 9 AM) with rotating motivational copy.
- */
-export async function scheduleNotificationsLimited(): Promise<void> {
-  if (Platform.OS === "web") return;
-  const granted = await requestNotificationPermissions();
-  if (!granted) return;
-
-  // Cancel everything first to prevent duplicates
-  await Notifications.cancelAllScheduledNotificationsAsync();
-
-  const pref = await getNotifPreference();
-  const hour = pref?.hour ?? 9;
-  const minute = pref?.minute ?? 0;
-
-  const variant = LIMITED_VARIANTS[new Date().getDate() % LIMITED_VARIANTS.length];
-
-  await Notifications.scheduleNotificationAsync({
-    identifier: ID_LIMITED,
-    content: {
-      title: "Threely",
-      body: variant,
-      sound: true,
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour,
-      minute,
-    },
-  });
-}

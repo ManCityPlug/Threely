@@ -433,15 +433,24 @@ export default function ProfileScreen() {
         {
           text: "Delete account",
           style: "destructive",
-          onPress: async () => {
-            try {
-              await accountApi.delete();
-              const { data: { user } } = await supabase.auth.getUser();
-              if (user) await AsyncStorage.removeItem(`@threely_onboarding_done_${user.id}`);
-              await supabase.auth.signOut();
-            } catch (e: unknown) {
-              Alert.alert("Error", e instanceof Error ? e.message : "Failed to delete account.");
-            }
+          onPress: () => {
+            Alert.prompt(
+              "Confirm with password",
+              "Enter your password to permanently delete your account.",
+              async (password) => {
+                if (!password) return;
+                try {
+                  await accountApi.delete(password);
+                  const { data: { user } } = await supabase.auth.getUser();
+                  if (user) await AsyncStorage.removeItem(`@threely_onboarding_done_${user.id}`);
+                  await supabase.auth.signOut();
+                } catch (e: unknown) {
+                  const msg = e instanceof Error ? e.message : "Failed to delete account.";
+                  Alert.alert("Error", msg.includes("Incorrect") ? "Incorrect password" : msg);
+                }
+              },
+              "secure-text"
+            );
           },
         },
       ]

@@ -470,7 +470,11 @@ export const summaryApi = {
 // ─── Account API ──────────────────────────────────────────────────────────────
 
 export const accountApi = {
-  delete: () => apiFetch<{ success: boolean }>("/api/account", { method: "DELETE" }),
+  delete: (password: string) =>
+    apiFetch<{ success: boolean }>("/api/account", {
+      method: "DELETE",
+      body: JSON.stringify({ password }),
+    }),
 };
 
 // ─── Subscription API ─────────────────────────────────────────────────────────

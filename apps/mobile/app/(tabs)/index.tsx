@@ -473,6 +473,19 @@ export default function DashboardScreen() {
   const buildNotifContext = useCallback((): NotifContext => {
     const focusGoalName = goals.find(g => g.id === selectedGoal)?.title ?? null;
     const incomplete = newTaskItems.filter(t => !t.isCompleted && !t.isSkipped);
+
+    // Count goals that are active today (not off-day)
+    const activeGoalsToday = goals.filter(g => {
+      const stat = goalStats.find(s => s.goalId === g.id);
+      return isGoalWorkDay(stat?.workDays);
+    });
+
+    // Total time across ALL active goals today (not just focused)
+    const allIncompleteTasks = dailyTasks
+      .filter(dt => activeGoalsToday.some(g => g.id === dt.goalId))
+      .flatMap(dt => (dt.tasks as TaskItem[]).filter(t => !t.isCompleted && !t.isSkipped));
+    const totalTimeAllGoals = allIncompleteTasks.reduce((s, t) => s + (t.estimated_minutes || 0), 0);
+
     return {
       focusGoalName,
       totalTimeMinutes: incomplete.reduce((s, t) => s + (t.estimated_minutes || 0), 0),
@@ -480,13 +493,18 @@ export default function DashboardScreen() {
       allDone,
       staleGoals: [],
       isRestDay: restDay,
+      activeGoalCountToday: activeGoalsToday.length,
+      totalTimeAllGoals,
     };
-  }, [selectedGoal, goals, newTaskItems, allDone, restDay]);
+  }, [selectedGoal, goals, newTaskItems, allDone, restDay, goalStats, dailyTasks]);
 
-  // Schedule notifications after data loads
+  // Schedule notifications after data loads (debounced to avoid rapid re-scheduling)
   useEffect(() => {
     if (!loading && goals.length > 0) {
-      scheduleNotifications(buildNotifContext()).catch(() => {});
+      const timer = setTimeout(() => {
+        scheduleNotifications(buildNotifContext()).catch(() => {});
+      }, 5000);
+      return () => clearTimeout(timer);
     }
   }, [loading, buildNotifContext, goals.length]);
 
@@ -620,7 +638,7 @@ export default function DashboardScreen() {
       setDailyTasks(newDailyTasks);
       // Update notifications after task completion
       if (isCompleted) {
-        onTaskCompleted(buildNotifContext()).catch(() => {});
+        onTaskCompleted(buildNotifContext());
       }
     } catch {
       showToast("Couldn't update task. Try again.", "error");

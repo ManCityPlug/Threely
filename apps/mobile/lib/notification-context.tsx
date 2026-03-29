@@ -16,7 +16,7 @@ const NotificationContext = createContext<NotificationContextValue>({
   dismiss: () => {},
 });
 
-const POLL_INTERVAL = 15000; // 15 seconds
+const POLL_INTERVAL = 300000; // 5 minutes
 
 export function NotificationProvider({ children }: { children: React.ReactNode }) {
   const [notifications, setNotifications] = useState<AppNotification[]>([]);

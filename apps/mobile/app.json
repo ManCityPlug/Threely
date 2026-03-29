@@ -42,6 +42,13 @@
           "color": "#635BFF",
           "sounds": []
         }
+      ],
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "threely-1v",
+          "project": "javascript-nextjs"
+        }
       ]
     ],
     "experiments": {

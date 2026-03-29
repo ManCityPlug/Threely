@@ -1,6 +1,15 @@
+import * as Sentry from "@sentry/react-native";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, AppState, Linking, LogBox, Modal, Platform, Text, TouchableOpacity, View } from "react-native";
 import * as SplashScreen from "expo-splash-screen";
+
+// Initialize Sentry before anything else
+Sentry.init({
+  dsn: "https://94b1f285e3a22ed4fedd01dc6249d5f0@o4511089895211008.ingest.us.sentry.io/4511089950326784",
+  tracesSampleRate: 0.1,
+  environment: __DEV__ ? "development" : "production",
+  enabled: !__DEV__,
+});
 
 // Keep native splash visible until we're ready
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -88,7 +97,7 @@ function AppContent() {
   const [welcomeDone, setWelcomeDone] = useState(false);
   const [authOverlay, setAuthOverlay] = useState(false);
   const [updateRequired, setUpdateRequired] = useState(false);
-  const pendingDestination = useRef<"login" | null>(null);
+  const pendingDestination = useRef<"login" | "register" | null>(null);
   const routingResolved = useRef(false);
 
   // Listen for notification responses (deep links)
@@ -133,7 +142,7 @@ function AppContent() {
   }, []);
 
   const handleWelcomeComplete = useCallback(
-    (destination?: "login") => {
+    (destination?: "login" | "register") => {
       if (destination) {
         pendingDestination.current = destination;
         setAuthOverlay(true); // Dark overlay prevents flash of default route
@@ -213,7 +222,7 @@ function AppContent() {
         if (dest) {
           pendingDestination.current = null;
           routingResolved.current = true;
-          const route = "/(auth)/login";
+          const route = dest === "register" ? "/(auth)/register" : "/(auth)/login";
           if (!inAuthGroup) {
             setTimeout(() => {
               router.replace(route);
@@ -444,7 +453,7 @@ function AppContent() {
   );
 }
 
-export default function RootLayout() {
+function RootLayout() {
   return (
     <ThemeProvider>
       <ToastProvider>
@@ -453,6 +462,8 @@ export default function RootLayout() {
     </ThemeProvider>
   );
 }
+
+export default Sentry.wrap(RootLayout);
 
 function AppContentWithSubscription() {
   const [userId, setUserId] = useState<string | null>(null);
