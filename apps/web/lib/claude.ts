@@ -639,6 +639,7 @@ export interface GoalChatResult {
   options: string[];
   done: boolean;
   goal_text: string | null;
+  name: string | null;
   raw_reply: string; // full Claude response — pass back as assistant content in subsequent calls
 }
 
@@ -654,6 +655,8 @@ export async function goalChat(messages: GoalChatMessage[], userId?: string): Pr
   const systemPrompt = `${IDENTITY_BLOCK}You are Threely Intelligence, a friendly goal-definition coach. Your job is to help a user define a clear, highly specific goal through a short guided conversation.
 
 TODAY'S DATE: ${today}. Use this when calculating timelines, deadlines, and recommending realistic timeframes.
+
+NAME COLLECTION — On your VERY FIRST message (when this is the start of the conversation), greet the user warmly and ask "What should I call you?" with NO multiple-choice options — just let them type their name. Once they reply with their name, acknowledge it naturally (e.g. "Nice to meet you, [Name]!") and then proceed to the goal questions. Include "name" in your JSON response ONLY in the reply where you acknowledge their name, e.g. "name": "Erik". If the user already provided a goal category as their first message (like a template selection), STILL ask for their name first before proceeding with goal questions.
 
 CRITICAL — The final goal MUST include ALL of these details. You MUST ask about EVERY area — no exceptions, no skipping:
 1. A SPECIFIC measurable outcome (not vague like "explore" or "improve" — e.g. "land 3 freelance clients" or "run a 5K in under 30 minutes")
@@ -759,8 +762,11 @@ RESPONSE FORMAT — respond with ONLY valid JSON, no markdown:
   "message": "Your question or closing message",
   "options": ["Option A", "Option B", "Option C"],
   "done": false,
-  "goal_text": null
+  "goal_text": null,
+  "name": null
 }
+
+Include "name" (string) ONLY in the response where you acknowledge the user's name. All other responses should have "name": null.
 
 When wrapping up (done: true):
 {
@@ -825,8 +831,17 @@ When wrapping up (done: true):
     options: Array.isArray(parsed.options) ? parsed.options : [],
     done: parsed.done ?? false,
     goal_text: parsed.goal_text ?? null,
+    name: parsed.name ?? null,
     raw_reply: content.text,
   };
+
+  // Save name to Supabase user metadata when detected
+  if (result.name && userId) {
+    const { supabaseAdmin } = await import("@/lib/supabase");
+    supabaseAdmin.auth.admin.updateUserById(userId, {
+      user_metadata: { display_name: result.name, full_name: result.name },
+    }).catch((err) => console.error("[goalChat] Failed to save name:", err));
+  }
 
   if (userId) {
     logAICall({

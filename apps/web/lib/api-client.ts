@@ -105,6 +105,7 @@ export interface GoalChatResult {
   options: string[];
   done: boolean;
   goal_text: string | null;
+  name: string | null;
   raw_reply: string;
 }
 

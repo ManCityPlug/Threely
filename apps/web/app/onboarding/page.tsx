@@ -202,6 +202,9 @@ export default function OnboardingPage() {
         ...prev,
         { role: "assistant", text: result.message, options: result.done ? [] : result.options },
       ]);
+      if (result.name) {
+        setNameInput(result.name);
+      }
       if (result.done) {
         setChatDone(true);
         setChatGoalText(result.goal_text);
