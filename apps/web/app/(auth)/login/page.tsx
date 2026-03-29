@@ -174,7 +174,7 @@ function LoginPageInner() {
             {error === "no_account" ? (
               <>
                 We couldn't find an account with this email.{" "}
-                <Link href="/register" style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "underline" }}>
+                <Link href="/start/signup" style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "underline" }}>
                   Sign up
                 </Link>
               </>
@@ -226,7 +226,7 @@ function LoginPageInner() {
 
       <p style={{ textAlign: "center", marginTop: "1.5rem", color: "var(--subtext)", fontSize: "0.875rem" }}>
         Don't have an account?{" "}
-        <Link href="/register" style={{ color: "var(--primary)", fontWeight: 600 }}>
+        <Link href="/start/signup" style={{ color: "var(--primary)", fontWeight: 600 }}>
           Sign up
         </Link>
       </p>

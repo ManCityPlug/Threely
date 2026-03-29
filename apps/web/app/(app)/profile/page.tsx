@@ -134,6 +134,8 @@ export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState<"history" | "settings">("settings");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState("");
   const [showChangePassword, setShowChangePassword] = useState(false);
   const [currentPw, setCurrentPw] = useState("");
   const [newPw, setNewPw] = useState("");
@@ -296,14 +298,20 @@ export default function ProfilePage() {
   }
 
   async function handleDeleteAccount() {
+    if (!deletePassword) {
+      setDeleteError("Please enter your password");
+      return;
+    }
+    setDeleteError("");
     setDeleting(true);
     try {
-      await accountApi.delete();
+      await accountApi.delete(deletePassword);
       await signOut();
       router.replace("/login");
-    } catch {
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to delete account";
+      setDeleteError(message.includes("Incorrect") ? "Incorrect password" : message);
       setDeleting(false);
-      setShowDeleteConfirm(false);
     }
   }
 
@@ -981,10 +989,27 @@ export default function ProfilePage() {
                   <p style={{ fontSize: "0.825rem", color: "var(--danger)", fontWeight: 600, marginBottom: 12 }}>
                     Are you sure? This will delete all your goals, tasks, and history forever.
                   </p>
+                  <p style={{ fontSize: "0.8rem", color: "var(--subtext)", marginBottom: 8 }}>
+                    Enter your password to confirm:
+                  </p>
+                  <input
+                    type="password"
+                    className="input"
+                    placeholder="Your password"
+                    value={deletePassword}
+                    onChange={(e) => { setDeletePassword(e.target.value); setDeleteError(""); }}
+                    disabled={deleting}
+                    style={{ marginBottom: 8, fontSize: "0.85rem" }}
+                  />
+                  {deleteError && (
+                    <p style={{ fontSize: "0.8rem", color: "var(--danger)", marginBottom: 8 }}>
+                      {deleteError}
+                    </p>
+                  )}
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
                       className="btn btn-outline"
-                      onClick={() => setShowDeleteConfirm(false)}
+                      onClick={() => { setShowDeleteConfirm(false); setDeletePassword(""); setDeleteError(""); }}
                       disabled={deleting}
                     >
                       Cancel
@@ -992,7 +1017,7 @@ export default function ProfilePage() {
                     <button
                       className="btn btn-danger"
                       onClick={handleDeleteAccount}
-                      disabled={deleting}
+                      disabled={deleting || !deletePassword}
                     >
                       {deleting ? "Deleting..." : "Yes, delete everything"}
                     </button>
