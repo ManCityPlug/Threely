@@ -455,6 +455,10 @@ export default function GoalsScreen() {
         { role: "user" as const, text: initialMessage },
         { role: "assistant" as const, text: result.message, options: result.options },
       ]);
+      // Auto-show text input when AI sends no options
+      if (!result.options || result.options.length === 0) {
+        setShowTypingInput(true);
+      }
       if (result.done) {
         setChatDone(true);
         setChatGoalText(result.goal_text);
@@ -477,7 +481,6 @@ export default function GoalsScreen() {
   async function sendChatAnswer(answer: string) {
     setChatHistory((prev) => [...prev, { role: "user" as const, text: answer }]);
     setCustomInput("");
-    setShowTypingInput(false);
     setSelectedOptions(new Set());
     setChatLoading(true);
 
@@ -492,9 +495,16 @@ export default function GoalsScreen() {
         ...prev,
         { role: "assistant", text: result.message, options: result.done ? [] : result.options },
       ]);
+      // Show text input when AI sends no options, hide when options are available
+      if (!result.done && (!result.options || result.options.length === 0)) {
+        setShowTypingInput(true);
+      } else {
+        setShowTypingInput(false);
+      }
       if (result.done) {
         setChatDone(true);
         setChatGoalText(result.goal_text);
+        setShowTypingInput(false);
       }
     } catch (err) {
       if (err instanceof Error && err.message?.includes("pro_required")) {
@@ -1641,8 +1651,6 @@ export default function GoalsScreen() {
                       onSubmitEditing={() => {
                         if (customInput.trim() && !chatLoading) {
                           sendChatAnswer(customInput.trim());
-                          setCustomInput("");
-                          setShowTypingInput(false);
                         }
                       }}
                     />
@@ -1651,8 +1659,6 @@ export default function GoalsScreen() {
                       onPress={() => {
                         if (customInput.trim() && !chatLoading) {
                           sendChatAnswer(customInput.trim());
-                          setCustomInput("");
-                          setShowTypingInput(false);
                         }
                       }}
                       activeOpacity={0.75}
