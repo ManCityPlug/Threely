@@ -174,6 +174,7 @@ function AppContent() {
         // routing and block post-OAuth navigation.
         if (event === "SIGNED_IN") {
           routingResolved.current = false;
+          setReady(false);
         }
       }
     );
