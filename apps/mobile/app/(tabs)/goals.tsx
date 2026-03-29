@@ -1499,7 +1499,8 @@ export default function GoalsScreen() {
         >
           <KeyboardAvoidingView
             style={styles.chatModal}
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            behavior={Platform.OS === "ios" ? "padding" : undefined}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 50 : 0}
           >
             {/* Header */}
             <View style={[styles.chatHeaderBlock, { paddingTop: insets.top }]}>
@@ -1540,7 +1541,8 @@ export default function GoalsScreen() {
                   ...(chatDone && chatGoalText ? [{ role: "goal" as const, text: chatGoalText }] : []),
                 ]}
                 keyExtractor={(_, i) => String(i)}
-                contentContainerStyle={[styles.chatList, { paddingBottom: spacing.xl }]}
+                keyboardShouldPersistTaps="handled"
+                contentContainerStyle={[styles.chatList, { flexGrow: 1, paddingBottom: spacing.xxl + spacing.md }]}
                 onContentSizeChange={() => {
                   requestAnimationFrame(() => chatListRef.current?.scrollToEnd({ animated: true }));
                   setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 300);
