@@ -164,6 +164,7 @@ export default function ProfilePage() {
   const [customEndMinute, setCustomEndMinute] = useState(0);
   const [customEndAmPm, setCustomEndAmPm] = useState<"AM" | "PM">("AM");
   const [focusGoalName, setFocusGoalName] = useState<string | null>(null);
+  const [goalCount, setGoalCount] = useState(0);
 
   const load = useCallback(async () => {
     try {
@@ -228,9 +229,12 @@ export default function ProfilePage() {
     const focusId = localStorage.getItem(`threely_focus_${today}`);
     if (focusId) {
       goalsApi.list().then(res => {
+        setGoalCount(res.goals.length);
         const goal = res.goals.find((g: Goal) => g.id === focusId);
         if (goal) setFocusGoalName(goal.title);
       }).catch(() => {});
+    } else {
+      goalsApi.list().then(res => setGoalCount(res.goals.length)).catch(() => {});
     }
   }, []);
 
@@ -761,13 +765,14 @@ export default function ProfilePage() {
                   </span>
                   <button
                     className="btn btn-outline"
+                    disabled={goalCount <= 1}
                     onClick={() => {
                       const today = new Date().toLocaleDateString("en-CA");
                       localStorage.removeItem(`threely_focus_${today}`);
                       setFocusGoalName(null);
                       router.push("/dashboard");
                     }}
-                    style={{ fontSize: "0.8rem", padding: "0.35rem 0.75rem" }}
+                    style={{ fontSize: "0.8rem", padding: "0.35rem 0.75rem", ...(goalCount <= 1 ? { opacity: 0.4, cursor: "not-allowed" } : {}) }}
                   >
                     Change focus
                   </button>
@@ -813,9 +818,13 @@ export default function ProfilePage() {
                     Manage subscription
                   </button>
                 ) : (
-                  <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
-                    Manage your subscription at threely.co
-                  </span>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => router.push("/checkout")}
+                    style={{ fontSize: "0.8rem", padding: "0.35rem 0.75rem" }}
+                  >
+                    Subscribe
+                  </button>
                 )}
               </div>
             </div>
