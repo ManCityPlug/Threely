@@ -1,6 +1,6 @@
 FROM node:20-slim
 WORKDIR /app
-COPY package.json ./
+COPY apps/discord-bot/package.json ./
 RUN npm install --production
-COPY index.js ./
+COPY apps/discord-bot/index.js ./
 CMD ["node", "index.js"]
