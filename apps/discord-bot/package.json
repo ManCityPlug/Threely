@@ -1,0 +1,16 @@
+{
+  "name": "@threely/discord-bot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "setup": "node src/setup.js",
+    "dev": "node --watch src/index.js"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.0",
+    "express": "^4.21.0",
+    "stripe": "^17.0.0"
+  }
+}
