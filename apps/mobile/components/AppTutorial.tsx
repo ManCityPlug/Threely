@@ -179,9 +179,9 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
           // Get-more button is above task cards — scroll to top
           await scrollToTop(scrollKey);
         } else if (s.target === "profile-stats") {
-          // For profile stats, scroll down past the Discord link so the stats
-          // section is centered and the tooltip can appear below without overlap
-          await scrollToOffset(scrollKey, 180);
+          // For profile stats, scroll down a bit so the stats section is
+          // centered and the tooltip can appear below without overlap
+          await scrollToOffset(scrollKey, 100);
         } else {
           await scrollTargetIntoView(s.target, scrollKey);
         }

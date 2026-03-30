@@ -529,22 +529,6 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* Discord */}
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => Linking.openURL("https://discord.gg/waDZaKFyrw")}
-          style={[styles.menuCard, { flexDirection: "row", alignItems: "center", gap: spacing.md, marginBottom: spacing.lg }]}
-        >
-          <View style={{ width: 40, height: 40, borderRadius: radius.md, backgroundColor: "#5865F2", justifyContent: "center", alignItems: "center" }}>
-            <Text style={{ color: "#fff", fontSize: 20, fontWeight: "700" }}>D</Text>
-          </View>
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.menuLabel, { marginBottom: 2 }]}>Join the Discord!</Text>
-            <Text style={[styles.menuValue, { color: colors.textSecondary }]}>Connect with the Threely community</Text>
-          </View>
-          <Text style={{ fontSize: 18, color: colors.textTertiary }}>{'>'}</Text>
-        </TouchableOpacity>
-
         {/* Stats */}
         <Text style={styles.sectionLabel}>Your stats</Text>
         <View ref={r => register("profile-stats", r)} collapsable={false}>
