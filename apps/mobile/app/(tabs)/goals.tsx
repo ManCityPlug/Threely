@@ -1553,7 +1553,7 @@ export default function GoalsScreen() {
                 ]}
                 keyExtractor={(_, i) => String(i)}
                 keyboardShouldPersistTaps="handled"
-                contentContainerStyle={[styles.chatList, { flexGrow: 1, paddingBottom: spacing.xxl + spacing.md }]}
+                contentContainerStyle={[styles.chatList, { flexGrow: 1, paddingBottom: spacing.xxl * 2 }]}
                 onContentSizeChange={() => {
                   requestAnimationFrame(() => chatListRef.current?.scrollToEnd({ animated: true }));
                   setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 300);
@@ -1609,6 +1609,7 @@ export default function GoalsScreen() {
                                     else next.add(opt);
                                     return next;
                                   });
+                                  setTimeout(() => chatListRef.current?.scrollToEnd({ animated: true }), 200);
                                 }}
                                 activeOpacity={0.7}
                               >
@@ -1631,11 +1632,11 @@ export default function GoalsScreen() {
                           </TouchableOpacity>
                           {selectedOptions.size > 0 && (
                             <TouchableOpacity
-                              style={[styles.chatOptionBtn, { backgroundColor: colors.primary, borderColor: colors.primary, width: "100%", alignItems: "center", marginTop: 4 }]}
+                              style={[styles.chatOptionBtn, { backgroundColor: colors.primary, borderColor: colors.primary, width: "100%", alignItems: "center", marginTop: spacing.sm, paddingVertical: spacing.md }]}
                               onPress={() => sendChatAnswer(Array.from(selectedOptions).join(" + "))}
                               activeOpacity={0.7}
                             >
-                              <Text style={[styles.chatOptionText, { color: "#fff", fontWeight: "700" }]}>
+                              <Text style={[styles.chatOptionText, { color: "#fff", fontWeight: "700", fontSize: typography.base }]}>
                                 Continue with {selectedOptions.size} selected →
                               </Text>
                             </TouchableOpacity>
@@ -2539,7 +2540,8 @@ function createStyles(c: Colors) {
       flexDirection: "row",
       flexWrap: "wrap",
       gap: spacing.sm,
-      marginTop: spacing.sm,
+      marginTop: spacing.md,
+      marginBottom: spacing.md,
     },
     chatOptionBtn: {
       paddingHorizontal: spacing.md,
