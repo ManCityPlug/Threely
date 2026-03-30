@@ -1590,6 +1590,20 @@ export default function GoalsScreen() {
                           {item.text}
                         </Text>
                       </View>
+                      {isLastAssistant && options && options.length > 0 && !chatLoading && !chatDone && showTypingInput && (
+                        <View style={[styles.chatOptions, { marginTop: spacing.sm }]}>
+                          <TouchableOpacity
+                            style={[styles.chatOptionBtn, { borderColor: colors.border, borderWidth: 1, backgroundColor: colors.bg }]}
+                            onPress={() => {
+                              setShowTypingInput(false);
+                              setCustomInput("");
+                            }}
+                            activeOpacity={0.7}
+                          >
+                            <Text style={[styles.chatOptionText, { color: colors.textSecondary }]}>Show options</Text>
+                          </TouchableOpacity>
+                        </View>
+                      )}
                       {isLastAssistant && options && options.length > 0 && !chatLoading && !chatDone && !showTypingInput && (
                         <View style={styles.chatOptions}>
                           {options.map((opt, j) => {

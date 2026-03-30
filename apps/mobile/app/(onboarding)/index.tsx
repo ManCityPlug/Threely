@@ -14,7 +14,7 @@ import {
   KeyboardAvoidingView,
   FlatList,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as Haptics from "expo-haptics";
@@ -101,6 +101,7 @@ function BuildingProgressMobile({ styles, colors }: { styles: any; colors: Color
 export default function OnboardingScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [step, setStep] = useState(2);
   const progressAnim = useRef(new Animated.Value(1 / TOTAL_STEPS)).current; // starts at 50%
@@ -1270,10 +1271,9 @@ export default function OnboardingScreen() {
         presentationStyle="fullScreen"
         onRequestClose={() => { setChatError(""); setShowAiChat(false); }}
       >
-        <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
-        <View style={styles.chatModal}>
+        <View style={[styles.chatModal, { backgroundColor: colors.bg }]}>
           {/* Header */}
-          <View style={styles.chatHeader}>
+          <View style={[styles.chatHeader, { paddingTop: insets.top + spacing.sm }]}>
             <View style={styles.chatHeaderLeft}>
               <Text style={styles.chatHeaderIcon}>✦</Text>
               <Text style={styles.chatHeaderTitle}>Threely Intelligence</Text>
@@ -1351,6 +1351,20 @@ export default function OnboardingScreen() {
                         {item.text}
                       </Text>
                     </View>
+                    {isLastAssistant && options && options.length > 0 && !chatLoading && !chatDone && showTypingInput && (
+                      <View style={[styles.chatOptions, { marginTop: spacing.sm }]}>
+                        <TouchableOpacity
+                          style={[styles.chatOptionBtn, { borderColor: colors.border, borderWidth: 1, backgroundColor: colors.bg }]}
+                          onPress={() => {
+                            setShowTypingInput(false);
+                            setCustomInput("");
+                          }}
+                          activeOpacity={0.7}
+                        >
+                          <Text style={[styles.chatOptionText, { color: colors.textSecondary }]}>Show options</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
                     {isLastAssistant && options && options.length > 0 && !chatLoading && !chatDone && !showTypingInput && (
                       <View style={styles.chatOptions}>
                         {options.map((opt, j) => {
@@ -1486,7 +1500,7 @@ export default function OnboardingScreen() {
 
             {/* Bottom: typing input */}
             {showTypingInput && !chatDone && !chatError && (
-              <View style={styles.chatFooter}>
+              <View style={[styles.chatFooter, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
                 <View style={styles.chatInputRow}>
                   <TextInput
                     ref={chatInputRef}
@@ -1527,7 +1541,7 @@ export default function OnboardingScreen() {
               </View>
             )}
             {chatDone && (
-              <View style={[styles.chatFooter, { paddingBottom: spacing.xl }]}>
+              <View style={[styles.chatFooter, { paddingBottom: Math.max(insets.bottom, spacing.xl) }]}>
                 <View style={{ gap: spacing.sm }}>
                   <TouchableOpacity
                     style={styles.continueBtn}
@@ -1550,7 +1564,6 @@ export default function OnboardingScreen() {
             )}
           </KeyboardAvoidingView>
         </View>
-        </SafeAreaView>
       </Modal>
     </SafeAreaView>
   );
