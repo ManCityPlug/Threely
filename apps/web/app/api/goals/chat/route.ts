@@ -62,8 +62,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Rate limit exceeded. Try again later." }, { status: 429 });
   }
 
+  // Check if user already has a display name (skip name question if so)
+  let userName: string | null = null;
   try {
-    const result = await goalChat(messages, user.id);
+    const { data } = await (await import("@/lib/supabase")).supabaseAdmin.auth.admin.getUserById(user.id);
+    userName = data?.user?.user_metadata?.display_name || data?.user?.user_metadata?.full_name || null;
+  } catch { /* ignore */ }
+
+  try {
+    const result = await goalChat(messages, user.id, userName);
     return NextResponse.json(result);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);

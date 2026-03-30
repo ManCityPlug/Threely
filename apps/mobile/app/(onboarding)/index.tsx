@@ -1525,7 +1525,7 @@ export default function OnboardingScreen() {
               </View>
             )}
             {chatDone && (
-              <View style={styles.chatFooter}>
+              <View style={[styles.chatFooter, { paddingBottom: spacing.xl }]}>
                 <View style={{ gap: spacing.sm }}>
                   <TouchableOpacity
                     style={styles.continueBtn}

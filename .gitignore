@@ -37,3 +37,4 @@ pnpm-debug.log*
 # Expo
 apps/mobile/.expo
 apps/mobile/web-build
+.vercel

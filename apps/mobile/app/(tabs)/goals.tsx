@@ -27,6 +27,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Ionicons } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { goalsApi, tasksApi, type Goal, type TaskItem, type ParsedGoal, type GoalChatMessage, type GoalChatResult } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 import { GoalCard } from "@/components/GoalCard";
 import { GoalTemplates } from "@/components/GoalTemplates";
 import { MOCK_TUTORIAL_GOAL } from "@/lib/mock-tutorial-data";
@@ -131,6 +132,7 @@ export default function GoalsScreen() {
   const [chatGoalText, setChatGoalText] = useState<string | null>(null);
   const [customInput, setCustomInput] = useState("");
   const [showTypingInput, setShowTypingInput] = useState(false);
+  const [chatError, setChatError] = useState("");
   const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
   const chatInputRef = useRef<TextInput>(null);
   const chatListRef = useRef<FlatList>(null);
@@ -440,6 +442,7 @@ export default function GoalsScreen() {
     setChatHistory([]);
     setChatMessages([]);
     setChatDone(false);
+    setChatError("");
     setChatGoalText(null);
     setCustomInput("");
     setShowTypingInput(false);
@@ -483,6 +486,7 @@ export default function GoalsScreen() {
     setCustomInput("");
     setSelectedOptions(new Set());
     setChatLoading(true);
+    setChatError("");
 
     const newMessages: GoalChatMessage[] = [...chatMessages, { role: "user", content: answer }];
     setChatMessages(newMessages);
@@ -495,6 +499,12 @@ export default function GoalsScreen() {
         ...prev,
         { role: "assistant", text: result.message, options: result.done ? [] : result.options },
       ]);
+      // Save name if returned by AI
+      if (result.name) {
+        const formatted = result.name.trim().replace(/\s+/g, " ").split(" ").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
+        AsyncStorage.setItem("@threely_nickname", formatted).catch(() => {});
+        supabase.auth.updateUser({ data: { display_name: formatted } }).catch(() => {});
+      }
       // Show text input when AI sends no options, hide when options are available
       if (!result.done && (!result.options || result.options.length === 0)) {
         setShowTypingInput(true);
@@ -516,8 +526,9 @@ export default function GoalsScreen() {
         console.warn("[goals chat]", msg);
         setChatHistory((prev) => [
           ...prev,
-          { role: "assistant", text: "Something went wrong. Please try again." },
+          { role: "assistant", text: "Something went wrong. Tap retry below to try again." },
         ]);
+        setChatError("retry_send");
       }
     } finally {
       setChatLoading(false);
@@ -1636,8 +1647,53 @@ export default function GoalsScreen() {
                 }}
               />
 
+              {/* Retry button after send failure */}
+              {chatError === "retry_send" && !chatLoading && (
+                <View style={[styles.chatFooter, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
+                  <TouchableOpacity
+                    style={styles.continueBtn}
+                    onPress={async () => {
+                      setChatError("");
+                      setChatHistory((prev) => prev.slice(0, -1));
+                      setChatLoading(true);
+                      try {
+                        const result = await chatWithRetry(chatMessages);
+                        const assistantMsg: GoalChatMessage = { role: "assistant", content: result.raw_reply };
+                        setChatMessages((prev) => [...prev, assistantMsg]);
+                        setChatHistory((prev) => [
+                          ...prev,
+                          { role: "assistant", text: result.message, options: result.done ? [] : result.options },
+                        ]);
+                        if (!result.done && (!result.options || result.options.length === 0)) {
+                          setShowTypingInput(true);
+                        } else {
+                          setShowTypingInput(false);
+                        }
+                        if (result.done) {
+                          setChatDone(true);
+                          setChatGoalText(result.goal_text);
+                          setShowTypingInput(false);
+                        }
+                      } catch (retryErr) {
+                        console.warn("[goals chat retry]", retryErr);
+                        setChatHistory((prev) => [
+                          ...prev,
+                          { role: "assistant", text: "Still having trouble. Please check your connection and try again." },
+                        ]);
+                        setChatError("retry_send");
+                      } finally {
+                        setChatLoading(false);
+                      }
+                    }}
+                    activeOpacity={0.85}
+                  >
+                    <Text style={styles.continueBtnText}>Retry</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+
               {/* Bottom: typing input */}
-              {showTypingInput && !chatDone && (
+              {showTypingInput && !chatDone && !chatError && (
                 <View style={[styles.chatFooter, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
                   <View style={styles.chatInputRow}>
                     <TextInput
