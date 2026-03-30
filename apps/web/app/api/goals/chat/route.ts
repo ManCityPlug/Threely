@@ -62,12 +62,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Rate limit exceeded. Try again later." }, { status: 429 });
   }
 
-  // Check if user already has a display name (skip name question if so)
+  // Check if user already has a real display name (skip name question if so)
+  // During onboarding, always ask — email-derived names don't count
   let userName: string | null = null;
-  try {
-    const { data } = await (await import("@/lib/supabase")).supabaseAdmin.auth.admin.getUserById(user.id);
-    userName = data?.user?.user_metadata?.display_name || data?.user?.user_metadata?.full_name || null;
-  } catch { /* ignore */ }
+  if (!onboarding) {
+    try {
+      const { data } = await (await import("@/lib/supabase")).supabaseAdmin.auth.admin.getUserById(user.id);
+      const name = data?.user?.user_metadata?.display_name || data?.user?.user_metadata?.full_name || null;
+      // Only use it if it looks like a real name (not an email prefix)
+      if (name && !name.includes("@") && !name.includes(".") && !/^\d+$/.test(name)) {
+        userName = name;
+      }
+    } catch { /* ignore */ }
+  }
 
   try {
     const result = await goalChat(messages, user.id, userName);
