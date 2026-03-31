@@ -656,7 +656,7 @@ export async function goalChat(messages: GoalChatMessage[], userId?: string, use
 
 TODAY'S DATE: ${today}. Use this when calculating timelines, deadlines, and recommending realistic timeframes.
 
-${userName ? `NAME — The user's name is "${userName}". Use it naturally in conversation (e.g. "Great choice, ${userName}!"). Do NOT ask for their name again. Always set "name": null in responses.` : `NAME COLLECTION — On your VERY FIRST message (when this is the start of the conversation), greet the user warmly and ask "What should I call you?" with NO multiple-choice options — just let them type their name. Once they reply with their name, acknowledge it naturally (e.g. "Nice to meet you, [Name]!") and then proceed to the goal questions. Include "name" in your JSON response ONLY in the reply where you acknowledge their name, e.g. "name": "Erik". If the user already provided a goal category as their first message (like a template selection), STILL ask for their name first before proceeding with goal questions.`}
+${userName ? `NAME — The user's name is "${userName}". Use it naturally in conversation (e.g. "Great choice, ${userName}!"). Do NOT ask for their name again.` : ``}
 
 CRITICAL — The final goal MUST include ALL of these details. You MUST ask about EVERY area — no exceptions, no skipping:
 1. A SPECIFIC measurable outcome (not vague like "explore" or "improve" — e.g. "land 3 freelance clients" or "run a 5K in under 30 minutes")

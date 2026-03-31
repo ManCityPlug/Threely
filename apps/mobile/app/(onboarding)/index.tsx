@@ -26,8 +26,8 @@ import { useTheme } from "@/lib/theme";
 import { GoalTemplates } from "@/components/GoalTemplates";
 import type { GoalCategory } from "@/constants/goal-templates";
 
-const TOTAL_STEPS = 2; // goal, AI chat (name asked in chat, deadline/time/workdays handled by AI)
-const FIRST_STEP = 2; // steps start at 2 (goal selection) — step 1 (name) was removed
+const TOTAL_STEPS = 3; // name, goal, AI chat
+const FIRST_STEP = 1;
 
 const WORK_DAY_PRESETS = [
   { label: "Every day", value: [1, 2, 3, 4, 5, 6, 7] },
@@ -103,10 +103,10 @@ export default function OnboardingScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const [step, setStep] = useState(2);
-  const progressAnim = useRef(new Animated.Value(1 / TOTAL_STEPS)).current; // starts at 50%
+  const [step, setStep] = useState(1);
+  const progressAnim = useRef(new Animated.Value(1 / TOTAL_STEPS)).current;
 
-  // Name (collected via AI chat, not a separate step)
+  // Step 1 — Name
   const [nameInput, setNameInput] = useState("");
 
   // Step 2 — Goal input (templates shown first, free text via "Something else")
@@ -178,9 +178,8 @@ export default function OnboardingScreen() {
 
   function advanceStep(nextStep: number) {
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const relativeProgress = Math.min((nextStep - FIRST_STEP + 1) / TOTAL_STEPS, 1);
     Animated.timing(progressAnim, {
-      toValue: relativeProgress,
+      toValue: nextStep / TOTAL_STEPS,
       duration: 300,
       useNativeDriver: false,
     }).start();
@@ -591,6 +590,38 @@ export default function OnboardingScreen() {
 
   // ─── Step renders ───────────────────────────────────────────────────────────
 
+  function renderStep1() {
+    return (
+      <View style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.stepScroll} keyboardShouldPersistTaps="handled">
+          <Text style={styles.stepTitle}>What should we call you?</Text>
+          <TextInput
+            style={styles.nameInput}
+            placeholder="Your first name"
+            placeholderTextColor={colors.textTertiary}
+            value={nameInput}
+            onChangeText={setNameInput}
+            autoCapitalize="words"
+            autoFocus
+            returnKeyType="done"
+            maxLength={30}
+          />
+        </ScrollView>
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={[styles.continueBtn, !nameInput.trim() && styles.continueBtnDisabled]}
+            onPress={() => nameInput.trim() && advanceStep(2)}
+            activeOpacity={nameInput.trim() ? 0.85 : 1}
+          >
+            <Text style={[styles.continueBtnText, !nameInput.trim() && styles.continueBtnTextDisabled]}>
+              Continue →
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  }
+
   function renderStep2() {
     // After parsing: show confirmation card
     if (showConfirmation) {
@@ -729,7 +760,7 @@ export default function OnboardingScreen() {
       <View style={{ flex: 1, paddingHorizontal: spacing.lg, paddingTop: spacing.sm }}>
         <GoalTemplates
           onSelect={handleCategorySelect}
-          onClose={() => {}}
+          onClose={() => advanceStep(1)}
           onOther={() => setShowFreeText(true)}
           closeLabel="‹ Back"
         />
@@ -1200,7 +1231,7 @@ export default function OnboardingScreen() {
       {/* Step counter — hidden when Step 2 shows templates (GoalTemplates has its own header) */}
       {!isMagicMoment && !(step === 2 && !showFreeText && !showConfirmation) && (
         <Text style={styles.stepCounter}>
-          Step {step - FIRST_STEP + 1} of {TOTAL_STEPS}
+          Step {step} of {TOTAL_STEPS}
         </Text>
       )}
 
@@ -1213,7 +1244,7 @@ export default function OnboardingScreen() {
         >
           <Text style={styles.backText}>‹ Back</Text>
         </TouchableOpacity>
-      ) : step > 2 && !isMagicMoment ? (
+      ) : step > 1 && !isMagicMoment && !(step === 2 && !showFreeText && !showConfirmation) ? (
         <TouchableOpacity
           style={styles.backBtn}
           onPress={() => {
@@ -1232,6 +1263,7 @@ export default function OnboardingScreen() {
 
       {/* Content */}
       <View style={{ flex: 1 }}>
+        {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}
         {step === 3 && !isMagicMoment && renderStep3()}
         {step === 4 && !isMagicMoment && renderStep4()}
