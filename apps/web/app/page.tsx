@@ -6,9 +6,8 @@ import { getSupabase } from "@/lib/supabase-client";
 
 const TESTIMONIALS = [
   { quote: "I told it I wanted to grow my Shopify store. Next morning my three tasks were: write 5 product descriptions with SEO keywords, set up an abandoned cart email, and research one competitor's pricing. Not vague 'grow your business' stuff — actual work I could finish before lunch.", author: "James R." },
-  { quote: "I've been trying to stay consistent at the gym for years. This app gave me 'do 3 sets of goblet squats at 25lbs' instead of 'work on legs.' I'm 60 days in and haven't skipped once.", author: "Melissa T." },
   { quote: "Running a small ecom brand is overwhelming. Threely breaks it down so I'm not staring at a massive to-do list anymore. Yesterday it had me A/B test my hero image, update shipping copy, and reply to 3 customer reviews. Stuff I'd normally put off for weeks.", author: "Daniel K." },
-  { quote: "I used to walk into the gym with no plan and just wing it. Now I wake up to exactly what I need to do — exercises, sets, rest times, everything. My bench went up 30lbs in two months and I actually look forward to going.", author: "Alyssa M." },
+  { quote: "I've been trying to stay consistent at the gym for years. This app gave me 'do 3 sets of goblet squats at 25lbs' instead of 'work on legs.' I'm 60 days in and haven't skipped once.", author: "Melissa T." },
 ];
 
 const FAQ = [
@@ -411,7 +410,7 @@ export default function LandingPage() {
         <div style={{
           maxWidth: 900, margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
+          gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
           gap: "1.25rem",
         }}>
           {TESTIMONIALS.map(t => (
