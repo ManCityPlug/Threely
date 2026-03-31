@@ -5,9 +5,9 @@ import Link from "next/link";
 import { getSupabase } from "@/lib/supabase-client";
 
 const TESTIMONIALS = [
-  { quote: "I knew I wanted to scale my Shopify store but had no idea where to start. Threely mapped the whole thing out for me — SEO, email flows, competitor research — in an order that actually made sense. I stopped guessing and just followed the path.", author: "James R." },
-  { quote: "I had a product and an audience but zero strategy. Threely gave me a real roadmap — not generic advice, an actual step-by-step plan for my brand. Two months in and my revenue is up 40% because I finally stopped doing random stuff.", author: "Daniel K." },
-  { quote: "I've wanted to get in shape for years but never knew what to actually do each day. Threely gave me a clear plan that builds on itself — not just workouts, but nutrition tips, recovery days, everything. I'm 60 days in and I've never been this consistent.", author: "Melissa T." },
+  { quote: "I had a shopify store just sitting there and no clue what to actually focus on. Threely laid out the whole game plan for me like SEO stuff, emails, what to fix first. honestly its the first time I felt like I knew what I was doing", author: "James R." },
+  { quote: "been running my brand for a year and still felt like I was winging it every day. this app literally gave me a step by step plan that made sense for where I was at. sales are up and I dont feel like im scrambling anymore", author: "Daniel K." },
+  { quote: "I always wanted to get in shape but id just show up to the gym and do random stuff. Threely actually mapped out what to do each day and it builds on itself so you see progress. two months in and I havent missed a day which is insane for me", author: "Melissa T." },
 ];
 
 const FAQ = [
