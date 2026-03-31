@@ -407,6 +407,9 @@ export default function LandingPage() {
 
       {/* ─── Testimonials ──────────────────────────────────────────────────────── */}
       <section style={{ padding: "3rem 1.5rem", background: "#fff" }}>
+        <div style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+          <span style={{ color: "#f5a623", fontSize: "1.6rem", letterSpacing: 3 }}>★★★★★</span>
+        </div>
         <div style={{
           maxWidth: 1100, margin: "0 auto",
           display: "grid",
