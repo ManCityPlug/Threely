@@ -408,7 +408,7 @@ export default function LandingPage() {
       {/* ─── Testimonials ──────────────────────────────────────────────────────── */}
       <section style={{ padding: "3rem 1.5rem", background: "#fff" }}>
         <div style={{
-          maxWidth: 900, margin: "0 auto",
+          maxWidth: 1100, margin: "0 auto",
           display: "grid",
           gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
           gap: "1.25rem",
