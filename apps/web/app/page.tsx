@@ -5,9 +5,10 @@ import Link from "next/link";
 import { getSupabase } from "@/lib/supabase-client";
 
 const TESTIMONIALS = [
-  { quote: "I said I wanted to learn guitar. Next morning it told me to practice the G-C-D chord switch for 10 minutes. Not 'learn chords' — the exact thing I needed.", author: "Sarah K." },
-  { quote: "Three tasks. That's it. I stopped overthinking and started doing. 47 days straight and counting.", author: "Marcus T." },
-  { quote: "I've tried every productivity app. This one doesn't give me a list — it gives me a plan that changes every day based on what I actually did.", author: "Priya R." },
+  { quote: "I told it I wanted to grow my Shopify store. Next morning my three tasks were: write 5 product descriptions with SEO keywords, set up an abandoned cart email, and research one competitor's pricing. Not vague 'grow your business' stuff — actual work I could finish before lunch.", author: "James R." },
+  { quote: "I've been trying to stay consistent at the gym for years. This app gave me 'do 3 sets of goblet squats at 25lbs' instead of 'work on legs.' I'm 60 days in and haven't skipped once.", author: "Melissa T." },
+  { quote: "Running a small ecom brand is overwhelming. Threely breaks it down so I'm not staring at a massive to-do list anymore. Yesterday it had me A/B test my hero image, update shipping copy, and reply to 3 customer reviews. Stuff I'd normally put off for weeks.", author: "Daniel K." },
+  { quote: "I used to walk into the gym with no plan and just wing it. Now I wake up to exactly what I need to do — exercises, sets, rest times, everything. My bench went up 30lbs in two months and I actually look forward to going.", author: "Alyssa M." },
 ];
 
 const FAQ = [
@@ -402,18 +403,6 @@ export default function LandingPage() {
             </>
           )}
 
-          {/* Social proof */}
-          <div style={{
-            marginTop: isMobile ? "1.25rem" : "2rem",
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-          }}>
-            <div style={{ color: "#f5a623", fontSize: "1.1rem", letterSpacing: 2 }}>
-              ★★★★★
-            </div>
-            <p style={{ fontSize: "0.85rem", color: "#8898aa", fontWeight: 500 }}>
-              Join 2,000+ people achieving their goals every day
-            </p>
-          </div>
         </div>
       </section>
 
@@ -422,7 +411,7 @@ export default function LandingPage() {
         <div style={{
           maxWidth: 900, margin: "0 auto",
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+          gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
           gap: "1.25rem",
         }}>
           {TESTIMONIALS.map(t => (
