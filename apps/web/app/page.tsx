@@ -59,6 +59,7 @@ export default function LandingPage() {
   const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [showGooglePopup, setShowGooglePopup] = useState(false);
 
   useEffect(() => {
     const ua = navigator.userAgent;
@@ -358,7 +359,7 @@ export default function LandingPage() {
               </div>
 
               <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-                <Link href="/" style={{
+                <Link href="https://apps.apple.com/us/app/threely/id6759625661" style={{
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                   padding: "14px 28px 14px 18px",
                   minWidth: 190,
@@ -378,7 +379,7 @@ export default function LandingPage() {
                     <span style={{ fontSize: "1.05rem" }}>App Store</span>
                   </span>
                 </Link>
-                <Link href="/" style={{
+                <button onClick={() => setShowGooglePopup(true)} style={{
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                   padding: "14px 28px 14px 18px",
                   minWidth: 190,
@@ -387,7 +388,7 @@ export default function LandingPage() {
                   borderRadius: 12,
                   fontSize: "0.95rem",
                   fontWeight: 600,
-                  textDecoration: "none",
+                  cursor: "pointer",
                   position: "relative" as const,
                   border: "1.5px solid rgba(10,37,64,0.25)",
                 }}>
@@ -397,7 +398,7 @@ export default function LandingPage() {
                     <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
                     <span style={{ fontSize: "1.05rem" }}>Google Play</span>
                   </span>
-                </Link>
+                </button>
               </div>
             </>
           )}
@@ -844,7 +845,7 @@ export default function LandingPage() {
             display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap",
           }}>
             {platform !== "android" && (
-              <Link href="/" style={{
+              <Link href="https://apps.apple.com/us/app/threely/id6759625661" style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
                 padding: "8px 16px",
                 background: "rgba(255,255,255,0.15)",
@@ -862,7 +863,7 @@ export default function LandingPage() {
               </Link>
             )}
             {platform !== "ios" && (
-              <Link href="/" style={{
+              <button onClick={() => setShowGooglePopup(true)} style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
                 padding: "8px 16px",
                 background: "rgba(255,255,255,0.15)",
@@ -871,13 +872,14 @@ export default function LandingPage() {
                 fontSize: "0.8rem",
                 fontWeight: 600,
                 border: "1px solid rgba(255,255,255,0.25)",
+                cursor: "pointer",
               }}>
                 <PlayIcon />
                 <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
                   <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
                   <span>Google Play</span>
                 </span>
-              </Link>
+              </button>
             )}
           </div>
         </div>
@@ -927,6 +929,39 @@ export default function LandingPage() {
           © {new Date().getFullYear()} Threely. All rights reserved.
         </p>
       </footer>
+
+      {/* Google Play Coming Soon Popup */}
+      {showGooglePopup && (
+        <div onClick={() => setShowGooglePopup(false)} style={{
+          position: "fixed", inset: 0, zIndex: 9999,
+          background: "rgba(0,0,0,0.5)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          padding: 20,
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: "#fff", borderRadius: 16, padding: "2rem",
+            maxWidth: 420, width: "100%", textAlign: "center",
+            boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
+          }}>
+            <div style={{ fontSize: "2rem", marginBottom: 12 }}>
+              <PlayIcon />
+            </div>
+            <h3 style={{ margin: "0 0 8px", fontSize: "1.2rem", color: "#0a2540" }}>
+              Coming Soon to Google Play
+            </h3>
+            <p style={{ margin: "0 0 20px", fontSize: "0.9rem", color: "#556677", lineHeight: 1.6 }}>
+              Threely for Android is currently in development. In the meantime, you can access the full experience through our mobile web app at <strong>threely.co</strong>.
+            </p>
+            <button onClick={() => setShowGooglePopup(false)} style={{
+              background: "#635bff", color: "#fff", border: "none",
+              borderRadius: 10, padding: "10px 28px",
+              fontSize: "0.9rem", fontWeight: 600, cursor: "pointer",
+            }}>
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
