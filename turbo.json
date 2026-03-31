@@ -1,7 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
-  "globalPassThroughEnv": ["*"],
+  "globalEnv": ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY", "SUPABASE_SERVICE_ROLE_KEY", "DATABASE_URL", "DIRECT_URL", "ANTHROPIC_API_KEY", "STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY", "REVENUECAT_SECRET_KEY", "REVENUECAT_WEBHOOK_SECRET", "NEXT_PUBLIC_SENTRY_DSN", "RESEND_API_KEY", "ADMIN_EMAIL", "ADMIN_PASSWORD", "ADMIN_JWT_SECRET"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
