@@ -632,7 +632,7 @@ export default function AdminUserDetailPage() {
             {cancelLoading ? "Cancelling..." : "Cancel Plan"}
           </button>
         )}
-        {subscription.stripeCustomerId && getRefundEligibility(subscription).label.startsWith("Eligible") && (
+        {subscription.stripeCustomerId && (
           <button
             onClick={async () => {
               if (!confirm("Issue a full refund and cancel subscription immediately? A confirmation email will be sent.")) return;
@@ -672,7 +672,7 @@ export default function AdminUserDetailPage() {
             {refundLoading ? "Refunding..." : "Issue Refund & Notify"}
           </button>
         )}
-        {subscription.stripeCustomerId && getRefundEligibility(subscription).label === "Not Eligible" && (
+        {subscription.stripeCustomerId && (
           <button
             onClick={async () => {
               if (!confirm(`Send refund denial email to ${user.email}?`)) return;
