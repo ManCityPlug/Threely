@@ -55,10 +55,10 @@ export async function POST(
     cancel_at_period_end: true,
   });
 
-  // Update DB
+  // Update DB — clear subscriptionId so webhook events can't re-activate
   await prisma.user.update({
     where: { id },
-    data: { subscriptionStatus: "canceled" },
+    data: { subscriptionStatus: "canceled", subscriptionId: null },
   });
 
   return NextResponse.json({

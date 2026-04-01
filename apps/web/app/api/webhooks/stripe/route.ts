@@ -33,11 +33,17 @@ export async function POST(request: NextRequest) {
         const sub = event.data.object as Stripe.Subscription;
         const customerId = typeof sub.customer === "string" ? sub.customer : sub.customer?.id;
 
-        // Sync subscription status
-        await prisma.user.updateMany({
-          where: { subscriptionId: sub.id },
-          data: { subscriptionStatus: sub.status },
-        });
+        // Don't overwrite "canceled" with "active" — this happens when admin
+        // refunds/cancels and Stripe fires an update event before the delete event
+        const existingUser = await prisma.user.findFirst({ where: { subscriptionId: sub.id } });
+        const skipStatusSync = existingUser?.subscriptionStatus === "canceled" && sub.status === "active" && sub.cancel_at_period_end;
+
+        if (!skipStatusSync) {
+          await prisma.user.updateMany({
+            where: { subscriptionId: sub.id },
+            data: { subscriptionStatus: sub.status },
+          });
+        }
 
         // Also persist stripeCustomerId if missing (backfill)
         if (customerId) {
