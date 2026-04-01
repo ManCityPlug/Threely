@@ -1085,8 +1085,8 @@ export default function ProfileScreen() {
       {pwSheetOpen && (
         <Modal visible transparent animationType="slide" onRequestClose={() => setPwSheetOpen(false)}>
           <KeyboardAvoidingView style={{ flex: 1, justifyContent: "flex-end" }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
-            <Pressable style={styles.overlay} onPress={() => setPwSheetOpen(false)} />
-            <View style={styles.sheet}>
+            <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setPwSheetOpen(false)}>
+              <TouchableOpacity activeOpacity={1} style={styles.sheet} onPress={() => {}}>
               <View style={styles.handle} />
               <Text style={styles.sheetTitle}>
                 {authProvider === "email" ? "Change password" : "Set a password"}
@@ -1177,7 +1177,8 @@ export default function ProfileScreen() {
                   )}
                 </TouchableOpacity>
               </View>
-            </View>
+            </TouchableOpacity>
+            </TouchableOpacity>
           </KeyboardAvoidingView>
         </Modal>
       )}
