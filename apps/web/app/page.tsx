@@ -359,7 +359,7 @@ export default function LandingPage() {
               </div>
 
               <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-                <Link href="https://apps.apple.com/us/app/threely/id6759625661" style={{
+                <Link href="https://apps.apple.com/us/app/threely/id6759625661" target="_blank" rel="noopener noreferrer" style={{
                   display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                   padding: "14px 28px 14px 18px",
                   minWidth: 190,
@@ -845,7 +845,7 @@ export default function LandingPage() {
             display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap",
           }}>
             {platform !== "android" && (
-              <Link href="https://apps.apple.com/us/app/threely/id6759625661" style={{
+              <Link href="https://apps.apple.com/us/app/threely/id6759625661" target="_blank" rel="noopener noreferrer" style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
                 padding: "8px 16px",
                 background: "rgba(255,255,255,0.15)",
