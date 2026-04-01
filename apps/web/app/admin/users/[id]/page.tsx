@@ -632,7 +632,7 @@ export default function AdminUserDetailPage() {
             {cancelLoading ? "Cancelling..." : "Cancel Plan"}
           </button>
         )}
-        {subscription.stripeCustomerId && getRefundEligibility(subscription).label.includes("Eligible") && (
+        {subscription.stripeCustomerId && getRefundEligibility(subscription).label.startsWith("Eligible") && (
           <button
             onClick={async () => {
               if (!confirm("Issue a full refund and cancel subscription immediately? A confirmation email will be sent.")) return;
