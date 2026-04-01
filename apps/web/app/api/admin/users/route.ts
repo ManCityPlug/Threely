@@ -11,21 +11,27 @@ export async function GET(request: NextRequest) {
   }
 
   const q = request.nextUrl.searchParams.get("q") || "";
-  if (!q || q.length < 2) {
-    return NextResponse.json({ users: [] });
-  }
+  const page = parseInt(request.nextUrl.searchParams.get("page") || "1", 10);
+  const limit = 30;
+  const skip = (page - 1) * limit;
 
-  const users = await prisma.user.findMany({
-    where: {
-      email: { contains: q, mode: "insensitive" },
-    },
-    take: 20,
-    orderBy: { createdAt: "desc" },
-    include: {
-      profile: { select: { dailyTimeMinutes: true, intensityLevel: true } },
-      _count: { select: { goals: true, dailyTasks: true } },
-    },
-  });
+  const where = q.length >= 2
+    ? { email: { contains: q, mode: "insensitive" as const } }
+    : {};
+
+  const [users, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      take: limit,
+      skip,
+      orderBy: { createdAt: "desc" },
+      include: {
+        profile: { select: { dailyTimeMinutes: true, intensityLevel: true } },
+        _count: { select: { goals: true, dailyTasks: true } },
+      },
+    }),
+    prisma.user.count({ where }),
+  ]);
 
   return NextResponse.json({
     users: users.map((u) => ({
@@ -37,5 +43,8 @@ export async function GET(request: NextRequest) {
       taskCount: u._count.dailyTasks,
       profile: u.profile,
     })),
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
   });
 }
