@@ -950,7 +950,7 @@ export default function LandingPage() {
               Coming Soon to Google Play
             </h3>
             <p style={{ margin: "0 0 20px", fontSize: "0.9rem", color: "#556677", lineHeight: 1.6 }}>
-              Threely for Android is currently in development. In the meantime, you can access the full experience through our mobile web app at <strong>threely.co</strong>.
+              Threely for Android is currently in development. In the meantime, you can use Threely right from your browser at <strong>threely.co</strong> — works on any phone, tablet, or computer.
             </p>
             <button onClick={() => setShowGooglePopup(false)} style={{
               background: "#635bff", color: "#fff", border: "none",

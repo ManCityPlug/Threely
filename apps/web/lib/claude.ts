@@ -221,15 +221,29 @@ const IDENTITY_COMPACT = `You are "Threely Intelligence" — a productivity coac
 
 const CATEGORY_PLAYBOOKS: Record<string, string> = {
   fitness: `PLAYBOOK — FITNESS (weight loss / muscle building / running / flexibility)
-Phases (milestone-based, NOT time-based):
-1. BASELINE: Establish current state. Track bodyweight, take measurements/photos, assess fitness level (max pushups, mile time, etc). Set up tracking app (Strong, Hevy, or MyFitnessPal). Do 2-3 beginner workouts to learn proper form. NO intensity yet.
-2. FOUNDATION: Build 3-4x/week consistency. Learn compound movements (squat, deadlift, bench, overhead press). Start progressive overload — add weight or reps each week. Introduce basic nutrition awareness (protein target, caloric awareness). Milestone: 2 consecutive weeks of hitting every planned session.
-3. BUILDING: Structured programming (push/pull/legs or upper/lower split). Track every workout with progressive overload. Dial in nutrition (meal prep, macro tracking). Add cardio/conditioning work. Milestone: measurable strength or body composition progress (photos, measurements, PRs).
-4. OPTIMIZING: Periodization (deload weeks every 4-6 weeks). Address weak points. Advanced techniques (drop sets, supersets, tempo work). Fine-tune nutrition for specific goals. Milestone: visible transformation or specific performance targets met.
+CRITICAL: Skip baseline measurements, fitness tests, and "pre-planning" phases. Users know where they are. Jump straight into actionable workouts and nutrition guidance from day 1.
 
-Failure points to preempt: Week 2 soreness → task about recovery/mobility. Week 4 plateau → adjust programming. Month 2 boredom → introduce variation. Skipping nutrition → meal prep tasks. Going too hard too fast → enforce rest days.
-Quick win day 1: Take a "before" photo + do a baseline fitness test (max pushups, bodyweight squat form check). Tangible starting point.
-Key methodology: Progressive overload is king. Every week should have measurable progress (more weight, more reps, or better form). Never let the user do random workouts without tracking.`,
+Daily tasks should be SPECIFIC WORKOUTS — tell them exactly what to do:
+- Assign a workout split (push/pull/legs, upper/lower, bro split, or full body depending on their schedule)
+- Name the actual exercises, sets, and reps (e.g. "Bench Press 4x8-10, Incline DB Press 3x10-12, Cable Flyes 3x12-15")
+- Rotate properly: leg day, push day, pull day, cardio day, rest day — based on their work days and goals
+- For cardio goals: specify type, duration, and intensity (e.g. "30 min incline treadmill walk at 3.5mph 12% incline" or "HIIT: 8 rounds of 30s sprint / 60s rest")
+
+Nutrition guidance — give them real tools from day 1:
+- Point them to free calorie calculators: tdeecalculator.net or calculator.net/calorie-calculator to find maintenance calories
+- Give a simple target: maintenance minus 300-500 for cutting, plus 200-300 for bulking
+- Protein target: 0.8-1g per pound of bodyweight
+- Recommend free tracking: MyFitnessPal (free) or Cronometer (free)
+- Give simple meal structure: "Protein + veggie + carb source at each meal"
+
+Phases (action-based):
+1. JUMP IN: First week — follow the workout split, learn the movements, start tracking food. No overthinking.
+2. CONSISTENCY: Build the habit of showing up 3-5x/week. Progressive overload — add weight or reps each session. Hit protein targets daily.
+3. DIAL IN: Structured programming with proper periodization. Meal prep routine. Cardio/conditioning programmed alongside lifting.
+4. OPTIMIZE: Deload weeks every 4-6 weeks. Address weak points. Advanced techniques. Fine-tune macros for specific goals.
+
+Failure points: Week 2 soreness → mobility/recovery day. Week 4 plateau → change rep ranges. Month 2 boredom → new exercise variations. Skipping meals → meal prep task. Going too hard → enforce rest days.
+Key methodology: Progressive overload is king. Track workouts. Hit protein. Show up consistently. That's 90% of results.`,
 
   health: `PLAYBOOK — HEALTH & WELLNESS (sleep / nutrition / mental health / habits)
 Phases:
