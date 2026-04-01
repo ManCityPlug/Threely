@@ -13,8 +13,11 @@ interface UserResult {
   profile: { dailyTimeMinutes: number; intensityLevel: number } | null;
 }
 
+type Tab = "all" | "paying";
+
 export default function AdminUsersPage() {
   const router = useRouter();
+  const [tab, setTab] = useState<Tab>("all");
   const [query, setQuery] = useState("");
   const [users, setUsers] = useState<UserResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,10 +30,12 @@ export default function AdminUsersPage() {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  const fetchUsers = useCallback(async (p: number, q?: string) => {
+  const fetchUsers = useCallback(async (p: number, q?: string, t?: Tab) => {
     setLoading(true);
+    const activeTab = t ?? tab;
     const params = new URLSearchParams({ page: String(p) });
     if (q && q.length >= 2) params.set("q", q);
+    if (activeTab === "paying") params.set("filter", "paying");
     const res = await fetch(`/api/admin/users?${params}`);
     const data = await res.json();
     setUsers(data.users || []);
@@ -38,12 +43,12 @@ export default function AdminUsersPage() {
     setTotalPages(data.totalPages || 1);
     setPage(data.page || 1);
     setLoading(false);
-  }, []);
+  }, [tab]);
 
-  // Load all users on mount
+  // Load users on mount and tab change
   useEffect(() => {
-    fetchUsers(1);
-  }, [fetchUsers]);
+    fetchUsers(1, query.length >= 2 ? query : undefined, tab);
+  }, [tab]);
 
   // Search suggestions as user types
   useEffect(() => {
@@ -54,7 +59,9 @@ export default function AdminUsersPage() {
       return;
     }
     debounceRef.current = setTimeout(() => {
-      fetch(`/api/admin/users?q=${encodeURIComponent(query)}`)
+      const params = new URLSearchParams({ q: query });
+      if (tab === "paying") params.set("filter", "paying");
+      fetch(`/api/admin/users?${params}`)
         .then((r) => r.json())
         .then((data) => {
           setSuggestions(data.users || []);
@@ -62,7 +69,7 @@ export default function AdminUsersPage() {
           setHighlightIdx(-1);
         });
     }, 300);
-  }, [query]);
+  }, [query, tab]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -85,7 +92,7 @@ export default function AdminUsersPage() {
     setQuery("");
     setSuggestions([]);
     setShowDropdown(false);
-    fetchUsers(1);
+    fetchUsers(1, undefined);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -123,6 +130,23 @@ export default function AdminUsersPage() {
     );
   };
 
+  const getBadge = (status: string | null) => {
+    if (status === "active") return { label: "Pro", bg: "#052e16", color: "#4ade80" };
+    if (status === "trialing") return { label: "Trial", bg: "#1e1b4b", color: "#a78bfa" };
+    return null;
+  };
+
+  const tabStyle = (t: Tab) => ({
+    padding: "6px 16px",
+    background: tab === t ? "#27272a" : "transparent",
+    border: tab === t ? "1px solid #3f3f46" : "1px solid transparent",
+    borderRadius: 8,
+    color: tab === t ? "#fff" : "#71717a",
+    fontSize: "0.85rem",
+    fontWeight: 600 as const,
+    cursor: "pointer" as const,
+  });
+
   return (
     <div style={{ maxWidth: 1100 }}>
       <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginBottom: "0.25rem" }}>
@@ -130,12 +154,15 @@ export default function AdminUsersPage() {
           Users
         </h1>
         <span style={{ fontSize: "0.85rem", color: "#52525b" }}>
-          {total} total
+          {total} {tab === "paying" ? "subscribers" : "total"}
         </span>
       </div>
-      <p style={{ fontSize: "0.85rem", color: "#71717a", marginBottom: "1.5rem" }}>
-        All registered users &middot; 30 per page
-      </p>
+
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: 6, marginBottom: "1.25rem" }}>
+        <button onClick={() => setTab("all")} style={tabStyle("all")}>All Users</button>
+        <button onClick={() => setTab("paying")} style={tabStyle("paying")}>Paying &amp; Trial</button>
+      </div>
 
       {/* Search input with dropdown */}
       <div ref={wrapperRef} style={{ position: "relative", maxWidth: 400, marginBottom: "1.5rem" }}>
@@ -215,23 +242,18 @@ export default function AdminUsersPage() {
                   fontSize: "0.85rem",
                 }}
               >
-                <span>{highlightMatch(u.email)}</span>
-                {u.subscriptionStatus && (
-                  <span
-                    style={{
-                      padding: "1px 6px",
-                      borderRadius: 4,
-                      fontSize: "0.7rem",
-                      fontWeight: 600,
-                      background: u.subscriptionStatus === "active" ? "#052e16" : u.subscriptionStatus === "trialing" ? "#1e1b4b" : "#27272a",
-                      color: u.subscriptionStatus === "active" ? "#4ade80" : u.subscriptionStatus === "trialing" ? "#a78bfa" : "#71717a",
-                      flexShrink: 0,
-                      marginLeft: 8,
-                    }}
-                  >
-                    {u.subscriptionStatus}
-                  </span>
-                )}
+                <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {highlightMatch(u.email)}
+                  {getBadge(u.subscriptionStatus) && (
+                    <span style={{
+                      padding: "1px 6px", borderRadius: 4, fontSize: "0.65rem", fontWeight: 700,
+                      background: getBadge(u.subscriptionStatus)!.bg,
+                      color: getBadge(u.subscriptionStatus)!.color,
+                    }}>
+                      {getBadge(u.subscriptionStatus)!.label}
+                    </span>
+                  )}
+                </span>
               </button>
             ))}
             <div style={{ padding: "0.4rem 0.75rem", fontSize: "0.75rem", color: "#52525b", borderTop: "1px solid #27272a" }}>
@@ -259,7 +281,7 @@ export default function AdminUsersPage() {
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
               <thead>
                 <tr style={{ borderBottom: "1px solid #27272a" }}>
-                  {["Email", "Goals", "Tasks", "Subscription", "Joined", ""].map((h) => (
+                  {["Email", "Status", "Goals", "Tasks", "Joined", ""].map((h) => (
                     <th
                       key={h}
                       style={{
@@ -276,50 +298,65 @@ export default function AdminUsersPage() {
                 </tr>
               </thead>
               <tbody>
-                {users.map((u) => (
-                  <tr
-                    key={u.id}
-                    onClick={() => router.push(`/admin/users/${u.id}`)}
-                    style={{ borderBottom: "1px solid #1e1e21", cursor: "pointer" }}
-                  >
-                    <td style={{ padding: "0.65rem 1rem", color: "#e4e4e7" }}>{u.email}</td>
-                    <td style={{ padding: "0.65rem 1rem", color: "#a1a1aa" }}>{u.goalCount}</td>
-                    <td style={{ padding: "0.65rem 1rem", color: "#a1a1aa" }}>{u.taskCount}</td>
-                    <td style={{ padding: "0.65rem 1rem" }}>
-                      <span
-                        style={{
-                          padding: "2px 8px",
-                          borderRadius: 6,
-                          fontSize: "0.75rem",
-                          fontWeight: 600,
-                          background: u.subscriptionStatus === "active" ? "#052e16" : u.subscriptionStatus === "trialing" ? "#1e1b4b" : "#27272a",
-                          color: u.subscriptionStatus === "active" ? "#4ade80" : u.subscriptionStatus === "trialing" ? "#a78bfa" : "#71717a",
-                        }}
-                      >
-                        {u.subscriptionStatus || "none"}
-                      </span>
-                    </td>
-                    <td style={{ padding: "0.65rem 1rem", color: "#71717a" }}>
-                      {new Date(u.createdAt).toLocaleDateString()}
-                    </td>
-                    <td style={{ padding: "0.65rem 1rem" }}>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); router.push(`/admin/users/${u.id}`); }}
-                        style={{
-                          padding: "4px 12px",
-                          background: "#27272a",
-                          border: "1px solid #3f3f46",
-                          borderRadius: 6,
-                          color: "#e4e4e7",
-                          fontSize: "0.8rem",
-                          cursor: "pointer",
-                        }}
-                      >
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {users.map((u) => {
+                  const badge = getBadge(u.subscriptionStatus);
+                  return (
+                    <tr
+                      key={u.id}
+                      onClick={() => router.push(`/admin/users/${u.id}`)}
+                      style={{ borderBottom: "1px solid #1e1e21", cursor: "pointer" }}
+                    >
+                      <td style={{ padding: "0.65rem 1rem", color: "#e4e4e7" }}>
+                        <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          {u.email}
+                          {badge && (
+                            <span style={{
+                              padding: "2px 8px", borderRadius: 6, fontSize: "0.7rem", fontWeight: 700,
+                              background: badge.bg, color: badge.color,
+                            }}>
+                              {badge.label}
+                            </span>
+                          )}
+                        </span>
+                      </td>
+                      <td style={{ padding: "0.65rem 1rem" }}>
+                        <span
+                          style={{
+                            padding: "2px 8px",
+                            borderRadius: 6,
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                            background: u.subscriptionStatus === "active" ? "#052e16" : u.subscriptionStatus === "trialing" ? "#1e1b4b" : "#27272a",
+                            color: u.subscriptionStatus === "active" ? "#4ade80" : u.subscriptionStatus === "trialing" ? "#a78bfa" : "#71717a",
+                          }}
+                        >
+                          {u.subscriptionStatus || "free"}
+                        </span>
+                      </td>
+                      <td style={{ padding: "0.65rem 1rem", color: "#a1a1aa" }}>{u.goalCount}</td>
+                      <td style={{ padding: "0.65rem 1rem", color: "#a1a1aa" }}>{u.taskCount}</td>
+                      <td style={{ padding: "0.65rem 1rem", color: "#71717a" }}>
+                        {new Date(u.createdAt).toLocaleDateString()}
+                      </td>
+                      <td style={{ padding: "0.65rem 1rem" }}>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); router.push(`/admin/users/${u.id}`); }}
+                          style={{
+                            padding: "4px 12px",
+                            background: "#27272a",
+                            border: "1px solid #3f3f46",
+                            borderRadius: 6,
+                            color: "#e4e4e7",
+                            fontSize: "0.8rem",
+                            cursor: "pointer",
+                          }}
+                        >
+                          View
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

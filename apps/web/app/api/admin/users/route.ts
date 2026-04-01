@@ -11,13 +11,18 @@ export async function GET(request: NextRequest) {
   }
 
   const q = request.nextUrl.searchParams.get("q") || "";
+  const filter = request.nextUrl.searchParams.get("filter") || "";
   const page = parseInt(request.nextUrl.searchParams.get("page") || "1", 10);
   const limit = 30;
   const skip = (page - 1) * limit;
 
-  const where = q.length >= 2
-    ? { email: { contains: q, mode: "insensitive" as const } }
-    : {};
+  const where: Record<string, unknown> = {};
+  if (q.length >= 2) {
+    where.email = { contains: q, mode: "insensitive" };
+  }
+  if (filter === "paying") {
+    where.subscriptionStatus = { in: ["active", "trialing"] };
+  }
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
