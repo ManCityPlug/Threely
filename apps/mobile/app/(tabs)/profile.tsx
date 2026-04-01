@@ -1487,6 +1487,7 @@ function createStyles(c: Colors) {
       maxWidth: 600,
       alignSelf: "center" as const,
       width: "100%",
+      zIndex: 200,
       ...shadow.lg,
     },
     handle: {

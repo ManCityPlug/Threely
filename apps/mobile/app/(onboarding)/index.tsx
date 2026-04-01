@@ -109,11 +109,28 @@ export default function OnboardingScreen() {
   // Step 1 — Name
   const [nameInput, setNameInput] = useState("");
 
-  // Check if we already have a name (e.g. from Apple Sign In) — skip name step if so
+  // Check if we already have a name — skip name step entirely for Apple Sign In
+  // or any user who already has a name stored
   useEffect(() => {
     (async () => {
       try {
-        // Check AsyncStorage first
+        const { data: { user } } = await supabase.auth.getUser();
+        const meta = user?.user_metadata;
+        const provider = user?.app_metadata?.provider;
+
+        // Apple Sign In — always skip name step (Apple provides it via credential)
+        if (provider === "apple") {
+          const appleName = meta?.display_name || meta?.full_name || meta?.name || "";
+          if (appleName) {
+            setNameInput(appleName);
+            await AsyncStorage.setItem("@threely_nickname", appleName);
+          }
+          setStep(2);
+          Animated.timing(progressAnim, { toValue: 2 / TOTAL_STEPS, duration: 0, useNativeDriver: false }).start();
+          return;
+        }
+
+        // Other providers — check if name already exists
         const saved = await AsyncStorage.getItem("@threely_nickname");
         if (saved) {
           setNameInput(saved);
@@ -121,9 +138,6 @@ export default function OnboardingScreen() {
           Animated.timing(progressAnim, { toValue: 2 / TOTAL_STEPS, duration: 0, useNativeDriver: false }).start();
           return;
         }
-        // Check Supabase user metadata
-        const { data: { user } } = await supabase.auth.getUser();
-        const meta = user?.user_metadata;
         const metaName = meta?.display_name || meta?.full_name || meta?.name;
         if (metaName && !metaName.includes("@") && !metaName.includes(".")) {
           setNameInput(metaName);
