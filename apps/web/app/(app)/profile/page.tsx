@@ -143,8 +143,16 @@ export default function ProfilePage() {
   const [pwLoading, setPwLoading] = useState(false);
   const [pwError, setPwError] = useState("");
   const [pwSuccess, setPwSuccess] = useState(false);
-  const isOAuthUser = user?.app_metadata?.provider === "google" || user?.app_metadata?.provider === "apple";
+  const isOAuthProvider = user?.app_metadata?.provider === "google" || user?.app_metadata?.provider === "apple";
   const providerName = user?.app_metadata?.provider === "google" ? "Google" : user?.app_metadata?.provider === "apple" ? "Apple" : "";
+  const [hasPassword, setHasPassword] = useState(!isOAuthProvider);
+  // Check localStorage for password-set flag (persists after OAuth user sets a password)
+  useEffect(() => {
+    if (isOAuthProvider && typeof window !== "undefined") {
+      const pwSet = localStorage.getItem("threely_password_set");
+      if (pwSet === "true") setHasPassword(true);
+    }
+  }, [isOAuthProvider]);
   const [showWeeklySummary, setShowWeeklySummary] = useState(false);
   const [weeklyStatus, setWeeklyStatus] = useState<WeeklySummaryStatus | null>(null);
   const [weeklyFrozenData, setWeeklyFrozenData] = useState<WeeklySummaryType | null>(null);
@@ -832,12 +840,12 @@ export default function ProfilePage() {
             {/* Change password */}
             <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
               <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-                {isOAuthUser ? "Set a password" : "Change password"}
+                {!hasPassword ? "Set a password" : "Change password"}
               </h3>
               {!showChangePassword ? (
                 <div>
                   <p style={{ fontSize: "0.825rem", color: "var(--subtext)", marginBottom: 12 }}>
-                    {isOAuthUser
+                    {!hasPassword
                       ? `You signed in with ${providerName}. Set a password to also sign in with email.`
                       : "Update the password you use to sign in."}
                   </p>
@@ -846,21 +854,21 @@ export default function ProfilePage() {
                     onClick={() => setShowChangePassword(true)}
                     style={{ fontSize: "0.825rem" }}
                   >
-                    {isOAuthUser ? "Set password" : "Change password"}
+                    {!hasPassword ? "Set password" : "Change password"}
                   </button>
                 </div>
               ) : (
                 <form onSubmit={async (e) => {
                   e.preventDefault();
                   setPwError("");
-                  if (!isOAuthUser && !currentPw.trim()) { setPwError("Enter your current password."); return; }
+                  if (hasPassword && !currentPw.trim()) { setPwError("Enter your current password."); return; }
                   if (newPw.length < 8) { setPwError("New password must be at least 8 characters."); return; }
                   if (newPw !== confirmPw) { setPwError("New passwords do not match."); return; }
                   setPwLoading(true);
                   try {
                     const supabase = getSupabase();
                     // Only verify current password for email users
-                    if (!isOAuthUser) {
+                    if (hasPassword) {
                       const { error: signInErr } = await supabase.auth.signInWithPassword({
                         email: user?.email ?? "",
                         password: currentPw,
@@ -870,6 +878,10 @@ export default function ProfilePage() {
                     // Update/set password
                     const { error: updateErr } = await supabase.auth.updateUser({ password: newPw });
                     if (updateErr) { setPwError(updateErr.message); setPwLoading(false); return; }
+                    if (!hasPassword) {
+                      localStorage.setItem("threely_password_set", "true");
+                      setHasPassword(true);
+                    }
                     setPwSuccess(true);
                     setCurrentPw(""); setNewPw(""); setConfirmPw("");
                     setTimeout(() => { setPwSuccess(false); setShowChangePassword(false); }, 2000);
@@ -879,7 +891,7 @@ export default function ProfilePage() {
                     setPwLoading(false);
                   }
                 }} style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: 8 }}>
-                  {!isOAuthUser && (
+                  {hasPassword && (
                     <div>
                       <label className="field-label">Current password</label>
                       <input
@@ -925,7 +937,7 @@ export default function ProfilePage() {
                     <div style={{
                       background: "var(--success-light)", color: "var(--success)",
                       padding: "0.5rem 0.75rem", borderRadius: "var(--radius)", fontSize: "0.825rem",
-                    }}>{isOAuthUser ? "Password set! You can now sign in with email too." : "Password updated successfully!"}</div>
+                    }}>{!hasPassword ? "Password set! You can now sign in with email too." : "Password updated successfully!"}</div>
                   )}
                   <div style={{ display: "flex", gap: 8 }}>
                     <button

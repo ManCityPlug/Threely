@@ -231,6 +231,7 @@ export default function ProfileScreen() {
   const [showNewPw, setShowNewPw] = useState(false);
   const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [authProvider, setAuthProvider] = useState<"email" | "google" | "apple" | "other">("email");
+  const [hasPassword, setHasPassword] = useState(true);
 
   // In-app notifications — shared context (synced with tab badge)
   const { notifications: appNotifications, unreadCount: notifUnreadCount, refresh: refreshNotifications, dismiss: dismissNotification } = useNotifications();
@@ -254,6 +255,9 @@ export default function ProfileScreen() {
         else if (provider === "apple") setAuthProvider("apple");
         else if (provider === "email") setAuthProvider("email");
         else setAuthProvider("other");
+        // Check if user has set a password (social login users may have set one later)
+        const pwSet = await AsyncStorage.getItem("@threely_password_set");
+        setHasPassword(provider === "email" || pwSet === "true");
       }
       setStats(statsRes);
       setNotifPref(notifRes);
@@ -1090,15 +1094,15 @@ export default function ProfileScreen() {
           <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
             <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center", padding: spacing.xl }} keyboardShouldPersistTaps="handled">
               <Text style={[styles.sheetTitle, { textAlign: "center", marginBottom: spacing.xs }]}>
-                {authProvider === "email" ? "Change password" : "Set a password"}
+                {hasPassword ? "Change password" : "Set a password"}
               </Text>
               <Text style={[styles.sheetSubtitle, { textAlign: "center", marginBottom: spacing.lg }]}>
-                {authProvider === "email"
+                {hasPassword
                   ? "Enter your current password and choose a new one."
                   : `You signed in with ${authProvider === "google" ? "Google" : authProvider === "apple" ? "Apple" : "a social account"}. Set a password to also sign in with email.`}
               </Text>
 
-              {authProvider === "email" && (
+              {hasPassword && (
                 <View style={styles.pwInputRow}>
                   <TextInput
                     style={[styles.pwInput, { flex: 1, marginBottom: 0 }, pwError && currentPw === "" ? { borderColor: colors.danger } : {}]}
@@ -1161,12 +1165,12 @@ export default function ProfileScreen() {
                   style={[styles.pwBtn, { backgroundColor: colors.primary }, pwLoading && { opacity: 0.6 }]}
                   onPress={async () => {
                     setPwError("");
-                    if (authProvider === "email" && !currentPw.trim()) { setPwError("Enter your current password."); return; }
+                    if (hasPassword && !currentPw.trim()) { setPwError("Enter your current password."); return; }
                     if (newPw.length < 8) { setPwError("New password must be at least 8 characters."); return; }
                     if (newPw !== confirmPw) { setPwError("New passwords do not match."); return; }
                     setPwLoading(true);
                     try {
-                      if (authProvider === "email") {
+                      if (hasPassword) {
                         const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password: currentPw });
                         if (signInErr) { setPwError("Current password is incorrect."); setPwLoading(false); return; }
                       }
@@ -1174,7 +1178,12 @@ export default function ProfileScreen() {
                       if (updateErr) { setPwError(updateErr.message); setPwLoading(false); return; }
                       setPwSheetOpen(false);
                       setCurrentPw(""); setNewPw(""); setConfirmPw(""); setPwError("");
-                      Alert.alert("Success", authProvider === "email" ? "Your password has been updated." : "Password set! You can now sign in with email and password too.");
+                      // Mark password as set for future sessions
+                      if (!hasPassword) {
+                        await AsyncStorage.setItem("@threely_password_set", "true");
+                        setHasPassword(true);
+                      }
+                      Alert.alert("Success", hasPassword ? "Your password has been updated." : "Password set! You can now sign in with email and password too.");
                     } catch {
                       setPwError("Something went wrong. Please try again.");
                     } finally {
