@@ -1084,17 +1084,15 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       )}
 
-      {/* ── Change Password Sheet ──────────────────────────────────────────────── */}
+      {/* ── Change Password Modal (full screen) ─────────────────────────────────── */}
       {pwSheetOpen && (
-        <Modal visible transparent animationType="slide" onRequestClose={() => setPwSheetOpen(false)}>
-          <KeyboardAvoidingView style={{ flex: 1, justifyContent: "flex-end" }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}>
-            <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setPwSheetOpen(false)}>
-              <TouchableOpacity activeOpacity={1} style={styles.sheet} onPress={() => {}}>
-              <View style={styles.handle} />
-              <Text style={styles.sheetTitle}>
+        <Modal visible animationType="slide" presentationStyle="formSheet" onRequestClose={() => { setPwSheetOpen(false); setPwError(""); setCurrentPw(""); setNewPw(""); setConfirmPw(""); setShowCurrentPw(false); setShowNewPw(false); setShowConfirmPw(false); }}>
+          <KeyboardAvoidingView style={{ flex: 1, backgroundColor: colors.bg }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+            <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: "center", padding: spacing.xl }} keyboardShouldPersistTaps="handled">
+              <Text style={[styles.sheetTitle, { textAlign: "center", marginBottom: spacing.xs }]}>
                 {authProvider === "email" ? "Change password" : "Set a password"}
               </Text>
-              <Text style={styles.sheetSubtitle}>
+              <Text style={[styles.sheetSubtitle, { textAlign: "center", marginBottom: spacing.lg }]}>
                 {authProvider === "email"
                   ? "Enter your current password and choose a new one."
                   : `You signed in with ${authProvider === "google" ? "Google" : authProvider === "apple" ? "Apple" : "a social account"}. Set a password to also sign in with email.`}
@@ -1151,9 +1149,9 @@ export default function ProfileScreen() {
                 </View>
               ) : null}
 
-              <View style={{ flexDirection: "row", gap: spacing.sm, marginTop: spacing.xs }}>
+              <View style={{ flexDirection: "row", gap: spacing.sm, marginTop: spacing.md }}>
                 <TouchableOpacity
-                  style={[styles.pwBtn, { backgroundColor: colors.bg, borderWidth: 1.5, borderColor: colors.border }]}
+                  style={[styles.pwBtn, { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.border }]}
                   onPress={() => { setPwSheetOpen(false); setPwError(""); setCurrentPw(""); setNewPw(""); setConfirmPw(""); setShowCurrentPw(false); setShowNewPw(false); setShowConfirmPw(false); }}
                   activeOpacity={0.7}
                 >
@@ -1168,12 +1166,10 @@ export default function ProfileScreen() {
                     if (newPw !== confirmPw) { setPwError("New passwords do not match."); return; }
                     setPwLoading(true);
                     try {
-                      // Only verify current password for email users
                       if (authProvider === "email") {
                         const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password: currentPw });
                         if (signInErr) { setPwError("Current password is incorrect."); setPwLoading(false); return; }
                       }
-                      // Update/set password
                       const { error: updateErr } = await supabase.auth.updateUser({ password: newPw });
                       if (updateErr) { setPwError(updateErr.message); setPwLoading(false); return; }
                       setPwSheetOpen(false);
@@ -1195,8 +1191,7 @@ export default function ProfileScreen() {
                   )}
                 </TouchableOpacity>
               </View>
-            </TouchableOpacity>
-            </TouchableOpacity>
+            </ScrollView>
           </KeyboardAvoidingView>
         </Modal>
       )}
