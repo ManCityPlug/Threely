@@ -227,6 +227,9 @@ export default function ProfileScreen() {
   const [confirmPw, setConfirmPw] = useState("");
   const [pwLoading, setPwLoading] = useState(false);
   const [pwError, setPwError] = useState("");
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
   const [authProvider, setAuthProvider] = useState<"email" | "google" | "apple" | "other">("email");
 
   // In-app notifications — shared context (synced with tab badge)
@@ -1084,7 +1087,7 @@ export default function ProfileScreen() {
       {/* ── Change Password Sheet ──────────────────────────────────────────────── */}
       {pwSheetOpen && (
         <Modal visible transparent animationType="slide" onRequestClose={() => setPwSheetOpen(false)}>
-          <KeyboardAvoidingView style={{ flex: 1, justifyContent: "flex-end" }} behavior={Platform.OS === "ios" ? "padding" : undefined}>
+          <KeyboardAvoidingView style={{ flex: 1, justifyContent: "flex-end" }} behavior={Platform.OS === "ios" ? "padding" : undefined} keyboardVerticalOffset={Platform.OS === "ios" ? 10 : 0}>
             <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setPwSheetOpen(false)}>
               <TouchableOpacity activeOpacity={1} style={styles.sheet} onPress={() => {}}>
               <View style={styles.handle} />
@@ -1098,34 +1101,49 @@ export default function ProfileScreen() {
               </Text>
 
               {authProvider === "email" && (
-                <TextInput
-                  style={[styles.pwInput, pwError && currentPw === "" ? { borderColor: colors.danger } : {}]}
-                  placeholder="Current password"
-                  placeholderTextColor={colors.textTertiary}
-                  secureTextEntry
-                  value={currentPw}
-                  onChangeText={setCurrentPw}
-                  autoComplete="current-password"
-                />
+                <View style={styles.pwInputRow}>
+                  <TextInput
+                    style={[styles.pwInput, { flex: 1, marginBottom: 0 }, pwError && currentPw === "" ? { borderColor: colors.danger } : {}]}
+                    placeholder="Current password"
+                    placeholderTextColor={colors.textTertiary}
+                    secureTextEntry={!showCurrentPw}
+                    value={currentPw}
+                    onChangeText={setCurrentPw}
+                    autoComplete="current-password"
+                  />
+                  <TouchableOpacity onPress={() => setShowCurrentPw(!showCurrentPw)} style={styles.pwEyeBtn} hitSlop={8}>
+                    <Ionicons name={showCurrentPw ? "eye-off-outline" : "eye-outline"} size={20} color={colors.textTertiary} />
+                  </TouchableOpacity>
+                </View>
               )}
-              <TextInput
-                style={styles.pwInput}
-                placeholder="New password (min. 8 characters)"
-                placeholderTextColor={colors.textTertiary}
-                secureTextEntry
-                value={newPw}
-                onChangeText={setNewPw}
-                autoComplete="new-password"
-              />
-              <TextInput
-                style={styles.pwInput}
-                placeholder="Confirm new password"
-                placeholderTextColor={colors.textTertiary}
-                secureTextEntry
-                value={confirmPw}
-                onChangeText={setConfirmPw}
-                autoComplete="new-password"
-              />
+              <View style={styles.pwInputRow}>
+                <TextInput
+                  style={[styles.pwInput, { flex: 1, marginBottom: 0 }]}
+                  placeholder="New password (min. 8 characters)"
+                  placeholderTextColor={colors.textTertiary}
+                  secureTextEntry={!showNewPw}
+                  value={newPw}
+                  onChangeText={setNewPw}
+                  autoComplete="new-password"
+                />
+                <TouchableOpacity onPress={() => setShowNewPw(!showNewPw)} style={styles.pwEyeBtn} hitSlop={8}>
+                  <Ionicons name={showNewPw ? "eye-off-outline" : "eye-outline"} size={20} color={colors.textTertiary} />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.pwInputRow}>
+                <TextInput
+                  style={[styles.pwInput, { flex: 1, marginBottom: 0 }]}
+                  placeholder="Confirm new password"
+                  placeholderTextColor={colors.textTertiary}
+                  secureTextEntry={!showConfirmPw}
+                  value={confirmPw}
+                  onChangeText={setConfirmPw}
+                  autoComplete="new-password"
+                />
+                <TouchableOpacity onPress={() => setShowConfirmPw(!showConfirmPw)} style={styles.pwEyeBtn} hitSlop={8}>
+                  <Ionicons name={showConfirmPw ? "eye-off-outline" : "eye-outline"} size={20} color={colors.textTertiary} />
+                </TouchableOpacity>
+              </View>
 
               {pwError ? (
                 <View style={{ backgroundColor: colors.dangerLight, borderRadius: radius.md, padding: spacing.sm, marginBottom: spacing.sm }}>
@@ -1136,7 +1154,7 @@ export default function ProfileScreen() {
               <View style={{ flexDirection: "row", gap: spacing.sm, marginTop: spacing.xs }}>
                 <TouchableOpacity
                   style={[styles.pwBtn, { backgroundColor: colors.bg, borderWidth: 1.5, borderColor: colors.border }]}
-                  onPress={() => { setPwSheetOpen(false); setPwError(""); setCurrentPw(""); setNewPw(""); setConfirmPw(""); }}
+                  onPress={() => { setPwSheetOpen(false); setPwError(""); setCurrentPw(""); setNewPw(""); setConfirmPw(""); setShowCurrentPw(false); setShowNewPw(false); setShowConfirmPw(false); }}
                   activeOpacity={0.7}
                 >
                   <Text style={[styles.pwBtnText, { color: colors.textSecondary }]}>Cancel</Text>
@@ -1654,6 +1672,12 @@ function createStyles(c: Colors) {
       justifyContent: "center",
     },
     // ── Change Password ──────────────────────────────────────────────────────
+    pwInputRow: {
+      flexDirection: "row" as const,
+      alignItems: "center" as const,
+      gap: spacing.sm,
+      marginBottom: spacing.sm,
+    },
     pwInput: {
       backgroundColor: c.bg,
       borderWidth: 1.5,
@@ -1663,6 +1687,9 @@ function createStyles(c: Colors) {
       fontSize: typography.base,
       color: c.text,
       marginBottom: spacing.sm,
+    },
+    pwEyeBtn: {
+      padding: spacing.sm,
     },
     pwBtn: {
       flex: 1,
