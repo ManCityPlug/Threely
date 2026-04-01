@@ -103,11 +103,39 @@ export default function OnboardingScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0); // 0 = loading, 1 = name, 2 = goal
   const progressAnim = useRef(new Animated.Value(1 / TOTAL_STEPS)).current;
 
   // Step 1 — Name
   const [nameInput, setNameInput] = useState("");
+
+  // Check if we already have a name (e.g. from Apple Sign In) — skip name step if so
+  useEffect(() => {
+    (async () => {
+      try {
+        // Check AsyncStorage first
+        const saved = await AsyncStorage.getItem("@threely_nickname");
+        if (saved) {
+          setNameInput(saved);
+          setStep(2);
+          Animated.timing(progressAnim, { toValue: 2 / TOTAL_STEPS, duration: 0, useNativeDriver: false }).start();
+          return;
+        }
+        // Check Supabase user metadata
+        const { data: { user } } = await supabase.auth.getUser();
+        const meta = user?.user_metadata;
+        const metaName = meta?.display_name || meta?.full_name || meta?.name;
+        if (metaName && !metaName.includes("@") && !metaName.includes(".")) {
+          setNameInput(metaName);
+          await AsyncStorage.setItem("@threely_nickname", metaName);
+          setStep(2);
+          Animated.timing(progressAnim, { toValue: 2 / TOTAL_STEPS, duration: 0, useNativeDriver: false }).start();
+          return;
+        }
+      } catch { /* ignore */ }
+      setStep(1);
+    })();
+  }, []);
 
   // Step 2 — Goal input (templates shown first, free text via "Something else")
   const [showFreeText, setShowFreeText] = useState(false);
@@ -1208,6 +1236,11 @@ export default function OnboardingScreen() {
   // ─── Root render ─────────────────────────────────────────────────────────────
 
   const isMagicMoment = step > TOTAL_STEPS;
+
+  // Still checking if name exists — show blank screen briefly
+  if (step === 0) {
+    return <SafeAreaView style={styles.container}><View style={{ flex: 1 }} /></SafeAreaView>;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
