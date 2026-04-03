@@ -127,7 +127,7 @@ function createStyles(c: Colors) {
       padding: spacing.lg,
       alignItems: "center",
       justifyContent: "center",
-      minHeight: 140,
+      height: 140,
       ...shadow.sm,
     },
     categoryEmoji: {
@@ -147,6 +147,8 @@ function createStyles(c: Colors) {
       lineHeight: 16,
     },
     otherCard: {
+      flex: 0,
+      width: "100%" as any,
       borderStyle: "dashed",
     },
   });
