@@ -4,8 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
-  useWindowDimensions,
 } from "react-native";
 import {
   goalCategories,
@@ -24,11 +22,7 @@ interface GoalTemplatesProps {
 
 export function GoalTemplates({ onSelect, onClose, onOther, closeLabel = "Back" }: GoalTemplatesProps) {
   const { colors } = useTheme();
-  const { width: screenWidth } = useWindowDimensions();
-
-  // On iPad/wider screens, use 3 columns; on phones, use 2
-  const numColumns = screenWidth >= 600 ? 3 : 2;
-  const styles = useMemo(() => createStyles(colors, numColumns), [colors, numColumns]);
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
     <View style={styles.container}>
@@ -50,51 +44,43 @@ export function GoalTemplates({ onSelect, onClose, onOther, closeLabel = "Back" 
         to build your perfect plan.
       </Text>
 
-      {/* Category grid -- ScrollView ensures it works on all screen sizes including iPad */}
-      <ScrollView
-        contentContainerStyle={styles.gridContent}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.grid}>
-          {goalCategories.map((cat) => (
-            <TouchableOpacity
-              key={cat.id}
-              style={styles.categoryCard}
-              onPress={() => onSelect(cat)}
-              activeOpacity={0.75}
-            >
-              <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
-              <Text style={styles.categoryLabel}>{cat.label}</Text>
-              <Text style={styles.categoryDesc} numberOfLines={2}>
-                {cat.description}
-              </Text>
-            </TouchableOpacity>
-          ))}
+      {/* Two category cards side by side */}
+      <View style={styles.row}>
+        {goalCategories.map((cat) => (
+          <TouchableOpacity
+            key={cat.id}
+            style={styles.categoryCard}
+            onPress={() => onSelect(cat)}
+            activeOpacity={0.75}
+          >
+            <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
+            <Text style={styles.categoryLabel}>{cat.label}</Text>
+            <Text style={styles.categoryDesc} numberOfLines={2}>
+              {cat.description}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
 
-          {/* "Something else" as a grid card */}
-          {onOther && (
-            <TouchableOpacity
-              style={[styles.categoryCard, styles.otherCard]}
-              onPress={onOther}
-              activeOpacity={0.75}
-            >
-              <Text style={styles.categoryEmoji}>✏️</Text>
-              <Text style={styles.categoryLabel}>Something else</Text>
-              <Text style={styles.categoryDesc} numberOfLines={2}>
-                Let me describe my own goal
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      </ScrollView>
+      {/* "Something else" full-width */}
+      {onOther && (
+        <TouchableOpacity
+          style={[styles.categoryCard, styles.otherCard]}
+          onPress={onOther}
+          activeOpacity={0.75}
+        >
+          <Text style={styles.categoryEmoji}>✏️</Text>
+          <Text style={styles.categoryLabel}>Something else</Text>
+          <Text style={styles.categoryDesc} numberOfLines={2}>
+            Let me describe my own goal
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
 
-function createStyles(c: Colors, numColumns: number) {
-  const cardWidthPct = numColumns === 3 ? "31%" : "47.5%";
-
+function createStyles(c: Colors) {
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -127,33 +113,32 @@ function createStyles(c: Colors, numColumns: number) {
       lineHeight: 20,
       marginBottom: spacing.lg,
     },
-    gridContent: {
-      paddingBottom: spacing.xl,
-    },
-    grid: {
+    row: {
       flexDirection: "row",
-      flexWrap: "wrap",
       gap: spacing.sm,
+      marginBottom: spacing.sm,
     },
     categoryCard: {
-      width: cardWidthPct as any,
+      flex: 1,
       backgroundColor: c.card,
       borderRadius: radius.lg,
       borderWidth: 1,
       borderColor: c.border,
-      padding: spacing.md,
+      padding: spacing.lg,
       alignItems: "center",
+      justifyContent: "center",
+      minHeight: 140,
       ...shadow.sm,
     },
     categoryEmoji: {
-      fontSize: 32,
-      marginBottom: spacing.xs,
+      fontSize: 36,
+      marginBottom: spacing.sm,
     },
     categoryLabel: {
       fontSize: typography.base,
       fontWeight: typography.semibold as "600",
       color: c.text,
-      marginBottom: 2,
+      marginBottom: 4,
     },
     categoryDesc: {
       fontSize: typography.xs,

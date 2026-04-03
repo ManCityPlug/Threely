@@ -146,9 +146,6 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
   // Record cooldown timestamp
   await setCooldown();
 
-  // Skip ALL notifications if no goals are active today (all off-day)
-  if (ctx.activeGoalCountToday === 0) return;
-
   // Read user's preferred notification time
   const pref = await getNotifPreference();
   const prefHour = pref?.hour ?? DEFAULT_HOUR;
@@ -162,39 +159,60 @@ export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
     return d;
   };
 
-  // Build notification content based on active goal count
-  const totalMin = ctx.totalTimeAllGoals;
-  const timeStr = totalMin >= 60
-    ? `${Math.floor(totalMin / 60)}h ${totalMin % 60 ? `${totalMin % 60}m` : ""}`
-    : `${totalMin} min`;
+  // Skip ALL notifications if no goals are active today (rest day / no goals)
+  if (ctx.activeGoalCountToday === 0) return;
 
-  let primaryTitle: string;
-  let primaryBody: string;
-  if (ctx.activeGoalCountToday === 1) {
-    primaryTitle = "Your tasks are ready";
-    primaryBody = `${timeStr} today — let's go!`;
-  } else {
-    primaryTitle = "Your tasks are ready";
-    primaryBody = `${timeStr} across ${ctx.activeGoalCountToday} goals today`;
+  // ── 1. PRIMARY reminder ──
+  // Schedule for TODAY if the preferred time hasn't passed yet, otherwise TOMORROW.
+  // Uses DATE trigger (one-shot) so it only fires with current context — re-scheduled
+  // every time the app opens with fresh task data.
+  const primaryTime = todayAt(prefHour, prefMinute);
+  if (now >= primaryTime) {
+    // Preferred time already passed today — schedule for tomorrow
+    primaryTime.setDate(primaryTime.getDate() + 1);
   }
 
-  // 1. PRIMARY reminder — recurring DAILY at user's chosen time
-  //    Uses DAILY trigger so it fires every day even if the app isn't opened.
-  await Notifications.scheduleNotificationAsync({
-    identifier: ID_PRIMARY,
-    content: {
-      title: primaryTitle,
-      body: primaryBody,
-      sound: true,
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour: prefHour,
-      minute: prefMinute,
-    },
-  });
+  // Build notification content based on actual task state
+  if (ctx.incompleteCount > 0) {
+    // Has incomplete tasks — remind them
+    const totalMin = ctx.totalTimeAllGoals;
+    const timeStr = totalMin >= 60
+      ? `${Math.floor(totalMin / 60)}h ${totalMin % 60 ? `${totalMin % 60}m` : ""}`
+      : `${totalMin} min`;
 
-  // 2. EVENING nudge at 8 PM — only if primary time is before 6 PM and tasks incomplete
+    let primaryTitle: string;
+    let primaryBody: string;
+    if (ctx.allDone) {
+      // All done — no notification needed
+    } else if (ctx.activeGoalCountToday === 1) {
+      primaryTitle = ctx.incompleteCount === 1
+        ? "You have 1 task left today"
+        : `You have ${ctx.incompleteCount} tasks today`;
+      primaryBody = `${timeStr} — let's go!`;
+    } else {
+      primaryTitle = `You have ${ctx.incompleteCount} tasks today`;
+      primaryBody = `${timeStr} across ${ctx.activeGoalCountToday} goals`;
+    }
+
+    if (!ctx.allDone) {
+      await Notifications.scheduleNotificationAsync({
+        identifier: ID_PRIMARY,
+        content: {
+          title: primaryTitle!,
+          body: primaryBody!,
+          sound: true,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: primaryTime,
+        },
+      });
+    }
+  }
+  // No tasks / all done → no primary notification scheduled
+
+  // ── 2. EVENING nudge at 8 PM ──
+  // Only if primary time is before 6 PM and tasks are still incomplete TODAY
   const eveningTime = todayAt(20, 0);
   if (prefHour < 18 && now < eveningTime && !ctx.allDone && ctx.incompleteCount > 0) {
     await Notifications.scheduleNotificationAsync({

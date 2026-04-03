@@ -37,11 +37,11 @@ export default function GoalTemplates({
         to build your perfect plan.
       </p>
 
-      {/* Category grid */}
+      {/* Two category cards side by side */}
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
+          gridTemplateColumns: "1fr 1fr",
           gap: "0.625rem",
         }}
       >
@@ -50,13 +50,18 @@ export default function GoalTemplates({
             key={cat.id}
             onClick={() => onSelect(cat)}
             style={{
-              padding: "1rem 0.75rem",
+              padding: "1.25rem 1rem",
               borderRadius: "var(--radius-lg)",
               border: "1.5px solid var(--border)",
               background: "var(--card)",
               cursor: "pointer",
               textAlign: "center",
               transition: "all 0.15s",
+              minHeight: 140,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.borderColor = "var(--primary)";
@@ -67,22 +72,22 @@ export default function GoalTemplates({
               e.currentTarget.style.background = "var(--card)";
             }}
           >
-            <div style={{ fontSize: 28, marginBottom: 6 }}>{cat.emoji}</div>
+            <div style={{ fontSize: 36, marginBottom: 8 }}>{cat.emoji}</div>
             <div
               style={{
                 fontWeight: 600,
-                fontSize: "0.85rem",
+                fontSize: "0.9rem",
                 color: "var(--text)",
-                marginBottom: 2,
+                marginBottom: 4,
               }}
             >
               {cat.label}
             </div>
             <div
               style={{
-                fontSize: "0.72rem",
+                fontSize: "0.75rem",
                 color: "var(--subtext)",
-                lineHeight: 1.3,
+                lineHeight: 1.4,
               }}
             >
               {cat.description}
@@ -91,33 +96,55 @@ export default function GoalTemplates({
         ))}
       </div>
 
-      {/* Other option */}
+      {/* "Something else" full-width */}
       {onOther && (
         <button
           onClick={onOther}
           style={{
             width: "100%",
-            marginTop: "0.75rem",
-            padding: "0.7rem 1rem",
-            borderRadius: "var(--radius)",
+            marginTop: "0.625rem",
+            padding: "1.25rem 1rem",
+            borderRadius: "var(--radius-lg)",
             border: "1.5px dashed var(--border)",
-            background: "transparent",
-            color: "var(--subtext)",
-            fontSize: "0.85rem",
-            fontWeight: 500,
+            background: "var(--card)",
             cursor: "pointer",
+            textAlign: "center",
             transition: "all 0.15s",
+            minHeight: 140,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = "var(--primary)";
-            e.currentTarget.style.color = "var(--primary)";
+            e.currentTarget.style.background = "var(--primary-light)";
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.borderColor = "var(--border)";
-            e.currentTarget.style.color = "var(--subtext)";
+            e.currentTarget.style.background = "var(--card)";
           }}
         >
-          Something else — let me describe it
+          <div style={{ fontSize: 36, marginBottom: 8 }}>✏️</div>
+          <div
+            style={{
+              fontWeight: 600,
+              fontSize: "0.9rem",
+              color: "var(--text)",
+              marginBottom: 4,
+            }}
+          >
+            Something else
+          </div>
+          <div
+            style={{
+              fontSize: "0.75rem",
+              color: "var(--subtext)",
+              lineHeight: 1.4,
+            }}
+          >
+            Let me describe my own goal
+          </div>
         </button>
       )}
     </div>
