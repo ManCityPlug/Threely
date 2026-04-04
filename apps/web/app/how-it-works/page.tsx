@@ -56,7 +56,7 @@ export default function HowItWorksPage() {
 
       {/* Hero */}
       <section style={{
-        background: "linear-gradient(135deg, #f6f9fc 0%, #ede9ff 100%)",
+        background: "radial-gradient(ellipse at 50% 0%, rgba(99,91,255,0.08) 0%, transparent 60%)",
         padding: "4.5rem 1.5rem 3.5rem",
         textAlign: "center",
       }}>

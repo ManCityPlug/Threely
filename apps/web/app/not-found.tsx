@@ -7,7 +7,7 @@ export default function NotFound() {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      background: "#f6f9fc",
+      background: "#0a0a0a",
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     }}>
       <div style={{ textAlign: "center", padding: "2rem" }}>
