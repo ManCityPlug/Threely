@@ -1,17 +1,62 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+const DEEPSEEK_TIMEOUT = 15_000; // 15s — if DeepSeek is slow, fall back to Gemini
 
-// Wrapper to match the Anthropic call pattern for easy migration
-async function callLLM(opts: {
+// ── DeepSeek call (OpenAI-compatible API) ────────────────────────────────────
+
+async function callDeepSeek(opts: {
   system?: string;
   messages: { role: "user" | "assistant"; content: string }[];
   maxTokens?: number;
   temperature?: number;
 }): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
-  const modelName = "gemini-2.5-flash";
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), DEEPSEEK_TIMEOUT);
+
+  const apiMessages: { role: string; content: string }[] = [];
+  if (opts.system) apiMessages.push({ role: "system", content: opts.system });
+  for (const m of opts.messages) apiMessages.push({ role: m.role, content: m.content });
+
+  const res = await fetch("https://api.deepseek.com/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${DEEPSEEK_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "deepseek-chat",
+      messages: apiMessages,
+      max_tokens: opts.maxTokens ?? 1024,
+      temperature: opts.temperature ?? 0.7,
+    }),
+    signal: controller.signal,
+  });
+  clearTimeout(timeout);
+
+  if (!res.ok) throw new Error(`DeepSeek API error: ${res.status}`);
+  const data = await res.json();
+  const choice = data.choices?.[0];
+  if (!choice) throw new Error("DeepSeek returned no choices");
+
+  return {
+    text: choice.message?.content ?? "",
+    inputTokens: data.usage?.prompt_tokens ?? 0,
+    outputTokens: data.usage?.completion_tokens ?? 0,
+  };
+}
+
+// ── Gemini call (fallback) ───────────────────────────────────────────────────
+
+async function callGemini(opts: {
+  system?: string;
+  messages: { role: "user" | "assistant"; content: string }[];
+  maxTokens?: number;
+  temperature?: number;
+}): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
   const model = genAI.getGenerativeModel({
-    model: modelName,
+    model: "gemini-2.5-flash",
     ...(opts.system ? { systemInstruction: opts.system } : {}),
     generationConfig: {
       maxOutputTokens: opts.maxTokens ?? 1024,
@@ -19,7 +64,6 @@ async function callLLM(opts: {
     },
   });
 
-  // Convert messages to Gemini format
   const history = opts.messages.slice(0, -1).map(m => ({
     role: m.role === "assistant" ? "model" as const : "user" as const,
     parts: [{ text: m.content }],
@@ -29,14 +73,32 @@ async function callLLM(opts: {
   const chat = model.startChat({ history });
   const result = await chat.sendMessage(lastMessage.content);
   const response = result.response;
-  const text = response.text();
-  const usage = response.usageMetadata;
 
   return {
-    text,
-    inputTokens: usage?.promptTokenCount ?? 0,
-    outputTokens: usage?.candidatesTokenCount ?? 0,
+    text: response.text(),
+    inputTokens: response.usageMetadata?.promptTokenCount ?? 0,
+    outputTokens: response.usageMetadata?.candidatesTokenCount ?? 0,
   };
+}
+
+// ── Main LLM call: DeepSeek primary → Gemini fallback ───────────────────────
+
+async function callLLM(opts: {
+  system?: string;
+  messages: { role: "user" | "assistant"; content: string }[];
+  maxTokens?: number;
+  temperature?: number;
+}): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
+  // Try DeepSeek first (cheaper)
+  if (DEEPSEEK_API_KEY) {
+    try {
+      return await callDeepSeek(opts);
+    } catch (err) {
+      console.warn("[LLM] DeepSeek failed, falling back to Gemini:", err instanceof Error ? err.message : err);
+    }
+  }
+  // Fallback to Gemini
+  return await callGemini(opts);
 }
 
 // ─── AI Call Logging ─────────────────────────────────────────────────────────
@@ -670,7 +732,7 @@ End with a brief note about what success looks like when ALL phases are complete
     logAICall({
       userId,
       functionName: 'generateRoadmap',
-      modelUsed: 'gemini-2.5-flash',
+      modelUsed: 'deepseek-chat',
       inputData: { title, rawInput, category, deadline: deadline?.toISOString() ?? null, dailyTimeMinutes, intensityLevel },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -899,7 +961,7 @@ When wrapping up (done: true):
     logAICall({
       userId,
       functionName: 'goalChat',
-      modelUsed: 'gemini-2.5-flash',
+      modelUsed: 'deepseek-chat',
       inputData: { turnCount, messageCount: messages.length },
       outputData: { message: result.message, done: result.done, goal_text: result.goal_text },
       inputTokens: llmResult.inputTokens,
@@ -966,7 +1028,7 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
     logAICall({
       userId,
       functionName: 'parseGoal',
-      modelUsed: 'gemini-2.5-flash',
+      modelUsed: 'deepseek-chat',
       inputData: { rawInput },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -1112,7 +1174,7 @@ ${previousTasksSection}`;
     logAICall({
       userId,
       functionName: 'generateTasks',
-      modelUsed: 'gemini-2.5-flash',
+      modelUsed: 'deepseek-chat',
       inputData: { goalId: goal.id, goalTitle: goal.title, requestingAdditional, focusShifted, postReview, newTaskCount, daysActive, tasksCompletedTotal },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -1195,7 +1257,7 @@ Return ONLY valid JSON matching this exact shape:
     logAICall({
       userId,
       functionName: 'updateCoachingContext',
-      modelUsed: 'gemini-2.5-flash',
+      modelUsed: 'deepseek-chat',
       inputData: { goalTitle, tasksCompletedToday, tasksTotalToday, difficultyRating, completionStatus },
       outputData: parsed,
       inputTokens: llmResult.inputTokens,
@@ -1272,7 +1334,7 @@ Keep it under 60 words. Punchy, direct, specific. No bullet points — just pros
     logAICall({
       userId,
       functionName: 'generateInsight',
-      modelUsed: 'gemini-2.5-flash',
+      modelUsed: 'deepseek-chat',
       inputData: { goalTitle, difficultyRating, completionStatus, tasksCompletedToday, tasksTotalToday, daysActive },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -1348,7 +1410,7 @@ Return ONLY valid JSON (no markdown):
     logAICall({
       userId,
       functionName: 'refineTask',
-      modelUsed: 'gemini-2.5-flash',
+      modelUsed: 'deepseek-chat',
       inputData: { task, goalTitle, goalCategory, userRequest },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -1460,7 +1522,7 @@ RESPONSE FORMAT — respond with ONLY valid JSON, no markdown:
     logAICall({
       userId,
       functionName: 'askAboutTask',
-      modelUsed: 'gemini-2.5-flash',
+      modelUsed: 'deepseek-chat',
       inputData: { task, goalTitle, goalCategory, messageCount: messages.length },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -1545,7 +1607,7 @@ Keep it under 80 words. Conversational, warm, specific. No bullet points — jus
     logAICall({
       userId,
       functionName: 'generateWeeklySummary',
-      modelUsed: 'gemini-2.5-flash',
+      modelUsed: 'deepseek-chat',
       inputData: { totalTasksCompleted, totalTasksGenerated, totalMinutesInvested, currentStreak, goalsCount: goalsWorkedOn.length },
       outputData: result,
       inputTokens: llmResult.inputTokens,
