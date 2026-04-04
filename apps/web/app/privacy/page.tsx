@@ -22,20 +22,20 @@ export default function PrivacyPage() {
 
   const pStyle = {
     fontSize: "0.925rem" as const,
-    color: "#425466" as const,
+    color: "rgba(255,255,255,0.5)" as const,
     lineHeight: 1.75 as const,
     marginBottom: "0.75rem" as const,
   };
 
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", background: "#fff" }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#0a0a0a" }}>
       <MarketingNav />
 
       {/* Hero */}
       <section style={{
-        background: "#f6f9fc",
+        background: "rgba(255,255,255,0.02)",
         padding: "3.5rem 1.5rem 2.5rem",
-        borderBottom: "1px solid #e3e8ef",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
       }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           <h1 style={{

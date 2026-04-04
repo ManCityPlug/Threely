@@ -195,9 +195,9 @@ export default function ScreenshotsPage() {
   }
 
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", background: "#f6f9fc", minHeight: "100vh" }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "rgba(255,255,255,0.02)", minHeight: "100vh" }}>
       {/* Header */}
-      <div style={{ background: "#fff", borderBottom: "1px solid #e3e8ef", padding: "1rem 1.5rem", position: "sticky", top: 0, zIndex: 100 }}>
+      <div style={{ background: "#0a0a0a", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "1rem 1.5rem", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1400, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
           <h1 style={{ fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.03em", margin: 0 }}>
             <span style={{ color: BRAND }}>Threely</span> Screenshot Generator
@@ -207,7 +207,7 @@ export default function ScreenshotsPage() {
             <select
               value={sizeIdx}
               onChange={(e) => setSizeIdx(Number(e.target.value))}
-              style={{ padding: "0.4rem 0.75rem", borderRadius: "0.5rem", border: "1px solid #e3e8ef", fontSize: "0.85rem", cursor: "pointer" }}
+              style={{ padding: "0.4rem 0.75rem", borderRadius: "0.5rem", border: "1px solid rgba(255,255,255,0.08)", fontSize: "0.85rem", cursor: "pointer" }}
             >
               {SIZES.map((s, i) => (
                 <option key={i} value={i}>{s.label}</option>
@@ -218,7 +218,7 @@ export default function ScreenshotsPage() {
             <select
               value={bgIdx}
               onChange={(e) => setBgIdx(Number(e.target.value))}
-              style={{ padding: "0.4rem 0.75rem", borderRadius: "0.5rem", border: "1px solid #e3e8ef", fontSize: "0.85rem", cursor: "pointer" }}
+              style={{ padding: "0.4rem 0.75rem", borderRadius: "0.5rem", border: "1px solid rgba(255,255,255,0.08)", fontSize: "0.85rem", cursor: "pointer" }}
             >
               {BG_OPTIONS.map((b, i) => (
                 <option key={i} value={i}>{b.label}</option>
@@ -268,7 +268,7 @@ export default function ScreenshotsPage() {
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "2rem 1.5rem" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "1.5rem" }}>
           {slides.map((slide, idx) => (
-            <div key={slide.id} style={{ background: "#fff", borderRadius: "1rem", border: "1px solid #e3e8ef", overflow: "hidden" }}>
+            <div key={slide.id} style={{ background: "#0a0a0a", borderRadius: "1rem", border: "1px solid rgba(255,255,255,0.08)", overflow: "hidden" }}>
               {/* Preview */}
               <div
                 style={{
@@ -370,7 +370,7 @@ export default function ScreenshotsPage() {
                       cursor: "pointer",
                       fontSize: "0.8rem",
                       fontWeight: 600,
-                      color: "#425466",
+                      color: "rgba(255,255,255,0.5)",
                       transition: "border-color 0.15s",
                     }}
                   >
@@ -393,13 +393,13 @@ export default function ScreenshotsPage() {
                 </div>
                 {slide.image && (
                   <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "#425466", minWidth: 54 }}>Position:</span>
+                    <span style={{ fontSize: "0.75rem", fontWeight: 600, color: "rgba(255,255,255,0.5)", minWidth: 54 }}>Position:</span>
                     <button
                       onClick={() => updateSlide(idx, "imageOffsetY", slide.imageOffsetY - 2)}
                       style={{
-                        width: 28, height: 28, borderRadius: 6, border: "1px solid #e3e8ef",
-                        background: "#fff", cursor: "pointer", fontSize: "0.85rem", fontWeight: 700,
-                        display: "flex", alignItems: "center", justifyContent: "center", color: "#425466",
+                        width: 28, height: 28, borderRadius: 6, border: "1px solid rgba(255,255,255,0.08)",
+                        background: "#0a0a0a", cursor: "pointer", fontSize: "0.85rem", fontWeight: 700,
+                        display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.5)",
                       }}
                       title="Move image up"
                     >
@@ -416,9 +416,9 @@ export default function ScreenshotsPage() {
                     <button
                       onClick={() => updateSlide(idx, "imageOffsetY", slide.imageOffsetY + 2)}
                       style={{
-                        width: 28, height: 28, borderRadius: 6, border: "1px solid #e3e8ef",
-                        background: "#fff", cursor: "pointer", fontSize: "0.85rem", fontWeight: 700,
-                        display: "flex", alignItems: "center", justifyContent: "center", color: "#425466",
+                        width: 28, height: 28, borderRadius: 6, border: "1px solid rgba(255,255,255,0.08)",
+                        background: "#0a0a0a", cursor: "pointer", fontSize: "0.85rem", fontWeight: 700,
+                        display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.5)",
                       }}
                       title="Move image down"
                     >
@@ -445,7 +445,7 @@ export default function ScreenshotsPage() {
                     width: "100%",
                     padding: "0.4rem 0.6rem",
                     borderRadius: "0.5rem",
-                    border: "1px solid #e3e8ef",
+                    border: "1px solid rgba(255,255,255,0.08)",
                     fontSize: "0.8rem",
                     boxSizing: "border-box",
                   }}
@@ -459,7 +459,7 @@ export default function ScreenshotsPage() {
                     width: "100%",
                     padding: "0.4rem 0.6rem",
                     borderRadius: "0.5rem",
-                    border: "1px solid #e3e8ef",
+                    border: "1px solid rgba(255,255,255,0.08)",
                     fontSize: "0.8rem",
                     boxSizing: "border-box",
                   }}
@@ -473,14 +473,14 @@ export default function ScreenshotsPage() {
         <div style={{
           marginTop: "2rem",
           padding: "1.25rem",
-          background: "#fff",
+          background: "#0a0a0a",
           borderRadius: "0.75rem",
-          border: "1px solid #e3e8ef",
+          border: "1px solid rgba(255,255,255,0.08)",
           fontSize: "0.85rem",
-          color: "#425466",
+          color: "rgba(255,255,255,0.5)",
           lineHeight: 1.7,
         }}>
-          <strong style={{ color: "#0a2540" }}>How to use:</strong>
+          <strong style={{ color: "#e8e8e8" }}>How to use:</strong>
           <ol style={{ margin: "0.5rem 0 0", paddingLeft: "1.25rem" }}>
             <li>Take screenshots on your iPhone (or simulator) of the 6 screens you want</li>
             <li>Upload each screenshot to its slot above</li>
