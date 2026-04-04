@@ -2,8 +2,8 @@
 
 // ─── Model Pricing (per million tokens) ──────────────────────────────────────
 const PRICING = {
-  sonnet: { input:  3.00, output: 15.00, label: "Sonnet 4.6" },
-  haiku:  { input:  0.80, output:  4.00, label: "Haiku 4.5" },
+  deepseek: { input: 0.28, output: 0.42, label: "DeepSeek V3 (primary)" },
+  gemini:   { input: 0.30, output: 2.50, label: "Gemini 2.5 Flash (fallback)" },
 };
 
 // ─── Per-function cost estimates ─────────────────────────────────────────────
@@ -11,7 +11,7 @@ const PRICING = {
 const FUNCTIONS = [
   {
     name: "parseGoal",
-    model: "haiku" as const,
+    model: "deepseek" as const,
     inputTokens: 600,
     outputTokens: 300,
     frequency: "Once per goal",
@@ -19,7 +19,7 @@ const FUNCTIONS = [
   },
   {
     name: "generateRoadmap",
-    model: "sonnet" as const,
+    model: "deepseek" as const,
     inputTokens: 1300,
     outputTokens: 1500,
     frequency: "Once per goal",
@@ -27,7 +27,7 @@ const FUNCTIONS = [
   },
   {
     name: "generateTasks",
-    model: "haiku" as const,
+    model: "deepseek" as const,
     inputTokens: 3500,
     outputTokens: 2000,
     frequency: "Daily per goal (max 2x/day)",
@@ -35,7 +35,7 @@ const FUNCTIONS = [
   },
   {
     name: "goalChat",
-    model: "haiku" as const,
+    model: "deepseek" as const,
     inputTokens: 800,
     outputTokens: 400,
     frequency: "~0.5x/day per goal",
@@ -43,7 +43,7 @@ const FUNCTIONS = [
   },
   {
     name: "updateCoachingContext",
-    model: "haiku" as const,
+    model: "deepseek" as const,
     inputTokens: 1000,
     outputTokens: 250,
     frequency: "After each review",
@@ -51,7 +51,7 @@ const FUNCTIONS = [
   },
   {
     name: "generateInsight",
-    model: "haiku" as const,
+    model: "deepseek" as const,
     inputTokens: 800,
     outputTokens: 150,
     frequency: "After each review",
@@ -59,7 +59,7 @@ const FUNCTIONS = [
   },
   {
     name: "refineTask",
-    model: "haiku" as const,
+    model: "deepseek" as const,
     inputTokens: 500,
     outputTokens: 250,
     frequency: "~10% of tasks",
@@ -67,7 +67,7 @@ const FUNCTIONS = [
   },
   {
     name: "askAboutTask",
-    model: "haiku" as const,
+    model: "deepseek" as const,
     inputTokens: 600,
     outputTokens: 300,
     frequency: "~0.3x/day per goal",
@@ -75,7 +75,7 @@ const FUNCTIONS = [
   },
   {
     name: "generateWeeklySummary",
-    model: "haiku" as const,
+    model: "deepseek" as const,
     inputTokens: 1500,
     outputTokens: 200,
     frequency: "Weekly per user",
@@ -176,10 +176,10 @@ const modelBadge = (model: string): React.CSSProperties => ({
   fontSize: "0.7rem",
   fontWeight: 600,
   background:
-    model === "sonnet" ? "rgba(99, 91, 255, 0.15)" :
+    model === "gemini" ? "rgba(99, 91, 255, 0.15)" :
     "rgba(74, 222, 128, 0.15)",
   color:
-    model === "sonnet" ? "#818cf8" :
+    model === "gemini" ? "#818cf8" :
     "#4ade80",
 });
 
@@ -416,8 +416,8 @@ export default function CostsPage() {
               color: "#4ade80",
             },
             {
-              label: "All functions on Haiku (except roadmap)",
-              value: "parseGoal, generateTasks, goalChat, insight, refine, askAboutTask, weeklySummary all run on Haiku 4.5 ($0.80/$4 per 1M tokens). Only generateRoadmap uses Sonnet.",
+              label: "All functions on DeepSeek (Gemini fallback)",
+              value: "All AI functions use DeepSeek V3 ($0.28/$0.42 per 1M tokens) as primary. If DeepSeek is down/slow (15s timeout), falls back to Gemini 2.5 Flash. Circuit breaker skips DeepSeek for 5 min after 3 consecutive failures.",
               color: "#4ade80",
             },
             {
@@ -427,7 +427,7 @@ export default function CostsPage() {
             },
             {
               label: "Biggest cost driver",
-              value: "generateTasks (Haiku) — runs up to 2x/day per goal. Cheap per call but highest frequency of any function.",
+              value: "generateTasks (DeepSeek) -- runs up to 2x/day per goal. Cheapest per call but highest frequency of any function.",
               color: "#f59e0b",
             },
             {

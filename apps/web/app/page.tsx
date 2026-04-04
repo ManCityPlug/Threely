@@ -43,7 +43,7 @@ export default function LandingPage() {
           50% { transform: scale(1.14); filter: drop-shadow(0 0 36px rgba(99,91,255,0.8)) drop-shadow(0 0 70px rgba(99,91,255,0.3)); }
         }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes glow { 0%,100% { box-shadow: 0 0 30px rgba(99,91,255,0.2); } 50% { box-shadow: 0 0 50px rgba(99,91,255,0.4); } }
+        @keyframes glow { 0%,100% { box-shadow: 0 0 20px rgba(212,168,67,0.2); } 50% { box-shadow: 0 0 40px rgba(212,168,67,0.4); } }
         .fade-up { animation: fadeUp 0.6s ease both; }
         .fade-up-d1 { animation: fadeUp 0.6s ease 0.1s both; }
         .fade-up-d2 { animation: fadeUp 0.6s ease 0.2s both; }
@@ -70,6 +70,7 @@ export default function LandingPage() {
             {[
               { label: "How It Works", href: "#how-it-works" },
               { label: "Pricing", href: "/pricing" },
+              { label: "Support", href: "/support" },
             ].map(item => (
               <Link key={item.label} href={item.href} style={{
                 padding: "0.4rem 0.75rem", fontSize: "0.85rem", fontWeight: 500,
@@ -83,7 +84,7 @@ export default function LandingPage() {
             }}>Log In</Link>
             <Link href={ctaHref} style={{
               padding: "0.5rem 1.25rem", fontSize: "0.85rem", fontWeight: 600,
-              color: "#fff", background: "#635bff", borderRadius: 8,
+              color: "#000", background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)", borderRadius: 8,
               textDecoration: "none", marginLeft: 4,
             }}>{ctaLabel}</Link>
           </div>
@@ -113,6 +114,7 @@ export default function LandingPage() {
           {[
             { label: "How It Works", href: "#how-it-works" },
             { label: "Pricing", href: "/pricing" },
+            { label: "Support", href: "/support" },
             { label: "Log In", href: "/login" },
           ].map(item => (
             <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{
@@ -123,7 +125,7 @@ export default function LandingPage() {
           ))}
           <Link href={ctaHref} onClick={() => setMenuOpen(false)} style={{
             marginTop: 20, padding: "0.9rem 2rem", fontSize: "1rem", fontWeight: 700,
-            color: "#fff", background: "#635bff", borderRadius: 12,
+            color: "#000", background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)", borderRadius: 12,
             textDecoration: "none", textAlign: "center",
           }}>{ctaLabel}</Link>
         </div>
@@ -179,9 +181,9 @@ export default function LandingPage() {
         <Link href={ctaHref} className="hero-cta fade-up-d3" style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
-          color: "#fff", background: "#635bff", borderRadius: 14,
+          color: "#000", background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)", borderRadius: 14,
           textDecoration: "none", transition: "transform 0.15s, box-shadow 0.15s",
-          boxShadow: "0 0 40px rgba(99,91,255,0.3)",
+          boxShadow: "0 0 30px rgba(212,168,67,0.3)",
         }}>
           {ctaLabel}
         </Link>
@@ -350,9 +352,9 @@ export default function LandingPage() {
         <Link href={ctaHref} style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
-          color: "#fff", background: "#635bff", borderRadius: 14,
+          color: "#000", background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)", borderRadius: 14,
           textDecoration: "none",
-          boxShadow: "0 0 40px rgba(99,91,255,0.3)",
+          boxShadow: "0 0 30px rgba(212,168,67,0.3)",
         }}>
           {ctaLabel}
         </Link>

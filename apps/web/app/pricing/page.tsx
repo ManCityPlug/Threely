@@ -86,8 +86,8 @@ export default function PricingPage() {
               textAlign: "center",
               padding: "0.75rem 1.5rem",
               background: "#0a0a0a",
-              color: "#635bff",
-              border: "1.5px solid #635bff",
+              color: "#D4A843",
+              border: "1.5px solid #D4A843",
               borderRadius: 10,
               fontWeight: 700,
               fontSize: "0.95rem",
@@ -100,10 +100,10 @@ export default function PricingPage() {
           <div style={{
             padding: "2rem 1.5rem",
             borderRadius: 16,
-            border: "2px solid #635bff",
+            border: "2px solid #D4A843",
             background: "#0a0a0a",
             position: "relative",
-            boxShadow: "0 4px 20px rgba(99,91,255,0.12)",
+            boxShadow: "0 4px 20px rgba(212,168,67,0.12)",
           }}>
             <div style={{
               position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)",
@@ -129,7 +129,7 @@ export default function PricingPage() {
               width: "100%",
               textAlign: "center",
               padding: "0.75rem 1.5rem",
-              background: "#635bff",
+              background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)",
               color: "#fff",
               borderRadius: 10,
               fontWeight: 700,
@@ -159,7 +159,7 @@ export default function PricingPage() {
               <div key={f} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
                   width: 24, height: 24, borderRadius: "50%",
-                  background: "#ede9ff", color: "#635bff",
+                  background: "#ede9ff", color: "#D4A843",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 14, fontWeight: 700, flexShrink: 0,
                 }}>
@@ -204,7 +204,7 @@ export default function PricingPage() {
                     display: "inline-block",
                     marginTop: 12,
                     padding: "0.5rem 1.15rem",
-                    background: "#635bff",
+                    background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)",
                     color: "#fff",
                     borderRadius: 8,
                     fontSize: "0.85rem",
@@ -237,7 +237,7 @@ export default function PricingPage() {
           <Link href="/start" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
-            background: "#635bff",
+            background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)",
             color: "#fff",
             fontWeight: 700,
             fontSize: "1rem",

@@ -56,7 +56,7 @@ export default function StartPage() {
       {/* CTA */}
       <Link href="/start/signup" style={{
         display: "block", width: "100%", maxWidth: 340, margin: "0 auto 16px",
-        padding: "16px 0", background: "#fff", color: "#635BFF",
+        padding: "16px 0", background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)", color: "#000",
         fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.2px",
         textDecoration: "none", textAlign: "center", borderRadius: 16,
         boxShadow: "0 4px 24px rgba(0,0,0,0.15)",

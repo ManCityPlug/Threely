@@ -32,7 +32,9 @@ export const metadata: Metadata = {
 };
 
 // Inline script to prevent flash of wrong theme on page load
-const themeScript = `(function(){try{var t=localStorage.getItem('threely-theme')||'light';document.documentElement.setAttribute('data-theme',t)}catch(e){}})()`;
+const themeScript = `(function(){try{var t=localStorage.getItem('threely-theme')||'dark';document.documentElement.setAttribute('data-theme',t)}catch(e){document.documentElement.setAttribute('data-theme','dark')}})()`;
+
+
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
