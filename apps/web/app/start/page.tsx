@@ -9,14 +9,14 @@ const BULLETS = [
 export default function StartPage() {
   return (
     <main style={{
-      maxWidth: 480, margin: "0 auto", padding: "48px 24px 60px",
+      maxWidth: 560, margin: "0 auto", padding: "48px 24px 60px",
       textAlign: "center", flex: 1,
       display: "flex", flexDirection: "column", justifyContent: "center",
     }}>
 
       {/* Headline */}
       <h1 style={{
-        fontSize: "2.25rem", fontWeight: 800, color: "#fff",
+        fontSize: "clamp(2.25rem, 5vw, 3.5rem)", fontWeight: 800, color: "#fff",
         letterSpacing: "-0.5px", lineHeight: 1.1, margin: "0 0 16px",
       }}>
         Do Less.<br />Achieve More.

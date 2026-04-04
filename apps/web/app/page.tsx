@@ -160,6 +160,11 @@ export default function LandingPage() {
         background: "radial-gradient(ellipse at 50% 0%, rgba(212,168,67,0.08) 0%, transparent 60%)",
         position: "relative",
       }}>
+        {/* Breathing logo */}
+        <div className="hero-logo" style={{ marginBottom: 28 }}>
+          <img src="/favicon.png" alt="" width={64} height={64} style={{ borderRadius: 18 }} />
+        </div>
+
         {/* Pill badge */}
         <div className="fade-up" style={{
           display: "inline-flex", alignItems: "center", gap: 8,
