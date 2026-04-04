@@ -21,7 +21,7 @@ import {
 } from "@/lib/auth-providers";
 
 const WELCOME_KEY = "@threely_welcome_seen";
-const PRIMARY = "#635BFF";
+const PRIMARY = "#D4A843";
 
 interface WelcomeScreenProps {
   onComplete: (destination?: "login" | "register") => void;
