@@ -399,7 +399,7 @@ export default function AppTutorial({ visible, onComplete }: AppTutorialProps) {
     return (
       <div
         style={{
-          position: "fixed", inset: 0, zIndex: 10000,
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10000,
           background: "rgba(0,0,0,0.75)",
           cursor: "default",
         }}
@@ -413,7 +413,7 @@ export default function AppTutorial({ visible, onComplete }: AppTutorialProps) {
       {/* Full-screen click blocker — sits ABOVE everything to prevent ALL interaction */}
       <div
         style={{
-          position: "fixed", inset: 0, zIndex: 10002,
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 10002,
           cursor: "default",
           background: "transparent",
         }}

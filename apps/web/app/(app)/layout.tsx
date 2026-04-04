@@ -116,7 +116,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     const params = new URLSearchParams(window.location.search);
     if (!params.has("welcome")) return;
     const tutorialKey = `threely_tutorial_done_${user.id}`;
-    if (localStorage.getItem(tutorialKey)) return;
+    try {
+      if (localStorage.getItem(tutorialKey)) return;
+    } catch { /* Safari Private Browsing — proceed with tutorial */ }
     // Small delay to let the dashboard render first
     const timer = setTimeout(() => setShowTutorial(true), 600);
     return () => clearTimeout(timer);
@@ -124,7 +126,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   function handleTutorialComplete() {
     if (user) {
-      localStorage.setItem(`threely_tutorial_done_${user.id}`, "true");
+      try { localStorage.setItem(`threely_tutorial_done_${user.id}`, "true"); } catch { /* ignore */ }
     }
     setShowTutorial(false);
     // Navigate to Today tab after tutorial
