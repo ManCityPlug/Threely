@@ -39,7 +39,6 @@ import {
   type GoalStat,
 } from "@/lib/api";
 import { TaskCard } from "@/components/TaskCard";
-import { Confetti } from "@/components/Confetti";
 import { AppTutorial } from "@/components/AppTutorial";
 import { MOCK_TUTORIAL_GOAL, MOCK_TUTORIAL_DAILY_TASK } from "@/lib/mock-tutorial-data";
 import { Button } from "@/components/ui/Button";
@@ -162,8 +161,6 @@ export default function DashboardScreen() {
   const [showInsightCard, setShowInsightCard] = useState(false);
   const [insightLoading, setInsightLoading] = useState(false);
 
-  // ─── Confetti state ───────────────────────────────────────────────────────────
-  const [showConfetti, setShowConfetti] = useState(false);
 
   // ─── Pro / trial state ────────────────────────────────────────────────────────
   const [showTutorial, setShowTutorial] = useState(false);
@@ -508,14 +505,10 @@ export default function DashboardScreen() {
     }
   }, [loading, buildNotifContext, goals.length]);
 
-  // Mark focus lock + confetti when all tasks become done
+  // Track when all tasks become done
   const prevAllDone = useRef(false);
   const goalKey = selectedGoal ?? "none";
   useEffect(() => {
-    if (allDone && !prevAllDone.current && newTaskItems.length > 0) {
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000);
-    }
     prevAllDone.current = allDone;
   }, [allDone, newTaskItems.length]);
 
@@ -688,9 +681,6 @@ export default function DashboardScreen() {
       setGenerating(false);
       const genTodayStr = new Date().toISOString().slice(0, 10);
       AsyncStorage.removeItem(`@threely_generating_${genTodayStr}`);
-      // Trigger confetti and completion banner
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000);
     } catch {
       showToast("Couldn't complete all tasks. Try again.", "error");
     }
@@ -806,7 +796,6 @@ export default function DashboardScreen() {
   return (
     <SwipeNavigator currentIndex={0}>
     <View style={styles.container}>
-      <Confetti active={showConfetti} />
       {/* Fixed header — outside ScrollView so it never hides under Dynamic Island */}
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <View style={[styles.headerRow, wideContentStyle]}>
@@ -1599,40 +1588,36 @@ function createStyles(c: Colors) {
       marginBottom: spacing.xl,
     },
     generateBtn: { width: "100%" },
-    // Get more tasks bar — unlocked (all tasks done)
+    // Get more tasks — unlocked (all tasks done)
     getMoreBar: {
+      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 14,
-      paddingHorizontal: spacing.lg,
-      borderRadius: radius.lg,
+      height: 52,
+      paddingHorizontal: spacing.xl,
+      borderRadius: radius.full,
       backgroundColor: c.primary,
-      marginBottom: spacing.md,
+      marginBottom: spacing.lg,
       ...shadow.md,
     },
     getMoreTitle: {
       fontSize: typography.base,
       fontWeight: typography.bold,
       color: c.primaryText,
-      letterSpacing: -0.2,
-      textAlign: "center",
+      letterSpacing: -0.3,
     },
-    // Get more tasks bar — locked
+    // Get more tasks — locked
     getMoreBarLocked: {
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 14,
+      paddingVertical: spacing.md,
       paddingHorizontal: spacing.lg,
-      borderRadius: radius.lg,
-      borderWidth: 1.5,
-      borderColor: c.border,
-      backgroundColor: c.card,
       marginBottom: spacing.md,
     },
     getMoreTitleLocked: {
       fontSize: typography.sm,
-      fontWeight: typography.semibold,
-      color: c.textSecondary,
+      fontWeight: typography.medium,
+      color: c.textTertiary,
       textAlign: "center",
     },
     getMoreSubtitleLocked: {

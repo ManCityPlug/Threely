@@ -10,7 +10,6 @@ import {
   type DailyTask, type TaskItem, type Goal, type GoalStat,
 } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/Skeleton";
-import Confetti from "@/components/Confetti";
 import { useToast } from "@/components/ToastProvider";
 import { useSubscription } from "@/lib/subscription-context";
 import { MOCK_TUTORIAL_GOAL, MOCK_TUTORIAL_DAILY_TASK } from "@/lib/mock-tutorial-data";
@@ -715,7 +714,6 @@ function DashboardPageInner() {
   const [insight, setInsight] = useState<string | null>(null);
   const [showReview, setShowReview] = useState(false);
   const [reviewDailyTaskId, setReviewDailyTaskId] = useState<string | null>(null);
-  const [showConfetti, setShowConfetti] = useState(false);
   const [showWorkAhead, setShowWorkAhead] = useState(false);
   const [completingAll, setCompletingAll] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -982,19 +980,6 @@ function DashboardPageInner() {
       const newDailyTasks = dailyTasks.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt);
       setDailyTasks(newDailyTasks);
 
-      // Check if all displayed tasks are now complete to trigger confetti
-      if (isCompleted) {
-        const currentDisplayed = (() => {
-          if (selectedGoalId === null) return [];
-          const dt = newDailyTasks.find(d => d.goalId === selectedGoalId);
-          return dt ? dt.tasks.slice(-3) : [];
-        })();
-        const allNowDone = currentDisplayed.length > 0 && currentDisplayed.every(t => t.isCompleted);
-        if (allNowDone) {
-          setShowConfetti(true);
-          setTimeout(() => setShowConfetti(false), 3000);
-        }
-      }
     } catch {
       showToast("Failed to update task", "error");
     }
@@ -1058,8 +1043,6 @@ function DashboardPageInner() {
       const todayStr = new Date().toLocaleDateString("en-CA");
       localStorage.removeItem(`threely_generating_${todayStr}`);
       if (pollingRef.current) { clearInterval(pollingRef.current); pollingRef.current = null; }
-      setShowConfetti(true);
-      setTimeout(() => setShowConfetti(false), 3000);
       showToast("All tasks completed!", "success");
     } catch {
       showToast("Failed to complete all tasks", "error");
@@ -1142,7 +1125,6 @@ function DashboardPageInner() {
 
   return (
     <div className="page-inner">
-      <Confetti active={showConfetti} />
 
       {/* Mobile app banner */}
       {isMobile && !appNudgeDismissed && (
@@ -1425,16 +1407,11 @@ function DashboardPageInner() {
             </div>
           </div>
 
-          {/* Locked bar — shown above tasks when not all done */}
+          {/* Locked hint — shown above tasks when not all done */}
           {!allDone && !insight && totalCount > 0 && (
-            <div className="give-more-bar locked" data-walkthrough="unlock-more-bar" style={{ marginBottom: "1.25rem", justifyContent: "center", textAlign: "center" }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>
-                  Complete all tasks to unlock more
-                </div>
-                <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
-                  {completedCount}/{totalCount} done — {totalCount - completedCount} remaining
-                </div>
+            <div data-walkthrough="unlock-more-bar" style={{ marginBottom: "1rem", textAlign: "center", padding: "0.75rem 0" }}>
+              <div style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
+                Complete all tasks to unlock more  ·  {completedCount}/{totalCount} done
               </div>
             </div>
           )}
@@ -1474,17 +1451,17 @@ function DashboardPageInner() {
             </div>
           )}
 
-          {/* Give me more bar — shown when all done */}
+          {/* Give me more — shown when all done */}
           {allDone && (
-            <div data-walkthrough="get-more-button" style={{ marginBottom: "1.25rem", textAlign: "center" }}>
+            <div data-walkthrough="get-more-button" style={{ marginBottom: "1.5rem", display: "flex", justifyContent: "center" }}>
               <button
                 onClick={handleGiveMore}
                 disabled={generating}
                 className="btn btn-primary"
                 style={{
-                  width: "100%",
                   fontWeight: 700, fontSize: "0.95rem",
-                  padding: "0.85rem 1.5rem",
+                  padding: "0.75rem 2.5rem",
+                  borderRadius: 9999,
                 }}
               >
                 {generating ? <><span className="spinner" style={{ width: 18, height: 18 }} /> Generating...</> : "Get more tasks"}
