@@ -96,25 +96,26 @@ export default function GoalTemplates({
         ))}
       </div>
 
-      {/* "Something else" full-width */}
+      {/* "Something else" compact bar */}
       {onOther && (
         <button
           onClick={onOther}
           style={{
             width: "100%",
             marginTop: "0.625rem",
-            padding: "1.25rem 1rem",
+            padding: "0.75rem 1rem",
             borderRadius: "var(--radius-lg)",
             border: "1.5px solid var(--border)",
             background: "var(--card)",
             cursor: "pointer",
             textAlign: "center",
             transition: "all 0.15s",
-            height: 140,
+            height: 52,
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             alignItems: "center",
             justifyContent: "center",
+            gap: "0.5rem",
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.borderColor = "var(--primary)";
@@ -125,26 +126,8 @@ export default function GoalTemplates({
             e.currentTarget.style.background = "var(--card)";
           }}
         >
-          <div style={{ fontSize: 36, marginBottom: 8 }}>✏️</div>
-          <div
-            style={{
-              fontWeight: 600,
-              fontSize: "0.9rem",
-              color: "var(--text)",
-              marginBottom: 4,
-            }}
-          >
-            Something else
-          </div>
-          <div
-            style={{
-              fontSize: "0.75rem",
-              color: "var(--subtext)",
-              lineHeight: 1.4,
-            }}
-          >
-            Let me describe my own goal
-          </div>
+          <span style={{ fontSize: 18 }}>✏️</span>
+          <span style={{ fontWeight: 600, fontSize: "0.85rem", color: "var(--text)" }}>Something else</span>
         </button>
       )}
     </div>

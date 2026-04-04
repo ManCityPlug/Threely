@@ -69,11 +69,8 @@ export function GoalTemplates({ onSelect, onClose, onOther, closeLabel = "Back" 
           onPress={onOther}
           activeOpacity={0.75}
         >
-          <Text style={styles.categoryEmoji}>✏️</Text>
-          <Text style={styles.categoryLabel}>Something else</Text>
-          <Text style={styles.categoryDesc} numberOfLines={2}>
-            Let me describe my own goal
-          </Text>
+          <Text style={{ fontSize: 20 }}>✏️</Text>
+          <Text style={[styles.categoryLabel, { marginBottom: 0, fontSize: typography.sm }]}>Something else</Text>
         </TouchableOpacity>
       )}
     </View>
@@ -149,6 +146,21 @@ function createStyles(c: Colors) {
     otherCard: {
       flex: 0,
       width: "100%" as any,
+      height: 60,
+      flexDirection: "row" as const,
+      gap: spacing.sm,
+      padding: spacing.md,
+    },
+    otherEmoji: {
+      fontSize: 22,
+      marginBottom: 0,
+    },
+    otherLabel: {
+      fontSize: typography.sm,
+      marginBottom: 0,
+    },
+    otherDesc: {
+      display: "none" as any,
     },
   });
 }

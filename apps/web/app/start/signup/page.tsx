@@ -37,23 +37,23 @@ export default function SignupPage() {
 // ─── Style constants ────────────────────────────────────────────────────────
 
 const CARD_STYLE: React.CSSProperties = {
-  background: "#fff",
+  background: "rgba(255,255,255,0.04)",
+  border: "1px solid rgba(255,255,255,0.08)",
   borderRadius: 20,
   padding: "28px 24px 32px",
   margin: "0 auto",
   maxWidth: 400,
-  boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
 };
 
 const INPUT_STYLE: React.CSSProperties = {
   width: "100%",
-  border: "1.5px solid #E3E8EF",
+  border: "1.5px solid rgba(255,255,255,0.12)",
   borderRadius: 12,
   padding: "14px 16px",
-  background: "#F6F9FC",
+  background: "rgba(255,255,255,0.06)",
   fontSize: "16px",
   fontFamily: "inherit",
-  color: "#0A2540",
+  color: "#fff",
   outline: "none",
   boxSizing: "border-box" as const,
   transition: "border-color 0.15s",
@@ -63,7 +63,7 @@ const LABEL_STYLE: React.CSSProperties = {
   display: "block",
   fontSize: "0.8rem",
   fontWeight: 600,
-  color: "#425466",
+  color: "rgba(255,255,255,0.5)",
   marginBottom: 6,
 };
 
@@ -188,7 +188,7 @@ function SignupForm() {
       <div className="signup-card" style={CARD_STYLE}>
         <h2 style={{
           fontWeight: 700,
-          color: "#0A2540",
+          color: "#fff",
           letterSpacing: "-0.3px",
           textAlign: "center",
           margin: "0 0 24px",
@@ -222,8 +222,8 @@ function SignupForm() {
           style={{
             ...OAUTH_BTN,
             background: "#fff",
-            color: "#0A2540",
-            border: "1.5px solid #E3E8EF",
+            color: "#fff",
+            border: "1.5px solid rgba(255,255,255,0.12)",
             marginBottom: 20,
             opacity: oauthLoading === "apple" ? 0.5 : 1,
           }}
@@ -244,9 +244,9 @@ function SignupForm() {
           gap: 12,
           marginBottom: 20,
         }}>
-          <div style={{ flex: 1, height: 1, background: "#E3E8EF" }} />
+          <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
           <span style={{ fontSize: "0.75rem", color: "#8898AA", fontWeight: 500 }}>or sign up with email</span>
-          <div style={{ flex: 1, height: 1, background: "#E3E8EF" }} />
+          <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.1)" }} />
         </div>
 
         {/* ── Email/Password form ────────────────────────────────────── */}
@@ -266,7 +266,7 @@ function SignupForm() {
                 borderColor: accountError && !validEmail ? "#FF4D4F" : undefined,
               }}
               onFocus={(e) => e.currentTarget.style.borderColor = "#635BFF"}
-              onBlur={(e) => e.currentTarget.style.borderColor = accountError && !validEmail ? "#FF4D4F" : "#E3E8EF"}
+              onBlur={(e) => e.currentTarget.style.borderColor = accountError && !validEmail ? "#FF4D4F" : "rgba(255,255,255,0.12)"}
             />
           </div>
 
@@ -286,7 +286,7 @@ function SignupForm() {
                 borderColor: accountError && !validPassword ? "#FF4D4F" : undefined,
               }}
               onFocus={(e) => e.currentTarget.style.borderColor = "#635BFF"}
-              onBlur={(e) => e.currentTarget.style.borderColor = accountError && !validPassword ? "#FF4D4F" : "#E3E8EF"}
+              onBlur={(e) => e.currentTarget.style.borderColor = accountError && !validPassword ? "#FF4D4F" : "rgba(255,255,255,0.12)"}
             />
           </div>
 
