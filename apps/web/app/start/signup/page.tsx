@@ -20,13 +20,13 @@ export default function SignupPage() {
           60% { transform: translateX(-4px); }
           80% { transform: translateX(4px); }
         }
-        .signup-main { max-width: 480px; }
-        .signup-card { max-width: 460px; padding: 32px 28px 36px; }
+        .signup-main { max-width: 580px; }
+        .signup-card { max-width: 580px; padding: 32px 28px 36px; }
         .signup-card h2 { font-size: 1.35rem; }
         @media (min-width: 768px) {
-          .signup-main { max-width: 600px; display: flex; flex-direction: column; justify-content: center; }
-          .signup-card { max-width: 540px; padding: 44px 40px 44px; }
-          .signup-card h2 { font-size: 1.75rem; }
+          .signup-main { max-width: 720px; display: flex; flex-direction: column; justify-content: center; }
+          .signup-card { max-width: 660px; padding: 44px 40px 44px; }
+          .signup-card h2 { font-size: 2rem; }
         }
       `}</style>
       <SignupForm />

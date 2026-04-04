@@ -9,7 +9,7 @@ const BULLETS = [
 export default function StartPage() {
   return (
     <main style={{
-      maxWidth: 560, margin: "0 auto", padding: "48px 24px 60px",
+      maxWidth: 700, margin: "0 auto", padding: "48px 24px 60px",
       textAlign: "center", flex: 1,
       display: "flex", flexDirection: "column", justifyContent: "center",
     }}>
@@ -51,7 +51,7 @@ export default function StartPage() {
 
       {/* CTA */}
       <Link href="/start/signup" style={{
-        display: "block", width: "100%", maxWidth: 340, margin: "0 auto 16px",
+        display: "block", width: "100%", maxWidth: 420, margin: "0 auto 16px",
         padding: "16px 0", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", color: "#000",
         fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.2px",
         textDecoration: "none", textAlign: "center", borderRadius: 16,

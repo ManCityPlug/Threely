@@ -27,7 +27,7 @@ export default function StartLayout({ children }: { children: React.ReactNode })
         .start-header { padding: 20px 0 0; gap: 10px; }
         @media (min-width: 768px) {
           .start-logo-img { width: 48px; height: 48px; border-radius: 13px; }
-          .start-logo-text { font-size: 1.4rem; }
+          .start-logo-text { font-size: 1.6rem; }
           .start-header { padding: 32px 0 0; gap: 12px; }
         }
       `}</style>
