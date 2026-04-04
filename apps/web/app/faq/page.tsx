@@ -112,7 +112,7 @@ export default function FaqPage() {
 
       {/* Hero */}
       <section style={{
-        background: "radial-gradient(ellipse at 50% 0%, rgba(99,91,255,0.08) 0%, transparent 60%)",
+        background: "radial-gradient(ellipse at 50% 0%, rgba(212,168,67,0.08) 0%, transparent 60%)",
         padding: "4.5rem 1.5rem 3.5rem",
         textAlign: "center",
       }}>
@@ -183,7 +183,7 @@ export default function FaqPage() {
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#0a0a0a",
-            color: "#635bff",
+            color: "#D4A843",
             fontWeight: 700,
             fontSize: "1rem",
             borderRadius: 10,

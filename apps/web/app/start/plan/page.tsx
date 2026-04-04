@@ -200,7 +200,7 @@ export default function PlanPage() {
           maxWidth: 400,
           display: "block",
           padding: "17px",
-          background: "#635BFF",
+          background: "#D4A843",
           color: "#fff",
           border: "none",
           borderRadius: 16,

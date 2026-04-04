@@ -33,7 +33,7 @@ export default function PricingPage() {
 
       {/* Hero */}
       <section style={{
-        background: "radial-gradient(ellipse at 50% 0%, rgba(99,91,255,0.08) 0%, transparent 60%)",
+        background: "radial-gradient(ellipse at 50% 0%, rgba(212,168,67,0.08) 0%, transparent 60%)",
         padding: "4.5rem 1.5rem 3.5rem",
         textAlign: "center",
       }}>
@@ -70,7 +70,7 @@ export default function PricingPage() {
             border: "1px solid rgba(255,255,255,0.08)",
             background: "#0a0a0a",
           }}>
-            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#635bff", textTransform: "uppercase", marginBottom: 8 }}>
+            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#D4A843", textTransform: "uppercase", marginBottom: 8 }}>
               MONTHLY
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
@@ -107,14 +107,14 @@ export default function PricingPage() {
           }}>
             <div style={{
               position: "absolute", top: -13, left: "50%", transform: "translateX(-50%)",
-              background: "#635bff", color: "#fff",
+              background: "#D4A843", color: "#fff",
               padding: "3px 14px", borderRadius: 20,
               fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.05em",
               whiteSpace: "nowrap",
             }}>
               SAVE 36%
             </div>
-            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#635bff", textTransform: "uppercase", marginBottom: 8 }}>
+            <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#D4A843", textTransform: "uppercase", marginBottom: 8 }}>
               YEARLY — BEST VALUE
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
@@ -134,7 +134,7 @@ export default function PricingPage() {
               borderRadius: 10,
               fontWeight: 700,
               fontSize: "0.95rem",
-              boxShadow: "0 4px 14px rgba(99,91,255,0.3)",
+              boxShadow: "0 4px 14px rgba(212,168,67,0.3)",
             }}>
               Get Pro Free
             </CheckoutButton>

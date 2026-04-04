@@ -49,7 +49,7 @@ function BuildingProgress() {
         {BUILDING_STEPS.map((_, i) => (
           <div key={i} style={{
             width: 8, height: 8, borderRadius: 4,
-            backgroundColor: i <= stepIdx ? "#635bff" : "rgba(255,255,255,0.15)",
+            backgroundColor: i <= stepIdx ? "#D4A843" : "rgba(255,255,255,0.15)",
             transition: "background-color 0.3s",
           }} />
         ))}
@@ -485,7 +485,7 @@ export default function OnboardingPage() {
                                   }}
                                   style={{
                                     padding: "10px 16px", borderRadius: 20,
-                                    border: `1.5px solid ${isSelected ? "var(--primary)" : "rgba(99,91,255,0.25)"}`,
+                                    border: `1.5px solid ${isSelected ? "var(--primary)" : "rgba(212,168,67,0.25)"}`,
                                     background: isSelected ? "var(--primary)" : "var(--card)",
                                     color: isSelected ? "#fff" : "var(--primary)",
                                     fontSize: "0.85rem", fontWeight: 600,
@@ -542,7 +542,7 @@ export default function OnboardingPage() {
                   {chatDone && chatGoalText && (
                     <div style={{
                       background: "var(--card)", borderRadius: "var(--radius-lg)",
-                      border: "1.5px solid rgba(99,91,255,0.27)", padding: "1rem",
+                      border: "1.5px solid rgba(212,168,67,0.27)", padding: "1rem",
                       marginTop: 8, boxShadow: "var(--shadow-sm)",
                     }}>
                       <p style={{

@@ -7,9 +7,9 @@
 :root {
   --bg: #f6f9fc;
   --card: #ffffff;
-  --primary: #635bff;
-  --primary-light: #ede9ff;
-  --primary-hover: #5144e8;
+  --primary: #D4A843;
+  --primary-light: rgba(212,168,67,0.1);
+  --primary-hover: #C49032;
   --text: #0a2540;
   --subtext: #425466;
   --muted: #8898aa;
@@ -37,9 +37,9 @@
 [data-theme="dark"] {
   --bg: #0b0f1a;
   --card: #151a2a;
-  --primary: #7c75ff;
-  --primary-light: rgba(124,117,255,0.12);
-  --primary-hover: #6e66f0;
+  --primary: #D4A843;
+  --primary-light: rgba(212,168,67,0.12);
+  --primary-hover: #C49032;
   --text: #e8eaf0;
   --subtext: #9ba3b5;
   --muted: #6b7280;

@@ -35,12 +35,23 @@ export default function LandingPage() {
   const ctaHref = loggedIn ? "/dashboard" : "/start";
   const ctaLabel = loggedIn ? "Go to Dashboard" : "Start Free →";
 
+  // Scroll reveal
+  useEffect(() => {
+    const els = document.querySelectorAll('.reveal');
+    if (!els.length) return;
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('revealed'); observer.unobserve(e.target); } });
+    }, { threshold: 0.15 });
+    els.forEach(el => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "#e8e8e8", background: "#0a0a0a", overflowX: "hidden", minHeight: "100vh" }}>
       <style>{`
         @keyframes logoBreathe {
-          0%,100% { transform: scale(1); filter: drop-shadow(0 0 16px rgba(99,91,255,0.4)) drop-shadow(0 0 40px rgba(99,91,255,0.15)); }
-          50% { transform: scale(1.14); filter: drop-shadow(0 0 36px rgba(99,91,255,0.8)) drop-shadow(0 0 70px rgba(99,91,255,0.3)); }
+          0%,100% { transform: scale(1); filter: drop-shadow(0 0 16px rgba(212,168,67,0.4)) drop-shadow(0 0 40px rgba(212,168,67,0.15)); }
+          50% { transform: scale(1.14); filter: drop-shadow(0 0 36px rgba(212,168,67,0.8)) drop-shadow(0 0 70px rgba(212,168,67,0.3)); }
         }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes glow { 0%,100% { box-shadow: 0 0 20px rgba(212,168,67,0.2); } 50% { box-shadow: 0 0 40px rgba(212,168,67,0.4); } }
@@ -50,6 +61,11 @@ export default function LandingPage() {
         .fade-up-d3 { animation: fadeUp 0.6s ease 0.3s both; }
         .hero-cta { animation: glow 3s ease-in-out infinite; }
         .hero-logo { animation: logoBreathe 3s ease-in-out infinite; }
+        .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .revealed { opacity: 1; transform: translateY(0); }
+        .reveal-d1 { transition-delay: 0.1s; }
+        .reveal-d2 { transition-delay: 0.2s; }
+        .reveal-d3 { transition-delay: 0.3s; }
       `}</style>
 
       {/* ─── Nav ──────────────────────────────────────────────────────────────── */}
@@ -136,7 +152,7 @@ export default function LandingPage() {
         minHeight: "90vh", display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center", textAlign: "center",
         padding: isMobile ? "3rem 1.5rem" : "5rem 2rem",
-        background: "radial-gradient(ellipse at 50% 0%, rgba(99,91,255,0.08) 0%, transparent 60%)",
+        background: "radial-gradient(ellipse at 50% 0%, rgba(212,168,67,0.08) 0%, transparent 60%)",
         position: "relative",
       }}>
         {/* Floating logo */}
@@ -201,14 +217,14 @@ export default function LandingPage() {
         padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
         maxWidth: 1000, margin: "0 auto",
       }}>
-        <div style={{ textAlign: "center", marginBottom: 60 }}>
-          <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#635bff", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>How It Works</p>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 60 }}>
+          <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>How It Works</p>
           <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
             Stop guessing. Start executing.
           </h2>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 48 }}>
+        <div className="reveal" style={{ display: "flex", flexDirection: "column", gap: 48 }}>
           {[
             { step: "01", title: "Tell us your goal", desc: "\"I want to launch my Shopify store and hit $5K in revenue.\" That's all Threely needs. The AI asks the right questions, builds a roadmap around your experience, timeline, and schedule." },
             { step: "02", title: "Wake up to your plan", desc: "Not 'work on marketing.' You'll get: 'Rewrite your product description to highlight the pain point from your customer research yesterday.' Specific. Actionable. Built for today." },
@@ -216,7 +232,7 @@ export default function LandingPage() {
           ].map((item, i) => (
             <div key={i} style={{ display: "flex", gap: isMobile ? 16 : 32, alignItems: "flex-start" }}>
               <div style={{
-                fontSize: "0.8rem", fontWeight: 700, color: "#635bff",
+                fontSize: "0.8rem", fontWeight: 700, color: "#D4A843",
                 minWidth: 40, paddingTop: 4,
               }}>{item.step}</div>
               <div>
@@ -235,8 +251,8 @@ export default function LandingPage() {
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#635bff", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12, textAlign: "center" }}>Results</p>
-          <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", textAlign: "center", marginBottom: 48 }}>
+          <p className="reveal" style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12, textAlign: "center" }}>Results</p>
+          <h2 className="reveal" style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", textAlign: "center", marginBottom: 48 }}>
             Real people. Real progress.
           </h2>
           <div style={{
@@ -254,7 +270,7 @@ export default function LandingPage() {
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 100, background: "rgba(99,91,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, color: "#635bff" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 100, background: "rgba(212,168,67,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, color: "#D4A843" }}>
                     {t.author[0]}
                   </div>
                   <div>
@@ -275,7 +291,7 @@ export default function LandingPage() {
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
         <div style={{ textAlign: "center", marginBottom: 60 }}>
-          <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
+          <h2 className="reveal" style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
             Built for people who want results.
           </h2>
         </div>

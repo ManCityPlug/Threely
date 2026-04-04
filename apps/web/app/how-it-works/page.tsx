@@ -21,7 +21,7 @@ const STEPS = [
     subtitle: "In your own words",
     desc: "Tell Threely what you're working toward — \"I want to learn guitar,\" \"Launch my online store,\" \"Get in shape for summer.\" Include your experience level, how much time you have each day, and any deadlines.",
     detail: "Threely Intelligence analyzes your input and extracts the key details: category, timeline, skill level, daily time budget, and intensity. No forms to fill out — just natural language.",
-    color: "#635bff",
+    color: "#D4A843",
   },
   {
     num: "02",
@@ -29,7 +29,7 @@ const STEPS = [
     subtitle: "Every single day",
     desc: "Each morning, Threely generates exactly three tasks designed for where you are right now. Not yesterday's plan. Not a generic template. Tasks that account for your progress, your pace, and your available time.",
     detail: "Each task includes a clear title, a detailed description, an estimated time, and a \"why it matters\" explanation so you understand how it connects to your bigger goal.",
-    color: "#635bff",
+    color: "#D4A843",
   },
   {
     num: "03",
@@ -37,7 +37,7 @@ const STEPS = [
     subtitle: "A 30-second feedback loop",
     desc: "Check off your tasks as you go. When you're done for the day, leave a quick review: was it too easy, just right, or overwhelming? Add any notes about what went well or what was difficult.",
     detail: "This review takes less than 30 seconds, but it's the most powerful part of Threely. Your feedback directly shapes what happens next.",
-    color: "#635bff",
+    color: "#D4A843",
   },
   {
     num: "04",
@@ -45,7 +45,7 @@ const STEPS = [
     subtitle: "Smarter every day",
     desc: "Threely Intelligence uses your review to generate a personalized coaching insight — a 2-3 sentence note that reflects on your progress and primes you for tomorrow. Then it calibrates your next set of tasks.",
     detail: "If yesterday was too hard, tomorrow gets recalibrated. If you're ahead of schedule, the AI pushes you further. It's a feedback loop that compounds — the more you use it, the better it gets.",
-    color: "#635bff",
+    color: "#D4A843",
   },
 ];
 
@@ -56,7 +56,7 @@ export default function HowItWorksPage() {
 
       {/* Hero */}
       <section style={{
-        background: "radial-gradient(ellipse at 50% 0%, rgba(99,91,255,0.08) 0%, transparent 60%)",
+        background: "radial-gradient(ellipse at 50% 0%, rgba(212,168,67,0.08) 0%, transparent 60%)",
         padding: "4.5rem 1.5rem 3.5rem",
         textAlign: "center",
       }}>
@@ -69,7 +69,7 @@ export default function HowItWorksPage() {
             marginBottom: "1.25rem",
           }}>
             From goal to done,<br />
-            <span style={{ color: "#635bff" }}>every single day</span>
+            <span style={{ color: "#D4A843" }}>every single day</span>
           </h1>
           <p style={{ fontSize: "1.05rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 540, margin: "0 auto" }}>
             Threely is a daily coaching loop. Describe your goal once, then get a personalized plan that evolves with you — automatically.
@@ -92,7 +92,7 @@ export default function HowItWorksPage() {
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", flexShrink: 0 }}>
                 <div style={{
                   width: 48, height: 48, borderRadius: 14,
-                  background: "#635bff", color: "#fff",
+                  background: "#D4A843", color: "#fff",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: "1.1rem", fontWeight: 800,
                 }}>
@@ -101,7 +101,7 @@ export default function HowItWorksPage() {
                 {i < STEPS.length - 1 && (
                   <div style={{
                     width: 2, flex: 1, minHeight: 40,
-                    background: "linear-gradient(to bottom, #635bff, rgba(255,255,255,0.12))",
+                    background: "linear-gradient(to bottom, #D4A843, rgba(255,255,255,0.12))",
                     marginTop: 8,
                   }} />
                 )}
@@ -109,7 +109,7 @@ export default function HowItWorksPage() {
 
               {/* Content */}
               <div style={{ flex: 1, paddingTop: 4 }}>
-                <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#635bff", textTransform: "uppercase", marginBottom: 4 }}>
+                <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#D4A843", textTransform: "uppercase", marginBottom: 4 }}>
                   {step.subtitle}
                 </div>
                 <h2 style={{ fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 10 }}>
@@ -161,7 +161,7 @@ export default function HowItWorksPage() {
               <div style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.1em", color: "#8898aa", textTransform: "uppercase" }}>
                 TODAY&apos;S PLAN
               </div>
-              <div style={{ fontSize: "0.65rem", fontWeight: 600, background: "#ede9ff", color: "#635bff", padding: "2px 8px", borderRadius: 10 }}>
+              <div style={{ fontSize: "0.65rem", fontWeight: 600, background: "#ede9ff", color: "#D4A843", padding: "2px 8px", borderRadius: 10 }}>
                 Day 24
               </div>
             </div>
@@ -177,7 +177,7 @@ export default function HowItWorksPage() {
                 <div style={{
                   width: 22, height: 22, borderRadius: "50%",
                   border: task.done ? "none" : "2px solid rgba(255,255,255,0.12)",
-                  background: task.done ? "#635bff" : "transparent",
+                  background: task.done ? "#D4A843" : "transparent",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   flexShrink: 0, marginTop: 1,
                 }}>
@@ -205,7 +205,7 @@ export default function HowItWorksPage() {
               background: "rgba(255,255,255,0.02)", borderRadius: 10,
               border: "1px solid rgba(255,255,255,0.08)",
             }}>
-              <div style={{ fontSize: "0.65rem", fontWeight: 700, color: "#635bff", letterSpacing: "0.05em", marginBottom: 4 }}>
+              <div style={{ fontSize: "0.65rem", fontWeight: 700, color: "#D4A843", letterSpacing: "0.05em", marginBottom: 4 }}>
                 AI COACHING INSIGHT
               </div>
               <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.5, margin: 0 }}>
@@ -258,7 +258,7 @@ export default function HowItWorksPage() {
               display: "inline-block",
               padding: "0.875rem 2.5rem",
               background: "#0a0a0a",
-              color: "#635bff",
+              color: "#D4A843",
               fontWeight: 700,
               fontSize: "1rem",
               borderRadius: 10,

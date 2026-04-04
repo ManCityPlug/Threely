@@ -289,7 +289,7 @@ function PaymentForm() {
           borderRadius: 14,
           padding: "16px 20px",
           marginBottom: 20,
-          border: "1.5px solid rgba(99,91,255,0.15)",
+          border: "1.5px solid rgba(212,168,67,0.15)",
         }}>
           <div style={{
             display: "flex",
@@ -380,7 +380,7 @@ function PaymentForm() {
                   placeholder="John Smith"
                   autoComplete="cc-name"
                   style={INPUT_STYLE}
-                  onFocus={(e) => e.currentTarget.style.borderColor = "#635BFF"}
+                  onFocus={(e) => e.currentTarget.style.borderColor = "#D4A843"}
                   onBlur={(e) => e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"}
                 />
               </div>
@@ -437,7 +437,7 @@ function PaymentForm() {
                 style={{
                   width: "100%",
                   padding: "16px",
-                  background: !cardAllComplete ? "rgba(255,255,255,0.12)" : "#635BFF",
+                  background: !cardAllComplete ? "rgba(255,255,255,0.12)" : "#D4A843",
                   color: !cardAllComplete ? "#8898AA" : "#fff",
                   border: "none",
                   borderRadius: 14,
@@ -446,7 +446,7 @@ function PaymentForm() {
                   letterSpacing: "-0.2px",
                   cursor: submitting ? "wait" : !cardAllComplete ? "not-allowed" : "pointer",
                   transition: "background 0.15s",
-                  boxShadow: cardAllComplete ? "0 4px 16px rgba(99,91,255,0.3)" : "none",
+                  boxShadow: cardAllComplete ? "0 4px 16px rgba(212,168,67,0.3)" : "none",
                   marginBottom: 8,
                 }}
               >

@@ -54,7 +54,7 @@ export default function SupportPage() {
               fontSize: "1.1rem",
               fontWeight: 700,
               color: "#fff",
-              background: "#635BFF",
+              background: "#D4A843",
               padding: "0.85rem 2.5rem",
               borderRadius: "0.75rem",
               textDecoration: "none",
