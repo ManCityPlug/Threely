@@ -35,9 +35,9 @@ export default function MarketingNav() {
     <>
       <nav style={{
         position: "sticky", top: 0, zIndex: 100,
-        background: "rgba(255,255,255,0.9)", backdropFilter: "blur(12px)",
+        background: "rgba(10,10,10,0.85)", backdropFilter: "blur(12px)",
         WebkitBackdropFilter: "blur(12px)",
-        borderBottom: "1px solid #e3e8ef",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
         padding: "0 1.25rem",
         height: 60,
         display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -46,7 +46,7 @@ export default function MarketingNav() {
         <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 28 }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
             <img src="/favicon.png" alt="Threely" width={34} height={34} style={{ borderRadius: 9 }} />
-            <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em", color: "#0a2540" }}>Threely</span>
+            <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em", color: "#e8e8e8" }}>Threely</span>
           </Link>
 
           {/* Desktop nav links */}
@@ -90,7 +90,7 @@ export default function MarketingNav() {
                 padding: "0.4rem 0.875rem",
                 fontSize: "0.875rem",
                 fontWeight: 600,
-                color: "#425466",
+                color: "rgba(255,255,255,0.5)",
                 borderRadius: 8,
                 textDecoration: "none",
               }}>
@@ -130,8 +130,8 @@ export default function MarketingNav() {
       {isMobile && menuOpen && (
         <div style={{
           position: "sticky", top: 60, zIndex: 99,
-          background: "#fff",
-          borderBottom: "1px solid #e3e8ef",
+          background: "#0a0a0a",
+          borderBottom: "1px solid rgba(255,255,255,0.06)",
           boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
           padding: "0.75rem 1.5rem",
           display: "flex", flexDirection: "column", gap: 4,
@@ -168,7 +168,7 @@ export default function MarketingNav() {
                   flex: 1, textAlign: "center",
                   padding: "0.6rem 0",
                   fontSize: "0.875rem", fontWeight: 600,
-                  color: "#425466",
+                  color: "rgba(255,255,255,0.5)",
                   border: "1.5px solid #e3e8ef",
                   borderRadius: 8,
                   textDecoration: "none",

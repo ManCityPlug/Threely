@@ -51,7 +51,7 @@ const STEPS = [
 
 export default function HowItWorksPage() {
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", background: "#fff" }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#0a0a0a" }}>
       <MarketingNav />
 
       {/* Hero */}
@@ -71,14 +71,14 @@ export default function HowItWorksPage() {
             From goal to done,<br />
             <span style={{ color: "#635bff" }}>every single day</span>
           </h1>
-          <p style={{ fontSize: "1.05rem", color: "#425466", lineHeight: 1.7, maxWidth: 540, margin: "0 auto" }}>
+          <p style={{ fontSize: "1.05rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 540, margin: "0 auto" }}>
             Threely is a daily coaching loop. Describe your goal once, then get a personalized plan that evolves with you — automatically.
           </p>
         </div>
       </section>
 
       {/* Steps */}
-      <section style={{ padding: "4rem 1.5rem", background: "#fff" }}>
+      <section style={{ padding: "4rem 1.5rem", background: "#0a0a0a" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           {STEPS.map((step, i) => (
             <div key={step.num} style={{
@@ -115,15 +115,15 @@ export default function HowItWorksPage() {
                 <h2 style={{ fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.02em", marginBottom: 10 }}>
                   {step.title}
                 </h2>
-                <p style={{ fontSize: "0.95rem", color: "#425466", lineHeight: 1.7, marginBottom: 10 }}>
+                <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, marginBottom: 10 }}>
                   {step.desc}
                 </p>
                 <p style={{
                   fontSize: "0.875rem", color: "#8898aa", lineHeight: 1.65,
                   padding: "0.75rem 1rem",
-                  background: "#f6f9fc",
+                  background: "rgba(255,255,255,0.02)",
                   borderRadius: 10,
-                  border: "1px solid #e3e8ef",
+                  border: "1px solid rgba(255,255,255,0.08)",
                 }}>
                   {step.detail}
                 </p>
@@ -134,7 +134,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Example daily plan */}
-      <section style={{ padding: "4rem 1.5rem", background: "#f6f9fc" }}>
+      <section style={{ padding: "4rem 1.5rem", background: "rgba(255,255,255,0.02)" }}>
         <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
           <h2 style={{
             fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)",
@@ -144,15 +144,15 @@ export default function HowItWorksPage() {
           }}>
             Here&apos;s what a typical day looks like
           </h2>
-          <p style={{ color: "#425466", marginBottom: "2rem", fontSize: "0.95rem" }}>
+          <p style={{ color: "rgba(255,255,255,0.5)", marginBottom: "2rem", fontSize: "0.95rem" }}>
             A real example from someone building a side business.
           </p>
 
           <div style={{
             maxWidth: 420, margin: "0 auto",
-            background: "#fff",
+            background: "#0a0a0a",
             borderRadius: 16,
-            border: "1px solid #e3e8ef",
+            border: "1px solid rgba(255,255,255,0.08)",
             boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
             padding: "1.5rem",
             textAlign: "left",
@@ -202,13 +202,13 @@ export default function HowItWorksPage() {
             {/* Coach note */}
             <div style={{
               marginTop: 14, padding: "10px 12px",
-              background: "#f6f9fc", borderRadius: 10,
-              border: "1px solid #e3e8ef",
+              background: "rgba(255,255,255,0.02)", borderRadius: 10,
+              border: "1px solid rgba(255,255,255,0.08)",
             }}>
               <div style={{ fontSize: "0.65rem", fontWeight: 700, color: "#635bff", letterSpacing: "0.05em", marginBottom: 4 }}>
                 AI COACHING INSIGHT
               </div>
-              <p style={{ fontSize: "0.78rem", color: "#425466", lineHeight: 1.5, margin: 0 }}>
+              <p style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.5, margin: 0 }}>
                 Your vocabulary retention is strong — you&apos;re consistently remembering 80%+ from previous sessions. Tomorrow I&apos;ll introduce a conversational roleplay exercise to build your confidence speaking.
               </p>
             </div>
@@ -217,7 +217,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Why 3 */}
-      <section style={{ padding: "4rem 1.5rem", background: "#fff" }}>
+      <section style={{ padding: "4rem 1.5rem", background: "#0a0a0a" }}>
         <div style={{ maxWidth: 650, margin: "0 auto", textAlign: "center" }}>
           <h2 style={{
             fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)",
@@ -227,13 +227,13 @@ export default function HowItWorksPage() {
           }}>
             Why three tasks?
           </h2>
-          <p style={{ fontSize: "1rem", color: "#425466", lineHeight: 1.8, marginBottom: "1rem" }}>
+          <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.8, marginBottom: "1rem" }}>
             Decision fatigue is real. The more choices you face, the less likely you are to act. Psychologists call it cognitive overload — and it&apos;s the #1 reason people abandon their goals.
           </p>
-          <p style={{ fontSize: "1rem", color: "#425466", lineHeight: 1.8, marginBottom: "1rem" }}>
+          <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.8, marginBottom: "1rem" }}>
             Three sits in the sweet spot: enough to make meaningful progress, few enough to stay focused. It&apos;s why we remember things in threes, present ideas in threes, and structure stories in three acts.
           </p>
-          <p style={{ fontSize: "1rem", color: "#425466", lineHeight: 1.8 }}>
+          <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.8 }}>
             Three tasks is a commitment you can keep. And consistency — not intensity — is what gets you to your goals.
           </p>
         </div>
@@ -257,7 +257,7 @@ export default function HowItWorksPage() {
             <Link href="/welcome" style={{
               display: "inline-block",
               padding: "0.875rem 2.5rem",
-              background: "#fff",
+              background: "#0a0a0a",
               color: "#635bff",
               fontWeight: 700,
               fontSize: "1rem",

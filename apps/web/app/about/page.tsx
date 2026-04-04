@@ -39,7 +39,7 @@ const VALUES = [
 
 export default function AboutPage() {
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", background: "#fff" }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#0a0a0a" }}>
       <MarketingNav />
 
       {/* Hero */}
@@ -58,14 +58,14 @@ export default function AboutPage() {
           }}>
             Everyone deserves a coach
           </h1>
-          <p style={{ fontSize: "1.05rem", color: "#425466", lineHeight: 1.7, maxWidth: 540, margin: "0 auto" }}>
+          <p style={{ fontSize: "1.05rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 540, margin: "0 auto" }}>
             Personal coaching used to cost hundreds of dollars an hour and was only available to a few. Threely was built to change that — to make real, adaptive coaching accessible to anyone with a goal.
           </p>
         </div>
       </section>
 
       {/* The problem */}
-      <section style={{ padding: "4rem 1.5rem", background: "#fff" }}>
+      <section style={{ padding: "4rem 1.5rem", background: "#0a0a0a" }}>
         <div style={{ maxWidth: 650, margin: "0 auto" }}>
           <h2 style={{
             fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)",
@@ -75,20 +75,20 @@ export default function AboutPage() {
           }}>
             The problem with productivity apps
           </h2>
-          <p style={{ fontSize: "1rem", color: "#425466", lineHeight: 1.8, marginBottom: "1rem" }}>
+          <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.8, marginBottom: "1rem" }}>
             There are thousands of to-do list apps, habit trackers, and planners. They all have one thing in common: they expect you to figure out what to do yourself.
           </p>
-          <p style={{ fontSize: "1rem", color: "#425466", lineHeight: 1.8, marginBottom: "1rem" }}>
+          <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.8, marginBottom: "1rem" }}>
             You set a goal like "learn guitar" or "launch my business" — and then stare at a blank task list. What should today look like? How much is too much? What comes after yesterday's work? These are the questions a good coach answers. And that&apos;s exactly what Threely does.
           </p>
-          <p style={{ fontSize: "1rem", color: "#425466", lineHeight: 1.8 }}>
+          <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.8 }}>
             Threely Intelligence takes your goal, your time constraints, your intensity preference, and your daily feedback — then generates exactly three actionable tasks that move you forward. Not tomorrow. Today.
           </p>
         </div>
       </section>
 
       {/* Values */}
-      <section style={{ padding: "4rem 1.5rem", background: "#f6f9fc" }}>
+      <section style={{ padding: "4rem 1.5rem", background: "rgba(255,255,255,0.02)" }}>
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
           <h2 style={{
             fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)",
@@ -107,13 +107,13 @@ export default function AboutPage() {
             {VALUES.map(v => (
               <div key={v.title} style={{
                 padding: "1.5rem",
-                background: "#fff",
+                background: "#0a0a0a",
                 borderRadius: 14,
-                border: "1px solid #e3e8ef",
+                border: "1px solid rgba(255,255,255,0.08)",
               }}>
                 <div style={{ fontSize: 28, marginBottom: 10 }}>{v.icon}</div>
                 <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 8 }}>{v.title}</h3>
-                <p style={{ fontSize: "0.875rem", color: "#425466", lineHeight: 1.65 }}>{v.desc}</p>
+                <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.65 }}>{v.desc}</p>
               </div>
             ))}
           </div>
@@ -121,7 +121,7 @@ export default function AboutPage() {
       </section>
 
       {/* How it works (brief) */}
-      <section style={{ padding: "4rem 1.5rem", background: "#fff" }}>
+      <section style={{ padding: "4rem 1.5rem", background: "#0a0a0a" }}>
         <div style={{ maxWidth: 650, margin: "0 auto" }}>
           <h2 style={{
             fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)",
@@ -131,10 +131,10 @@ export default function AboutPage() {
           }}>
             The daily coaching loop
           </h2>
-          <p style={{ fontSize: "1rem", color: "#425466", lineHeight: 1.8, marginBottom: "1.5rem" }}>
+          <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.8, marginBottom: "1.5rem" }}>
             Every day, Threely gives you three tasks tailored to your goal. You complete them, leave a quick review, and the AI generates a coaching insight. Then it uses everything — your feedback, your pace, your progress — to build a better plan for tomorrow.
           </p>
-          <p style={{ fontSize: "1rem", color: "#425466", lineHeight: 1.8, marginBottom: "2rem" }}>
+          <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.8, marginBottom: "2rem" }}>
             It&apos;s a feedback loop that compounds. The more you use it, the better it gets at knowing exactly what you need.
           </p>
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -151,9 +151,9 @@ export default function AboutPage() {
             </Link>
             <Link href="/pricing" style={{
               padding: "0.75rem 1.5rem",
-              background: "#fff",
+              background: "#0a0a0a",
               color: "#635bff",
-              border: "1.5px solid #e3e8ef",
+              border: "1.5px solid rgba(255,255,255,0.08)",
               borderRadius: 10,
               fontWeight: 600,
               fontSize: "0.95rem",
@@ -182,7 +182,7 @@ export default function AboutPage() {
           <Link href="/welcome" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
-            background: "#fff",
+            background: "#0a0a0a",
             color: "#635bff",
             fontWeight: 700,
             fontSize: "1rem",

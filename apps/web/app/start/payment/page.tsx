@@ -45,23 +45,23 @@ export default function PaymentPage() {
 // ─── Style constants ────────────────────────────────────────────────────────
 
 const CARD_STYLE: React.CSSProperties = {
-  background: "#fff",
+  background: "rgba(255,255,255,0.04)",
+  border: "1px solid rgba(255,255,255,0.08)",
   borderRadius: 20,
   padding: "28px 24px 32px",
   margin: "0 auto",
   maxWidth: 400,
-  boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
 };
 
 const INPUT_STYLE: React.CSSProperties = {
   width: "100%",
-  border: "1.5px solid #E3E8EF",
+  border: "1.5px solid rgba(255,255,255,0.12)",
   borderRadius: 12,
   padding: "14px 16px",
-  background: "#F6F9FC",
+  background: "rgba(255,255,255,0.06)",
   fontSize: "16px",
   fontFamily: "inherit",
-  color: "#0A2540",
+  color: "#fff",
   outline: "none",
   boxSizing: "border-box" as const,
   transition: "border-color 0.15s",
@@ -71,25 +71,25 @@ const LABEL_STYLE: React.CSSProperties = {
   display: "block",
   fontSize: "0.8rem",
   fontWeight: 600,
-  color: "#425466",
+  color: "rgba(255,255,255,0.5)",
   marginBottom: 6,
 };
 
 const STRIPE_ELEMENT_WRAPPER: React.CSSProperties = {
-  border: "1.5px solid #E3E8EF",
+  border: "1.5px solid rgba(255,255,255,0.12)",
   borderRadius: 12,
   padding: "14px 16px",
-  background: "#F6F9FC",
+  background: "rgba(255,255,255,0.06)",
   transition: "border-color 0.15s",
 };
 
 const STRIPE_ELEMENT_STYLE = {
   base: {
     fontSize: "16px",
-    color: "#0A2540",
+    color: "#fff",
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontSmoothing: "antialiased",
-    "::placeholder": { color: "#8898aa" },
+    "::placeholder": { color: "rgba(255,255,255,0.35)" },
   },
   invalid: { color: "#ff4d4f" },
 };
@@ -275,7 +275,7 @@ function PaymentForm() {
       <div className="payment-card" style={CARD_STYLE}>
         <h2 style={{
           fontWeight: 700,
-          color: "#0A2540",
+          color: "#fff",
           letterSpacing: "-0.3px",
           textAlign: "center",
           margin: "0 0 24px",
@@ -297,7 +297,7 @@ function PaymentForm() {
             alignItems: "center",
             marginBottom: 6,
           }}>
-            <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#0A2540" }}>
+            <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "#fff" }}>
               Total due today
             </span>
             <span style={{
@@ -309,7 +309,7 @@ function PaymentForm() {
               $0.00
             </span>
           </div>
-          <div style={{ fontSize: "0.75rem", color: "#425466", lineHeight: 1.4 }}>
+          <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.4 }}>
             7-day free trial &middot; you&apos;ll choose your plan next
           </div>
         </div>
@@ -346,7 +346,7 @@ function PaymentForm() {
                 borderRadius: 14,
                 fontSize: "0.9rem",
                 fontWeight: 600,
-                color: "#425466",
+                color: "rgba(255,255,255,0.5)",
                 cursor: "pointer",
                 transition: "border-color 0.15s, background 0.15s",
                 marginBottom: 16,
@@ -364,9 +364,9 @@ function PaymentForm() {
                   gap: 12,
                   margin: "4px 0 16px",
                 }}>
-                  <div style={{ flex: 1, height: 1, background: "#E3E8EF" }} />
+                  <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.12)" }} />
                   <span style={{ fontSize: "0.72rem", color: "#8898AA", fontWeight: 500 }}>or pay with card</span>
-                  <div style={{ flex: 1, height: 1, background: "#E3E8EF" }} />
+                  <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.12)" }} />
                 </div>
               )}
 
@@ -381,7 +381,7 @@ function PaymentForm() {
                   autoComplete="cc-name"
                   style={INPUT_STYLE}
                   onFocus={(e) => e.currentTarget.style.borderColor = "#635BFF"}
-                  onBlur={(e) => e.currentTarget.style.borderColor = "#E3E8EF"}
+                  onBlur={(e) => e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)"}
                 />
               </div>
 
@@ -437,7 +437,7 @@ function PaymentForm() {
                 style={{
                   width: "100%",
                   padding: "16px",
-                  background: !cardAllComplete ? "#E3E8EF" : "#635BFF",
+                  background: !cardAllComplete ? "rgba(255,255,255,0.12)" : "#635BFF",
                   color: !cardAllComplete ? "#8898AA" : "#fff",
                   border: "none",
                   borderRadius: 14,

@@ -107,7 +107,7 @@ const CATEGORIES = [
 
 export default function FaqPage() {
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", background: "#fff" }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#0a0a0a" }}>
       <MarketingNav />
 
       {/* Hero */}
@@ -126,14 +126,14 @@ export default function FaqPage() {
           }}>
             Frequently asked questions
           </h1>
-          <p style={{ fontSize: "1.05rem", color: "#425466", lineHeight: 1.7 }}>
+          <p style={{ fontSize: "1.05rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>
             Everything you need to know about Threely.
           </p>
         </div>
       </section>
 
       {/* FAQ sections */}
-      <section style={{ padding: "3.5rem 1.5rem", background: "#fff" }}>
+      <section style={{ padding: "3.5rem 1.5rem", background: "#0a0a0a" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           {CATEGORIES.map((cat, ci) => (
             <div key={cat.title} style={{ marginBottom: ci < CATEGORIES.length - 1 ? "3rem" : 0 }}>
@@ -150,13 +150,13 @@ export default function FaqPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                 {cat.items.map(item => (
                   <div key={item.q} style={{
-                    background: "#f6f9fc",
+                    background: "rgba(255,255,255,0.02)",
                     borderRadius: 14,
                     padding: "1.25rem 1.5rem",
-                    border: "1px solid #e3e8ef",
+                    border: "1px solid rgba(255,255,255,0.08)",
                   }}>
                     <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 8 }}>{item.q}</h3>
-                    <p style={{ fontSize: "0.9rem", color: "#425466", lineHeight: 1.7 }}>{item.a}</p>
+                    <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>{item.a}</p>
                   </div>
                 ))}
               </div>
@@ -182,7 +182,7 @@ export default function FaqPage() {
           <Link href="/welcome" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
-            background: "#fff",
+            background: "#0a0a0a",
             color: "#635bff",
             fontWeight: 700,
             fontSize: "1rem",

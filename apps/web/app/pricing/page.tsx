@@ -28,7 +28,7 @@ const FEATURES = [
 
 export default function PricingPage() {
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", background: "#fff" }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#0a0a0a" }}>
       <MarketingNav />
 
       {/* Hero */}
@@ -47,14 +47,14 @@ export default function PricingPage() {
           }}>
             Pricing
           </h1>
-          <p style={{ fontSize: "1.05rem", color: "#425466", lineHeight: 1.7 }}>
+          <p style={{ fontSize: "1.05rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>
             Get Pro free for 7 days. Cancel anytime.
           </p>
         </div>
       </section>
 
       {/* Pricing cards — 2 tiers */}
-      <section style={{ padding: "3.5rem 1.5rem", background: "#fff" }}>
+      <section style={{ padding: "3.5rem 1.5rem", background: "#0a0a0a" }}>
         <div style={{
           maxWidth: 700,
           margin: "0 auto",
@@ -67,8 +67,8 @@ export default function PricingPage() {
           <div style={{
             padding: "2rem 1.5rem",
             borderRadius: 16,
-            border: "1px solid #e3e8ef",
-            background: "#fff",
+            border: "1px solid rgba(255,255,255,0.08)",
+            background: "#0a0a0a",
           }}>
             <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#635bff", textTransform: "uppercase", marginBottom: 8 }}>
               MONTHLY
@@ -77,7 +77,7 @@ export default function PricingPage() {
               <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$12.99</span>
               <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/month</span>
             </div>
-            <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
+            <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.5)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
               Monthly access.<br />7 days free included.
             </p>
             <CheckoutButton plan="monthly" style={{
@@ -85,7 +85,7 @@ export default function PricingPage() {
               width: "100%",
               textAlign: "center",
               padding: "0.75rem 1.5rem",
-              background: "#fff",
+              background: "#0a0a0a",
               color: "#635bff",
               border: "1.5px solid #635bff",
               borderRadius: 10,
@@ -101,7 +101,7 @@ export default function PricingPage() {
             padding: "2rem 1.5rem",
             borderRadius: 16,
             border: "2px solid #635bff",
-            background: "#fff",
+            background: "#0a0a0a",
             position: "relative",
             boxShadow: "0 4px 20px rgba(99,91,255,0.12)",
           }}>
@@ -121,7 +121,7 @@ export default function PricingPage() {
               <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$99.99</span>
               <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/year</span>
             </div>
-            <p style={{ fontSize: "0.875rem", color: "#425466", marginBottom: "1.5rem", lineHeight: 1.5 }}>
+            <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.5)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
               $8.33/month · billed annually.<br />7 days free included.
             </p>
             <CheckoutButton plan="yearly" style={{
@@ -143,7 +143,7 @@ export default function PricingPage() {
       </section>
 
       {/* What's included */}
-      <section style={{ padding: "3.5rem 1.5rem", background: "#f6f9fc" }}>
+      <section style={{ padding: "3.5rem 1.5rem", background: "rgba(255,255,255,0.02)" }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <h2 style={{
             fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)",
@@ -165,7 +165,7 @@ export default function PricingPage() {
                 }}>
                   ✓
                 </div>
-                <span style={{ fontSize: "0.95rem", color: "#0a2540" }}>{f}</span>
+                <span style={{ fontSize: "0.95rem", color: "#e8e8e8" }}>{f}</span>
               </div>
             ))}
           </div>
@@ -173,7 +173,7 @@ export default function PricingPage() {
       </section>
 
       {/* Billing FAQ */}
-      <section style={{ padding: "3.5rem 1.5rem", background: "#fff" }}>
+      <section style={{ padding: "3.5rem 1.5rem", background: "#0a0a0a" }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <h2 style={{
             fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)",
@@ -192,13 +192,13 @@ export default function PricingPage() {
               { q: "Is there a refund policy?", a: "Yes! We offer a 7-day, no-questions-asked refund policy. If you're not satisfied within 7 days of your first charge, just email refund@threely.co and we'll refund you in full.", link: "/refund", linkText: "View Refund Policy" },
             ].map(item => (
               <div key={item.q} style={{
-                background: "#f6f9fc",
+                background: "rgba(255,255,255,0.02)",
                 borderRadius: 14,
                 padding: "1.25rem 1.5rem",
-                border: "1px solid #e3e8ef",
+                border: "1px solid rgba(255,255,255,0.08)",
               }}>
                 <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 8 }}>{item.q}</h3>
-                <p style={{ fontSize: "0.9rem", color: "#425466", lineHeight: 1.7 }}>{item.a}</p>
+                <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>{item.a}</p>
                 {"link" in item && item.link && (
                   <Link href={item.link} style={{
                     display: "inline-block",
@@ -237,7 +237,7 @@ export default function PricingPage() {
           <Link href="/welcome" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
-            background: "#fff",
+            background: "#0a0a0a",
             color: "#635bff",
             fontWeight: 700,
             fontSize: "1rem",
