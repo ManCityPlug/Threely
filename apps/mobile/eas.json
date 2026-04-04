@@ -17,6 +17,9 @@
     "production": {
       "autoIncrement": true,
       "channel": "main",
+      "env": {
+        "SENTRY_ALLOW_FAILURE": "true"
+      },
       "ios": {
         "image": "latest"
       }
