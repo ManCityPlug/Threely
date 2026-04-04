@@ -61,9 +61,7 @@
       }
     },
     "owner": "web9800",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
+    "runtimeVersion": "1.0.0",
     "updates": {
       "url": "https://u.expo.dev/af6f7b2a-7755-4aa1-b8a8-15421c34cbe1"
     }
