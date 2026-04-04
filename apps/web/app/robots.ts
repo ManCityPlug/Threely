@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/login", "/register", "/welcome", "/onboarding", "/dashboard", "/goals", "/profile", "/payment"],
+        disallow: ["/api/", "/login", "/register", "/start", "/onboarding", "/dashboard", "/goals", "/profile", "/payment"],
       },
     ],
     sitemap: "https://threely.co/sitemap.xml",

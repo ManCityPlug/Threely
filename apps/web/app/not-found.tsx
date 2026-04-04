@@ -12,10 +12,10 @@ export default function NotFound() {
     }}>
       <div style={{ textAlign: "center", padding: "2rem" }}>
         <img src="/favicon.png" alt="Threely" width={52} height={52} style={{ borderRadius: 14, margin: "0 auto 1.5rem", display: "block" }} />
-        <h1 style={{ fontSize: "2rem", fontWeight: 700, color: "#0a2540", marginBottom: 8 }}>
+        <h1 style={{ fontSize: "2rem", fontWeight: 700, color: "#e8e8e8", marginBottom: 8 }}>
           404
         </h1>
-        <p style={{ color: "#425466", marginBottom: "1.5rem" }}>
+        <p style={{ color: "rgba(255,255,255,0.5)", marginBottom: "1.5rem" }}>
           This page doesn't exist.
         </p>
         <Link href="/" style={{

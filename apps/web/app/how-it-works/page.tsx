@@ -101,7 +101,7 @@ export default function HowItWorksPage() {
                 {i < STEPS.length - 1 && (
                   <div style={{
                     width: 2, flex: 1, minHeight: 40,
-                    background: "linear-gradient(to bottom, #635bff, #e3e8ef)",
+                    background: "linear-gradient(to bottom, #635bff, rgba(255,255,255,0.12))",
                     marginTop: 8,
                   }} />
                 )}
@@ -176,7 +176,7 @@ export default function HowItWorksPage() {
               <div key={task.text} style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 12 }}>
                 <div style={{
                   width: 22, height: 22, borderRadius: "50%",
-                  border: task.done ? "none" : "2px solid #e3e8ef",
+                  border: task.done ? "none" : "2px solid rgba(255,255,255,0.12)",
                   background: task.done ? "#635bff" : "transparent",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   flexShrink: 0, marginTop: 1,
@@ -186,7 +186,7 @@ export default function HowItWorksPage() {
                 <div style={{ flex: 1 }}>
                   <span style={{
                     fontSize: "0.85rem",
-                    color: task.done ? "#8898aa" : "#0a2540",
+                    color: task.done ? "#8898aa" : "#e8e8e8",
                     textDecoration: task.done ? "line-through" : "none",
                     lineHeight: 1.4,
                   }}>

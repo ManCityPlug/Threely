@@ -198,11 +198,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const initials = nickname[0]?.toUpperCase() ?? "?";
 
   const subBadge = subStatus === "trialing"
-    ? { label: "Pro", bg: "#ecfdf5", color: "#059669" }
+    ? { label: "Pro", bg: "rgba(5,150,105,0.15)", color: "#34d399" }
     : subStatus === "active"
     ? { label: "Pro", bg: "var(--primary-light)", color: "var(--primary)" }
     : subStatus !== undefined
-    ? { label: "No plan", bg: "#f3f4f6", color: "#6b7280" }
+    ? { label: "No plan", bg: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)" }
     : null;
 
   async function handleSignOut() {

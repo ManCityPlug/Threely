@@ -49,7 +49,7 @@ function BuildingProgress() {
         {BUILDING_STEPS.map((_, i) => (
           <div key={i} style={{
             width: 8, height: 8, borderRadius: 4,
-            backgroundColor: i <= stepIdx ? "#635bff" : "#e3e8ef",
+            backgroundColor: i <= stepIdx ? "#635bff" : "rgba(255,255,255,0.15)",
             transition: "background-color 0.3s",
           }} />
         ))}

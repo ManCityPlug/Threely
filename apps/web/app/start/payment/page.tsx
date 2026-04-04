@@ -342,7 +342,7 @@ function PaymentForm() {
                 width: "100%",
                 padding: "14px",
                 background: "none",
-                border: "1.5px solid #E3E8EF",
+                border: "1.5px solid rgba(255,255,255,0.12)",
                 borderRadius: 14,
                 fontSize: "0.9rem",
                 fontWeight: 600,
@@ -482,7 +482,7 @@ function PaymentForm() {
           color: "#8898AA",
           marginTop: 20,
           paddingTop: 16,
-          borderTop: "1px solid #E3E8EF",
+          borderTop: "1px solid rgba(255,255,255,0.08)",
         }}>
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />

@@ -313,7 +313,7 @@ function UpdateCardForm({
   const elementStyle = {
     base: {
       fontSize: "14px",
-      color: "#0a2540",
+      color: "#e8e8e8",
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       "::placeholder": { color: "#8898aa" },
     },
