@@ -38,16 +38,18 @@ export default function LandingPage() {
   return (
     <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "#e8e8e8", background: "#0a0a0a", overflowX: "hidden", minHeight: "100vh" }}>
       <style>{`
-        @keyframes logoZoom { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+        @keyframes logoBreathe {
+          0%,100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(99,91,255,0.2)); }
+          50% { transform: scale(1.12); filter: drop-shadow(0 0 28px rgba(99,91,255,0.6)); }
+        }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes glow { 0%,100% { box-shadow: 0 0 30px rgba(99,91,255,0.2); } 50% { box-shadow: 0 0 50px rgba(99,91,255,0.4); } }
-        @keyframes logoPulse { 0%,100% { filter: drop-shadow(0 0 8px rgba(99,91,255,0.3)); } 50% { filter: drop-shadow(0 0 20px rgba(99,91,255,0.6)); } }
         .fade-up { animation: fadeUp 0.6s ease both; }
         .fade-up-d1 { animation: fadeUp 0.6s ease 0.1s both; }
         .fade-up-d2 { animation: fadeUp 0.6s ease 0.2s both; }
         .fade-up-d3 { animation: fadeUp 0.6s ease 0.3s both; }
         .hero-cta { animation: glow 3s ease-in-out infinite; }
-        .hero-logo { animation: logoZoom 5s ease-in-out infinite, logoPulse 4s ease-in-out infinite; }
+        .hero-logo { animation: logoBreathe 3s ease-in-out infinite; }
       `}</style>
 
       {/* ─── Nav ──────────────────────────────────────────────────────────────── */}
