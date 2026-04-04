@@ -84,7 +84,7 @@ export default function LandingPage() {
             }}>Log In</Link>
             <Link href={ctaHref} style={{
               padding: "0.5rem 1.25rem", fontSize: "0.85rem", fontWeight: 600,
-              color: "#000", background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)", borderRadius: 8,
+              color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 8,
               textDecoration: "none", marginLeft: 4,
             }}>{ctaLabel}</Link>
           </div>
@@ -125,7 +125,7 @@ export default function LandingPage() {
           ))}
           <Link href={ctaHref} onClick={() => setMenuOpen(false)} style={{
             marginTop: 20, padding: "0.9rem 2rem", fontSize: "1rem", fontWeight: 700,
-            color: "#000", background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)", borderRadius: 12,
+            color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 12,
             textDecoration: "none", textAlign: "center",
           }}>{ctaLabel}</Link>
         </div>
@@ -181,7 +181,7 @@ export default function LandingPage() {
         <Link href={ctaHref} className="hero-cta fade-up-d3" style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
-          color: "#000", background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)", borderRadius: 14,
+          color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 14,
           textDecoration: "none", transition: "transform 0.15s, box-shadow 0.15s",
           boxShadow: "0 0 30px rgba(212,168,67,0.3)",
         }}>
@@ -352,7 +352,7 @@ export default function LandingPage() {
         <Link href={ctaHref} style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
-          color: "#000", background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)", borderRadius: 14,
+          color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 14,
           textDecoration: "none",
           boxShadow: "0 0 30px rgba(212,168,67,0.3)",
         }}>

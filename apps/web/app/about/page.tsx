@@ -140,7 +140,7 @@ export default function AboutPage() {
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
             <Link href="/how-it-works" style={{
               padding: "0.75rem 1.5rem",
-              background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)",
+              background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)",
               color: "#fff",
               borderRadius: 10,
               fontWeight: 700,

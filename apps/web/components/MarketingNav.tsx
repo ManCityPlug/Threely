@@ -77,7 +77,7 @@ export default function MarketingNav() {
               fontSize: "0.875rem",
               fontWeight: 600,
               color: "#000",
-              background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)",
+              background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)",
               borderRadius: 8,
               textDecoration: "none",
             }}>
@@ -101,7 +101,7 @@ export default function MarketingNav() {
                 fontSize: "0.875rem",
                 fontWeight: 600,
                 color: "#000",
-                background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)",
+                background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)",
                 borderRadius: 8,
                 textDecoration: "none",
               }}>
@@ -156,7 +156,7 @@ export default function MarketingNav() {
                 padding: "0.6rem 0",
                 fontSize: "0.875rem", fontWeight: 600,
                 color: "#000",
-                background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)",
+                background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)",
                 borderRadius: 8,
                 textDecoration: "none",
               }}>
@@ -180,7 +180,7 @@ export default function MarketingNav() {
                   padding: "0.6rem 0",
                   fontSize: "0.875rem", fontWeight: 600,
                   color: "#000",
-                  background: "linear-gradient(135deg, #D4A843 0%, #C49032 100%)",
+                  background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)",
                   borderRadius: 8,
                   textDecoration: "none",
                 }}>
