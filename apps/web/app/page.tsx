@@ -39,8 +39,8 @@ export default function LandingPage() {
     <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "#e8e8e8", background: "#0a0a0a", overflowX: "hidden", minHeight: "100vh" }}>
       <style>{`
         @keyframes logoBreathe {
-          0%,100% { transform: scale(1); filter: drop-shadow(0 0 8px rgba(99,91,255,0.2)); }
-          50% { transform: scale(1.12); filter: drop-shadow(0 0 28px rgba(99,91,255,0.6)); }
+          0%,100% { transform: scale(1); filter: drop-shadow(0 0 16px rgba(99,91,255,0.4)) drop-shadow(0 0 40px rgba(99,91,255,0.15)); }
+          50% { transform: scale(1.14); filter: drop-shadow(0 0 36px rgba(99,91,255,0.8)) drop-shadow(0 0 70px rgba(99,91,255,0.3)); }
         }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes glow { 0%,100% { box-shadow: 0 0 30px rgba(99,91,255,0.2); } 50% { box-shadow: 0 0 50px rgba(99,91,255,0.4); } }
