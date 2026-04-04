@@ -9,7 +9,6 @@ const NAV_LINKS = [
   { href: "/how-it-works", label: "How it works" },
   { href: "/pricing", label: "Pricing" },
   { href: "/faq", label: "FAQ" },
-  { href: "/about", label: "About" },
   { href: "/support", label: "Support" },
 ];
 
@@ -45,7 +44,7 @@ export default function MarketingNav() {
         {/* Left: Logo */}
         <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 28 }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            <img src="/favicon.png" alt="Threely" width={34} height={34} style={{ borderRadius: 9 }} />
+            
             <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em", color: "#e8e8e8" }}>Threely</span>
           </Link>
 

@@ -78,7 +78,7 @@ export default function LandingPage() {
         maxWidth: 1200, margin: "0 auto", width: "100%",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/favicon.png" alt="Threely" width={32} height={32} style={{ borderRadius: 8 }} />
+          
           <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "#fff", letterSpacing: "-0.02em" }}>Threely</span>
         </div>
         {!isMobile ? (

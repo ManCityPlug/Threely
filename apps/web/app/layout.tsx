@@ -29,6 +29,10 @@ export const metadata: Metadata = {
     apple: "/icon-192x192.png",
   },
   manifest: "/manifest.json",
+  other: {
+    "theme-color": "#0a0a0a",
+    "apple-mobile-web-app-status-bar-style": "black-translucent",
+  },
 };
 
 // Inline script to prevent flash of wrong theme on page load
