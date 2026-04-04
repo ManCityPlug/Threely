@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getSupabase } from "@/lib/supabase-client";
 
-const TESTIMONIALS = [
+const TESTIMONIALS: { quote: string; author: string; label: string; image?: string }[] = [
   { quote: "I had a Shopify store just sitting there. Threely laid out the plan — SEO, emails, what to fix first. First time I felt like I knew what I was doing.", author: "James R.", label: "E-commerce" },
   { quote: "Been running my brand for a year and still wasn't getting much done. This app gave me a step by step plan that made sense. Revenue is way up.", author: "Daniel K.", label: "Brand Owner" },
-  { quote: "I always went to the gym and did random stuff. Threely mapped out what to do each day with science-backed workouts. 2 months in, haven't missed a day.", author: "Melissa T.", label: "Fitness" },
+  { quote: "This app is actually very useful. Been getting amazing progress in the gym with it.", author: "Nikolay M.", label: "Fitness", image: "/nikolay.png" },
 ];
 
 const FAQ = [
@@ -222,7 +222,7 @@ export default function LandingPage() {
         <div className="reveal" style={{ textAlign: "center", marginBottom: 60 }}>
           <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>How It Works</p>
           <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
-            Stop guessing. Start executing.
+            Stop guessing.
           </h2>
         </div>
 
@@ -272,9 +272,13 @@ export default function LandingPage() {
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 100, background: "rgba(212,168,67,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, color: "#D4A843" }}>
-                    {t.author[0]}
-                  </div>
+                  {t.image ? (
+                    <img src={t.image} alt={t.author} style={{ width: 36, height: 36, borderRadius: 100, objectFit: "cover" }} />
+                  ) : (
+                    <div style={{ width: 36, height: 36, borderRadius: 100, background: "rgba(212,168,67,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, color: "#D4A843" }}>
+                      {t.author[0]}
+                    </div>
+                  )}
                   <div>
                     <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff" }}>{t.author}</div>
                     <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.4)" }}>{t.label}</div>
