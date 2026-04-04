@@ -193,7 +193,8 @@ export default function LandingPage() {
           maxWidth: 800, margin: "0 0 24px",
         }}>
           10x Your Productivity.<br />
-          <span style={{ color: "rgba(255,255,255,0.5)" }}>Become Rich as F*ck.</span>
+          <span style={{ color: "rgba(255,255,255,0.5)" }}>Become</span><br />
+          <span style={{ color: "rgba(255,255,255,0.5)" }}>Rich as F*ck.</span>
         </h1>
 
         {/* CTA */}
