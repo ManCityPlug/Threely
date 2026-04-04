@@ -352,7 +352,7 @@ export default function LandingPage() {
           Ready to level up?
         </h2>
         <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", marginBottom: 32 }}>
-          Your first 7 days are free. No credit card required.
+          Your first 7 days are free.
         </p>
         <Link href={ctaHref} style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
