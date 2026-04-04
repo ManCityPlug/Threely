@@ -540,9 +540,9 @@ export default function ProfilePage() {
                   onClick={() => {
                     if (confirm("Would you like to go through the guided tutorial? It will walk you through all the features.")) {
                       if (user) {
-                        localStorage.removeItem(`threely_tutorial_done_${user.id}`);
+                        try { localStorage.removeItem(`threely_tutorial_done_${user.id}`); } catch {}
                       }
-                      window.location.href = "/dashboard";
+                      window.location.href = "/dashboard?welcome=1";
                     }
                   }}
                   style={{ fontSize: "0.82rem", padding: "6px 16px" }}

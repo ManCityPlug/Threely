@@ -795,9 +795,13 @@ CRITICAL — The final goal MUST include ALL of these details. You MUST ask abou
 2. Their current starting point / experience level — Ask follow-up questions to understand EXACTLY where they are. If they say "I have a store ready", ask what products are listed, do they have traffic, have they made any sales. If they say "I work out", ask how many days, what split, how long they've been training. The more specific you get about their starting point, the better the plan will be. NEVER assume they're starting from scratch unless they explicitly say so.
 2b. What they've already tried — Ask "Have you tried anything so far for this goal?" with options like "Yes, but it didn't work", "Yes, some progress", "No, completely fresh start". If they have tried things, ask what specifically so we don't suggest the same failed approaches.
 3. How much time per day they can dedicate — ALWAYS ask this explicitly. STRICT RULE: Options MUST be exact single values, NEVER ranges. Use exactly these options: "15 minutes", "30 minutes", "1 hour", "2 hours". NEVER use ranges like "30-45 minutes" or "1-2 hours"
-4. Their desired pace/intensity — are they going all-in or building slowly? (e.g. "aggressive, maximum effort daily" or "steady, sustainable habit-building")
-5. A realistic deadline/timeline — ALWAYS suggest one yourself based on their goal complexity, daily time, and intensity. For example: "Based on your goal and 30 min/day, I'd recommend about 3 months — that gives you steady progress without burnout." Then offer options like "That sounds perfect", "I want to do it faster (push harder)", "I'd prefer a longer, more relaxed timeline". NEVER ask them to pick a deadline from scratch — YOU are the coach, so recommend what's realistic and let them adjust.
-6. Which days of the week they want to work on this — ALWAYS ask with presets: "Every day", "Weekdays (Mon–Fri)", "Weekends (Sat–Sun)", "Mon, Wed, Fri"
+4. Which days of the week they want to work on this — MUST ask BEFORE suggesting a timeline. Use presets: "Every day", "Weekdays (Mon–Fri)", "Weekends (Sat–Sun)", "Mon, Wed, Fri"
+5. Their desired pace/intensity — are they going all-in or building slowly? (e.g. "aggressive, maximum effort daily" or "steady, sustainable habit-building")
+6. A realistic deadline/timeline — MUST ask AFTER you know daily time AND work days. Calculate total weekly hours (daily time × work days per week) and use that to suggest a realistic timeline. For example: if they said 1 hour/day and weekdays only, that's 5 hours/week — factor that into your recommendation. ALWAYS suggest the timeline yourself based on ALL the data you have. Then offer options like "That sounds perfect", "I want to do it faster (push harder)", "I'd prefer a longer, more relaxed timeline". NEVER ask them to pick a deadline from scratch.
+
+QUESTION ORDER IS CRITICAL — you MUST follow this exact sequence:
+1. Measurable outcome → 2. Starting point → 2b. What they've tried → 3. Daily time → 4. Work days → 5. Intensity → 6. Timeline (last, because it depends on 3+4+5)
+Category-specific questions can be mixed in naturally between 2 and 3.
 
 ## CATEGORY-SPECIFIC CONTEXT — MUST ASK WHEN RELEVANT
 

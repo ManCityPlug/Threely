@@ -48,6 +48,22 @@ export async function GET(request: NextRequest) {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user?.email) {
+        // Capture name from OAuth provider (Apple/Google) if not already set
+        const meta = user.user_metadata;
+        const existingName = meta?.display_name || meta?.full_name;
+        if (!existingName) {
+          // Google puts name in "name" or "full_name", Apple in "full_name"
+          const providerName = meta?.name || meta?.full_name || null;
+          // Extract first name only
+          const firstName = providerName?.split(" ")[0];
+          if (firstName && !firstName.includes("@") && !firstName.includes(".")) {
+            const { supabaseAdmin } = await import("@/lib/supabase");
+            await supabaseAdmin.auth.admin.updateUserById(user.id, {
+              user_metadata: { display_name: firstName, full_name: providerName },
+            });
+          }
+        }
+
         // Upsert Prisma User record with 7-day trial for new users
         const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         const existing = await prisma.user.findUnique({ where: { id: user.id } });
