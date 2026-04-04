@@ -223,7 +223,7 @@ export default function PricingPage() {
       {/* CTA */}
       <section style={{
         padding: "4rem 1.5rem",
-        background: "linear-gradient(135deg, #635bff 0%, #5144e8 100%)",
+        background: "#0a0a0a", borderTop: "1px solid rgba(255,255,255,0.06)",
         textAlign: "center",
         color: "#fff",
       }}>
@@ -237,8 +237,8 @@ export default function PricingPage() {
           <Link href="/welcome" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
-            background: "#0a0a0a",
-            color: "#635bff",
+            background: "#635bff",
+            color: "#fff",
             fontWeight: 700,
             fontSize: "1rem",
             borderRadius: 10,

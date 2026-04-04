@@ -57,7 +57,7 @@ export default function MarketingNav() {
                   padding: "0.35rem 0.75rem",
                   fontSize: "0.85rem",
                   fontWeight: 500,
-                  color: pathname === link.href ? "#635bff" : "#425466",
+                  color: pathname === link.href ? "#635bff" : "rgba(255,255,255,0.6)",
                   borderRadius: 6,
                   textDecoration: "none",
                   transition: "color 0.15s",
@@ -118,9 +118,9 @@ export default function MarketingNav() {
               }}
               aria-label="Menu"
             >
-              <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
-              <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
-              <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
+              <span style={{ width: 20, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
+              <span style={{ width: 20, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
+              <span style={{ width: 20, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
             </button>
           )}
         </div>
@@ -141,8 +141,8 @@ export default function MarketingNav() {
               padding: "0.6rem 0",
               fontSize: "0.9rem",
               fontWeight: 600,
-              color: pathname === link.href ? "#635bff" : "#0a2540",
-              borderBottom: "1px solid #f0f0f0",
+              color: pathname === link.href ? "#635bff" : "rgba(255,255,255,0.8)",
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
               textDecoration: "none",
               display: "block",
             }}>

@@ -179,7 +179,7 @@ export default function MobileAppPrompt() {
               style={{
                 fontSize: "0.85rem",
                 fontWeight: 700,
-                color: "#0a2540",
+                color: "#e8e8e8",
                 lineHeight: 1.3,
               }}
             >

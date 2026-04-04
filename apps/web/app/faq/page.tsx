@@ -168,7 +168,7 @@ export default function FaqPage() {
       {/* CTA */}
       <section style={{
         padding: "4rem 1.5rem",
-        background: "linear-gradient(135deg, #635bff 0%, #5144e8 100%)",
+        background: "#0a0a0a", borderTop: "1px solid rgba(255,255,255,0.06)",
         textAlign: "center",
         color: "#fff",
       }}>

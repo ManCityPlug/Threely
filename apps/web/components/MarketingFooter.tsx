@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function MarketingFooter() {
   return (
     <footer style={{
-      background: "#0a2540",
+      background: "#0a0a0a", borderTop: "1px solid rgba(255,255,255,0.06)",
       color: "rgba(255,255,255,0.5)",
       padding: "3.5rem 1.5rem 2rem",
       fontSize: "0.825rem",

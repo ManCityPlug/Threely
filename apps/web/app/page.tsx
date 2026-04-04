@@ -38,7 +38,7 @@ export default function LandingPage() {
   return (
     <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "#e8e8e8", background: "#0a0a0a", overflowX: "hidden", minHeight: "100vh" }}>
       <style>{`
-        @keyframes logoFloat { 0%,100% { transform: translateY(0px) rotate(0deg); } 25% { transform: translateY(-6px) rotate(3deg); } 50% { transform: translateY(-10px) rotate(0deg); } 75% { transform: translateY(-6px) rotate(-3deg); } }
+        @keyframes logoZoom { 0%,100% { transform: scale(1); } 50% { transform: scale(1.08); } }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes glow { 0%,100% { box-shadow: 0 0 30px rgba(99,91,255,0.2); } 50% { box-shadow: 0 0 50px rgba(99,91,255,0.4); } }
         @keyframes logoPulse { 0%,100% { filter: drop-shadow(0 0 8px rgba(99,91,255,0.3)); } 50% { filter: drop-shadow(0 0 20px rgba(99,91,255,0.6)); } }
@@ -47,7 +47,7 @@ export default function LandingPage() {
         .fade-up-d2 { animation: fadeUp 0.6s ease 0.2s both; }
         .fade-up-d3 { animation: fadeUp 0.6s ease 0.3s both; }
         .hero-cta { animation: glow 3s ease-in-out infinite; }
-        .hero-logo { animation: logoFloat 6s ease-in-out infinite, logoPulse 4s ease-in-out infinite; }
+        .hero-logo { animation: logoZoom 5s ease-in-out infinite, logoPulse 4s ease-in-out infinite; }
       `}</style>
 
       {/* ─── Nav ──────────────────────────────────────────────────────────────── */}
@@ -170,7 +170,7 @@ export default function LandingPage() {
           color: "rgba(255,255,255,0.5)", lineHeight: 1.6,
           maxWidth: 520, margin: "0 0 40px",
         }}>
-          Know exactly what to do when you open the app. Every single day.
+          Know exactly what to do when you open the app.<br />Every single day.
         </p>
 
         {/* CTA */}
