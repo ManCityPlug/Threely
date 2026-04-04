@@ -63,18 +63,16 @@ export async function POST(request: NextRequest) {
   }
 
   // Check if user already has a real display name (skip name question if so)
-  // During onboarding, always ask — email-derived names don't count
+  // Apple/Google sign-in provides real names — use those. Only filter out email-derived names.
   let userName: string | null = null;
-  if (!onboarding) {
-    try {
-      const { data } = await (await import("@/lib/supabase")).supabaseAdmin.auth.admin.getUserById(user.id);
-      const name = data?.user?.user_metadata?.display_name || data?.user?.user_metadata?.full_name || null;
-      // Only use it if it looks like a real name (not an email prefix)
-      if (name && !name.includes("@") && !name.includes(".") && !/^\d+$/.test(name)) {
-        userName = name;
-      }
-    } catch { /* ignore */ }
-  }
+  try {
+    const { data } = await (await import("@/lib/supabase")).supabaseAdmin.auth.admin.getUserById(user.id);
+    const name = data?.user?.user_metadata?.display_name || data?.user?.user_metadata?.full_name || null;
+    // Only use it if it looks like a real name (not an email prefix like "erik.mitev37")
+    if (name && !name.includes("@") && !name.includes(".") && !/^\d+$/.test(name)) {
+      userName = name;
+    }
+  } catch { /* ignore */ }
 
   try {
     const result = await goalChat(messages, user.id, userName);
