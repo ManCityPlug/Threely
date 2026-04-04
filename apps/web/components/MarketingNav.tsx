@@ -39,16 +39,16 @@ export default function MarketingNav() {
         borderBottom: "1px solid rgba(255,255,255,0.06)",
         padding: "0 1.25rem",
         height: 60,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
+        display: "flex", alignItems: "center", justifyContent: "center",
       }}>
         {/* Left: Logo */}
-        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 28 }}>
+        <div style={{ position: "absolute", left: "1.25rem", display: "flex", alignItems: "center" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-            
             <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em", color: "#e8e8e8" }}>Threely</span>
           </Link>
+        </div>
 
-          {/* Desktop nav links */}
+          {/* Desktop nav links — centered */}
           {!isMobile && (
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               {NAV_LINKS.map(link => (
@@ -66,10 +66,9 @@ export default function MarketingNav() {
               ))}
             </div>
           )}
-        </div>
 
         {/* Right: Auth buttons (desktop) or Hamburger (mobile) */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ position: "absolute", right: "1.25rem", display: "flex", alignItems: "center", gap: 10 }}>
           {!isMobile && loggedIn && (
             <Link href="/dashboard" style={{
               padding: "0.4rem 1rem",
