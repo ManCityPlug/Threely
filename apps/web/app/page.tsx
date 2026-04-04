@@ -11,7 +11,7 @@ const TESTIMONIALS: { quote: string; author: string; label: string; image?: stri
 ];
 
 const FAQ = [
-  { q: "Does it work for any goal?", a: "Fitness, launching a business, learning a skill — anything. You describe what you want and Threely builds a real daily plan tailored to your experience, timeline, and schedule." },
+  { q: "How is this different from ChatGPT?", a: "Threely gives you the same playbook that million-dollar brands use to grow — applied directly to your business, built around your schedule, and updated every morning based on your real progress. ChatGPT gives you generic advice you already know. Threely tells you exactly what to do, how to do it, and hands you the exact resources to get it done." },
   { q: "How personalized is it?", a: "Every set of tasks is generated fresh based on your goal, what you completed yesterday, your review feedback, and your available time. It gets better the more you use it." },
   { q: "What if I miss a day?", a: "No guilt. Just open Threely and pick up where you left off. Your progress and goal context are preserved." },
   { q: "Is it free?", a: "7-day free trial with full access. After that, choose a plan to keep your daily tasks and coaching generating." },
@@ -160,7 +160,7 @@ export default function LandingPage() {
       )}
 
       {/* ─── Hero ─────────────────────────────────────────────────────────────── */}
-      <section style={{
+      <section className="reveal revealed" style={{
         minHeight: "90vh", display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center", textAlign: "center",
         padding: isMobile ? "3rem 1.5rem" : "5rem 2rem",
@@ -173,7 +173,7 @@ export default function LandingPage() {
         </div>
 
         {/* Pill badge */}
-        <div className="fade-up" style={{
+        <div style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           padding: "0.4rem 1.25rem", borderRadius: 100,
           border: "1px solid rgba(255,255,255,0.12)",
@@ -186,18 +186,18 @@ export default function LandingPage() {
         </div>
 
         {/* Headline */}
-        <h1 className="fade-up-d1" style={{
+        <h1 style={{
           fontSize: isMobile ? "2.5rem" : "4.5rem",
           fontWeight: 800, lineHeight: 1.05,
           letterSpacing: "-0.03em", color: "#fff",
           maxWidth: 800, margin: "0 0 24px",
         }}>
           10x Your Productivity.<br />
-          <span style={{ color: "rgba(255,255,255,0.5)" }}>Become Unrecognizable.</span>
+          <span style={{ color: "rgba(255,255,255,0.5)" }}>Become Rich as F*ck.</span>
         </h1>
 
         {/* CTA */}
-        <Link href={ctaHref} className="hero-cta fade-up-d2" style={{
+        <Link href={ctaHref} className="hero-cta" style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
           color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 14,
@@ -268,22 +268,21 @@ export default function LandingPage() {
                 background: "rgba(255,255,255,0.03)",
                 border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: 16, padding: "1.75rem",
+                display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
               }}>
+                {t.image ? (
+                  <img src={t.image} alt={t.author} style={{ width: 80, height: 80, borderRadius: 100, objectFit: "cover", marginBottom: 16 }} />
+                ) : (
+                  <div style={{ width: 80, height: 80, borderRadius: 100, background: "rgba(212,168,67,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem", fontWeight: 700, color: "#D4A843", marginBottom: 16 }}>
+                    {t.author[0]}
+                  </div>
+                )}
                 <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.7, marginBottom: 16 }}>
                   &ldquo;{t.quote}&rdquo;
                 </p>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  {t.image ? (
-                    <img src={t.image} alt={t.author} style={{ width: 48, height: 48, borderRadius: 100, objectFit: "cover" }} />
-                  ) : (
-                    <div style={{ width: 48, height: 48, borderRadius: 100, background: "rgba(212,168,67,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.95rem", fontWeight: 700, color: "#D4A843" }}>
-                      {t.author[0]}
-                    </div>
-                  )}
-                  <div>
-                    <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>{t.author}</div>
-                    <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.4)" }}>{t.label}</div>
-                  </div>
+                <div>
+                  <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>{t.author}</div>
+                  <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.4)" }}>{t.label}</div>
                 </div>
               </div>
             ))}
