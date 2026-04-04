@@ -37,6 +37,17 @@ export default function LandingPage() {
 
   return (
     <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "#e8e8e8", background: "#0a0a0a", overflowX: "hidden", minHeight: "100vh" }}>
+      <style>{`
+        @keyframes float { 0%,100% { transform: translateY(0px); } 50% { transform: translateY(-8px); } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes glow { 0%,100% { box-shadow: 0 0 30px rgba(99,91,255,0.2); } 50% { box-shadow: 0 0 50px rgba(99,91,255,0.4); } }
+        .fade-up { animation: fadeUp 0.6s ease both; }
+        .fade-up-d1 { animation: fadeUp 0.6s ease 0.1s both; }
+        .fade-up-d2 { animation: fadeUp 0.6s ease 0.2s both; }
+        .fade-up-d3 { animation: fadeUp 0.6s ease 0.3s both; }
+        .hero-cta { animation: glow 3s ease-in-out infinite; }
+        .hero-logo { animation: float 4s ease-in-out infinite; }
+      `}</style>
 
       {/* ─── Nav ──────────────────────────────────────────────────────────────── */}
       <nav style={{
@@ -123,8 +134,13 @@ export default function LandingPage() {
         background: "radial-gradient(ellipse at 50% 0%, rgba(99,91,255,0.08) 0%, transparent 60%)",
         position: "relative",
       }}>
+        {/* Floating logo */}
+        <div className="hero-logo" style={{ marginBottom: 24 }}>
+          <img src="/favicon.png" alt="" width={56} height={56} style={{ borderRadius: 16, opacity: 0.9 }} />
+        </div>
+
         {/* Pill badge */}
-        <div style={{
+        <div className="fade-up" style={{
           display: "inline-flex", alignItems: "center", gap: 8,
           padding: "0.4rem 1.25rem", borderRadius: 100,
           border: "1px solid rgba(255,255,255,0.12)",
@@ -137,7 +153,7 @@ export default function LandingPage() {
         </div>
 
         {/* Headline */}
-        <h1 style={{
+        <h1 className="fade-up-d1" style={{
           fontSize: isMobile ? "2.5rem" : "4.5rem",
           fontWeight: 800, lineHeight: 1.05,
           letterSpacing: "-0.03em", color: "#fff",
@@ -148,7 +164,7 @@ export default function LandingPage() {
         </h1>
 
         {/* Sub */}
-        <p style={{
+        <p className="fade-up-d2" style={{
           fontSize: isMobile ? "1rem" : "1.2rem",
           color: "rgba(255,255,255,0.5)", lineHeight: 1.6,
           maxWidth: 520, margin: "0 0 40px",
@@ -157,7 +173,7 @@ export default function LandingPage() {
         </p>
 
         {/* CTA */}
-        <Link href={ctaHref} style={{
+        <Link href={ctaHref} className="hero-cta fade-up-d3" style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
           color: "#fff", background: "#635bff", borderRadius: 14,
@@ -172,25 +188,8 @@ export default function LandingPage() {
         </p>
       </section>
 
-      {/* ─── Social Proof Bar ─────────────────────────────────────────────────── */}
-      <div style={{
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
-        padding: "1.5rem 2rem",
-        display: "flex", justifyContent: "center", gap: isMobile ? 30 : 60,
-        flexWrap: "wrap",
-      }}>
-        {[
-          { num: "3", label: "Daily tasks, personalized" },
-          { num: "7", label: "Day free trial" },
-          { num: "24/7", label: "AI coaching" },
-        ].map((s, i) => (
-          <div key={i} style={{ textAlign: "center" }}>
-            <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "#635bff" }}>{s.num}</div>
-            <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.4)", marginTop: 4 }}>{s.label}</div>
-          </div>
-        ))}
-      </div>
+      {/* Subtle divider */}
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }} />
 
       {/* ─── How It Works ─────────────────────────────────────────────────────── */}
       <section id="how-it-works" style={{

@@ -1,5 +1,11 @@
 import Link from "next/link";
 
+const BULLETS = [
+  "Finally become the person you keep saying you'll be.",
+  "Achieve your goals.",
+  "10x your productivity.",
+];
+
 export default function StartPage() {
   return (
     <main style={{
@@ -7,70 +13,57 @@ export default function StartPage() {
       textAlign: "center", flex: 1,
       display: "flex", flexDirection: "column", justifyContent: "center",
     }}>
-      {/* Pill badge */}
-      <div style={{
-        display: "inline-flex", alignItems: "center", justifyContent: "center",
-        padding: "0.35rem 1rem", borderRadius: 100,
-        border: "1px solid rgba(255,255,255,0.12)",
-        background: "rgba(255,255,255,0.04)",
-        margin: "0 auto 28px", fontSize: "0.75rem", fontWeight: 600,
-        color: "rgba(255,255,255,0.6)", letterSpacing: "0.05em",
-        textTransform: "uppercase",
-      }}>
-        The Fastest Path To Success
-      </div>
+      {/* Sparkle icon */}
+      <div style={{ fontSize: 44, color: "#A78BFA", marginBottom: 16 }}>✦</div>
 
       {/* Headline */}
       <h1 style={{
-        fontSize: "2.5rem", fontWeight: 800, color: "#fff",
-        letterSpacing: "-0.03em", lineHeight: 1.1, margin: "0 0 16px",
+        fontSize: "2.25rem", fontWeight: 800, color: "#fff",
+        letterSpacing: "-0.5px", lineHeight: 1.1, margin: "0 0 16px",
       }}>
         Do Less.<br />Achieve More.
       </h1>
 
       {/* Sub */}
       <p style={{
-        color: "rgba(255,255,255,0.55)", fontSize: "1.05rem",
+        color: "rgba(255,255,255,0.75)", fontSize: "1.05rem",
         lineHeight: 1.5, margin: "0 auto 36px", maxWidth: 360,
+        fontWeight: 400,
       }}>
-        Your AI coach for fitness and business. Know exactly what to do — every single day.
+        Achieve your goals and actually become the best version of yourself.
       </p>
 
       {/* Bullets */}
       <div style={{
-        display: "inline-flex", flexDirection: "column", gap: 14,
-        margin: "0 auto 36px", textAlign: "left",
+        display: "inline-flex", flexDirection: "column", gap: 12,
+        margin: "0 auto 40px", textAlign: "left",
       }}>
-        {[
-          "Personalized daily tasks built around your goal",
-          "Adapts based on your progress and feedback",
-          "7-day free trial — $0 due today",
-        ].map((b) => (
+        {BULLETS.map((b) => (
           <div key={b} style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{
-              flexShrink: 0, width: 22, height: 22, borderRadius: "50%",
-              background: "rgba(99,91,255,0.15)", display: "flex",
+              flexShrink: 0, width: 24, height: 24, borderRadius: "50%",
+              background: "rgba(62,207,142,0.2)", display: "flex",
               alignItems: "center", justifyContent: "center",
-              color: "#635bff", fontSize: 12, fontWeight: 700,
+              color: "#3ecf8e", fontSize: 13, fontWeight: 700,
             }}>✓</span>
-            <span style={{ color: "rgba(255,255,255,0.8)", fontSize: "0.95rem", fontWeight: 500 }}>{b}</span>
+            <span style={{ color: "rgba(255,255,255,0.9)", fontSize: "0.95rem", fontWeight: 500, lineHeight: 1.45 }}>{b}</span>
           </div>
         ))}
       </div>
 
       {/* CTA */}
       <Link href="/start/signup" style={{
-        display: "block", width: "100%", maxWidth: 360, margin: "0 auto 16px",
-        padding: "16px 0", background: "#635bff", color: "#fff",
-        fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.01em",
-        textDecoration: "none", textAlign: "center", borderRadius: 14,
-        boxShadow: "0 0 30px rgba(99,91,255,0.25)",
+        display: "block", width: "100%", maxWidth: 340, margin: "0 auto 16px",
+        padding: "16px 0", background: "#fff", color: "#635BFF",
+        fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.2px",
+        textDecoration: "none", textAlign: "center", borderRadius: 16,
+        boxShadow: "0 4px 24px rgba(0,0,0,0.15)",
       }}>
-        Start Free →
+        Start for Free
       </Link>
 
-      <p style={{ color: "rgba(255,255,255,0.35)", fontSize: "0.8rem", margin: 0, fontWeight: 500 }}>
-        Cancel anytime · No commitment
+      <p style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.8rem", margin: 0, fontWeight: 500 }}>
+        $0.00 due today · 7-day free trial · Cancel anytime
       </p>
     </main>
   );
