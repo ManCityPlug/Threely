@@ -14,7 +14,7 @@ export default function StartLayout({ children }: { children: React.ReactNode })
           margin: 0 !important;
           padding: 0 !important;
           min-height: 100% !important;
-          background: #1A1040 !important;
+          background: #0a0a0a !important;
         }
         .start-gradient-wrapper {
           position: fixed;
@@ -34,7 +34,7 @@ export default function StartLayout({ children }: { children: React.ReactNode })
       <div
         className="start-gradient-wrapper"
         style={{
-          background: "linear-gradient(180deg, #1A1040 0%, #2D1B69 50%, #635BFF 100%)",
+          background: "#0a0a0a",
           fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
           WebkitFontSmoothing: "antialiased",
           display: "flex",

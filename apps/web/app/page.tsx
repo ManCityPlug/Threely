@@ -5,963 +5,381 @@ import Link from "next/link";
 import { getSupabase } from "@/lib/supabase-client";
 
 const TESTIMONIALS = [
-  { quote: "I had a Shopify store just sitting there. I did not know what to focus on. Threely laid out the plan for my Shopify store, including the search engine optimization stuff, emails and what to fix first. This is the time I felt like I knew what I was doing with my Shopify store.", author: "James R." },
-  { quote: "Been running my brand for a year and still wasn't getting much done. this app literally gave me a step by step plan that made sense for where I was at. My brand sales and revenue are way up from what they were before I started using this app.", author: "Daniel K." },
-  { quote: "I always wanted to get in shape but I would just go to the gym and do random stuff. Threely actually mapped out what to do each day and gave me videos to watch for proper science backed workouts. I'm 2 months in and I havent missed a day which is insane for me", author: "Melissa T." },
+  { quote: "I had a Shopify store just sitting there. Threely laid out the plan — SEO, emails, what to fix first. First time I felt like I knew what I was doing.", author: "James R.", label: "E-commerce" },
+  { quote: "Been running my brand for a year and still wasn't getting much done. This app gave me a step by step plan that made sense. Revenue is way up.", author: "Daniel K.", label: "Brand Owner" },
+  { quote: "I always went to the gym and did random stuff. Threely mapped out what to do each day with science-backed workouts. 2 months in, haven't missed a day.", author: "Melissa T.", label: "Fitness" },
 ];
 
 const FAQ = [
-  {
-    q: "Does it work for any goal?",
-    a: "Yes. Fitness, learning an instrument, launching a side project, reading more, career goals — anything. You describe what you want in your own words and Threely breaks it into a real daily plan tailored to your experience, timeline, and schedule.",
-  },
-  {
-    q: "How personalized is it really?",
-    a: "Very. Threely factors in your goal details, how much time you have, your intensity preference, what you completed yesterday, and your review feedback. Every set of tasks is generated fresh — not pulled from a template. The more you use it, the better it gets.",
-  },
-  {
-    q: "What happens after I complete my tasks?",
-    a: "You leave a quick review — how difficult it felt, what went well, any notes. Threely uses that feedback to generate a coaching insight and adjust tomorrow's tasks. It's a daily feedback loop that compounds over time.",
-  },
-  {
-    q: "What if I miss a day?",
-    a: "No guilt, no penalty. Just open Threely and pick up where you left off. Your streak resets, but your progress and goal context are preserved. The AI picks back up right where you were.",
-  },
-  {
-    q: "Is it free?",
-    a: "Threely Pro is free for 7 days so you can experience the full AI coaching loop. After that, choose a plan to keep your daily tasks and insights generating.",
-  },
+  { q: "Does it work for any goal?", a: "Fitness, launching a business, learning a skill — anything. You describe what you want and Threely builds a real daily plan tailored to your experience, timeline, and schedule." },
+  { q: "How personalized is it?", a: "Every set of tasks is generated fresh based on your goal, what you completed yesterday, your review feedback, and your available time. It gets better the more you use it." },
+  { q: "What if I miss a day?", a: "No guilt. Just open Threely and pick up where you left off. Your progress and goal context are preserved." },
+  { q: "Is it free?", a: "7-day free trial with full access. After that, choose a plan to keep your daily tasks and coaching generating." },
 ];
-
-/* ─── SVG Store Badges ──────────────────────────────────────────────────────── */
-
-function AppleIcon() {
-  return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-    </svg>
-  );
-}
-
-function PlayIcon() {
-  return (
-    <svg width="20" height="22" viewBox="0 0 17 20" fill="currentColor">
-      <path d="M.517 1.206A1.4 1.4 0 0 0 0 2.275v15.45a1.4 1.4 0 0 0 .517 1.069l.056.05 8.662-8.663v-.204L.573 1.156l-.056.05z"/>
-      <path d="M12.122 13.068l-2.887-2.887v-.204l2.887-2.887.065.037 3.42 1.943c.977.555.977 1.463 0 2.018l-3.42 1.943-.065.037z"/>
-      <path d="M12.187 13.031L9.235 10.08.517 18.794c.322.34.856.382 1.456.043l10.214-5.806"/>
-      <path d="M12.187 7.127L1.973 1.322C1.373.982.84 1.024.517 1.365L9.235 10.08l2.952-2.952z"/>
-    </svg>
-  );
-}
 
 export default function LandingPage() {
   const [isMobile, setIsMobile] = useState(false);
-  const [platform, setPlatform] = useState<"ios" | "android" | "desktop">("desktop");
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [showGooglePopup, setShowGooglePopup] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
     const ua = navigator.userAgent;
-    // Detect iPadOS 13+ (reports as Macintosh with touch support)
     const isIPad = /iPad/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
-    const mobile = isIPad || /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua);
-    setIsMobile(mobile);
-    if (/iPhone|iPod/i.test(ua) || isIPad) {
-      setPlatform("ios");
-    } else if (/Android/i.test(ua)) {
-      setPlatform("android");
-    }
-
+    setIsMobile(isIPad || /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
     getSupabase().auth.getSession().then(({ data: { session } }) => {
       if (session) setLoggedIn(true);
     });
   }, []);
 
+  const ctaHref = loggedIn ? "/dashboard" : "/start";
+  const ctaLabel = loggedIn ? "Go to Dashboard" : "Start Free →";
+
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#0a2540", overflowX: "hidden", background: "#fff" }}>
-      {/* Nav */}
+    <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "#e8e8e8", background: "#0a0a0a", overflowX: "hidden", minHeight: "100vh" }}>
+
+      {/* ─── Nav ──────────────────────────────────────────────────────────────── */}
       <nav style={{
         position: "sticky", top: 0, zIndex: 100,
-        background: "rgba(255,255,255,0.9)", backdropFilter: "blur(12px)",
-        borderBottom: "1px solid #e3e8ef",
-        padding: "0 1.25rem",
-        height: 60,
+        background: "rgba(10,10,10,0.85)", backdropFilter: "blur(16px)",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+        padding: "0 1.5rem", height: 64,
         display: "flex", alignItems: "center", justifyContent: "space-between",
+        maxWidth: 1200, margin: "0 auto", width: "100%",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 28 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img src="/favicon.png" alt="Threely" width={34} height={34} style={{ borderRadius: 9 }} />
-            <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em" }}>Threely</span>
-          </div>
-          {/* Desktop nav links */}
-          {!isMobile && (
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              {[
-                { label: "How It Works", href: "#how-it-works" },
-                { label: "Pricing", href: "/pricing" },
-                { label: "FAQ", href: "/faq" },
-                { label: "About", href: "/about" },
-                { label: "Support", href: "/support" },
-              ].map(item => (
-                <Link key={item.label} href={item.href} style={{
-                  padding: "0.35rem 0.75rem",
-                  fontSize: "0.85rem",
-                  fontWeight: 500,
-                  color: "#425466",
-                  borderRadius: 6,
-                  textDecoration: "none",
-                }}>
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {!isMobile && !loggedIn && (
-            <Link href="/login" style={{
-              padding: "0.4rem 0.875rem",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              color: "#425466",
-              borderRadius: 8,
-            }}>
-              Sign in
-            </Link>
-          )}
-          {!isMobile && (
-            <Link href={loggedIn ? "/dashboard" : "/start"} style={{
-              padding: "0.4rem 1rem",
-              fontSize: "0.875rem",
-              fontWeight: 600,
-              color: "#fff",
-              background: "#635bff",
-              borderRadius: 8,
-            }}>
-              {loggedIn ? "Go to dashboard" : "Get started"}
-            </Link>
-          )}
-          {/* Hamburger — mobile only */}
-          {isMobile && (
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              style={{
-                background: "none", border: "none", cursor: "pointer",
-                padding: 6, display: "flex", flexDirection: "column", gap: 4,
-                marginLeft: 4,
-              }}
-              aria-label="Menu"
-            >
-              <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
-              <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
-              <span style={{ width: 20, height: 2, background: "#0a2540", borderRadius: 1, display: "block" }} />
-            </button>
-          )}
+          <img src="/favicon.png" alt="Threely" width={32} height={32} style={{ borderRadius: 8 }} />
+          <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "#fff", letterSpacing: "-0.02em" }}>Threely</span>
         </div>
+        {!isMobile ? (
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            {[
+              { label: "How It Works", href: "#how-it-works" },
+              { label: "Pricing", href: "/pricing" },
+            ].map(item => (
+              <Link key={item.label} href={item.href} style={{
+                padding: "0.4rem 0.75rem", fontSize: "0.85rem", fontWeight: 500,
+                color: "rgba(255,255,255,0.6)", textDecoration: "none", borderRadius: 6,
+                transition: "color 0.15s",
+              }}>{item.label}</Link>
+            ))}
+            <Link href="/login" style={{
+              padding: "0.4rem 0.875rem", fontSize: "0.85rem", fontWeight: 600,
+              color: "rgba(255,255,255,0.7)", textDecoration: "none", marginLeft: 8,
+            }}>Log In</Link>
+            <Link href={ctaHref} style={{
+              padding: "0.5rem 1.25rem", fontSize: "0.85rem", fontWeight: 600,
+              color: "#fff", background: "#635bff", borderRadius: 8,
+              textDecoration: "none", marginLeft: 4,
+            }}>{ctaLabel}</Link>
+          </div>
+        ) : (
+          <button onClick={() => setMenuOpen(!menuOpen)} style={{
+            background: "none", border: "none", cursor: "pointer", padding: 6,
+            display: "flex", flexDirection: "column", gap: 5,
+          }} aria-label="Menu">
+            <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
+            <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
+            <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
+          </button>
+        )}
       </nav>
 
-      {/* Mobile dropdown menu */}
+      {/* Mobile menu */}
       {isMobile && menuOpen && (
         <div style={{
-          position: "sticky", top: 60, zIndex: 99,
-          background: "#fff",
-          borderBottom: "1px solid #e3e8ef",
-          boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-          padding: "0.75rem 1.5rem",
-          display: "flex", flexDirection: "column", gap: 4,
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 200,
+          background: "rgba(0,0,0,0.95)", backdropFilter: "blur(20px)",
+          padding: "80px 2rem 2rem", display: "flex", flexDirection: "column", gap: 8,
         }}>
+          <button onClick={() => setMenuOpen(false)} style={{
+            position: "absolute", top: 20, right: 20, background: "none", border: "none",
+            color: "#fff", fontSize: 28, cursor: "pointer",
+          }}>×</button>
           {[
             { label: "How It Works", href: "#how-it-works" },
-            { label: "FAQ", href: "/faq" },
             { label: "Pricing", href: "/pricing" },
-            { label: "About", href: "/about" },
-            { label: "Support", href: "/support" },
+            { label: "Log In", href: "/login" },
           ].map(item => (
             <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{
-              padding: "0.6rem 0",
-              fontSize: "0.9rem",
-              fontWeight: 600,
-              color: "#0a2540",
-              borderBottom: "1px solid #f0f0f0",
+              padding: "1rem 0", fontSize: "1.1rem", fontWeight: 600,
+              color: "#fff", borderBottom: "1px solid rgba(255,255,255,0.08)",
               textDecoration: "none",
-              display: "block",
-            }}>
-              {item.label}
-            </Link>
+            }}>{item.label}</Link>
           ))}
-
-          {/* Auth buttons */}
-          <div style={{ display: "flex", gap: 10, marginTop: 12 }}>
-            {loggedIn ? (
-              <Link href="/dashboard" onClick={() => setMenuOpen(false)} style={{
-                flex: 1, textAlign: "center",
-                padding: "0.6rem 0",
-                fontSize: "0.875rem", fontWeight: 600,
-                color: "#fff",
-                background: "#635bff",
-                borderRadius: 8,
-                textDecoration: "none",
-              }}>
-                Go to dashboard
-              </Link>
-            ) : (
-              <>
-                <Link href="/login" onClick={() => setMenuOpen(false)} style={{
-                  flex: 1, textAlign: "center",
-                  padding: "0.6rem 0",
-                  fontSize: "0.875rem", fontWeight: 600,
-                  color: "#425466",
-                  border: "1.5px solid #e3e8ef",
-                  borderRadius: 8,
-                  textDecoration: "none",
-                }}>
-                  Sign in
-                </Link>
-                <Link href="/start" onClick={() => setMenuOpen(false)} style={{
-                  flex: 1, textAlign: "center",
-                  padding: "0.6rem 0",
-                  fontSize: "0.875rem", fontWeight: 600,
-                  color: "#fff",
-                  background: "#635bff",
-                  borderRadius: 8,
-                  textDecoration: "none",
-                }}>
-                  Get started
-                </Link>
-              </>
-            )}
-          </div>
+          <Link href={ctaHref} onClick={() => setMenuOpen(false)} style={{
+            marginTop: 20, padding: "0.9rem 2rem", fontSize: "1rem", fontWeight: 700,
+            color: "#fff", background: "#635bff", borderRadius: 12,
+            textDecoration: "none", textAlign: "center",
+          }}>{ctaLabel}</Link>
         </div>
       )}
 
-      {/* ─── Hero ──────────────────────────────────────────────────────────────── */}
+      {/* ─── Hero ─────────────────────────────────────────────────────────────── */}
       <section style={{
-        background: "linear-gradient(135deg, #f6f9fc 0%, #ede9ff 100%)",
-        padding: isMobile ? "2rem 1.5rem 2.5rem" : "5rem 1.5rem 3.5rem",
-        textAlign: "center",
+        minHeight: "90vh", display: "flex", flexDirection: "column",
+        alignItems: "center", justifyContent: "center", textAlign: "center",
+        padding: isMobile ? "3rem 1.5rem" : "5rem 2rem",
+        background: "radial-gradient(ellipse at 50% 0%, rgba(99,91,255,0.08) 0%, transparent 60%)",
+        position: "relative",
       }}>
-        <div style={{ maxWidth: 700, margin: "0 auto" }}>
-          {/* Animated logo with glow + sparkles */}
-          <div style={{
-            position: "relative",
-            width: isMobile ? 72 : 80,
-            height: isMobile ? 72 : 80,
-            margin: isMobile ? "0 auto 1.75rem" : "0 auto 1.5rem",
-          }}>
-            <div style={{
-              position: "absolute",
-              left: -12, top: -12,
-              width: (isMobile ? 72 : 80) + 24,
-              height: (isMobile ? 72 : 80) + 24,
-              borderRadius: "50%",
-              backgroundColor: "rgba(99, 91, 255, 0.2)",
-              animation: "pulse 3s ease-in-out infinite",
-            }} />
-            <img src="/favicon.png" alt="Threely" width={isMobile ? 72 : 80} height={isMobile ? 72 : 80} style={{
-              position: "relative",
-              borderRadius: isMobile ? 18 : 20,
-              animation: "pulse 3s ease-in-out infinite",
-              zIndex: 2,
-            }} />
-            {[0, 60, 120, 180, 240, 300].map((angle, idx) => {
-              const rad = (angle * Math.PI) / 180;
-              const center = (isMobile ? 72 : 80) / 2;
-              const dist = isMobile ? 50 : 55;
-              return (
-                <div key={idx} style={{
-                  position: "absolute",
-                  left: center + Math.cos(rad) * dist - 3,
-                  top: center + Math.sin(rad) * dist - 3,
-                  width: 6, height: 6, borderRadius: 3,
-                  backgroundColor: "#635bff",
-                  animation: `sparkle 2s ease-in-out ${0.6 + idx * 0.08}s infinite`,
-                  zIndex: 3,
-                }} />
-              );
-            })}
-          </div>
-
-          <p style={{
-            fontSize: "0.85rem",
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            color: "#635bff",
-            textTransform: "uppercase" as const,
-            marginBottom: isMobile ? "0.5rem" : "0.75rem",
-          }}>
-            Do Less. Achieve More.
-          </p>
-
-          <h1 style={{
-            fontSize: "clamp(2.5rem, 7vw, 4rem)",
-            fontWeight: 800,
-            letterSpacing: "-0.04em",
-            lineHeight: 1.05,
-            marginBottom: isMobile ? "1rem" : "1.25rem",
-          }}>
-            10x your productivity.<br />
-            <span style={{ background: "linear-gradient(135deg, #635bff, #9b59b6, #635bff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Reach your goals.</span>
-          </h1>
-
-          <p style={{
-            fontSize: "clamp(1rem, 2.5vw, 1.15rem)",
-            color: "#425466",
-            lineHeight: 1.7,
-            maxWidth: 540,
-            margin: isMobile ? "0 auto 1.5rem" : "0 auto 2.5rem",
-          }}>
-            The #1 AI app that turns any goal into reality.<br />Just tell us what you want — we&apos;ll get you there.
-          </p>
-
-          {/* Get started button */}
-          <div style={{ marginBottom: isMobile ? "0.5rem" : "1.5rem", display: "flex", flexDirection: "column", alignItems: "center", gap: 12 }}>
-            <Link href={loggedIn ? "/dashboard" : "/start"} style={{
-              display: "inline-block",
-              padding: "0.875rem 2.5rem",
-              background: "#635bff",
-              color: "#fff",
-              fontWeight: 700,
-              fontSize: "1.05rem",
-              borderRadius: 12,
-              boxShadow: "0 4px 14px rgba(99,91,255,0.35)",
-              textDecoration: "none",
-              letterSpacing: "-0.01em",
-            }}>
-              {loggedIn ? "Go to dashboard" : "Get started \u2192"}
-            </Link>
-            {isMobile && !loggedIn && (
-              <Link href="/login" style={{
-                fontSize: "0.9rem",
-                fontWeight: 600,
-                color: "#425466",
-                textDecoration: "none",
-              }}>
-                Already have an account? <span style={{ color: "#635bff" }}>Sign in</span>
-              </Link>
-            )}
-          </div>
-
-          {/* Platform availability banner + store buttons — desktop only */}
-          {!isMobile && (
-            <>
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 10,
-                padding: "10px 24px",
-                background: "#ede9ff",
-                borderRadius: 24,
-                marginBottom: "1.25rem",
-              }}>
-                <span style={{ fontSize: "1.05rem" }}>📱</span>
-                <span style={{ fontSize: "0.95rem", fontWeight: 600, color: "#635bff" }}>
-                  Now available on mobile
-                </span>
-              </div>
-
-              <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-                <Link href="https://apps.apple.com/us/app/threely/id6759625661" target="_blank" rel="noopener noreferrer" style={{
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                  padding: "14px 28px 14px 18px",
-                  minWidth: 190,
-                  background: "#0a2540",
-                  color: "#fff",
-                  borderRadius: 12,
-                  fontSize: "0.95rem",
-                  fontWeight: 600,
-                  textDecoration: "none",
-                  position: "relative" as const,
-                  border: "1.5px solid rgba(10,37,64,0.25)",
-                }}>
-                  <span className="new-badge" style={{ position: "absolute" as const, top: -14, right: -10 }}>New</span>
-                  <AppleIcon />
-                  <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                    <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
-                    <span style={{ fontSize: "1.05rem" }}>App Store</span>
-                  </span>
-                </Link>
-                <button onClick={() => setShowGooglePopup(true)} style={{
-                  display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
-                  padding: "14px 28px 14px 18px",
-                  minWidth: 190,
-                  background: "#0a2540",
-                  color: "#fff",
-                  borderRadius: 12,
-                  fontSize: "0.95rem",
-                  fontWeight: 600,
-                  cursor: "pointer",
-                  position: "relative" as const,
-                  border: "1.5px solid rgba(10,37,64,0.25)",
-                }}>
-                  <span className="new-badge" style={{ position: "absolute" as const, top: -14, right: -10 }}>New</span>
-                  <PlayIcon />
-                  <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                    <span style={{ fontSize: "0.65rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
-                    <span style={{ fontSize: "1.05rem" }}>Google Play</span>
-                  </span>
-                </button>
-              </div>
-            </>
-          )}
-
-        </div>
-      </section>
-
-      {/* ─── Testimonials ──────────────────────────────────────────────────────── */}
-      <section style={{ padding: "3rem 1.5rem", background: "#fff" }}>
+        {/* Pill badge */}
         <div style={{
-          maxWidth: 1100, margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
-          gap: "1.25rem",
+          display: "inline-flex", alignItems: "center", gap: 8,
+          padding: "0.4rem 1.25rem", borderRadius: 100,
+          border: "1px solid rgba(255,255,255,0.12)",
+          background: "rgba(255,255,255,0.04)",
+          marginBottom: 32, fontSize: "0.8rem", fontWeight: 600,
+          color: "rgba(255,255,255,0.7)", letterSpacing: "0.02em",
+          textTransform: "uppercase",
         }}>
-          {TESTIMONIALS.map(t => (
-            <div key={t.author} style={{
-              padding: "1.5rem",
-              background: "#f6f9fc",
-              borderRadius: 14,
-              border: "1px solid #e3e8ef",
-            }}>
-              <p style={{
-                fontSize: "0.95rem", fontStyle: "italic",
-                color: "#0a2540", lineHeight: 1.6, marginBottom: 12,
-              }}>
-                &ldquo;{t.quote}&rdquo;
-              </p>
-              <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#8898aa" }}>
-                — {t.author}
-              </p>
-            </div>
-          ))}
+          The Fastest Path To Success
         </div>
-      </section>
 
-      {/* ─── How It Works (visual) ─────────────────────────────────────────────── */}
-      <section id="how-it-works" style={{ padding: "4.5rem 1.5rem", background: "#f6f9fc" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h2 style={{
-            fontSize: "clamp(1.5rem, 4vw, 2.25rem)",
-            fontWeight: 800,
-            letterSpacing: "-0.03em",
-            textAlign: "center",
-            marginBottom: "0.5rem",
-          }}>
-            Turn any goal into a real plan.
-          </h2>
-          <p style={{ color: "#425466", textAlign: "center", marginBottom: "3rem", fontSize: "0.95rem" }}>
-            You bring the ambition. We bring the plan.
-          </p>
+        {/* Headline */}
+        <h1 style={{
+          fontSize: isMobile ? "2.5rem" : "4.5rem",
+          fontWeight: 800, lineHeight: 1.05,
+          letterSpacing: "-0.03em", color: "#fff",
+          maxWidth: 800, margin: "0 0 24px",
+        }}>
+          10x Your Productivity.<br />
+          <span style={{ color: "rgba(255,255,255,0.5)" }}>Become Unrecognizable.</span>
+        </h1>
 
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-            gap: "1.5rem",
-            marginBottom: "3rem",
-          }}>
-            {[
-              { step: "01", title: "Describe what you want to achieve", desc: "\"I want to launch a side project in 3 months. I can spend 30 minutes a day and I'm a beginner at marketing.\" That's all Threely needs. Threely Intelligence breaks it down, identifies the critical path, and builds a personalized roadmap around your experience, timeline, and schedule. You don't need a plan — that's our job." },
-              { step: "02", title: "Wake up to 3 tasks built for today", desc: "Not 'work on marketing.' You'll get things like 'Rewrite your pricing headline to address the ROI objection from yesterday's user interviews.' Every task is crafted by Threely Intelligence — referencing your context, building on previous days, and scoped to fit your exact schedule." },
-              { step: "03", title: "Review & watch it evolve", desc: "Rate the difficulty, leave a quick note. Threely Intelligence recalibrates your trajectory and generates tomorrow's plan. Struggling? It eases up. Crushing it? It pushes further. A daily coaching loop that compounds over time." },
-            ].map(item => (
-              <div key={item.step} style={{
-                background: "#fff",
-                borderRadius: 14,
-                padding: "1.5rem",
-                border: "1px solid #e3e8ef",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-              }}>
-                <div style={{
-                  fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em",
-                  color: "#635bff", marginBottom: 12,
-                }}>
-                  STEP {item.step}
-                </div>
-                <h3 style={{ fontSize: "1.05rem", fontWeight: 700, marginBottom: 8 }}>{item.title}</h3>
-                <p style={{ fontSize: "0.875rem", color: "#425466", lineHeight: 1.6 }}>{item.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* Visual mockup card — advanced example */}
-          <div style={{
-            maxWidth: 420, margin: "0 auto",
-            background: "#fff",
-            borderRadius: 16,
-            border: "1px solid #e3e8ef",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
-            padding: "1.5rem",
-          }}>
-            {/* Header with goal + badge */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 4 }}>
-              <div style={{
-                fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.1em",
-                color: "#8898aa", textTransform: "uppercase",
-              }}>
-                TODAY&apos;S PLAN
-              </div>
-              <div style={{
-                fontSize: "0.65rem", fontWeight: 600,
-                background: "#ede9ff", color: "#635bff",
-                padding: "2px 8px", borderRadius: 10,
-              }}>
-                Day 12
-              </div>
-            </div>
-            <div style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 4 }}>
-              Launch my SaaS product
-            </div>
-            <div style={{ fontSize: "0.75rem", color: "#8898aa", marginBottom: 16 }}>
-              30 min/day &middot; Moderate intensity
-            </div>
-
-            {/* Tasks with time badges */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {[
-                { text: "Rewrite your pricing page headline to address the #1 objection from yesterday's user interviews — frame it around ROI, not features", time: "15m", done: true },
-                { text: "Set up 3 pricing tiers on your payment page and connect the checkout webhook to your backend — use the test keys from Day 9", time: "10m", done: true },
-                { text: "Draft a 5-email onboarding sequence outline — email 1: welcome + quick win, email 2: core feature walkthrough", time: "5m", done: false },
-              ].map(task => (
-                <div key={task.text} style={{
-                  display: "flex", alignItems: "flex-start", gap: 10,
-                }}>
-                  <div style={{
-                    width: 22, height: 22, borderRadius: "50%",
-                    border: task.done ? "none" : "2px solid #e3e8ef",
-                    background: task.done ? "#635bff" : "transparent",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    flexShrink: 0, marginTop: 1,
-                  }}>
-                    {task.done && <span style={{ color: "#fff", fontSize: 12, fontWeight: 700 }}>✓</span>}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <span style={{
-                      fontSize: "0.85rem",
-                      color: task.done ? "#8898aa" : "#0a2540",
-                      textDecoration: task.done ? "line-through" : "none",
-                      lineHeight: 1.4,
-                    }}>
-                      {task.text}
-                    </span>
-                  </div>
-                  <span style={{
-                    fontSize: "0.7rem", fontWeight: 600,
-                    color: "#8898aa", flexShrink: 0, marginTop: 2,
-                  }}>
-                    {task.time}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Progress */}
-            <div style={{
-              marginTop: 16, display: "flex", alignItems: "center", gap: 8,
-            }}>
-              <div style={{
-                flex: 1, height: 6, background: "#e3e8ef", borderRadius: 3, overflow: "hidden",
-              }}>
-                <div style={{
-                  width: "66%", height: "100%",
-                  background: "linear-gradient(90deg, #635bff, #7c74ff)",
-                  borderRadius: 3,
-                }} />
-              </div>
-              <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "#635bff" }}>
-                2 of 3
-              </span>
-            </div>
-
-            {/* Coach note preview */}
-            <div style={{
-              marginTop: 14, padding: "10px 12px",
-              background: "#f6f9fc", borderRadius: 10,
-              border: "1px solid #e3e8ef",
-            }}>
-              <div style={{ fontSize: "0.65rem", fontWeight: 700, color: "#635bff", letterSpacing: "0.05em", marginBottom: 4 }}>
-                AI COACHING INSIGHT
-              </div>
-              <p style={{ fontSize: "0.78rem", color: "#425466", lineHeight: 1.5, margin: 0 }}>
-                You&apos;re ahead of schedule on the technical setup. Based on your interview notes, pricing is your biggest conversion blocker — tomorrow I&apos;ll shift focus to building the comparison page and ROI calculator.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── The Problem ───────────────────────────────────────────────────────── */}
-      <section style={{ padding: "4.5rem 1.5rem", background: "#fff" }}>
-        <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
-          <h2 style={{
-            fontSize: "clamp(1.4rem, 4vw, 2rem)",
-            fontWeight: 800,
-            letterSpacing: "-0.03em",
-            lineHeight: 1.2,
-            marginBottom: "1.5rem",
-          }}>
-            Most apps give you a to-do list.<br />
-            <span style={{ color: "#635bff" }}>Threely gives you a game plan.</span>
-          </h2>
-          <p style={{
-            fontSize: "1rem", color: "#425466", lineHeight: 1.8,
-            marginBottom: "1.5rem",
-          }}>
-            To-do apps let you write down tasks. But they don&apos;t know what to work on, in what order, or how much you can handle today. You still have to figure everything out yourself.
-          </p>
-          <p style={{
-            fontSize: "1rem", color: "#425466", lineHeight: 1.8,
-          }}>
-            Threely is different. You share your goal, and our AI builds a daily plan around your experience, your schedule, and what you did yesterday. Three tasks. Specific. Actionable. Designed for exactly where you are right now.
-          </p>
-        </div>
-      </section>
-
-      {/* ─── Personalization Features ──────────────────────────────────────────── */}
-      <section style={{ padding: "4.5rem 1.5rem", background: "#f6f9fc" }}>
-        <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <h2 style={{
-            fontSize: "clamp(1.4rem, 4vw, 2rem)",
-            fontWeight: 800,
-            letterSpacing: "-0.03em",
-            textAlign: "center",
-            marginBottom: "0.5rem",
-          }}>
-            Built around you, not a template.
-          </h2>
-          <p style={{ color: "#425466", textAlign: "center", marginBottom: "3rem", fontSize: "0.95rem" }}>
-            Every detail adapts to how you work, how much time you have, and how you did yesterday.
-          </p>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-            gap: "1.25rem",
-          }}>
-            {[
-              {
-                icon: "🧠",
-                title: "Gets Smarter Every Day",
-                desc: "After each session you leave a quick review. Threely uses your feedback to calibrate difficulty, shift focus, and generate better tasks tomorrow.",
-              },
-              {
-                icon: "⏱",
-                title: "Fits Your Real Schedule",
-                desc: "Tell us if you have 15 minutes or 2 hours. Every task is scoped to fit your actual day — not an idealized version of it.",
-              },
-              {
-                icon: "🎚",
-                title: "Your Intensity, Your Pace",
-                desc: "Choose steady, committed, or all-in. Threely adjusts the challenge so you're always progressing — without burning out.",
-              },
-              {
-                icon: "💬",
-                title: "Daily Coaching Insights",
-                desc: "After your review, get an AI coaching note that reflects on your progress and tells you what to focus on next.",
-              },
-              {
-                icon: "🔄",
-                title: "Tasks That Build on Each Other",
-                desc: "Today's tasks reference what you did yesterday. Every day compounds — you're never starting from scratch.",
-              },
-              {
-                icon: "📊",
-                title: "See How Far You've Come",
-                desc: "Streaks, heatmaps, and weekly summaries show your real progress over time. Watch your consistency compound — and get a recap every week of what you've accomplished.",
-              },
-            ].map(f => (
-              <div key={f.title} style={{
-                padding: "1.25rem",
-                background: "#fff",
-                borderRadius: 12,
-                border: "1px solid #e3e8ef",
-              }}>
-                <div style={{ fontSize: 28, marginBottom: 10 }}>{f.icon}</div>
-                <h3 style={{ fontSize: "0.95rem", fontWeight: 700, marginBottom: 6 }}>{f.title}</h3>
-                <p style={{ fontSize: "0.825rem", color: "#425466", lineHeight: 1.6 }}>{f.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── The Loop ──────────────────────────────────────────────────────────── */}
-      <section style={{ padding: "4.5rem 1.5rem", background: "#fff" }}>
-        <div style={{ maxWidth: 700, margin: "0 auto" }}>
-          <h2 style={{
-            fontSize: "clamp(1.4rem, 4vw, 2rem)",
-            fontWeight: 800,
-            letterSpacing: "-0.03em",
-            textAlign: "center",
-            marginBottom: "0.5rem",
-          }}>
-            The daily loop that compounds.
-          </h2>
-          <p style={{ color: "#425466", textAlign: "center", marginBottom: "3rem", fontSize: "0.95rem" }}>
-            Not a one-time plan. A coaching relationship that gets better every day.
-          </p>
-          {[
-            {
-              num: "1",
-              title: "Monday: You start fresh",
-              desc: "You told Threely you want to launch a side project. Today's tasks: research 3 competitor pricing pages, outline your landing page, and draft a value prop. Each one fits your 30-minute window — no overwhelm, no guesswork.",
-            },
-            {
-              num: "2",
-              title: "Wednesday: It builds on what you did",
-              desc: "You completed Monday's research but skipped the value prop. Threely noticed. Today's plan picks up where you left off: refine your value prop using the competitor insights you gathered, then write your first headline. Nothing falls through the cracks.",
-            },
-            {
-              num: "3",
-              title: "Friday: It knows how you work",
-              desc: "You rated Wednesday as tough and left a note that copywriting feels hard. Threely adjusts — today's tasks break the writing into smaller pieces and include a framework to follow. Same goal, smarter approach. This is what compounding feels like.",
-            },
-          ].map((item, i) => (
-            <div key={item.num} style={{
-              display: "flex", gap: 20, alignItems: "flex-start",
-              marginBottom: i < 2 ? "2.5rem" : 0,
-            }}>
-              <div style={{
-                width: 44, height: 44, borderRadius: 12,
-                background: "#635bff", color: "#fff",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "1.1rem", fontWeight: 800,
-                flexShrink: 0,
-              }}>
-                {item.num}
-              </div>
-              <div>
-                <h3 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 6 }}>
-                  {item.title}
-                </h3>
-                <p style={{ fontSize: "0.95rem", color: "#425466", lineHeight: 1.7 }}>
-                  {item.desc}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ─── Why Three ─────────────────────────────────────────────────────────── */}
-      <section style={{ padding: "4.5rem 1.5rem", background: "#f6f9fc" }}>
-        <div style={{ maxWidth: 700, margin: "0 auto", textAlign: "center" }}>
-          <h2 style={{
-            fontSize: "clamp(1.4rem, 4vw, 2rem)",
-            fontWeight: 800,
-            letterSpacing: "-0.03em",
-            marginBottom: "1.5rem",
-          }}>
-            There&apos;s real science behind the number.
-          </h2>
-          <p style={{
-            fontSize: "1rem", color: "#425466", lineHeight: 1.8,
-            marginBottom: "1.25rem",
-          }}>
-            Decision fatigue is real. The more choices you face, the worse your decisions get — and the less likely you are to act at all. Psychologists call it cognitive overload.
-          </p>
-          <p style={{
-            fontSize: "1rem", color: "#425466", lineHeight: 1.8,
-            marginBottom: "1.25rem",
-          }}>
-            Three sits in the sweet spot: enough to make meaningful progress, few enough to stay focused. It&apos;s why we remember things in threes, present ideas in threes, and structure stories in three acts.
-          </p>
-          <p style={{
-            fontSize: "1rem", color: "#425466", lineHeight: 1.8,
-          }}>
-            Three tasks is a commitment you can keep. And consistency — not intensity — is what gets you to your goals.
-          </p>
-        </div>
-      </section>
-
-      {/* ─── FAQ ───────────────────────────────────────────────────────────────── */}
-      <section style={{ padding: "4.5rem 1.5rem", background: "#fff" }}>
-        <div style={{ maxWidth: 700, margin: "0 auto" }}>
-          <h2 style={{
-            fontSize: "clamp(1.4rem, 4vw, 2rem)",
-            fontWeight: 800,
-            letterSpacing: "-0.03em",
-            textAlign: "center",
-            marginBottom: "2.5rem",
-          }}>
-            Frequently asked questions
-          </h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-            {FAQ.map(item => (
-              <div key={item.q} style={{
-                background: "#f6f9fc",
-                borderRadius: 14,
-                padding: "1.25rem 1.5rem",
-                border: "1px solid #e3e8ef",
-              }}>
-                <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 8 }}>
-                  {item.q}
-                </h3>
-                <p style={{ fontSize: "0.9rem", color: "#425466", lineHeight: 1.7 }}>
-                  {item.a}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── CTA ───────────────────────────────────────────────────────────────── */}
-      <section style={{
-        padding: "5rem 1.5rem",
-        background: "linear-gradient(135deg, #635bff 0%, #5144e8 100%)",
-        textAlign: "center",
-        color: "#fff",
-      }}>
-        <div style={{ maxWidth: 560, margin: "0 auto" }}>
-          <h2 style={{
-            fontSize: "clamp(1.5rem, 4vw, 2.25rem)",
-            fontWeight: 800,
-            letterSpacing: "-0.03em",
-            marginBottom: "1rem",
-          }}>
-            Do Less. Achieve More.
-          </h2>
-          <p style={{
-            fontSize: "1.05rem",
-            color: "rgba(255,255,255,0.8)",
-            lineHeight: 1.6,
-            marginBottom: "2rem",
-          }}>
-            Set your first goal and get 3 personalized tasks in under a minute.
-          </p>
-          <Link href="/start" style={{
-            display: "inline-block",
-            padding: "0.875rem 2.5rem",
-            background: "#fff",
-            color: "#635bff",
-            fontWeight: 700,
-            fontSize: "1rem",
-            borderRadius: 10,
-            boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
-          }}>
-            Create free account →
-          </Link>
-
-          {/* App store badges in CTA */}
-          <div style={{
-            marginTop: "1.5rem",
-            display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap",
-          }}>
-            {platform !== "android" && (
-              <Link href="https://apps.apple.com/us/app/threely/id6759625661" target="_blank" rel="noopener noreferrer" style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "8px 16px",
-                background: "rgba(255,255,255,0.15)",
-                color: "#fff",
-                borderRadius: 8,
-                fontSize: "0.8rem",
-                fontWeight: 600,
-                border: "1px solid rgba(255,255,255,0.25)",
-              }}>
-                <AppleIcon />
-                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Download on the</span>
-                  <span>App Store</span>
-                </span>
-              </Link>
-            )}
-            {platform !== "ios" && (
-              <button onClick={() => setShowGooglePopup(true)} style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "8px 16px",
-                background: "rgba(255,255,255,0.15)",
-                color: "#fff",
-                borderRadius: 8,
-                fontSize: "0.8rem",
-                fontWeight: 600,
-                border: "1px solid rgba(255,255,255,0.25)",
-                cursor: "pointer",
-              }}>
-                <PlayIcon />
-                <span style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", lineHeight: 1.2 }}>
-                  <span style={{ fontSize: "0.6rem", fontWeight: 400, opacity: 0.8 }}>Get it on</span>
-                  <span>Google Play</span>
-                </span>
-              </button>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Footer ────────────────────────────────────────────────────────────── */}
-      <footer style={{
-        background: "#0a2540",
-        color: "rgba(255,255,255,0.5)",
-        padding: isMobile ? "2.5rem 1.5rem 5rem" : "2.5rem 1.5rem",
-        textAlign: "center",
-        fontSize: "0.825rem",
-      }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 16 }}>
-          <img src="/favicon.png" alt="Threely" width={28} height={28} style={{ borderRadius: 7 }} />
-          <span style={{ color: "#fff", fontWeight: 600 }}>Threely</span>
-        </div>
-        <div style={{ display: "flex", justifyContent: "center", gap: 20, flexWrap: "wrap", marginBottom: 16 }}>
-          <Link href="/login" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
-            Sign in
-          </Link>
-          <Link href="/start" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
-            Get started
-          </Link>
-          <Link href="/faq" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
-            FAQ
-          </Link>
-          <Link href="/pricing" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
-            Pricing
-          </Link>
-          <Link href="/about" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
-            About
-          </Link>
-          <Link href="/support" style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.825rem" }}>
-            Support
-          </Link>
-        </div>
-        <div style={{ display: "flex", justifyContent: "center", gap: 20, flexWrap: "wrap", marginBottom: 16 }}>
-          <Link href="/privacy" style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.775rem" }}>
-            Privacy Policy
-          </Link>
-          <Link href="/terms" style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.775rem" }}>
-            Terms of Service
-          </Link>
-        </div>
-        <p style={{ margin: 0 }}>
-          © {new Date().getFullYear()} Threely. All rights reserved.
+        {/* Sub */}
+        <p style={{
+          fontSize: isMobile ? "1rem" : "1.2rem",
+          color: "rgba(255,255,255,0.5)", lineHeight: 1.6,
+          maxWidth: 520, margin: "0 0 40px",
+        }}>
+          Know exactly what to do when you open the app. Every single day.
         </p>
-      </footer>
 
-      {/* Google Play Coming Soon Popup */}
-      {showGooglePopup && (
-        <div onClick={() => setShowGooglePopup(false)} style={{
-          position: "fixed", inset: 0, zIndex: 9999,
-          background: "rgba(0,0,0,0.5)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          padding: 20,
+        {/* CTA */}
+        <Link href={ctaHref} style={{
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
+          color: "#fff", background: "#635bff", borderRadius: 14,
+          textDecoration: "none", transition: "transform 0.15s, box-shadow 0.15s",
+          boxShadow: "0 0 40px rgba(99,91,255,0.3)",
         }}>
-          <div onClick={e => e.stopPropagation()} style={{
-            background: "#fff", borderRadius: 16, padding: "2rem",
-            maxWidth: 420, width: "100%", textAlign: "center",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.2)",
-          }}>
-            <div style={{ fontSize: "2rem", marginBottom: 12 }}>
-              <PlayIcon />
+          {ctaLabel}
+        </Link>
+
+        <p style={{ marginTop: 16, fontSize: "0.8rem", color: "rgba(255,255,255,0.3)" }}>
+          $0 due today · 7-day free trial · Cancel anytime
+        </p>
+      </section>
+
+      {/* ─── Social Proof Bar ─────────────────────────────────────────────────── */}
+      <div style={{
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+        padding: "1.5rem 2rem",
+        display: "flex", justifyContent: "center", gap: isMobile ? 30 : 60,
+        flexWrap: "wrap",
+      }}>
+        {[
+          { num: "3", label: "Daily tasks, personalized" },
+          { num: "7", label: "Day free trial" },
+          { num: "24/7", label: "AI coaching" },
+        ].map((s, i) => (
+          <div key={i} style={{ textAlign: "center" }}>
+            <div style={{ fontSize: "1.5rem", fontWeight: 800, color: "#635bff" }}>{s.num}</div>
+            <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.4)", marginTop: 4 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ─── How It Works ─────────────────────────────────────────────────────── */}
+      <section id="how-it-works" style={{
+        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        maxWidth: 1000, margin: "0 auto",
+      }}>
+        <div style={{ textAlign: "center", marginBottom: 60 }}>
+          <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#635bff", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>How It Works</p>
+          <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
+            Stop guessing. Start executing.
+          </h2>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 48 }}>
+          {[
+            { step: "01", title: "Tell us your goal", desc: "\"I want to launch my Shopify store and hit $5K in revenue.\" That's all Threely needs. The AI asks the right questions, builds a roadmap around your experience, timeline, and schedule." },
+            { step: "02", title: "Wake up to your plan", desc: "Not 'work on marketing.' You'll get: 'Rewrite your product description to highlight the pain point from your customer research yesterday.' Specific. Actionable. Built for today." },
+            { step: "03", title: "Execute, review, evolve", desc: "Complete your tasks, rate the difficulty. The AI recalibrates. Struggling? It eases up. Crushing it? It pushes harder. A daily coaching loop that compounds." },
+          ].map((item, i) => (
+            <div key={i} style={{ display: "flex", gap: isMobile ? 16 : 32, alignItems: "flex-start" }}>
+              <div style={{
+                fontSize: "0.8rem", fontWeight: 700, color: "#635bff",
+                minWidth: 40, paddingTop: 4,
+              }}>{item.step}</div>
+              <div>
+                <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#fff", marginBottom: 8 }}>{item.title}</h3>
+                <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 600 }}>{item.desc}</p>
+              </div>
             </div>
-            <h3 style={{ margin: "0 0 8px", fontSize: "1.2rem", color: "#0a2540" }}>
-              Coming Soon to Google Play
-            </h3>
-            <p style={{ margin: "0 0 20px", fontSize: "0.9rem", color: "#556677", lineHeight: 1.6 }}>
-              Threely for Android is currently in development. In the meantime, you can use Threely right from your browser at <strong>threely.co</strong> — works on any phone, tablet, or computer.
-            </p>
-            <button onClick={() => setShowGooglePopup(false)} style={{
-              background: "#635bff", color: "#fff", border: "none",
-              borderRadius: 10, padding: "10px 28px",
-              fontSize: "0.9rem", fontWeight: 600, cursor: "pointer",
-            }}>
-              Got it
-            </button>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Testimonials ─────────────────────────────────────────────────────── */}
+      <section style={{
+        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        background: "rgba(255,255,255,0.02)",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+      }}>
+        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
+          <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#635bff", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12, textAlign: "center" }}>Results</p>
+          <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", textAlign: "center", marginBottom: 48 }}>
+            Real people. Real progress.
+          </h2>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
+            gap: 20,
+          }}>
+            {TESTIMONIALS.map((t, i) => (
+              <div key={i} style={{
+                background: "rgba(255,255,255,0.03)",
+                border: "1px solid rgba(255,255,255,0.08)",
+                borderRadius: 16, padding: "1.75rem",
+              }}>
+                <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.7, marginBottom: 16 }}>
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 100, background: "rgba(99,91,255,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, color: "#635bff" }}>
+                    {t.author[0]}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff" }}>{t.author}</div>
+                    <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.4)" }}>{t.label}</div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      )}
+      </section>
+
+      {/* ─── Features ─────────────────────────────────────────────────────────── */}
+      <section style={{
+        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        maxWidth: 1000, margin: "0 auto",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+      }}>
+        <div style={{ textAlign: "center", marginBottom: 60 }}>
+          <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
+            Built for people who want results.
+          </h2>
+        </div>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
+          gap: 20,
+        }}>
+          {[
+            { icon: "🎯", title: "AI that actually listens", desc: "Tell it your situation — what you have, what you've tried, where you're stuck. It builds from there, not from a template." },
+            { icon: "📋", title: "3 tasks every morning", desc: "Specific actions with exact steps, tools, and what 'done' looks like. No vague advice." },
+            { icon: "📈", title: "Adapts daily", desc: "Struggling? Easier tasks. Crushing it? Harder ones. The AI coaches based on your actual performance." },
+            { icon: "💪", title: "Fitness & business", desc: "Whether you're building muscle or building revenue, the same daily system works. Real workouts. Real business plans." },
+          ].map((f, i) => (
+            <div key={i} style={{
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.08)",
+              borderRadius: 16, padding: "2rem",
+            }}>
+              <div style={{ fontSize: 32, marginBottom: 12 }}>{f.icon}</div>
+              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#fff", marginBottom: 8 }}>{f.title}</h3>
+              <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── FAQ ──────────────────────────────────────────────────────────────── */}
+      <section style={{
+        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        maxWidth: 700, margin: "0 auto",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+      }}>
+        <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", textAlign: "center", marginBottom: 40 }}>
+          Questions
+        </h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          {FAQ.map((faq, i) => (
+            <div key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+              <button
+                onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                style={{
+                  width: "100%", background: "none", border: "none", cursor: "pointer",
+                  padding: "1.25rem 0", display: "flex", justifyContent: "space-between", alignItems: "center",
+                  color: "#fff", fontSize: "1rem", fontWeight: 600, textAlign: "left",
+                }}
+              >
+                {faq.q}
+                <span style={{ fontSize: "1.2rem", color: "rgba(255,255,255,0.3)", transition: "transform 0.2s", transform: openFaq === i ? "rotate(45deg)" : "none" }}>+</span>
+              </button>
+              {openFaq === i && (
+                <p style={{ padding: "0 0 1.25rem", fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>
+                  {faq.a}
+                </p>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── Final CTA ────────────────────────────────────────────────────────── */}
+      <section style={{
+        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        textAlign: "center",
+        background: "radial-gradient(ellipse at 50% 100%, rgba(99,91,255,0.08) 0%, transparent 60%)",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+      }}>
+        <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.8rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 16 }}>
+          Ready to level up?
+        </h2>
+        <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", marginBottom: 32 }}>
+          Your first 7 days are free. No credit card required.
+        </p>
+        <Link href={ctaHref} style={{
+          display: "inline-flex", alignItems: "center", justifyContent: "center",
+          padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
+          color: "#fff", background: "#635bff", borderRadius: 14,
+          textDecoration: "none",
+          boxShadow: "0 0 40px rgba(99,91,255,0.3)",
+        }}>
+          {ctaLabel}
+        </Link>
+      </section>
+
+      {/* ─── Footer ───────────────────────────────────────────────────────────── */}
+      <footer style={{
+        padding: "2rem",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+        display: "flex", justifyContent: "space-between", alignItems: "center",
+        maxWidth: 1000, margin: "0 auto",
+        flexWrap: "wrap", gap: 16,
+      }}>
+        <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.3)" }}>
+          © {new Date().getFullYear()} Threely. All rights reserved.
+        </div>
+        <div style={{ display: "flex", gap: 20 }}>
+          {[
+            { label: "Privacy", href: "/privacy" },
+            { label: "Terms", href: "/terms" },
+            { label: "Support", href: "/support" },
+          ].map(item => (
+            <Link key={item.label} href={item.href} style={{
+              fontSize: "0.8rem", color: "rgba(255,255,255,0.3)",
+              textDecoration: "none",
+            }}>{item.label}</Link>
+          ))}
+        </div>
+      </footer>
     </div>
   );
 }
