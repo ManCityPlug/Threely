@@ -64,13 +64,6 @@ const STEPS: TutorialStep[] = [
     openMenu: "goal-menu-button",
   },
   {
-    title: "Your Profile & Stats",
-    description: "Track your streaks, total tasks completed, and time invested. Threely generates AI-powered weekly insights to help you stay on track.",
-    target: "profile-stats",
-    route: "/profile",
-    position: "below",
-  },
-  {
     title: "You\u2019re all set!",
     description: "Threely adapts to your progress and evolves your tasks over time. The more you use it, the smarter it gets. Let\u2019s crush those goals!",
     target: null,

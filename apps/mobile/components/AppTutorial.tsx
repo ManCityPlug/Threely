@@ -68,15 +68,6 @@ const STEPS: TutorialStep[] = [
     icon: "ellipsis-horizontal",
   },
   {
-    title: "Your Profile",
-    description:
-      "Track streaks, view weekly summaries, manage notifications, and adjust your settings.",
-    target: "profile-stats",
-    tabRoute: "/(tabs)/profile",
-    tooltipPosition: "below",
-    icon: "person",
-  },
-  {
     title: "You're all set!",
     description:
       "Threely adapts to your progress and evolves your tasks over time. The more you use it, the better it gets. Let's crush those goals!",

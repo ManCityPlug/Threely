@@ -418,52 +418,6 @@ export default function ProfilePage() {
         )}
       </div>
 
-      {/* Stats row — 3 top + 2 bottom centered */}
-      <div data-walkthrough="profile-stats" style={{
-        display: "grid",
-        gridTemplateColumns: "repeat(6, 1fr)",
-        gap: "0.75rem",
-        marginBottom: "1.75rem",
-      }}>
-        <div className="card slide-up" style={{ gridColumn: "1 / 3", padding: "1.25rem 1rem", textAlign: "center", animationDelay: "0s" }}>
-          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--warning)" }}>
-            🔥 <AnimatedNumber value={stats?.streak ?? 0} />
-          </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 4 }}>Current streak</div>
-        </div>
-        <div className="card slide-up" style={{ gridColumn: "3 / 5", padding: "1.25rem 1rem", textAlign: "center", animationDelay: "0.08s" }}>
-          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--success)" }}>
-            ✓ <AnimatedNumber value={stats?.totalCompleted ?? 0} />
-          </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 4 }}>Total tasks done</div>
-        </div>
-        <div className="card slide-up" style={{ gridColumn: "5 / 7", padding: "1.25rem 1rem", textAlign: "center", animationDelay: "0.16s" }}>
-          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#3B82F6" }}>
-            <AnimatedNumber value={stats?.activeGoals ?? 0} />
-          </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 4 }}>Active goals</div>
-        </div>
-        <div className="card slide-up" style={{ gridColumn: "1 / 4", padding: "1.25rem 1rem", textAlign: "center", animationDelay: "0.24s" }}>
-          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#0891B2" }}>
-            {(() => {
-              const totalMin = stats?.totalMinutesInvested ?? (stats?.totalHoursInvested ? Math.round(stats.totalHoursInvested * 60) : 0);
-              const h = Math.floor(totalMin / 60);
-              const m = totalMin % 60;
-              if (h === 0) return <>{m}m</>;
-              if (m === 0) return <>{h}h</>;
-              return <>{h}h {m}m</>;
-            })()}
-          </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 4 }}>Time invested</div>
-        </div>
-        <div className="card slide-up" style={{ gridColumn: "4 / 7", padding: "1.25rem 1rem", textAlign: "center", animationDelay: "0.32s" }}>
-          <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "var(--primary)" }}>
-            <AnimatedNumber value={stats?.bestStreak ?? 0} suffix="d" />
-          </div>
-          <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 4 }}>Best streak</div>
-        </div>
-      </div>
-
       {/* Tabs */}
       <div style={{
         display: "flex", gap: 4, marginBottom: "1rem",

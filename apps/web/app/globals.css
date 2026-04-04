@@ -7,9 +7,9 @@
 :root {
   --bg: #f6f9fc;
   --card: #ffffff;
-  --primary: #D4A843;
-  --primary-light: rgba(212,168,67,0.1);
-  --primary-hover: #C49032;
+  --primary: #000000;
+  --primary-light: rgba(0,0,0,0.06);
+  --primary-hover: #1a1a1a;
   --text: #0a2540;
   --subtext: #425466;
   --muted: #8898aa;
@@ -35,11 +35,11 @@
 
 /* ─── Dark mode ─────────────────────────────────────────────────────────────── */
 [data-theme="dark"] {
-  --bg: #0b0f1a;
-  --card: #151a2a;
-  --primary: #D4A843;
-  --primary-light: rgba(212,168,67,0.12);
-  --primary-hover: #C49032;
+  --bg: #0a0a0a;
+  --card: #161616;
+  --primary: #FFFFFF;
+  --primary-light: rgba(255,255,255,0.08);
+  --primary-hover: #e0e0e0;
   --text: #e8eaf0;
   --subtext: #9ba3b5;
   --muted: #6b7280;
