@@ -6,7 +6,7 @@ import { getSupabase } from "@/lib/supabase-client";
 
 const TESTIMONIALS: { quote: string; author: string; label: string; image?: string }[] = [
   { quote: "I had a Shopify store just sitting there. Threely laid out the plan — SEO, emails, what to fix first. First time I felt like I knew what I was doing.", author: "James R.", label: "E-commerce" },
-  { quote: "Been running my brand for a year and still wasn't getting much done. This app gave me a step by step plan that made sense. Revenue is way up.", author: "Daniel K.", label: "Brand Owner" },
+  { quote: "I was so confused on how to start an e-commerce brand until I started using Threely. It truly told me step by step what to do and by month 2 i'm making 7k/month from my new store.", author: "Daniel", label: "Brand Owner", image: "/daniel.png" },
   { quote: "This app is actually very useful. Been getting amazing progress in the gym with it.", author: "Nikolay M.", label: "Fitness", image: "/nikolay.png" },
 ];
 
