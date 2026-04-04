@@ -540,7 +540,10 @@ export default function ProfilePage() {
                   onClick={() => {
                     if (confirm("Would you like to go through the guided tutorial? It will walk you through all the features.")) {
                       if (user) {
-                        try { localStorage.removeItem(`threely_tutorial_done_${user.id}`); } catch {}
+                        try {
+                          localStorage.removeItem(`threely_tutorial_done_${user.id}`);
+                          localStorage.setItem("threely_start_tutorial", "true");
+                        } catch {}
                       }
                       window.location.href = "/dashboard?welcome=1";
                     }

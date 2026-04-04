@@ -108,17 +108,30 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
-  // Show tutorial only right after onboarding (welcome=1 query param)
+  // Show tutorial after onboarding or when requested from profile
   useEffect(() => {
     if (!user || loading || checkingOnboarding) return;
     if (!isOnboarded(user.id)) return;
-    // Only trigger tutorial when coming directly from onboarding
+
+    // Check URL param (from onboarding) or localStorage flag (from profile "Start tutorial")
     const params = new URLSearchParams(window.location.search);
-    if (!params.has("welcome")) return;
+    const hasWelcome = params.has("welcome");
+    let requestedFromProfile = false;
+    try { requestedFromProfile = localStorage.getItem("threely_start_tutorial") === "true"; } catch {}
+
+    if (!hasWelcome && !requestedFromProfile) return;
+
+    // Clear the profile flag
+    if (requestedFromProfile) {
+      try { localStorage.removeItem("threely_start_tutorial"); } catch {}
+    }
+
     const tutorialKey = `threely_tutorial_done_${user.id}`;
-    try {
-      if (localStorage.getItem(tutorialKey)) return;
-    } catch { /* Safari Private Browsing — proceed with tutorial */ }
+    // Only check done flag for onboarding flow, not manual restart
+    if (hasWelcome && !requestedFromProfile) {
+      try { if (localStorage.getItem(tutorialKey)) return; } catch {}
+    }
+
     // Small delay to let the dashboard render first
     const timer = setTimeout(() => setShowTutorial(true), 600);
     return () => clearTimeout(timer);
