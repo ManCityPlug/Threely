@@ -149,7 +149,6 @@ function createStyles(c: Colors) {
     otherCard: {
       flex: 0,
       width: "100%" as any,
-      borderStyle: "dashed",
     },
   });
 }

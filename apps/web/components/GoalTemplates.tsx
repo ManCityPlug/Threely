@@ -105,7 +105,7 @@ export default function GoalTemplates({
             marginTop: "0.625rem",
             padding: "1.25rem 1rem",
             borderRadius: "var(--radius-lg)",
-            border: "1.5px dashed var(--border)",
+            border: "1.5px solid var(--border)",
             background: "var(--card)",
             cursor: "pointer",
             textAlign: "center",

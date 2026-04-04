@@ -1476,8 +1476,8 @@ export default function GoalsScreen() {
         {/* Step counter + close/back — hidden when showing templates (GoalTemplates has its own header) */}
         {!(addStep === 1 && !showFreeText) && (
           <View style={styles.addFlowHeader}>
-            {!isBuildStep ? (
-              <Text style={styles.stepCounter}>{editingGoalId ? "Edit goal" : `Step ${addStep} of ${TOTAL_ADD_STEPS - 1}`}</Text>
+            {!isBuildStep && addStep > 1 ? (
+              <Text style={styles.stepCounter}>{editingGoalId ? "Edit goal" : ""}</Text>
             ) : <View />}
             {(addStep === 1 && showFreeText) ? (
               <TouchableOpacity onPress={() => setShowFreeText(false)} activeOpacity={0.7}>
