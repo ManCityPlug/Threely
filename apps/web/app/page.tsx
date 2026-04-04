@@ -6,7 +6,7 @@ import { getSupabase } from "@/lib/supabase-client";
 
 const TESTIMONIALS: { quote: string; author: string; label: string; image?: string }[] = [
   { quote: "I had a Shopify store just sitting there. Threely laid out the plan — SEO, emails, what to fix first. First time I felt like I knew what I was doing.", author: "James R.", label: "E-commerce" },
-  { quote: "I was so confused on how to start an e-commerce brand until I started using Threely. It truly told me step by step what to do and by month 2 i'm making 7k/month from my new store.", author: "Daniel", label: "Brand Owner", image: "/daniel.png" },
+  { quote: "I was so confused on how to start an ecommerce brand until I started using Threely. It truly told me step by step what to do and by month 2 i'm making 7k/month from my new store.", author: "Daniel", label: "Brand Owner", image: "/daniel.png" },
   { quote: "This app is actually very useful. Been getting amazing progress in the gym with it.", author: "Nikolay M.", label: "Fitness", image: "/nikolay.png" },
 ];
 
@@ -116,6 +116,7 @@ export default function LandingPage() {
           </>
         ) : (
           <button onClick={() => setMenuOpen(!menuOpen)} style={{
+            position: "absolute", right: "1.5rem",
             background: "none", border: "none", cursor: "pointer", padding: 6,
             display: "flex", flexDirection: "column", gap: 5,
           }} aria-label="Menu">
@@ -271,17 +272,17 @@ export default function LandingPage() {
                 <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.7, marginBottom: 16 }}>
                   &ldquo;{t.quote}&rdquo;
                 </p>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   {t.image ? (
-                    <img src={t.image} alt={t.author} style={{ width: 36, height: 36, borderRadius: 100, objectFit: "cover" }} />
+                    <img src={t.image} alt={t.author} style={{ width: 48, height: 48, borderRadius: 100, objectFit: "cover" }} />
                   ) : (
-                    <div style={{ width: 36, height: 36, borderRadius: 100, background: "rgba(212,168,67,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.8rem", fontWeight: 700, color: "#D4A843" }}>
+                    <div style={{ width: 48, height: 48, borderRadius: 100, background: "rgba(212,168,67,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.95rem", fontWeight: 700, color: "#D4A843" }}>
                       {t.author[0]}
                     </div>
                   )}
                   <div>
-                    <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff" }}>{t.author}</div>
-                    <div style={{ fontSize: "0.75rem", color: "rgba(255,255,255,0.4)" }}>{t.label}</div>
+                    <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>{t.author}</div>
+                    <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.4)" }}>{t.label}</div>
                   </div>
                 </div>
               </div>
