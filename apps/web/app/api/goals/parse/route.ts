@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "rawInput is required" }, { status: 400 });
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: "ANTHROPIC_API_KEY not configured" }, { status: 500 });
+  if (!process.env.GEMINI_API_KEY) {
+    return NextResponse.json({ error: "GEMINI_API_KEY not configured" }, { status: 500 });
   }
 
   const { checkRateLimit } = await import("@/lib/rate-limit");
