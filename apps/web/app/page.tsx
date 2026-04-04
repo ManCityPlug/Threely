@@ -81,31 +81,33 @@ export default function LandingPage() {
           <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "#fff", letterSpacing: "-0.02em" }}>Threely</span>
         </div>
         {!isMobile ? (
-          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-            {[
-              { label: "How It Works", href: "#how-it-works" },
-              { label: "Pricing", href: "/pricing" },
-              { label: "FAQ", href: "/faq" },
-              { label: "Support", href: "/support" },
-            ].map(item => (
-              <Link key={item.label} href={item.href} style={{
-                padding: "0.4rem 0.75rem", fontSize: "0.85rem", fontWeight: 500,
-                color: "rgba(255,255,255,0.6)", textDecoration: "none", borderRadius: 6,
-                transition: "color 0.15s",
-              }}>{item.label}</Link>
-            ))}
-          </div>
-          <div style={{ position: "absolute", right: "1.5rem", display: "flex", alignItems: "center", gap: 6 }}>
-            <Link href="/login" style={{
-              padding: "0.4rem 0.875rem", fontSize: "0.85rem", fontWeight: 600,
-              color: "rgba(255,255,255,0.7)", textDecoration: "none",
-            }}>Log In</Link>
-            <Link href={ctaHref} style={{
-              padding: "0.5rem 1.25rem", fontSize: "0.85rem", fontWeight: 600,
-              color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 8,
-              textDecoration: "none",
-            }}>{ctaLabel}</Link>
-          </div>
+          <>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              {[
+                { label: "How It Works", href: "#how-it-works" },
+                { label: "Pricing", href: "/pricing" },
+                { label: "FAQ", href: "/faq" },
+                { label: "Support", href: "/support" },
+              ].map(item => (
+                <Link key={item.label} href={item.href} style={{
+                  padding: "0.4rem 0.75rem", fontSize: "0.85rem", fontWeight: 500,
+                  color: "rgba(255,255,255,0.6)", textDecoration: "none", borderRadius: 6,
+                  transition: "color 0.15s",
+                }}>{item.label}</Link>
+              ))}
+            </div>
+            <div style={{ position: "absolute", right: "1.5rem", display: "flex", alignItems: "center", gap: 6 }}>
+              <Link href="/login" style={{
+                padding: "0.4rem 0.875rem", fontSize: "0.85rem", fontWeight: 600,
+                color: "rgba(255,255,255,0.7)", textDecoration: "none",
+              }}>Log In</Link>
+              <Link href={ctaHref} style={{
+                padding: "0.5rem 1.25rem", fontSize: "0.85rem", fontWeight: 600,
+                color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 8,
+                textDecoration: "none",
+              }}>{ctaLabel}</Link>
+            </div>
+          </>
         ) : (
           <button onClick={() => setMenuOpen(!menuOpen)} style={{
             background: "none", border: "none", cursor: "pointer", padding: 6,
