@@ -590,7 +590,7 @@ export async function generateRoadmap(input: {
   const prompt = `${IDENTITY_COMPACT}You are Threely Intelligence, an expert goal coach. Create a detailed milestone-based roadmap for this user's goal.
 
 GOAL: ${title}
-${structuredSummary ? `Summary: ${structuredSummary}` : `Raw input: "${rawInput}"`}
+${structuredSummary ? `Summary: ${structuredSummary}\nFull user input: "${rawInput}"` : `User input: "${rawInput}"`}
 Category: ${category ?? "general"}
 ${deadlineStr}
 Daily time available: ${dailyTimeMinutes} minutes
@@ -606,7 +606,7 @@ Create a milestone-based progression plan with 4-6 phases. Each phase must have:
 4. Estimated duration based on their daily time and intensity (but clarify it's milestone-based, not calendar-based)
 5. Common pitfall for this phase and how to avoid it
 
-Adapt the generic playbook to THIS SPECIFIC user's goal, timeline, and available time. Be specific to their situation, not generic.
+Adapt the generic playbook to THIS SPECIFIC user's goal, timeline, and available time. Be specific to their situation, not generic. CRITICAL: Read the user's input carefully — if they already have things set up (a store, a workout routine, a budget, etc.), START the roadmap AFTER those steps. Do NOT include phases for things they've already done.
 
 Format as a clean, structured text plan that can be read by both the user and an AI task generator. Use this format:
 
@@ -624,7 +624,7 @@ End with a brief note about what success looks like when ALL phases are complete
 
   const startTime = Date.now();
   const message = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
+    model: "claude-haiku-4-5-20251001",
     max_tokens: 2048,
     temperature: 0.5,
     messages: [{ role: "user", content: prompt }],
@@ -686,6 +686,7 @@ ${userName ? `NAME — The user's name is "${userName}". Use it naturally in con
 CRITICAL — The final goal MUST include ALL of these details. You MUST ask about EVERY area — no exceptions, no skipping:
 1. A SPECIFIC measurable outcome (not vague like "explore" or "improve" — e.g. "land 3 freelance clients" or "run a 5K in under 30 minutes")
 2. Their current starting point / experience level — Ask follow-up questions to understand EXACTLY where they are. If they say "I have a store ready", ask what products are listed, do they have traffic, have they made any sales. If they say "I work out", ask how many days, what split, how long they've been training. The more specific you get about their starting point, the better the plan will be. NEVER assume they're starting from scratch unless they explicitly say so.
+2b. What they've already tried — Ask "Have you tried anything so far for this goal?" with options like "Yes, but it didn't work", "Yes, some progress", "No, completely fresh start". If they have tried things, ask what specifically so we don't suggest the same failed approaches.
 3. How much time per day they can dedicate — ALWAYS ask this explicitly. STRICT RULE: Options MUST be exact single values, NEVER ranges. Use exactly these options: "15 minutes", "30 minutes", "1 hour", "2 hours". NEVER use ranges like "30-45 minutes" or "1-2 hours"
 4. Their desired pace/intensity — are they going all-in or building slowly? (e.g. "aggressive, maximum effort daily" or "steady, sustainable habit-building")
 5. A realistic deadline/timeline — ALWAYS suggest one yourself based on their goal complexity, daily time, and intensity. For example: "Based on your goal and 30 min/day, I'd recommend about 3 months — that gives you steady progress without burnout." Then offer options like "That sounds perfect", "I want to do it faster (push harder)", "I'd prefer a longer, more relaxed timeline". NEVER ask them to pick a deadline from scratch — YOU are the coach, so recommend what's realistic and let them adjust.
@@ -746,7 +747,7 @@ RULES:
 - If the user provides a custom answer, roll with it naturally
 - You can combine areas 4+5 (intensity + timeline) into one question if natural, but NEVER skip them
 ${shouldWrapUp ? "- IMPORTANT: You have asked enough questions. You MUST wrap up NOW and produce the final goal_text." : ""}
-- Do NOT wrap up until you have covered ALL 6 core areas above AND at least the most critical category-specific context. If you haven't asked about daily time, deadline/timeline, or work days yet, you MUST ask before wrapping up. For fitness goals, you MUST ask about nutrition before wrapping up. For business goals, you MUST ask about budget before wrapping up.
+- Do NOT wrap up until you have covered ALL 6 core areas above AND at least the most critical category-specific context. Before setting done=true, mentally verify you can write a goal_text that includes: specific outcome, EXACT starting point (what they have/don't have), what they've tried, daily time, intensity, timeline, work days, and category context. If ANY of these are vague or missing, ask one more question to clarify. If you haven't asked about daily time, deadline/timeline, or work days yet, you MUST ask before wrapping up. For fitness goals, you MUST ask about nutrition before wrapping up. For business goals, you MUST ask about budget before wrapping up.
 
 ## REALITY CHECK — AMBITIOUS GOAL DETECTION
 
@@ -798,7 +799,7 @@ When wrapping up (done: true):
   "message": "A short encouraging summary",
   "options": [],
   "done": true,
-  "goal_text": "A detailed 3-6 sentence goal description in first person. MUST include: the specific measurable outcome, where they're starting from, how much daily time they have, their preferred pace/intensity, their target timeline, their work schedule (which days), AND any category-specific context gathered (nutrition plans, budget, risk tolerance, equipment, etc.). Example quality for a fitness goal: 'I want to add visible muscle size to my arms, chest, and shoulders over the next 3-4 months. I'm a regular lifter with a solid routine and full gym access, dedicating 30-60 minutes per day on weekdays. I eat healthy but don't currently track macros and want guidance on nutrition to support muscle growth. I'm taking a steady, committed approach — consistent progress without burning out.' Example for a business goal: 'I want to launch an online store selling handmade jewelry and make my first 10 sales within 3 months. I'm starting from scratch with a budget of about $500 for tools and initial inventory. I can dedicate 1-2 hours per day on weekdays. I want a committed, consistent approach — building something real, not rushing.'"
+  "goal_text": "A detailed 6-10 sentence goal description in first person. This is the MOST IMPORTANT output — it becomes the permanent context for ALL future daily task generation. Include EVERY specific detail the user shared: the measurable outcome, EXACTLY where they're starting (what they already have, what's set up, what's not), what they've already tried, how much daily time, pace/intensity, timeline, work days, AND all category-specific context (nutrition plans, budget, equipment, store status, products, traffic, etc.). Do NOT summarize or compress — include every relevant detail. Example: 'I want to make my first 10 sales on my existing Shopify air freshener store within 6 weeks. I already have the store set up with 5 products listed, basic branding done, but zero traffic and zero sales so far. I haven't tried any paid ads yet but I have a $200 marketing budget. I eat healthy but don't track macros. I can dedicate 2 hours per day on weekdays. I want a committed, aggressive approach — I'm ready to put in the work. My store URL is live and products are ready to ship from my supplier.'"
 }`;
 
   // If messages is empty, inject a seed to start the conversation
@@ -1032,7 +1033,7 @@ ${previousTasks.map((t, i) => {
 
 TODAY'S DATE: ${todayStr}
 GOAL: ${goal.title} | ${goal.category ?? "general"} | ${deadlineStr}
-${goal.structuredSummary ? `Summary: ${goal.structuredSummary}` : `Input: "${goal.rawInput}"`}
+${goal.structuredSummary ? `Summary: ${goal.structuredSummary}\nFull user input: "${goal.rawInput}"` : `User input: "${goal.rawInput}"`}
 goal_id: ${goal.id}
 ${roadmapSection}
 
