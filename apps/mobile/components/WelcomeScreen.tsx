@@ -29,7 +29,7 @@ interface WelcomeScreenProps {
 }
 
 const VALUE_PROPS = [
-  "Finally become the person you keep saying you'll be.",
+  "Become the person you want to be.",
   "Achieve your goals.",
   "10x your productivity.",
 ];

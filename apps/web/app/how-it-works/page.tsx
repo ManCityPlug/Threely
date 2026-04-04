@@ -254,7 +254,7 @@ export default function HowItWorksPage() {
             Describe your first goal. Get 3 personalized tasks in under a minute.
           </p>
           <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-            <Link href="/welcome" style={{
+            <Link href="/start" style={{
               display: "inline-block",
               padding: "0.875rem 2.5rem",
               background: "#0a0a0a",

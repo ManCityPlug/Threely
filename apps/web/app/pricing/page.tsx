@@ -234,7 +234,7 @@ export default function PricingPage() {
           <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", marginBottom: "1.5rem" }}>
             Set your first goal and get personalized tasks in under a minute.
           </p>
-          <Link href="/welcome" style={{
+          <Link href="/start" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#635bff",

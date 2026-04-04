@@ -222,7 +222,7 @@ function SignupForm() {
           style={{
             ...OAUTH_BTN,
             background: "#fff",
-            color: "#fff",
+            color: "#1f2937",
             border: "1.5px solid rgba(255,255,255,0.12)",
             marginBottom: 20,
             opacity: oauthLoading === "apple" ? 0.5 : 1,

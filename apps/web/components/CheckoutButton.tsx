@@ -19,7 +19,7 @@ export default function CheckoutButton({ plan, style, children }: CheckoutButton
     const supabase = getSupabase();
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) {
-      window.location.href = "/welcome";
+      window.location.href = "/start";
       return;
     }
 

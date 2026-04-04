@@ -179,7 +179,7 @@ export default function AboutPage() {
           <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", marginBottom: "1.5rem" }}>
             Describe your goal. Get your first three tasks in under a minute.
           </p>
-          <Link href="/welcome" style={{
+          <Link href="/start" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#0a0a0a",

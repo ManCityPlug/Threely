@@ -179,7 +179,7 @@ export default function FaqPage() {
           <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", marginBottom: "1.5rem" }}>
             Try Threely free for 7 days and see for yourself.
           </p>
-          <Link href="/welcome" style={{
+          <Link href="/start" style={{
             display: "inline-block",
             padding: "0.875rem 2.5rem",
             background: "#0a0a0a",

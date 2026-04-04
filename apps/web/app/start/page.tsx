@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const BULLETS = [
-  "Finally become the person you keep saying you'll be.",
+  "Become the person you want to be.",
   "Achieve your goals.",
   "10x your productivity.",
 ];
@@ -13,8 +13,10 @@ export default function StartPage() {
       textAlign: "center", flex: 1,
       display: "flex", flexDirection: "column", justifyContent: "center",
     }}>
-      {/* Sparkle icon */}
-      <div style={{ fontSize: 44, color: "#A78BFA", marginBottom: 16 }}>✦</div>
+      {/* Logo */}
+      <div style={{ marginBottom: 20 }}>
+        <img src="/favicon.png" alt="" width={48} height={48} style={{ borderRadius: 14 }} />
+      </div>
 
       {/* Headline */}
       <h1 style={{
