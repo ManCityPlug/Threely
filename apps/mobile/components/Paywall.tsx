@@ -145,9 +145,8 @@ export default function Paywall({ visible, onDismiss }: PaywallProps) {
           <View style={styles.handle} />
         </View>
 
-        {/* Icon + heading */}
-        <Text style={styles.icon}>✦</Text>
-        <Text style={styles.heading}>Unlock this with Threely Pro</Text>
+        {/* Heading */}
+        <Text style={[styles.heading, { color: "#D4A843" }]}>Unlock Threely Pro</Text>
         <Text style={styles.subheading}>
           The #1 AI app that turns any goal into reality.{"\n"}Just tell us what you want — we'll get you there.
         </Text>
@@ -156,12 +155,12 @@ export default function Paywall({ visible, onDismiss }: PaywallProps) {
         <View style={[styles.planCard, styles.planCardSelected]}>
           <View style={styles.planRow}>
             <View style={{ flex: 1 }}>
-              <Text style={[styles.planName, { color: colors.primary }]}>Monthly</Text>
+              <Text style={[styles.planName, { color: colors.text }]}>Monthly</Text>
               <Text style={styles.planSub}>
                 {trialEligible ? "7 Day Free Trial · per month" : "per month"}
               </Text>
             </View>
-            <Text style={[styles.planPrice, { color: colors.primary }]}>{priceString}</Text>
+            <Text style={[styles.planPrice, { color: "#D4A843" }]}>{priceString}</Text>
           </View>
         </View>
 
@@ -346,7 +345,7 @@ function createStyles(c: Colors) {
     ctaBtnText: {
       fontSize: typography.md,
       fontWeight: typography.bold,
-      color: "#fff",
+      color: c.primaryText,
       letterSpacing: -0.2,
     },
     trialNote: {

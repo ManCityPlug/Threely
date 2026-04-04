@@ -26,9 +26,9 @@ import { useScalePress } from "@/lib/animations";
 const RESOURCE_ICONS: Record<string, string> = {
   youtube_channel: "\u25B6",
   tool: "\u2699",
-  website: "\uD83D\uDD17",
-  book: "\uD83D\uDCD6",
-  app: "\uD83D\uDCF1",
+  website: "\u2197",
+  book: "\u2261",
+  app: "\u25A0",
 };
 
 interface AskMessage {
@@ -700,7 +700,7 @@ function createStyles(c: Colors) {
       borderRadius: radius.lg,
       borderWidth: 1,
       borderColor: c.border,
-      marginBottom: spacing.sm,
+      marginBottom: spacing.md,
       overflow: "hidden",
       ...shadow.sm,
     },
@@ -711,7 +711,7 @@ function createStyles(c: Colors) {
     inner: {
       flexDirection: "row",
       alignItems: "flex-start",
-      padding: spacing.md,
+      padding: spacing.md + 2,
       gap: spacing.md,
     },
     checkboxHitArea: {
@@ -747,10 +747,10 @@ function createStyles(c: Colors) {
     },
     title: {
       flex: 1,
-      fontSize: typography.base,
+      fontSize: typography.md,
       fontWeight: typography.semibold,
       color: c.text,
-      lineHeight: 21,
+      lineHeight: 23,
     },
     titleDone: {
       color: c.textSecondary,
@@ -791,7 +791,8 @@ function createStyles(c: Colors) {
     description: {
       fontSize: typography.sm,
       color: c.textSecondary,
-      lineHeight: 19,
+      lineHeight: 20,
+      marginTop: 2,
     },
     descDone: {
       color: c.textTertiary,

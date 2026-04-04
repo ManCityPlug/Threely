@@ -881,16 +881,7 @@ export default function DashboardScreen() {
           </View>
         )}
 
-        {/* Complete All button — shown when any incomplete tasks remain */}
-        {newTaskItems.length > 0 && newTaskItems.filter(t => !t.isCompleted).length >= 1 && !allDone && (
-          <TouchableOpacity
-            style={styles.completeAllBtn}
-            onPress={handleCompleteAll}
-            activeOpacity={0.85}
-          >
-            <Text style={styles.completeAllText}>Complete all tasks</Text>
-          </TouchableOpacity>
-        )}
+        {/* Complete All button removed — users check tasks off individually */}
 
         {/* Insight card — shown after review submission */}
         {showInsightCard && (
@@ -932,7 +923,7 @@ export default function DashboardScreen() {
         {/* Task sections */}
         {effectiveGoals.length === 0 ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>{"\ud83c\udfaf"}</Text>
+            <Text style={styles.emptyIcon}>{"✦"}</Text>
             <Text style={styles.emptyTitle}>Get started</Text>
             <Text style={styles.emptySubtitle}>
               Create your first goal and we'll generate daily tasks to help you achieve it.
@@ -945,7 +936,7 @@ export default function DashboardScreen() {
           </View>
         ) : restDay && !generating ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>😌</Text>
+            <Text style={styles.emptyIcon}>{"✦"}</Text>
             <Text style={styles.emptyTitle}>No goals scheduled for today</Text>
             <Text style={styles.emptySubtitle}>
               Enjoy your rest day — or keep the momentum going!
@@ -1029,28 +1020,15 @@ export default function DashboardScreen() {
                   {generating ? (
                     <ActivityIndicator color={colors.primaryText} size="small" />
                   ) : (
-                    <>
-                      <View style={styles.getMoreIconWrap}>
-                        <Text style={{ fontSize: 18 }}>🚀</Text>
-                      </View>
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.getMoreTitle}>Get more tasks</Text>
-                        <Text style={styles.getMoreSubtitle}>All tasks complete — generate your next set</Text>
-                      </View>
-                    </>
+                    <Text style={styles.getMoreTitle}>Get more tasks</Text>
                   )}
                 </TouchableOpacity>
               ) : (
                 <View style={styles.getMoreBarLocked}>
-                  <View style={styles.getMoreIconWrapLocked}>
-                    <Text style={{ fontSize: 18 }}>🔒</Text>
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.getMoreTitleLocked}>Complete all tasks to unlock more</Text>
-                    <Text style={styles.getMoreSubtitleLocked}>
-                      {completedCount}/{totalCount} done — {totalCount - completedCount} remaining
-                    </Text>
-                  </View>
+                  <Text style={styles.getMoreTitleLocked}>Complete all tasks to unlock more</Text>
+                  <Text style={styles.getMoreSubtitleLocked}>
+                    {completedCount}/{totalCount} done — {totalCount - completedCount} remaining
+                  </Text>
                 </View>
               )}
             </View>
@@ -1344,7 +1322,7 @@ export default function DashboardScreen() {
       <Modal visible={showGenLimit} transparent animationType="fade">
         <Pressable style={styles.welcomeOverlay} onPress={() => setShowGenLimit(false)}>
           <Pressable style={[styles.welcomeBox, { alignItems: "flex-start" }]} onPress={() => {}}>
-            <Text style={{ fontSize: 32, textAlign: "center", alignSelf: "center", marginBottom: spacing.md }}>🚀</Text>
+            <Text style={{ fontSize: 32, textAlign: "center", alignSelf: "center", marginBottom: spacing.md }}>{"✦"}</Text>
             <Text style={[styles.welcomeTitle, { textAlign: "center", alignSelf: "center", color: colors.text }]}>You're on a roll!</Text>
             <Text style={[styles.welcomeSubtitle, { textAlign: "center", alignSelf: "center" }]}>
               You've already gotten extra tasks for this goal today. Instead of generating more, try these:
@@ -1546,24 +1524,6 @@ function createStyles(c: Colors) {
       fontWeight: typography.semibold,
       color: c.text,
     },
-    completeAllBtn: {
-      backgroundColor: c.success,
-      borderRadius: radius.md,
-      paddingVertical: 12,
-      alignItems: "center",
-      justifyContent: "center",
-      marginBottom: spacing.md,
-      shadowColor: c.success,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.25,
-      shadowRadius: 8,
-      elevation: 4,
-    },
-    completeAllText: {
-      fontSize: typography.sm,
-      fontWeight: typography.bold,
-      color: "#fff",
-    },
     // ── Insight card ────────────────────────────────────────────────────────
     insightCard: {
       backgroundColor: c.primaryLight,
@@ -1641,23 +1601,14 @@ function createStyles(c: Colors) {
     generateBtn: { width: "100%" },
     // Get more tasks bar — unlocked (all tasks done)
     getMoreBar: {
-      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: spacing.md,
-      padding: spacing.md,
+      paddingVertical: 14,
+      paddingHorizontal: spacing.lg,
       borderRadius: radius.lg,
       backgroundColor: c.primary,
       marginBottom: spacing.md,
       ...shadow.md,
-    },
-    getMoreIconWrap: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: "rgba(255,255,255,0.2)",
-      alignItems: "center",
-      justifyContent: "center",
     },
     getMoreTitle: {
       fontSize: typography.base,
@@ -1666,44 +1617,28 @@ function createStyles(c: Colors) {
       letterSpacing: -0.2,
       textAlign: "center",
     },
-    getMoreSubtitle: {
-      fontSize: typography.xs,
-      color: "rgba(255,255,255,0.8)",
-      marginTop: 1,
-      textAlign: "center",
-    },
     // Get more tasks bar — locked
     getMoreBarLocked: {
-      flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      gap: spacing.md,
-      padding: spacing.md,
+      paddingVertical: 14,
+      paddingHorizontal: spacing.lg,
       borderRadius: radius.lg,
       borderWidth: 1.5,
       borderColor: c.border,
       backgroundColor: c.card,
       marginBottom: spacing.md,
     },
-    getMoreIconWrapLocked: {
-      width: 40,
-      height: 40,
-      borderRadius: 20,
-      backgroundColor: c.bg,
-      alignItems: "center",
-      justifyContent: "center",
-    },
     getMoreTitleLocked: {
       fontSize: typography.sm,
       fontWeight: typography.semibold,
-      color: c.text,
-      letterSpacing: -0.2,
+      color: c.textSecondary,
       textAlign: "center",
     },
     getMoreSubtitleLocked: {
       fontSize: typography.xs,
-      color: c.textSecondary,
-      marginTop: 1,
+      color: c.textTertiary,
+      marginTop: 2,
       textAlign: "center",
     },
     reviewPromptBtn: {

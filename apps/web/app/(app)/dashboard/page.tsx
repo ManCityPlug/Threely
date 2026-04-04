@@ -82,9 +82,9 @@ const DIFFICULTY_OPTIONS = [
 const RESOURCE_ICONS_WEB: Record<string, string> = {
   youtube_channel: "\u25B6",
   tool: "\u2699",
-  website: "\uD83D\uDD17",
-  book: "\uD83D\uDCD6",
-  app: "\uD83D\uDCF1",
+  website: "\u2197",
+  book: "\u2261",
+  app: "\u25A0",
 };
 
 function TaskCard({
@@ -181,12 +181,12 @@ function TaskCard({
     <div
       className={`card${!task.isCompleted && !task.isSkipped ? " task-card-hover" : ""}`}
       style={{
-        padding: "1rem 1.25rem",
+        padding: "1.125rem 1.25rem",
         opacity: task.isCompleted || task.isSkipped ? 0.7 : 1,
         transition: "opacity 0.2s, transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease",
         display: "flex",
         flexDirection: "column",
-        gap: "0.5rem",
+        gap: "0.625rem",
         borderColor: overdue ? "var(--warning)" : undefined,
         position: "relative",
       }}
@@ -237,10 +237,10 @@ function TaskCard({
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
                 <div style={{
                   fontWeight: 600,
-                  fontSize: "0.95rem",
+                  fontSize: "1rem",
                   color: task.isCompleted ? "var(--muted)" : "var(--text)",
                   textDecoration: task.isCompleted ? "line-through" : "none",
-                  lineHeight: 1.4,
+                  lineHeight: 1.45,
                 }}>
                   {task.task}
                 </div>
@@ -1153,7 +1153,7 @@ function DashboardPageInner() {
           marginBottom: "1.25rem",
         }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 10, marginBottom: 10 }}>
-            <span style={{ fontSize: 20, flexShrink: 0 }}>📱</span>
+            <span style={{ fontSize: 20, flexShrink: 0 }}>{">"}</span>
             <div style={{ flex: 1 }}>
               <span style={{ fontSize: "0.85rem", fontWeight: 700, color: "var(--text)", display: "block", marginBottom: 2 }}>
                 Threely is available on mobile
@@ -1202,7 +1202,7 @@ function DashboardPageInner() {
             const formatted = formatDisplayName(raw);
             const first = formatted.split(" ")[0] || "there";
             return first;
-          })()} {"👋"}
+          })()}
         </h1>
       </div>
 
@@ -1237,7 +1237,7 @@ function DashboardPageInner() {
       {/* No goals — prompt to create one */}
       {effectiveGoals.length === 0 && (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"🎯"}</div>
+          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"✦"}</div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
             Get started
           </h2>
@@ -1257,7 +1257,7 @@ function DashboardPageInner() {
       {/* Has goals but no selection yet — auto-open picker */}
       {effectiveGoals.length > 0 && effectiveSelectedGoalId === null && !goalPickerOpen && effectiveDailyTasks.length === 0 && (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"🎯"}</div>
+          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"✦"}</div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
             What do you want to work on today?
           </h2>
@@ -1277,7 +1277,7 @@ function DashboardPageInner() {
       {/* Rest day */}
       {effectiveGoals.length > 0 && restDay && !generating && !walkthroughActive && (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"😌"}</div>
+          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"✦"}</div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
             No goals scheduled for today
           </h2>
@@ -1425,35 +1425,17 @@ function DashboardPageInner() {
             </div>
           </div>
 
-          {/* Complete all bar — shown above tasks when not all done */}
+          {/* Locked bar — shown above tasks when not all done */}
           {!allDone && !insight && totalCount > 0 && (
-            <div className="give-more-bar locked" data-walkthrough="unlock-more-bar" style={{ marginBottom: "1.25rem" }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: "50%",
-                background: "var(--bg)", display: "flex",
-                alignItems: "center", justifyContent: "center",
-                fontSize: 18, flexShrink: 0,
-              }}>
-                {"🔒"}
-              </div>
+            <div className="give-more-bar locked" data-walkthrough="unlock-more-bar" style={{ marginBottom: "1.25rem", justifyContent: "center", textAlign: "center" }}>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>
-                  Complete all {totalCount} tasks to unlock more
+                  Complete all tasks to unlock more
                 </div>
                 <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
                   {completedCount}/{totalCount} done — {totalCount - completedCount} remaining
                 </div>
               </div>
-              {incompleteCount >= 1 && (
-                <button
-                  className="btn btn-outline"
-                  onClick={handleCompleteAll}
-                  disabled={completingAll}
-                  style={{ fontSize: "0.8rem", flexShrink: 0 }}
-                >
-                  {completingAll ? <><span className="spinner" style={{ width: 14, height: 14 }} /> ...</> : "✓ Complete all"}
-                </button>
-              )}
             </div>
           )}
 
@@ -1494,25 +1476,19 @@ function DashboardPageInner() {
 
           {/* Give me more bar — shown when all done */}
           {allDone && (
-            <div className="give-more-bar unlocked" data-walkthrough="get-more-button" style={{ marginBottom: "1.25rem" }}>
+            <div data-walkthrough="get-more-button" style={{ marginBottom: "1.25rem", textAlign: "center" }}>
               <button
                 onClick={handleGiveMore}
                 disabled={generating}
+                className="btn btn-primary"
                 style={{
-                  display: "inline-flex", alignItems: "center", gap: 8,
-                  background: "#fff", color: "var(--primary)",
+                  width: "100%",
                   fontWeight: 700, fontSize: "0.95rem",
-                  padding: "0.7rem 1.5rem", borderRadius: "var(--radius)",
-                  border: "none", cursor: "pointer",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                  transition: "transform 0.15s",
+                  padding: "0.85rem 1.5rem",
                 }}
               >
-                {generating ? <><span className="spinner spinner-dark" style={{ width: 18, height: 18 }} /> Generating...</> : "🚀 Get more tasks"}
+                {generating ? <><span className="spinner" style={{ width: 18, height: 18 }} /> Generating...</> : "Get more tasks"}
               </button>
-              <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.9)", fontWeight: 500 }}>
-                {generating ? <><strong>This can take a couple of minutes.</strong> Hang tight!</> : "Great work! Ready for your next steps?"}
-              </span>
             </div>
           )}
 
@@ -1532,7 +1508,7 @@ function DashboardPageInner() {
             <div style={{
               display: "flex",
               flexDirection: "column",
-              gap: "0.875rem",
+              gap: "1rem",
               marginBottom: "1.25rem",
             }}>
               {displayedTasks.map(({ dt, task }, i) => (
@@ -1599,7 +1575,7 @@ function DashboardPageInner() {
         <div className="modal-overlay" onClick={() => setShowGenLimit(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 440, padding: "2rem" }}>
             <div style={{ textAlign: "center", marginBottom: "1rem" }}>
-              <span style={{ fontSize: "2rem" }}>🚀</span>
+              <span style={{ fontSize: "2rem" }}>{"✦"}</span>
             </div>
             <h2 style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.02em", textAlign: "center", marginBottom: 8 }}>
               You&apos;re on a roll!
