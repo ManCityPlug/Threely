@@ -11,7 +11,6 @@ export default function NotFound() {
       fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     }}>
       <div style={{ textAlign: "center", padding: "2rem" }}>
-        <img src="/favicon.png" alt="Threely" width={52} height={52} style={{ borderRadius: 14, margin: "0 auto 1.5rem", display: "block" }} />
         <h1 style={{ fontSize: "2rem", fontWeight: 700, color: "#e8e8e8", marginBottom: 8 }}>
           404
         </h1>

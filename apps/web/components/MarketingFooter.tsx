@@ -19,7 +19,6 @@ export default function MarketingFooter() {
           {/* Brand column */}
           <div>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
-              <img src="/favicon.png" alt="Threely" width={28} height={28} style={{ borderRadius: 7 }} />
               <span style={{ color: "#fff", fontWeight: 600 }}>Threely</span>
             </div>
             <p style={{ color: "rgba(255,255,255,0.4)", fontSize: "0.8rem", lineHeight: 1.6, maxWidth: 260 }}>

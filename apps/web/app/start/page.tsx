@@ -13,10 +13,6 @@ export default function StartPage() {
       textAlign: "center", flex: 1,
       display: "flex", flexDirection: "column", justifyContent: "center",
     }}>
-      {/* Logo */}
-      <div style={{ marginBottom: 20 }}>
-        <img src="/favicon.png" alt="" width={48} height={48} style={{ borderRadius: 14 }} />
-      </div>
 
       {/* Headline */}
       <h1 style={{

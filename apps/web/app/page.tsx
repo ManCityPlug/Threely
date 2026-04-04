@@ -74,11 +74,10 @@ export default function LandingPage() {
         background: "rgba(10,10,10,0.85)", backdropFilter: "blur(16px)",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
         padding: "0 1.5rem", height: 64,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
+        display: "flex", alignItems: "center", justifyContent: "center",
         maxWidth: 1200, margin: "0 auto", width: "100%",
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          
+        <div style={{ position: "absolute", left: "1.5rem", display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "#fff", letterSpacing: "-0.02em" }}>Threely</span>
         </div>
         {!isMobile ? (
@@ -86,6 +85,7 @@ export default function LandingPage() {
             {[
               { label: "How It Works", href: "#how-it-works" },
               { label: "Pricing", href: "/pricing" },
+              { label: "FAQ", href: "/faq" },
               { label: "Support", href: "/support" },
             ].map(item => (
               <Link key={item.label} href={item.href} style={{
@@ -94,14 +94,16 @@ export default function LandingPage() {
                 transition: "color 0.15s",
               }}>{item.label}</Link>
             ))}
+          </div>
+          <div style={{ position: "absolute", right: "1.5rem", display: "flex", alignItems: "center", gap: 6 }}>
             <Link href="/login" style={{
               padding: "0.4rem 0.875rem", fontSize: "0.85rem", fontWeight: 600,
-              color: "rgba(255,255,255,0.7)", textDecoration: "none", marginLeft: 8,
+              color: "rgba(255,255,255,0.7)", textDecoration: "none",
             }}>Log In</Link>
             <Link href={ctaHref} style={{
               padding: "0.5rem 1.25rem", fontSize: "0.85rem", fontWeight: 600,
               color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 8,
-              textDecoration: "none", marginLeft: 4,
+              textDecoration: "none",
             }}>{ctaLabel}</Link>
           </div>
         ) : (
@@ -130,6 +132,7 @@ export default function LandingPage() {
           {[
             { label: "How It Works", href: "#how-it-works" },
             { label: "Pricing", href: "/pricing" },
+            { label: "FAQ", href: "/faq" },
             { label: "Support", href: "/support" },
             { label: "Log In", href: "/login" },
           ].map(item => (
@@ -155,11 +158,6 @@ export default function LandingPage() {
         background: "radial-gradient(ellipse at 50% 0%, rgba(212,168,67,0.08) 0%, transparent 60%)",
         position: "relative",
       }}>
-        {/* Floating logo */}
-        <div className="hero-logo" style={{ marginBottom: 24 }}>
-          <img src="/favicon.png" alt="" width={56} height={56} style={{ borderRadius: 16, opacity: 0.9 }} />
-        </div>
-
         {/* Pill badge */}
         <div className="fade-up" style={{
           display: "inline-flex", alignItems: "center", gap: 8,

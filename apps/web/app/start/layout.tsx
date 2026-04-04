@@ -51,11 +51,6 @@ export default function StartLayout({ children }: { children: React.ReactNode })
             justifyContent: "center",
           }}
         >
-          <img
-            className="start-logo-img"
-            src="/favicon.png"
-            alt="Threely"
-          />
           <span
             className="start-logo-text"
             style={{
