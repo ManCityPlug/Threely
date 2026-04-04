@@ -35,13 +35,19 @@ export default function LandingPage() {
   const ctaHref = loggedIn ? "/dashboard" : "/start";
   const ctaLabel = loggedIn ? "Go to Dashboard" : "Start Free →";
 
-  // Scroll reveal
+  // Scroll reveal — fade in on enter, fade out on leave
   useEffect(() => {
     const els = document.querySelectorAll('.reveal');
     if (!els.length) return;
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('revealed'); observer.unobserve(e.target); } });
-    }, { threshold: 0.15 });
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('revealed');
+        } else {
+          e.target.classList.remove('revealed');
+        }
+      });
+    }, { threshold: 0.12 });
     els.forEach(el => observer.observe(el));
     return () => observer.disconnect();
   }, []);
@@ -257,7 +263,7 @@ export default function LandingPage() {
             gap: 20,
           }}>
             {TESTIMONIALS.map((t, i) => (
-              <div key={i} style={{
+              <div key={i} className={`reveal reveal-d${i + 1}`} style={{
                 background: "rgba(255,255,255,0.03)",
                 border: "1px solid rgba(255,255,255,0.08)",
                 borderRadius: 16, padding: "1.75rem",
@@ -297,17 +303,16 @@ export default function LandingPage() {
           gap: 20,
         }}>
           {[
-            { icon: "🎯", title: "AI that actually listens", desc: "Tell it your situation — what you have, what you've tried, where you're stuck. It builds from there, not from a template." },
-            { icon: "📋", title: "3 tasks every morning", desc: "Specific actions with exact steps, tools, and what 'done' looks like. No vague advice." },
-            { icon: "📈", title: "Adapts daily", desc: "Struggling? Easier tasks. Crushing it? Harder ones. The AI coaches based on your actual performance." },
-            { icon: "💪", title: "Fitness & business", desc: "Whether you're building muscle or building revenue, the same daily system works. Real workouts. Real business plans." },
+            { title: "AI that actually listens", desc: "Tell it your situation — what you have, what you've tried, where you're stuck. It builds from there, not from a template." },
+            { title: "3 tasks every morning", desc: "Specific actions with exact steps, tools, and what 'done' looks like. No vague advice." },
+            { title: "Adapts daily", desc: "Struggling? Easier tasks. Crushing it? Harder ones. The AI coaches based on your actual performance." },
+            { title: "Fitness & business", desc: "Whether you're building muscle or building revenue, the same daily system works. Real workouts. Real business plans." },
           ].map((f, i) => (
-            <div key={i} style={{
+            <div key={i} className="reveal" style={{
               background: "rgba(255,255,255,0.03)",
               border: "1px solid rgba(255,255,255,0.08)",
               borderRadius: 16, padding: "2rem",
             }}>
-              <div style={{ fontSize: 32, marginBottom: 12 }}>{f.icon}</div>
               <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#fff", marginBottom: 8 }}>{f.title}</h3>
               <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>{f.desc}</p>
             </div>
@@ -321,7 +326,7 @@ export default function LandingPage() {
         maxWidth: 700, margin: "0 auto",
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
-        <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", textAlign: "center", marginBottom: 40 }}>
+        <h2 className="reveal" style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", textAlign: "center", marginBottom: 40 }}>
           Questions
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -355,10 +360,10 @@ export default function LandingPage() {
         background: "transparent",
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
-        <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.8rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 16 }}>
+        <h2 className="reveal" style={{ fontSize: isMobile ? "1.8rem" : "2.8rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 16 }}>
           Ready to level up?
         </h2>
-        <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", marginBottom: 32 }}>
+        <p className="reveal reveal-d1" style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", marginBottom: 32 }}>
           Your first 7 days are free.
         </p>
         <Link href={ctaHref} style={{
