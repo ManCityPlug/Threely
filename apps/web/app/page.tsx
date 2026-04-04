@@ -184,17 +184,8 @@ export default function LandingPage() {
           <span style={{ color: "rgba(255,255,255,0.5)" }}>Become Unrecognizable.</span>
         </h1>
 
-        {/* Sub */}
-        <p className="fade-up-d2" style={{
-          fontSize: isMobile ? "1rem" : "1.2rem",
-          color: "rgba(255,255,255,0.5)", lineHeight: 1.6,
-          maxWidth: 520, margin: "0 0 40px",
-        }}>
-          Know exactly what to do when you open the app.<br />Every single day.
-        </p>
-
         {/* CTA */}
-        <Link href={ctaHref} className="hero-cta fade-up-d3" style={{
+        <Link href={ctaHref} className="hero-cta fade-up-d2" style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
           color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 14,
