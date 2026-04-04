@@ -67,7 +67,7 @@ export default function RegisterScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={["#1A1040", "#2D1B69", "#635BFF"]}
+        colors={["#0a0a0a", "#0a0a0a", "#0a0a0a"]}
         style={StyleSheet.absoluteFillObject}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
@@ -159,7 +159,7 @@ export default function RegisterScreen() {
               disabled={loading || socialLoading}
             >
               {loading ? (
-                <ActivityIndicator color="#1A1040" size="small" />
+                <ActivityIndicator color="#635BFF" size="small" />
               ) : (
                 <Text style={styles.buttonText}>Create account</Text>
               )}
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF", marginTop: spacing.sm,
   },
   buttonText: {
-    color: "#1A1040", fontSize: typography.base,
+    color: "#fff", fontSize: typography.base,
     fontWeight: typography.semibold, letterSpacing: -0.2,
   },
   footer: {

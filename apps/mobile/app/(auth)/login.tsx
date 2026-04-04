@@ -132,7 +132,7 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <LinearGradient
-        colors={["#1A1040", "#2D1B69", "#635BFF"]}
+        colors={["#0a0a0a", "#0a0a0a", "#0a0a0a"]}
         style={StyleSheet.absoluteFillObject}
         start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}
@@ -276,7 +276,7 @@ export default function LoginScreen() {
                   disabled={cooldown > 0 || forgotLoading}
                 >
                   {forgotLoading ? (
-                    <ActivityIndicator color="#1A1040" size="small" />
+                    <ActivityIndicator color="#635BFF" size="small" />
                   ) : (
                     <Text style={styles.modalBtnText}>
                       {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend reset link"}
@@ -321,7 +321,7 @@ export default function LoginScreen() {
                     disabled={forgotLoading}
                   >
                     {forgotLoading ? (
-                      <ActivityIndicator color="#1A1040" size="small" />
+                      <ActivityIndicator color="#635BFF" size="small" />
                     ) : (
                       <Text style={styles.modalBtnText}>Send reset link</Text>
                     )}
@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   buttonText: {
-    color: "#1A1040",
+    color: "#fff",
     fontSize: typography.base,
     fontWeight: typography.semibold,
     letterSpacing: -0.2,
@@ -493,7 +493,7 @@ const styles = StyleSheet.create({
   modalCard: {
     width: "100%",
     maxWidth: 400,
-    backgroundColor: "#1A1040",
+    backgroundColor: "rgba(255,255,255,0.08)",
     borderRadius: radius.lg,
     padding: spacing.xl,
     borderWidth: 1,
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalBtnText: {
-    color: "#1A1040",
+    color: "#fff",
     fontSize: typography.sm,
     fontWeight: typography.semibold,
   },

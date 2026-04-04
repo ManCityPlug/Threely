@@ -109,13 +109,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
 
   return (
     <View style={styles.root}>
-      <LinearGradient
-        colors={["#1A1040", "#2D1B69", "#635BFF"]}
-        style={StyleSheet.absoluteFillObject}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-      />
-      <FloatingParticles />
+      <View style={[StyleSheet.absoluteFillObject, { backgroundColor: "#0a0a0a" }]} />
 
       <SafeAreaView style={styles.content}>
         {/* Top section: logo + headline + value props */}
@@ -157,7 +151,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
           {/* Headline */}
           <Text style={styles.title}>
             Do Less.{"\n"}
-            <Text style={{ color: PRIMARY }}>Achieve</Text> More.
+            <Text style={{ color: "rgba(255,255,255,0.5)" }}>Achieve More.</Text>
           </Text>
 
           <Text style={styles.subtitle}>
@@ -169,7 +163,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
             {VALUE_PROPS.map((text, i) => (
               <View key={i} style={styles.valuePropRow}>
                 <View style={styles.checkCircle}>
-                  <Ionicons name="checkmark" size={14} color="#FFFFFF" />
+                  <Ionicons name="checkmark" size={14} color="#635BFF" />
                 </View>
                 <Text style={styles.valuePropText}>{text}</Text>
               </View>
@@ -313,7 +307,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: PRIMARY,
+    backgroundColor: "rgba(99,91,255,0.2)",
     alignItems: "center",
     justifyContent: "center",
   },
