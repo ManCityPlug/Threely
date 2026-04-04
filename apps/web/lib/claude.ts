@@ -4,6 +4,12 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 const DEEPSEEK_TIMEOUT = 15_000; // 15s — if DeepSeek is slow, fall back to Gemini
 
+// ── Circuit breaker: skip DeepSeek for 5 min after 3 consecutive failures ────
+let deepseekFailCount = 0;
+let deepseekCircuitOpenUntil = 0;
+const CIRCUIT_BREAKER_THRESHOLD = 3;
+const CIRCUIT_BREAKER_COOLDOWN = 5 * 60 * 1000; // 5 minutes
+
 // ── DeepSeek call (OpenAI-compatible API) ────────────────────────────────────
 
 async function callDeepSeek(opts: {
@@ -89,11 +95,20 @@ async function callLLM(opts: {
   maxTokens?: number;
   temperature?: number;
 }): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
-  // Try DeepSeek first (cheaper)
-  if (DEEPSEEK_API_KEY) {
+  // Try DeepSeek first (cheaper) — skip if circuit breaker is open
+  const circuitOpen = Date.now() < deepseekCircuitOpenUntil;
+  if (DEEPSEEK_API_KEY && !circuitOpen) {
     try {
-      return await callDeepSeek(opts);
+      const result = await callDeepSeek(opts);
+      deepseekFailCount = 0; // Reset on success
+      return result;
     } catch (err) {
+      deepseekFailCount++;
+      if (deepseekFailCount >= CIRCUIT_BREAKER_THRESHOLD) {
+        deepseekCircuitOpenUntil = Date.now() + CIRCUIT_BREAKER_COOLDOWN;
+        console.warn(`[LLM] DeepSeek circuit breaker OPEN — skipping for 5 min after ${deepseekFailCount} failures`);
+        deepseekFailCount = 0;
+      }
       console.warn("[LLM] DeepSeek failed, falling back to Gemini:", err instanceof Error ? err.message : err);
     }
   }
@@ -773,7 +788,8 @@ export async function goalChat(messages: GoalChatMessage[], userId?: string, use
 
 TODAY'S DATE: ${today}. Use this when calculating timelines, deadlines, and recommending realistic timeframes.
 
-${userName ? `NAME — The user's name is "${userName}". Use it naturally in conversation (e.g. "Great choice, ${userName}!"). Do NOT ask for their name again.` : ``}
+${userName ? `NAME — The user's name is "${userName}". Use it naturally in conversation (e.g. "Great choice, ${userName}!").` : ``}
+IMPORTANT: NEVER ask the user for their name. Do NOT ask "what should I call you" or anything similar. Jump straight into goal-related questions.
 
 CRITICAL — The final goal MUST include ALL of these details. You MUST ask about EVERY area — no exceptions, no skipping:
 1. A SPECIFIC measurable outcome (not vague like "explore" or "improve" — e.g. "land 3 freelance clients" or "run a 5K in under 30 minutes")
