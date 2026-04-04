@@ -143,6 +143,9 @@ export default function ProfilePage() {
   const [pwLoading, setPwLoading] = useState(false);
   const [pwError, setPwError] = useState("");
   const [pwSuccess, setPwSuccess] = useState(false);
+  const [showCurrentPw, setShowCurrentPw] = useState(false);
+  const [showNewPw, setShowNewPw] = useState(false);
+  const [showConfirmPw, setShowConfirmPw] = useState(false);
   const isOAuthProvider = user?.app_metadata?.provider === "google" || user?.app_metadata?.provider === "apple";
   const providerName = user?.app_metadata?.provider === "google" ? "Google" : user?.app_metadata?.provider === "apple" ? "Apple" : "";
   const [hasPassword, setHasPassword] = useState(!isOAuthProvider);
@@ -894,38 +897,56 @@ export default function ProfilePage() {
                   {hasPassword && (
                     <div>
                       <label className="field-label">Current password</label>
-                      <input
-                        className="field-input"
-                        type="password"
-                        value={currentPw}
-                        onChange={e => setCurrentPw(e.target.value)}
-                        autoComplete="current-password"
-                        required
-                      />
+                      <div style={{ position: "relative" }}>
+                        <input
+                          className="field-input"
+                          type={showCurrentPw ? "text" : "password"}
+                          value={currentPw}
+                          onChange={e => setCurrentPw(e.target.value)}
+                          autoComplete="current-password"
+                          required
+                          style={{ paddingRight: 40 }}
+                        />
+                        <button type="button" onClick={() => setShowCurrentPw(!showCurrentPw)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--subtext)", fontSize: "0.85rem", padding: 4 }}>
+                          {showCurrentPw ? "Hide" : "Show"}
+                        </button>
+                      </div>
                     </div>
                   )}
                   <div>
                     <label className="field-label">New password</label>
-                    <input
-                      className="field-input"
-                      type="password"
-                      placeholder="Min. 8 characters"
-                      value={newPw}
-                      onChange={e => setNewPw(e.target.value)}
-                      autoComplete="new-password"
-                      required
-                    />
+                    <div style={{ position: "relative" }}>
+                      <input
+                        className="field-input"
+                        type={showNewPw ? "text" : "password"}
+                        placeholder="Min. 8 characters"
+                        value={newPw}
+                        onChange={e => setNewPw(e.target.value)}
+                        autoComplete="new-password"
+                        required
+                        style={{ paddingRight: 40 }}
+                      />
+                      <button type="button" onClick={() => setShowNewPw(!showNewPw)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--subtext)", fontSize: "0.85rem", padding: 4 }}>
+                        {showNewPw ? "Hide" : "Show"}
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label className="field-label">Confirm new password</label>
-                    <input
-                      className="field-input"
-                      type="password"
-                      value={confirmPw}
-                      onChange={e => setConfirmPw(e.target.value)}
-                      autoComplete="new-password"
-                      required
-                    />
+                    <div style={{ position: "relative" }}>
+                      <input
+                        className="field-input"
+                        type={showConfirmPw ? "text" : "password"}
+                        value={confirmPw}
+                        onChange={e => setConfirmPw(e.target.value)}
+                        autoComplete="new-password"
+                        required
+                        style={{ paddingRight: 40 }}
+                      />
+                      <button type="button" onClick={() => setShowConfirmPw(!showConfirmPw)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", cursor: "pointer", color: "var(--subtext)", fontSize: "0.85rem", padding: 4 }}>
+                        {showConfirmPw ? "Hide" : "Show"}
+                      </button>
+                    </div>
                   </div>
                   {pwError && (
                     <div style={{
