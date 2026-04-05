@@ -214,8 +214,9 @@ const styles = StyleSheet.create({
 
   // Top
   topSection: {
+    flex: 1,
     alignItems: "center",
-    paddingTop: spacing.xl,
+    justifyContent: "center",
   },
   logoWrap: {
     width: 88,
