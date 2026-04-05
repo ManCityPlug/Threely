@@ -6,9 +6,8 @@ import { usePathname } from "next/navigation";
 import { getSupabase } from "@/lib/supabase-client";
 
 const NAV_LINKS = [
-  { href: "/how-it-works", label: "How it works" },
+  { href: "/#how-it-works", label: "How It Works" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/faq", label: "FAQ" },
   { href: "/support", label: "Support" },
 ];
 
@@ -34,15 +33,16 @@ export default function MarketingNav() {
     <>
       <nav style={{
         position: "sticky", top: 0, zIndex: 100,
-        background: "rgba(10,10,10,0.85)", backdropFilter: "blur(12px)",
-        WebkitBackdropFilter: "blur(12px)",
+        background: "rgba(10,10,10,0.85)", backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
-        padding: "0 1.25rem",
-        height: 60,
+        padding: "0 1.5rem",
+        height: 64,
         display: "flex", alignItems: "center", justifyContent: "center",
+        maxWidth: 1200, margin: "0 auto", width: "100%",
       }}>
         {/* Left: Logo */}
-        <div style={{ position: "absolute", left: "1.25rem", display: "flex", alignItems: "center" }}>
+        <div style={{ position: "absolute", left: "1.5rem", display: "flex", alignItems: "center" }}>
           <Link href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
             <span style={{ fontWeight: 700, fontSize: "1.05rem", letterSpacing: "-0.02em", color: "#e8e8e8" }}>Threely</span>
           </Link>
@@ -50,7 +50,7 @@ export default function MarketingNav() {
 
           {/* Desktop nav links — centered */}
           {!isMobile && (
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
               {NAV_LINKS.map(link => (
                 <Link key={link.href} href={link.href} style={{
                   padding: "0.35rem 0.75rem",
@@ -68,7 +68,7 @@ export default function MarketingNav() {
           )}
 
         {/* Right: Auth buttons (desktop) or Hamburger (mobile) */}
-        <div style={{ position: "absolute", right: "1.25rem", display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ position: "absolute", right: "1.5rem", display: "flex", alignItems: "center", gap: 6 }}>
           {!isMobile && loggedIn && (
             <Link href="/dashboard" style={{
               padding: "0.4rem 1rem",
@@ -92,18 +92,18 @@ export default function MarketingNav() {
                 borderRadius: 8,
                 textDecoration: "none",
               }}>
-                Sign in
+                Log In
               </Link>
-              <Link href="/start" style={{
-                padding: "0.4rem 1rem",
-                fontSize: "0.875rem",
+              <Link href="/start/signup" style={{
+                padding: "0.5rem 1.25rem",
+                fontSize: "0.85rem",
                 fontWeight: 600,
                 color: "#000",
                 background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)",
                 borderRadius: 8,
                 textDecoration: "none",
               }}>
-                Get started
+                Start Free →
               </Link>
             </>
           )}
@@ -173,7 +173,7 @@ export default function MarketingNav() {
                 }}>
                   Sign in
                 </Link>
-                <Link href="/start" onClick={() => setMenuOpen(false)} style={{
+                <Link href="/start/signup" onClick={() => setMenuOpen(false)} style={{
                   flex: 1, textAlign: "center",
                   padding: "0.6rem 0",
                   fontSize: "0.875rem", fontWeight: 600,
