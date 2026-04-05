@@ -19,7 +19,7 @@ export default function MarketingFooter() {
           <Link href="/terms" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Terms</Link>
           <Link href="/privacy" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Privacy</Link>
           <Link href="/refund" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Refund</Link>
-          <Link href="/start/signup" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Sign up</Link>
+          <Link href="/signup" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Sign up</Link>
           <Link href="/login" style={{ color: "rgba(255,255,255,0.5)", fontSize: "0.825rem", textDecoration: "none" }}>Sign in</Link>
         </div>
 
