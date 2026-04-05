@@ -235,10 +235,12 @@ export default function LandingPage() {
             <p style={{ fontSize: isMobile ? "0.95rem" : "1.05rem", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0, marginBottom: 16 }}>
               Threely tells you exactly what{"'"}s needed, personalized to you — not generic BS that{"'"}s keeping you stuck.
             </p>
-            <p style={{ fontSize: isMobile ? "1.05rem" : "1.2rem", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0, marginBottom: 24 }}>
+            <p style={{ fontSize: isMobile ? "1.05rem" : "1.2rem", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0 }}>
               Use Threely or don{"'"}t. The time will pass regardless.<br />
               <strong style={{ color: "#fff" }}>Lock in</strong> or Clock in.
             </p>
+          </div>
+          <div style={{ textAlign: "center" }}>
             <Link href={ctaHref} style={{
               display: "inline-flex", alignItems: "center", justifyContent: "center",
               padding: "0.85rem 2.5rem", fontSize: "1rem", fontWeight: 700,
