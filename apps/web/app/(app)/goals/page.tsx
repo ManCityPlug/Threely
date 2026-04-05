@@ -388,8 +388,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
 
         <div className="card" style={{ padding: "1.25rem", background: "var(--bg)", marginBottom: "1rem" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-            <span style={{ fontSize: 16, color: "var(--primary)" }}>&#10022;</span>
-            <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                        <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
               Threely Intelligence read your goal
             </span>
           </div>
@@ -867,8 +866,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
             padding: "1rem 1.25rem", borderBottom: "1px solid var(--border)",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ fontSize: 16, color: "var(--primary)" }}>&#10022;</span>
-              <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>Threely Intelligence</span>
+                            <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>Threely Intelligence</span>
             </div>
             <button
               onClick={() => { if (editGoal) { onClose(); } else { setShowAiChat(false); setShowTemplates(true); } }}
@@ -1438,11 +1436,11 @@ function GoalsPageInner() {
             Set a goal and your AI coach will break it into 3 small daily tasks — the proven way to make real progress.
           </p>
           <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: "1.5rem", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>{"✦"} AI-powered tasks</span>
+            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>AI-powered tasks</span>
             <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{"·"}</span>
-            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>{"✦"} Daily coaching</span>
+            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>Daily coaching</span>
             <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{"·"}</span>
-            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>{"✦"} Progress tracking</span>
+            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>Progress tracking</span>
           </div>
           <button className="btn btn-primary" onClick={handleTryAddGoal} style={{ fontSize: "0.95rem", padding: "0.75rem 2rem" }}>
             Create your first goal {"\u2192"}

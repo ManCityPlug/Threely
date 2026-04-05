@@ -935,7 +935,6 @@ export default function GoalsScreen() {
 
           <View style={styles.confirmCard}>
             <View style={styles.confirmHeader}>
-              <Text style={styles.confirmIcon}>✦</Text>
               <Text style={styles.confirmTitle}>Threely Intelligence read your goal</Text>
             </View>
             {parsedGoal.category ? (
@@ -969,7 +968,7 @@ export default function GoalsScreen() {
                 onPress={() => startAiChatWithMessage(rawGoalInput.trim())}
                 activeOpacity={0.85}
               >
-                <Text style={[styles.continueBtnText, { color: colors.primary }]}>✦ Use AI instead</Text>
+                <Text style={[styles.continueBtnText, { color: colors.primary }]}>Use AI instead</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.skipWarningBtn} onPress={() => advanceAddStep(3)} activeOpacity={0.7}>
                 <Text style={styles.skipWarningText}>Continue anyway</Text>
@@ -1835,11 +1834,11 @@ export default function GoalsScreen() {
               Set a goal and your AI coach will break it into 3 small daily tasks — the proven way to make real progress.
             </Text>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginBottom: spacing.lg }}>
-              <Text style={{ fontSize: typography.xs, color: colors.textSecondary }}>✦ AI-powered tasks</Text>
+              <Text style={{ fontSize: typography.xs, color: colors.textSecondary }}>AI-powered tasks</Text>
               <Text style={{ fontSize: typography.xs, color: colors.textTertiary }}>·</Text>
-              <Text style={{ fontSize: typography.xs, color: colors.textSecondary }}>✦ Daily coaching</Text>
+              <Text style={{ fontSize: typography.xs, color: colors.textSecondary }}>Daily coaching</Text>
               <Text style={{ fontSize: typography.xs, color: colors.textTertiary }}>·</Text>
-              <Text style={{ fontSize: typography.xs, color: colors.textSecondary }}>✦ Progress tracking</Text>
+              <Text style={{ fontSize: typography.xs, color: colors.textSecondary }}>Progress tracking</Text>
             </View>
             <Button title="Create your first goal" onPress={openAddFlow} style={styles.emptyBtn} />
           </View>

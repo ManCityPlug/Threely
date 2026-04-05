@@ -378,8 +378,7 @@ export default function OnboardingPage() {
               flexShrink: 0,
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 18, color: "var(--primary)" }}>✦</span>
-                <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)" }}>
+                                <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)" }}>
                   Threely Intelligence
                 </span>
               </div>

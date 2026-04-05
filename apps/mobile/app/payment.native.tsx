@@ -50,9 +50,7 @@ export default function PaymentScreen() {
       >
         {/* Hero */}
         <View style={styles.hero}>
-          <View style={styles.logoWrap}>
-            <Text style={styles.logoIcon}>✦</Text>
-          </View>
+          <View style={styles.logoWrap} />
           <Text style={styles.heroTitle}>Start Your Free Trial</Text>
           <Text style={styles.heroSubtitle}>
             7 days free, then your chosen plan.{"\n"}Cancel anytime before the trial ends.

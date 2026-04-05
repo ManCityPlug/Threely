@@ -676,7 +676,6 @@ export default function OnboardingScreen() {
 
             <View style={styles.confirmCard}>
               <View style={styles.confirmHeader}>
-                <Text style={styles.confirmIcon}>✦</Text>
                 <Text style={styles.confirmTitle}>Threely Intelligence read your goal</Text>
               </View>
 
@@ -718,7 +717,7 @@ export default function OnboardingScreen() {
                   onPress={() => startAiChatWithMessage(rawGoalInput.trim())}
                   activeOpacity={0.85}
                 >
-                  <Text style={[styles.continueBtnText, { color: colors.primary }]}>✦ Use AI instead</Text>
+                  <Text style={[styles.continueBtnText, { color: colors.primary }]}>Use AI instead</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.skipWarningBtn}

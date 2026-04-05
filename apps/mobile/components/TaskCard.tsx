@@ -340,7 +340,6 @@ function TaskDetailContent({
                     }}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.intelligenceActionIcon}>✦</Text>
                     <Text style={styles.modalActionText}>Ask AI</Text>
                   </TouchableOpacity>
                 )}
@@ -353,7 +352,6 @@ function TaskDetailContent({
                     }}
                     activeOpacity={0.7}
                   >
-                    <Text style={styles.intelligenceActionIcon}>✦</Text>
                     <Text style={styles.modalActionText}>Refine</Text>
                   </TouchableOpacity>
                 )}
@@ -494,7 +492,6 @@ function AskChatModal({
           <View style={chatStyles.header}>
             <View style={{ width: 32 }} />
             <View style={chatStyles.headerCenter}>
-              <Text style={chatStyles.headerIcon}>✦</Text>
               <Text style={chatStyles.headerTitle}>Ask Threely</Text>
             </View>
             <TouchableOpacity onPress={onClose} hitSlop={12} activeOpacity={0.7} style={chatStyles.closeBtn}>
@@ -514,7 +511,7 @@ function AskChatModal({
         >
           {messages.length === 0 && (
             <View style={chatStyles.emptyState}>
-              <Text style={chatStyles.emptyIcon}>✦</Text>
+
               <Text style={chatStyles.emptyTitle}>Ask anything about this task</Text>
               <Text style={chatStyles.emptySubtitle}>
                 Get tips, clarification, alternative approaches, or help getting started.
@@ -546,7 +543,7 @@ function AskChatModal({
                 msg.role === "user" ? chatStyles.bubbleUser : chatStyles.bubbleAI,
               ]}
             >
-              {msg.role === "assistant" && <Text style={chatStyles.bubbleAIIcon}>✦</Text>}
+
               <Text style={[
                 chatStyles.bubbleText,
                 msg.role === "user" ? chatStyles.bubbleTextUser : chatStyles.bubbleTextAI,
@@ -572,7 +569,6 @@ function AskChatModal({
 
           {loading && (
             <View style={[chatStyles.bubble, chatStyles.bubbleAI]}>
-              <Text style={chatStyles.bubbleAIIcon}>✦</Text>
               <ActivityIndicator size="small" color={colors.primary} />
             </View>
           )}
@@ -660,7 +656,6 @@ function RefineChatModal({
           keyboardDismissMode="interactive"
         >
           <View style={chatStyles.emptyState}>
-            <Text style={chatStyles.emptyIcon}>✦</Text>
             <Text style={chatStyles.emptyTitle}>How should we adjust this task?</Text>
             <Text style={chatStyles.emptySubtitle}>
               Tell us what to change — make it easier, harder, more specific, shorter, etc. AI will regenerate the task for you.

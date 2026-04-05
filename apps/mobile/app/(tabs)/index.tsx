@@ -877,7 +877,6 @@ export default function DashboardScreen() {
         {showInsightCard && (
           <View style={styles.insightCard}>
             <View style={styles.insightHeader}>
-              <Text style={styles.insightIcon}>✦</Text>
               <Text style={styles.insightTitle}>Coach note</Text>
             </View>
             {insightLoading ? (
@@ -913,7 +912,7 @@ export default function DashboardScreen() {
         {/* Task sections */}
         {effectiveGoals.length === 0 ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>{"✦"}</Text>
+            <Text style={styles.emptyIcon}>{""}</Text>
             <Text style={styles.emptyTitle}>Get started</Text>
             <Text style={styles.emptySubtitle}>
               Create your first goal and we'll generate daily tasks to help you achieve it.
@@ -926,7 +925,7 @@ export default function DashboardScreen() {
           </View>
         ) : restDay && !generating ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>{"✦"}</Text>
+            <Text style={styles.emptyIcon}>{""}</Text>
             <Text style={styles.emptyTitle}>No goals scheduled for today</Text>
             <Text style={styles.emptySubtitle}>
               Enjoy your rest day — or keep the momentum going!
@@ -978,7 +977,6 @@ export default function DashboardScreen() {
           </View>
         ) : !hasVisibleTasks ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>✦</Text>
             <Text style={styles.emptyTitle}>No tasks for today</Text>
             <Text style={styles.emptySubtitle}>
               Tap below to generate 3 tasks for each of your goals.
@@ -1313,18 +1311,18 @@ export default function DashboardScreen() {
       <Modal visible={showGenLimit} transparent animationType="fade">
         <Pressable style={styles.welcomeOverlay} onPress={() => setShowGenLimit(false)}>
           <Pressable style={[styles.welcomeBox, { alignItems: "flex-start" }]} onPress={() => {}}>
-            <Text style={{ fontSize: 32, textAlign: "center", alignSelf: "center", marginBottom: spacing.md }}>{"✦"}</Text>
+            <Text style={{ fontSize: 32, textAlign: "center", alignSelf: "center", marginBottom: spacing.md }}>{""}</Text>
             <Text style={[styles.welcomeTitle, { textAlign: "center", alignSelf: "center", color: colors.text }]}>You're on a roll!</Text>
             <Text style={[styles.welcomeSubtitle, { textAlign: "center", alignSelf: "center" }]}>
               You've already gotten extra tasks for this goal today. Instead of generating more, try these:
             </Text>
 
             <Text style={{ fontSize: typography.base, fontWeight: typography.bold, color: colors.text, marginBottom: 6 }}>
-              ✦ Refine a task
+              Refine a task
             </Text>
             <Text style={{ fontSize: typography.sm, color: colors.textSecondary, lineHeight: 20, marginBottom: spacing.md }}>
               Tap on any task to open it, then hit the{" "}
-              <Text style={{ fontWeight: typography.bold, color: colors.primary }}>✦ Refine</Text>
+              <Text style={{ fontWeight: typography.bold, color: colors.primary }}>Refine</Text>
               {" "}button and tell the AI what to change. Need it harder? Shorter? More specific? Just ask.
             </Text>
 

@@ -299,8 +299,7 @@ function TaskCard({
                   onMouseEnter={e => { e.currentTarget.style.background = "color-mix(in srgb, var(--primary) 15%, transparent)"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "var(--primary-light)"; }}
                 >
-                  <span style={{ fontSize: "0.75rem" }}>&#10022;</span>
-                  Ask AI
+                                    Ask AI
                 </button>
               )}
             </>
@@ -1218,7 +1217,7 @@ function DashboardPageInner() {
       {/* No goals — prompt to create one */}
       {effectiveGoals.length === 0 && (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"✦"}</div>
+          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{""}</div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
             Get started
           </h2>
@@ -1238,7 +1237,7 @@ function DashboardPageInner() {
       {/* Has goals but no selection yet — auto-open picker */}
       {effectiveGoals.length > 0 && effectiveSelectedGoalId === null && !goalPickerOpen && effectiveDailyTasks.length === 0 && (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"✦"}</div>
+          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{""}</div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
             What do you want to work on today?
           </h2>
@@ -1258,7 +1257,7 @@ function DashboardPageInner() {
       {/* Rest day */}
       {effectiveGoals.length > 0 && restDay && !generating && !walkthroughActive && (
         <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"✦"}</div>
+          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{""}</div>
           <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
             No goals scheduled for today
           </h2>
@@ -1424,7 +1423,7 @@ function DashboardPageInner() {
               marginBottom: "1.25rem",
             }}>
               <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--primary)", margin: 0, marginBottom: 6 }}>
-                ✦ Coach note
+                Coach note
               </p>
               <p style={{ fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.6, margin: 0 }}>
                 {insight}
@@ -1551,7 +1550,7 @@ function DashboardPageInner() {
         <div className="modal-overlay" onClick={() => setShowGenLimit(false)}>
           <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 440, padding: "2rem" }}>
             <div style={{ textAlign: "center", marginBottom: "1rem" }}>
-              <span style={{ fontSize: "2rem" }}>{"✦"}</span>
+              <span style={{ fontSize: "2rem" }}>{""}</span>
             </div>
             <h2 style={{ fontSize: "1.25rem", fontWeight: 700, letterSpacing: "-0.02em", textAlign: "center", marginBottom: 8 }}>
               You&apos;re on a roll!
@@ -1562,10 +1561,10 @@ function DashboardPageInner() {
 
             <div style={{ textAlign: "left", marginBottom: "1.5rem" }}>
               <p style={{ fontWeight: 700, fontSize: "0.95rem", marginBottom: 4 }}>
-                ✦ Refine a task
+                Refine a task
               </p>
               <p style={{ color: "var(--subtext)", fontSize: "0.85rem", lineHeight: 1.6, marginBottom: "1rem" }}>
-                Click on any task to expand it, then hit the <span style={{ fontWeight: 700, color: "var(--primary)" }}>✦ Refine</span> button and tell the AI what to change. Need it harder? Shorter? More specific? Just ask.
+                Click on any task to expand it, then hit the <span style={{ fontWeight: 700, color: "var(--primary)" }}>Refine</span> button and tell the AI what to change. Need it harder? Shorter? More specific? Just ask.
               </p>
 
               <p style={{ fontWeight: 700, fontSize: "0.95rem", marginBottom: 4 }}>
