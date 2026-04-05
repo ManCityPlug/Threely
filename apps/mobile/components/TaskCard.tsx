@@ -56,6 +56,7 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, pa
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [modalVisible, setModalVisible] = useState(false);
   const pendingPaywallRef = useRef(false);
+  const paywallTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const strikeAnim = useRef(new Animated.Value(task.isCompleted ? 1 : 0)).current;
   const checkScaleAnim = useRef(new Animated.Value(1)).current;
@@ -198,6 +199,7 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, pa
         onDismiss={() => {
           if (pendingPaywallRef.current) {
             pendingPaywallRef.current = false;
+            if (paywallTimerRef.current) { clearTimeout(paywallTimerRef.current); paywallTimerRef.current = null; }
             onShowPaywall?.();
           }
         }}
@@ -217,14 +219,14 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, pa
             onPaywall={() => {
               pendingPaywallRef.current = true;
               setModalVisible(false);
-              if (Platform.OS !== "ios") {
-                setTimeout(() => {
-                  if (pendingPaywallRef.current) {
-                    pendingPaywallRef.current = false;
-                    onShowPaywall?.();
-                  }
-                }, 350);
-              }
+              // Use setTimeout on all platforms for reliable paywall display
+              if (paywallTimerRef.current) clearTimeout(paywallTimerRef.current);
+              paywallTimerRef.current = setTimeout(() => {
+                if (pendingPaywallRef.current) {
+                  pendingPaywallRef.current = false;
+                  onShowPaywall?.();
+                }
+              }, 400);
             }}
           />
         )}

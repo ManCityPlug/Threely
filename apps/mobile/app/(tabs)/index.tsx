@@ -646,14 +646,26 @@ export default function DashboardScreen() {
         prev.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt))
       );
       showToast("Task refined by AI", "success");
-    } catch {
-      showToast("Couldn't refine task. Try again.", "error");
+    } catch (e) {
+      if (e instanceof Error && e.message?.includes("pro_required")) {
+        setShowPaywall(true);
+      } else {
+        showToast("Couldn't refine task. Try again.", "error");
+      }
     }
   }
 
   async function handleAskAboutTask(dailyTaskId: string, taskItemId: string, messages: { role: "user" | "assistant"; content: string }[]) {
-    const res = await tasksApi.askAboutTask(dailyTaskId, taskItemId, messages);
-    return { answer: res.answer, options: res.options ?? [] };
+    try {
+      const res = await tasksApi.askAboutTask(dailyTaskId, taskItemId, messages);
+      return { answer: res.answer, options: res.options ?? [] };
+    } catch (e) {
+      if (e instanceof Error && e.message?.includes("pro_required")) {
+        setShowPaywall(true);
+        return { answer: "", options: [] };
+      }
+      throw e;
+    }
   }
 
   async function handleCompleteAll() {

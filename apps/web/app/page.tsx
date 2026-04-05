@@ -5,7 +5,7 @@ import Link from "next/link";
 import { getSupabase } from "@/lib/supabase-client";
 
 const TESTIMONIALS: { quote: string; author: string; label: string; image?: string }[] = [
-  { quote: "I had a Shopify store just sitting there. Threely laid out the plan — SEO, emails, what to fix first. First time I felt like I knew what I was doing.", author: "James R.", label: "E-commerce" },
+  { quote: "I had a Shopify store just sitting there. Threely laid out the plan — SEO, emails, what to fix first. First time I felt like I knew what I was doing.", author: "George T.", label: "E-commerce", image: "/George.png" },
   { quote: "I was so confused on how to start an ecommerce brand until I started using Threely. It truly told me step by step what to do and by month 2 i'm making 7k/month from my new store.", author: "Daniel", label: "Brand Owner", image: "/daniel.png" },
   { quote: "This app is actually very useful. Been getting amazing progress in the gym with it.", author: "Nikolay M.", label: "Fitness", image: "/nikolay.png" },
 ];
@@ -230,12 +230,8 @@ export default function LandingPage() {
             borderRadius: 16, padding: isMobile ? "1.75rem" : "2.5rem 3rem",
             marginBottom: 32, textAlign: "center",
           }}>
-            <p style={{ fontSize: isMobile ? "0.95rem" : "1.05rem", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0, marginBottom: 16 }}>
+            <p style={{ fontSize: isMobile ? "0.95rem" : "1.05rem", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0 }}>
               Threely tells you exactly what{"'"}s needed, personalized to you — not generic BS that{"'"}s keeping you stuck.
-            </p>
-            <p style={{ fontSize: isMobile ? "1.05rem" : "1.2rem", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0 }}>
-              Use Threely or don{"'"}t. The time will pass regardless.<br />
-              <strong style={{ color: "#fff" }}>Lock in</strong> or Clock in.
             </p>
           </div>
           <div style={{ textAlign: "center" }}>

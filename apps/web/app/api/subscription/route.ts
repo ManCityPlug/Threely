@@ -227,9 +227,8 @@ async function checkRevenueCatSubscription(userId: string): Promise<string | nul
 
     const data = await res.json();
     const entitlements = data?.subscriber?.entitlements;
-    if (!entitlements?.pro) return null;
-
-    const pro = entitlements.pro;
+    const pro = entitlements?.pro ?? entitlements?.["threely Pro"];
+    if (!pro) return null;
     const expiresDate = pro.expires_date ? new Date(pro.expires_date) : null;
 
     if (expiresDate && expiresDate > new Date()) {
