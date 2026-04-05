@@ -11,8 +11,11 @@ const TESTIMONIALS: { quote: string; author: string; label: string; image?: stri
 ];
 
 const FAQ = [
-  { q: "Is it free?", a: "7-day free trial with full access. No credit card required. After that, choose a plan to keep going." },
+  { q: "Is it free?", a: "7-day free trial with full access. After that, choose a plan to keep going. Cancel anytime." },
   { q: "What if I miss a day?", a: "No guilt. Just open Threely and pick up where you left off. Your progress is saved." },
+  { q: "Does it work for fitness too?", a: "Yes. Threely builds real workout plans based on your experience level, schedule, and goals. It adapts every day based on how your sessions went." },
+  { q: "How long before I see results?", a: "Most users notice a difference within the first week. You're doing 3 focused tasks every single day — that compounds fast." },
+  { q: "Can I cancel anytime?", a: "Yes. Cancel in your settings whenever you want. No contracts, no hidden fees, no questions asked." },
 ];
 
 export default function LandingPage() {
@@ -214,25 +217,39 @@ export default function LandingPage() {
       {/* ─── ChatGPT comparison ──────────────────────────────────────────────── */}
       <section className="reveal" style={{
         padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
-        textAlign: "center",
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
-        <div style={{ maxWidth: 700, margin: "0 auto" }}>
-          <h2 style={{ fontSize: isMobile ? "1.6rem" : "2.2rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 20, lineHeight: 1.2 }}>
+        <div style={{ maxWidth: 800, margin: "0 auto" }}>
+          <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 16, textAlign: "center" }}>
+            How is this different from ChatGPT?
+          </p>
+          <h2 style={{ fontSize: isMobile ? "1.6rem" : "2.4rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 24, lineHeight: 1.15, textAlign: "center" }}>
             You{"'"}ve had ChatGPT for 4 years.<br />What did you build?
           </h2>
-          <p style={{ fontSize: isMobile ? "1rem" : "1.15rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, marginBottom: 32 }}>
+          <div style={{
+            background: "rgba(255,255,255,0.03)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 16, padding: isMobile ? "1.5rem" : "2rem 2.5rem",
+            marginBottom: 32,
+          }}>
+            <p style={{ fontSize: isMobile ? "0.95rem" : "1.05rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.8, margin: 0 }}>
+              Threely gives you the same playbook that million-dollar brands use to grow — applied directly to your business, built around your schedule, and updated every morning based on your real progress. ChatGPT gives you generic advice you already know. Threely tells you exactly what to do, how to do it, and hands you the exact resources to get it done.
+            </p>
+          </div>
+          <p style={{ fontSize: isMobile ? "1.05rem" : "1.2rem", fontWeight: 700, color: "#fff", textAlign: "center", lineHeight: 1.6, marginBottom: 32 }}>
             Use Threely or don{"'"}t. The time will pass regardless.<br />
             Your competition isn{"'"}t waiting. Stop sleeping. Get rich.
           </p>
-          <Link href={ctaHref} style={{
-            display: "inline-flex", alignItems: "center", justifyContent: "center",
-            padding: "0.85rem 2.5rem", fontSize: "1rem", fontWeight: 700,
-            color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 12,
-            textDecoration: "none",
-          }}>
-            {ctaLabel}
-          </Link>
+          <div style={{ textAlign: "center" }}>
+            <Link href={ctaHref} style={{
+              display: "inline-flex", alignItems: "center", justifyContent: "center",
+              padding: "0.85rem 2.5rem", fontSize: "1rem", fontWeight: 700,
+              color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 12,
+              textDecoration: "none",
+            }}>
+              {ctaLabel}
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -342,6 +359,15 @@ export default function LandingPage() {
             </div>
           ))}
         </div>
+        <div style={{ textAlign: "center", marginTop: 32 }}>
+          <Link href="/faq" style={{
+            fontSize: "0.9rem", fontWeight: 600, color: "rgba(255,255,255,0.5)",
+            textDecoration: "none", borderBottom: "1px solid rgba(255,255,255,0.2)",
+            paddingBottom: 2,
+          }}>
+            View all FAQs →
+          </Link>
+        </div>
       </section>
 
       {/* ─── Final CTA ────────────────────────────────────────────────────────── */}
@@ -351,12 +377,9 @@ export default function LandingPage() {
         background: "transparent",
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
-        <h2 className="reveal" style={{ fontSize: isMobile ? "1.8rem" : "2.8rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 16 }}>
-          Ready to level up?
+        <h2 className="reveal" style={{ fontSize: isMobile ? "1.8rem" : "2.8rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 32 }}>
+          Lock The F*ck In.
         </h2>
-        <p className="reveal reveal-d1" style={{ fontSize: "1rem", color: "rgba(255,255,255,0.5)", marginBottom: 32 }}>
-          Your first 7 days are free.
-        </p>
         <Link href={ctaHref} style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",
           padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
