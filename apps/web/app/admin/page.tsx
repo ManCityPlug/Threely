@@ -102,7 +102,7 @@ const WEB_YEARLY = 99.99;    // Stripe (web)
 const WEB_YEARLY_MONTHLY = WEB_YEARLY / 12;
 const APPLE_COMMISSION = 0.15; // Apple Small Business Program (under $1M/yr)
 
-function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
+function CostEstimatorSection({ activeUsers, payingUsers }: { activeUsers: number; payingUsers: number }) {
   const costs = AI_FUNCTIONS.map((f) => ({ ...f, cost: costPerCall(f) }));
 
   // ── Scenario builder ──
@@ -175,8 +175,8 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
     };
   });
 
-  const totalAvg = monthlyAiCost(2) * activeUsers; // assume avg 2 goals
-  const totalMax = monthlyAiCostMax(3) * activeUsers;
+  const totalAvg = monthlyAiCost(2) * payingUsers; // paying users, assume avg 2 goals
+  const totalMax = monthlyAiCostMax(3) * payingUsers;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem", marginBottom: "2rem" }}>
@@ -298,8 +298,11 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
       {/* Fleet Estimate */}
       <div style={cardStyle}>
         <h3 style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff", marginBottom: "0.75rem" }}>
-          Fleet Cost Estimate ({activeUsers} active users)
+          Fleet Cost Estimate ({payingUsers} paying subscribers)
         </h3>
+        <div style={{ fontSize: "0.7rem", color: "#71717a", marginBottom: "0.75rem" }}>
+          Only paying users (trial + active) are counted. Free users get 1 goal + 1 task set — negligible cost.
+        </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
           <div style={{ background: "#1e1e1e", borderRadius: 8, padding: "1rem", textAlign: "center" }}>
             <div style={{ fontSize: "0.7rem", color: "#71717a", marginBottom: 4 }}>Avg usage (2 goals)</div>
@@ -431,7 +434,7 @@ export default function AdminOverviewPage() {
       >
         Per-User Cost Estimator
       </h2>
-      <CostEstimatorSection activeUsers={data.users.active7d} />
+      <CostEstimatorSection activeUsers={data.users.active7d} payingUsers={data.subscriptions.trialing + data.subscriptions.active} />
 
       {/* AI Costs */}
       <h2
