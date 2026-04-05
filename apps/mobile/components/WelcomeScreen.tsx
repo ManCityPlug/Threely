@@ -70,10 +70,10 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
     loops.push(floatLoop);
     floatLoop.start();
 
-    // Pulse
+    // Pulse — matches web logoBreathe (scale 1 → 1.14, 3s cycle)
     const pulseLoop = Animated.loop(
       Animated.sequence([
-        Animated.timing(pulseAnim, { toValue: 1.06, duration: 1500, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 1.14, duration: 1500, useNativeDriver: true }),
         Animated.timing(pulseAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
       ])
     );
@@ -122,8 +122,8 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
             ]}
           >
             <Animated.View style={[styles.logoGlow, {
-              opacity: pulseAnim.interpolate({ inputRange: [0.97, 1.03], outputRange: [0.4, 0.9] }),
-              transform: [{ scale: pulseAnim.interpolate({ inputRange: [0.97, 1.03], outputRange: [1, 1.3] }) }],
+              opacity: pulseAnim.interpolate({ inputRange: [1, 1.14], outputRange: [0.3, 0.8] }),
+              transform: [{ scale: pulseAnim.interpolate({ inputRange: [1, 1.14], outputRange: [1, 1.4] }) }],
             }]} />
             <Image source={require("@/assets/icon.png")} style={styles.logo} />
           </Animated.View>
