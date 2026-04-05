@@ -6,23 +6,23 @@ import { ThemeProvider } from "@/lib/theme-context";
 
 export const metadata: Metadata = {
   title: {
-    default: "Threely | Do Less. Achieve More.",
+    default: "Threely | Lock In and Achieve Any Goal",
     template: "%s | Threely",
   },
   description:
-    "Describe your goal, get 3 personalized tasks every day. Threely adapts to your schedule, skill level, and progress — like a coach that never sleeps.",
+    "Tell Threely your goal — it builds your personalized daily plan. 3 tasks every day, fully adapted to your life. Stop guessing, start executing.",
   openGraph: {
     siteName: "Threely",
     type: "website",
     url: "https://threely.co",
-    title: "Threely | Do Less. Achieve More.",
-    description: "Describe your goal, get 3 personalized tasks every day. Threely adapts to your schedule, skill level, and progress.",
+    title: "Threely | Lock In and Achieve Any Goal",
+    description: "Tell Threely your goal — it builds your personalized daily plan. 3 tasks every day, fully adapted to your life. Stop guessing, start executing.",
     images: [{ url: "https://threely.co/favicon.png" }],
   },
   twitter: {
     card: "summary",
-    title: "Threely | Do Less. Achieve More.",
-    description: "Describe your goal, get 3 personalized tasks every day. Threely adapts to your schedule, skill level, and progress.",
+    title: "Threely | Lock In and Achieve Any Goal",
+    description: "Tell Threely your goal — it builds your personalized daily plan. 3 tasks every day, fully adapted to your life. Stop guessing, start executing.",
   },
   icons: {
     icon: "/favicon.png",
