@@ -229,25 +229,20 @@ export default function LandingPage() {
           <div style={{
             background: "rgba(255,255,255,0.03)",
             border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 16, padding: isMobile ? "1.5rem" : "2rem 2.5rem",
-            marginBottom: 32,
+            borderRadius: 16, padding: isMobile ? "1.75rem" : "2.5rem 3rem",
+            marginBottom: 32, textAlign: "center",
           }}>
-            <p style={{ fontSize: isMobile ? "0.95rem" : "1.05rem", color: "rgba(255,255,255,0.6)", lineHeight: 1.8, margin: 0 }}>
-              Threely gives you the same playbook that million-dollar brands use to grow — applied directly to your business, built around your schedule, and updated every morning based on your real progress. ChatGPT gives you generic advice you already know. Threely tells you exactly what to do, how to do it, and hands you the exact resources to get it done.
+            <p style={{ fontSize: isMobile ? "1.05rem" : "1.2rem", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0, marginBottom: 24 }}>
+              Use Threely or don{"'"}t. The time will pass regardless.<br />
+              <strong style={{ color: "#fff" }}>Lock in</strong> or Clock in.
             </p>
-          </div>
-          <p style={{ fontSize: isMobile ? "1.05rem" : "1.2rem", fontWeight: 700, color: "#fff", textAlign: "center", lineHeight: 1.6, marginBottom: 32 }}>
-            Use Threely or don{"'"}t. The time will pass regardless.<br />
-            <span style={{ color: "#D4A843" }}>Lock in</span> or Clock in.
-          </p>
-          <div style={{ textAlign: "center" }}>
             <Link href={ctaHref} style={{
               display: "inline-flex", alignItems: "center", justifyContent: "center",
               padding: "0.85rem 2.5rem", fontSize: "1rem", fontWeight: 700,
               color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 12,
               textDecoration: "none",
             }}>
-              {ctaLabel}
+              Lock In
             </Link>
           </div>
         </div>
