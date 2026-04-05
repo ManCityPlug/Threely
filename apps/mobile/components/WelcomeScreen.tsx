@@ -114,31 +114,42 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
       <SafeAreaView style={styles.content}>
         {/* Top section: logo + headline + value props */}
         <Animated.View style={[styles.topSection, { opacity: fadeAnim }]}>
-          {/* Logo with gold breathing glow — matches web logoBreathe */}
+          {/* Logo with gold ambient glow — replicates web radial gradient + drop-shadow */}
           <Animated.View
             style={[
               styles.logoWrap,
               { transform: [{ scale: pulseAnim }, { translateY: floatAnim }] },
             ]}
           >
-            {/* Soft gold glow behind icon — pulses with breathing */}
+            {/* Outer ambient glow — large soft radial */}
             <Animated.View style={{
               position: "absolute",
-              width: 120,
-              height: 120,
-              borderRadius: 60,
-              backgroundColor: "rgba(212, 168, 67, 0.15)",
-              opacity: pulseAnim.interpolate({ inputRange: [1, 1.14], outputRange: [0.5, 1] }),
-              transform: [{ scale: pulseAnim.interpolate({ inputRange: [1, 1.14], outputRange: [0.9, 1.3] }) }],
-            }} />
-            <Animated.View style={{
-              position: "absolute",
-              width: 90,
-              height: 90,
-              borderRadius: 45,
-              backgroundColor: "rgba(212, 168, 67, 0.25)",
+              width: 280,
+              height: 280,
+              borderRadius: 140,
+              backgroundColor: "rgba(212, 168, 67, 0.06)",
               opacity: pulseAnim.interpolate({ inputRange: [1, 1.14], outputRange: [0.6, 1] }),
+              transform: [{ scale: pulseAnim.interpolate({ inputRange: [1, 1.14], outputRange: [0.9, 1.1] }) }],
+            }} />
+            {/* Mid glow */}
+            <Animated.View style={{
+              position: "absolute",
+              width: 180,
+              height: 180,
+              borderRadius: 90,
+              backgroundColor: "rgba(212, 168, 67, 0.1)",
+              opacity: pulseAnim.interpolate({ inputRange: [1, 1.14], outputRange: [0.5, 0.9] }),
               transform: [{ scale: pulseAnim.interpolate({ inputRange: [1, 1.14], outputRange: [0.95, 1.15] }) }],
+            }} />
+            {/* Inner glow — tight around icon */}
+            <Animated.View style={{
+              position: "absolute",
+              width: 110,
+              height: 110,
+              borderRadius: 55,
+              backgroundColor: "rgba(212, 168, 67, 0.18)",
+              opacity: pulseAnim.interpolate({ inputRange: [1, 1.14], outputRange: [0.6, 1] }),
+              transform: [{ scale: pulseAnim.interpolate({ inputRange: [1, 1.14], outputRange: [1, 1.2] }) }],
             }} />
             <Image source={require("@/assets/icon.png")} style={styles.logo} />
           </Animated.View>
@@ -230,11 +241,11 @@ const styles = StyleSheet.create({
     paddingTop: spacing.xl,
   },
   logoWrap: {
-    width: 88,
-    height: 88,
+    width: 280,
+    height: 280,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: spacing.lg,
+    marginBottom: -40,
   },
   logo: {
     width: 64,
