@@ -278,7 +278,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
                   </span>
                   {info.badge && (
                     <span style={{
-                      fontSize: "0.6rem", fontWeight: 700, color: "#fff",
+                      fontSize: "0.6rem", fontWeight: 700, color: "var(--primary-text)",
                       background: "var(--primary)", padding: "2px 8px", borderRadius: 10,
                       letterSpacing: "0.03em",
                     }}>
@@ -545,7 +545,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
                 width: "100%",
                 padding: "0.875rem",
                 background: (!stripe || !clientSecret || !allComplete) ? "var(--muted)" : "var(--primary)",
-                color: "#fff",
+                color: "var(--primary-text)",
                 border: "none",
                 borderRadius: "var(--radius)",
                 fontSize: "0.95rem",

@@ -182,7 +182,7 @@ export default function Paywall({ visible, onDismiss }: PaywallProps) {
           disabled={loading || !offerings}
         >
           {loading ? (
-            <ActivityIndicator color="#fff" size="small" />
+            <ActivityIndicator color={colors.primaryText} size="small" />
           ) : (
             <Text style={styles.ctaBtnText}>{trialEligible ? "Start Free Trial" : "Subscribe"}</Text>
           )}

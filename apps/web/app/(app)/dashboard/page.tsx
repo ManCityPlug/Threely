@@ -482,7 +482,7 @@ function TaskCard({
                     fontSize: "0.86rem",
                     lineHeight: 1.55,
                     ...(msg.role === "user"
-                      ? { background: "var(--primary)", color: "#fff" }
+                      ? { background: "var(--primary)", color: "var(--primary-text)" }
                       : { background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }),
                   }}
                 >
@@ -1156,7 +1156,7 @@ function DashboardPageInner() {
             style={{
               display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               padding: "10px 16px",
-              background: "var(--primary)", color: "#fff",
+              background: "var(--primary)", color: "var(--primary-text)",
               borderRadius: 10, fontSize: "0.85rem", fontWeight: 700,
               textDecoration: "none", width: "100%",
             }}

@@ -1365,7 +1365,7 @@ export default function DashboardScreen() {
                 onPress={() => setShowGenLimit(false)}
                 activeOpacity={0.85}
               >
-                <Text style={{ fontSize: typography.sm, fontWeight: typography.bold, color: "#fff" }}>Got it</Text>
+                <Text style={{ fontSize: typography.sm, fontWeight: typography.bold, color: colors.primaryText }}>Got it</Text>
               </TouchableOpacity>
             </View>
           </Pressable>
@@ -1984,7 +1984,7 @@ function createStyles(c: Colors) {
     welcomeBtnText: {
       fontSize: typography.md,
       fontWeight: typography.bold,
-      color: "#fff",
+      color: c.primaryText,
       letterSpacing: -0.2,
     },
     // ── Pro expired banner ────────────────────────────────────────────────────

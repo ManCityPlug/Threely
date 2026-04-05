@@ -258,7 +258,7 @@ function createStyles(c: Colors) {
     badge: {
       fontSize: 10,
       fontWeight: typography.bold,
-      color: "#fff",
+      color: c.primaryText,
       letterSpacing: 0.8,
     },
     planName: {
@@ -330,7 +330,7 @@ function createStyles(c: Colors) {
     ctaBtnText: {
       fontSize: typography.md,
       fontWeight: typography.bold,
-      color: "#fff",
+      color: c.primaryText,
       letterSpacing: -0.2,
     },
     ctaSub: {

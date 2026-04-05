@@ -1219,7 +1219,7 @@ export default function ProfileScreen() {
                             borderRadius: radius.md,
                           }}
                         >
-                          <Text style={{ color: "#fff", fontSize: typography.sm, fontWeight: "600" }}>
+                          <Text style={{ color: colors.primaryText, fontSize: typography.sm, fontWeight: "600" }}>
                             Open Link
                           </Text>
                         </TouchableOpacity>
