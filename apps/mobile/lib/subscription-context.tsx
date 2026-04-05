@@ -154,8 +154,18 @@ export function SubscriptionProvider({ userId, children }: SubscriptionProviderP
       }
       return false;
     } catch (e: unknown) {
-      const err = e as { userCancelled?: boolean };
+      const err = e as { userCancelled?: boolean; code?: number };
       if (err.userCancelled) return false;
+      // If already subscribed (error code 6778003), check entitlements
+      if (err.code === 6778003 || (e instanceof Error && e.message?.includes("already"))) {
+        try {
+          const info = await Purchases.getCustomerInfo();
+          if (info.entitlements.active["threely Pro"] || info.entitlements.active["pro"]) {
+            setHasPro(true);
+            return true;
+          }
+        } catch { /* ignore */ }
+      }
       throw e;
     }
   }, [currentPackage]);

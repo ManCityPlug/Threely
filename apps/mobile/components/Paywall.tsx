@@ -94,8 +94,14 @@ export default function Paywall({ visible, onDismiss }: PaywallProps) {
         onDismiss();
       }
     } catch (e: unknown) {
-      const err = e as { userCancelled?: boolean; message?: string };
-      if (!err.userCancelled) {
+      const err = e as { userCancelled?: boolean; message?: string; code?: number };
+      if (err.userCancelled) {
+        // User cancelled — do nothing
+      } else if (err.code === 6778003 || err.message?.includes("already")) {
+        // Already subscribed — refresh and dismiss
+        await refreshSubscription();
+        onDismiss();
+      } else {
         const message = err.message === "Purchase timed out"
           ? "The purchase is taking too long. Please check your connection and try again."
           : "Something went wrong. Please try again.";
