@@ -33,7 +33,7 @@ export default function LandingPage() {
     });
   }, []);
 
-  const ctaHref = loggedIn ? "/dashboard" : "/start";
+  const ctaHref = loggedIn ? "/dashboard" : "/start/signup";
   const ctaLabel = loggedIn ? "Go to Dashboard" : "Start Free →";
 
   // Scroll reveal — fade in on enter, fade out on leave
@@ -232,6 +232,9 @@ export default function LandingPage() {
             borderRadius: 16, padding: isMobile ? "1.75rem" : "2.5rem 3rem",
             marginBottom: 32, textAlign: "center",
           }}>
+            <p style={{ fontSize: isMobile ? "0.95rem" : "1.05rem", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0, marginBottom: 16 }}>
+              Threely tells you exactly what{"'"}s needed, personalized to you — not generic BS that{"'"}s keeping you stuck.
+            </p>
             <p style={{ fontSize: isMobile ? "1.05rem" : "1.2rem", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0, marginBottom: 24 }}>
               Use Threely or don{"'"}t. The time will pass regardless.<br />
               <strong style={{ color: "#fff" }}>Lock in</strong> or Clock in.
