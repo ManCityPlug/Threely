@@ -372,8 +372,8 @@ function TaskCard({
           <div style={{
             position: "fixed", top: "50%", left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "calc(100vw - 2rem)", maxWidth: 480,
-            maxHeight: "min(600px, 80vh)",
+            width: "calc(100vw - 2rem)", maxWidth: 640,
+            maxHeight: "min(700px, 85vh)",
             background: "var(--card)",
             borderRadius: 16,
             boxShadow: "0 20px 60px rgba(0,0,0,0.15), 0 0 0 1px var(--border)",
@@ -388,8 +388,7 @@ function TaskCard({
               display: "flex", alignItems: "center", justifyContent: "space-between",
             }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ fontSize: 16, color: "var(--primary)" }}>&#10022;</span>
-                <span style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--primary)" }}>Threely Intelligence</span>
+                <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)" }}>Threely Intelligence</span>
               </div>
               <button
                 onClick={() => { setAskMode(false); setAskMessages([]); setAskInput(""); }}
