@@ -241,7 +241,7 @@ export default function LandingPage() {
               color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 12,
               textDecoration: "none",
             }}>
-              Lock In →
+              Lock TF In →
             </Link>
           </div>
         </div>
