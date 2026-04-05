@@ -41,8 +41,8 @@ interface LLMTrainingData {
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
 const cardStyle: React.CSSProperties = {
-  background: "#18181b",
-  border: "1px solid #27272a",
+  background: "#111111",
+  border: "1px solid #1e1e1e",
   borderRadius: 12,
   padding: "1.25rem",
 };
@@ -80,7 +80,7 @@ const tableStyle: React.CSSProperties = {
 const thStyle: React.CSSProperties = {
   textAlign: "left",
   padding: "8px 10px",
-  borderBottom: "1px solid #27272a",
+  borderBottom: "1px solid #1e1e1e",
   color: "#a1a1aa",
   fontWeight: 600,
   fontSize: "0.75rem",
@@ -239,7 +239,7 @@ export default function LLMTrainingPage() {
     progressPercent = 25 + ((readyCount - 500) / 500) * 25;
   } else if (readyCount < 5000) {
     progressLabel = "Good Fine-Tune Ready";
-    progressColor = "#635bff";
+    progressColor = "#D4A843";
     progressPercent = 50 + ((readyCount - 1000) / 4000) * 25;
   } else {
     progressLabel = "Great Fine-Tune Ready";
@@ -277,7 +277,7 @@ export default function LLMTrainingPage() {
           onClick={fetchData}
           disabled={loading}
           style={{
-            background: "#635bff",
+            background: "#D4A843",
             color: "#fff",
             border: "none",
             borderRadius: 8,
@@ -355,7 +355,7 @@ export default function LLMTrainingPage() {
           style={{
             width: "100%",
             height: 12,
-            background: "#27272a",
+            background: "#1e1e1e",
             borderRadius: 6,
             overflow: "hidden",
             marginBottom: 12,
@@ -385,7 +385,7 @@ export default function LLMTrainingPage() {
           <span style={{ color: readyCount >= 500 ? "#fbbf24" : "#71717a" }}>
             500 (Basic)
           </span>
-          <span style={{ color: readyCount >= 1000 ? "#635bff" : "#71717a" }}>
+          <span style={{ color: readyCount >= 1000 ? "#D4A843" : "#71717a" }}>
             1K (Good)
           </span>
           <span style={{ color: readyCount >= 5000 ? "#3ecf8e" : "#71717a" }}>
@@ -523,7 +523,7 @@ export default function LLMTrainingPage() {
               key={item.label}
               style={{
                 background: "#151a2a",
-                border: "1px solid #27272a",
+                border: "1px solid #1e1e1e",
                 borderRadius: 10,
                 padding: "1rem 1.25rem",
                 minWidth: 140,
@@ -614,10 +614,10 @@ export default function LLMTrainingPage() {
               </tr>
             ))}
             <tr>
-              <td style={{ ...tdStyle, fontWeight: 700, borderTop: "1px solid #27272a" }}>Total</td>
-              <td style={{ ...tdStyle, textAlign: "right", borderTop: "1px solid #27272a" }} />
-              <td style={{ ...tdStyle, textAlign: "right", borderTop: "1px solid #27272a" }} />
-              <td style={{ ...tdStyle, textAlign: "right", fontWeight: 700, color: "#fbbf24", borderTop: "1px solid #27272a" }}>
+              <td style={{ ...tdStyle, fontWeight: 700, borderTop: "1px solid #1e1e1e" }}>Total</td>
+              <td style={{ ...tdStyle, textAlign: "right", borderTop: "1px solid #1e1e1e" }} />
+              <td style={{ ...tdStyle, textAlign: "right", borderTop: "1px solid #1e1e1e" }} />
+              <td style={{ ...tdStyle, textAlign: "right", fontWeight: 700, color: "#fbbf24", borderTop: "1px solid #1e1e1e" }}>
                 ${data.costBreakdown.totalCost.toFixed(2)}
               </td>
             </tr>
@@ -671,7 +671,7 @@ export default function LLMTrainingPage() {
                           barWidth > 75
                             ? "#3ecf8e"
                             : barWidth > 40
-                            ? "#635bff"
+                            ? "#D4A843"
                             : barWidth > 15
                             ? "#fbbf24"
                             : "#ef4444",

@@ -24,8 +24,8 @@ interface OverviewData {
 }
 
 const cardStyle: React.CSSProperties = {
-  background: "#18181b",
-  border: "1px solid #27272a",
+  background: "#111111",
+  border: "1px solid #1e1e1e",
   borderRadius: 12,
   padding: "1.25rem",
 };
@@ -179,7 +179,7 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
         </h3>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid #27272a" }}>
+            <tr style={{ borderBottom: "1px solid #1e1e1e" }}>
               <th style={{ textAlign: "left", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>Function</th>
               <th style={{ textAlign: "center", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>Model</th>
               <th style={{ textAlign: "center", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>Frequency</th>
@@ -196,7 +196,7 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
                     fontWeight: 600,
                     padding: "1px 6px",
                     borderRadius: 4,
-                    background: c.model === "Sonnet" ? "#635bff22" : "#27272a",
+                    background: c.model === "Sonnet" ? "#D4A84322" : "#1e1e1e",
                     color: c.model === "Sonnet" ? "#818cf8" : "#a1a1aa",
                   }}>
                     {c.model}
@@ -223,7 +223,7 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
 
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
           <thead>
-            <tr style={{ borderBottom: "1px solid #27272a" }}>
+            <tr style={{ borderBottom: "1px solid #1e1e1e" }}>
               <th style={{ textAlign: "left", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Goals</th>
               <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>AI Cost/mo (avg)</th>
               <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>AI Cost/mo (max)</th>
@@ -234,7 +234,7 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
           <tbody>
             {scenarios.map((s) => (
               <tr key={s.goals} style={{ borderBottom: "1px solid #1e1e21" }}>
-                <td style={{ padding: "0.6rem 0", color: "#635bff", fontWeight: 700, fontSize: "1rem" }}>{s.goals}</td>
+                <td style={{ padding: "0.6rem 0", color: "#D4A843", fontWeight: 700, fontSize: "1rem" }}>{s.goals}</td>
                 <td style={{ padding: "0.6rem 0", textAlign: "center", color: "#a1a1aa", fontWeight: 600 }}>
                   ${s.avgCost.toFixed(2)}
                 </td>
@@ -302,12 +302,12 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
           Fleet Cost Estimate ({activeUsers} active users)
         </h3>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-          <div style={{ background: "#27272a", borderRadius: 8, padding: "1rem", textAlign: "center" }}>
+          <div style={{ background: "#1e1e1e", borderRadius: 8, padding: "1rem", textAlign: "center" }}>
             <div style={{ fontSize: "0.7rem", color: "#71717a", marginBottom: 4 }}>Avg usage (2 goals)</div>
             <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#3ecf8e" }}>${totalAvg.toFixed(2)}</div>
             <div style={{ fontSize: "0.7rem", color: "#71717a" }}>per month</div>
           </div>
-          <div style={{ background: "#27272a", borderRadius: 8, padding: "1rem", textAlign: "center" }}>
+          <div style={{ background: "#1e1e1e", borderRadius: 8, padding: "1rem", textAlign: "center" }}>
             <div style={{ fontSize: "0.7rem", color: "#71717a", marginBottom: 4 }}>Worst case (3 goals, max)</div>
             <div style={{ fontSize: "1.5rem", fontWeight: 700, color: "#f59e0b" }}>${totalMax.toFixed(2)}</div>
             <div style={{ fontSize: "0.7rem", color: "#71717a" }}>per month</div>
@@ -511,7 +511,7 @@ export default function AdminOverviewPage() {
           }}
         >
           <thead>
-            <tr style={{ borderBottom: "1px solid #27272a" }}>
+            <tr style={{ borderBottom: "1px solid #1e1e1e" }}>
               <th
                 style={{
                   textAlign: "left",

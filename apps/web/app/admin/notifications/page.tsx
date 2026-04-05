@@ -14,8 +14,8 @@ interface Notification {
 }
 
 const cardStyle: React.CSSProperties = {
-  background: "#18181b",
-  border: "1px solid #27272a",
+  background: "#111111",
+  border: "1px solid #1e1e1e",
   borderRadius: 12,
   padding: "1.25rem",
 };
@@ -23,7 +23,7 @@ const cardStyle: React.CSSProperties = {
 const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "0.6rem 0.75rem",
-  background: "#27272a",
+  background: "#1e1e1e",
   border: "1px solid #3f3f46",
   borderRadius: 8,
   color: "#e4e4e7",
@@ -281,7 +281,7 @@ export default function AdminNotificationsPage() {
             disabled={sending || !heading.trim() || !subheading.trim()}
             style={{
               padding: "0.6rem 1.5rem",
-              background: sending ? "#3f3f46" : "#635bff",
+              background: sending ? "#3f3f46" : "#D4A843",
               color: "#fff",
               border: "none",
               borderRadius: 8,
@@ -388,7 +388,7 @@ export default function AdminNotificationsPage() {
                         href={n.linkUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ color: "#635bff", textDecoration: "none" }}
+                        style={{ color: "#D4A843", textDecoration: "none" }}
                       >
                         {n.linkUrl}
                       </a>
@@ -444,7 +444,7 @@ export default function AdminNotificationsPage() {
           </span>
           <span
             style={{
-              background: "#27272a",
+              background: "#1e1e1e",
               padding: "2px 10px",
               borderRadius: 6,
               fontSize: "0.9rem",

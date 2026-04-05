@@ -139,8 +139,8 @@ const PLANS = [
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
 const cardStyle: React.CSSProperties = {
-  background: "#18181b",
-  border: "1px solid #27272a",
+  background: "#111111",
+  border: "1px solid #1e1e1e",
   borderRadius: 12,
   padding: "1.25rem",
   marginBottom: "1.5rem",
@@ -155,7 +155,7 @@ const tableStyle: React.CSSProperties = {
 const thStyle: React.CSSProperties = {
   textAlign: "left",
   padding: "8px 10px",
-  borderBottom: "1px solid #27272a",
+  borderBottom: "1px solid #1e1e1e",
   color: "#a1a1aa",
   fontWeight: 600,
   fontSize: "0.75rem",

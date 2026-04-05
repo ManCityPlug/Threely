@@ -83,8 +83,8 @@ interface UserDetail {
 }
 
 const cardStyle: React.CSSProperties = {
-  background: "#18181b",
-  border: "1px solid #27272a",
+  background: "#111111",
+  border: "1px solid #1e1e1e",
   borderRadius: 12,
   padding: "1.25rem",
 };
@@ -142,7 +142,7 @@ function GoalCard({ goal }: { goal: GoalItem }) {
         marginBottom: "0.75rem",
         cursor: "pointer",
         transition: "border-color 0.15s",
-        borderColor: expanded ? "#3f3f46" : "#27272a",
+        borderColor: expanded ? "#3f3f46" : "#1e1e1e",
       }}
     >
       {/* Header — always visible */}
@@ -163,7 +163,7 @@ function GoalCard({ goal }: { goal: GoalItem }) {
                 fontWeight: 600,
                 background: goal.isActive
                   ? goal.isPaused ? "#422006" : "#052e16"
-                  : "#27272a",
+                  : "#1e1e1e",
                 color: goal.isActive
                   ? goal.isPaused ? "#fbbf24" : "#4ade80"
                   : "#71717a",
@@ -191,11 +191,11 @@ function GoalCard({ goal }: { goal: GoalItem }) {
 
       {/* Expanded content */}
       {expanded && (
-        <div style={{ marginTop: "1rem", borderTop: "1px solid #27272a", paddingTop: "1rem" }}>
+        <div style={{ marginTop: "1rem", borderTop: "1px solid #1e1e1e", paddingTop: "1rem" }}>
           {/* Today's Tasks */}
           {goal.todayTasks && goal.todayTasks.length > 0 && (
             <div style={{ marginBottom: "1.25rem" }}>
-              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#635bff", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
+              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
                 Today&apos;s Tasks
                 {goal.todayTasksDate && (
                   <span style={{ color: "#52525b", fontWeight: 500, marginLeft: 8, textTransform: "none" }}>
@@ -212,7 +212,7 @@ function GoalCard({ goal }: { goal: GoalItem }) {
                       alignItems: "flex-start",
                       gap: 10,
                       padding: "0.5rem 0.65rem",
-                      background: "#0f1117",
+                      background: "#0a0a0a",
                       borderRadius: 8,
                       border: "1px solid #1e1e21",
                     }}
@@ -223,7 +223,7 @@ function GoalCard({ goal }: { goal: GoalItem }) {
                         height: 20,
                         borderRadius: "50%",
                         border: t.isCompleted ? "none" : t.isSkipped ? "none" : "2px solid #3f3f46",
-                        background: t.isCompleted ? "#635bff" : t.isSkipped ? "#422006" : "transparent",
+                        background: t.isCompleted ? "#D4A843" : t.isSkipped ? "#422006" : "transparent",
                         display: "flex",
                         alignItems: "center",
                         justifyContent: "center",
@@ -273,7 +273,7 @@ function GoalCard({ goal }: { goal: GoalItem }) {
               <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
                 User&apos;s Raw Input
               </div>
-              <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#0f1117", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
+              <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#0a0a0a", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
                 {goal.rawInput}
               </div>
             </div>
@@ -285,7 +285,7 @@ function GoalCard({ goal }: { goal: GoalItem }) {
               <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
                 Structured Summary
               </div>
-              <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#0f1117", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
+              <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#0a0a0a", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
                 {goal.structuredSummary}
               </div>
             </div>
@@ -302,7 +302,7 @@ function GoalCard({ goal }: { goal: GoalItem }) {
                   fontSize: "0.83rem",
                   color: "#d4d4d8",
                   lineHeight: 1.7,
-                  background: "#0f1117",
+                  background: "#0a0a0a",
                   borderRadius: 8,
                   padding: "0.75rem",
                   border: "1px solid #1e1e21",
@@ -328,12 +328,12 @@ function getRefundEligibility(subscription: UserDetail["subscription"]): {
 } {
   const status = subscription.status;
   if (!status || status === "none" || status === "trialing") {
-    return { label: "None", color: "#71717a", bg: "#27272a" };
+    return { label: "None", color: "#71717a", bg: "#1e1e1e" };
   }
 
   const chargeDate = subscription.firstChargeDate;
   if (!chargeDate) {
-    return { label: "None", color: "#71717a", bg: "#27272a" };
+    return { label: "None", color: "#71717a", bg: "#1e1e1e" };
   }
 
   const daysSinceCharge = Math.floor(
@@ -385,7 +385,7 @@ export default function AdminUserDetailPage() {
         style={{
           background: "none",
           border: "none",
-          color: "#635bff",
+          color: "#D4A843",
           fontSize: "0.85rem",
           cursor: "pointer",
           marginBottom: "1rem",
@@ -503,7 +503,7 @@ export default function AdminUserDetailPage() {
             const live = subscription.stripeStatus || subscription.status;
             const isCanceling = subscription.cancelAtPeriodEnd;
             let color = "#71717a";
-            let bg = "#27272a";
+            let bg = "#1e1e1e";
             let label = live || "none";
 
             if (live === "trialing") { color = "#60a5fa"; bg = "#172554"; label = "Trialing"; }
@@ -696,7 +696,7 @@ export default function AdminUserDetailPage() {
             style={{
               padding: "0.6rem 1.25rem",
               borderRadius: 10,
-              background: "#27272a",
+              background: "#1e1e1e",
               color: "#a1a1aa",
               fontWeight: 700,
               fontSize: "0.85rem",
@@ -733,7 +733,7 @@ export default function AdminUserDetailPage() {
           }}
         >
           <thead>
-            <tr style={{ borderBottom: "1px solid #27272a" }}>
+            <tr style={{ borderBottom: "1px solid #1e1e1e" }}>
               <th style={{ textAlign: "left", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>
                 Function
               </th>

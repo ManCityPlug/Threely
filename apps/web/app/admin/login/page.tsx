@@ -51,8 +51,8 @@ export default function AdminLoginPage() {
         style={{
           width: "100%",
           maxWidth: 380,
-          background: "#18181b",
-          border: "1px solid #27272a",
+          background: "#111111",
+          border: "1px solid #1e1e1e",
           borderRadius: 16,
           padding: "2rem",
         }}
@@ -114,8 +114,8 @@ export default function AdminLoginPage() {
           style={{
             width: "100%",
             padding: "0.6rem 0.75rem",
-            background: "#0f1117",
-            border: "1px solid #27272a",
+            background: "#0a0a0a",
+            border: "1px solid #1e1e1e",
             borderRadius: 8,
             color: "#fff",
             fontSize: "0.9rem",
@@ -144,8 +144,8 @@ export default function AdminLoginPage() {
           style={{
             width: "100%",
             padding: "0.6rem 0.75rem",
-            background: "#0f1117",
-            border: "1px solid #27272a",
+            background: "#0a0a0a",
+            border: "1px solid #1e1e1e",
             borderRadius: 8,
             color: "#fff",
             fontSize: "0.9rem",
@@ -161,7 +161,7 @@ export default function AdminLoginPage() {
           style={{
             width: "100%",
             padding: "0.65rem",
-            background: "#635bff",
+            background: "#D4A843",
             color: "#fff",
             border: "none",
             borderRadius: 8,

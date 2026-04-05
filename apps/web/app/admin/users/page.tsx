@@ -138,7 +138,7 @@ export default function AdminUsersPage() {
 
   const tabStyle = (t: Tab) => ({
     padding: "6px 16px",
-    background: tab === t ? "#27272a" : "transparent",
+    background: tab === t ? "#1e1e1e" : "transparent",
     border: tab === t ? "1px solid #3f3f46" : "1px solid transparent",
     borderRadius: 8,
     color: tab === t ? "#fff" : "#71717a",
@@ -178,8 +178,8 @@ export default function AdminUsersPage() {
             style={{
               flex: 1,
               padding: "0.6rem 0.75rem",
-              background: "#18181b",
-              border: showDropdown ? "1px solid #3f3f46" : "1px solid #27272a",
+              background: "#111111",
+              border: showDropdown ? "1px solid #3f3f46" : "1px solid #1e1e1e",
               borderRadius: showDropdown ? "8px 8px 0 0" : 8,
               color: "#fff",
               fontSize: "0.9rem",
@@ -192,7 +192,7 @@ export default function AdminUsersPage() {
               onClick={clearSearch}
               style={{
                 padding: "0.6rem 0.75rem",
-                background: "#27272a",
+                background: "#1e1e1e",
                 border: "1px solid #3f3f46",
                 borderRadius: 8,
                 color: "#a1a1aa",
@@ -214,7 +214,7 @@ export default function AdminUsersPage() {
               left: 0,
               right: query ? "auto" : 0,
               width: query ? "calc(100% - 68px)" : "100%",
-              background: "#18181b",
+              background: "#111111",
               border: "1px solid #3f3f46",
               borderTop: "none",
               borderRadius: "0 0 8px 8px",
@@ -234,7 +234,7 @@ export default function AdminUsersPage() {
                   justifyContent: "space-between",
                   width: "100%",
                   padding: "0.55rem 0.75rem",
-                  background: i === highlightIdx ? "#27272a" : "transparent",
+                  background: i === highlightIdx ? "#1e1e1e" : "transparent",
                   border: "none",
                   borderBottom: i < suggestions.length - 1 ? "1px solid #1e1e21" : "none",
                   cursor: "pointer",
@@ -256,7 +256,7 @@ export default function AdminUsersPage() {
                 </span>
               </button>
             ))}
-            <div style={{ padding: "0.4rem 0.75rem", fontSize: "0.75rem", color: "#52525b", borderTop: "1px solid #27272a" }}>
+            <div style={{ padding: "0.4rem 0.75rem", fontSize: "0.75rem", color: "#52525b", borderTop: "1px solid #1e1e1e" }}>
               Press Enter to search &middot; &uarr;&darr; to navigate
             </div>
           </div>
@@ -272,15 +272,15 @@ export default function AdminUsersPage() {
         <>
           <div
             style={{
-              background: "#18181b",
-              border: "1px solid #27272a",
+              background: "#111111",
+              border: "1px solid #1e1e1e",
               borderRadius: 12,
               overflow: "hidden",
             }}
           >
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
               <thead>
-                <tr style={{ borderBottom: "1px solid #27272a" }}>
+                <tr style={{ borderBottom: "1px solid #1e1e1e" }}>
                   {["Email", "Status", "Goals", "Tasks", "Joined", ""].map((h) => (
                     <th
                       key={h}
@@ -326,7 +326,7 @@ export default function AdminUsersPage() {
                             borderRadius: 6,
                             fontSize: "0.75rem",
                             fontWeight: 600,
-                            background: u.subscriptionStatus === "active" ? "#052e16" : u.subscriptionStatus === "trialing" ? "#1e1b4b" : "#27272a",
+                            background: u.subscriptionStatus === "active" ? "#052e16" : u.subscriptionStatus === "trialing" ? "#1e1b4b" : "#1e1e1e",
                             color: u.subscriptionStatus === "active" ? "#4ade80" : u.subscriptionStatus === "trialing" ? "#a78bfa" : "#71717a",
                           }}
                         >
@@ -343,7 +343,7 @@ export default function AdminUsersPage() {
                           onClick={(e) => { e.stopPropagation(); router.push(`/admin/users/${u.id}`); }}
                           style={{
                             padding: "4px 12px",
-                            background: "#27272a",
+                            background: "#1e1e1e",
                             border: "1px solid #3f3f46",
                             borderRadius: 6,
                             color: "#e4e4e7",
@@ -373,7 +373,7 @@ export default function AdminUsersPage() {
                   onClick={() => fetchUsers(page - 1, query.length >= 2 ? query : undefined)}
                   style={{
                     padding: "6px 14px",
-                    background: page <= 1 ? "#18181b" : "#27272a",
+                    background: page <= 1 ? "#111111" : "#1e1e1e",
                     border: "1px solid #3f3f46",
                     borderRadius: 6,
                     color: page <= 1 ? "#3f3f46" : "#e4e4e7",
@@ -388,7 +388,7 @@ export default function AdminUsersPage() {
                   onClick={() => fetchUsers(page + 1, query.length >= 2 ? query : undefined)}
                   style={{
                     padding: "6px 14px",
-                    background: page >= totalPages ? "#18181b" : "#27272a",
+                    background: page >= totalPages ? "#111111" : "#1e1e1e",
                     border: "1px solid #3f3f46",
                     borderRadius: 6,
                     color: page >= totalPages ? "#3f3f46" : "#e4e4e7",

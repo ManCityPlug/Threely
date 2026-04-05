@@ -56,7 +56,7 @@ export default function AdminLayout({
         data-theme="dark"
         style={{
           minHeight: "100vh",
-          background: "#0f1117",
+          background: "#0a0a0a",
           color: "#e4e4e7",
           fontFamily:
             "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -72,7 +72,7 @@ export default function AdminLayout({
       <div
         style={{
           minHeight: "100vh",
-          background: "#0f1117",
+          background: "#0a0a0a",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -97,7 +97,7 @@ export default function AdminLayout({
       data-theme="dark"
       style={{
         minHeight: "100vh",
-        background: "#0f1117",
+        background: "#0a0a0a",
         color: "#e4e4e7",
         fontFamily:
           "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -129,8 +129,8 @@ export default function AdminLayout({
           left: 0,
           right: 0,
           zIndex: 100,
-          background: "#18181b",
-          borderBottom: "1px solid #27272a",
+          background: "#111111",
+          borderBottom: "1px solid #1e1e1e",
           padding: "0.75rem 1rem",
           display: "none",
           alignItems: "center",
@@ -183,15 +183,15 @@ export default function AdminLayout({
               left: 0,
               bottom: 0,
               width: 260,
-              background: "#18181b",
-              borderRight: "1px solid #27272a",
+              background: "#111111",
+              borderRight: "1px solid #1e1e1e",
               padding: "1.5rem 0",
               display: "flex",
               flexDirection: "column",
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <div style={{ padding: "0 1.25rem 1.5rem", borderBottom: "1px solid #27272a", marginBottom: "0.75rem" }}>
+            <div style={{ padding: "0 1.25rem 1.5rem", borderBottom: "1px solid #1e1e1e", marginBottom: "0.75rem" }}>
               <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "#fff" }}>
                 Threely Admin
               </span>
@@ -209,9 +209,9 @@ export default function AdminLayout({
                     fontSize: "0.95rem",
                     fontWeight: item.isActive ? 600 : 400,
                     color: item.isActive ? "#fff" : "#a1a1aa",
-                    background: item.isActive ? "#27272a" : "transparent",
+                    background: item.isActive ? "#1e1e1e" : "transparent",
                     textDecoration: "none",
-                    borderLeft: item.isActive ? "3px solid #635bff" : "3px solid transparent",
+                    borderLeft: item.isActive ? "3px solid #D4A843" : "3px solid transparent",
                   }}
                 >
                   <span>{item.icon}</span>
@@ -225,7 +225,7 @@ export default function AdminLayout({
                 margin: "0 1.25rem",
                 padding: "0.6rem 0",
                 background: "none",
-                border: "1px solid #27272a",
+                border: "1px solid #1e1e1e",
                 borderRadius: 8,
                 color: "#a1a1aa",
                 fontSize: "0.85rem",
@@ -243,8 +243,8 @@ export default function AdminLayout({
         className="admin-sidebar"
         style={{
           width: 220,
-          background: "#18181b",
-          borderRight: "1px solid #27272a",
+          background: "#111111",
+          borderRight: "1px solid #1e1e1e",
           padding: "1.5rem 0",
           flexDirection: "column",
           flexShrink: 0,
@@ -256,7 +256,7 @@ export default function AdminLayout({
         <div
           style={{
             padding: "0 1.25rem 1.5rem",
-            borderBottom: "1px solid #27272a",
+            borderBottom: "1px solid #1e1e1e",
             marginBottom: "0.75rem",
           }}
         >
@@ -278,10 +278,10 @@ export default function AdminLayout({
                 fontSize: "0.9rem",
                 fontWeight: item.isActive ? 600 : 400,
                 color: item.isActive ? "#fff" : "#a1a1aa",
-                background: item.isActive ? "#27272a" : "transparent",
+                background: item.isActive ? "#1e1e1e" : "transparent",
                 textDecoration: "none",
                 borderLeft: item.isActive
-                  ? "3px solid #635bff"
+                  ? "3px solid #D4A843"
                   : "3px solid transparent",
               }}
             >
@@ -297,7 +297,7 @@ export default function AdminLayout({
             margin: "0 1.25rem",
             padding: "0.5rem 0",
             background: "none",
-            border: "1px solid #27272a",
+            border: "1px solid #1e1e1e",
             borderRadius: 8,
             color: "#a1a1aa",
             fontSize: "0.85rem",
