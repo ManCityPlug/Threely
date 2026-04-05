@@ -150,25 +150,12 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
 
           {/* Headline */}
           <Text style={styles.title}>
-            Do Less.{"\n"}
-            <Text style={{ color: "rgba(255,255,255,0.5)" }}>Achieve More.</Text>
+            Lock In.
           </Text>
 
           <Text style={styles.subtitle}>
-            Achieve your goals and actually become{"\n"}the best version of yourself.
+            The AI app that tells you exactly{"\n"}what to do to hit your goals.
           </Text>
-
-          {/* Value props */}
-          <View style={styles.valueProps}>
-            {VALUE_PROPS.map((text, i) => (
-              <View key={i} style={styles.valuePropRow}>
-                <View style={styles.checkCircle}>
-                  <Ionicons name="checkmark" size={14} color="#635BFF" />
-                </View>
-                <Text style={styles.valuePropText}>{text}</Text>
-              </View>
-            ))}
-          </View>
         </Animated.View>
 
         {/* Bottom section: auth buttons */}

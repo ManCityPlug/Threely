@@ -375,47 +375,6 @@ export default function ProfilePage() {
         <div>
           <h1 style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.03em" }}>Profile</h1>
         </div>
-        {weeklyStatus?.status === "ready" ? (
-          <button
-            className="btn"
-            onClick={handleOpenWeekly}
-            disabled={weeklyOpening}
-            style={{
-              fontSize: "0.85rem",
-              background: "var(--primary)",
-              color: "white",
-              border: "none",
-            }}
-          >
-            {weeklyOpening ? "Loading..." : "\u2728 Weekly Analysis Ready!"}
-          </button>
-        ) : weeklyStatus?.status === "available" ? (
-          <button
-            className="btn btn-outline"
-            onClick={handleOpenWeekly}
-            style={{ fontSize: "0.85rem" }}
-          >
-            {"\uD83D\uDCCA"} Weekly Analysis
-          </button>
-        ) : (
-          <button
-            className="btn btn-outline"
-            onClick={() => {
-              if (!hasPro) { return; }
-              alert("Your weekly analysis is generated every Monday. Check back then to see your progress report and personalized insights!");
-            }}
-            style={{
-              fontSize: "0.85rem",
-              opacity: 0.5,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-            }}
-          >
-            {"\uD83D\uDD12"} Weekly Analysis {countdown ? `· ${countdown.replace("Unlocks in ", "")}` : ""}
-          </button>
-        )}
       </div>
 
       {/* Tabs */}

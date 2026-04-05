@@ -644,7 +644,6 @@ function RefineChatModal({
           <View style={chatStyles.header}>
             <View style={{ width: 32 }} />
             <View style={chatStyles.headerCenter}>
-              <Text style={chatStyles.headerIcon}>✦</Text>
               <Text style={chatStyles.headerTitle}>Threely Intelligence</Text>
             </View>
             <TouchableOpacity onPress={onClose} hitSlop={12} activeOpacity={0.7} style={chatStyles.closeBtn}>

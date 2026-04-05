@@ -1518,7 +1518,6 @@ export default function GoalsScreen() {
               <View style={styles.chatHeader}>
                 <View style={{ width: 32 }} />
                 <View style={styles.chatHeaderLeft}>
-                  <Text style={styles.chatHeaderIcon}>✦</Text>
                   <Text style={styles.chatHeaderTitle}>Threely Intelligence</Text>
                 </View>
                 <TouchableOpacity

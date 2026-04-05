@@ -1354,7 +1354,6 @@ export default function OnboardingScreen() {
           {/* Header */}
           <View style={[styles.chatHeader, { paddingTop: insets.top + spacing.sm }]}>
             <View style={styles.chatHeaderLeft}>
-              <Text style={styles.chatHeaderIcon}>✦</Text>
               <Text style={styles.chatHeaderTitle}>Threely Intelligence</Text>
             </View>
             <TouchableOpacity
