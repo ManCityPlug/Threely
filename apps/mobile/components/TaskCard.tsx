@@ -513,7 +513,6 @@ function AskChatModal({
         >
           {messages.length === 0 && (
             <View style={chatStyles.emptyState}>
-
               <Text style={chatStyles.emptyTitle}>Ask anything about this task</Text>
               <Text style={chatStyles.emptySubtitle}>
                 Get tips, clarification, alternative approaches, or help getting started.
@@ -545,7 +544,6 @@ function AskChatModal({
                 msg.role === "user" ? chatStyles.bubbleUser : chatStyles.bubbleAI,
               ]}
             >
-
               <Text style={[
                 chatStyles.bubbleText,
                 msg.role === "user" ? chatStyles.bubbleTextUser : chatStyles.bubbleTextAI,
@@ -1119,8 +1117,6 @@ function createChatStyles(c: Colors) {
       borderWidth: 1,
       borderColor: c.border,
       borderBottomLeftRadius: 4,
-      flexDirection: "row",
-      gap: spacing.xs,
     },
     bubbleAIIcon: {
       fontSize: 14,
