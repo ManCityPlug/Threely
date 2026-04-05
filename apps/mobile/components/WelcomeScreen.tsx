@@ -227,7 +227,8 @@ const styles = StyleSheet.create({
   logo: {
     width: 64,
     height: 64,
-    borderRadius: 16,
+    borderRadius: 18,
+    overflow: "hidden" as const,
     zIndex: 2,
   },
   logoGlow: {
