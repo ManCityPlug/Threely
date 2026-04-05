@@ -536,91 +536,9 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* Weekly Analysis Card */}
-        <Text style={styles.sectionLabel}>Weekly analysis</Text>
-        {weeklyStatus?.status === "ready" ? (
-          <TouchableOpacity
-            style={[styles.weeklyCard, { borderColor: colors.primary, borderWidth: 1.5 }]}
-            onPress={handleOpenWeekly}
-            activeOpacity={0.7}
-            disabled={weeklyOpening}
-          >
-            <View style={[styles.weeklyIconWrap, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="sparkles" size={20} color={colors.primary} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.menuLabel, { color: colors.primary }]}>Your weekly analysis is ready!</Text>
-              <Text style={styles.menuValue}>Tap to view your stats + AI insight</Text>
-            </View>
-            {weeklyOpening ? (
-              <ActivityIndicator size="small" color={colors.primary} />
-            ) : (
-              <Ionicons name="chevron-forward" size={16} color={colors.primary} />
-            )}
-          </TouchableOpacity>
-        ) : weeklyStatus?.status === "available" ? (
-          <TouchableOpacity
-            style={styles.weeklyCard}
-            onPress={handleOpenWeekly}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.weeklyIconWrap, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="bar-chart-outline" size={20} color={colors.primary} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.menuLabel}>Weekly Analysis</Text>
-              <Text style={styles.menuValue}>Tap to re-read</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            style={[styles.weeklyCard, { opacity: 0.7 }]}
-            activeOpacity={0.7}
-            onPress={() => {
-              if (isLimitedMode) {
-                setShowPaywall(true);
-                return;
-              }
-              if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-              Alert.alert(
-                "Weekly Analysis",
-                "Your weekly analysis is generated every Monday. Check back then to see your progress report and personalized insights!",
-                [{ text: "OK" }],
-              );
-            }}
-          >
-            <View style={[styles.weeklyIconWrap, { backgroundColor: colors.bg }]}>
-              <Ionicons name="lock-closed-outline" size={20} color={colors.textTertiary} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.menuLabel, { color: colors.textSecondary }]}>Weekly Analysis</Text>
-              <Text style={styles.menuValue}>{countdown ? countdown.replace("Unlocks in ", "Available in ") : "Loading..."}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
-
         {/* Settings */}
         <Text style={styles.sectionLabel}>Settings</Text>
         <View style={styles.menuCard}>
-          {/* History */}
-          <TouchableOpacity
-            style={styles.menuRow}
-            onPress={openHistory}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="time-outline" size={18} color={colors.primary} />
-            </View>
-            <View style={styles.menuText}>
-              <Text style={styles.menuLabel}>Task history</Text>
-              <Text style={styles.menuValue}>View past 30 days</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
           {/* Notifications */}
           <TouchableOpacity
             style={styles.menuRow}

@@ -121,9 +121,17 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
               { transform: [{ scale: pulseAnim }, { translateY: floatAnim }] },
             ]}
           >
-            <View style={styles.logoGlow} />
+            <Animated.View style={[styles.logoGlow, {
+              opacity: pulseAnim.interpolate({ inputRange: [0.97, 1.03], outputRange: [0.4, 0.9] }),
+              transform: [{ scale: pulseAnim.interpolate({ inputRange: [0.97, 1.03], outputRange: [1, 1.3] }) }],
+            }]} />
             <Image source={require("@/assets/icon.png")} style={styles.logo} />
           </Animated.View>
+
+          {/* Lock In text */}
+          <Animated.Text style={[styles.lockInText, { opacity: fadeAnim }]}>
+            Lock In.
+          </Animated.Text>
         </Animated.View>
 
         {/* Bottom section: auth buttons */}
@@ -231,6 +239,14 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
     backgroundColor: "#FFFFFF",
+  },
+  lockInText: {
+    fontSize: 32,
+    fontWeight: "800" as const,
+    color: "rgba(255,255,255,0.85)",
+    textAlign: "center" as const,
+    letterSpacing: -0.5,
+    marginTop: spacing.xl,
   },
   title: {
     fontSize: typography.xxxl,

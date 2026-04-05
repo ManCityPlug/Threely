@@ -4,7 +4,8 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <style>{`
         html, body { background: #0a0a0a !important; }
       `}</style>
-      <div data-theme="dark" style={{
+      <script dangerouslySetInnerHTML={{ __html: `document.documentElement.setAttribute('data-theme','dark');` }} />
+      <div style={{
         minHeight: "100vh",
         display: "flex",
         alignItems: "center",

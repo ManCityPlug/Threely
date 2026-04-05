@@ -56,15 +56,15 @@ export default function RefundPage() {
 
           {/* Highlight box */}
           <div style={{
-            background: "#f0edff",
-            border: "1px solid #d9d4ff",
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.1)",
             borderRadius: 14,
             padding: "1.5rem",
             marginBottom: "2rem",
           }}>
-            <p style={{ fontSize: "1rem", color: "#e8e8e8", lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
+            <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
               Not happy with Threely? Email us at{" "}
-              <a href="mailto:refund@threely.co" style={{ color: "#635bff", fontWeight: 700, textDecoration: "none" }}>
+              <a href="mailto:refund@threely.co" style={{ color: "#fff", fontWeight: 700, textDecoration: "underline" }}>
                 refund@threely.co
               </a>{" "}
               within <strong>7 days</strong> of your first paid charge for a full refund. No questions asked.
@@ -82,7 +82,7 @@ export default function RefundPage() {
           <h2 style={h2Style}>How to Request a Refund</h2>
           <p style={pStyle}>
             Send an email to{" "}
-            <a href="mailto:refund@threely.co" style={{ color: "#635bff", fontWeight: 600, textDecoration: "none" }}>
+            <a href="mailto:refund@threely.co" style={{ color: "#fff", fontWeight: 600, textDecoration: "underline" }}>
               refund@threely.co
             </a>{" "}
             with the email address associated with your Threely account. Include the reason for your refund request so we can improve.
@@ -101,13 +101,13 @@ export default function RefundPage() {
           <h2 style={h2Style}>Contact</h2>
           <p style={pStyle}>
             For refund requests:{" "}
-            <a href="mailto:refund@threely.co" style={{ color: "#635bff", fontWeight: 600, textDecoration: "none" }}>
+            <a href="mailto:refund@threely.co" style={{ color: "#fff", fontWeight: 600, textDecoration: "underline" }}>
               refund@threely.co
             </a>
           </p>
           <p style={pStyle}>
             For general support:{" "}
-            <a href="mailto:support@threely.co" style={{ color: "#635bff", fontWeight: 600, textDecoration: "none" }}>
+            <a href="mailto:support@threely.co" style={{ color: "#fff", fontWeight: 600, textDecoration: "underline" }}>
               support@threely.co
             </a>
           </p>

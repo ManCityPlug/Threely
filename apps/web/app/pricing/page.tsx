@@ -23,7 +23,6 @@ const FEATURES = [
   "Schedule-aware tasks (15 min to 2+ hours/day)",
   "Progress tracking and streaks",
   "iOS and Android apps",
-  "Weekly summary reports",
 ];
 
 export default function PricingPage() {

@@ -42,7 +42,7 @@ const CARD_STYLE: React.CSSProperties = {
   borderRadius: 20,
   padding: "28px 24px 32px",
   margin: "0 auto",
-  maxWidth: 400,
+  maxWidth: 480,
 };
 
 const INPUT_STYLE: React.CSSProperties = {

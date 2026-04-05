@@ -93,7 +93,6 @@ export default function LandingPage() {
               {[
                 { label: "How It Works", href: "#how-it-works" },
                 { label: "Pricing", href: "/pricing" },
-                { label: "FAQ", href: "/faq" },
                 { label: "Support", href: "/support" },
               ].map(item => (
                 <Link key={item.label} href={item.href} style={{
@@ -142,7 +141,6 @@ export default function LandingPage() {
           {[
             { label: "How It Works", href: "#how-it-works" },
             { label: "Pricing", href: "/pricing" },
-            { label: "FAQ", href: "/faq" },
             { label: "Support", href: "/support" },
             { label: "Log In", href: "/login" },
           ].map(item => (
@@ -358,15 +356,6 @@ export default function LandingPage() {
               )}
             </div>
           ))}
-        </div>
-        <div style={{ textAlign: "center", marginTop: 32 }}>
-          <Link href="/faq" style={{
-            fontSize: "0.9rem", fontWeight: 600, color: "rgba(255,255,255,0.5)",
-            textDecoration: "none", borderBottom: "1px solid rgba(255,255,255,0.2)",
-            paddingBottom: 2,
-          }}>
-            View all FAQs →
-          </Link>
         </div>
       </section>
 
