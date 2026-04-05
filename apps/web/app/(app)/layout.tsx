@@ -330,7 +330,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               Threely
             </span>
             <span style={{ fontSize: "0.7rem", color: "var(--muted)", fontWeight: 500 }}>
-              Do Less, Achieve More
+              Lock TF In
             </span>
           </div>
         </div>
