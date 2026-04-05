@@ -166,8 +166,8 @@ export default function Paywall({ visible, onDismiss }: PaywallProps) {
                 {trialEligible ? "7 Day Free Trial · per month" : "per month"}
               </Text>
             </View>
-            <Text style={[styles.planPrice, { color: trialEligible ? "#D4A843" : colors.text }]}>
-              {trialEligible ? "$0.00" : priceString}
+            <Text style={[styles.planPrice, { color: colors.text }]}>
+              {priceString}
             </Text>
           </View>
         </View>

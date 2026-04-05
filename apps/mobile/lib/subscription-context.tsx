@@ -3,7 +3,7 @@ import { Platform } from "react-native";
 import Purchases, { LOG_LEVEL, PurchasesPackage, CustomerInfo } from "react-native-purchases";
 import { subscriptionApi } from "@/lib/api";
 
-const RC_IOS_KEY = "appl_ASqjSLtAtKmDGSFhhFHZbbahFSF";
+const RC_IOS_KEY = "appl_WNuHXpQKCJqLrlhpWBnxYbnScLh";
 
 interface SubscriptionContextValue {
   hasPro: boolean;
