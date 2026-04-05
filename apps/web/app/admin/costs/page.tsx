@@ -134,7 +134,7 @@ function calculateCosts(goals: number) {
 const APPLE_COMMISSION = 0.15; // Apple Small Business Program (under $1M/yr)
 const PLANS = [
   { name: "Yearly", price: 99.99, period: "year", monthly: 99.99 / 12 },
-  { name: "Monthly", price: 12.99, period: "month", monthly: 12.99 },
+  { name: "Monthly", price: 15.99, period: "month", monthly: 15.99 },
 ];
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
@@ -211,7 +211,7 @@ export default function CostsPage() {
         AI Cost Estimator
       </h1>
       <p style={{ color: "#71717a", fontSize: "0.85rem", marginBottom: "2rem" }}>
-        Estimated costs based on Claude API pricing and actual token usage in Threely functions.
+        DeepSeek V3 (primary) with Gemini 2.5 Flash fallback. Circuit breaker: 15s timeout, skip DeepSeek for 5 min after 3 consecutive failures.
       </p>
 
       {/* ─── Enforced Limits ───────────────────────────────────────────── */}
@@ -274,31 +274,32 @@ export default function CostsPage() {
             <thead>
               <tr>
                 <th style={thStyle}>Function</th>
-                <th style={thStyle}>Model</th>
-                <th style={thStyle}>Input Tokens</th>
-                <th style={thStyle}>Output Tokens</th>
-                <th style={thStyle}>Cost/Call</th>
+                <th style={thStyle}>Tokens (in/out)</th>
+                <th style={thStyle}>DeepSeek $/Call</th>
+                <th style={thStyle}>Gemini $/Call</th>
                 <th style={thStyle}>Frequency</th>
               </tr>
             </thead>
             <tbody>
-              {FUNCTIONS.map(fn => (
+              {FUNCTIONS.map(fn => {
+                const geminiCost = (fn.inputTokens * PRICING.gemini.input + fn.outputTokens * PRICING.gemini.output) / 1_000_000;
+                return (
                 <tr key={fn.name}>
                   <td style={tdStyle}>
                     <div style={{ fontWeight: 600 }}>{fn.name}</div>
                     <div style={{ fontSize: "0.72rem", color: "#71717a", marginTop: 2 }}>{fn.description}</div>
                   </td>
-                  <td style={tdStyle}>
-                    <span style={modelBadge(fn.model)}>{PRICING[fn.model].label}</span>
-                  </td>
-                  <td style={tdStyle}>~{fn.inputTokens.toLocaleString()}</td>
-                  <td style={tdStyle}>~{fn.outputTokens.toLocaleString()}</td>
-                  <td style={{ ...tdStyle, fontWeight: 600, fontFamily: "monospace" }}>
+                  <td style={tdStyle}>~{fn.inputTokens.toLocaleString()} / ~{fn.outputTokens.toLocaleString()}</td>
+                  <td style={{ ...tdStyle, fontWeight: 600, fontFamily: "monospace", color: "#4ade80" }}>
                     {fmt(costPerCall(fn))}
+                  </td>
+                  <td style={{ ...tdStyle, fontWeight: 600, fontFamily: "monospace", color: "#f59e0b" }}>
+                    {fmt(geminiCost)}
                   </td>
                   <td style={tdStyle}>{fn.frequency}</td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>

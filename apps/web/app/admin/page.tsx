@@ -68,21 +68,27 @@ function StatCard({
 }
 
 // ── Per-User Cost Estimator ──────────────────────────────────────────────────
-// Haiku 4.5: $0.80/M input, $4/M output
-// Sonnet 4.6: $3/M input, $15/M output
+// DeepSeek V3 (primary): $0.28/M input, $0.42/M output
+// Gemini 2.5 Flash (fallback): $0.30/M input, $2.50/M output
 //
 // Estimated tokens per call (input/output) based on prompt lengths:
 const AI_FUNCTIONS = [
-  { name: "parseGoal",            model: "Haiku",  frequency: "Once per goal",          inputTok: 600,  outputTok: 300,  inputRate: 0.80, outputRate: 4 },
-  { name: "generateRoadmap",      model: "Sonnet", frequency: "Once per goal",          inputTok: 1300, outputTok: 1500, inputRate: 3,    outputRate: 15 },
-  { name: "goalChat (per turn)",  model: "Haiku",  frequency: "5-10× during goal setup",inputTok: 800,  outputTok: 400,  inputRate: 0.80, outputRate: 4 },
-  { name: "generateTasks",        model: "Haiku",  frequency: "1-2×/day per goal",      inputTok: 3500, outputTok: 2000, inputRate: 0.80, outputRate: 4 },
-  { name: "generateInsight",      model: "Haiku",  frequency: "1×/day (after review)",  inputTok: 800,  outputTok: 150,  inputRate: 0.80, outputRate: 4 },
-  { name: "updateCoachingContext", model: "Haiku",  frequency: "1×/day (after review)",  inputTok: 1000, outputTok: 250,  inputRate: 0.80, outputRate: 4 },
-  { name: "refineTask",           model: "Haiku",  frequency: "On demand (0-3×/day)",   inputTok: 500,  outputTok: 250,  inputRate: 0.80, outputRate: 4 },
-  { name: "askAboutTask",         model: "Haiku",  frequency: "On demand (0-5×/day)",   inputTok: 600,  outputTok: 300,  inputRate: 0.80, outputRate: 4 },
-  { name: "generateWeeklySummary",model: "Haiku",  frequency: "1×/week",                inputTok: 1500, outputTok: 200,  inputRate: 0.80, outputRate: 4 },
+  { name: "parseGoal",            model: "DeepSeek", frequency: "Once per goal",          inputTok: 600,  outputTok: 300,  inputRate: 0.28, outputRate: 0.42 },
+  { name: "generateRoadmap",      model: "DeepSeek", frequency: "Once per goal",          inputTok: 1300, outputTok: 1500, inputRate: 0.28, outputRate: 0.42 },
+  { name: "goalChat (per turn)",  model: "DeepSeek", frequency: "5-10× during goal setup",inputTok: 800,  outputTok: 400,  inputRate: 0.28, outputRate: 0.42 },
+  { name: "generateTasks",        model: "DeepSeek", frequency: "1-2×/day per goal",      inputTok: 3500, outputTok: 2000, inputRate: 0.28, outputRate: 0.42 },
+  { name: "generateInsight",      model: "DeepSeek", frequency: "1×/day (after review)",  inputTok: 800,  outputTok: 150,  inputRate: 0.28, outputRate: 0.42 },
+  { name: "updateCoachingContext", model: "DeepSeek", frequency: "1×/day (after review)",  inputTok: 1000, outputTok: 250,  inputRate: 0.28, outputRate: 0.42 },
+  { name: "refineTask",           model: "DeepSeek", frequency: "On demand (0-3×/day)",   inputTok: 500,  outputTok: 250,  inputRate: 0.28, outputRate: 0.42 },
+  { name: "askAboutTask",         model: "DeepSeek", frequency: "On demand (0-5×/day)",   inputTok: 600,  outputTok: 300,  inputRate: 0.28, outputRate: 0.42 },
+  { name: "generateWeeklySummary",model: "DeepSeek", frequency: "1×/week",                inputTok: 1500, outputTok: 200,  inputRate: 0.28, outputRate: 0.42 },
 ];
+
+// Gemini fallback rates (used if DeepSeek fails — 15s timeout, circuit breaker after 3 failures)
+const GEMINI_RATES = { inputRate: 0.30, outputRate: 2.50 };
+function costPerCallGemini(f: typeof AI_FUNCTIONS[number]) {
+  return (f.inputTok * GEMINI_RATES.inputRate + f.outputTok * GEMINI_RATES.outputRate) / 1_000_000;
+}
 
 // Cost per call in USD
 function costPerCall(f: typeof AI_FUNCTIONS[number]) {
@@ -90,7 +96,7 @@ function costPerCall(f: typeof AI_FUNCTIONS[number]) {
 }
 
 // Pricing
-const MONTHLY_PRICE = 12.99;
+const MONTHLY_PRICE = 15.99;
 const YEARLY_PRICE = 99.99;
 const YEARLY_MONTHLY = YEARLY_PRICE / 12;
 const APPLE_COMMISSION = 0.15; // Apple Small Business Program (under $1M/yr)
@@ -177,34 +183,28 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
         <h3 style={{ fontSize: "0.85rem", fontWeight: 600, color: "#fff", marginBottom: "0.75rem" }}>
           AI Cost Per Call
         </h3>
+        <div style={{ fontSize: "0.72rem", color: "#71717a", marginBottom: "0.75rem" }}>
+          Primary: DeepSeek V3 ($0.28/$0.42 per 1M tokens) · Fallback: Gemini 2.5 Flash ($0.30/$2.50 per 1M tokens)
+        </div>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid #1e1e1e" }}>
               <th style={{ textAlign: "left", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>Function</th>
-              <th style={{ textAlign: "center", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>Model</th>
               <th style={{ textAlign: "center", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>Frequency</th>
-              <th style={{ textAlign: "right", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>$/Call</th>
+              <th style={{ textAlign: "right", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>DeepSeek</th>
+              <th style={{ textAlign: "right", padding: "0.4rem 0", color: "#71717a", fontWeight: 600 }}>Gemini (fallback)</th>
             </tr>
           </thead>
           <tbody>
             {costs.map((c) => (
               <tr key={c.name} style={{ borderBottom: "1px solid #1e1e21" }}>
                 <td style={{ padding: "0.4rem 0", color: "#e4e4e7", fontFamily: "monospace", fontSize: "0.75rem" }}>{c.name}</td>
-                <td style={{ padding: "0.4rem 0", textAlign: "center" }}>
-                  <span style={{
-                    fontSize: "0.65rem",
-                    fontWeight: 600,
-                    padding: "1px 6px",
-                    borderRadius: 4,
-                    background: c.model === "Sonnet" ? "#D4A84322" : "#1e1e1e",
-                    color: c.model === "Sonnet" ? "#818cf8" : "#a1a1aa",
-                  }}>
-                    {c.model}
-                  </span>
-                </td>
                 <td style={{ padding: "0.4rem 0", textAlign: "center", color: "#71717a", fontSize: "0.7rem" }}>{c.frequency}</td>
-                <td style={{ padding: "0.4rem 0", textAlign: "right", color: "#e4e4e7", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+                <td style={{ padding: "0.4rem 0", textAlign: "right", color: "#4ade80", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
                   ${c.cost.toFixed(4)}
+                </td>
+                <td style={{ padding: "0.4rem 0", textAlign: "right", color: "#f59e0b", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>
+                  ${costPerCallGemini(c).toFixed(4)}
                 </td>
               </tr>
             ))}
@@ -280,9 +280,9 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
           {[
             { color: "#3ecf8e", label: "Goal cap enforced", text: "Max 3 active goals per user. Prevents runaway costs from power users." },
             { color: "#3ecf8e", label: "Generation cap enforced", text: "Max 2 task generations per goal per day (initial + 1 extra)." },
-            { color: "#3ecf8e", label: "Almost all Haiku", text: "8/9 AI functions run on Haiku 4.5. Only generateRoadmap uses Sonnet." },
-            { color: "#f59e0b", label: "Biggest cost driver", text: `generateTasks (Haiku) — runs up to 2×/day per goal. ~$${costs.find(c => c.name === "generateTasks")!.cost.toFixed(4)}/call.` },
-            { color: "#818cf8", label: "Setup cost", text: `parseGoal (Haiku) + generateRoadmap (Sonnet) + goalChat — ~$${(costs.find(c => c.name === "parseGoal")!.cost + costs.find(c => c.name === "generateRoadmap")!.cost + costs.find(c => c.name === "goalChat (per turn)")!.cost * 8).toFixed(2)} per goal, one-time only.` },
+            { color: "#4ade80", label: "DeepSeek primary, Gemini fallback", text: "All functions use DeepSeek V3 ($0.28/$0.42/M). Falls back to Gemini 2.5 Flash ($0.30/$2.50/M) on failure. 15s timeout, circuit breaker after 3 consecutive failures (5 min cooldown)." },
+            { color: "#f59e0b", label: "Biggest cost driver", text: `generateTasks (DeepSeek) — runs up to 2×/day per goal. ~$${costs.find(c => c.name === "generateTasks")!.cost.toFixed(4)}/call (DeepSeek) or ~$${costPerCallGemini(costs.find(c => c.name === "generateTasks")!).toFixed(4)}/call (Gemini fallback).` },
+            { color: "#D4A843", label: "Setup cost", text: `parseGoal + generateRoadmap + goalChat — ~$${(costs.find(c => c.name === "parseGoal")!.cost + costs.find(c => c.name === "generateRoadmap")!.cost + costs.find(c => c.name === "goalChat (per turn)")!.cost * 8).toFixed(4)} per goal (DeepSeek), one-time only.` },
             { color: "#ef4444", label: "Apple commission", text: `15% via Small Business Program (under $1M/yr). ~$${(MONTHLY_PRICE * APPLE_COMMISSION).toFixed(2)}/mo on monthly, ~$${(YEARLY_PRICE * APPLE_COMMISSION / 12).toFixed(2)}/mo on yearly.` },
           ].map((item) => (
             <div key={item.label} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
@@ -388,48 +388,6 @@ export default function AdminOverviewPage() {
         <StatCard label="Total Users" value={data.users.total} />
         <StatCard label="Active (7d)" value={data.users.active7d} />
         <StatCard label="New (30d)" value={data.users.new30d} />
-      </div>
-
-      {/* Content */}
-      <h2
-        style={{
-          fontSize: "0.85rem",
-          fontWeight: 600,
-          color: "#a1a1aa",
-          textTransform: "uppercase",
-          letterSpacing: "0.05em",
-          marginBottom: "0.75rem",
-        }}
-      >
-        Content
-      </h2>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-          gap: "1rem",
-          marginBottom: "2rem",
-        }}
-      >
-        <StatCard
-          label="Total Goals"
-          value={data.goals.total}
-          sub={`${data.goals.active} active`}
-        />
-        <StatCard
-          label="Task Items"
-          value={data.tasks.totalItems.toLocaleString()}
-          sub={`${data.tasks.dailyTaskRecords} daily records`}
-        />
-        <StatCard
-          label="Completed"
-          value={data.tasks.completed.toLocaleString()}
-          sub={`${data.tasks.completionRate}% rate`}
-        />
-        <StatCard
-          label="Skipped"
-          value={data.tasks.skipped.toLocaleString()}
-        />
       </div>
 
       {/* Revenue */}
