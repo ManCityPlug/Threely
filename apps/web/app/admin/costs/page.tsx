@@ -133,8 +133,9 @@ function calculateCosts(goals: number) {
 // ─── Revenue per plan ────────────────────────────────────────────────────────
 const APPLE_COMMISSION = 0.15; // Apple Small Business Program (under $1M/yr)
 const PLANS = [
-  { name: "Yearly", price: 99.99, period: "year", monthly: 99.99 / 12 },
-  { name: "Monthly", price: 15.99, period: "month", monthly: 15.99 },
+  { name: "App Monthly", price: 15.99, period: "month", monthly: 15.99, appleCommission: true },
+  { name: "Web Monthly", price: 12.99, period: "month", monthly: 12.99, appleCommission: false },
+  { name: "Web Yearly", price: 99.99, period: "year", monthly: 99.99 / 12, appleCommission: false },
 ];
 
 // ─── Styles ──────────────────────────────────────────────────────────────────
@@ -357,10 +358,10 @@ export default function CostsPage() {
                 <th style={thStyle}>Goals</th>
                 <th style={thStyle}>AI Cost/mo</th>
                 {PLANS.map(p => {
-                  const afterApple = p.monthly * (1 - APPLE_COMMISSION);
+                  const net = p.appleCommission ? p.monthly * (1 - APPLE_COMMISSION) : p.monthly;
                   return (
                     <th key={p.name} style={thStyle}>
-                      {p.name} ({fmtCents(afterApple)}/mo after Apple)
+                      {p.name} ({fmtCents(net)}/mo{p.appleCommission ? " after Apple" : ""})
                     </th>
                   );
                 })}
@@ -374,8 +375,8 @@ export default function CostsPage() {
                     <td style={{ ...tdStyle, fontWeight: 700 }}>{g}</td>
                     <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.monthlyOngoing, 2)}</td>
                     {PLANS.map(plan => {
-                      const revenueAfterApple = plan.monthly * (1 - APPLE_COMMISSION);
-                      const netProfit = revenueAfterApple - c.monthlyOngoing;
+                      const netRevenue = plan.appleCommission ? plan.monthly * (1 - APPLE_COMMISSION) : plan.monthly;
+                      const netProfit = netRevenue - c.monthlyOngoing;
                       const isNeg = netProfit < 0;
                       return (
                         <td key={plan.name} style={{

@@ -96,9 +96,10 @@ function costPerCall(f: typeof AI_FUNCTIONS[number]) {
 }
 
 // Pricing
-const MONTHLY_PRICE = 15.99;
-const YEARLY_PRICE = 99.99;
-const YEARLY_MONTHLY = YEARLY_PRICE / 12;
+const APP_MONTHLY = 15.99;   // iOS App Store (RevenueCat)
+const WEB_MONTHLY = 12.99;   // Stripe (web)
+const WEB_YEARLY = 99.99;    // Stripe (web)
+const WEB_YEARLY_MONTHLY = WEB_YEARLY / 12;
 const APPLE_COMMISSION = 0.15; // Apple Small Business Program (under $1M/yr)
 
 function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
@@ -160,16 +161,17 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
   const scenarios = [1, 2, 3].map((goals) => {
     const avg = monthlyAiCost(goals);
     const max = monthlyAiCostMax(goals);
-    const yearlyAfterApple = YEARLY_MONTHLY * (1 - APPLE_COMMISSION);
-    const monthlyAfterApple = MONTHLY_PRICE * (1 - APPLE_COMMISSION);
+    const appAfterApple = APP_MONTHLY * (1 - APPLE_COMMISSION);
+    const webMonthlyNet = WEB_MONTHLY; // Stripe fees ~2.9% but negligible here
+    const webYearlyNet = WEB_YEARLY_MONTHLY;
     return {
       goals,
       avgCost: avg,
       maxCost: max,
-      yearlyProfitAvg: yearlyAfterApple - avg,
-      yearlyProfitMax: yearlyAfterApple - max,
-      monthlyProfitAvg: monthlyAfterApple - avg,
-      monthlyProfitMax: monthlyAfterApple - max,
+      appProfitAvg: appAfterApple - avg,
+      appProfitMax: appAfterApple - max,
+      webMonthlyProfitAvg: webMonthlyNet - avg,
+      webYearlyProfitAvg: webYearlyNet - avg,
     };
   });
 
@@ -218,17 +220,17 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
           Profit Margins by Plan (Monthly, Ongoing)
         </h3>
         <div style={{ fontSize: "0.7rem", color: "#71717a", marginBottom: "1rem" }}>
-          Revenue per month after Apple&apos;s 15% commission minus estimated AI costs (avg &amp; worst case).
+          App: $15.99/mo (after Apple 15% = ${(APP_MONTHLY * (1 - APPLE_COMMISSION)).toFixed(2)}) · Web: $12.99/mo or $99.99/yr (${WEB_YEARLY_MONTHLY.toFixed(2)}/mo)
         </div>
 
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
           <thead>
             <tr style={{ borderBottom: "1px solid #1e1e1e" }}>
               <th style={{ textAlign: "left", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Goals</th>
-              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>AI Cost/mo (avg)</th>
-              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>AI Cost/mo (max)</th>
-              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Yearly (${(YEARLY_MONTHLY * (1 - APPLE_COMMISSION)).toFixed(2)}/mo)</th>
-              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Monthly (${(MONTHLY_PRICE * (1 - APPLE_COMMISSION)).toFixed(2)}/mo)</th>
+              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>AI Cost/mo</th>
+              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>App $15.99 (${(APP_MONTHLY * (1 - APPLE_COMMISSION)).toFixed(2)} net)</th>
+              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Web $12.99/mo</th>
+              <th style={{ textAlign: "center", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>Web $99.99/yr (${WEB_YEARLY_MONTHLY.toFixed(2)}/mo)</th>
             </tr>
           </thead>
           <tbody>
@@ -238,31 +240,28 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
                 <td style={{ padding: "0.6rem 0", textAlign: "center", color: "#a1a1aa", fontWeight: 600 }}>
                   ${s.avgCost.toFixed(2)}
                 </td>
-                <td style={{ padding: "0.6rem 0", textAlign: "center", color: "#a1a1aa", fontWeight: 600 }}>
-                  ${s.maxCost.toFixed(2)}
-                </td>
                 <td style={{ padding: "0.6rem 0", textAlign: "center" }}>
-                  <div style={{ color: s.yearlyProfitAvg >= 0 ? "#3ecf8e" : "#ef4444", fontWeight: 700 }}>
-                    {s.yearlyProfitAvg >= 0 ? "+" : ""}${s.yearlyProfitAvg.toFixed(2)}
+                  <div style={{ color: s.appProfitAvg >= 0 ? "#3ecf8e" : "#ef4444", fontWeight: 700 }}>
+                    +${s.appProfitAvg.toFixed(2)}
                   </div>
                   <div style={{ fontSize: "0.65rem", color: "#71717a" }}>
-                    avg · {Math.round((s.yearlyProfitAvg / YEARLY_MONTHLY) * 100)}% margin
-                  </div>
-                  <div style={{ color: s.yearlyProfitMax >= 0 ? "#3ecf8e" : "#ef4444", fontWeight: 600, fontSize: "0.75rem", marginTop: 2 }}>
-                    {s.yearlyProfitMax >= 0 ? "+" : ""}${s.yearlyProfitMax.toFixed(2)}
-                    <span style={{ color: "#71717a", fontWeight: 400 }}> worst</span>
+                    {Math.round((s.appProfitAvg / APP_MONTHLY) * 100)}% margin
                   </div>
                 </td>
                 <td style={{ padding: "0.6rem 0", textAlign: "center" }}>
-                  <div style={{ color: s.monthlyProfitAvg >= 0 ? "#3ecf8e" : "#ef4444", fontWeight: 700 }}>
-                    {s.monthlyProfitAvg >= 0 ? "+" : ""}${s.monthlyProfitAvg.toFixed(2)}
+                  <div style={{ color: s.webMonthlyProfitAvg >= 0 ? "#3ecf8e" : "#ef4444", fontWeight: 700 }}>
+                    +${s.webMonthlyProfitAvg.toFixed(2)}
                   </div>
                   <div style={{ fontSize: "0.65rem", color: "#71717a" }}>
-                    avg · {Math.round((s.monthlyProfitAvg / MONTHLY_PRICE) * 100)}% margin
+                    {Math.round((s.webMonthlyProfitAvg / WEB_MONTHLY) * 100)}% margin
                   </div>
-                  <div style={{ color: s.monthlyProfitMax >= 0 ? "#3ecf8e" : "#ef4444", fontWeight: 600, fontSize: "0.75rem", marginTop: 2 }}>
-                    {s.monthlyProfitMax >= 0 ? "+" : ""}${s.monthlyProfitMax.toFixed(2)}
-                    <span style={{ color: "#71717a", fontWeight: 400 }}> worst</span>
+                </td>
+                <td style={{ padding: "0.6rem 0", textAlign: "center" }}>
+                  <div style={{ color: s.webYearlyProfitAvg >= 0 ? "#3ecf8e" : "#ef4444", fontWeight: 700 }}>
+                    +${s.webYearlyProfitAvg.toFixed(2)}
+                  </div>
+                  <div style={{ fontSize: "0.65rem", color: "#71717a" }}>
+                    {Math.round((s.webYearlyProfitAvg / WEB_YEARLY_MONTHLY) * 100)}% margin
                   </div>
                 </td>
               </tr>
@@ -283,7 +282,7 @@ function CostEstimatorSection({ activeUsers }: { activeUsers: number }) {
             { color: "#4ade80", label: "DeepSeek primary, Gemini fallback", text: "All functions use DeepSeek V3 ($0.28/$0.42/M). Falls back to Gemini 2.5 Flash ($0.30/$2.50/M) on failure. 15s timeout, circuit breaker after 3 consecutive failures (5 min cooldown)." },
             { color: "#f59e0b", label: "Biggest cost driver", text: `generateTasks (DeepSeek) — runs up to 2×/day per goal. ~$${costs.find(c => c.name === "generateTasks")!.cost.toFixed(4)}/call (DeepSeek) or ~$${costPerCallGemini(costs.find(c => c.name === "generateTasks")!).toFixed(4)}/call (Gemini fallback).` },
             { color: "#D4A843", label: "Setup cost", text: `parseGoal + generateRoadmap + goalChat — ~$${(costs.find(c => c.name === "parseGoal")!.cost + costs.find(c => c.name === "generateRoadmap")!.cost + costs.find(c => c.name === "goalChat (per turn)")!.cost * 8).toFixed(4)} per goal (DeepSeek), one-time only.` },
-            { color: "#ef4444", label: "Apple commission", text: `15% via Small Business Program (under $1M/yr). ~$${(MONTHLY_PRICE * APPLE_COMMISSION).toFixed(2)}/mo on monthly, ~$${(YEARLY_PRICE * APPLE_COMMISSION / 12).toFixed(2)}/mo on yearly.` },
+            { color: "#ef4444", label: "Apple commission (app only)", text: `15% via Small Business Program (under $1M/yr). ~$${(APP_MONTHLY * APPLE_COMMISSION).toFixed(2)}/mo. Web subscriptions via Stripe have no Apple cut.` },
           ].map((item) => (
             <div key={item.label} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: item.color, marginTop: 5, flexShrink: 0 }} />
