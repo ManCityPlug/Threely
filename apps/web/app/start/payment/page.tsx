@@ -127,7 +127,7 @@ function PaymentForm() {
 
       if (!session) {
         // No session — redirect back to signup
-        router.replace("/start/signup");
+        router.replace("/signup");
         return;
       }
 
