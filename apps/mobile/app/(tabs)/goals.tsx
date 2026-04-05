@@ -1629,7 +1629,7 @@ export default function GoalsScreen() {
                               >
                                 <Text style={[
                                   styles.chatOptionText,
-                                  isSelected && { color: "#fff" },
+                                  isSelected && { color: colors.primaryText },
                                 ]}>{isSelected ? `✓ ${opt}` : opt}</Text>
                               </TouchableOpacity>
                             );
@@ -1650,7 +1650,7 @@ export default function GoalsScreen() {
                               onPress={() => sendChatAnswer(Array.from(selectedOptions).join(" + "))}
                               activeOpacity={0.7}
                             >
-                              <Text style={[styles.chatOptionText, { color: "#fff", fontWeight: "700", fontSize: typography.base }]}>
+                              <Text style={[styles.chatOptionText, { color: colors.primaryText, fontWeight: "700", fontSize: typography.base }]}>
                                 Continue with {selectedOptions.size} selected →
                               </Text>
                             </TouchableOpacity>

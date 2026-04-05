@@ -41,9 +41,9 @@ const STEPS: TutorialStep[] = [
     icon: "flash",
   },
   {
-    title: "Want More?",
+    title: "Get More Tasks",
     description:
-      "Finished all your tasks? Tap here to generate more. You get one extra set per goal each day.",
+      "Complete all your tasks to unlock more. You get one extra set per goal each day.",
     target: "get-more-button",
     tabRoute: "/(tabs)",
     tooltipPosition: "below",
@@ -414,7 +414,7 @@ export function AppTutorial({ visible, onComplete }: AppTutorialProps) {
                 {step.buttonLabel ?? "Next"}
               </Text>
               {!isLastStep && (
-                <Ionicons name="arrow-forward" size={18} color="#fff" style={{ marginLeft: 6 }} />
+                <Ionicons name="arrow-forward" size={18} color={colors.primaryText} style={{ marginLeft: 6 }} />
               )}
             </TouchableOpacity>
           </View>
@@ -526,7 +526,7 @@ function createStyles(c: Colors, screenW: number) {
     nextBtnText: {
       fontSize: typography.base,
       fontWeight: typography.bold,
-      color: "#fff",
+      color: c.primaryText,
       letterSpacing: -0.2,
     },
   });
