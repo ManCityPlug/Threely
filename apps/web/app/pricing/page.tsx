@@ -219,35 +219,6 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section style={{
-        padding: "4rem 1.5rem",
-        background: "#0a0a0a", borderTop: "1px solid rgba(255,255,255,0.06)",
-        textAlign: "center",
-        color: "#fff",
-      }}>
-        <div style={{ maxWidth: 500, margin: "0 auto" }}>
-          <h2 style={{ fontSize: "clamp(1.4rem, 4vw, 2rem)", fontWeight: 800, letterSpacing: "-0.03em", marginBottom: "0.75rem" }}>
-            Get Pro free for 7 days
-          </h2>
-          <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", marginBottom: "1.5rem" }}>
-            Set your first goal and get personalized tasks in under a minute.
-          </p>
-          <Link href="/start" style={{
-            display: "inline-block",
-            padding: "0.875rem 2.5rem",
-            background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)",
-            color: "#fff",
-            fontWeight: 700,
-            fontSize: "1rem",
-            borderRadius: 10,
-            textDecoration: "none",
-            boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
-          }}>
-            Create free account →
-          </Link>
-        </div>
-      </section>
 
       <MarketingFooter />
     </div>
