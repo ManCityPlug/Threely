@@ -11,10 +11,8 @@ const TESTIMONIALS: { quote: string; author: string; label: string; image?: stri
 ];
 
 const FAQ = [
-  { q: "How is this different from ChatGPT?", a: "Threely gives you the same playbook that million-dollar brands use to grow — applied directly to your business, built around your schedule, and updated every morning based on your real progress. ChatGPT gives you generic advice you already know. Threely tells you exactly what to do, how to do it, and hands you the exact resources to get it done." },
-  { q: "How personalized is it?", a: "Every set of tasks is generated fresh based on your goal, what you completed yesterday, your review feedback, and your available time. It gets better the more you use it." },
-  { q: "What if I miss a day?", a: "No guilt. Just open Threely and pick up where you left off. Your progress and goal context are preserved." },
-  { q: "Is it free?", a: "7-day free trial with full access. After that, choose a plan to keep your daily tasks and coaching generating." },
+  { q: "Is it free?", a: "7-day free trial with full access. No credit card required. After that, choose a plan to keep going." },
+  { q: "What if I miss a day?", a: "No guilt. Just open Threely and pick up where you left off. Your progress is saved." },
 ];
 
 export default function LandingPage() {
@@ -213,6 +211,31 @@ export default function LandingPage() {
         </p>
       </section>
 
+      {/* ─── ChatGPT comparison ──────────────────────────────────────────────── */}
+      <section className="reveal" style={{
+        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        textAlign: "center",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+      }}>
+        <div style={{ maxWidth: 700, margin: "0 auto" }}>
+          <h2 style={{ fontSize: isMobile ? "1.6rem" : "2.2rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 20, lineHeight: 1.2 }}>
+            You{"'"}ve had ChatGPT for 4 years.<br />What did you build?
+          </h2>
+          <p style={{ fontSize: isMobile ? "1rem" : "1.15rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, marginBottom: 32 }}>
+            Use Threely or don{"'"}t. The time will pass regardless.<br />
+            Your competition isn{"'"}t waiting. Stop sleeping. Get rich.
+          </p>
+          <Link href={ctaHref} style={{
+            display: "inline-flex", alignItems: "center", justifyContent: "center",
+            padding: "0.85rem 2.5rem", fontSize: "1rem", fontWeight: 700,
+            color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 12,
+            textDecoration: "none",
+          }}>
+            {ctaLabel}
+          </Link>
+        </div>
+      </section>
+
       {/* Subtle divider */}
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }} />
 
@@ -255,10 +278,7 @@ export default function LandingPage() {
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <p className="reveal" style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12, textAlign: "center" }}>Results</p>
-          <h2 className="reveal" style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", textAlign: "center", marginBottom: 48 }}>
-            Real people. Real progress.
-          </h2>
+          <p className="reveal" style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 48, textAlign: "center" }}>Results</p>
           <div style={{
             display: "grid",
             gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
@@ -288,40 +308,6 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ─── Features ─────────────────────────────────────────────────────────── */}
-      <section style={{
-        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
-        maxWidth: 1000, margin: "0 auto",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-      }}>
-        <div style={{ textAlign: "center", marginBottom: 60 }}>
-          <h2 className="reveal" style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
-            Built for people who want results.
-          </h2>
-        </div>
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: isMobile ? "1fr" : "repeat(2, 1fr)",
-          gap: 20,
-        }}>
-          {[
-            { title: "AI that actually listens", desc: "Tell it your situation — what you have, what you've tried, where you're stuck. It builds from there, not from a template." },
-            { title: "3 tasks every morning", desc: "Specific actions with exact steps, tools, and what 'done' looks like. No vague advice." },
-            { title: "Adapts daily", desc: "Struggling? Easier tasks. Crushing it? Harder ones. The AI coaches based on your actual performance." },
-            { title: "Fitness & business", desc: "Whether you're building muscle or building revenue, the same daily system works. Real workouts. Real business plans." },
-          ].map((f, i) => (
-            <div key={i} className="reveal" style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.08)",
-              borderRadius: 16, padding: "2rem",
-            }}>
-              <h3 style={{ fontSize: "1.1rem", fontWeight: 700, color: "#fff", marginBottom: 8 }}>{f.title}</h3>
-              <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>{f.desc}</p>
-            </div>
-          ))}
         </div>
       </section>
 
