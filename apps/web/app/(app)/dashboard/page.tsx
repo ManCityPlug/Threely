@@ -1414,8 +1414,6 @@ function DashboardPageInner() {
             </div>
           )}
 
-          )}
-
           {/* Give me more — shown when all done */}
           {allDone && (
             <div data-walkthrough="get-more-button" style={{ marginBottom: "1.5rem", display: "flex", justifyContent: "center" }}>
