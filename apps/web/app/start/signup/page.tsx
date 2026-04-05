@@ -265,7 +265,7 @@ function SignupForm() {
                 ...INPUT_STYLE,
                 borderColor: accountError && !validEmail ? "#FF4D4F" : undefined,
               }}
-              onFocus={(e) => e.currentTarget.style.borderColor = "#D4A843"}
+              onFocus={(e) => e.currentTarget.style.borderColor = "#fff"}
               onBlur={(e) => e.currentTarget.style.borderColor = accountError && !validEmail ? "#FF4D4F" : "rgba(255,255,255,0.12)"}
             />
           </div>
@@ -285,7 +285,7 @@ function SignupForm() {
                 ...INPUT_STYLE,
                 borderColor: accountError && !validPassword ? "#FF4D4F" : undefined,
               }}
-              onFocus={(e) => e.currentTarget.style.borderColor = "#D4A843"}
+              onFocus={(e) => e.currentTarget.style.borderColor = "#fff"}
               onBlur={(e) => e.currentTarget.style.borderColor = accountError && !validPassword ? "#FF4D4F" : "rgba(255,255,255,0.12)"}
             />
           </div>
@@ -335,8 +335,8 @@ function SignupForm() {
             style={{
               width: "100%",
               padding: "16px",
-              background: "#D4A843",
-              color: "#fff",
+              background: "#fff",
+              color: "#000",
               border: "none",
               borderRadius: 14,
               fontSize: "1rem",
@@ -344,7 +344,7 @@ function SignupForm() {
               letterSpacing: "-0.2px",
               cursor: submitting ? "wait" : "pointer",
               transition: "background 0.15s",
-              boxShadow: "0 4px 16px rgba(212,168,67,0.3)",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
             }}
           >
             {submitting ? "Creating account..." : "Continue"}
@@ -375,9 +375,9 @@ function SignupForm() {
           margin: "16px 0 0",
         }}>
           By continuing, you agree to our{" "}
-          <a href="https://threely.co/terms" style={{ color: "#D4A843", textDecoration: "underline" }}>Terms</a>
+          <a href="https://threely.co/terms" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Terms</a>
           {" "}&{" "}
-          <a href="https://threely.co/privacy" style={{ color: "#D4A843", textDecoration: "underline" }}>Privacy Policy</a>.
+          <a href="https://threely.co/privacy" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Privacy Policy</a>.
         </p>
       </div>
     </main>

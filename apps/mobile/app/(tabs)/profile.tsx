@@ -1110,9 +1110,9 @@ export default function ProfileScreen() {
                   disabled={pwLoading}
                 >
                   {pwLoading ? (
-                    <ActivityIndicator color="#fff" size="small" />
+                    <ActivityIndicator color={colors.primaryText} size="small" />
                   ) : (
-                    <Text style={[styles.pwBtnText, { color: "#fff" }]}>Update password</Text>
+                    <Text style={[styles.pwBtnText, { color: colors.primaryText }]}>Update password</Text>
                   )}
                 </TouchableOpacity>
               </View>

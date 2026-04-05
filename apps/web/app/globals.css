@@ -8,6 +8,7 @@
   --bg: #f6f9fc;
   --card: #ffffff;
   --primary: #000000;
+  --primary-text: #FFFFFF;
   --primary-light: rgba(0,0,0,0.06);
   --primary-hover: #1a1a1a;
   --text: #0a2540;
@@ -38,6 +39,7 @@
   --bg: #0a0a0a;
   --card: #161616;
   --primary: #FFFFFF;
+  --primary-text: #000000;
   --primary-light: rgba(255,255,255,0.08);
   --primary-hover: #e0e0e0;
   --text: #e8eaf0;
@@ -222,7 +224,7 @@ input, textarea, select {
 }
 .sidebar-nav-link.active .nav-icon {
   background: var(--primary);
-  color: #fff;
+  color: var(--primary-text);
 }
 .sidebar-nav-link .nav-icon svg {
   width: 16px;
@@ -265,7 +267,7 @@ input, textarea, select {
 
 .btn-primary {
   background: var(--primary);
-  color: #fff;
+  color: var(--primary-text);
 }
 .btn-primary:hover { background: var(--primary-hover); }
 .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
@@ -368,7 +370,7 @@ input, textarea, select {
 .task-checkbox.checked {
   background: var(--primary);
   border-color: var(--primary);
-  color: #fff;
+  color: var(--primary-text);
 }
 
 /* ─── Badge ──────────────────────────────────────────────────────────────────── */
