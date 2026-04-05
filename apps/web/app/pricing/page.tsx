@@ -91,7 +91,7 @@ export default function PricingPage() {
               fontWeight: 700,
               fontSize: "0.95rem",
             }}>
-              Get Pro Free
+              Lock In
             </CheckoutButton>
           </div>
 
@@ -135,7 +135,7 @@ export default function PricingPage() {
               fontSize: "0.95rem",
               boxShadow: "0 4px 14px rgba(212,168,67,0.3)",
             }}>
-              Get Pro Free
+              Lock TF In
             </CheckoutButton>
           </div>
         </div>
