@@ -231,7 +231,7 @@ export default function LandingPage() {
             marginBottom: 32, textAlign: "center",
           }}>
             <p style={{ fontSize: isMobile ? "0.95rem" : "1.05rem", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0 }}>
-              Threely tells you exactly what{"'"}s needed, personalized to you — not generic BS that{"'"}s keeping you stuck.
+              Threely tells you exactly what needs to be done, built around your life — not generic BS that{"'"}s keeping you stuck while everyone else moves forward.
             </p>
           </div>
           <div style={{ textAlign: "center" }}>
