@@ -224,7 +224,7 @@ export default function LandingPage() {
             How is this different from ChatGPT?
           </p>
           <h2 style={{ fontSize: isMobile ? "1.6rem" : "2.4rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 24, lineHeight: 1.15, textAlign: "center" }}>
-            You{"'"}ve had ChatGPT for 4 years.<br />What did you build?
+            You{"'"}ve had ChatGPT for 4 years.<br />What have you accomplished?
           </h2>
           <div style={{
             background: "rgba(255,255,255,0.03)",
@@ -238,7 +238,7 @@ export default function LandingPage() {
           </div>
           <p style={{ fontSize: isMobile ? "1.05rem" : "1.2rem", fontWeight: 700, color: "#fff", textAlign: "center", lineHeight: 1.6, marginBottom: 32 }}>
             Use Threely or don{"'"}t. The time will pass regardless.<br />
-            Your competition isn{"'"}t waiting. Stop sleeping. Get rich.
+            <span style={{ color: "#D4A843" }}>Lock in</span> or Clock in.
           </p>
           <div style={{ textAlign: "center" }}>
             <Link href={ctaHref} style={{
