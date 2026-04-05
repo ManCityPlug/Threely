@@ -48,12 +48,14 @@ interface TaskCardProps {
   onAsk?: (messages: AskMessage[]) => Promise<AskResult>;
   readonly?: boolean;
   paywalled?: boolean;
+  onShowPaywall?: () => void;
 }
 
-export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, paywalled = false }: TaskCardProps) {
+export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, paywalled = false, onShowPaywall }: TaskCardProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [modalVisible, setModalVisible] = useState(false);
+  const pendingPaywallRef = useRef(false);
 
   const strikeAnim = useRef(new Animated.Value(task.isCompleted ? 1 : 0)).current;
   const checkScaleAnim = useRef(new Animated.Value(1)).current;
@@ -193,6 +195,12 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, pa
         transparent
         animationType="slide"
         onRequestClose={() => setModalVisible(false)}
+        onDismiss={() => {
+          if (pendingPaywallRef.current) {
+            pendingPaywallRef.current = false;
+            onShowPaywall?.();
+          }
+        }}
       >
         {modalVisible && (
           <TaskDetailContent
@@ -206,6 +214,18 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, pa
             onRefine={onRefine}
             onAsk={onAsk}
             paywalled={paywalled}
+            onPaywall={() => {
+              pendingPaywallRef.current = true;
+              setModalVisible(false);
+              if (Platform.OS !== "ios") {
+                setTimeout(() => {
+                  if (pendingPaywallRef.current) {
+                    pendingPaywallRef.current = false;
+                    onShowPaywall?.();
+                  }
+                }, 350);
+              }
+            }}
           />
         )}
       </Modal>
