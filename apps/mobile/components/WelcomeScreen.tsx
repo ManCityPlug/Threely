@@ -128,10 +128,11 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
             <Image source={require("@/assets/icon.png")} style={styles.logo} />
           </Animated.View>
 
-          {/* Lock In text */}
-          <Animated.Text style={[styles.lockInText, { opacity: fadeAnim }]}>
-            Lock In.
-          </Animated.Text>
+          {/* Lock In text — large, two lines, faded gradient feel */}
+          <Animated.View style={[{ alignItems: "center", marginTop: spacing.xl }, { opacity: fadeAnim }]}>
+            <Text style={styles.lockInLine1}>LOCK</Text>
+            <Text style={styles.lockInLine2}>IN</Text>
+          </Animated.View>
         </Animated.View>
 
         {/* Bottom section: auth buttons */}
@@ -240,13 +241,21 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: "#FFFFFF",
   },
-  lockInText: {
-    fontSize: 32,
-    fontWeight: "800" as const,
-    color: "rgba(255,255,255,0.85)",
+  lockInLine1: {
+    fontSize: 72,
+    fontWeight: "900" as const,
+    color: "rgba(255,255,255,0.7)",
     textAlign: "center" as const,
-    letterSpacing: -0.5,
-    marginTop: spacing.xl,
+    letterSpacing: 12,
+    lineHeight: 78,
+  },
+  lockInLine2: {
+    fontSize: 72,
+    fontWeight: "900" as const,
+    color: "rgba(255,255,255,0.35)",
+    textAlign: "center" as const,
+    letterSpacing: 12,
+    lineHeight: 78,
   },
   title: {
     fontSize: typography.xxxl,
