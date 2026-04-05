@@ -577,18 +577,18 @@ export default function GoalsScreen() {
       }, 10000));
     } else {
       buildProgressAnim.setValue(0);
-      setBuildStageText("Analyzing your goal...");
+      setBuildStageText("Understanding your situation...");
       Animated.timing(buildProgressAnim, { toValue: 0.25, duration: 3000, useNativeDriver: false }).start();
       buildStageTimers.current.push(setTimeout(() => {
-        setBuildStageText("Creating your roadmap...");
+        setBuildStageText("Mapping out your path...");
         Animated.timing(buildProgressAnim, { toValue: 0.55, duration: 5000, useNativeDriver: false }).start();
       }, 3000));
       buildStageTimers.current.push(setTimeout(() => {
-        setBuildStageText("Generating your first tasks...");
+        setBuildStageText("Creating today's tasks...");
         Animated.timing(buildProgressAnim, { toValue: 0.85, duration: 7000, useNativeDriver: false }).start();
       }, 8000));
       buildStageTimers.current.push(setTimeout(() => {
-        setBuildStageText("Almost there...");
+        setBuildStageText("Locking it in...");
         Animated.timing(buildProgressAnim, { toValue: 0.95, duration: 10000, useNativeDriver: false }).start();
       }, 15000));
     }

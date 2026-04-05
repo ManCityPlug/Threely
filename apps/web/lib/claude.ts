@@ -1006,7 +1006,7 @@ Goal text: "${rawInput}"
 
 Return ONLY valid JSON with this exact shape (no markdown, no explanation):
 {
-  "short_title": "A very short 2-5 word goal name used as the display title. Keep it punchy and specific. Capitalize like a title. Examples: 'Lose 10 lbs', 'Get to 11% BF', 'WGU Degree', 'Launch Meta Ads Tool', 'YouTube 10K Subs', 'Run a Sub-25 5K', 'Learn Piano Basics'. NEVER include timeframes, method details, or full sentences. NEVER start with 'I want to' or 'You want to'.",
+  "short_title": "MAXIMUM 3-5 words. This is a tiny UI label — must fit in 25 characters or less. Capitalize like a title. Examples: 'Scale SaaS to $10K', 'Lose 10 lbs', 'Launch Shopify Store', 'Get Shredded', 'Learn Piano'. NEVER use full sentences. NEVER start with 'I want to'. Strip all filler words.",
   "structured_summary": "A clear 1-sentence restatement of the core goal in second person starting with 'You want to...'. Keep it under 15 words - just the outcome, no method details or timeframes.",
   "category": "One of: fitness, business, learning, creative, financial, health, relationships, productivity, spiritual, religion, mindfulness, career, other",
   "deadline_detected": "ISO date string YYYY-MM-DD calculated from today's date (${today}) if a specific deadline or timeframe is mentioned (e.g. 'in 3 months' = add 3 months to today, 'by summer' = ${new Date().getFullYear()}-09-01, 'by December' = ${new Date().getFullYear()}-12-01), otherwise null",
@@ -1033,7 +1033,7 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
   }
 
   const result = {
-    short_title: parsed.short_title ?? rawInput.slice(0, 30),
+    short_title: (parsed.short_title ?? rawInput.slice(0, 25)).slice(0, 25),
     structured_summary: parsed.structured_summary ?? rawInput,
     category: parsed.category ?? "other",
     deadline_detected: parsed.deadline_detected ?? null,

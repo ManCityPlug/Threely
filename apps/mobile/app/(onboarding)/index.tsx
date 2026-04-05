@@ -64,10 +64,10 @@ const MONTHS = [
 ];
 
 const BUILDING_STEPS = [
-  "Analyzing your goal…",
-  "Crafting your personalized roadmap…",
-  "Generating 3 perfect tasks to start with…",
-  "Almost there — putting the finishing touches…",
+  "Understanding your situation…",
+  "Mapping out your path…",
+  "Creating today's tasks…",
+  "Locking it in…",
 ];
 
 function BuildingProgressMobile({ styles, colors }: { styles: any; colors: Colors }) {

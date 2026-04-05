@@ -772,7 +772,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
           Threely Intelligence is building your plan...
         </h2>
         <p style={{ color: "var(--subtext)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-          Analyzing your goal and crafting 3 perfect tasks to start with.
+          Understanding your situation and creating today's tasks.
         </p>
         <span className="spinner spinner-dark" style={{ width: 32, height: 32 }} />
       </div>

@@ -16,10 +16,10 @@ const TOTAL_STEPS = 1; // goal + AI chat (name asked in chat, config handled by 
 // ─── Building Progress (rotating status messages) ─────────────────────────────
 
 const BUILDING_STEPS = [
-  "Analyzing your goal…",
-  "Crafting your personalized roadmap…",
-  "Generating 3 perfect tasks to start with…",
-  "Almost there — putting the finishing touches…",
+  "Understanding your situation…",
+  "Mapping out your path…",
+  "Creating today's tasks…",
+  "Locking it in…",
 ];
 
 function BuildingProgress() {
