@@ -82,7 +82,6 @@ function BuildingProgressMobile({ styles, colors }: { styles: any; colors: Color
 
   return (
     <View style={styles.buildingCenter}>
-      <Text style={styles.buildIcon}>✦</Text>
       <Text style={styles.buildTitle}>Threely Intelligence is building your plan…</Text>
       <Text style={styles.buildSubtitle}>{BUILDING_STEPS[stepIdx]}</Text>
       <View style={{ flexDirection: "row", gap: 6, marginTop: spacing.md, marginBottom: spacing.sm }}>
@@ -1192,7 +1191,7 @@ export default function OnboardingScreen() {
     return (
       <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.stepScroll}>
-          <Text style={styles.buildTitle}>Your plan is ready ✦</Text>
+          <Text style={styles.buildTitle}>Your plan is ready</Text>
           {coachNote ? <Text style={styles.coachNote}>{coachNote}</Text> : null}
 
           <View style={styles.taskRevealList}>

@@ -38,7 +38,6 @@ function BuildingProgress() {
       alignItems: "center", justifyContent: "center",
       textAlign: "center", padding: "2rem 0",
     }}>
-      <span style={{ fontSize: 48, color: "var(--primary)", marginBottom: 20 }}>✦</span>
       <h2 style={{ fontSize: "1.2rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 8 }}>
         Threely Intelligence is building your plan…
       </h2>

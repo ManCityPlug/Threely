@@ -769,7 +769,6 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
   function renderBuildingStep() {
     return (
       <div style={{ textAlign: "center", padding: "3rem 0" }}>
-        <div style={{ fontSize: 40, color: "var(--primary)", marginBottom: "1rem" }}>&#10022;</div>
         <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8 }}>
           Threely Intelligence is building your plan...
         </h2>
@@ -787,7 +786,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
     return (
       <>
         <h2 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>
-          {offDayMessage ? "Goal created &#10022;" : "Your plan is ready &#10022;"}
+          {offDayMessage ? "Goal created" : "Your plan is ready"}
         </h2>
         {coachNote && (
           <p style={{ fontSize: "0.9rem", color: "var(--subtext)", fontStyle: "italic", lineHeight: 1.6, marginBottom: "1.25rem" }}>

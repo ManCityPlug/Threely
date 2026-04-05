@@ -1338,7 +1338,6 @@ export default function GoalsScreen() {
     if (!tasksReady && !buildError && !isOffDay) {
       return (
         <View style={styles.buildingCenter}>
-          <Text style={styles.buildIcon}>{"\u2726"}</Text>
           <Text style={styles.buildTitle}>
             {buildRetrying ? "Still working on it..." : "Threely Intelligence is building your plan\u2026"}
           </Text>
@@ -1390,7 +1389,7 @@ export default function GoalsScreen() {
     return (
       <View style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.stepScroll} showsVerticalScrollIndicator={false}>
-          <Text style={styles.buildReadyTitle}>{isOffDay ? "Goal created ✦" : "Your plan is ready ✦"}</Text>
+          <Text style={styles.buildReadyTitle}>{isOffDay ? "Goal created" : "Your plan is ready"}</Text>
           {coachNote ? <Text style={styles.coachNote}>{coachNote}</Text> : null}
 
           {isOffDay ? (
