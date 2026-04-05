@@ -584,7 +584,6 @@ export default function DashboardScreen() {
   }
 
   function handleGiveMoreTasks() {
-    if (isLimitedMode && !walkthroughActive) { setShowPaywall(true); return; }
     if (!allDone) return;
     // Pre-check: if tasks already have > 3 items, this goal already got extra tasks today
     const dt = visibleTasks[0];
@@ -1040,7 +1039,6 @@ export default function DashboardScreen() {
                           onRefine={(userRequest) => handleRefineTask(dt.id, task.id, userRequest)}
                           onAsk={(messages) => handleAskAboutTask(dt.id, task.id, messages)}
                           paywalled={isLimitedMode}
-                          onShowPaywall={() => setShowPaywall(true)}
                         />
                       );
                       return (
