@@ -114,7 +114,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
       <SafeAreaView style={styles.content}>
         {/* Top section: logo + headline + value props */}
         <Animated.View style={[styles.topSection, { opacity: fadeAnim }]}>
-          {/* Logo with glow + sparkles + float */}
+          {/* Logo with gold breathing glow */}
           <Animated.View
             style={[
               styles.logoWrap,
@@ -123,39 +123,7 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
           >
             <View style={styles.logoGlow} />
             <Image source={require("@/assets/icon.png")} style={styles.logo} />
-            {sparklePositions.map((pos, idx) => {
-              const rad = (pos.angle * Math.PI) / 180;
-              const dist = 50;
-              return (
-                <Animated.View
-                  key={idx}
-                  style={[
-                    styles.sparkle,
-                    {
-                      left: 44 + Math.cos(rad) * dist - 3,
-                      top: 44 + Math.sin(rad) * dist - 3,
-                      opacity: sparkleAnims[idx],
-                      transform: [{
-                        scale: sparkleAnims[idx].interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [0, 1],
-                        }),
-                      }],
-                    },
-                  ]}
-                />
-              );
-            })}
           </Animated.View>
-
-          {/* Headline */}
-          <Text style={styles.title}>
-            Lock In.
-          </Text>
-
-          <Text style={styles.subtitle}>
-            The AI app that tells you exactly{"\n"}what to do to hit your goals.
-          </Text>
         </Animated.View>
 
         {/* Bottom section: auth buttons */}
@@ -255,7 +223,7 @@ const styles = StyleSheet.create({
     width: 88,
     height: 88,
     borderRadius: 44,
-    backgroundColor: "rgba(99, 91, 255, 0.25)",
+    backgroundColor: "rgba(212, 168, 67, 0.3)",
   },
   sparkle: {
     position: "absolute",
