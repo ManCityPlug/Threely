@@ -584,6 +584,7 @@ export default function DashboardScreen() {
   }
 
   function handleGiveMoreTasks() {
+    if (isLimitedMode) { setShowPaywall(true); return; }
     if (!allDone) return;
     // Pre-check: if tasks already have > 3 items, this goal already got extra tasks today
     const dt = visibleTasks[0];
@@ -873,40 +874,6 @@ export default function DashboardScreen() {
         {/* Complete All button removed — users check tasks off individually */}
 
         {/* Insight card — shown after review submission */}
-        {showInsightCard && (
-          <View style={styles.insightCard}>
-            <View style={styles.insightHeader}>
-              <Text style={styles.insightTitle}>Coach note</Text>
-            </View>
-            {insightLoading ? (
-              <ActivityIndicator color={colors.primary} size="small" />
-            ) : (
-              <>
-                <Text style={styles.insightText}>{insightText}</Text>
-                {generating ? (
-                  <View style={{ marginTop: spacing.xs }}>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                      <ActivityIndicator color={colors.primary} size="small" />
-                      <Text style={{ fontSize: typography.sm, color: colors.textSecondary }}>Generating next tasks…</Text>
-                    </View>
-                    <Text style={{ fontSize: typography.xs, color: colors.textTertiary, marginTop: 4 }}>
-                      <Text style={{ fontWeight: typography.bold }}>This can take a couple of minutes. </Text>
-                      We'll notify you when they're ready.
-                    </Text>
-                  </View>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.insightBtn}
-                    onPress={dismissInsight}
-                    activeOpacity={0.85}
-                  >
-                    <Text style={styles.insightBtnText}>Got it</Text>
-                  </TouchableOpacity>
-                )}
-              </>
-            )}
-          </View>
-        )}
 
         {/* Task sections */}
         {effectiveGoals.length === 0 ? (
@@ -1039,6 +1006,7 @@ export default function DashboardScreen() {
                           onRefine={(userRequest) => handleRefineTask(dt.id, task.id, userRequest)}
                           onAsk={(messages) => handleAskAboutTask(dt.id, task.id, messages)}
                           paywalled={isLimitedMode}
+                          onShowPaywall={() => setShowPaywall(true)}
                         />
                       );
                       return (
@@ -1136,15 +1104,22 @@ export default function DashboardScreen() {
           style={styles.historyOverlay}
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
-          <Pressable style={{ flex: 1 }} onPress={closeReview} />
+          <View style={{ flex: 1 }} />
           <View style={styles.reviewSheet}>
 
-            <Pressable onPress={closeReview} style={{ alignItems: "center", paddingVertical: 8 }}>
+            <View style={{ alignItems: "center", paddingVertical: 8 }}>
               <View style={styles.historyHandle} />
-            </Pressable>
+            </View>
 
             <View style={styles.reviewHeaderRow}>
               <Text style={styles.reviewTitle}>Daily Review</Text>
+              <TouchableOpacity
+                onPress={closeReview}
+                hitSlop={12}
+                style={{ position: "absolute", right: 0, top: 0, padding: 4 }}
+              >
+                <Text style={{ fontSize: 20, color: colors.textSecondary, fontWeight: "600" }}>✕</Text>
+              </TouchableOpacity>
             </View>
 
             {reviewStep === 1 && (
