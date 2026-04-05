@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF", marginTop: spacing.sm,
   },
   buttonText: {
-    color: "#fff", fontSize: typography.base,
+    color: "#000", fontSize: typography.base,
     fontWeight: typography.semibold, letterSpacing: -0.2,
   },
   footer: {

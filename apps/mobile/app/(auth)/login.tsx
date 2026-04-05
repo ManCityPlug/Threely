@@ -421,7 +421,7 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
   },
   buttonText: {
-    color: "#fff",
+    color: "#000",
     fontSize: typography.base,
     fontWeight: typography.semibold,
     letterSpacing: -0.2,
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   modalBtnText: {
-    color: "#fff",
+    color: "#000",
     fontSize: typography.sm,
     fontWeight: typography.semibold,
   },
