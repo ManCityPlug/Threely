@@ -118,9 +118,18 @@ export default function OnboardingPage() {
     return null;
   }
 
-  function handleNameSubmit() {
+  async function handleNameSubmit() {
     if (!nameInput.trim() || !pendingStarterMessage) return;
+    const trimmedName = nameInput.trim();
     setAwaitingName(false);
+    // Persist name to Supabase user metadata so we don't ask again
+    try {
+      await getSupabase().auth.updateUser({
+        data: { display_name: trimmedName, full_name: trimmedName },
+      });
+    } catch {
+      // Non-critical — continue with chat
+    }
     startAiChatWithMessage(pendingStarterMessage);
     setPendingStarterMessage(null);
   }
