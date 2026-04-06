@@ -46,15 +46,15 @@ export async function POST(request: NextRequest) {
           to: [email.trim()],
           subject: "Reset Your Password",
           html: `
-            <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 480px; margin: 0 auto; padding: 2rem;">
-              <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem;">Reset Your Password</h2>
-              <p style="color: #71717a; font-size: 0.9rem; line-height: 1.6;">
+            <div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; max-width: 480px; margin: 0 auto; padding: 2rem; background-color: #ffffff; color: #1a1a1a;">
+              <h2 style="font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; color: #1a1a1a;">Reset Your Password</h2>
+              <p style="color: #555555; font-size: 0.9rem; line-height: 1.6;">
                 Click the button below to set a new password for your Threely account.
               </p>
-              <a href="${resetLink}" style="display: inline-block; margin: 1.5rem 0; padding: 0.75rem 2rem; background: #000; color: #fff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.9rem;">
+              <a href="${resetLink}" style="display: inline-block; margin: 1.5rem 0; padding: 0.75rem 2rem; background-color: #1a1a1a; color: #ffffff; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 0.9rem;">
                 Reset Password
               </a>
-              <p style="color: #a1a1aa; font-size: 0.8rem;">
+              <p style="color: #888888; font-size: 0.8rem;">
                 This link expires in 1 hour. If you didn't request this, you can safely ignore this email.
               </p>
             </div>
