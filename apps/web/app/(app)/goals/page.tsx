@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { goalsApi, tasksApi, type Goal, type ParsedGoal, type GoalChatMessage, type GoalChatResult, type TaskItem } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/Skeleton";
 import GoalTemplatesComponent from "@/components/GoalTemplates";
+import BuildingProgress from "@/components/BuildingProgress";
 import type { GoalCategory } from "@/lib/goal-templates";
 import { useToast } from "@/components/ToastProvider";
 import { useSubscription } from "@/lib/subscription-context";
@@ -766,17 +767,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
   // ─── Render: Building step ─────────────────────────────────────────────────
 
   function renderBuildingStep() {
-    return (
-      <div style={{ textAlign: "center", padding: "3rem 0" }}>
-        <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8 }}>
-          Threely Intelligence is building your plan...
-        </h2>
-        <p style={{ color: "var(--subtext)", fontSize: "0.9rem", marginBottom: "1.5rem" }}>
-          Understanding your situation and creating today's tasks.
-        </p>
-        <span className="spinner spinner-dark" style={{ width: 32, height: 32 }} />
-      </div>
-    );
+    return <BuildingProgress />;
   }
 
   // ─── Render: Done step (task reveal) ───────────────────────────────────────

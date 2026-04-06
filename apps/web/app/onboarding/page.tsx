@@ -6,6 +6,7 @@ import { useAuth, isOnboarded, markOnboarded, saveNickname } from "@/lib/auth-co
 import { getSupabase } from "@/lib/supabase-client";
 import { goalsApi, profileApi, tasksApi, type ParsedGoal, type GoalChatMessage, type GoalChatResult } from "@/lib/api-client";
 import GoalTemplatesComponent from "@/components/GoalTemplates";
+import SharedBuildingProgress from "@/components/BuildingProgress";
 import type { GoalCategory } from "@/lib/goal-templates";
 import { formatDisplayName } from "@/lib/format-name";
 
@@ -13,47 +14,10 @@ import { formatDisplayName } from "@/lib/format-name";
 
 const TOTAL_STEPS = 1; // goal + AI chat (name asked in chat, config handled by AI)
 
-// ─── Building Progress (rotating status messages) ─────────────────────────────
-
-const BUILDING_STEPS = [
-  "Understanding your situation…",
-  "Mapping out your path…",
-  "Creating today's tasks…",
-  "Locking it in…",
-];
-
 function BuildingProgress() {
-  const [stepIdx, setStepIdx] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setStepIdx((prev) => Math.min(prev + 1, BUILDING_STEPS.length - 1));
-    }, 7000);
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <div style={{
-      flex: 1, display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "center",
-      textAlign: "center", padding: "2rem 0",
-    }}>
-      <h2 style={{ fontSize: "1.2rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 8 }}>
-        Threely Intelligence is building your plan…
-      </h2>
-      <p style={{ fontSize: "0.9rem", color: "#8898aa", marginBottom: 16, minHeight: 24, transition: "opacity 0.3s" }}>
-        {BUILDING_STEPS[stepIdx]}
-      </p>
-      <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
-        {BUILDING_STEPS.map((_, i) => (
-          <div key={i} style={{
-            width: 8, height: 8, borderRadius: 4,
-            backgroundColor: i <= stepIdx ? "#D4A843" : "rgba(255,255,255,0.15)",
-            transition: "background-color 0.3s",
-          }} />
-        ))}
-      </div>
-      <span className="spinner spinner-dark" />
+    <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <SharedBuildingProgress />
     </div>
   );
 }
