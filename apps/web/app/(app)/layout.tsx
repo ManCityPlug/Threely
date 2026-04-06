@@ -67,6 +67,16 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     setIsTablet(isTabletDevice());
   }, []);
 
+  // Force dark theme in the app — entire app is designed for dark mode
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", "dark");
+    document.documentElement.style.colorScheme = "dark";
+    return () => {
+      document.documentElement.removeAttribute("data-theme");
+      document.documentElement.style.colorScheme = "";
+    };
+  }, []);
+
   useEffect(() => {
     if (loading) return;
     if (!user) {
@@ -318,25 +328,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       {/* ── Sidebar (desktop) ──────────────────────────────────────────────── */}
       <aside className="sidebar">
-        {/* Logo */}
-        <div style={{
-          padding: "1.25rem 1.25rem 1.25rem",
-          borderBottom: "1px solid var(--border)",
-          display: "flex", alignItems: "center", gap: 10,
-        }}>
-          <img src="/favicon.png" alt="Threely" width={36} height={36} style={{ borderRadius: 10, flexShrink: 0 }} />
-          <div>
-            <span style={{ fontWeight: 700, fontSize: "1rem", letterSpacing: "-0.02em", color: "var(--text)", display: "block", marginTop: 3 }}>
-              Threely
-            </span>
-            <span style={{ fontSize: "0.7rem", color: "var(--muted)", fontWeight: 500 }}>
-              Lock TF In
-            </span>
-          </div>
-        </div>
-
         {/* Nav */}
-        <nav style={{ padding: "1rem 0.75rem", flex: 1 }}>
+        <nav style={{ padding: "1.5rem 0.75rem 1rem", flex: 1 }}>
           {NAV.map(item => {
             const active = pathname === item.href || (item.href === "/dashboard" && pathname === "/");
             return (
