@@ -261,7 +261,7 @@ function LoginPageInner() {
                     setForgotLoading(true);
                     const supabase = getSupabase();
                     await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
-                      redirectTo: `${window.location.origin}/api/auth/callback?type=recovery`,
+                      redirectTo: `${window.location.origin}/reset-password`,
                     });
                     setForgotLoading(false);
                     setForgotCooldown(60);
@@ -298,7 +298,7 @@ function LoginPageInner() {
                   setForgotLoading(true);
                   const supabase = getSupabase();
                   await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
-                    redirectTo: `${window.location.origin}/api/auth/callback?type=recovery`,
+                    redirectTo: `${window.location.origin}/reset-password`,
                   });
                   setForgotLoading(false);
                   setForgotSent(true);
