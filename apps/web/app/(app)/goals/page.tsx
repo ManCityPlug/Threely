@@ -891,8 +891,8 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
                   <div style={{
                     maxWidth: "90%", padding: "0.65rem 1rem", borderRadius: 14,
                     ...(isAssistant
-                      ? { background: "var(--primary-light)", borderBottomLeftRadius: 4, alignSelf: "flex-start" }
-                      : { background: "var(--primary)", color: "#fff", borderBottomRightRadius: 4, alignSelf: "flex-end", marginLeft: "auto" }),
+                      ? { background: "var(--primary-light)", color: "var(--text)", borderBottomLeftRadius: 4, alignSelf: "flex-start" }
+                      : { background: "var(--primary)", color: "var(--primary-text)", borderBottomRightRadius: 4, alignSelf: "flex-end", marginLeft: "auto" }),
                     fontSize: "0.9rem", lineHeight: 1.6,
                   }}>
                     {msg.text}
@@ -917,7 +917,7 @@ function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => vo
                                 padding: "0.45rem 0.85rem", borderRadius: 20,
                                 border: `1.5px solid ${isSelected ? "var(--primary)" : "rgba(99,91,255,0.25)"}`,
                                 background: isSelected ? "var(--primary)" : "var(--card)",
-                                color: isSelected ? "#fff" : "var(--primary)",
+                                color: isSelected ? "var(--primary-text)" : "var(--text)",
                                 fontSize: "0.82rem", fontWeight: 600,
                                 cursor: "pointer", transition: "all 0.15s",
                               }}
@@ -1294,7 +1294,7 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
               goalRouter.push("/dashboard");
             }}
             style={{
-              fontSize: "0.78rem", fontWeight: 600, color: "#fff",
+              fontSize: "0.78rem", fontWeight: 600, color: "var(--primary-text)",
               background: "var(--primary)", textDecoration: "none",
               padding: "5px 12px", borderRadius: 6,
               display: "inline-flex", alignItems: "center",
