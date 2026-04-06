@@ -33,15 +33,21 @@ export async function GET(request: NextRequest) {
       );
 
       const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+      // Password recovery flow — redirect to reset-password page with code
+      const type = searchParams.get("type");
+      if (type === "recovery") {
+        if (error) {
+          // PKCE exchange failed (cross-device: reset requested from app, link opened in browser)
+          // Pass the code to reset-password page to try client-side exchange
+          return NextResponse.redirect(`${origin}/reset-password?code=${code}`);
+        }
+        return NextResponse.redirect(`${origin}/reset-password`);
+      }
+
       if (error) {
         console.error("[auth/callback] exchangeCodeForSession error:", error.message);
         return NextResponse.redirect(`${origin}/login?error=auth`);
-      }
-
-      // Password recovery flow — redirect to reset-password page
-      const type = searchParams.get("type");
-      if (type === "recovery") {
-        return NextResponse.redirect(`${origin}/reset-password`);
       }
 
       // Get the authenticated user
