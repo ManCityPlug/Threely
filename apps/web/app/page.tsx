@@ -250,39 +250,7 @@ export default function LandingPage() {
       {/* Subtle divider */}
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }} />
 
-      {/* ─── How It Works ─────────────────────────────────────────────────────── */}
-      <section id="how-it-works" style={{
-        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
-        maxWidth: 1000, margin: "0 auto",
-      }}>
-        <div className="reveal" style={{ textAlign: "center", marginBottom: 60 }}>
-          <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>How It Works</p>
-          <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
-            Stop guessing.
-          </h2>
-        </div>
-
-        <div className="reveal" style={{ display: "flex", flexDirection: "column", gap: 48 }}>
-          {[
-            { step: "01", title: "Tell us your goal", desc: "\"I want to launch my Shopify store and hit $5K in revenue.\" That's all Threely needs. The AI asks the right questions, builds a roadmap around your experience, timeline, and schedule." },
-            { step: "02", title: "Wake up to your plan", desc: "Not 'work on marketing.' You'll get: 'Rewrite your product description to highlight the pain point from your customer research yesterday.' Specific. Actionable. Built for today." },
-            { step: "03", title: "Execute, review, evolve", desc: "Complete your tasks, rate the difficulty. The AI recalibrates. Struggling? It eases up. Crushing it? It pushes harder. A daily coaching loop that compounds." },
-          ].map((item, i) => (
-            <div key={i} style={{ display: "flex", gap: isMobile ? 16 : 32, alignItems: "flex-start" }}>
-              <div style={{
-                fontSize: "0.8rem", fontWeight: 700, color: "#D4A843",
-                minWidth: 40, paddingTop: 4,
-              }}>{item.step}</div>
-              <div>
-                <h3 style={{ fontSize: "1.25rem", fontWeight: 700, color: "#fff", marginBottom: 8 }}>{item.title}</h3>
-                <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 600 }}>{item.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ─── Testimonials ─────────────────────────────────────────────────────── */}
+      {/* ─── Results (Testimonials) ─────────────────────────────────────────── */}
       <section style={{
         padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
         background: "rgba(255,255,255,0.02)",
@@ -319,6 +287,38 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ─── How It Works ─────────────────────────────────────────────────────── */}
+      <section id="how-it-works" style={{
+        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        maxWidth: 1000, margin: "0 auto",
+      }}>
+        <div className="reveal" style={{ textAlign: "center", marginBottom: 60 }}>
+          <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>How It Works</p>
+          <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
+            Stop guessing.
+          </h2>
+        </div>
+
+        <div className="reveal" style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: isMobile ? 40 : 48, textAlign: "center" }}>
+          {[
+            { step: "1", title: "Tell us your goal", desc: "Enter your goal \u2014 \"I want to launch my Shopify store and hit $5K in revenue.\" Threely asks the right questions to find the best path for you." },
+            { step: "2", title: "Step by step plan", desc: "You'll get a real path based on where you currently are. Threely tells you daily what needs to be done to actually grow." },
+            { step: "3", title: "Scale.", desc: "Complete your tasks and the AI tracks your progress to build on your next set of tasks." },
+          ].map((item, i) => (
+            <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+              <div style={{
+                width: 48, height: 48, borderRadius: "50%",
+                border: "2px solid #D4A843", color: "#D4A843",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: "1.1rem", fontWeight: 700, marginBottom: 20,
+              }}>{item.step}</div>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#fff", marginBottom: 10 }}>{item.title}</h3>
+              <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 320 }}>{item.desc}</p>
+            </div>
+          ))}
         </div>
       </section>
 
