@@ -88,21 +88,9 @@ export function SubscriptionProvider({ userId, children }: SubscriptionProviderP
   const checkSubscription = useCallback(async () => {
     if (!userId) return;
 
-    // Check RevenueCat first (for IAP purchases)
-    if (Platform.OS !== "web" && rcConfigured) {
-      try {
-        const customerInfo = await Purchases.getCustomerInfo();
-        if (customerInfo.entitlements.active["threely Pro"] || customerInfo.entitlements.active["pro"]) {
-          setHasPro(true);
-          setLoaded(true);
-          return;
-        }
-      } catch {
-        // RC check failed — fall through to backend
-      }
-    }
-
-    // Check backend (for Stripe / web subscriptions)
+    // Server is the sole source of truth for subscription status.
+    // It checks Stripe, rcSubscriptionActive flag, and RevenueCat REST API.
+    // This prevents mismatched Apple ID subscriptions from granting pro.
     try {
       const subRes = await subscriptionApi.status();
       if (subRes.status === "trialing" || subRes.status === "active") {
@@ -132,17 +120,18 @@ export function SubscriptionProvider({ userId, children }: SubscriptionProviderP
     }
   }, [userId, checkSubscription]);
 
-  // Listen for RevenueCat purchase updates
+  // Listen for RevenueCat purchase updates — verify with server before granting pro
   useEffect(() => {
     if (Platform.OS === "web" || !rcConfigured) return;
     const listener = (info: CustomerInfo) => {
       if (info.entitlements.active["threely Pro"] || info.entitlements.active["pro"]) {
-        setHasPro(true);
+        // Don't blindly set hasPro — verify with server to prevent mismatched Apple ID issues
+        checkSubscription();
       }
     };
     Purchases.addCustomerInfoUpdateListener(listener);
     return () => Purchases.removeCustomerInfoUpdateListener(listener);
-  }, []);
+  }, [checkSubscription]);
 
   const purchasePro = useCallback(async (): Promise<boolean> => {
     if (!currentPackage) return false;

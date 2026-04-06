@@ -28,6 +28,11 @@ export async function GET(request: NextRequest) {
       // If no Stripe sub and no RC flag, try RevenueCat REST API as fallback
       const rcStatus = await checkRevenueCatSubscription(user.id);
       if (rcStatus === "active" || rcStatus === "trialing") {
+        // Persist to DB so getUserAccess picks it up for API calls
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { rcSubscriptionActive: true, subscriptionStatus: rcStatus },
+        });
         return NextResponse.json({
           status: rcStatus,
           trialEndsAt: null,
