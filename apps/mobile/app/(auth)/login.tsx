@@ -65,11 +65,13 @@ export default function LoginScreen() {
     if (!trimmed) return;
     setForgotLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(trimmed, {
-        redirectTo: "https://threely.co/api/auth/callback?type=recovery",
+      const res = await fetch("https://threely.co/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: trimmed }),
       });
-      if (error) {
-        Alert.alert("Reset failed", error.message);
+      if (!res.ok) {
+        Alert.alert("Reset failed", "Something went wrong. Please try again.");
         return;
       }
       setForgotSent(true);

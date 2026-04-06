@@ -18,50 +18,47 @@ function ResetPasswordContent() {
 
   useEffect(() => {
     const supabase = getSupabase();
-    let resolved = false;
+    const token = searchParams.get("token");
+    const type = searchParams.get("type");
 
-    // Listen for auth state changes (recovery token from URL hash)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
-        resolved = true;
-        setHasSession(true);
-        setChecking(false);
-      }
-    });
-
-    // Handle PKCE code in URL params
-    const code = searchParams.get("code");
-    if (code) {
-      supabase.auth.exchangeCodeForSession(code).then(({ error: codeError }) => {
-        if (codeError) {
-          console.error("[reset-password] code exchange failed:", codeError.message);
-          resolved = true;
-          setExpired(true);
-          setChecking(false);
-        } else {
-          resolved = true;
+    (async () => {
+      // Try verifying the OTP token directly (bypasses PKCE)
+      if (token && type === "recovery") {
+        const { error: otpError } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: "recovery",
+        });
+        if (!otpError) {
           setHasSession(true);
           setChecking(false);
+          return;
         }
-      });
-    }
+        console.error("[reset-password] verifyOtp failed:", otpError.message);
+      }
 
-    // Fallback: check existing session after delay
-    const timeout = setTimeout(async () => {
-      if (resolved) return;
+      // Try PKCE code exchange
+      const code = searchParams.get("code");
+      if (code) {
+        const { error: codeError } = await supabase.auth.exchangeCodeForSession(code);
+        if (!codeError) {
+          setHasSession(true);
+          setChecking(false);
+          return;
+        }
+      }
+
+      // Check existing session
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         setHasSession(true);
-      } else {
-        setExpired(true);
+        setChecking(false);
+        return;
       }
-      setChecking(false);
-    }, 3000);
 
-    return () => {
-      subscription.unsubscribe();
-      clearTimeout(timeout);
-    };
+      // Nothing worked
+      setExpired(true);
+      setChecking(false);
+    })();
   }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent) {

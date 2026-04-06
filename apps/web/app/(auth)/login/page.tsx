@@ -260,8 +260,10 @@ function LoginPageInner() {
                   onClick={async () => {
                     setForgotLoading(true);
                     const supabase = getSupabase();
-                    await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
-                      redirectTo: `${window.location.origin}/api/auth/callback?type=recovery`,
+                    await fetch("/api/auth/forgot-password", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email: forgotEmail.trim() }),
                     });
                     setForgotLoading(false);
                     setForgotCooldown(60);
