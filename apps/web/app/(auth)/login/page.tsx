@@ -250,6 +250,9 @@ function LoginPageInner() {
                 <p style={{ color: "var(--subtext)", fontSize: "0.875rem", lineHeight: 1.6 }}>
                   We sent a password reset link to <strong>{forgotEmail}</strong>. Click the link to set a new password.
                 </p>
+                <p style={{ color: "var(--muted)", fontSize: "0.8rem", marginTop: 8 }}>
+                  Not seeing it? Check your spam folder.
+                </p>
                 <button
                   type="button"
                   className="btn btn-primary"

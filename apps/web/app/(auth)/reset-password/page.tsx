@@ -15,14 +15,31 @@ export default function ResetPasswordPage() {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    getSupabase().auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        router.replace('/login');
-      } else {
+    const supabase = getSupabase();
+
+    // Listen for auth state changes (recovery token from URL hash)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
         setHasSession(true);
+        setChecking(false);
+      }
+    });
+
+    // Also check existing session after a short delay (gives time for hash token to be processed)
+    const timeout = setTimeout(async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setHasSession(true);
+      } else if (!hasSession) {
+        router.replace('/login');
       }
       setChecking(false);
-    });
+    }, 2000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {

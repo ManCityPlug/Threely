@@ -269,6 +269,8 @@ export default function LoginScreen() {
                   We sent a password reset link to{" "}
                   <Text style={{ fontWeight: "700", color: "#fff" }}>{forgotEmail}</Text>.
                   {"\n"}Click the link to set a new password.
+                  {"\n\n"}
+                  <Text style={{ fontWeight: "600", color: "rgba(255,255,255,0.7)" }}>Not seeing it? Check your spam folder.</Text>
                 </Text>
                 <Pressable
                   style={[styles.modalBtn, (cooldown > 0 || forgotLoading) && { opacity: 0.5 }]}
