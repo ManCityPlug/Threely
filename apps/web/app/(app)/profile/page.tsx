@@ -377,33 +377,13 @@ export default function ProfilePage() {
 
       {/* Tabs */}
       <div style={{
-        display: "flex", gap: 4, marginBottom: "1rem",
-        borderBottom: "1px solid var(--border)", paddingBottom: 0,
+        display: "none",
       }}>
-        {(["settings", "history"] as const).map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            style={{
-              padding: "0.5rem 1rem",
-              fontSize: "0.875rem",
-              fontWeight: activeTab === tab ? 600 : 400,
-              color: activeTab === tab ? "var(--primary)" : "var(--subtext)",
-              borderBottom: activeTab === tab ? "2px solid var(--primary)" : "2px solid transparent",
-              background: "none",
-              cursor: "pointer",
-              marginBottom: -1,
-            }}
-          >
-            {tab === "history" ? "Task History" : "Settings"}
-          </button>
-        ))}
       </div>
 
-      {/* Tab content */}
+      {/* Settings */}
       <div style={{ marginBottom: "2rem" }}>
-        {activeTab === "history" && <HistoryPanel history={history} />}
-        {activeTab === "settings" && (
+        {true && (
           <>
             {/* Tutorial */}
             <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
