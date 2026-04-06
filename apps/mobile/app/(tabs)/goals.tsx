@@ -247,6 +247,50 @@ export default function GoalsScreen() {
     setRefreshing(false);
   }, [loadGoals]);
 
+  // ── Recover pending goal if app was killed during build ────────────────────
+  useEffect(() => {
+    (async () => {
+      try {
+        const pendingGoalId = await AsyncStorage.getItem("@threely_pending_goal");
+        if (!pendingGoalId) return;
+
+        // Fetch the goal and today's tasks for it
+        const [goalsRes, tasksRes] = await Promise.all([
+          goalsApi.list(),
+          tasksApi.today(),
+        ]);
+
+        const goal = goalsRes.goals.find((g) => g.id === pendingGoalId);
+        if (!goal) {
+          // Goal no longer exists — clear the flag
+          await AsyncStorage.removeItem("@threely_pending_goal");
+          return;
+        }
+
+        const dailyTask = tasksRes.dailyTasks.find((dt) => dt.goalId === pendingGoalId);
+        const tasks = dailyTask
+          ? (Array.isArray(dailyTask.tasks) ? (dailyTask.tasks as TaskItem[]).slice(-3) : [])
+          : [];
+
+        if (tasks.length > 0) {
+          // Restore the "plan ready" screen with built tasks
+          setBuiltTasks(tasks);
+          createdGoalIdRef.current = pendingGoalId;
+          progressAnim.setValue(1);
+          buildProgressAnim.setValue(1);
+          taskRevealAnims.forEach((a) => a.setValue(1));
+          setAddStep(TOTAL_ADD_STEPS);
+        } else {
+          // Goal exists but no tasks yet (off-day or tasks not generated) — clear flag
+          await AsyncStorage.removeItem("@threely_pending_goal");
+        }
+      } catch (e) {
+        console.warn("Pending goal recovery error", e);
+        AsyncStorage.removeItem("@threely_pending_goal").catch(() => {});
+      }
+    })();
+  }, []);
+
   // ── Add flow helpers ────────────────────────────────────────────────────────
   function openAddFlow() {
     // Allow first goal free — only gate if user already has goals
@@ -332,6 +376,8 @@ export default function GoalsScreen() {
     createdGoalIdRef.current = null;
     buildInProgressRef.current = false;
     progressAnim.setValue(0);
+    // Clear pending goal flag so we don't restore on next launch
+    AsyncStorage.removeItem("@threely_pending_goal").catch(() => {});
   }
 
   // ── Step 1: Parse goal ────────────────────────────────────────────────────
@@ -689,6 +735,8 @@ export default function GoalsScreen() {
           setGoals((prev) => [goalResult.goal, ...prev]);
           goalId = goalResult.goal.id;
           createdGoalIdRef.current = goalId;
+          // Persist goal ID so we can recover if the app is killed during build
+          AsyncStorage.setItem("@threely_pending_goal", goalId).catch(() => {});
         }
 
         // Check if today is a work day for this goal
