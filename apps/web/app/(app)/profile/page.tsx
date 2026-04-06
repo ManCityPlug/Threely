@@ -9,7 +9,6 @@ import { SkeletonStatCard, SkeletonCard } from "@/components/Skeleton";
 
 import WeeklySummaryModal from "@/components/WeeklySummary";
 import { useToast } from "@/components/ToastProvider";
-import { useTheme } from "@/lib/theme-context";
 import { useSubscription } from "@/lib/subscription-context";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -126,7 +125,6 @@ export default function ProfilePage() {
   const { user, signOut } = useAuth();
   const router = useRouter();
   const { showToast } = useToast();
-  const { mode, setMode } = useTheme();
   const { hasPro } = useSubscription();
   const [stats, setStats] = useState<Stats | null>(null);
   const [history, setHistory] = useState<DailyTask[]>([]);
@@ -407,36 +405,6 @@ export default function ProfilePage() {
         {activeTab === "history" && <HistoryPanel history={history} />}
         {activeTab === "settings" && (
           <>
-            {/* Appearance */}
-            <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
-              <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 12 }}>
-                Appearance
-              </h3>
-              <div style={{ display: "flex", gap: 8 }}>
-                {(["light", "dark"] as const).map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => setMode(opt)}
-                    style={{
-                      flex: 1,
-                      padding: "0.6rem 0.75rem",
-                      borderRadius: "var(--radius)",
-                      border: mode === opt ? "2px solid var(--primary)" : "1.5px solid var(--border)",
-                      background: mode === opt ? "var(--primary-light)" : "var(--card)",
-                      color: mode === opt ? "var(--primary)" : "var(--subtext)",
-                      fontWeight: mode === opt ? 600 : 500,
-                      fontSize: "0.85rem",
-                      cursor: "pointer",
-                      transition: "all 0.15s",
-                      textTransform: "capitalize",
-                    }}
-                  >
-                    {opt === "light" ? "\u2600\uFE0F Light" : "\uD83C\uDF19 Dark"}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Tutorial */}
             <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
