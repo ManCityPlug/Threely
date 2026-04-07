@@ -24,13 +24,40 @@ model User {
   trialDeviceId      String?      @map("trial_device_id")
   trialEndsAt        DateTime?    @map("trial_ends_at")
   rcSubscriptionActive Boolean   @default(false) @map("rc_subscription_active")
+  pauseEndsAt        DateTime?    @map("pause_ends_at")
+  lastSaveOfferAt    DateTime?    @map("last_save_offer_at")
   goals              Goal[]
   dailyTasks         DailyTask[]
   dailyFocus         DailyFocus[]
   weeklySummaries    WeeklySummary[]
   profile            UserProfile?
+  offers             Offer[]
 
   @@map("users")
+}
+
+// ─── Offer ───────────────────────────────────────────────────────────────────
+// Admin-granted special offers (discounts, free months, pauses).
+// One active offer per user at a time.
+model Offer {
+  id             String    @id @default(uuid())
+  userId         String
+  type           String    // 'discount_percent' | 'discount_amount' | 'free_month' | 'pause'
+  value          Float     // 50 (for 50%) or 30 (for days) or 12.99 (for $)
+  duration       String?   // 'once' | 'repeating' (for discounts)
+  durationMonths Int?      // for repeating discounts
+  description    String    // human-readable: "50% off next month"
+  mode           String    // 'manual' | 'auto'
+  status         String    // 'pending' | 'claimed' | 'expired' | 'auto_applied' | 'revoked'
+  expiresAt      DateTime
+  claimedAt      DateTime?
+  createdAt      DateTime  @default(now())
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("offers")
+  @@index([userId])
+  @@index([status])
 }
 
 // ─── UserProfile ─────────────────────────────────────────────────────────────
@@ -197,6 +224,20 @@ model SystemConfig {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("system_config")
+}
+
+// ─── CancellationFeedback ────────────────────────────────────────────────────
+// Records why users cancel — used to improve product retention.
+model CancellationFeedback {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  reason    String
+  feedback  String?
+  plan      String   // yearly or monthly
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([userId])
+  @@map("cancellation_feedback")
 }
 
 // ─── AICallLog ───────────────────────────────────────────────────────────────

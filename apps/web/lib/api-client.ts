@@ -347,15 +347,16 @@ export const summaryApi = {
 // ─── Subscription API ─────────────────────────────────────────────────────────
 
 export interface SubscriptionStatus {
-  status: "trialing" | "active" | "past_due" | "canceled" | null;
+  status: "trialing" | "active" | "past_due" | "canceled" | "paused" | null;
   trialEndsAt: string | null;
   currentPeriodEnd: string | null;
   trialEligible?: boolean;
+  pauseEndsAt?: string | null;
 }
 
 export interface SubscriptionDetails {
   managedExternally?: boolean;
-  status: "trialing" | "active" | "past_due" | "canceled" | null;
+  status: "trialing" | "active" | "past_due" | "canceled" | "paused" | null;
   cancelAtPeriodEnd?: boolean;
   trialEnd: string | null;
   currentPeriodEnd: string | null;
@@ -380,8 +381,18 @@ export interface SubscriptionDetails {
     status: string | null;
     hostedUrl: string | null;
   }[];
+  firstPaidAt?: string | null;
+  pauseEndsAt?: string | null;
+  lastSaveOfferAt?: string | null;
   trialEligible?: boolean;
 }
+
+export type CancelReason =
+  | "too_expensive"
+  | "not_using"
+  | "found_better"
+  | "just_trying"
+  | "other";
 
 export const subscriptionApi = {
   status: () => apiFetch<SubscriptionStatus>("/api/subscription"),
@@ -399,17 +410,54 @@ export const subscriptionApi = {
 
   details: () => apiFetch<SubscriptionDetails>("/api/subscription/details"),
 
-  cancel: () =>
-    apiFetch<{ cancelAtPeriodEnd: boolean; currentPeriodEnd: string }>(
-      "/api/subscription/cancel",
-      { method: "POST" }
-    ),
+  cancel: (data: { reason: CancelReason; feedback?: string; refund?: boolean }) =>
+    apiFetch<{
+      cancelAtPeriodEnd?: boolean;
+      currentPeriodEnd?: string;
+      refunded?: boolean;
+      amount?: number;
+      currency?: string;
+      cancelAt?: string;
+    }>("/api/subscription/cancel", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 
   reactivate: () =>
     apiFetch<{ cancelAtPeriodEnd: boolean; status: string }>(
       "/api/subscription/reactivate",
       { method: "POST" }
     ),
+
+  pause: (days?: number) =>
+    apiFetch<{ paused: boolean; pauseEndsAt: string; days: number }>(
+      "/api/subscription/pause",
+      { method: "POST", body: JSON.stringify({ days }) }
+    ),
+
+  resume: () =>
+    apiFetch<{ resumed: boolean; status: string }>(
+      "/api/subscription/resume",
+      { method: "POST" }
+    ),
+
+  applyDiscount: (data: {
+    percent_off: number;
+    duration: "once" | "repeating";
+    duration_in_months?: number;
+  }) =>
+    apiFetch<{
+      applied: boolean;
+      coupon: {
+        id: string;
+        percentOff: number | null;
+        duration: string;
+        durationInMonths: number | null;
+      };
+    }>("/api/subscription/apply-discount", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 
   updatePayment: () =>
     apiFetch<{ clientSecret: string }>("/api/subscription/update-payment", {
@@ -456,6 +504,35 @@ export const focusApi = {
       body: JSON.stringify({ focusGoalId, localDate }),
     });
   },
+};
+
+// ─── Offers API ───────────────────────────────────────────────────────────────
+
+export interface UserOffer {
+  id: string;
+  type: string;
+  value: number;
+  duration: string | null;
+  durationMonths: number | null;
+  description: string;
+  mode: string;
+  status: string;
+  expiresAt: string;
+  claimedAt: string | null;
+  createdAt: string;
+}
+
+export const offersApi = {
+  me: () => apiFetch<{ offer: UserOffer | null }>("/api/offers/me"),
+
+  claim: (offerId: string) =>
+    apiFetch<{ success: boolean; details: string; description: string }>(
+      "/api/offers/claim",
+      {
+        method: "POST",
+        body: JSON.stringify({ offerId }),
+      }
+    ),
 };
 
 // ─── Notifications API ───────────────────────────────────────────────────────

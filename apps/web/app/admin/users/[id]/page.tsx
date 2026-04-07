@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
 interface TaskItem {
@@ -316,6 +316,637 @@ function GoalCard({ goal }: { goal: GoalItem }) {
             </div>
           )}
         </div>
+      )}
+    </div>
+  );
+}
+
+interface OfferRow {
+  id: string;
+  type: string;
+  value: number;
+  duration: string | null;
+  durationMonths: number | null;
+  description: string;
+  mode: string;
+  status: string;
+  expiresAt: string;
+  claimedAt: string | null;
+  createdAt: string;
+}
+
+const OFFER_PRESETS: {
+  key: string;
+  label: string;
+  type: string;
+  value: number;
+  duration?: string;
+  durationMonths?: number;
+  description: string;
+}[] = [
+  {
+    key: "50_off_next",
+    label: "50% off next month",
+    type: "discount_percent",
+    value: 50,
+    duration: "once",
+    description: "50% off your next month",
+  },
+  {
+    key: "30_off_3mo",
+    label: "30% off for 3 months",
+    type: "discount_percent",
+    value: 30,
+    duration: "repeating",
+    durationMonths: 3,
+    description: "30% off for 3 months",
+  },
+  {
+    key: "free_month",
+    label: "1 free month",
+    type: "free_month",
+    value: 12.99,
+    description: "1 free month on us",
+  },
+  {
+    key: "pause_30",
+    label: "Pause 30 days",
+    type: "pause",
+    value: 30,
+    description: "Subscription paused for 30 days",
+  },
+  {
+    key: "custom_percent",
+    label: "Custom % off",
+    type: "discount_percent",
+    value: 0,
+    duration: "once",
+    description: "",
+  },
+];
+
+function GrantOfferSection({
+  userId,
+  onChange,
+}: {
+  userId: string;
+  onChange?: () => void;
+}) {
+  const [presetKey, setPresetKey] = useState<string>(OFFER_PRESETS[0].key);
+  const [customPercent, setCustomPercent] = useState<number>(20);
+  const [customDuration, setCustomDuration] = useState<"once" | "repeating">(
+    "once"
+  );
+  const [customMonths, setCustomMonths] = useState<number>(3);
+  const [mode, setMode] = useState<"manual" | "auto">("manual");
+  const [expirationDays, setExpirationDays] = useState<number>(7);
+  const [description, setDescription] = useState<string>(
+    OFFER_PRESETS[0].description
+  );
+  const [granting, setGranting] = useState(false);
+  const [grantMessage, setGrantMessage] = useState<string>("");
+  const [offers, setOffers] = useState<OfferRow[]>([]);
+  const [loadingOffers, setLoadingOffers] = useState(true);
+  const [revoking, setRevoking] = useState<string | null>(null);
+
+  const preset = OFFER_PRESETS.find((p) => p.key === presetKey)!;
+  const isCustom = preset.key === "custom_percent";
+
+  // Auto-fill description when preset changes
+  useEffect(() => {
+    if (isCustom) {
+      const dur =
+        customDuration === "repeating"
+          ? ` for ${customMonths} months`
+          : " on next month";
+      setDescription(`${customPercent}% off${dur}`);
+    } else {
+      setDescription(preset.description);
+    }
+  }, [presetKey, customPercent, customDuration, customMonths, isCustom, preset.description]);
+
+  const loadOffers = useCallback(async () => {
+    setLoadingOffers(true);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/offers`);
+      if (res.ok) {
+        const json = await res.json();
+        setOffers(json.offers ?? []);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setLoadingOffers(false);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    loadOffers();
+  }, [loadOffers]);
+
+  async function handleGrant() {
+    setGranting(true);
+    setGrantMessage("");
+    try {
+      const body: Record<string, unknown> = {
+        type: preset.type,
+        value: isCustom ? customPercent : preset.value,
+        description,
+        mode,
+        expirationDays,
+      };
+      if (preset.type === "discount_percent") {
+        if (isCustom) {
+          body.duration = customDuration;
+          if (customDuration === "repeating") {
+            body.durationMonths = customMonths;
+          }
+        } else {
+          body.duration = preset.duration;
+          if (preset.duration === "repeating") {
+            body.durationMonths = preset.durationMonths;
+          }
+        }
+      }
+
+      const res = await fetch(`/api/admin/users/${userId}/grant-offer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        setGrantMessage(
+          `Offer granted (${mode === "auto" ? "auto-applied" : "pending claim"}).`
+        );
+        await loadOffers();
+        if (onChange) onChange();
+      } else {
+        setGrantMessage(`Error: ${json.error || "Failed"}`);
+      }
+    } catch (e) {
+      setGrantMessage(
+        `Error: ${e instanceof Error ? e.message : "Network error"}`
+      );
+    } finally {
+      setGranting(false);
+    }
+  }
+
+  async function handleRevoke(offerId: string) {
+    if (!confirm("Revoke this offer? If auto-applied, we'll try to remove it from Stripe.")) return;
+    setRevoking(offerId);
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/revoke-offer`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ offerId }),
+      });
+      const json = await res.json();
+      if (res.ok) {
+        setGrantMessage(json.note || "Offer revoked.");
+        await loadOffers();
+      } else {
+        setGrantMessage(`Error: ${json.error || "Failed"}`);
+      }
+    } catch (e) {
+      setGrantMessage(
+        `Error: ${e instanceof Error ? e.message : "Network error"}`
+      );
+    } finally {
+      setRevoking(null);
+    }
+  }
+
+  const activeOffers = offers.filter(
+    (o) => o.status === "pending" || o.status === "auto_applied"
+  );
+  const claimedOffers = offers.filter((o) => o.status === "claimed");
+  const historicalOffers = offers.filter(
+    (o) => o.status === "expired" || o.status === "revoked"
+  );
+
+  const inputBase: React.CSSProperties = {
+    background: "#0a0a0a",
+    color: "#fff",
+    border: "1px solid #3f3f46",
+    borderRadius: 8,
+    padding: "0.5rem 0.65rem",
+    fontSize: "0.85rem",
+    width: "100%",
+  };
+
+  return (
+    <>
+      <h2 style={sectionTitle}>Grant Offer</h2>
+      <div style={{ ...cardStyle, marginBottom: "1rem" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+            gap: "0.875rem",
+            marginBottom: "0.875rem",
+          }}
+        >
+          <div>
+            <label
+              style={{
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                color: "#71717a",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                display: "block",
+                marginBottom: 4,
+              }}
+            >
+              Offer Type
+            </label>
+            <select
+              value={presetKey}
+              onChange={(e) => setPresetKey(e.target.value)}
+              style={inputBase}
+            >
+              {OFFER_PRESETS.map((p) => (
+                <option key={p.key} value={p.key}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {isCustom && (
+            <>
+              <div>
+                <label
+                  style={{
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    color: "#71717a",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    display: "block",
+                    marginBottom: 4,
+                  }}
+                >
+                  Percent Off
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={customPercent}
+                  onChange={(e) => setCustomPercent(Number(e.target.value))}
+                  style={inputBase}
+                />
+              </div>
+              <div>
+                <label
+                  style={{
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    color: "#71717a",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    display: "block",
+                    marginBottom: 4,
+                  }}
+                >
+                  Duration
+                </label>
+                <select
+                  value={customDuration}
+                  onChange={(e) =>
+                    setCustomDuration(e.target.value as "once" | "repeating")
+                  }
+                  style={inputBase}
+                >
+                  <option value="once">Once</option>
+                  <option value="repeating">Repeating (months)</option>
+                </select>
+              </div>
+              {customDuration === "repeating" && (
+                <div>
+                  <label
+                    style={{
+                      fontSize: "0.7rem",
+                      fontWeight: 700,
+                      color: "#71717a",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                      display: "block",
+                      marginBottom: 4,
+                    }}
+                  >
+                    Months
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    max={12}
+                    value={customMonths}
+                    onChange={(e) => setCustomMonths(Number(e.target.value))}
+                    style={inputBase}
+                  />
+                </div>
+              )}
+            </>
+          )}
+
+          <div>
+            <label
+              style={{
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                color: "#71717a",
+                textTransform: "uppercase",
+                letterSpacing: "0.05em",
+                display: "block",
+                marginBottom: 4,
+              }}
+            >
+              Mode
+            </label>
+            <div style={{ display: "flex", gap: 6 }}>
+              <button
+                onClick={() => setMode("manual")}
+                style={{
+                  flex: 1,
+                  padding: "0.5rem",
+                  borderRadius: 8,
+                  background: mode === "manual" ? "#D4A843" : "#0a0a0a",
+                  color: mode === "manual" ? "#000" : "#a1a1aa",
+                  fontWeight: 700,
+                  fontSize: "0.78rem",
+                  border:
+                    mode === "manual"
+                      ? "1px solid #D4A843"
+                      : "1px solid #3f3f46",
+                  cursor: "pointer",
+                }}
+              >
+                Manual claim
+              </button>
+              <button
+                onClick={() => setMode("auto")}
+                style={{
+                  flex: 1,
+                  padding: "0.5rem",
+                  borderRadius: 8,
+                  background: mode === "auto" ? "#D4A843" : "#0a0a0a",
+                  color: mode === "auto" ? "#000" : "#a1a1aa",
+                  fontWeight: 700,
+                  fontSize: "0.78rem",
+                  border:
+                    mode === "auto"
+                      ? "1px solid #D4A843"
+                      : "1px solid #3f3f46",
+                  cursor: "pointer",
+                }}
+              >
+                Auto-apply
+              </button>
+            </div>
+          </div>
+
+          {mode === "manual" && (
+            <div>
+              <label
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  color: "#71717a",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  display: "block",
+                  marginBottom: 4,
+                }}
+              >
+                Expiration (days)
+              </label>
+              <input
+                type="number"
+                min={1}
+                max={90}
+                value={expirationDays}
+                onChange={(e) => setExpirationDays(Number(e.target.value))}
+                style={inputBase}
+              />
+            </div>
+          )}
+        </div>
+
+        <div style={{ marginBottom: "0.875rem" }}>
+          <label
+            style={{
+              fontSize: "0.7rem",
+              fontWeight: 700,
+              color: "#71717a",
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              display: "block",
+              marginBottom: 4,
+            }}
+          >
+            Description (shown to user)
+          </label>
+          <input
+            type="text"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="50% off next month"
+            style={inputBase}
+          />
+        </div>
+
+        {grantMessage && (
+          <div
+            style={{
+              padding: "0.6rem 0.85rem",
+              borderRadius: 8,
+              background: grantMessage.startsWith("Error")
+                ? "#450a0a"
+                : "#052e16",
+              color: grantMessage.startsWith("Error") ? "#f87171" : "#4ade80",
+              fontSize: "0.82rem",
+              marginBottom: "0.75rem",
+            }}
+          >
+            {grantMessage}
+          </div>
+        )}
+
+        <button
+          onClick={handleGrant}
+          disabled={granting || !description.trim()}
+          style={{
+            padding: "0.65rem 1.5rem",
+            borderRadius: 10,
+            background: "linear-gradient(135deg, #D4A843, #B8862D)",
+            color: "#fff",
+            fontWeight: 800,
+            fontSize: "0.88rem",
+            border: "none",
+            cursor: granting ? "not-allowed" : "pointer",
+            opacity: granting ? 0.6 : 1,
+          }}
+        >
+          {granting ? "Granting..." : "Grant Offer"}
+        </button>
+      </div>
+
+      {/* Existing offers list */}
+      <div style={{ marginBottom: "2rem" }}>
+        {loadingOffers ? (
+          <div style={{ color: "#71717a", fontSize: "0.85rem" }}>
+            Loading offers...
+          </div>
+        ) : (
+          <>
+            {activeOffers.length > 0 && (
+              <div style={{ marginBottom: "0.75rem" }}>
+                <div
+                  style={{
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    color: "#D4A843",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    marginBottom: 8,
+                  }}
+                >
+                  Active ({activeOffers.length})
+                </div>
+                {activeOffers.map((o) => (
+                  <OfferListItem
+                    key={o.id}
+                    offer={o}
+                    onRevoke={handleRevoke}
+                    revoking={revoking === o.id}
+                  />
+                ))}
+              </div>
+            )}
+            {claimedOffers.length > 0 && (
+              <div style={{ marginBottom: "0.75rem" }}>
+                <div
+                  style={{
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    color: "#4ade80",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    marginBottom: 8,
+                  }}
+                >
+                  Claimed ({claimedOffers.length})
+                </div>
+                {claimedOffers.map((o) => (
+                  <OfferListItem key={o.id} offer={o} />
+                ))}
+              </div>
+            )}
+            {historicalOffers.length > 0 && (
+              <div>
+                <div
+                  style={{
+                    fontSize: "0.7rem",
+                    fontWeight: 700,
+                    color: "#71717a",
+                    textTransform: "uppercase",
+                    letterSpacing: "0.05em",
+                    marginBottom: 8,
+                  }}
+                >
+                  Expired / Revoked ({historicalOffers.length})
+                </div>
+                {historicalOffers.map((o) => (
+                  <OfferListItem key={o.id} offer={o} />
+                ))}
+              </div>
+            )}
+            {offers.length === 0 && (
+              <div style={{ color: "#52525b", fontSize: "0.82rem", fontStyle: "italic" }}>
+                No offers granted yet.
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+function formatRemaining(expiresAt: string): string {
+  const ms = new Date(expiresAt).getTime() - Date.now();
+  if (ms <= 0) return "Expired";
+  const days = Math.floor(ms / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((ms % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  if (days >= 1) return `${days}d ${hours}h left`;
+  return `${hours}h left`;
+}
+
+function OfferListItem({
+  offer,
+  onRevoke,
+  revoking,
+}: {
+  offer: OfferRow;
+  onRevoke?: (id: string) => void;
+  revoking?: boolean;
+}) {
+  const isActive =
+    offer.status === "pending" || offer.status === "auto_applied";
+  return (
+    <div
+      style={{
+        background: "#0a0a0a",
+        border: "1px solid #1e1e21",
+        borderRadius: 10,
+        padding: "0.75rem 0.875rem",
+        marginBottom: 6,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 12,
+      }}
+    >
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div
+          style={{
+            fontSize: "0.88rem",
+            fontWeight: 600,
+            color: "#fff",
+            marginBottom: 2,
+          }}
+        >
+          {offer.description}
+        </div>
+        <div style={{ fontSize: "0.74rem", color: "#71717a" }}>
+          {offer.type} · {offer.mode} · {offer.status}
+          {isActive && ` · ${formatRemaining(offer.expiresAt)}`}
+          {offer.claimedAt &&
+            ` · claimed ${new Date(offer.claimedAt).toLocaleDateString()}`}
+        </div>
+      </div>
+      {isActive && onRevoke && (
+        <button
+          onClick={() => onRevoke(offer.id)}
+          disabled={revoking}
+          style={{
+            padding: "0.4rem 0.85rem",
+            borderRadius: 8,
+            background: "#450a0a",
+            color: "#f87171",
+            fontWeight: 700,
+            fontSize: "0.75rem",
+            border: "1px solid #7f1d1d",
+            cursor: revoking ? "not-allowed" : "pointer",
+            opacity: revoking ? 0.5 : 1,
+          }}
+        >
+          {revoking ? "Revoking..." : "Revoke"}
+        </button>
       )}
     </div>
   );
@@ -708,7 +1339,47 @@ export default function AdminUserDetailPage() {
             {denyLoading ? "Sending..." : "Deny Refund & Notify"}
           </button>
         )}
+        <button
+          onClick={async () => {
+            try {
+              const res = await fetch(`/api/admin/users/${user.id}/usage-report`);
+              if (!res.ok) {
+                const text = await res.text();
+                setActionMessage(`Error: Failed to download report (${text})`);
+                return;
+              }
+              const blob = await res.blob();
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              const dateStr = new Date().toISOString().split("T")[0];
+              a.download = `threely-usage-${user.id}-${dateStr}.pdf`;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              window.URL.revokeObjectURL(url);
+              setActionMessage("Usage report downloaded.");
+            } catch (e) {
+              setActionMessage(`Error: ${e instanceof Error ? e.message : "Failed"}`);
+            }
+          }}
+          style={{
+            padding: "0.6rem 1.25rem",
+            borderRadius: 10,
+            background: "#1e1e1e",
+            color: "#D4A843",
+            fontWeight: 700,
+            fontSize: "0.85rem",
+            border: "1px solid #D4A843",
+            cursor: "pointer",
+          }}
+        >
+          Download Usage Report
+        </button>
       </div>
+
+      {/* Grant Offer Section */}
+      <GrantOfferSection userId={user.id} />
 
       {/* AI Costs */}
       <h2 style={sectionTitle}>AI Costs (Estimated)</h2>
