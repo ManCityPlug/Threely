@@ -315,7 +315,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
         }}>
           {(["yearly", "monthly"] as const).map((p) => {
             const active = plan === p;
-            const label = p === "yearly" ? "Yearly — $99.99/yr" : "Monthly — $12.99/mo";
+            const label = p === "yearly" ? "Yearly" : "Monthly";
             return (
               <button
                 key={p}
@@ -351,41 +351,23 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
 
         {/* ── Trial info banner ────────────────────────────────────────── */}
         {trialEligible && (
-          <>
-            {/* Light mode banner */}
-            <div className="light-only" style={{
-              background: "linear-gradient(135deg, var(--primary-light), #e8f5e9)",
-              border: "1px solid var(--border)",
-              borderRadius: "var(--radius)",
-              padding: "1rem 1.25rem",
-              marginBottom: "1.25rem",
-              textAlign: "center",
-            }}>
-              <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>
-                7 days free
-              </div>
-              <div style={{ fontSize: "0.82rem", color: "var(--subtext)", lineHeight: 1.5 }}>
-                Your trial starts today. You won&apos;t be charged until <strong>{getTrialEndDate()}</strong>.
-                <br />Cancel anytime in Settings — no questions asked.
-              </div>
+          <div style={{
+            background: "linear-gradient(135deg, #B8862D 0%, #A07428 50%, #7a5820 100%)",
+            border: "1px solid rgba(212,168,67,0.4)",
+            borderRadius: "var(--radius)",
+            padding: "1rem 1.25rem",
+            marginBottom: "1.25rem",
+            textAlign: "center",
+            boxShadow: "0 4px 14px rgba(184,134,45,0.2)",
+          }}>
+            <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "#ffffff", marginBottom: 4 }}>
+              7 days free
             </div>
-            {/* Dark mode banner */}
-            <div className="dark-only" style={{
-              background: "linear-gradient(135deg, #4338ca, #635BFF, #7c6fff)",
-              borderRadius: "var(--radius)",
-              padding: "1rem 1.25rem",
-              marginBottom: "1.25rem",
-              textAlign: "center",
-            }}>
-              <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "#fff", marginBottom: 4 }}>
-                7 days free
-              </div>
-              <div style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.8)", lineHeight: 1.5 }}>
-                Your trial starts today. You won&apos;t be charged until <strong style={{ color: "#fff" }}>{getTrialEndDate()}</strong>.
-                <br />Cancel anytime in Settings — no questions asked.
-              </div>
+            <div style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.92)", lineHeight: 1.5 }}>
+              Your trial starts today. You won&apos;t be charged until <strong style={{ color: "#ffffff" }}>{getTrialEndDate()}</strong>.
+              <br />Cancel anytime in Settings — no questions asked.
             </div>
-          </>
+          </div>
         )}
 
         {/* ── Payment form card ────────────────────────────────────────── */}
