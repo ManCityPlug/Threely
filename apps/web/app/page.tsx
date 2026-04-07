@@ -103,10 +103,12 @@ export default function LandingPage() {
               ))}
             </div>
             <div style={{ position: "absolute", right: "1.5rem", display: "flex", alignItems: "center", gap: 6 }}>
-              <Link href="/login" style={{
-                padding: "0.4rem 0.875rem", fontSize: "0.85rem", fontWeight: 600,
-                color: "rgba(255,255,255,0.7)", textDecoration: "none",
-              }}>Log In</Link>
+              {!loggedIn && (
+                <Link href="/login" style={{
+                  padding: "0.4rem 0.875rem", fontSize: "0.85rem", fontWeight: 600,
+                  color: "rgba(255,255,255,0.7)", textDecoration: "none",
+                }}>Log In</Link>
+              )}
               <Link href={ctaHref} style={{
                 padding: "0.5rem 1.25rem", fontSize: "0.85rem", fontWeight: 600,
                 color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 8,
@@ -142,7 +144,7 @@ export default function LandingPage() {
             { label: "How It Works", href: "#how-it-works" },
             { label: "Pricing", href: "/pricing" },
             { label: "Support", href: "/support" },
-            { label: "Log In", href: "/login" },
+            ...(!loggedIn ? [{ label: "Log In", href: "/login" }] : []),
           ].map(item => (
             <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{
               padding: "1rem 0", fontSize: "1.1rem", fontWeight: 600,
