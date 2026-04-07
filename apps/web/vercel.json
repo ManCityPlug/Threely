@@ -1,3 +1,9 @@
 {
-  "alias": ["threely-app.vercel.app"]
+  "alias": ["threely-app.vercel.app"],
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-anon",
+      "schedule": "0 4 * * *"
+    }
+  ]
 }

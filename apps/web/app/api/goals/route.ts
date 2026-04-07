@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUserFromRequest } from "@/lib/supabase";
+import { getUserFromRequest, getAnyUserFromRequest } from "@/lib/supabase";
 import { notifyGoalCreated } from "@/lib/discord";
 import { generateRoadmap } from "@/lib/claude";
 import { getUserAccess } from "@/lib/subscription";
@@ -10,7 +10,7 @@ export const maxDuration = 30;
 // GET /api/goals — list all active goals for the authenticated user
 export async function GET(request: NextRequest) {
   try {
-    const user = await getUserFromRequest(request);
+    const user = await getAnyUserFromRequest(request);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
 // Body: { title, description?, rawInput?, structuredSummary?, category?, deadline? }
 export async function POST(request: NextRequest) {
   try {
-    const user = await getUserFromRequest(request);
+    const user = await getAnyUserFromRequest(request);
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -54,25 +54,34 @@ export async function POST(request: NextRequest) {
       where: { userId: user.id, isActive: true },
     });
 
-    // Pro gate — skip during onboarding or if this is the user's very first goal
-    const isFirstGoal = activeGoalCount === 0;
-    if (!onboarding && !isFirstGoal) {
-      const access = await getUserAccess(user.id);
-      if (!access.hasPro) {
+    if (user.isAnonymous) {
+      // Anon user — hard cap at 2 goals
+      if (activeGoalCount >= 2) {
         return NextResponse.json({
-          error: "pro_required",
-          message: "Subscribe to keep your momentum going",
-          trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
+          error: "anon_goal_limit",
+          message: "Sign up to create more goals",
         }, { status: 403 });
       }
-    }
+    } else {
+      // Real user — pro gate, allow first goal free, hard cap at 3
+      const isFirstGoal = activeGoalCount === 0;
+      if (!onboarding && !isFirstGoal) {
+        const access = await getUserAccess(user.id);
+        if (!access.hasPro) {
+          return NextResponse.json({
+            error: "pro_required",
+            message: "Subscribe to keep your momentum going",
+            trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
+          }, { status: 403 });
+        }
+      }
 
-    // 3-goal limit
-    if (activeGoalCount >= 3) {
-      return NextResponse.json({
-        error: "goal_limit_reached",
-        message: "You can have up to 3 active goals. Complete or pause a goal to make room.",
-      }, { status: 403 });
+      if (activeGoalCount >= 3) {
+        return NextResponse.json({
+          error: "goal_limit_reached",
+          message: "You can have up to 3 active goals. Complete or pause a goal to make room.",
+        }, { status: 403 });
+      }
     }
     const { title, description, rawInput, structuredSummary, category, deadline, dailyTimeMinutes, intensityLevel, workDays } = body as {
       title: string;
@@ -91,10 +100,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Ensure user record exists (upsert in case they just registered)
+    // Anonymous users get a placeholder email which gets updated on conversion
+    const userEmail = user.email ?? `anon-${user.id}@anon.threely.local`;
     await prisma.user.upsert({
       where: { id: user.id },
-      create: { id: user.id, email: user.email },
-      update: {},
+      create: { id: user.id, email: userEmail },
+      update: user.email ? { email: user.email } : {},
     });
 
     const goal = await prisma.goal.create({
@@ -112,10 +123,12 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Discord notification with goal counts (fire-and-forget)
-    const totalGoals = await prisma.goal.count({ where: { userId: user.id } });
-    const activeGoals = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
-    notifyGoalCreated(user.email ?? "unknown", goal.title, goal.category, { total: totalGoals, active: activeGoals });
+    // Discord notification with goal counts (fire-and-forget) — skip for anon
+    if (!user.isAnonymous) {
+      const totalGoals = await prisma.goal.count({ where: { userId: user.id } });
+      const activeGoals = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
+      notifyGoalCreated(user.email ?? "unknown", goal.title, goal.category, { total: totalGoals, active: activeGoals });
+    }
 
     // Generate roadmap async — don't block the response
     const profile = await prisma.userProfile.findUnique({ where: { userId: user.id } });

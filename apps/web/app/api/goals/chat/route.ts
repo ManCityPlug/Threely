@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUserFromRequest } from "@/lib/supabase";
+import { getAnyUserFromRequest } from "@/lib/supabase";
 import { goalChat, type GoalChatMessage } from "@/lib/claude";
 import { getUserAccess } from "@/lib/subscription";
 import { prisma } from "@/lib/prisma";
+import { checkAnonRateLimit, getClientIp } from "@/lib/anon-rate-limit";
 
 // Allow up to 30 seconds for Claude API calls (cold starts + response generation)
 export const maxDuration = 30;
@@ -11,14 +12,20 @@ export const maxDuration = 30;
 // Body: { messages: Array<{ role: "user" | "assistant", content: string }>, onboarding?: boolean }
 // Returns the next question (or final goal_text) from the guided chat.
 export async function POST(request: NextRequest) {
-  const user = await getUserFromRequest(request);
+  const user = await getAnyUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json().catch(() => ({}));
   const { messages, onboarding } = body as { messages?: GoalChatMessage[]; onboarding?: boolean };
 
-  // Pro gate — skip during onboarding or if user has no goals yet (first goal free)
-  if (!onboarding) {
+  if (user.isAnonymous) {
+    const ip = getClientIp(request);
+    const { allowed: ipAllowed } = checkAnonRateLimit(ip);
+    if (!ipAllowed) {
+      return NextResponse.json({ error: "Too many requests from this IP. Try again tomorrow or sign up." }, { status: 429 });
+    }
+  } else if (!onboarding) {
+    // Pro gate for real users — skip during onboarding or if user has no goals yet (first goal free)
     const goalCount = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
     if (goalCount > 0) {
       const access = await getUserAccess(user.id);

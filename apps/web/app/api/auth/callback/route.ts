@@ -70,14 +70,13 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        // Upsert Prisma User record with 7-day trial for new users
-        const trialEndsAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        // Upsert Prisma User record — no auto-trial, user must add CC for trial
         const existing = await prisma.user.findUnique({ where: { id: user.id } });
 
         await prisma.user.upsert({
           where: { id: user.id },
           update: { email: user.email },
-          create: { id: user.id, email: user.email, trialEndsAt },
+          create: { id: user.id, email: user.email },
         });
 
         // Discord notification for new users only

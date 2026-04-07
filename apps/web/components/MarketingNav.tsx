@@ -94,7 +94,7 @@ export default function MarketingNav() {
               }}>
                 Log In
               </Link>
-              <Link href="/signup" style={{
+              <Link href="/start" style={{
                 padding: "0.5rem 1.25rem",
                 fontSize: "0.85rem",
                 fontWeight: 600,
@@ -173,7 +173,7 @@ export default function MarketingNav() {
                 }}>
                   Sign in
                 </Link>
-                <Link href="/signup" onClick={() => setMenuOpen(false)} style={{
+                <Link href="/start" onClick={() => setMenuOpen(false)} style={{
                   flex: 1, textAlign: "center",
                   padding: "0.6rem 0",
                   fontSize: "0.875rem", fontWeight: 600,

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUserFromRequest } from "@/lib/supabase";
+import { getAnyUserFromRequest } from "@/lib/supabase";
 
 // GET /api/profile — get the user's profile (daily time + intensity)
 export async function GET(request: NextRequest) {
   try {
-    const user = await getUserFromRequest(request);
+    const user = await getAnyUserFromRequest(request);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const profile = await prisma.userProfile.findUnique({
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
 // Body: { dailyTimeMinutes?: number, intensityLevel?: number }
 export async function POST(request: NextRequest) {
   try {
-    const user = await getUserFromRequest(request);
+    const user = await getAnyUserFromRequest(request);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await request.json().catch(() => ({}));
@@ -43,11 +43,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid theme" }, { status: 400 });
     }
 
-    // Ensure user record exists
+    // Ensure user record exists (anon users get a placeholder email)
+    const userEmail = user.email ?? `anon-${user.id}@anon.threely.local`;
     await prisma.user.upsert({
       where: { id: user.id },
-      create: { id: user.id, email: user.email },
-      update: {},
+      create: { id: user.id, email: userEmail },
+      update: user.email ? { email: user.email } : {},
     });
 
     const profile = await prisma.userProfile.upsert({

@@ -809,7 +809,9 @@ function DashboardPageInner() {
       }
 
       // Auto-generate tasks if none exist and user has goals
+      // Only for pro users — free users get their initial tasks then must subscribe
       if (
+        hasPro &&
         tasksRes.dailyTasks.length === 0 &&
         goalsRes.goals.length > 0 &&
         !tasksRes.restDay &&
@@ -838,7 +840,7 @@ function DashboardPageInner() {
     } finally {
       setLoading(false);
     }
-  }, [showToast, walkthroughActive]);
+  }, [showToast, walkthroughActive, hasPro]);
 
   useEffect(() => { load(); return () => { if (pollingRef.current) clearInterval(pollingRef.current); }; }, [load]);
 

@@ -33,7 +33,7 @@ export default function LandingPage() {
     });
   }, []);
 
-  const ctaHref = loggedIn ? "/dashboard" : "/signup";
+  const ctaHref = loggedIn ? "/dashboard" : "/start";
   const ctaLabel = loggedIn ? "Go to Dashboard" : "Lock TF In →";
 
   // Scroll reveal — fade in on enter, fade out on leave

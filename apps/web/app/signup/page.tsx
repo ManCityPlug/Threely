@@ -1,17 +1,35 @@
 "use client";
 
-import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useState, FormEvent, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getSupabase } from "@/lib/supabase-client";
 import { SocialAuthButtons, AuthDivider } from "@/components/SocialAuthButtons";
 
-export default function SignupPage() {
+function SignupContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const fromStart = searchParams.get("from") === "start";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isAnon, setIsAnon] = useState(false);
+
+  // Detect anonymous session — if anon, we convert instead of creating new
+  useEffect(() => {
+    (async () => {
+      const supabase = getSupabase();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user?.is_anonymous) {
+        setIsAnon(true);
+      } else if (session?.user && !session.user.is_anonymous) {
+        // Already a real user — go to dashboard
+        router.replace("/dashboard");
+      }
+    })();
+  }, [router]);
 
   async function handleSignup(e: FormEvent) {
     e.preventDefault();
@@ -21,6 +39,19 @@ export default function SignupPage() {
     setError("");
 
     try {
+      const supabase = getSupabase();
+
+      if (isAnon) {
+        // Convert anon user to real user — same user ID, all data persists
+        const { error: updateError } = await supabase.auth.updateUser({ email, password });
+        if (updateError) {
+          throw new Error(updateError.message.includes("already") ? "An account with this email already exists." : updateError.message);
+        }
+        router.push("/dashboard?welcome=1");
+        return;
+      }
+
+      // Regular signup flow
       const res = await fetch("/api/start/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -31,7 +62,6 @@ export default function SignupPage() {
         throw new Error(data.error || "Registration failed.");
       }
 
-      const supabase = getSupabase();
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
       if (signInError) throw new Error("Account created but sign-in failed. Please try again.");
 
@@ -46,10 +76,10 @@ export default function SignupPage() {
     <div className="card fade-in" style={{ padding: "2.5rem 2rem" }}>
       <div style={{ textAlign: "center", marginBottom: "2rem" }}>
         <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 4 }}>
-          Create your account
+          {fromStart || isAnon ? "Save your plan" : "Create your account"}
         </h1>
         <p style={{ color: "var(--subtext)", fontSize: "0.9rem" }}>
-          Start your 7-day free trial
+          {fromStart || isAnon ? "Free account. No credit card required." : "Start your free account"}
         </p>
       </div>
 
@@ -121,5 +151,13 @@ export default function SignupPage() {
         <a href="https://threely.co/privacy" style={{ color: "var(--muted)", textDecoration: "underline" }}>Privacy Policy</a>.
       </p>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={<div className="card fade-in" style={{ padding: "2.5rem 2rem", textAlign: "center" }}><span className="spinner spinner-dark" /></div>}>
+      <SignupContent />
+    </Suspense>
   );
 }

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getUserFromRequest } from "@/lib/supabase";
+import { getAnyUserFromRequest } from "@/lib/supabase";
 import { parseGoal } from "@/lib/claude";
 import { getUserAccess } from "@/lib/subscription";
 import { prisma } from "@/lib/prisma";
+import { checkAnonRateLimit, getClientIp } from "@/lib/anon-rate-limit";
 
 // Allow up to 30 seconds for Claude API calls
 export const maxDuration = 30;
@@ -11,19 +12,32 @@ export const maxDuration = 30;
 // Body: { rawInput: string }
 // Calls Claude to parse free-text goal input into structured data.
 export async function POST(request: NextRequest) {
-  const user = await getUserFromRequest(request);
+  const user = await getAnyUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Pro gate — allow first goal free
-  const goalCount = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
-  if (goalCount > 0) {
-    const access = await getUserAccess(user.id);
-    if (!access.hasPro) {
-      return NextResponse.json({
-        error: "pro_required",
-        message: "Subscribe to keep your momentum going",
-        trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
-      }, { status: 403 });
+  // Anonymous user — IP rate limit + goal cap
+  if (user.isAnonymous) {
+    const ip = getClientIp(request);
+    const { allowed: ipAllowed } = checkAnonRateLimit(ip);
+    if (!ipAllowed) {
+      return NextResponse.json({ error: "Too many goal generations from this IP. Try again tomorrow or sign up." }, { status: 429 });
+    }
+    const anonGoalCount = await prisma.goal.count({ where: { userId: user.id } });
+    if (anonGoalCount >= 2) {
+      return NextResponse.json({ error: "Sign up to create more goals" }, { status: 403 });
+    }
+  } else {
+    // Real user — pro gate, allow first goal free
+    const goalCount = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
+    if (goalCount > 0) {
+      const access = await getUserAccess(user.id);
+      if (!access.hasPro) {
+        return NextResponse.json({
+          error: "pro_required",
+          message: "Subscribe to keep your momentum going",
+          trialEndsAt: access.trialEndsAt?.toISOString() ?? null,
+        }, { status: 403 });
+      }
     }
   }
 

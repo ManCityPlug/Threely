@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUserFromRequest } from "@/lib/supabase";
+import { getAnyUserFromRequest } from "@/lib/supabase";
 import { generateTasks, type TaskItem } from "@/lib/claude";
 import { getUserAccess } from "@/lib/subscription";
+import { checkAnonRateLimit, getClientIp } from "@/lib/anon-rate-limit";
 
 export const maxDuration = 30;
 
@@ -13,7 +14,7 @@ export const maxDuration = 30;
 // - focusShifted: true → user just switched focus to this goal
 // - postReview: true → generate with review feedback as context
 export async function POST(request: NextRequest) {
-  const user = await getUserFromRequest(request);
+  const user = await getAnyUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json().catch(() => ({}));
@@ -26,9 +27,18 @@ export async function POST(request: NextRequest) {
     onboarding?: boolean;
   };
 
-  // Pro gate — free users can generate daily tasks for existing goals,
-  // but pro features (more tasks, post-review regen) require subscription
-  if (!onboarding && (requestingAdditional || postReview)) {
+  if (user.isAnonymous) {
+    // Anon users — only initial generation allowed (no requestingAdditional / postReview)
+    if (requestingAdditional || postReview) {
+      return NextResponse.json({ error: "Sign up to generate more tasks", message: "Sign up to keep going" }, { status: 403 });
+    }
+    const ip = getClientIp(request);
+    const { allowed: ipAllowed } = checkAnonRateLimit(ip);
+    if (!ipAllowed) {
+      return NextResponse.json({ error: "Too many requests from this IP. Try again tomorrow or sign up." }, { status: 429 });
+    }
+  } else if (!onboarding && (requestingAdditional || postReview)) {
+    // Pro gate for real users
     const access = await getUserAccess(user.id);
     if (!access.hasPro) {
       return NextResponse.json({
