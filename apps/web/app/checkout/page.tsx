@@ -349,6 +349,37 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
           })}
         </div>
 
+        {/* ── 21 days risk-free badge ─────────────────────────────────── */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+          background: "var(--card)",
+          border: "1px solid rgba(212,168,67,0.45)",
+          borderRadius: "var(--radius)",
+          padding: "0.7rem 1rem",
+          marginBottom: "1rem",
+          boxShadow: "0 0 0 1px rgba(212,168,67,0.08), 0 2px 8px rgba(212,168,67,0.08)",
+        }}>
+          <span style={{
+            fontSize: "0.85rem",
+            fontWeight: 700,
+            color: "#D4A843",
+            letterSpacing: "-0.01em",
+            whiteSpace: "nowrap",
+          }}>
+            ✓ 21 days risk-free
+          </span>
+          <span style={{
+            fontSize: "0.72rem",
+            color: "var(--subtext)",
+            lineHeight: 1.4,
+          }}>
+            7-day free trial + 14-day money-back guarantee
+          </span>
+        </div>
+
         {/* ── Trial info banner ────────────────────────────────────────── */}
         {trialEligible && (
           <div style={{

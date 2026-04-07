@@ -50,10 +50,17 @@ export async function POST(request: NextRequest) {
     const trialEligible = !dbUser?.trialClaimedAt;
 
     // ── Create SetupIntent — collect card without charging ────────────────────
+    // Force 3DS for yearly plans (high-value commitments) — bank authentication
+    // reduces chargebacks and verifies card ownership before the trial begins.
     const setupIntent = await stripeClient.setupIntents.create({
       customer: customerId,
       usage: "off_session",
       metadata: { userId: user.id, plan: body.plan },
+      ...(body.plan === "yearly" && {
+        payment_method_options: {
+          card: { request_three_d_secure: "any" },
+        },
+      }),
     });
 
     return NextResponse.json({

@@ -188,7 +188,7 @@ export default function PricingPage() {
               { q: "Do I need a credit card to start?", a: "Yes — we securely collect payment details when you sign up, but you won't be charged during the 7-day free period. We'll send you a reminder 2 days before it ends so there are no surprises. You can cancel anytime." },
               { q: "Can I cancel anytime?", a: "Yes. Cancel your subscription at any time from your profile settings. You'll keep access until the end of your current billing period." },
               { q: "What happens after my 7 free days?", a: "You'll be prompted to choose a plan. If you don't subscribe, your account stays active — you just won't receive new AI-generated tasks until you upgrade." },
-              { q: "Is there a refund policy?", a: "Yes! We offer a 7-day, no-questions-asked refund policy. If you're not satisfied within 7 days of your first charge, just email refund@threely.co and we'll refund you in full.", link: "/refund", linkText: "View Refund Policy" },
+              { q: "Is there a refund policy?", a: "Yes! We offer a 14-day, no-questions-asked refund policy. If you're not satisfied within 14 days of your first charge, just email refund@threely.co and we'll refund you in full.", link: "/refund", linkText: "View Refund Policy" },
             ].map(item => (
               <div key={item.q} style={{
                 background: "rgba(255,255,255,0.02)",

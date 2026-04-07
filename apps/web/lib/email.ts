@@ -65,14 +65,14 @@ export async function sendRefundDenial(toEmail: string): Promise<void> {
         </div>
         <h1 style="font-size: 1.4rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem;">Regarding your refund request</h1>
         <p style="font-size: 0.95rem; color: #425466; line-height: 1.7; text-align: center;">
-          Thank you for reaching out. Unfortunately, your subscription is outside our <strong>7-day refund window</strong>, so we're unable to process a refund at this time.
+          Thank you for reaching out. Unfortunately, your subscription is outside our <strong>14-day refund window</strong>, so we're unable to process a refund at this time.
         </p>
         <div style="background: #f6f9fc; border-radius: 12px; padding: 1.25rem; margin: 1.5rem 0; border: 1px solid #e3e8ef;">
           <p style="font-size: 0.9rem; color: #425466; line-height: 1.7; margin: 0 0 0.5rem;">
             <strong>Our refund policy:</strong>
           </p>
           <p style="font-size: 0.9rem; color: #425466; line-height: 1.7; margin: 0;">
-            Refunds are available within 7 days of your first paid subscription charge. After this window, all charges are non-refundable. You can read our full refund policy at <a href="https://threely.co/refund" style="color: #635bff;">threely.co/refund</a>.
+            Refunds are available within 14 days of your first paid subscription charge. After this window, all charges are non-refundable. You can read our full refund policy at <a href="https://threely.co/refund" style="color: #635bff;">threely.co/refund</a>.
           </p>
         </div>
         <p style="font-size: 0.9rem; color: #425466; line-height: 1.7;">
