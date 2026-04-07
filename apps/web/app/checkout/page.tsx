@@ -291,7 +291,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
                 </span>
               </div>
             </div>
-            <span style={{ fontWeight: 700, fontSize: "1.15rem", color: trialEligible ? "#D4A843" : "var(--text)", letterSpacing: "-0.02em" }}>
+            <span style={{ fontWeight: 700, fontSize: "1.15rem", color: trialEligible ? "#3ecf8e" : "var(--text)", letterSpacing: "-0.02em" }}>
               {trialEligible ? "$0.00" : info.price}
             </span>
           </div>
