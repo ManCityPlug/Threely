@@ -83,31 +83,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       router.replace("/login");
       return;
     }
-    // Fast path: localStorage says onboarded
-    if (isOnboarded(user.id)) return;
-
-    // Slow path: check DB for existing profile OR goals
-    // If user has either, they're onboarded. Only truly new users get sent to /onboarding.
-    setCheckingOnboarding(true);
-    Promise.all([
-      profileApi.get().catch(() => ({ profile: null })),
-      goalsApi.list().catch(() => ({ goals: [] as unknown[] })),
-    ]).then(([profileRes, goalsRes]) => {
-      const hasProfile = !!profileRes.profile;
-      const hasGoals = (goalsRes.goals?.length ?? 0) > 0;
-      if (hasProfile || hasGoals) {
-        // Existing user — mark as onboarded
-        markOnboarded(user.id);
-      } else {
-        // Truly new user
-        router.replace("/onboarding");
-      }
-    }).catch(() => {
-      // On error, fail open — assume onboarded so we don't bounce existing users
-      markOnboarded(user.id);
-    }).finally(() => {
-      setCheckingOnboarding(false);
-    });
+    // If you have an account, you never go to /onboarding.
+    // Goal creation happens via /start (pre-signup) for new users.
+    // Existing users with no goals see the dashboard empty state.
+    markOnboarded(user.id);
   }, [user, loading, router]);
 
   // Fetch subscription status
