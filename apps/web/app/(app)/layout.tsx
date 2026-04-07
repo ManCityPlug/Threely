@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth, isOnboarded, markOnboarded, getNickname, saveNickname } from "@/lib/auth-context";
-import { profileApi, subscriptionApi, notificationsApi, type SubscriptionStatus, type AppNotification } from "@/lib/api-client";
+import { profileApi, goalsApi, subscriptionApi, notificationsApi, type SubscriptionStatus, type AppNotification } from "@/lib/api-client";
 import { formatDisplayName } from "@/lib/format-name";
 import ToastProvider from "@/components/ToastProvider";
 import { SubscriptionProvider } from "@/lib/subscription-context";
@@ -86,19 +86,25 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     // Fast path: localStorage says onboarded
     if (isOnboarded(user.id)) return;
 
-    // Slow path: check DB for existing profile
+    // Slow path: check DB for existing profile OR goals
+    // If user has either, they're onboarded. Only truly new users get sent to /onboarding.
     setCheckingOnboarding(true);
-    profileApi.get().then(({ profile }) => {
-      if (profile) {
-        // User already onboarded — restore localStorage flag
+    Promise.all([
+      profileApi.get().catch(() => ({ profile: null })),
+      goalsApi.list().catch(() => ({ goals: [] as unknown[] })),
+    ]).then(([profileRes, goalsRes]) => {
+      const hasProfile = !!profileRes.profile;
+      const hasGoals = (goalsRes.goals?.length ?? 0) > 0;
+      if (hasProfile || hasGoals) {
+        // Existing user — mark as onboarded
         markOnboarded(user.id);
       } else {
         // Truly new user
         router.replace("/onboarding");
       }
     }).catch(() => {
-      // On error, redirect to onboarding as fallback
-      router.replace("/onboarding");
+      // On error, fail open — assume onboarded so we don't bounce existing users
+      markOnboarded(user.id);
     }).finally(() => {
       setCheckingOnboarding(false);
     });
