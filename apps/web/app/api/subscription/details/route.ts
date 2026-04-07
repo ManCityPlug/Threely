@@ -22,6 +22,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       status: null,
       trialEligible: !dbUser.trialClaimedAt,
+      pauseEndsAt: null,
+      lastSaveOfferAt: null,
     });
   }
 
@@ -66,6 +68,14 @@ export async function GET(request: NextRequest) {
       hostedUrl: inv.hosted_invoice_url,
     }));
 
+    // First paid invoice — used by the cancel modal to determine 14-day refund eligibility
+    const firstPaidInvoice = invoicesRes.data
+      .filter((inv) => inv.status === "paid" && (inv.amount_paid ?? 0) > 0)
+      .sort((a, b) => (a.created ?? 0) - (b.created ?? 0))[0];
+    const firstPaidAt = firstPaidInvoice
+      ? new Date((firstPaidInvoice.status_transitions?.paid_at ?? firstPaidInvoice.created) * 1000).toISOString()
+      : null;
+
     return NextResponse.json({
       status: sub.status,
       cancelAtPeriodEnd: sub.cancel_at_period_end,
@@ -84,6 +94,9 @@ export async function GET(request: NextRequest) {
       paymentMethod,
       customerEmail: dbUser.email,
       invoices,
+      firstPaidAt,
+      pauseEndsAt: dbUser.pauseEndsAt ? dbUser.pauseEndsAt.toISOString() : null,
+      lastSaveOfferAt: dbUser.lastSaveOfferAt ? dbUser.lastSaveOfferAt.toISOString() : null,
       trialEligible: !dbUser.trialClaimedAt,
       currentPriceMonthly: PRICE_MONTHLY,
       currentPriceYearly: PRICE_YEARLY,

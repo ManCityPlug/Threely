@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { subscriptionApi, type SubscriptionDetails } from "@/lib/api-client";
+import CancelModal from "@/components/CancelModal";
+import { useSubscription } from "@/lib/subscription-context";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
@@ -467,19 +469,15 @@ function InvoiceHistory({ invoices }: { invoices: SubscriptionDetails["invoices"
 
 function CancelSection({
   details,
-  onCancel,
+  onOpenCancel,
   onReactivate,
-  cancelling,
   reactivating,
 }: {
   details: SubscriptionDetails;
-  onCancel: () => void;
+  onOpenCancel: () => void;
   onReactivate: () => void;
-  cancelling: boolean;
   reactivating: boolean;
 }) {
-  const [showConfirm, setShowConfirm] = useState(false);
-
   if (details.cancelAtPeriodEnd) {
     return (
       <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
@@ -506,47 +504,16 @@ function CancelSection({
       <h3 style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", margin: 0, marginBottom: 8 }}>
         Cancel subscription
       </h3>
-      {!showConfirm ? (
-        <button
-          className="btn btn-outline"
-          onClick={() => setShowConfirm(true)}
-          style={{ fontSize: "0.8rem", padding: "0.4rem 0.75rem", color: "var(--danger)", borderColor: "var(--danger)" }}
-        >
-          Cancel subscription
-        </button>
-      ) : (
-        <div style={{
-          padding: "0.875rem", borderRadius: "var(--radius-sm)",
-          background: "var(--danger-light)", border: "1px solid var(--danger)",
-        }}>
-          <p style={{ fontSize: "0.825rem", color: "var(--text)", marginBottom: 12, fontWeight: 500 }}>
-            Are you sure? Your access will continue until {details.currentPeriodEnd ? formatDate(details.currentPeriodEnd) : "the end of your billing period"}.
-          </p>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              className="btn"
-              onClick={() => {
-                onCancel();
-                setShowConfirm(false);
-              }}
-              disabled={cancelling}
-              style={{
-                fontSize: "0.8rem", padding: "0.4rem 1rem",
-                background: "var(--danger)", color: "#fff",
-              }}
-            >
-              {cancelling ? "Cancelling…" : "Yes, cancel"}
-            </button>
-            <button
-              className="btn btn-outline"
-              onClick={() => setShowConfirm(false)}
-              style={{ fontSize: "0.8rem", padding: "0.4rem 0.75rem" }}
-            >
-              Never mind
-            </button>
-          </div>
-        </div>
-      )}
+      <p style={{ fontSize: "0.825rem", color: "var(--subtext)", marginBottom: 12 }}>
+        We&apos;ll walk you through your options — including a possible refund or pause — before any changes are made.
+      </p>
+      <button
+        className="btn btn-outline"
+        onClick={onOpenCancel}
+        style={{ fontSize: "0.8rem", padding: "0.4rem 0.75rem", color: "var(--danger)", borderColor: "var(--danger)" }}
+      >
+        Cancel subscription
+      </button>
     </div>
   );
 }
@@ -555,12 +522,13 @@ function CancelSection({
 
 export default function SubscriptionPage() {
   const router = useRouter();
+  const { refreshSubscription } = useSubscription();
   const [details, setDetails] = useState<SubscriptionDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [cancelling, setCancelling] = useState(false);
   const [reactivating, setReactivating] = useState(false);
   const [changingPlan, setChangingPlan] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   const fetchDetails = useCallback(async () => {
     try {
@@ -575,29 +543,23 @@ export default function SubscriptionPage() {
 
   useEffect(() => { fetchDetails(); }, [fetchDetails]);
 
-  const handleCancel = async () => {
-    setCancelling(true);
-    try {
-      await subscriptionApi.cancel();
-      await fetchDetails();
-    } catch {
-      // error handled by refetch
-    } finally {
-      setCancelling(false);
-    }
-  };
-
   const handleReactivate = async () => {
     setReactivating(true);
     try {
       await subscriptionApi.reactivate();
       await fetchDetails();
+      await refreshSubscription();
     } catch {
       // error handled by refetch
     } finally {
       setReactivating(false);
     }
   };
+
+  const refreshAfterAction = useCallback(async () => {
+    await fetchDetails();
+    await refreshSubscription();
+  }, [fetchDetails, refreshSubscription]);
 
   const handleChangePlan = async (plan: "monthly" | "yearly") => {
     setChangingPlan(true);
@@ -754,10 +716,18 @@ export default function SubscriptionPage() {
       <InvoiceHistory invoices={details.invoices} />
       <CancelSection
         details={details}
-        onCancel={handleCancel}
+        onOpenCancel={() => setCancelOpen(true)}
         onReactivate={handleReactivate}
-        cancelling={cancelling}
         reactivating={reactivating}
+      />
+
+      <CancelModal
+        open={cancelOpen}
+        details={details}
+        onClose={() => setCancelOpen(false)}
+        onCancelled={refreshAfterAction}
+        onPaused={refreshAfterAction}
+        onDiscountApplied={refreshAfterAction}
       />
     </div>
   );

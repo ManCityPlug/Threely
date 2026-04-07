@@ -14,6 +14,9 @@ export async function GET(request: NextRequest) {
 
     const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
 
+    const pauseEndsAt = dbUser?.pauseEndsAt ?? null;
+    const isPaused = pauseEndsAt && pauseEndsAt > new Date();
+
     if (!dbUser?.subscriptionId) {
       // Check RevenueCat subscription (mobile IAP users)
       if (dbUser?.rcSubscriptionActive) {
@@ -22,6 +25,7 @@ export async function GET(request: NextRequest) {
           trialEndsAt: null,
           currentPeriodEnd: null,
           trialEligible: !dbUser?.trialClaimedAt,
+          pauseEndsAt: null,
         });
       }
 
@@ -38,6 +42,7 @@ export async function GET(request: NextRequest) {
           trialEndsAt: null,
           currentPeriodEnd: null,
           trialEligible: !dbUser?.trialClaimedAt,
+          pauseEndsAt: null,
         });
       }
 
@@ -47,6 +52,7 @@ export async function GET(request: NextRequest) {
         trialEndsAt: null,
         currentPeriodEnd: null,
         trialEligible: !dbUser?.trialClaimedAt,
+        pauseEndsAt: null,
       });
     }
 
@@ -63,18 +69,20 @@ export async function GET(request: NextRequest) {
       }
 
       return NextResponse.json({
-        status,
+        status: isPaused ? "paused" : status,
         trialEndsAt: sub.trial_end ? new Date(sub.trial_end * 1000).toISOString() : null,
         currentPeriodEnd: new Date(sub.current_period_end * 1000).toISOString(),
         trialEligible: !dbUser?.trialClaimedAt,
+        pauseEndsAt: pauseEndsAt ? pauseEndsAt.toISOString() : null,
       });
     } catch {
       // Stripe unreachable — return cached status
       return NextResponse.json({
-        status: dbUser.subscriptionStatus,
+        status: isPaused ? "paused" : dbUser.subscriptionStatus,
         trialEndsAt: null,
         currentPeriodEnd: null,
         trialEligible: !dbUser?.trialClaimedAt,
+        pauseEndsAt: pauseEndsAt ? pauseEndsAt.toISOString() : null,
       });
     }
   } catch (e) {
