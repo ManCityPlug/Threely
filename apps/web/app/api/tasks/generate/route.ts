@@ -32,11 +32,6 @@ export async function POST(request: NextRequest) {
     if (requestingAdditional || postReview) {
       return NextResponse.json({ error: "Sign up to generate more tasks", message: "Sign up to keep going" }, { status: 403 });
     }
-    const ip = getClientIp(request);
-    const { allowed: ipAllowed } = checkAnonRateLimit(ip);
-    if (!ipAllowed) {
-      return NextResponse.json({ error: "Too many requests from this IP. Try again tomorrow or sign up." }, { status: 429 });
-    }
   } else if (!onboarding && (requestingAdditional || postReview)) {
     // Pro gate for real users
     const access = await getUserAccess(user.id);

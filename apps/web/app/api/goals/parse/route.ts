@@ -15,13 +15,8 @@ export async function POST(request: NextRequest) {
   const user = await getAnyUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Anonymous user — IP rate limit + goal cap
+  // Anonymous user — goal cap only
   if (user.isAnonymous) {
-    const ip = getClientIp(request);
-    const { allowed: ipAllowed } = checkAnonRateLimit(ip);
-    if (!ipAllowed) {
-      return NextResponse.json({ error: "Too many goal generations from this IP. Try again tomorrow or sign up." }, { status: 429 });
-    }
     const anonGoalCount = await prisma.goal.count({ where: { userId: user.id } });
     if (anonGoalCount >= 2) {
       return NextResponse.json({ error: "Sign up to create more goals" }, { status: 403 });
