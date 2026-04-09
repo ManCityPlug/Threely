@@ -192,7 +192,7 @@ export default function MobileAppPrompt() {
                 lineHeight: 1.3,
               }}
             >
-              Lock TF In.
+              Lock In.
             </div>
           </div>
 

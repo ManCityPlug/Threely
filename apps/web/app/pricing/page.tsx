@@ -135,7 +135,7 @@ export default function PricingPage() {
               fontSize: "0.95rem",
               boxShadow: "0 4px 14px rgba(212,168,67,0.3)",
             }}>
-              Lock TF In
+              Lock In
             </CheckoutButton>
           </div>
         </div>

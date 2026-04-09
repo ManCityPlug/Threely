@@ -6,23 +6,23 @@ import { ThemeProvider } from "@/lib/theme-context";
 
 export const metadata: Metadata = {
   title: {
-    default: "Threely | Lock TF In",
+    default: "Threely | Lock In",
     template: "%s | Threely",
   },
   description:
-    "Tell Threely your goal — it tells you exactly what to do every day. 3 personalized tasks, built around your life. Stop guessing. Lock TF in.",
+    "Tell Threely your goal — it tells you exactly what to do every day. 3 personalized tasks, built around your life. Stop guessing. Lock in.",
   openGraph: {
     siteName: "Threely",
     type: "website",
     url: "https://threely.co",
-    title: "Threely | Lock TF In",
-    description: "Tell Threely your goal — it tells you exactly what to do every day. 3 personalized tasks, built around your life. Stop guessing. Lock TF in.",
+    title: "Threely | Lock In",
+    description: "Tell Threely your goal — it tells you exactly what to do every day. 3 personalized tasks, built around your life. Stop guessing. Lock in.",
     images: [{ url: "https://threely.co/favicon.png" }],
   },
   twitter: {
     card: "summary",
-    title: "Threely | Lock TF In",
-    description: "Tell Threely your goal — it tells you exactly what to do every day. 3 personalized tasks, built around your life. Stop guessing. Lock TF in.",
+    title: "Threely | Lock In",
+    description: "Tell Threely your goal — it tells you exactly what to do every day. 3 personalized tasks, built around your life. Stop guessing. Lock in.",
   },
   icons: {
     icon: "/favicon.png",
