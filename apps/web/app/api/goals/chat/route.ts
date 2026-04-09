@@ -19,11 +19,8 @@ export async function POST(request: NextRequest) {
   const { messages, onboarding } = body as { messages?: GoalChatMessage[]; onboarding?: boolean };
 
   if (user.isAnonymous) {
-    const ip = getClientIp(request);
-    const { allowed: ipAllowed } = checkAnonRateLimit(ip);
-    if (!ipAllowed) {
-      return NextResponse.json({ error: "Too many requests from this IP. Try again tomorrow or sign up." }, { status: 429 });
-    }
+    // Chat turns don't count against the IP rate limit — only goal creation does.
+    // Just cap total messages to prevent abuse.
   } else if (!onboarding) {
     // Pro gate for real users — skip during onboarding or if user has no goals yet (first goal free)
     const goalCount = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
