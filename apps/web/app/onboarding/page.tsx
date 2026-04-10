@@ -4,25 +4,61 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth, isOnboarded, markOnboarded, saveNickname } from "@/lib/auth-context";
 import { getSupabase } from "@/lib/supabase-client";
-import { goalsApi, profileApi, tasksApi, type ParsedGoal, type GoalChatMessage, type GoalChatResult } from "@/lib/api-client";
-import GoalTemplatesComponent from "@/components/GoalTemplates";
+import { goalsApi, profileApi, tasksApi, type ParsedGoal, type GoalChatMessage } from "@/lib/api-client";
 import SharedBuildingProgress from "@/components/BuildingProgress";
-import type { GoalCategory } from "@/lib/goal-templates";
 import { formatDisplayName } from "@/lib/format-name";
 
-// ─── Constants ─────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 
-const TOTAL_STEPS = 1; // goal + AI chat (name asked in chat, config handled by AI)
+type Category = "business" | "health" | "other";
 
-function BuildingProgress() {
-  return (
-    <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <SharedBuildingProgress />
-    </div>
-  );
+interface ChatEntry {
+  role: "user" | "assistant";
+  text: string;
+  options?: string[];
 }
 
-// ─── Onboarding Page ───────────────────────────────────────────────────────────
+interface StepConfig {
+  question: string;
+  buttons?: string[];
+  isTextInput?: boolean;
+  placeholder?: string;
+  skippable?: boolean;
+  continueButton?: string;
+}
+
+// ─── Step configurations per category ─────────────────────────────────────────
+
+const STEPS: Record<Category, StepConfig[]> = {
+  business: [
+    { question: "How much do you want to make per month?", buttons: ["$500", "$1K-$5K", "$10K+"] },
+    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
+    { question: "Got a business idea?", isTextInput: true, placeholder: "Enter your idea...", skippable: true },
+  ],
+  health: [
+    { question: "What do you want?", buttons: ["Lose weight", "Glow up", "Gain more muscle"] },
+    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
+    { question: "Do you have a specific target goal?", isTextInput: true, placeholder: "Enter my goal...", skippable: true },
+  ],
+  other: [
+    { question: "What's your goal?", isTextInput: true, placeholder: "Describe your goal...", continueButton: "Continue" },
+    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
+    { question: "Anything specific?", isTextInput: true, placeholder: "Enter details...", skippable: true },
+  ],
+};
+
+function buildInitialMessage(category: Category, answers: string[]): string {
+  switch (category) {
+    case "business":
+      return `I want to make ${answers[0]} per month. I can put in ${answers[1].toLowerCase()} work. My business idea: ${answers[2] || "no specific idea yet"}`;
+    case "health":
+      return `I want to ${answers[0].toLowerCase()}. I can put in ${answers[1].toLowerCase()} work. My target: ${answers[2] || "no specific target"}`;
+    case "other":
+      return `My goal: ${answers[0]}. I can put in ${answers[1].toLowerCase()} work. Details: ${answers[2] || "no specific details"}`;
+  }
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function OnboardingPage() {
   const { user, loading } = useAuth();
@@ -35,84 +71,86 @@ export default function OnboardingPage() {
     if (isOnboarded(user.id)) router.replace("/dashboard");
   }, [user, loading, router]);
 
-  const [step, setStep] = useState(1);
+  // ── Funnel state ──
+  const [category, setCategory] = useState<Category | null>(null);
+  const [funnelStep, setFunnelStep] = useState(0); // 0 = category picker, 1-3 = steps
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [textValue, setTextValue] = useState("");
+  const [fadeKey, setFadeKey] = useState(0);
 
-  // Name (asked in AI chat if not available from OAuth)
-  const [nameInput, setNameInput] = useState("");
-  const [awaitingName, setAwaitingName] = useState(false);
-  const [pendingStarterMessage, setPendingStarterMessage] = useState<string | null>(null);
-
-  // Goal input
-  const [rawGoalInput, setRawGoalInput] = useState("");
-  const [parsedGoal, setParsedGoal] = useState<ParsedGoal | null>(null);
-
-  // Category picker
-  const [showTemplates, setShowTemplates] = useState(true);
-
-  // AI Plan chat
+  // ── AI Chat state ──
   const [showAiChat, setShowAiChat] = useState(false);
-  const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant"; text: string; options?: string[] }>>([]);
+  const [chatHistory, setChatHistory] = useState<ChatEntry[]>([]);
   const [chatMessages, setChatMessages] = useState<GoalChatMessage[]>([]);
   const [chatLoading, setChatLoading] = useState(false);
   const [chatDone, setChatDone] = useState(false);
   const [chatGoalText, setChatGoalText] = useState<string | null>(null);
   const [customInput, setCustomInput] = useState("");
   const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  const chatInputRef = useRef<HTMLInputElement>(null);
+  const [nameInput, setNameInput] = useState("");
 
-  // Build state
+  // ── Build state ──
   const [building, setBuilding] = useState(false);
   const [buildError, setBuildError] = useState("");
 
-  // ─── Navigation ────────────────────────────────────────────────────────────
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatInputRef = useRef<HTMLInputElement>(null);
 
-  function advanceStep(next: number) {
-    setStep(next);
+  // ── Helpers ──
+  function animateStep(newStep: number) {
+    setFadeKey((k) => k + 1);
+    setFunnelStep(newStep);
   }
 
-  // ─── Name helpers ──────────────────────────────────────────────────────────
-
-  function getUserDisplayName(): string | null {
-    if (nameInput.trim()) return nameInput.trim();
-    const meta = user?.user_metadata;
-    if (meta?.display_name) return meta.display_name;
-    if (meta?.full_name) return meta.full_name;
-    if (meta?.name) return meta.name;
-    return null;
+  function handleCategorySelect(cat: Category) {
+    setCategory(cat);
+    setAnswers([]);
+    setTextValue("");
+    animateStep(1);
   }
 
-  async function handleNameSubmit() {
-    if (!nameInput.trim() || !pendingStarterMessage) return;
-    const trimmedName = nameInput.trim();
-    setAwaitingName(false);
-    // Persist name to Supabase user metadata so we don't ask again
-    try {
-      await getSupabase().auth.updateUser({
-        data: { display_name: trimmedName, full_name: trimmedName },
-      });
-    } catch {
-      // Non-critical — continue with chat
+  function handleButtonAnswer(answer: string) {
+    const newAnswers = [...answers, answer];
+    setAnswers(newAnswers);
+    setTextValue("");
+
+    if (newAnswers.length >= 3) {
+      launchChat(category!, newAnswers);
+    } else {
+      animateStep(funnelStep + 1);
     }
-    startAiChatWithMessage(pendingStarterMessage);
-    setPendingStarterMessage(null);
   }
 
-  // ─── Category selection → opens AI chat (or name input first) ──────────────
+  function handleTextSubmit(value: string) {
+    const newAnswers = [...answers, value];
+    setAnswers(newAnswers);
+    setTextValue("");
 
-  function handleCategorySelect(category: GoalCategory) {
-    setShowTemplates(false);
-    startAiChatWithMessage(category.starterMessage);
+    if (newAnswers.length >= 3) {
+      launchChat(category!, newAnswers);
+    } else {
+      animateStep(funnelStep + 1);
+    }
   }
 
-  function handleOther() {
-    setShowTemplates(false);
-    startAiChatWithMessage("Help me define my goal.");
+  function handleSkip() {
+    handleTextSubmit("");
   }
 
-  // ─── AI Plan chat ─────────────────────────────────────────────────────────
+  function handleBack() {
+    if (funnelStep === 1) {
+      setCategory(null);
+      setAnswers([]);
+      animateStep(0);
+    } else if (funnelStep > 1) {
+      setAnswers((prev) => prev.slice(0, -1));
+      animateStep(funnelStep - 1);
+    }
+  }
 
-  async function startAiChatWithMessage(initialMessage: string) {
+  // ── AI Chat launch ──
+  async function launchChat(cat: Category, allAnswers: string[]) {
+    const initialMessage = buildInitialMessage(cat, allAnswers);
     setShowAiChat(true);
     setChatHistory([]);
     setChatMessages([]);
@@ -120,6 +158,7 @@ export default function OnboardingPage() {
     setChatGoalText(null);
     setCustomInput("");
     setChatLoading(true);
+
     try {
       const seedMessages: GoalChatMessage[] = [{ role: "user", content: initialMessage }];
       const result = await goalsApi.chat(seedMessages);
@@ -136,67 +175,46 @@ export default function OnboardingPage() {
         setChatGoalText(result.goal_text);
       }
     } catch {
-      setChatHistory([{ role: "assistant", text: "Something went wrong. Please close and try again." }]);
+      setChatHistory([{ role: "assistant", text: "Something went wrong. Please try again." }]);
     } finally {
       setChatLoading(false);
     }
   }
 
   async function sendChatAnswer(answer: string) {
-    const userEntry = { role: "user" as const, text: answer };
-    setChatHistory((prev) => [...prev, userEntry]);
+    setChatHistory((prev) => [...prev, { role: "user", text: answer }]);
     setCustomInput("");
     setSelectedOptions(new Set());
     setChatLoading(true);
-
     const newMessages: GoalChatMessage[] = [...chatMessages, { role: "user", content: answer }];
     setChatMessages(newMessages);
-
     try {
       const result = await goalsApi.chat(newMessages);
-      const assistantMsg: GoalChatMessage = { role: "assistant", content: result.raw_reply };
-      setChatMessages((prev) => [...prev, assistantMsg]);
-      setChatHistory((prev) => [
-        ...prev,
-        { role: "assistant", text: result.message, options: result.done ? [] : result.options },
-      ]);
-      if (result.name) {
-        setNameInput(result.name);
-      }
+      setChatMessages((prev) => [...prev, { role: "assistant", content: result.raw_reply }]);
+      setChatHistory((prev) => [...prev, { role: "assistant", text: result.message, options: result.done ? [] : result.options }]);
+      if (result.name) setNameInput(result.name);
       if (result.done) {
         setChatDone(true);
         setChatGoalText(result.goal_text);
       }
     } catch {
-      setChatHistory((prev) => [
-        ...prev,
-        { role: "assistant", text: "Something went wrong. Please try again." },
-      ]);
+      setChatHistory((prev) => [...prev, { role: "assistant", text: "Something went wrong. Please try again." }]);
     } finally {
       setChatLoading(false);
       setTimeout(() => chatInputRef.current?.focus(), 100);
     }
   }
 
-  function handleEditChatGoal() {
-    setChatDone(false);
-    setChatGoalText(null);
-    sendChatAnswer("I'd like to change something about my goal.");
-  }
-
+  // ── Build plan ──
   async function handleUseGoal() {
     if (!chatGoalText) return;
     const goalText = chatGoalText.trim();
-    setRawGoalInput(goalText);
     setShowAiChat(false);
     setBuildError("");
     setBuilding(true);
-    advanceStep(TOTAL_STEPS + 1);
 
     try {
-      const result = await goalsApi.parse(goalText);
-      setParsedGoal(result);
-
+      const result: ParsedGoal = await goalsApi.parse(goalText);
       const goalTitle = result.short_title ?? goalText.slice(0, 40);
       const detectedTime = result.daily_time_detected && result.daily_time_detected > 0
         ? result.daily_time_detected : null;
@@ -214,7 +232,7 @@ export default function OnboardingPage() {
         intensityLevel: 2,
       });
 
-      // Create goal with AI-parsed data + sensible defaults
+      // Create goal
       const detectedWorkDays = (result.work_days_detected && result.work_days_detected.length > 0)
         ? result.work_days_detected : [1, 2, 3, 4, 5, 6, 7];
       const goalResult = await goalsApi.create({
@@ -232,7 +250,7 @@ export default function OnboardingPage() {
       // Generate tasks
       await tasksApi.generate({ goalId: goalResult.goal.id, onboarding: true });
 
-      // Mark onboarded and go straight to dashboard
+      // Mark onboarded and go to dashboard
       if (user) markOnboarded(user.id);
       router.replace("/dashboard?welcome=1");
     } catch (e) {
@@ -241,80 +259,332 @@ export default function OnboardingPage() {
     }
   }
 
+  // Auto-scroll chat
   useEffect(() => {
     const t = setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }), 200);
     return () => clearTimeout(t);
   }, [chatHistory, chatLoading, selectedOptions.size]);
 
-  // ─── Render ────────────────────────────────────────────────────────────────
+  // ── Get current step config ──
+  const currentStepConfig = category && funnelStep >= 1 && funnelStep <= 3
+    ? STEPS[category][funnelStep - 1]
+    : null;
 
-  const isMagicMoment = step > TOTAL_STEPS;
+  // ── Building state ──
+  if (building) {
+    return (
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: "1rem" }}>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <SharedBuildingProgress />
+          {buildError && (
+            <div style={{ textAlign: "center", marginTop: 20 }}>
+              <p style={{ color: "var(--danger)", fontSize: "0.85rem", marginBottom: 12 }}>{buildError}</p>
+              <button className="btn btn-primary" onClick={handleUseGoal} style={{ height: 46, padding: "0 2rem" }}>Try again</button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "var(--bg)",
-      padding: "1rem",
-    }}>
-      <div style={{
-        width: "100%",
-        maxWidth: 500,
-        background: "var(--card)",
-        borderRadius: "var(--radius-xl)",
-        boxShadow: "var(--shadow-lg)",
-        display: "flex",
-        flexDirection: "column",
-        minHeight: isMagicMoment ? 420 : undefined,
-      }}>
-        {/* Logo */}
-        <div style={{ textAlign: "center", padding: "1.5rem clamp(1rem, 5vw, 2rem) 0" }}>
-          <img src="/favicon.png" alt="Threely" width={44} height={44} style={{ borderRadius: 12 }} />
-        </div>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)" }}>
+      <div style={{ width: "100%", maxWidth: 560 }}>
 
-        {/* ── Step 1: Goal ── */}
-        {step === 1 && (
-          <div className="fade-in" style={{ padding: "1.5rem clamp(1rem, 5vw, 2rem) 2rem", display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-            {showTemplates ? (
-              <GoalTemplatesComponent
-                onSelect={handleCategorySelect}
-                onClose={() => {}}
-                onOther={handleOther}
-              />
-            ) : null}
+        {/* ── Step 0: Category Picker ── */}
+        {funnelStep === 0 && !showAiChat && (
+          <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            <div style={{ textAlign: "center" }}>
+              <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 16 }} />
+              <h1 style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
+                What do you want to achieve?
+              </h1>
+              <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.85)" }}>
+                Pick a category to get started
+              </p>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+              {([
+                { id: "business" as Category, label: "Business", subtitle: "Start or grow a business" },
+                { id: "health" as Category, label: "Health", subtitle: "Transform your body" },
+                { id: "other" as Category, label: "Other", subtitle: "Set any goal" },
+              ]).map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategorySelect(cat.id)}
+                  style={{
+                    padding: "1.5rem 1.25rem",
+                    borderRadius: 16,
+                    border: "1.5px solid var(--border)",
+                    background: "var(--card)",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    transition: "all 0.15s",
+                    minHeight: 80,
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#D4A843"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
+                >
+                  <div style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--text)", marginBottom: 4 }}>
+                    {cat.label}
+                  </div>
+                  <div style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.4 }}>
+                    {cat.subtitle}
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* ── Magic Moment ── */}
-        {isMagicMoment && (
-          <div style={{ padding: "clamp(1rem, 5vw, 2rem)", flex: 1, display: "flex", flexDirection: "column" }}>
-            {/* Building state with rotating progress messages */}
-            {building && !buildError && (
-              <BuildingProgress />
+        {/* ── Steps 1-3: Funnel questions ── */}
+        {funnelStep >= 1 && funnelStep <= 3 && !showAiChat && currentStepConfig && (
+          <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            {/* Back arrow */}
+            <button
+              onClick={handleBack}
+              style={{
+                background: "none", border: "none", color: "rgba(255,255,255,0.85)",
+                cursor: "pointer", fontSize: "1rem", padding: "4px 0",
+                alignSelf: "flex-start", display: "flex", alignItems: "center", gap: 6, minHeight: 48,
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              Back
+            </button>
+
+            <div style={{ textAlign: "center" }}>
+              <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 16 }} />
+              <h2 style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
+                {currentStepConfig.question}
+              </h2>
+              <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 12 }}>
+                {[1, 2, 3].map((dot) => (
+                  <div key={dot} style={{
+                    width: 8, height: 8, borderRadius: "50%",
+                    background: dot <= funnelStep ? "#D4A843" : "var(--border)",
+                    transition: "background 0.2s",
+                  }} />
+                ))}
+              </div>
+            </div>
+
+            {/* Button options */}
+            {currentStepConfig.buttons && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {currentStepConfig.buttons.map((btn) => (
+                  <button
+                    key={btn}
+                    onClick={() => handleButtonAnswer(btn)}
+                    style={{
+                      padding: "1rem 1.25rem", borderRadius: 14,
+                      border: "1.5px solid var(--border)", background: "var(--card)",
+                      color: "var(--text)", fontSize: "1rem", fontWeight: 600,
+                      cursor: "pointer", transition: "all 0.15s", minHeight: 56, textAlign: "center",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#D4A843"; e.currentTarget.style.color = "#D4A843"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text)"; }}
+                  >
+                    {btn}
+                  </button>
+                ))}
+              </div>
             )}
 
-            {/* Error state */}
-            {buildError && (
-              <div style={{
-                flex: 1, display: "flex", flexDirection: "column",
-                alignItems: "center", justifyContent: "center",
-                textAlign: "center", padding: "2rem 0",
-              }}>
-                <span style={{ fontSize: 48, marginBottom: 20 }}>⚠</span>
-                <h2 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 8 }}>
-                  Something went wrong
-                </h2>
-                <p style={{ color: "var(--danger)", fontSize: "0.85rem", lineHeight: 1.5 }}>
-                  {buildError}
-                </p>
+            {/* Text input */}
+            {currentStepConfig.isTextInput && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <input
+                  className="field-input"
+                  placeholder={currentStepConfig.placeholder}
+                  value={textValue}
+                  onChange={(e) => setTextValue(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && textValue.trim()) handleTextSubmit(textValue.trim()); }}
+                  autoFocus
+                  style={{
+                    fontSize: "1rem", padding: "1rem 1.25rem", borderRadius: 14, minHeight: 56,
+                    background: "var(--card)", border: "1.5px solid var(--border)", color: "var(--text)",
+                  }}
+                />
+                {currentStepConfig.continueButton && (
+                  <button
+                    onClick={() => textValue.trim() && handleTextSubmit(textValue.trim())}
+                    disabled={!textValue.trim()}
+                    style={{
+                      padding: "1rem 1.25rem", borderRadius: 14, border: "none",
+                      background: textValue.trim()
+                        ? "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)"
+                        : "var(--border)",
+                      color: textValue.trim() ? "#000" : "rgba(255,255,255,0.5)",
+                      fontSize: "1rem", fontWeight: 700,
+                      cursor: textValue.trim() ? "pointer" : "default",
+                      minHeight: 56, transition: "all 0.15s",
+                    }}
+                  >
+                    {currentStepConfig.continueButton}
+                  </button>
+                )}
+                {currentStepConfig.skippable && (
+                  <button
+                    onClick={handleSkip}
+                    style={{
+                      background: "none", border: "none", color: "rgba(255,255,255,0.85)",
+                      cursor: "pointer", fontSize: "0.95rem", fontWeight: 600,
+                      padding: "0.75rem", minHeight: 48,
+                      textDecoration: "underline", textUnderlineOffset: 3,
+                    }}
+                  >
+                    Skip
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── AI Chat (inline) ── */}
+        {showAiChat && (
+          <div className="fade-in" style={{
+            background: "var(--card)", borderRadius: "var(--radius-xl)",
+            boxShadow: "var(--shadow-lg)", display: "flex", flexDirection: "column",
+            maxHeight: "80vh", overflow: "hidden",
+          }}>
+            {/* Header */}
+            <div style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border)", flexShrink: 0,
+            }}>
+              <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)" }}>Threely Intelligence</span>
+              <button
+                onClick={() => { setShowAiChat(false); setCategory(null); setAnswers([]); animateStep(0); }}
+                style={{
+                  width: 40, height: 40, borderRadius: 8,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  background: "var(--bg)", border: "1px solid var(--border)",
+                  cursor: "pointer", fontSize: 16, color: "rgba(255,255,255,0.85)",
+                }}
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Chat messages */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "1.25rem clamp(1rem, 4vw, 1.5rem) 2rem", display: "flex", flexDirection: "column", gap: 12 }}>
+              {chatHistory.map((entry, i) => (
+                <div key={i}>
+                  {entry.role === "assistant" ? (
+                    <div style={{ background: "var(--primary-light)", borderRadius: "14px 14px 14px 4px", padding: "0.75rem 1rem", maxWidth: "90%", fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.5 }}>
+                      {entry.text}
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                      <div style={{ background: "var(--primary)", borderRadius: "14px 14px 4px 14px", padding: "0.75rem 1rem", maxWidth: "90%", fontSize: "0.9rem", color: "var(--primary-text)", lineHeight: 1.5 }}>
+                        {entry.text}
+                      </div>
+                    </div>
+                  )}
+
+                  {entry.role === "assistant" && entry.options && entry.options.length > 0 && !chatLoading && i === chatHistory.length - 1 && !chatDone && (
+                    <div style={{ marginTop: 10 }}>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                        {entry.options.map((opt, j) => {
+                          const isSelected = selectedOptions.has(opt);
+                          return (
+                            <button
+                              key={j}
+                              onClick={() => {
+                                setSelectedOptions((prev) => {
+                                  const next = new Set(prev);
+                                  if (next.has(opt)) next.delete(opt);
+                                  else next.add(opt);
+                                  return next;
+                                });
+                              }}
+                              style={{
+                                padding: "10px 16px", borderRadius: 20,
+                                border: `1.5px solid ${isSelected ? "#D4A843" : "rgba(212,168,67,0.25)"}`,
+                                background: isSelected ? "var(--primary)" : "var(--card)",
+                                color: isSelected ? "var(--primary-text)" : "var(--text)",
+                                fontSize: "0.85rem", fontWeight: 600,
+                                cursor: "pointer", transition: "all 0.15s", minHeight: 48,
+                              }}
+                            >
+                              {isSelected ? `\u2713 ${opt}` : opt}
+                            </button>
+                          );
+                        })}
+                        <button
+                          onClick={() => chatInputRef.current?.focus()}
+                          style={{
+                            padding: "10px 16px", borderRadius: 20,
+                            border: "1px solid var(--border)", background: "var(--bg)",
+                            color: "rgba(255,255,255,0.85)", fontSize: "0.85rem", fontWeight: 600,
+                            cursor: "pointer", transition: "all 0.15s", minHeight: 48,
+                          }}
+                        >Type my own</button>
+                      </div>
+                      {selectedOptions.size > 0 && (
+                        <button
+                          onClick={() => sendChatAnswer(Array.from(selectedOptions).join(" + "))}
+                          className="btn btn-primary"
+                          style={{ marginTop: 10, height: 48, width: "100%", fontSize: "0.85rem", fontWeight: 700 }}
+                        >
+                          Continue with {selectedOptions.size} selected
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))}
+
+              {chatLoading && (
+                <div style={{ background: "var(--primary-light)", borderRadius: "14px 14px 14px 4px", padding: "0.75rem 1rem", maxWidth: 80, display: "flex", alignItems: "center", gap: 4 }}>
+                  <span className="spinner spinner-dark" style={{ width: 16, height: 16 }} />
+                </div>
+              )}
+
+              {chatDone && chatGoalText && (
+                <div style={{ background: "var(--card)", borderRadius: "var(--radius-lg)", border: "1.5px solid rgba(212,168,67,0.27)", padding: "1rem", marginTop: 8 }}>
+                  <p style={{ fontSize: "0.7rem", fontWeight: 700, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Your Goal</p>
+                  <p style={{ fontSize: "0.95rem", color: "var(--text)", marginBottom: 12, lineHeight: 1.5 }}>{chatGoalText}</p>
+                  <button
+                    onClick={handleUseGoal}
+                    className="btn btn-primary"
+                    style={{ width: "100%", height: 56, fontSize: "0.95rem", fontWeight: 700 }}
+                  >
+                    Build my plan
+                  </button>
+                </div>
+              )}
+
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Chat input */}
+            {!chatDone && !chatLoading && chatHistory.length > 0 && (
+              <div style={{ borderTop: "1px solid var(--border)", padding: "0.75rem 1rem", display: "flex", gap: 8, flexShrink: 0 }}>
+                <input
+                  ref={chatInputRef}
+                  className="field-input"
+                  placeholder="Type your answer..."
+                  value={customInput}
+                  onChange={(e) => setCustomInput(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && customInput.trim()) sendChatAnswer(customInput.trim()); }}
+                  style={{ flex: 1 }}
+                />
                 <button
+                  onClick={() => customInput.trim() && sendChatAnswer(customInput.trim())}
+                  disabled={!customInput.trim()}
                   className="btn btn-primary"
-                  onClick={handleUseGoal}
-                  style={{ marginTop: 20, height: 46, padding: "0 2rem" }}
+                  style={{ padding: "0 1.25rem", height: 46 }}
                 >
-                  Try again
+                  Send
                 </button>
               </div>
             )}
@@ -322,258 +592,15 @@ export default function OnboardingPage() {
         )}
       </div>
 
-      {/* ── AI Plan Chat Modal ── */}
-      {showAiChat && (
-        <div className="modal-overlay" onClick={() => { setShowAiChat(false); setShowTemplates(true); setAwaitingName(false); setPendingStarterMessage(null); }}>
-          <div
-            className="modal-box"
-            onClick={(e) => e.stopPropagation()}
-            style={{ display: "flex", flexDirection: "column", padding: 0, maxHeight: "85vh" }}
-          >
-            {/* Header */}
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border)",
-              flexShrink: 0,
-            }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)" }}>
-                  Threely Intelligence
-                </span>
-              </div>
-              <button
-                onClick={() => { setShowAiChat(false); setShowTemplates(true); setAwaitingName(false); setPendingStarterMessage(null); }}
-                style={{
-                  width: 40, height: 40, minHeight: 44, borderRadius: 8,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  background: "var(--bg)", border: "1px solid var(--border)",
-                  cursor: "pointer", fontSize: 16, color: "var(--subtext)",
-                }}
-              >
-                ×
-              </button>
-            </div>
-
-            {/* Name-asking phase */}
-            {awaitingName ? (
-              <div style={{
-                flex: 1, display: "flex", flexDirection: "column",
-                padding: "1.25rem clamp(1rem, 4vw, 1.5rem)",
-                gap: 12,
-              }}>
-                <div style={{
-                  background: "var(--primary-light)", borderRadius: "14px 14px 14px 4px",
-                  padding: "0.75rem 1rem", maxWidth: "90%",
-                  fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.5,
-                }}>
-                  Hey! Before we get started — what should I call you?
-                </div>
-                <div style={{ marginTop: "auto", display: "flex", gap: 8 }}>
-                  <input
-                    className="field-input"
-                    placeholder="Your first name"
-                    value={nameInput}
-                    onChange={(e) => setNameInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && nameInput.trim()) handleNameSubmit();
-                    }}
-                    autoFocus
-                    style={{ flex: 1 }}
-                  />
-                  <button
-                    className="btn btn-primary"
-                    onClick={handleNameSubmit}
-                    disabled={!nameInput.trim()}
-                    style={{ padding: "0 16px", flexShrink: 0 }}
-                  >
-                    Send
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <>
-                {/* Chat area */}
-                <div style={{
-                  flex: 1, overflowY: "auto", padding: "1.25rem clamp(1rem, 4vw, 1.5rem) 2rem",
-                  display: "flex", flexDirection: "column", gap: 12,
-                }}>
-                  {chatHistory.map((entry, i) => (
-                    <div key={i}>
-                      {entry.role === "assistant" ? (
-                        <div style={{
-                          background: "var(--primary-light)", borderRadius: "14px 14px 14px 4px",
-                          padding: "0.75rem 1rem", maxWidth: "90%",
-                          fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.5,
-                        }}>
-                          {entry.text}
-                        </div>
-                      ) : (
-                        <div style={{
-                          display: "flex", justifyContent: "flex-end",
-                        }}>
-                          <div style={{
-                            background: "var(--primary)", borderRadius: "14px 14px 4px 14px",
-                            padding: "0.75rem 1rem", maxWidth: "90%",
-                            fontSize: "0.9rem", color: "#fff", lineHeight: 1.5,
-                          }}>
-                            {entry.text}
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Option buttons for assistant messages — multi-select toggle */}
-                      {entry.role === "assistant" && entry.options && entry.options.length > 0 && !chatLoading && i === chatHistory.length - 1 && !chatDone && (
-                        <div style={{ marginTop: 10 }}>
-                          <div style={{
-                            display: "flex", flexWrap: "wrap", gap: 8,
-                          }}>
-                            {entry.options.map((opt, j) => {
-                              const isSelected = selectedOptions.has(opt);
-                              return (
-                                <button
-                                  key={j}
-                                  onClick={() => {
-                                    setSelectedOptions((prev) => {
-                                      const next = new Set(prev);
-                                      if (next.has(opt)) next.delete(opt);
-                                      else next.add(opt);
-                                      return next;
-                                    });
-                                  }}
-                                  style={{
-                                    padding: "10px 16px", borderRadius: 20,
-                                    border: `1.5px solid ${isSelected ? "var(--primary)" : "rgba(212,168,67,0.25)"}`,
-                                    background: isSelected ? "var(--primary)" : "var(--card)",
-                                    color: isSelected ? "#fff" : "var(--primary)",
-                                    fontSize: "0.85rem", fontWeight: 600,
-                                    cursor: "pointer", transition: "all 0.15s",
-                                  }}
-                                >
-                                  {isSelected ? `✓ ${opt}` : opt}
-                                </button>
-                              );
-                            })}
-                            {/* Type my own button */}
-                            <button
-                              onClick={() => chatInputRef.current?.focus()}
-                              style={{
-                                padding: "10px 16px", borderRadius: 20,
-                                border: "1px solid var(--border)",
-                                background: "var(--bg)", color: "var(--subtext)",
-                                fontSize: "0.85rem", fontWeight: 600,
-                                cursor: "pointer", transition: "all 0.15s",
-                              }}
-                            >
-                              Type my own
-                            </button>
-                          </div>
-                          {selectedOptions.size > 0 && (
-                            <button
-                              onClick={() => sendChatAnswer(Array.from(selectedOptions).join(" + "))}
-                              className="btn btn-primary"
-                              style={{
-                                marginTop: 10, height: 38, width: "100%",
-                                fontSize: "0.85rem", fontWeight: 700,
-                              }}
-                            >
-                              Continue with {selectedOptions.size} selected →
-                            </button>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-
-                  {/* Loading indicator */}
-                  {chatLoading && (
-                    <div style={{
-                      background: "var(--primary-light)", borderRadius: "14px 14px 14px 4px",
-                      padding: "0.75rem 1rem", maxWidth: 80,
-                      display: "flex", alignItems: "center", gap: 4,
-                    }}>
-                      <span className="spinner spinner-dark" style={{ width: 16, height: 16 }} />
-                    </div>
-                  )}
-
-                  {/* Done state — goal preview */}
-                  {chatDone && chatGoalText && (
-                    <div style={{
-                      background: "var(--card)", borderRadius: "var(--radius-lg)",
-                      border: "1.5px solid rgba(212,168,67,0.27)", padding: "1rem",
-                      marginTop: 8, boxShadow: "var(--shadow-sm)",
-                    }}>
-                      <p style={{
-                        fontSize: "0.75rem", fontWeight: 600, color: "var(--primary)",
-                        textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8,
-                      }}>
-                        Your goal
-                      </p>
-                      <p style={{ fontSize: "0.95rem", color: "var(--text)", lineHeight: 1.5, fontWeight: 500 }}>
-                        {chatGoalText}
-                      </p>
-                    </div>
-                  )}
-
-                  <div ref={chatEndRef} />
-                </div>
-
-                {/* Bottom area */}
-                <div style={{
-                  padding: "1rem 1.5rem", borderTop: "1px solid var(--border)",
-                  flexShrink: 0,
-                }}>
-                  {chatDone ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                      <button
-                        className="btn btn-primary"
-                        onClick={handleUseGoal}
-                        style={{ height: 46, width: "100%" }}
-                      >
-                        Use this goal →
-                      </button>
-                      <button
-                        onClick={handleEditChatGoal}
-                        style={{
-                          fontSize: "0.85rem", color: "var(--subtext)",
-                          textDecoration: "underline", background: "none", border: "none",
-                          cursor: "pointer", padding: "6px 0", textAlign: "center",
-                        }}
-                      >
-                        Edit goal
-                      </button>
-                    </div>
-                  ) : (
-                    <div style={{ display: "flex", gap: 8 }}>
-                      <input
-                        ref={chatInputRef}
-                        className="field-input"
-                        placeholder="Type your own answer…"
-                        value={customInput}
-                        onChange={(e) => setCustomInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && customInput.trim() && !chatLoading) {
-                            sendChatAnswer(customInput.trim());
-                          }
-                        }}
-                        disabled={chatLoading}
-                        style={{ flex: 1 }}
-                      />
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => customInput.trim() && !chatLoading && sendChatAnswer(customInput.trim())}
-                        disabled={!customInput.trim() || chatLoading}
-                        style={{ padding: "0 16px", flexShrink: 0 }}
-                      >
-                        Send
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      )}
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+          animation: fadeInUp 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
