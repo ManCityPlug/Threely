@@ -307,7 +307,7 @@ export default function LandingPage() {
           {[
             { step: "1", title: "Tell us your goal", desc: "Enter your goal \u2014 \"I want to launch my Shopify store and hit $5K in revenue.\" Threely asks the right questions to find the best path for you." },
             { step: "2", title: "Step by step plan", desc: "You'll get a real path based on where you currently are. Threely tells you daily what needs to be done to actually grow." },
-            { step: "3", title: "Scale.", desc: "Complete your tasks and the AI tracks your progress to build on your next set of tasks." },
+            { step: "3", title: "Make Money.", desc: "Complete your tasks and the AI tracks your progress to build on your next set of tasks." },
           ].map((item, i) => (
             <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
               <div style={{
