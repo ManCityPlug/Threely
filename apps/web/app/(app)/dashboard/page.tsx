@@ -1196,12 +1196,7 @@ function DashboardPageInner() {
       <div style={{ marginBottom: "1.75rem" }}>
         <p style={{ color: "var(--muted)", fontSize: "0.85rem", marginBottom: 4 }}>{todayStr()}</p>
         <h1 style={{ fontSize: "2rem", fontWeight: 800, letterSpacing: "-0.04em" }}>
-          {greeting()}, {(() => {
-            const raw = getNickname() || user?.email?.split("@")[0] || "";
-            const formatted = formatDisplayName(raw);
-            const first = formatted.split(" ")[0] || "there";
-            return first;
-          })()}
+          Today
         </h1>
       </div>
 
@@ -1230,13 +1225,7 @@ function DashboardPageInner() {
       <OfferBanner onActiveChange={setHasActiveOffer} />
 
       {/* One-time login modal for new offers */}
-      <OfferLoginModal
-        firstName={(() => {
-          const raw = getNickname() || user?.email?.split("@")[0] || "";
-          const formatted = formatDisplayName(raw);
-          return formatted.split(" ")[0] || "there";
-        })()}
-      />
+      <OfferLoginModal firstName="" />
 
       {/* Limited mode banner — hidden when an active offer banner is showing */}
       {!hasPro && !hasActiveOffer && (

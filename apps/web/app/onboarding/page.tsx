@@ -101,26 +101,12 @@ export default function OnboardingPage() {
   // ─── Category selection → opens AI chat (or name input first) ──────────────
 
   function handleCategorySelect(category: GoalCategory) {
-    const name = getUserDisplayName();
     setShowTemplates(false);
-    if (!name) {
-      setPendingStarterMessage(category.starterMessage);
-      setAwaitingName(true);
-      setShowAiChat(true);
-      return;
-    }
     startAiChatWithMessage(category.starterMessage);
   }
 
   function handleOther() {
-    const name = getUserDisplayName();
     setShowTemplates(false);
-    if (!name) {
-      setPendingStarterMessage("Help me define my goal.");
-      setAwaitingName(true);
-      setShowAiChat(true);
-      return;
-    }
     startAiChatWithMessage("Help me define my goal.");
   }
 

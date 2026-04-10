@@ -792,7 +792,7 @@ export default function DashboardScreen() {
             <View>
               <Text style={styles.date}>{formatDate(today)}</Text>
               <Text style={styles.greeting}>
-                {getGreeting()}, {firstName}
+                Today
               </Text>
             </View>
           </View>

@@ -79,23 +79,11 @@ export default function StartPage() {
   // ── Category select ──
   function handleCategorySelect(category: GoalCategory) {
     setShowTemplates(false);
-    if (!nameInput.trim()) {
-      setPendingStarterMessage(category.starterMessage);
-      setAwaitingName(true);
-      setShowAiChat(true);
-      return;
-    }
     startAiChatWithMessage(category.starterMessage);
   }
 
   function handleOther() {
     setShowTemplates(false);
-    if (!nameInput.trim()) {
-      setPendingStarterMessage("Help me define my goal.");
-      setAwaitingName(true);
-      setShowAiChat(true);
-      return;
-    }
     startAiChatWithMessage("Help me define my goal.");
   }
 
@@ -352,26 +340,7 @@ export default function StartPage() {
               >×</button>
             </div>
 
-            {awaitingName ? (
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "1.25rem clamp(1rem, 4vw, 1.5rem)", gap: 12 }}>
-                <div style={{ background: "var(--primary-light)", borderRadius: "14px 14px 14px 4px", padding: "0.75rem 1rem", maxWidth: "90%", fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.5 }}>
-                  Hey! Before we get started — what should I call you?
-                </div>
-                <div style={{ marginTop: "auto", display: "flex", gap: 8 }}>
-                  <input
-                    className="field-input"
-                    placeholder="Your first name"
-                    value={nameInput}
-                    onChange={(e) => setNameInput(e.target.value)}
-                    onKeyDown={(e) => { if (e.key === "Enter" && nameInput.trim()) handleNameSubmit(); }}
-                    autoFocus
-                    style={{ flex: 1 }}
-                  />
-                  <button className="btn btn-primary" onClick={handleNameSubmit} disabled={!nameInput.trim()} style={{ padding: "0 1.25rem", height: 46 }}>Continue</button>
-                </div>
-              </div>
-            ) : (
-              <>
+            <>
                 <div style={{ flex: 1, overflowY: "auto", padding: "1.25rem clamp(1rem, 4vw, 1.5rem) 2rem", display: "flex", flexDirection: "column", gap: 12 }}>
                   {chatHistory.map((entry, i) => (
                     <div key={i}>
@@ -486,7 +455,6 @@ export default function StartPage() {
                   </div>
                 )}
               </>
-            )}
           </div>
         </div>
       )}

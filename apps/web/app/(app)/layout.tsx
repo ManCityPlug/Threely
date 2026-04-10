@@ -276,10 +276,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 background: "var(--primary-light)", color: "var(--primary)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontWeight: 700, fontSize: "0.8rem", flexShrink: 0,
-              }}>{initials}</div>
+              }}>{user?.email?.[0]?.toUpperCase() ?? "?"}</div>
               <div style={{ flex: 1, overflow: "hidden" }}>
-                <span style={{ fontSize: "0.85rem", fontWeight: 500, color: "var(--text)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {nickname}
+                <span style={{ fontSize: "0.75rem", fontWeight: 500, color: "var(--text)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {user?.email ?? ""}
                 </span>
                 {subBadge && (
                   <span style={{
@@ -357,12 +357,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               background: "var(--primary-light)", color: "var(--primary)",
               display: "flex", alignItems: "center", justifyContent: "center",
               fontWeight: 700, fontSize: "0.9rem", flexShrink: 0,
-            }}>{initials}</div>
+            }}>{user?.email?.[0]?.toUpperCase() ?? "?"}</div>
             <div style={{ overflow: "hidden", flex: 1 }}>
-              <div style={{ fontWeight: 600, fontSize: "0.85rem", color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {nickname}
-              </div>
-              <div style={{ fontSize: "0.75rem", color: "var(--muted)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              <div style={{ fontWeight: 500, fontSize: "0.75rem", color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                 {user.email}
               </div>
             </div>

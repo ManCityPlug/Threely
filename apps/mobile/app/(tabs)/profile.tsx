@@ -522,8 +522,7 @@ export default function ProfileScreen() {
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initials}</Text>
           </View>
-          <Text style={styles.displayName}>{displayName}</Text>
-          {nickname ? <Text style={styles.emailSmall}>{email}</Text> : null}
+          <Text style={styles.displayName}>{email}</Text>
           <Text style={styles.memberSince}>Member since {memberSince}</Text>
           {hasPro ? (
             <View style={{ backgroundColor: colors.primaryLight, paddingHorizontal: 12, paddingVertical: 3, borderRadius: 999, marginTop: spacing.xs }}>
