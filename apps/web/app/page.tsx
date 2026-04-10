@@ -316,8 +316,7 @@ export default function LandingPage() {
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: "1.1rem", fontWeight: 700, marginBottom: 20,
               }}>{item.step}</div>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#fff", marginBottom: 10 }}>{item.title}</h3>
-              <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7, maxWidth: 320 }}>{item.desc}</p>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#fff", marginBottom: 0 }}>{item.title}</h3>
             </div>
           ))}
         </div>
