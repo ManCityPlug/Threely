@@ -12,7 +12,7 @@ const TESTIMONIALS: { quote: string; author: string; label: string; image?: stri
 
 const FAQ = [
   { q: "Is it free?", a: "7-day free trial with full access." },
-  { q: "How long before I see results?", a: "Our users have quit their jobs and started making money their first 2 weeks." },
+  { q: "How long before I see results?", a: "Our users have quit their jobs and started making money their first week." },
   { q: "Can I cancel anytime?", a: "Yes. Cancel in your settings whenever you want. No contracts, no hidden fees, no questions asked." },
 ];
 
