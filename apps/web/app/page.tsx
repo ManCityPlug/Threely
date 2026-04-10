@@ -12,8 +12,6 @@ const TESTIMONIALS: { quote: string; author: string; label: string; image?: stri
 
 const FAQ = [
   { q: "Is it free?", a: "7-day free trial with full access. After that, choose a plan to keep going. Cancel anytime." },
-  { q: "What if I miss a day?", a: "No guilt. Just open Threely and pick up where you left off. Your progress is saved." },
-  { q: "Does it work for fitness too?", a: "Yes. Threely builds real workout plans based on your experience level, schedule, and goals. It adapts every day based on how your sessions went." },
   { q: "How long before I see results?", a: "Most users notice a difference within the first week. You're doing 3 focused tasks every single day — that compounds fast." },
   { q: "Can I cancel anytime?", a: "Yes. Cancel in your settings whenever you want. No contracts, no hidden fees, no questions asked." },
 ];
