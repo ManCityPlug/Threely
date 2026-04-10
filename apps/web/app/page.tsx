@@ -192,7 +192,7 @@ export default function LandingPage() {
           maxWidth: 800, margin: "0 0 24px",
         }}>
           10x Your Income.<br />
-          <span style={{ color: "rgba(255,255,255,0.5)" }}>Reach Your Goals.</span>
+          <span style={{ color: "rgba(255,255,255,0.85)" }}>Reach Your Goals.</span>
         </h1>
 
         {/* CTA */}
@@ -281,7 +281,7 @@ export default function LandingPage() {
                 </p>
                 <div>
                   <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>{t.author}</div>
-                  <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.4)" }}>{t.label}</div>
+                  <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.7)" }}>{t.label}</div>
                 </div>
               </div>
             ))}
@@ -344,7 +344,7 @@ export default function LandingPage() {
                 <span style={{ fontSize: "1.2rem", color: "rgba(255,255,255,0.3)", transition: "transform 0.2s", transform: openFaq === i ? "rotate(45deg)" : "none" }}>+</span>
               </button>
               {openFaq === i && (
-                <p style={{ padding: "0 0 1.25rem", fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>
+                <p style={{ padding: "0 0 1.25rem", fontSize: "0.9rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.7 }}>
                   {faq.a}
                 </p>
               )}

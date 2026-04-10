@@ -42,7 +42,7 @@ export default function PricingPage() {
           }}>
             Pricing
           </h1>
-          <p style={{ fontSize: "1.05rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>
+          <p style={{ fontSize: "1.05rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.7 }}>
             Get Pro free for 7 days. Cancel anytime.
           </p>
         </div>
@@ -70,9 +70,9 @@ export default function PricingPage() {
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
               <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$12.99</span>
-              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/month</span>
+              <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)" }}>/month</span>
             </div>
-            <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.5)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
+            <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.85)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
               Monthly access.<br />7 days free included.
             </p>
             <CheckoutButton plan="monthly" style={{
@@ -114,9 +114,9 @@ export default function PricingPage() {
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
               <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$8.33</span>
-              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/month</span>
+              <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)" }}>/month</span>
             </div>
-            <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.5)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
+            <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.85)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
               Billed annually at $99.99.<br />7 days free included.
             </p>
             <CheckoutButton plan="yearly" style={{
@@ -151,16 +151,9 @@ export default function PricingPage() {
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
             {FEATURES.map((f, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{
-                  width: 24, height: 24, borderRadius: "50%",
-                  background: "#ede9ff", color: "#D4A843",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 14, fontWeight: 700, flexShrink: 0,
-                }}>
-                  ✓
-                </div>
-                <span style={{ fontSize: "0.95rem", color: "#e8e8e8" }}>{f.text}<strong style={{ color: "#fff" }}>{f.bold}</strong>{f.after}</span>
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span style={{ color: "#D4A843", fontSize: 16, fontWeight: 700, flexShrink: 0 }}>✓</span>
+                <span style={{ fontSize: "1rem", color: "#fff" }}>{f.text}<strong>{f.bold}</strong>{f.after}</span>
               </div>
             ))}
           </div>
@@ -191,7 +184,7 @@ export default function PricingPage() {
                 border: "1px solid rgba(255,255,255,0.08)",
               }}>
                 <h3 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 8 }}>{item.q}</h3>
-                <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.5)", lineHeight: 1.7 }}>{item.a}</p>
+                <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.7 }}>{item.a}</p>
                 {"link" in item && item.link && (
                   <Link href={item.link} style={{
                     display: "inline-block",
