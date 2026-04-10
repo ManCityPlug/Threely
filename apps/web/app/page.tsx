@@ -32,7 +32,7 @@ export default function LandingPage() {
   }, []);
 
   const ctaHref = loggedIn ? "/dashboard" : "/start";
-  const ctaLabel = loggedIn ? "Go to Dashboard" : "Lock In →";
+  const ctaLabel = loggedIn ? "Go to Dashboard" : "Start Today →";
 
   // Scroll reveal — fade in on enter, fade out on leave
   useEffect(() => {
@@ -240,7 +240,7 @@ export default function LandingPage() {
               color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 12,
               textDecoration: "none",
             }}>
-              Lock In →
+              Start Today →
             </Link>
           </div>
         </div>
