@@ -361,7 +361,7 @@ export default function LandingPage() {
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
         <h2 className="reveal" style={{ fontSize: isMobile ? "1.8rem" : "2.8rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 32 }}>
-          The future starts today.
+          Make your first 10k this week.
         </h2>
         <Link href={ctaHref} style={{
           display: "inline-flex", alignItems: "center", justifyContent: "center",

@@ -16,9 +16,9 @@ export const metadata: Metadata = {
 };
 
 const FEATURES = [
-  "Your first $10K month starts here",
-  "Quit your 9-5",
-  "Multiple sources of income",
+  { text: "Your first ", bold: "$10K month", after: " starts here" },
+  { text: "", bold: "Quit your 9-5", after: "" },
+  { text: "", bold: "Multiple sources", after: " of income" },
 ];
 
 export default function PricingPage() {
@@ -113,11 +113,11 @@ export default function PricingPage() {
               YEARLY — BEST VALUE
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$99.99</span>
-              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/year</span>
+              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$8.33</span>
+              <span style={{ fontSize: "0.9rem", color: "#8898aa" }}>/month</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.5)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              $8.33/month · billed annually.<br />7 days free included.
+              Billed annually at $99.99.<br />7 days free included.
             </p>
             <CheckoutButton plan="yearly" style={{
               display: "block",
@@ -150,8 +150,8 @@ export default function PricingPage() {
             Everything included in every plan
           </h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-            {FEATURES.map(f => (
-              <div key={f} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {FEATURES.map((f, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
                 <div style={{
                   width: 24, height: 24, borderRadius: "50%",
                   background: "#ede9ff", color: "#D4A843",
@@ -160,7 +160,7 @@ export default function PricingPage() {
                 }}>
                   ✓
                 </div>
-                <span style={{ fontSize: "0.95rem", color: "#e8e8e8" }}>{f}</span>
+                <span style={{ fontSize: "0.95rem", color: "#e8e8e8" }}>{f.text}<strong style={{ color: "#fff" }}>{f.bold}</strong>{f.after}</span>
               </div>
             ))}
           </div>
