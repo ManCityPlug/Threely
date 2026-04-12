@@ -411,8 +411,8 @@ export default function StartPage() {
               gap: 12,
             }}>
               {([
-                { id: "business" as Category, label: "Business", subtitle: "Start or grow a business" },
-                { id: "health" as Category, label: "Health", subtitle: "Transform your body" },
+                { id: "business" as Category, label: "🤑 Business", subtitle: "Start or grow a business" },
+                { id: "health" as Category, label: "💪 Health", subtitle: "Transform your body" },
                 { id: "other" as Category, label: "Other", subtitle: "Set any goal" },
               ]).map((cat) => (
                 <button
