@@ -113,9 +113,6 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
             </Text>
           ) : null}
         </View>
-        {ringPct !== undefined && !isPaused && (
-          <ProgressRing percentage={ringPct} size={36} />
-        )}
         {onMenu && (
           <View ref={menuRef} collapsable={false}>
             <TouchableOpacity
@@ -130,26 +127,11 @@ export function GoalCard({ goal, completedToday = 0, totalToday = 3, onPress, on
         )}
       </View>
 
-      <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${progressPct}%` }, isPaused && styles.progressFillPaused]} />
-      </View>
-
-      {/* Badge row — wrapping */}
-      <View style={styles.badgeRow}>
-        {badges.map((b, i) => (
-          <View key={i} style={styles.badgeCol}>
-            <View style={[styles.pill, { backgroundColor: b.bg }]}>
-              {b.icon && <Ionicons name={b.icon as keyof typeof Ionicons.glyphMap} size={11} color={b.color} style={{ marginRight: 3 }} />}
-              <Text style={[styles.pillText, { color: b.color }]}>
-                {b.label}
-              </Text>
-            </View>
-          </View>
-        ))}
-      </View>
-
-      {/* Added date */}
-      <Text style={styles.addedDate}>Added {addedDate}</Text>
+      {isPaused && (
+        <View style={[styles.pill, { backgroundColor: `${colors.textTertiary}14`, marginTop: spacing.sm }]}>
+          <Text style={[styles.pillText, { color: colors.textTertiary }]}>Paused</Text>
+        </View>
+      )}
 
       {onViewTasks && !isPaused && (
         <TouchableOpacity

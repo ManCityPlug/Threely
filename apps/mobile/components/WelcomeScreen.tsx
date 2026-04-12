@@ -131,10 +131,10 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
             <Image source={require("@/assets/icon.png")} style={styles.logo} />
           </Animated.View>
 
-          {/* Lock In text — large, two lines, faded gradient feel */}
+          {/* Tagline */}
           <Animated.View style={[{ alignItems: "center", marginTop: spacing.xl }, { opacity: fadeAnim }]}>
-            <Text style={styles.lockInLine1}>LOCK</Text>
-            <Text style={styles.lockInLine2}>IN</Text>
+            <Text style={styles.lockInLine1}>REACH YOUR</Text>
+            <Text style={styles.lockInLine2}>GOALS</Text>
           </Animated.View>
         </Animated.View>
 

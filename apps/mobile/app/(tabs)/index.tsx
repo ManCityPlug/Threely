@@ -868,20 +868,7 @@ export default function DashboardScreen() {
           </View>
         )}
 
-        {/* Progress pill */}
-        {totalCount > 0 && (
-          <View style={styles.progressPill}>
-            <View
-              style={[
-                styles.progressBar,
-                { width: `${Math.round((completedCount / totalCount) * 100)}%` as `${number}%` },
-              ]}
-            />
-            <Text style={styles.progressText}>
-              {completedCount}/{totalCount} tasks complete
-            </Text>
-          </View>
-        )}
+        {/* Progress pill removed — no task progress indicators */}
 
         {/* Complete All button removed — users check tasks off individually */}
 
@@ -992,9 +979,6 @@ export default function DashboardScreen() {
               ) : (
                 <View style={styles.getMoreBarLocked}>
                   <Text style={styles.getMoreTitleLocked}>Complete all tasks to unlock more</Text>
-                  <Text style={styles.getMoreSubtitleLocked}>
-                    {completedCount}/{totalCount} done — {totalCount - completedCount} remaining
-                  </Text>
                 </View>
               )}
             </View>
@@ -1265,19 +1249,6 @@ export default function DashboardScreen() {
                       {goal.title}
                     </Text>
                     <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                      {offDay && stat?.nextWorkDay ? (
-                        <View style={[styles.menuTimeBadge, { backgroundColor: colors.primaryLight }]}>
-                          <Text style={[styles.menuTimeBadgeText, { color: colors.primary }]}>Next: {stat.nextWorkDay}</Text>
-                        </View>
-                      ) : stat && stat.overdueCount > 0 ? (
-                        <View style={[styles.menuTimeBadge, { backgroundColor: colors.warningLight }]}>
-                          <Text style={[styles.menuTimeBadgeText, { color: colors.warning }]}>{stat.overdueCount} overdue</Text>
-                        </View>
-                      ) : timeLabel ? (
-                        <View style={styles.menuTimeBadge}>
-                          <Text style={styles.menuTimeBadgeText}>{timeLabel}</Text>
-                        </View>
-                      ) : null}
                       {isSelected && <Text style={styles.menuCheck}>✓</Text>}
                     </View>
                   </View>
