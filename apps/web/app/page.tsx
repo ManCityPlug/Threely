@@ -276,7 +276,7 @@ export default function LandingPage() {
                     {t.author[0]}
                   </div>
                 )}
-                <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.7, marginBottom: 16 }}>
+                <p style={{ fontSize: "0.9rem", color: "#fff", lineHeight: 1.7, marginBottom: 16 }}>
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <div>
