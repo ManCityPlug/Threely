@@ -350,6 +350,24 @@ export default function LandingPage() {
               )}
             </div>
           ))}
+
+          {/* Support button */}
+          <div style={{ textAlign: "center", marginTop: 32 }}>
+            <a
+              href="https://go.crisp.chat/chat/embed/?website_id=498b2c8b-bec0-4790-a2bb-795f9c295898"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                padding: "0.75rem 2rem", fontSize: "0.95rem", fontWeight: 600,
+                color: "#fff", background: "none",
+                border: "1px solid rgba(255,255,255,0.15)", borderRadius: 10,
+                textDecoration: "none",
+              }}
+            >
+              Support →
+            </a>
+          </div>
         </div>
       </section>
 

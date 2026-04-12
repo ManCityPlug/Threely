@@ -254,14 +254,8 @@ function TaskCard({
                   }}>
                     {task.estimated_minutes}m
                   </span>
-                  {task.isCarriedOver && (
-                    <span style={{
-                      fontSize: "0.7rem", fontWeight: 600,
-                      color: "var(--warning)", background: "var(--warning-light)",
-                      borderRadius: 20, padding: "2px 8px",
-                    }}>
-                      Overdue
-                    </span>
+                  {false && (
+                    <span></span>
                   )}
                 </div>
               </div>
@@ -1427,12 +1421,6 @@ function DashboardPageInner() {
                     ~{formatMinutes(totalEstimatedMinutes)}
                   </span>
                 )}
-                <span style={{
-                  fontSize: "0.85rem", fontWeight: 600,
-                  color: allDone ? "var(--success)" : "var(--subtext)",
-                }}>
-                  {completedCount}/{totalCount}
-                </span>
               </div>
               {effectiveGoals.length > 1 && (
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ flexShrink: 0 }}>
@@ -1440,20 +1428,7 @@ function DashboardPageInner() {
                 </svg>
               )}
             </div>
-            {/* Progress bar */}
-            <div className="progress-track">
-              <div className="progress-fill" style={{ width: `${progress}%`, background: allDone ? "var(--success)" : undefined }} />
-            </div>
           </div>
-
-          {/* Locked hint — shown above tasks when not all done */}
-          {!allDone && !insight && totalCount > 0 && (
-            <div data-walkthrough="unlock-more-bar" style={{ marginBottom: "1rem", textAlign: "center", padding: "0.75rem 0" }}>
-              <div style={{ fontSize: "0.85rem", color: "var(--muted)" }}>
-                Complete all tasks to unlock more  ·  {completedCount}/{totalCount} done
-              </div>
-            </div>
-          )}
 
           {/* Give me more — shown when all done */}
           {allDone && (

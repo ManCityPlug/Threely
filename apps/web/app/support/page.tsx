@@ -48,30 +48,25 @@ export default function SupportPage() {
           </p>
 
           <a
-            href="mailto:support@threely.co"
+            href="https://go.crisp.chat/chat/embed/?website_id=498b2c8b-bec0-4790-a2bb-795f9c295898"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
-              display: "inline-block",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
               fontSize: "1.1rem",
               fontWeight: 700,
-              color: "#fff",
-              background: "#000",
-              border: "1px solid rgba(255,255,255,0.15)",
+              color: "#000",
+              background: "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)",
               padding: "0.85rem 2.5rem",
               borderRadius: "0.75rem",
               textDecoration: "none",
               letterSpacing: "-0.01em",
             }}
           >
-            support@threely.co
+            Support →
           </a>
-
-          <p style={{
-            fontSize: "0.85rem",
-            color: "#8898aa",
-            marginTop: "1.5rem",
-          }}>
-            We typically respond within 24 hours.
-          </p>
         </div>
       </section>
 
