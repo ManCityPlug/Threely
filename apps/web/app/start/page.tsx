@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { getSupabase } from "@/lib/supabase-client";
-import { goalsApi, profileApi, tasksApi, type ParsedGoal, type TaskItem } from "@/lib/api-client";
-import SharedBuildingProgress from "@/components/BuildingProgress";
+import type { TaskItem } from "@/lib/api-client";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -108,13 +107,10 @@ export default function StartPage() {
   const [textValue, setTextValue] = useState("");
   const [fadeKey, setFadeKey] = useState(0);
 
-  // ── Hype + build state ──
+  // ── Hype + preview state ──
   const [showHype, setShowHype] = useState(false);
-  const [building, setBuilding] = useState(false);
   const [planReady, setPlanReady] = useState(false);
-  const [generatedTasks, setGeneratedTasks] = useState<TaskItem[]>([]);
   const [generatedGoalTitle, setGeneratedGoalTitle] = useState("");
-  const buildDoneRef = useRef(false);
 
   // ── Helpers ──
   function animateStep(newStep: number) {
@@ -168,71 +164,32 @@ export default function StartPage() {
     }
   }
 
-  // ── Build plan in background ──
-  async function startBuild(cat: Category, allAnswers: string[]) {
-    setShowHype(true);
-    buildDoneRef.current = false;
-
+  // ── Show hype + blurred preview (NO plan building yet) ──
+  function startBuild(cat: Category, allAnswers: string[]) {
     const goalText = buildGoalText(cat, allAnswers);
-    const effortLevel = allAnswers[1]?.toLowerCase() ?? "moderate";
-    const dailyTime = EFFORT_TO_MINUTES[effortLevel] ?? 60;
-    const intensity = EFFORT_TO_INTENSITY[effortLevel] ?? 2;
-
+    // Store goal info for later (after checkout + signup)
     try {
-      // Parse goal
-      const parsed: ParsedGoal = await goalsApi.parse(goalText);
-      const goalTitle = parsed.short_title ?? goalText.slice(0, 40);
+      localStorage.setItem("threely_pending_goal", JSON.stringify({
+        category: cat,
+        answers: allAnswers,
+        goalText,
+      }));
+    } catch { /* ignore */ }
 
-      // Save profile
-      await profileApi.save({
-        dailyTimeMinutes: parsed.daily_time_detected ?? dailyTime,
-        intensityLevel: intensity,
-      });
+    // Create a short display title from their answers
+    const displayTitle = cat === "business"
+      ? `Make ${allAnswers[0]}/month`
+      : cat === "health"
+        ? allAnswers[0]
+        : allAnswers[0]?.slice(0, 40) || "Your goal";
 
-      // Create goal
-      const detectedWorkDays = (parsed.work_days_detected && parsed.work_days_detected.length > 0)
-        ? parsed.work_days_detected : [1, 2, 3, 4, 5, 6, 7];
-
-      const goalResult = await goalsApi.create({
-        title: goalTitle.slice(0, 80),
-        rawInput: goalText,
-        structuredSummary: parsed.structured_summary,
-        category: parsed.category ?? (cat === "health" ? "health" : "business"),
-        deadline: parsed.deadline_detected ?? null,
-        dailyTimeMinutes: parsed.daily_time_detected ?? dailyTime,
-        intensityLevel: intensity,
-        workDays: detectedWorkDays,
-        onboarding: true,
-      });
-
-      // Generate tasks
-      const tasksResult = await tasksApi.generate({ goalId: goalResult.goal.id, onboarding: true });
-      const allTasks = tasksResult.dailyTasks.flatMap((dt) => dt.tasks).slice(0, 3);
-
-      setGeneratedGoalTitle(goalTitle);
-      setGeneratedTasks(allTasks);
-      buildDoneRef.current = true;
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong");
-    }
+    setGeneratedGoalTitle(displayTitle);
+    setShowHype(true);
   }
 
   function handleHypeContinue() {
-    if (buildDoneRef.current) {
-      setPlanReady(true);
-      setShowHype(false);
-    } else {
-      setBuilding(true);
-      setShowHype(false);
-      // Poll for completion
-      const interval = setInterval(() => {
-        if (buildDoneRef.current) {
-          clearInterval(interval);
-          setBuilding(false);
-          setPlanReady(true);
-        }
-      }, 500);
-    }
+    setPlanReady(true);
+    setShowHype(false);
   }
 
   // ── Loading state ──
@@ -275,25 +232,21 @@ export default function StartPage() {
             <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)" }}>{generatedGoalTitle}</div>
           </div>
 
-          {/* Blurred tasks — tease the plan */}
+          {/* Blurred tasks — fake preview to tease the plan */}
           <div style={{ position: "relative" }}>
             <div style={{ filter: "blur(6px)", pointerEvents: "none", userSelect: "none" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {generatedTasks.map((task, i) => (
-                  <div key={task.id ?? i} className="card" style={{ padding: "1.25rem 1.5rem", borderRadius: 16, border: "1px solid var(--border)" }}>
+                {["Your personalized first step toward your goal", "A quick action to build momentum today", "Something small that moves you forward"].map((placeholder, i) => (
+                  <div key={i} className="card" style={{ padding: "1.25rem 1.5rem", borderRadius: 16, border: "1px solid var(--border)" }}>
                     <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
                       <div style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid var(--border)", flexShrink: 0 }} />
                       <div style={{ flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
-                          <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text)", lineHeight: 1.35, margin: 0 }}>
-                            {(task as unknown as { title?: string }).title ?? task.task}
-                          </h3>
-                        </div>
-                        {task.description && (
-                          <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.6, margin: 0 }}>
-                            {task.description}
-                          </p>
-                        )}
+                        <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text)", lineHeight: 1.35, margin: 0, marginBottom: 6 }}>
+                          Task {i + 1}: {placeholder}
+                        </h3>
+                        <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.6, margin: 0 }}>
+                          This task is personalized to your specific goal and situation.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -339,14 +292,6 @@ export default function StartPage() {
     );
   }
 
-  // ── Building state (if they clicked continue before plan was ready) ──
-  if (building) {
-    return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: "1rem" }}>
-        <SharedBuildingProgress />
-      </div>
-    );
-  }
 
   // ── Hype screen ──
   if (showHype) {
