@@ -55,8 +55,8 @@ export async function POST(request: NextRequest) {
     });
 
     if (user.isAnonymous) {
-      // Anon user — hard cap at 2 goals
-      if (activeGoalCount >= 2) {
+      // Anon user — allow first goal (onboarding), hard cap at 2
+      if (!onboarding && activeGoalCount >= 2) {
         return NextResponse.json({
           error: "anon_goal_limit",
           message: "Sign up to create more goals",

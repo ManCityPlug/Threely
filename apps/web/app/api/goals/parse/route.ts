@@ -15,12 +15,9 @@ export async function POST(request: NextRequest) {
   const user = await getAnyUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Anonymous user — goal cap only
+  // Anonymous user — soft cap (allow parsing, goal create enforces hard cap)
   if (user.isAnonymous) {
-    const anonGoalCount = await prisma.goal.count({ where: { userId: user.id } });
-    if (anonGoalCount >= 2) {
-      return NextResponse.json({ error: "Sign up to create more goals" }, { status: 403 });
-    }
+    // No cap on parsing — the goal creation endpoint enforces the limit
   } else {
     // Real user — pro gate, allow first goal free
     const goalCount = await prisma.goal.count({ where: { userId: user.id, isActive: true } });
