@@ -15,6 +15,7 @@ import { useSubscription } from "@/lib/subscription-context";
 import { MOCK_TUTORIAL_GOAL, MOCK_TUTORIAL_DAILY_TASK } from "@/lib/mock-tutorial-data";
 import OfferBanner from "@/components/OfferBanner";
 import OfferLoginModal from "@/components/OfferLoginModal";
+import PathView from "@/components/PathView";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -347,6 +348,11 @@ function DashboardPageInner() {
   const [showCelebration, setShowCelebration] = useState(false);
   const [celebrationDismissed, setCelebrationDismissed] = useState(false);
   const [animatingTaskId, setAnimatingTaskId] = useState<string | null>(null);
+
+  // Path view state
+  const [showTasks, setShowTasks] = useState(true); // tasks visible below path
+  const [workAheadModal, setWorkAheadModal] = useState(false);
+  const [lockedToast, setLockedToast] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -985,30 +991,133 @@ function DashboardPageInner() {
             </div>
           )}
 
-          {/* ─── Main task area ─── */}
+          {/* ─── Path view + task area ─── */}
           {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && (
             <>
-              {/* Day label */}
-              <div style={{
-                textAlign: "center",
-                marginBottom: "1.75rem",
-              }}>
-                <h1 style={{
-                  fontSize: "2.5rem",
-                  fontWeight: 800,
-                  color: "var(--text)",
-                  letterSpacing: "-0.04em",
-                  margin: 0,
+              {/* Path View */}
+              <PathView
+                dayNumber={goalDayNumber}
+                completedDays={goalDayNumber - 1}
+                onDayClick={(day, type) => {
+                  if (type === "today") {
+                    setShowTasks(true);
+                  } else if (type === "next") {
+                    setWorkAheadModal(true);
+                  } else if (type === "locked") {
+                    if (day === goalDayNumber + 1 && !allDone) {
+                      setLockedToast("Complete today's tasks to unlock this day");
+                      setTimeout(() => setLockedToast(null), 2500);
+                    } else if (day > goalDayNumber + 1) {
+                      setLockedToast("Complete the previous day first");
+                      setTimeout(() => setLockedToast(null), 2500);
+                    }
+                  }
+                }}
+                allDoneToday={allDone}
+                totalTasks={totalCount}
+              />
+
+              {/* Locked day toast */}
+              {lockedToast && (
+                <div style={{
+                  textAlign: "center",
+                  padding: "10px 20px",
+                  background: "rgba(255,255,255,0.08)",
+                  borderRadius: 10,
+                  marginBottom: 16,
+                  fontSize: "0.85rem",
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,0.85)",
+                  animation: "pathFadeIn 0.25s ease",
+                  border: "1px solid rgba(255,255,255,0.1)",
                 }}>
-                  Day {goalDayNumber}
-                </h1>
-              </div>
+                  {lockedToast}
+                </div>
+              )}
+
+              {/* Work ahead modal */}
+              {workAheadModal && (
+                <div
+                  style={{
+                    position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    zIndex: 9999, backdropFilter: "blur(4px)",
+                  }}
+                  onClick={() => setWorkAheadModal(false)}
+                >
+                  <div
+                    className="card"
+                    style={{
+                      padding: "2rem",
+                      width: "calc(100vw - 2rem)",
+                      maxWidth: 380,
+                      textAlign: "center",
+                    }}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <div style={{ fontSize: 40, marginBottom: 16 }}>{"⚡"}</div>
+                    <h3 style={{
+                      fontSize: "1.15rem",
+                      fontWeight: 700,
+                      marginBottom: 8,
+                      letterSpacing: "-0.02em",
+                      color: "var(--text)",
+                    }}>
+                      Work ahead?
+                    </h3>
+                    <p style={{
+                      color: "rgba(255,255,255,0.7)",
+                      fontSize: "0.9rem",
+                      lineHeight: 1.6,
+                      marginBottom: "1.5rem",
+                    }}>
+                      We recommend doing one day&apos;s work per day. Want to work ahead?
+                    </p>
+                    <div style={{ display: "flex", gap: 10 }}>
+                      <button
+                        className="btn"
+                        onClick={() => setWorkAheadModal(false)}
+                        style={{
+                          flex: 1, padding: "12px 16px",
+                          border: "1px solid var(--border)",
+                          borderRadius: 10,
+                          background: "transparent",
+                          color: "rgba(255,255,255,0.85)",
+                          fontSize: "0.9rem",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                      >
+                        I&apos;ll wait
+                      </button>
+                      <button
+                        onClick={() => {
+                          setWorkAheadModal(false);
+                          handleGenerate(effectiveSelectedGoalId ?? undefined);
+                        }}
+                        style={{
+                          flex: 1, padding: "12px 16px",
+                          borderRadius: 10,
+                          background: "#D4A843",
+                          color: "#000",
+                          fontSize: "0.9rem",
+                          fontWeight: 700,
+                          border: "none",
+                          cursor: "pointer",
+                        }}
+                      >
+                        Work ahead
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* All done state */}
               {allDone && celebrationDismissed ? (
                 <div style={{
                   textAlign: "center",
-                  padding: "3rem 2rem",
+                  padding: "2rem 2rem 1rem",
                 }}>
                   <div style={{
                     fontSize: "2rem",
@@ -1034,8 +1143,8 @@ function DashboardPageInner() {
                     {getCompletionMessage(goalDayNumber)}
                   </p>
                 </div>
-              ) : (
-                /* Task cards */
+              ) : showTasks && (
+                /* Task cards below path */
                 <div style={{
                   display: "flex",
                   flexDirection: "column",
