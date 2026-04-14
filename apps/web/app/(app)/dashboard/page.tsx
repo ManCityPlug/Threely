@@ -352,7 +352,7 @@ function DashboardPageInner() {
   // Path view state
   const [showTasks, setShowTasks] = useState(true); // tasks visible below path
   const [workAheadModal, setWorkAheadModal] = useState(false);
-  const [lockedToast, setLockedToast] = useState<string | null>(null);
+  const tasksRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
     try {
@@ -994,6 +994,40 @@ function DashboardPageInner() {
           {/* ─── Path view + task area ─── */}
           {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && (
             <>
+              {/* All done state — shown ABOVE the path */}
+              {allDone && celebrationDismissed && (
+                <div style={{
+                  textAlign: "center",
+                  padding: "1.5rem 2rem",
+                  marginBottom: 8,
+                }}>
+                  <div style={{
+                    fontSize: "2rem",
+                    marginBottom: 12,
+                    color: "#D4A843",
+                    fontWeight: 800,
+                  }}>
+                    {"✓"}
+                  </div>
+                  <h2 style={{
+                    fontSize: "1.25rem",
+                    fontWeight: 700,
+                    color: "var(--text)",
+                    marginBottom: 6,
+                    letterSpacing: "-0.02em",
+                  }}>
+                    All done for today
+                  </h2>
+                  <p style={{
+                    color: "rgba(255,255,255,0.85)",
+                    fontSize: "0.95rem",
+                    lineHeight: 1.6,
+                  }}>
+                    {getCompletionMessage(goalDayNumber)}
+                  </p>
+                </div>
+              )}
+
               {/* Path View */}
               <PathView
                 dayNumber={goalDayNumber}
@@ -1001,39 +1035,29 @@ function DashboardPageInner() {
                 onDayClick={(day, type) => {
                   if (type === "today") {
                     setShowTasks(true);
+                    // Scroll to tasks section
+                    setTimeout(() => {
+                      if (tasksRef.current) {
+                        tasksRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+                      }
+                    }, 100);
                   } else if (type === "next") {
                     setWorkAheadModal(true);
-                  } else if (type === "locked") {
-                    if (day === goalDayNumber + 1 && !allDone) {
-                      setLockedToast("Complete today's tasks to unlock this day");
-                      setTimeout(() => setLockedToast(null), 2500);
-                    } else if (day > goalDayNumber + 1) {
-                      setLockedToast("Complete the previous day first");
-                      setTimeout(() => setLockedToast(null), 2500);
-                    }
                   }
+                  // "locked" is now handled by modal inside PathView
                 }}
                 allDoneToday={allDone}
                 totalTasks={totalCount}
+                onStartDay={() => {
+                  setShowTasks(true);
+                  setTimeout(() => {
+                    if (tasksRef.current) {
+                      tasksRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }
+                  }, 100);
+                }}
+                tasksVisible={showTasks}
               />
-
-              {/* Locked day toast */}
-              {lockedToast && (
-                <div style={{
-                  textAlign: "center",
-                  padding: "10px 20px",
-                  background: "rgba(255,255,255,0.08)",
-                  borderRadius: 10,
-                  marginBottom: 16,
-                  fontSize: "0.85rem",
-                  fontWeight: 600,
-                  color: "rgba(255,255,255,0.85)",
-                  animation: "pathFadeIn 0.25s ease",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }}>
-                  {lockedToast}
-                </div>
-              )}
 
               {/* Work ahead modal */}
               {workAheadModal && (
@@ -1066,7 +1090,7 @@ function DashboardPageInner() {
                       Work ahead?
                     </h3>
                     <p style={{
-                      color: "rgba(255,255,255,0.7)",
+                      color: "rgba(255,255,255,0.85)",
                       fontSize: "0.9rem",
                       lineHeight: 1.6,
                       marginBottom: "1.5rem",
@@ -1113,39 +1137,9 @@ function DashboardPageInner() {
                 </div>
               )}
 
-              {/* All done state */}
-              {allDone && celebrationDismissed ? (
-                <div style={{
-                  textAlign: "center",
-                  padding: "2rem 2rem 1rem",
-                }}>
-                  <div style={{
-                    fontSize: "2rem",
-                    marginBottom: 16,
-                    color: "#D4A843",
-                  }}>
-                    {"✓"}
-                  </div>
-                  <h2 style={{
-                    fontSize: "1.25rem",
-                    fontWeight: 700,
-                    color: "var(--text)",
-                    marginBottom: 8,
-                    letterSpacing: "-0.02em",
-                  }}>
-                    All done for today
-                  </h2>
-                  <p style={{
-                    color: "rgba(255,255,255,0.7)",
-                    fontSize: "0.95rem",
-                    lineHeight: 1.6,
-                  }}>
-                    {getCompletionMessage(goalDayNumber)}
-                  </p>
-                </div>
-              ) : showTasks && (
-                /* Task cards below path */
-                <div style={{
+              {/* Task cards below path */}
+              {!allDone && showTasks && (
+                <div ref={tasksRef} style={{
                   display: "flex",
                   flexDirection: "column",
                   gap: "0.875rem",
