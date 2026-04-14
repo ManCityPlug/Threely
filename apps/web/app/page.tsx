@@ -27,7 +27,7 @@ export default function LandingPage() {
     const isIPad = /iPad/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
     setIsMobile(isIPad || /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
     getSupabase().auth.getSession().then(({ data: { session } }) => {
-      if (session) setLoggedIn(true);
+      if (session?.user && !session.user.is_anonymous) setLoggedIn(true);
     });
   }, []);
 
