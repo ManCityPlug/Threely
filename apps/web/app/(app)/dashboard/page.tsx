@@ -104,6 +104,9 @@ function GamifiedTaskCard({
 
   return (
     <div
+      onClick={() => {
+        if (!task.isSkipped) onToggle(task.id, !task.isCompleted);
+      }}
       style={{
         display: "flex",
         alignItems: "flex-start",
@@ -267,18 +270,6 @@ function CelebrationOverlay({
         transitionDelay: "0.6s",
       }}>
         {getCompletionMessage(dayNumber)}
-      </p>
-
-      <p style={{
-        fontSize: "0.9rem",
-        color: "#D4A843",
-        marginBottom: 40,
-        transform: visible ? "translateY(0)" : "translateY(20px)",
-        opacity: visible ? 1 : 0,
-        transition: "all 0.5s ease",
-        transitionDelay: "0.7s",
-      }}>
-        {"→"} {goalTitle}
       </p>
 
       <button

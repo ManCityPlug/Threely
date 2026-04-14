@@ -168,22 +168,26 @@ export default function StartPage() {
   function startBuild(cat: Category, allAnswers: string[]) {
     const goalText = buildGoalText(cat, allAnswers);
     // Store goal info for later (after checkout + signup)
+    // Create an aspirational display title
+    const title = cat === "business"
+      ? `Making ${allAnswers[0] === "$500" ? "$500" : allAnswers[0] === "$1K-$5K" ? "$5,000" : "$10,000"}/Month`
+      : cat === "health"
+        ? allAnswers[0] === "Lose weight" ? "Losing Weight"
+          : allAnswers[0] === "Glow up" ? "Glow Up"
+          : allAnswers[0] === "Gain more muscle" ? "Building Muscle"
+          : allAnswers[0]
+        : allAnswers[0]?.slice(0, 40) || "Your Goal";
+
     try {
       localStorage.setItem("threely_pending_goal", JSON.stringify({
         category: cat,
         answers: allAnswers,
         goalText,
+        displayTitle: title,
       }));
     } catch { /* ignore */ }
 
-    // Create a short display title from their answers
-    const displayTitle = cat === "business"
-      ? `Make ${allAnswers[0]}/month`
-      : cat === "health"
-        ? allAnswers[0]
-        : allAnswers[0]?.slice(0, 40) || "Your goal";
-
-    setGeneratedGoalTitle(displayTitle);
+    setGeneratedGoalTitle(title);
     setShowHype(true);
   }
 
