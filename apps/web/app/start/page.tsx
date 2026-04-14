@@ -275,31 +275,42 @@ export default function StartPage() {
             <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)" }}>{generatedGoalTitle}</div>
           </div>
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            {generatedTasks.map((task, i) => (
-              <div key={task.id ?? i} className="card" style={{ padding: "1.25rem 1.5rem", borderRadius: 16, border: "1px solid var(--border)" }}>
-                <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                  <div style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid var(--border)", flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
-                      <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text)", lineHeight: 1.35, margin: 0 }}>
-                        {(task as unknown as { title?: string }).title ?? task.task}
-                      </h3>
-                      {task.estimated_minutes ? (
-                        <span style={{ fontSize: "0.7rem", fontWeight: 600, color: "rgba(255,255,255,0.85)", background: "var(--primary-light)", padding: "3px 8px", borderRadius: 999, flexShrink: 0 }}>
-                          {task.estimated_minutes}m
-                        </span>
-                      ) : null}
+          {/* Blurred tasks — tease the plan */}
+          <div style={{ position: "relative" }}>
+            <div style={{ filter: "blur(6px)", pointerEvents: "none", userSelect: "none" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {generatedTasks.map((task, i) => (
+                  <div key={task.id ?? i} className="card" style={{ padding: "1.25rem 1.5rem", borderRadius: 16, border: "1px solid var(--border)" }}>
+                    <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid var(--border)", flexShrink: 0 }} />
+                      <div style={{ flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
+                          <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text)", lineHeight: 1.35, margin: 0 }}>
+                            {(task as unknown as { title?: string }).title ?? task.task}
+                          </h3>
+                        </div>
+                        {task.description && (
+                          <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.6, margin: 0 }}>
+                            {task.description}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    {task.description && (
-                      <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.6, margin: 0 }}>
-                        {task.description}
-                      </p>
-                    )}
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
+            </div>
+            {/* Overlay gradient fade */}
+            <div style={{
+              position: "absolute", inset: 0,
+              background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.7) 80%, rgba(10,10,10,0.95) 100%)",
+              display: "flex", alignItems: "flex-end", justifyContent: "center",
+              paddingBottom: 20, borderRadius: 16,
+            }}>
+              <p style={{ fontSize: "0.9rem", fontWeight: 600, color: "rgba(255,255,255,0.85)" }}>
+                Start your free trial to unlock your plan
+              </p>
+            </div>
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 8 }}>
@@ -311,10 +322,10 @@ export default function StartPage() {
                 color: "#000", borderRadius: 14, border: "none", cursor: "pointer",
               }}
             >
-              Save Your Plan →
+              Start Free Trial →
             </button>
             <p style={{ textAlign: "center", fontSize: "0.8rem", color: "rgba(255,255,255,0.85)" }}>
-              Free account. No credit card required.
+              7-day free trial. Cancel anytime.
             </p>
           </div>
 

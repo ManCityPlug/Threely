@@ -47,7 +47,8 @@ function SignupContent() {
         if (updateError) {
           throw new Error(updateError.message.includes("already") ? "An account with this email already exists." : updateError.message);
         }
-        router.push("/dashboard?welcome=1");
+        // Send to checkout to capture CC for free trial
+        router.push("/checkout?plan=monthly");
         return;
       }
 
