@@ -114,7 +114,7 @@ export default function AdminLoginPage() {
           style={{
             width: "100%",
             padding: "0.6rem 0.75rem",
-            background: "#131F24",
+            background: "#141414",
             border: "1px solid #1e1e1e",
             borderRadius: 8,
             color: "#fff",
@@ -144,7 +144,7 @@ export default function AdminLoginPage() {
           style={{
             width: "100%",
             padding: "0.6rem 0.75rem",
-            background: "#131F24",
+            background: "#141414",
             border: "1px solid #1e1e1e",
             borderRadius: 8,
             color: "#fff",

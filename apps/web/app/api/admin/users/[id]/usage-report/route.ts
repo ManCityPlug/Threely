@@ -14,7 +14,7 @@ interface TaskItem {
 }
 
 const GOLD = "#D4A843";
-const DARK = "#131F24";
+const DARK = "#141414";
 const TEXT = "#222222";
 const SUBTEXT = "#555555";
 const MUTED = "#888888";

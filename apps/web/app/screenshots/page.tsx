@@ -197,7 +197,7 @@ export default function ScreenshotsPage() {
   return (
     <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "rgba(255,255,255,0.02)", minHeight: "100vh" }}>
       {/* Header */}
-      <div style={{ background: "#131F24", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "1rem 1.5rem", position: "sticky", top: 0, zIndex: 100 }}>
+      <div style={{ background: "#141414", borderBottom: "1px solid rgba(255,255,255,0.06)", padding: "1rem 1.5rem", position: "sticky", top: 0, zIndex: 100 }}>
         <div style={{ maxWidth: 1400, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem" }}>
           <h1 style={{ fontSize: "1.25rem", fontWeight: 800, letterSpacing: "-0.03em", margin: 0 }}>
             <span style={{ color: BRAND }}>Threely</span> Screenshot Generator
@@ -268,7 +268,7 @@ export default function ScreenshotsPage() {
       <div style={{ maxWidth: 1400, margin: "0 auto", padding: "2rem 1.5rem" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: "1.5rem" }}>
           {slides.map((slide, idx) => (
-            <div key={slide.id} style={{ background: "#131F24", borderRadius: "1rem", border: "1px solid rgba(255,255,255,0.08)", overflow: "hidden" }}>
+            <div key={slide.id} style={{ background: "#141414", borderRadius: "1rem", border: "1px solid rgba(255,255,255,0.08)", overflow: "hidden" }}>
               {/* Preview */}
               <div
                 style={{
@@ -398,7 +398,7 @@ export default function ScreenshotsPage() {
                       onClick={() => updateSlide(idx, "imageOffsetY", slide.imageOffsetY - 2)}
                       style={{
                         width: 28, height: 28, borderRadius: 6, border: "1px solid rgba(255,255,255,0.08)",
-                        background: "#131F24", cursor: "pointer", fontSize: "0.85rem", fontWeight: 700,
+                        background: "#141414", cursor: "pointer", fontSize: "0.85rem", fontWeight: 700,
                         display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.5)",
                       }}
                       title="Move image up"
@@ -417,7 +417,7 @@ export default function ScreenshotsPage() {
                       onClick={() => updateSlide(idx, "imageOffsetY", slide.imageOffsetY + 2)}
                       style={{
                         width: 28, height: 28, borderRadius: 6, border: "1px solid rgba(255,255,255,0.08)",
-                        background: "#131F24", cursor: "pointer", fontSize: "0.85rem", fontWeight: 700,
+                        background: "#141414", cursor: "pointer", fontSize: "0.85rem", fontWeight: 700,
                         display: "flex", alignItems: "center", justifyContent: "center", color: "rgba(255,255,255,0.5)",
                       }}
                       title="Move image down"
@@ -473,7 +473,7 @@ export default function ScreenshotsPage() {
         <div style={{
           marginTop: "2rem",
           padding: "1.25rem",
-          background: "#131F24",
+          background: "#141414",
           borderRadius: "0.75rem",
           border: "1px solid rgba(255,255,255,0.08)",
           fontSize: "0.85rem",

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function SupportPage() {
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#131F24", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#141414", minHeight: "100vh", display: "flex", flexDirection: "column" }}>
       <MarketingNav />
 
       {/* Hero */}

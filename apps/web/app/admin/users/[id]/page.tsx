@@ -212,7 +212,7 @@ function GoalCard({ goal }: { goal: GoalItem }) {
                       alignItems: "flex-start",
                       gap: 10,
                       padding: "0.5rem 0.65rem",
-                      background: "#131F24",
+                      background: "#141414",
                       borderRadius: 8,
                       border: "1px solid #1e1e21",
                     }}
@@ -273,7 +273,7 @@ function GoalCard({ goal }: { goal: GoalItem }) {
               <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
                 User&apos;s Raw Input
               </div>
-              <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#131F24", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
+              <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#141414", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
                 {goal.rawInput}
               </div>
             </div>
@@ -285,7 +285,7 @@ function GoalCard({ goal }: { goal: GoalItem }) {
               <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
                 Structured Summary
               </div>
-              <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#131F24", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
+              <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#141414", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
                 {goal.structuredSummary}
               </div>
             </div>
@@ -302,7 +302,7 @@ function GoalCard({ goal }: { goal: GoalItem }) {
                   fontSize: "0.83rem",
                   color: "#d4d4d8",
                   lineHeight: 1.7,
-                  background: "#131F24",
+                  background: "#141414",
                   borderRadius: 8,
                   padding: "0.75rem",
                   border: "1px solid #1e1e21",
@@ -527,7 +527,7 @@ function GrantOfferSection({
   );
 
   const inputBase: React.CSSProperties = {
-    background: "#131F24",
+    background: "#141414",
     color: "#fff",
     border: "1px solid #3f3f46",
     borderRadius: 8,
@@ -674,7 +674,7 @@ function GrantOfferSection({
                   flex: 1,
                   padding: "0.5rem",
                   borderRadius: 8,
-                  background: mode === "manual" ? "#D4A843" : "#131F24",
+                  background: mode === "manual" ? "#D4A843" : "#141414",
                   color: mode === "manual" ? "#000" : "#a1a1aa",
                   fontWeight: 700,
                   fontSize: "0.78rem",
@@ -693,7 +693,7 @@ function GrantOfferSection({
                   flex: 1,
                   padding: "0.5rem",
                   borderRadius: 8,
-                  background: mode === "auto" ? "#D4A843" : "#131F24",
+                  background: mode === "auto" ? "#D4A843" : "#141414",
                   color: mode === "auto" ? "#000" : "#a1a1aa",
                   fontWeight: 700,
                   fontSize: "0.78rem",
@@ -900,7 +900,7 @@ function OfferListItem({
   return (
     <div
       style={{
-        background: "#131F24",
+        background: "#141414",
         border: "1px solid #1e1e21",
         borderRadius: 10,
         padding: "0.75rem 0.875rem",
