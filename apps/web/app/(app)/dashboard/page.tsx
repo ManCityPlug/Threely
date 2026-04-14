@@ -1140,11 +1140,29 @@ function DashboardPageInner() {
               <PathView
                 dayNumber={goalDayNumber}
                 completedDays={goalDayNumber - 1}
-                onDayClick={(day, type) => {
+                onDayClick={async (day, type) => {
                   if (type === "today") {
                     setShowTasks(true);
                   } else if (type === "next") {
                     setWorkAheadModal(true);
+                  } else if (type === "completed") {
+                    // Fetch and show past day's tasks in read-only mode
+                    try {
+                      const goalCreated = selectedGoal?.createdAt ? new Date(selectedGoal.createdAt) : new Date();
+                      const pastDate = new Date(goalCreated);
+                      pastDate.setDate(pastDate.getDate() + day - 1);
+                      const dateStr = pastDate.toISOString().split("T")[0];
+                      const res = await tasksApi.today(false, dateStr);
+                      const goalTasks = res.dailyTasks.filter(dt => dt.goalId === effectiveSelectedGoalId);
+                      if (goalTasks.length > 0) {
+                        const items = goalTasks[0].tasks.slice(-3);
+                        alert(`Day ${day} Tasks:\n\n${items.map((t: { task?: string; title?: string; isCompleted?: boolean }, i: number) => `${(t as { isCompleted?: boolean }).isCompleted ? "✓" : "○"} ${(t as { task?: string; title?: string }).task || (t as { task?: string; title?: string }).title}`).join("\n")}`);
+                      } else {
+                        alert(`Day ${day}: No tasks found for this day.`);
+                      }
+                    } catch {
+                      alert(`Day ${day}: Couldn't load tasks.`);
+                    }
                   }
                 }}
                 allDoneToday={allDone}
