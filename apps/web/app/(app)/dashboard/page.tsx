@@ -1028,6 +1028,20 @@ function DashboardPageInner() {
                 </div>
               )}
 
+              {/* Day heading */}
+              {!allDone && (
+                <h1 style={{
+                  fontSize: "2.5rem",
+                  fontWeight: 800,
+                  letterSpacing: "-0.04em",
+                  color: "var(--text)",
+                  textAlign: "center",
+                  marginBottom: 8,
+                }}>
+                  Day {goalDayNumber}
+                </h1>
+              )}
+
               {/* Path View */}
               <PathView
                 dayNumber={goalDayNumber}
@@ -1115,9 +1129,24 @@ function DashboardPageInner() {
                         I&apos;ll wait
                       </button>
                       <button
-                        onClick={() => {
+                        onClick={async () => {
                           setWorkAheadModal(false);
-                          handleGenerate(effectiveSelectedGoalId ?? undefined);
+                          if (!hasPro) { router.push("/checkout?plan=yearly"); return; }
+                          setGenerating(true);
+                          try {
+                            const res = await tasksApi.generate(
+                              effectiveSelectedGoalId
+                                ? { goalId: effectiveSelectedGoalId, requestingAdditional: true }
+                                : { requestingAdditional: true }
+                            );
+                            if (res.dailyTasks.length > 0) {
+                              setDailyTasks(prev => [...prev, ...res.dailyTasks]);
+                            }
+                          } catch {
+                            showToast("Couldn't generate tasks", "error");
+                          } finally {
+                            setGenerating(false);
+                          }
                         }}
                         style={{
                           flex: 1, padding: "12px 16px",

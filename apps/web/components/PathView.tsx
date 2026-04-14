@@ -181,41 +181,6 @@ export default function PathView({
         .path-node-btn:hover { filter: brightness(1.12); }
       `}</style>
 
-      {/* Section banner */}
-      <div style={{
-        background: `linear-gradient(135deg, ${GOLD}, #C49A3C)`,
-        borderRadius: 12,
-        padding: "12px 20px",
-        marginBottom: 16,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-      }}>
-        <span style={{
-          fontSize: "0.72rem",
-          fontWeight: 800,
-          color: "rgba(0,0,0,0.5)",
-          letterSpacing: "0.08em",
-          textTransform: "uppercase",
-        }}>
-          WEEK {week}
-        </span>
-        <span style={{
-          width: 4,
-          height: 4,
-          borderRadius: "50%",
-          background: "rgba(0,0,0,0.3)",
-        }} />
-        <span style={{
-          fontSize: "0.88rem",
-          fontWeight: 700,
-          color: "#000",
-          letterSpacing: "-0.01em",
-        }}>
-          {phase}
-        </span>
-      </div>
 
       <div
         ref={scrollRef}
