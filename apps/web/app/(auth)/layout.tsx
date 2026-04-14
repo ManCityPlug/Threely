@@ -2,7 +2,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <>
       <style>{`
-        html, body { background: #0a0a0a !important; }
+        html, body { background: #131F24 !important; }
       `}</style>
       <script dangerouslySetInnerHTML={{ __html: `document.documentElement.setAttribute('data-theme','dark');` }} />
       <div style={{
@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0a0a0a",
+        background: "#131F24",
         padding: "1rem",
       }}>
         <div style={{ width: "100%", maxWidth: 480 }}>

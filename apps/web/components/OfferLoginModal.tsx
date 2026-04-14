@@ -114,7 +114,7 @@ export default function OfferLoginModal({ firstName }: Props) {
           transform: "translate(-50%, -50%)",
           width: "calc(100vw - 2rem)",
           maxWidth: 460,
-          background: "#0a0a0a",
+          background: "#131F24",
           border: "1.5px solid #D4A843",
           borderRadius: 18,
           padding: "2rem 1.75rem",

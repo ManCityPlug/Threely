@@ -162,7 +162,7 @@ export default function OfferBanner({ onActiveChange }: Props) {
           <div
             onClick={(e) => e.stopPropagation()}
             style={{
-              background: "#0a0a0a",
+              background: "#131F24",
               border: "1.5px solid #D4A843",
               borderRadius: 16,
               padding: "1.75rem 1.5rem",

@@ -28,7 +28,7 @@ export default function TermsPage() {
   };
 
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#0a0a0a" }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#131F24" }}>
       <MarketingNav />
 
       {/* Hero */}

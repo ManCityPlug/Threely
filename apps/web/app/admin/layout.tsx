@@ -56,7 +56,7 @@ export default function AdminLayout({
         data-theme="dark"
         style={{
           minHeight: "100vh",
-          background: "#0a0a0a",
+          background: "#131F24",
           color: "#e4e4e7",
           fontFamily:
             "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
@@ -72,7 +72,7 @@ export default function AdminLayout({
       <div
         style={{
           minHeight: "100vh",
-          background: "#0a0a0a",
+          background: "#131F24",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -97,7 +97,7 @@ export default function AdminLayout({
       data-theme="dark"
       style={{
         minHeight: "100vh",
-        background: "#0a0a0a",
+        background: "#131F24",
         color: "#e4e4e7",
         fontFamily:
           "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",

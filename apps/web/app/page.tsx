@@ -52,7 +52,7 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "#e8e8e8", background: "#0a0a0a", overflowX: "hidden", minHeight: "100vh" }}>
+    <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "#e8e8e8", background: "#131F24", overflowX: "hidden", minHeight: "100vh" }}>
       <style>{`
         @keyframes logoBreathe {
           0%,100% { transform: scale(1); filter: drop-shadow(0 0 16px rgba(212,168,67,0.4)) drop-shadow(0 0 40px rgba(212,168,67,0.15)); }

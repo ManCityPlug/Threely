@@ -23,7 +23,7 @@ const FEATURES = [
 
 export default function PricingPage() {
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#0a0a0a" }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#131F24" }}>
       <MarketingNav />
 
       {/* Hero */}
@@ -49,7 +49,7 @@ export default function PricingPage() {
       </section>
 
       {/* Pricing cards — 2 tiers */}
-      <section style={{ padding: "3.5rem 1.5rem", background: "#0a0a0a" }}>
+      <section style={{ padding: "3.5rem 1.5rem", background: "#131F24" }}>
         <div style={{
           maxWidth: 700,
           margin: "0 auto",
@@ -63,7 +63,7 @@ export default function PricingPage() {
             padding: "2rem 1.5rem",
             borderRadius: 16,
             border: "1px solid rgba(255,255,255,0.08)",
-            background: "#0a0a0a",
+            background: "#131F24",
           }}>
             <div style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.1em", color: "#D4A843", textTransform: "uppercase", marginBottom: 8 }}>
               MONTHLY
@@ -80,7 +80,7 @@ export default function PricingPage() {
               width: "100%",
               textAlign: "center",
               padding: "0.75rem 1.5rem",
-              background: "#0a0a0a",
+              background: "#131F24",
               color: "#D4A843",
               border: "1.5px solid #D4A843",
               borderRadius: 10,
@@ -96,7 +96,7 @@ export default function PricingPage() {
             padding: "2rem 1.5rem",
             borderRadius: 16,
             border: "2px solid #D4A843",
-            background: "#0a0a0a",
+            background: "#131F24",
             position: "relative",
             boxShadow: "0 4px 20px rgba(212,168,67,0.12)",
           }}>
@@ -161,7 +161,7 @@ export default function PricingPage() {
       </section>
 
       {/* Billing FAQ */}
-      <section style={{ padding: "3.5rem 1.5rem", background: "#0a0a0a" }}>
+      <section style={{ padding: "3.5rem 1.5rem", background: "#131F24" }}>
         <div style={{ maxWidth: 600, margin: "0 auto" }}>
           <h2 style={{
             fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)",

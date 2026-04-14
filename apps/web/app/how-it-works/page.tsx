@@ -51,7 +51,7 @@ const STEPS = [
 
 export default function HowItWorksPage() {
   return (
-    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#0a0a0a" }}>
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#131F24" }}>
       <MarketingNav />
 
       {/* Hero */}
@@ -78,7 +78,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Steps */}
-      <section style={{ padding: "4rem 1.5rem", background: "#0a0a0a" }}>
+      <section style={{ padding: "4rem 1.5rem", background: "#131F24" }}>
         <div style={{ maxWidth: 700, margin: "0 auto" }}>
           {STEPS.map((step, i) => (
             <div key={step.num} style={{
@@ -150,7 +150,7 @@ export default function HowItWorksPage() {
 
           <div style={{
             maxWidth: 420, margin: "0 auto",
-            background: "#0a0a0a",
+            background: "#131F24",
             borderRadius: 16,
             border: "1px solid rgba(255,255,255,0.08)",
             boxShadow: "0 8px 32px rgba(0,0,0,0.08)",
@@ -217,7 +217,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Why 3 */}
-      <section style={{ padding: "4rem 1.5rem", background: "#0a0a0a" }}>
+      <section style={{ padding: "4rem 1.5rem", background: "#131F24" }}>
         <div style={{ maxWidth: 650, margin: "0 auto", textAlign: "center" }}>
           <h2 style={{
             fontSize: "clamp(1.3rem, 3.5vw, 1.75rem)",
@@ -242,7 +242,7 @@ export default function HowItWorksPage() {
       {/* CTA */}
       <section style={{
         padding: "4rem 1.5rem",
-        background: "#0a0a0a", borderTop: "1px solid rgba(255,255,255,0.06)",
+        background: "#131F24", borderTop: "1px solid rgba(255,255,255,0.06)",
         textAlign: "center",
         color: "#fff",
       }}>
@@ -257,7 +257,7 @@ export default function HowItWorksPage() {
             <Link href="/start" style={{
               display: "inline-block",
               padding: "0.875rem 2.5rem",
-              background: "#0a0a0a",
+              background: "#131F24",
               color: "#D4A843",
               fontWeight: 700,
               fontSize: "1rem",

@@ -21,7 +21,7 @@
   --danger-light: #fff0f0;
   --warning: #f59e0b;
   --warning-light: #fef3c7;
-  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --radius-sm: 6px;
   --radius: 10px;
   --radius-lg: 14px;
@@ -36,8 +36,8 @@
 /* ─── Dark mode (forced via data-theme or system preference) ────────────────── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0a0a0a;
-    --card: #161616;
+    --bg: #131F24;
+    --card: #1a2a32;
     --primary: #FFFFFF;
     --primary-text: #000000;
     --primary-light: rgba(255,255,255,0.08);
@@ -45,7 +45,7 @@
     --text: #e8eaf0;
     --subtext: #9ba3b5;
     --muted: #6b7280;
-    --border: #252b3d;
+    --border: #2a3a42;
     --success: #3ecf8e;
     --success-light: rgba(62,207,142,0.12);
     --danger: #ff6b6b;
@@ -62,8 +62,8 @@
 }
 
 [data-theme="dark"] {
-  --bg: #0a0a0a;
-  --card: #161616;
+  --bg: #131F24;
+  --card: #1a2a32;
   --primary: #FFFFFF;
   --primary-text: #000000;
   --primary-light: rgba(255,255,255,0.08);
@@ -71,7 +71,7 @@
   --text: #e8eaf0;
   --subtext: #9ba3b5;
   --muted: #6b7280;
-  --border: #252b3d;
+  --border: #2a3a42;
   --success: #3ecf8e;
   --success-light: rgba(62,207,142,0.12);
   --danger: #ff6b6b;
@@ -88,13 +88,13 @@
 
 html {
   height: 100%;
-  background: #0a0a0a;
+  background: #131F24;
 }
 
 body {
   min-height: 100%;
   font-family: var(--font);
-  background: #0a0a0a;
+  background: #131F24;
   color: var(--text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -1489,5 +1489,92 @@ input, textarea, select {
 @media (max-width: 768px) {
   .footer-grid {
     grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+/* ─── Heading font-weight boost ────────────────────────────────────────── */
+h1, h2, h3, h4 {
+  font-weight: 800;
+}
+
+/* ─── Desktop left sidebar (Duolingo-style, >=900px) ───────────────────── */
+@media (min-width: 900px) {
+  .top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: 0;
+    width: 200px;
+    height: 100vh;
+    border-bottom: none;
+    border-right: 1px solid var(--border);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    padding-top: 1.5rem;
+  }
+
+  .top-nav-inner {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0.35rem;
+    max-width: none;
+    padding: 0 0.75rem;
+    height: auto;
+  }
+
+  .top-nav-item {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 14px;
+    transition: background 0.15s ease, transform 0.1s ease;
+  }
+
+  .top-nav-icon {
+    width: 38px;
+    height: 38px;
+  }
+
+  .top-nav-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .top-nav-label {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .top-nav-item:hover {
+    background: rgba(255,255,255,0.05);
+  }
+
+  .top-nav-item.active {
+    background: rgba(212,168,67,0.12);
+  }
+
+  .top-nav-item.active .top-nav-label {
+    color: #D4A843;
+    font-weight: 700;
+  }
+
+  .top-nav-bell {
+    position: relative;
+    right: auto;
+    top: auto;
+    transform: none;
+    margin-top: 0.5rem;
+    align-self: flex-start;
+    margin-left: 14px;
+  }
+
+  .main-content {
+    padding-top: 0;
+    margin-left: 200px;
   }
 }

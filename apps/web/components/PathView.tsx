@@ -40,6 +40,7 @@ export default function PathView({
   const [mounted, setMounted] = useState(false);
   const [todayPopup, setTodayPopup] = useState(false);
   const [lockedModal, setLockedModal] = useState(false);
+  const [showScrollHint, setShowScrollHint] = useState(true);
 
   // Show 20 nodes: some before today, rest after
   const VISIBLE_NODES = 20;
@@ -70,6 +71,17 @@ export default function PathView({
       }
     }, 250);
     return () => clearTimeout(timer);
+  }, [mounted]);
+
+  // Hide scroll hint on first scroll
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    function handleScroll() {
+      setShowScrollHint(false);
+    }
+    container.addEventListener("scroll", handleScroll, { once: true });
+    return () => container.removeEventListener("scroll", handleScroll);
   }, [mounted]);
 
   // Close today popup on outside click
@@ -343,25 +355,32 @@ export default function PathView({
     <>
       <style>{`
         @keyframes breathe {
-          0%, 100% { box-shadow: 0 0 20px 6px rgba(212,168,67,0.25), 0 4px 12px rgba(212,168,67,0.3), inset 0 2px 4px rgba(255,255,255,0.05); }
-          50% { box-shadow: 0 0 40px 16px rgba(212,168,67,0.4), 0 4px 12px rgba(212,168,67,0.3), inset 0 2px 4px rgba(255,255,255,0.05); }
+          0%, 100% { box-shadow: 0 0 24px 8px rgba(212,168,67,0.35), 0 4px 16px rgba(212,168,67,0.4), inset 0 2px 4px rgba(255,255,255,0.05); }
+          50% { box-shadow: 0 0 48px 20px rgba(212,168,67,0.55), 0 4px 16px rgba(212,168,67,0.4), inset 0 2px 4px rgba(255,255,255,0.05); }
         }
 
         @keyframes crownGlow {
           0%, 100% {
-            box-shadow: 0 0 20px 6px rgba(212,168,67,0.25), 0 4px 12px rgba(212,168,67,0.3);
+            box-shadow: 0 0 24px 8px rgba(212,168,67,0.3), 0 4px 12px rgba(212,168,67,0.3);
           }
           50% {
-            box-shadow: 0 0 35px 12px rgba(212,168,67,0.4), 0 4px 12px rgba(212,168,67,0.3);
+            box-shadow: 0 0 40px 14px rgba(212,168,67,0.5), 0 4px 12px rgba(212,168,67,0.3);
           }
         }
 
-        @keyframes nodeEnterPath {
-          from {
+        @keyframes nodeEnterBounce {
+          0% {
             opacity: 0;
-            transform: translateX(-50%) translateY(16px) scale(0.85);
+            transform: translateX(-50%) translateY(24px) scale(0.7);
           }
-          to {
+          60% {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-4px) scale(1.06);
+          }
+          80% {
+            transform: translateX(-50%) translateY(2px) scale(0.98);
+          }
+          100% {
             opacity: 1;
             transform: translateX(-50%) translateY(0) scale(1);
           }
@@ -382,11 +401,27 @@ export default function PathView({
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
+        @keyframes startBadgePulse {
+          0%, 100% { transform: translateX(-50%) scale(1); }
+          50% { transform: translateX(-50%) scale(1.06); }
+        }
+
+        @keyframes scrollHintFade {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+
+        @keyframes scrollArrowBounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(4px); }
+        }
+
         .path-container::-webkit-scrollbar { display: none; }
 
         .path-node-btn {
           font-family: inherit;
           -webkit-tap-highlight-color: transparent;
+          transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), filter 0.25s ease;
         }
         .path-node-btn:hover {
           filter: brightness(1.1);
@@ -413,6 +448,7 @@ export default function PathView({
         }
       `}</style>
 
+      <div style={{ position: "relative", width: "100%" }}>
       <div
         ref={scrollRef}
         className="path-container"
@@ -452,15 +488,45 @@ export default function PathView({
             else if (nodeType === "next") size = 58;
 
             const xOffset = getHorizontalOffset(i);
-            // Use calc for spacing
-            const yPos = 40 + i * 100; // will be overridden by CSS var
 
             // Determine if label should show
             const showLabel = isToday || crown || milestone || (nodeType === "next" && allDoneToday);
 
+            // Section divider: every 7 nodes, between week boundaries
+            const weekNumber = Math.floor((day - windowStart) / 7) + 1;
+            const isWeekBoundary = i > 0 && i % 7 === 0;
+
             return (
+              <div key={day}>
+                {/* Week section divider */}
+                {isWeekBoundary && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: `calc(40px + ${i} * var(--node-spacing, 100px) - 20px)`,
+                      left: "10%",
+                      right: "10%",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      zIndex: 2,
+                    }}
+                  >
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+                    <span style={{
+                      fontSize: "0.7rem",
+                      fontWeight: 700,
+                      color: "rgba(255,255,255,0.3)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                      whiteSpace: "nowrap",
+                    }}>
+                      Week {weekNumber}
+                    </span>
+                    <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,0.08)" }} />
+                  </div>
+                )}
               <div
-                key={day}
                 ref={isToday ? todayRef : undefined}
                 style={{
                   position: "absolute",
@@ -473,10 +539,52 @@ export default function PathView({
                   zIndex: isToday ? 10 : crown ? 5 : 1,
                   opacity: mounted ? 1 : 0,
                   animation: mounted
-                    ? `nodeEnterPath 0.45s cubic-bezier(0.4, 0, 0.2, 1) ${i * 0.04}s both`
+                    ? `nodeEnterBounce 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) ${i * 0.04}s both`
                     : "none",
                 }}
               >
+                {/* START / COMPLETE badge above today's node */}
+                {isToday && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      bottom: "calc(100% + 8px)",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      zIndex: 20,
+                      animation: !allDoneToday ? "startBadgePulse 2s ease-in-out infinite" : "none",
+                    }}
+                  >
+                    <div style={{
+                      padding: "5px 16px",
+                      borderRadius: 20,
+                      fontSize: "0.72rem",
+                      fontWeight: 800,
+                      letterSpacing: "0.1em",
+                      textTransform: "uppercase",
+                      whiteSpace: "nowrap",
+                      background: allDoneToday
+                        ? "linear-gradient(135deg, #3ecf8e, #2bb77a)"
+                        : `linear-gradient(135deg, ${GOLD}, #C49A3C)`,
+                      color: allDoneToday ? "#fff" : "#000",
+                      boxShadow: allDoneToday
+                        ? "0 2px 12px rgba(62,207,142,0.35)"
+                        : "0 2px 12px rgba(212,168,67,0.4)",
+                    }}>
+                      {allDoneToday ? "COMPLETE \u2713" : "START"}
+                    </div>
+                    {/* Small connector line */}
+                    <div style={{
+                      width: 2,
+                      height: 8,
+                      background: allDoneToday
+                        ? "rgba(62,207,142,0.4)"
+                        : "rgba(212,168,67,0.4)",
+                      margin: "0 auto",
+                    }} />
+                  </div>
+                )}
+
                 {/* Node wrapper for progress ring positioning */}
                 <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
 
@@ -508,18 +616,18 @@ export default function PathView({
                         ? {
                             border: `4px solid ${GOLD_DARK}`,
                             background: `linear-gradient(145deg, #E8C547, ${GOLD})`,
-                            boxShadow: `0 4px 12px rgba(212,168,67,0.3), inset 0 2px 4px rgba(255,255,255,0.15)`,
+                            boxShadow: `0 4px 12px rgba(212,168,67,0.3), inset 0 -3px 6px rgba(0,0,0,0.15), inset 0 3px 6px rgba(255,255,255,0.3)`,
                           }
                         : isToday
                         ? {
                             border: `3px solid ${GOLD}`,
-                            background: "rgba(20,20,20,0.95)",
+                            background: "rgba(19,31,36,0.95)",
                             animation: "breathe 3s ease-in-out infinite",
                           }
                         : nodeType === "next"
                         ? {
                             border: `2.5px dashed ${GOLD}`,
-                            background: "#252525",
+                            background: "#1a2a32",
                             boxShadow: `0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.03)`,
                             opacity: 0.6,
                           }
@@ -531,8 +639,8 @@ export default function PathView({
                           }
                         : {
                             // locked
-                            border: "4px solid #1a1a1a",
-                            background: "#252525",
+                            border: "4px solid #1a2a32",
+                            background: "#1a2a32",
                             boxShadow: `0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.03)`,
                             opacity: 0.45,
                           }),
@@ -603,9 +711,46 @@ export default function PathView({
                   </div>
                 )}
               </div>
+              </div>
             );
           })}
         </div>
+      </div>
+
+      {/* Scroll hint overlay */}
+      {showScrollHint && (
+        <div
+          style={{
+            position: "absolute",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: 60,
+            background: "linear-gradient(transparent, var(--bg, #131F24))",
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "center",
+            paddingBottom: 8,
+            pointerEvents: "none",
+            transition: "opacity 0.5s ease",
+            zIndex: 5,
+          }}
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="rgba(255,255,255,0.35)"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ animation: "scrollArrowBounce 1.5s ease-in-out infinite" }}
+          >
+            <polyline points="6 9 12 15 18 9" />
+          </svg>
+        </div>
+      )}
       </div>
 
       {/* Locked day modal */}
