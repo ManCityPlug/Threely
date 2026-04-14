@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
-import { getUserFromRequest } from "@/lib/supabase";
+import { getAnyUserFromRequest } from "@/lib/supabase";
 import { getStripe, PRICE_MONTHLY, PRICE_YEARLY, TRIAL_DAYS } from "@/lib/stripe";
 
 const PRICE_MAP: Record<string, string> = {
@@ -12,7 +12,7 @@ const PRICE_MAP: Record<string, string> = {
 // ─── POST /api/subscription/confirm — create subscription after card setup ────
 
 export async function POST(request: NextRequest) {
-  const user = await getUserFromRequest(request);
+  const user = await getAnyUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json() as { plan: string };

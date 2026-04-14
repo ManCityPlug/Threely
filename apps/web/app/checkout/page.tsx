@@ -196,8 +196,11 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
 
       const confirmData = await safeJson(res);
 
-      // If user expected a trial but card fingerprint blocked it, let them know
-      if (trialEligible && confirmData.trialGranted === false) {
+      // If coming from /start flow, send to signup to create account
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("from") === "start") {
+        router.replace("/signup?from=checkout");
+      } else if (trialEligible && confirmData.trialGranted === false) {
         router.replace("/dashboard?subscribed=1&trial=denied");
       } else {
         router.replace("/dashboard?subscribed=1");

@@ -315,7 +315,7 @@ export default function StartPage() {
 
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 8 }}>
             <button
-              onClick={() => router.push("/signup?from=start")}
+              onClick={() => router.push("/checkout?plan=monthly&from=start")}
               style={{
                 height: 56, fontSize: "1rem", fontWeight: 700,
                 background: "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)",

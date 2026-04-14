@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getUserFromRequest } from "@/lib/supabase";
+import { getAnyUserFromRequest } from "@/lib/supabase";
 import { getStripe, PRICE_MONTHLY, PRICE_YEARLY } from "@/lib/stripe";
 
 const PRICE_MAP: Record<string, string> = {
@@ -12,7 +12,7 @@ const PRICE_MAP: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getUserFromRequest(request);
+    const user = await getAnyUserFromRequest(request);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const body = await request.json() as { plan: string };
@@ -21,6 +21,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid plan. Use 'monthly' or 'yearly'." }, { status: 400 });
     }
 
+    // Ensure user record exists (anon users may not have one yet)
+    const userEmail = user.email ?? `anon-${user.id}@anon.threely.local`;
+    await prisma.user.upsert({
+      where: { id: user.id },
+      create: { id: user.id, email: userEmail },
+      update: user.email ? { email: user.email } : {},
+    });
     const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
 
     // ── Anti-abuse: if already active, block ──────────────────────────────────
@@ -34,7 +41,7 @@ export async function POST(request: NextRequest) {
     let customerId = dbUser?.stripeCustomerId ?? null;
     if (!customerId) {
       const customer = await stripeClient.customers.create({
-        email: user.email,
+        ...(user.email ? { email: user.email } : {}),
         metadata: { userId: user.id },
       });
       customerId = customer.id;
