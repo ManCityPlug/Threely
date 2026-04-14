@@ -606,14 +606,18 @@ function DashboardPageInner() {
   const streak = getStreakFromGoals(effectiveGoals);
   const goalDayNumber = selectedGoal ? getGoalDayNumber(selectedGoal) : 1;
 
-  // Show celebration when all tasks just completed
-  const prevAllDone = useRef(false);
+  // Show celebration when all tasks just completed — only once per day
+  const prevAllDone = useRef(allDone);
+  const celebrationShownKey = `threely_celebrated_${new Date().toLocaleDateString("en-CA")}_${effectiveSelectedGoalId ?? "all"}`;
   useEffect(() => {
-    if (allDone && !prevAllDone.current && totalCount > 0 && !celebrationDismissed) {
+    const alreadyShown = localStorage.getItem(celebrationShownKey) === "true";
+    if (allDone && !prevAllDone.current && totalCount > 0 && !alreadyShown) {
       setShowCelebration(true);
+      setCelebrationDismissed(false);
+      localStorage.setItem(celebrationShownKey, "true");
     }
     prevAllDone.current = allDone;
-  }, [allDone, totalCount, celebrationDismissed]);
+  }, [allDone, totalCount, celebrationShownKey]);
 
   function pickGoal(val: string) {
     setSelectedGoalId(val);
