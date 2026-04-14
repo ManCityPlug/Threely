@@ -1240,9 +1240,12 @@ function DashboardPageInner() {
                                 : undefined
                             );
                             if (res.dailyTasks.length > 0) {
-                              setDailyTasks(prev => [...prev, ...res.dailyTasks]);
+                              setDailyTasks(res.dailyTasks);
                               setCelebrationDismissed(false);
                               setShowTasks(true);
+                            } else {
+                              // Reload all data if generate returned empty
+                              window.location.reload();
                             }
                           } catch {
                             showToast("Couldn't generate tasks", "error");

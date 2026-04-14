@@ -545,43 +545,6 @@ export default function PathView({
                     : "none",
                 }}
               >
-                {/* START / COMPLETE badge BELOW today's node */}
-                {isToday && (
-                  <div
-                    onClick={() => {
-                      if (onStartDay) onStartDay();
-                      else onDayClick(day, nodeType);
-                    }}
-                    style={{
-                      position: "absolute",
-                      top: "calc(100% + 8px)",
-                      left: "50%",
-                      transform: "translateX(-50%)",
-                      zIndex: 20,
-                      cursor: "pointer",
-                      animation: !allDoneToday ? "startBadgePulse 2s ease-in-out infinite" : "none",
-                    }}
-                  >
-                    <div style={{
-                      padding: "5px 16px",
-                      borderRadius: 20,
-                      fontSize: "0.72rem",
-                      fontWeight: 800,
-                      letterSpacing: "0.1em",
-                      textTransform: "uppercase",
-                      whiteSpace: "nowrap",
-                      background: allDoneToday
-                        ? "linear-gradient(135deg, #3ecf8e, #2bb77a)"
-                        : `linear-gradient(135deg, ${GOLD}, #C49A3C)`,
-                      color: allDoneToday ? "#fff" : "#000",
-                      boxShadow: allDoneToday
-                        ? "0 2px 12px rgba(62,207,142,0.35)"
-                        : "0 2px 12px rgba(212,168,67,0.4)",
-                    }}>
-                      {allDoneToday ? "COMPLETE ✓" : "START"}
-                    </div>
-                  </div>
-                )}
 
                 {/* Node wrapper for progress ring positioning */}
                 <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
