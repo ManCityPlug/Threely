@@ -1224,6 +1224,7 @@ function DashboardPageInner() {
                             if (res.dailyTasks.length > 0) {
                               setDailyTasks(prev => [...prev, ...res.dailyTasks]);
                               setCelebrationDismissed(false);
+                              setShowTasks(true);
                             }
                           } catch {
                             showToast("Couldn't generate tasks", "error");

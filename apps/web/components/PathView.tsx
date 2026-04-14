@@ -434,12 +434,12 @@ export default function PathView({
 
         /* Responsive vertical spacing */
         .path-field {
-          --node-spacing: 100px;
+          --node-spacing: 130px;
           --max-path-width: 500px;
         }
         @media (min-width: 900px) {
           .path-field {
-            --node-spacing: 110px;
+            --node-spacing: 140px;
           }
         }
         @media (max-width: 499px) {
