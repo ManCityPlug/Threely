@@ -1,43 +1,13 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { goalsApi, profileApi, tasksApi, type Goal, type ParsedGoal, type TaskItem } from "@/lib/api-client";
+import { goalsApi, profileApi, tasksApi, type Goal } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/Skeleton";
 import BuildingProgress from "@/components/BuildingProgress";
 import { useToast } from "@/components/ToastProvider";
 import { useSubscription } from "@/lib/subscription-context";
 import { MOCK_TUTORIAL_GOAL } from "@/lib/mock-tutorial-data";
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const CATEGORY_EMOJI: Record<string, string> = {
-  fitness: "\uD83D\uDCAA", business: "\uD83D\uDCBC", learning: "\uD83D\uDCDA", creative: "\uD83C\uDFA8",
-  financial: "\uD83D\uDCB0", health: "\uD83C\uDF31", relationships: "\uD83E\uDD1D", productivity: "\u26A1",
-  spiritual: "\uD83D\uDE4F", religion: "\uD83D\uDE4F", mindfulness: "\uD83E\uDDE0", career: "\uD83D\uDCBC",
-  wealth: "\uD83D\uDCB0", other: "\uD83C\uDFAF",
-};
-
-function CategoryBadge({ category }: { category: string | null }) {
-  const cat = category ?? "other";
-  return (
-    <span className="badge" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-      {CATEGORY_EMOJI[cat] ?? "\uD83C\uDFAF"} {cat}
-    </span>
-  );
-}
-
-function formatWorkDays(days: number[] | undefined | null): string {
-  if (!days || days.length === 0 || days.length === 7) return "Every day";
-  const sorted = [...days].sort();
-  const key = sorted.join(",");
-  if (key === "1,2,3,4,5") return "Weekdays";
-  if (key === "6,7") return "Weekends";
-  if (key === "1,3,5") return "Mon, Wed, Fri";
-  if (key === "2,4") return "Tue, Thu";
-  const names = ["", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  return sorted.map(d => names[d]).join(", ");
-}
 
 // ─── 3-Step Funnel for "Add Goal" (same as /start) ───────────────────────────
 
@@ -407,33 +377,14 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
   );
 }
 
-// ─── Goal Card ────────────────────────────────────────────────────────────────
+// ─── Goal Card (simplified: title + delete) ──────────────────────────────────
 
-function GoalCard({ goal, onDeleted, onUpdated }: { goal: Goal; onDeleted: () => void; onUpdated: (goal: Goal) => void }) {
+function GoalCard({ goal, onDeleted }: { goal: Goal; onDeleted: () => void }) {
   const goalRouter = useRouter();
-  const { hasPro } = useSubscription();
-  const [showMenu, setShowMenu] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [toggling, setToggling] = useState(false);
-  const [completing, setCompleting] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  // Close menu on outside click
-  useEffect(() => {
-    if (!showMenu) return;
-    function handleClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setShowMenu(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [showMenu]);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   async function handleDelete() {
-    setShowMenu(false);
-    if (!hasPro) { return; }
-    if (!confirm("Delete this goal and all its tasks?")) return;
     setDeleting(true);
     try {
       await goalsApi.delete(goal.id);
@@ -443,186 +394,96 @@ function GoalCard({ goal, onDeleted, onUpdated }: { goal: Goal; onDeleted: () =>
     }
   }
 
-  async function handleTogglePause() {
-    setToggling(true);
-    try {
-      const { goal: updated } = await goalsApi.update(goal.id, { isPaused: !goal.isPaused } as Partial<Goal>);
-      onUpdated(updated);
-      setShowMenu(false);
-    } catch {
-      // silently fail
-    } finally {
-      setToggling(false);
-    }
-  }
-
-  async function handleMarkComplete() {
-    setShowMenu(false);
-    if (!confirm(`Mark "${goal.title}" as complete? It will be removed from your active goals.`)) return;
-    setCompleting(true);
-    try {
-      await goalsApi.update(goal.id, { isActive: false } as Partial<Goal>);
-      onDeleted();
-    } catch {
-      setCompleting(false);
-    }
-  }
-
-  const daysLeft = goal.deadline
-    ? Math.ceil((new Date(goal.deadline).getTime() - Date.now()) / 86400000)
-    : null;
-
-  // Build badge array like mobile
-  const badges: { label: string; color: string; bg: string }[] = [];
-  if (!goal.isPaused) {
-    // Schedule badge
-    badges.push({ label: formatWorkDays(goal.workDays), color: "#D97706", bg: "#FFFBEB" });
-    // Daily time badge
-    if (goal.dailyTimeMinutes) {
-      const h = Math.floor(goal.dailyTimeMinutes / 60);
-      const m = goal.dailyTimeMinutes % 60;
-      const timeLabel = h > 0 && m > 0 ? `${h}h ${m}m/day` : h > 0 ? `${h}h/day` : `${m}m/day`;
-      badges.push({ label: timeLabel, color: "#0891B2", bg: "#ECFEFF" });
-    }
-    // Days left badge
-    if (daysLeft !== null) {
-      badges.push({
-        label: daysLeft > 0 ? `${daysLeft}d left` : "Overdue",
-        color: daysLeft < 14 ? "var(--danger)" : "#D97706",
-        bg: daysLeft < 14 ? "var(--danger-light)" : "#FFFBEB",
-      });
-    }
-    // Status badge
-    badges.push({ label: "Active", color: "var(--success)", bg: "rgba(34,197,94,0.08)" });
-  } else {
-    badges.push({ label: "Paused", color: "var(--muted)", bg: "var(--bg)" });
-  }
-
   return (
-    <div className="card" style={{ padding: "1.25rem", opacity: goal.isPaused ? 0.7 : 1, display: "flex", flexDirection: "column", gap: 10, height: "100%" }}>
-      {/* Top row: category + title + menu */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8, flex: 1 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-            <CategoryBadge category={goal.category} />
-          </div>
-          <h3 style={{
-            fontWeight: 600, fontSize: "0.95rem",
-            color: goal.isPaused ? "var(--muted)" : "var(--text)",
-            lineHeight: 1.4, margin: 0,
-          }}>
-            {goal.title}
-          </h3>
-          {goal.structuredSummary && (
-            <p style={{ fontSize: "0.82rem", color: "var(--subtext)", lineHeight: 1.5, marginTop: 4, marginBottom: 0 }}>
-              {goal.structuredSummary}
-            </p>
-          )}
-        </div>
+    <>
+      <div
+        data-walkthrough="first-goal-card"
+        onClick={() => {
+          const todayKey = `threely_focus_${new Date().toLocaleDateString("en-CA")}`;
+          localStorage.setItem(todayKey, goal.id);
+          goalRouter.push("/dashboard");
+        }}
+        style={{
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          background: "var(--card)", border: "1px solid var(--border)",
+          borderRadius: "var(--radius)", padding: "1rem 1.25rem",
+          cursor: "pointer", transition: "border-color 0.15s",
+        }}
+        onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#D4A843"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
+      >
+        <h3 style={{
+          fontWeight: 600, fontSize: "0.95rem", color: "var(--text)",
+          lineHeight: 1.4, margin: 0, flex: 1, minWidth: 0,
+          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+        }}>
+          {goal.title}
+        </h3>
 
-        {/* Menu button */}
-        <div ref={menuRef} data-walkthrough="goal-menu-button" style={{ position: "relative", flexShrink: 0 }}>
-          <button
-            onClick={() => setShowMenu(v => !v)}
-            style={{
-              width: 30, height: 30, borderRadius: "50%",
-              background: "var(--bg)", color: "var(--subtext)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 18, cursor: "pointer", border: "none",
-            }}
-          >
-            &#x22EF;
-          </button>
-          {showMenu && (
-            <div
-              data-walkthrough="goal-menu-button-dropdown"
-              style={{
-                position: "absolute", right: 0, top: "100%", marginTop: 4, zIndex: 50,
-                background: "var(--card)", border: "1px solid var(--border)",
-                borderRadius: "var(--radius)", boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
-                minWidth: 160, maxWidth: "calc(100vw - 3rem)", overflow: "hidden",
-              }}
-            >
+        {/* Delete button */}
+        <button
+          onClick={(e) => { e.stopPropagation(); setShowConfirm(true); }}
+          disabled={deleting}
+          style={{
+            background: "none", border: "none", cursor: "pointer",
+            color: "rgba(255,255,255,0.25)", padding: 6, marginLeft: 12,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            borderRadius: 6, transition: "color 0.15s", flexShrink: 0,
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--danger)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.25)"; }}
+          aria-label="Delete goal"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Delete confirmation dialog */}
+      {showConfirm && (
+        <div
+          className="modal-overlay"
+          onClick={() => setShowConfirm(false)}
+          style={{ zIndex: 300 }}
+        >
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{ maxWidth: 360, textAlign: "center", padding: "2rem" }}>
+            <h2 style={{ fontSize: "1.1rem", fontWeight: 700, letterSpacing: "-0.02em", marginBottom: 8 }}>
+              Delete this goal?
+            </h2>
+            <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
+              This can&apos;t be undone.
+            </p>
+            <div style={{ display: "flex", gap: 10 }}>
               <button
-                onClick={handleTogglePause}
-                disabled={toggling}
+                onClick={() => setShowConfirm(false)}
                 style={{
-                  display: "block", width: "100%", padding: "0.6rem 0.875rem",
-                  textAlign: "left", color: "var(--warning)", fontSize: "0.875rem",
-                  fontWeight: 500, cursor: "pointer", background: "none", border: "none",
+                  flex: 1, padding: "0.7rem", borderRadius: "var(--radius)",
+                  border: "1px solid var(--border)", background: "var(--card)",
+                  color: "var(--text)", fontSize: "0.9rem", fontWeight: 600,
+                  cursor: "pointer",
                 }}
               >
-                {toggling ? "..." : goal.isPaused ? "\u25B6 Resume goal" : "\u23F8 Pause goal"}
-              </button>
-              <button
-                onClick={handleMarkComplete}
-                disabled={completing}
-                style={{
-                  display: "block", width: "100%", padding: "0.6rem 0.875rem",
-                  textAlign: "left", color: "var(--success)", fontSize: "0.875rem",
-                  fontWeight: 500, cursor: "pointer", background: "none", border: "none",
-                }}
-              >
-                {completing ? "..." : "\u2705 Mark as complete"}
+                Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={deleting}
                 style={{
-                  display: "block", width: "100%", padding: "0.6rem 0.875rem",
-                  textAlign: "left", color: "var(--danger)", fontSize: "0.875rem",
-                  fontWeight: 500, cursor: "pointer", background: "none", border: "none",
+                  flex: 1, padding: "0.7rem", borderRadius: "var(--radius)",
+                  border: "none", background: "var(--danger)", color: "#fff",
+                  fontSize: "0.9rem", fontWeight: 600, cursor: "pointer",
+                  opacity: deleting ? 0.6 : 1,
                 }}
               >
-                {deleting ? "Deleting..." : "\uD83D\uDDD1 Delete goal"}
+                {deleting ? "Deleting..." : "Delete"}
               </button>
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Badge row — even columns like mobile */}
-      <div style={{ display: "flex", gap: 6 }}>
-        {badges.map((b, i) => (
-          <div key={i} style={{ flex: 1, minWidth: 0 }}>
-            <span style={{
-              display: "block", textAlign: "center",
-              fontSize: "0.7rem", fontWeight: 600,
-              color: b.color, background: b.bg,
-              borderRadius: 20, padding: "3px 6px",
-              whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",
-            }}>
-              {b.label}
-            </span>
           </div>
-        ))}
-      </div>
-
-      {/* Footer: date + view tasks button */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <p style={{ fontSize: "0.75rem", color: "var(--muted)", margin: 0 }}>
-          Added {new Date(goal.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-        </p>
-        {!goal.isPaused && (
-          <button
-            onClick={() => {
-              const todayKey = `threely_focus_${new Date().toLocaleDateString("en-CA")}`;
-              localStorage.setItem(todayKey, goal.id);
-              goalRouter.push("/dashboard");
-            }}
-            style={{
-              fontSize: "0.78rem", fontWeight: 600, color: "var(--primary-text)",
-              background: "var(--primary)", textDecoration: "none",
-              padding: "5px 12px", borderRadius: 6,
-              display: "inline-flex", alignItems: "center",
-              border: "none", cursor: "pointer",
-            }}
-          >
-            View tasks
-          </button>
-        )}
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -684,12 +545,7 @@ function GoalsPageInner() {
     setGoals(prev => prev.filter(g => g.id !== id));
   }
 
-  function handleGoalUpdated(updated: Goal) {
-    setGoals(prev => prev.map(g => g.id === updated.id ? updated : g));
-  }
-
-  const activeGoals = effectiveGoals.filter(g => !g.isPaused);
-  const pausedGoals = effectiveGoals.filter(g => g.isPaused);
+  const activeGoals = effectiveGoals;
 
   if (loading) {
     return (
@@ -717,8 +573,7 @@ function GoalsPageInner() {
         <div>
           <h1 style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.03em" }}>Goals</h1>
           <p style={{ color: "var(--subtext)", fontSize: "0.875rem", marginTop: 2 }}>
-            {activeGoals.length} active goal{activeGoals.length !== 1 ? "s" : ""}
-            {pausedGoals.length > 0 && ` \u00B7 ${pausedGoals.length} paused`}
+            {activeGoals.length} goal{activeGoals.length !== 1 ? "s" : ""}
           </p>
         </div>
         <button
@@ -750,44 +605,16 @@ function GoalsPageInner() {
           </button>
         </div>
       ) : (
-        <>
-          {/* Active goals */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "0.875rem" }}>
-            {activeGoals.map((goal, i) => (
-              <div key={goal.id} className="slide-up" style={{ animationDelay: `${i * 0.08}s` }} {...(i === 0 ? { "data-walkthrough": "first-goal-card" } : {})}>
-                <GoalCard
-                  goal={goal}
-                  onDeleted={() => handleGoalDeleted(goal.id)}
-                  onUpdated={handleGoalUpdated}
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Paused goals */}
-          {pausedGoals.length > 0 && (
-            <div style={{ marginTop: "2rem" }}>
-              <h2 style={{
-                fontSize: "0.8rem", fontWeight: 700, color: "var(--muted)",
-                textTransform: "uppercase", letterSpacing: "0.05em",
-                marginBottom: "0.75rem",
-              }}>
-                Paused
-              </h2>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "0.875rem" }}>
-                {pausedGoals.map((goal, i) => (
-                  <div key={goal.id} className="slide-up" style={{ animationDelay: `${i * 0.08}s` }}>
-                    <GoalCard
-                      goal={goal}
-                      onDeleted={() => handleGoalDeleted(goal.id)}
-                      onUpdated={handleGoalUpdated}
-                    />
-                  </div>
-                ))}
-              </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.625rem" }}>
+          {activeGoals.map((goal, i) => (
+            <div key={goal.id} className="slide-up" style={{ animationDelay: `${i * 0.08}s` }}>
+              <GoalCard
+                goal={goal}
+                onDeleted={() => handleGoalDeleted(goal.id)}
+              />
             </div>
-          )}
-        </>
+          ))}
+        </div>
       )}
 
       {showAdd && (
