@@ -429,8 +429,8 @@ function DashboardPageInner() {
   const [celebrationDismissed, setCelebrationDismissed] = useState(false);
   const [animatingTaskId, setAnimatingTaskId] = useState<string | null>(null);
 
-  // Path view state
-  const [showTasks, setShowTasks] = useState(true); // tasks visible below path
+  // Path view state — false = path/roadmap view, true = fullscreen task view
+  const [showTasks, setShowTasks] = useState(false);
   const [workAheadModal, setWorkAheadModal] = useState(false);
   const tasksRef = useRef<HTMLDivElement>(null);
 
@@ -1076,7 +1076,7 @@ function DashboardPageInner() {
           )}
 
           {/* ─── Path view + task area ─── */}
-          {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && (
+          {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && !showTasks && (
             <>
               {/* All done state — shown ABOVE the path */}
               {allDone && celebrationDismissed && (
@@ -1134,26 +1134,14 @@ function DashboardPageInner() {
                 onDayClick={(day, type) => {
                   if (type === "today") {
                     setShowTasks(true);
-                    // Scroll to tasks section
-                    setTimeout(() => {
-                      if (tasksRef.current) {
-                        tasksRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-                      }
-                    }, 100);
                   } else if (type === "next") {
                     setWorkAheadModal(true);
                   }
-                  // "locked" is now handled by modal inside PathView
                 }}
                 allDoneToday={allDone}
                 totalTasks={totalCount}
                 onStartDay={() => {
                   setShowTasks(true);
-                  setTimeout(() => {
-                    if (tasksRef.current) {
-                      tasksRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }
-                  }, 100);
                 }}
                 tasksVisible={showTasks}
               />
@@ -1251,29 +1239,147 @@ function DashboardPageInner() {
                   </div>
                 </div>
               )}
-
-              {/* Task cards below path */}
-              {!allDone && showTasks && (
-                <div ref={tasksRef} style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "0.875rem",
-                  marginBottom: "1.25rem",
-                }}>
-                  {displayedTasks.map(({ dt, task }) => (
-                    <div key={task.id} className="slide-up">
-                      <GamifiedTaskCard
-                        task={task}
-                        onToggle={(taskItemId, isCompleted) =>
-                          handleToggle(dt.id, taskItemId, isCompleted)
-                        }
-                        animatingId={animatingTaskId}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
             </>
+          )}
+
+          {/* ─── Fullscreen Task View ─── */}
+          {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && showTasks && !allDone && (
+            <div ref={tasksRef} className="slide-up" style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            }}>
+              {/* Back to path button */}
+              <button
+                onClick={() => setShowTasks(false)}
+                style={{
+                  background: "none", border: "none", color: "rgba(255,255,255,0.85)",
+                  cursor: "pointer", fontSize: "0.95rem", fontWeight: 600,
+                  padding: "8px 0", alignSelf: "flex-start",
+                  display: "flex", alignItems: "center", gap: 6, minHeight: 44,
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = "#D4A843"; }}
+                onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.85)"; }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Back to path
+              </button>
+
+              {/* Day heading */}
+              <h1 style={{
+                fontSize: "2.5rem",
+                fontWeight: 800,
+                letterSpacing: "-0.04em",
+                color: "var(--text)",
+                textAlign: "center",
+                marginBottom: 4,
+              }}>
+                Day {goalDayNumber}
+              </h1>
+
+              <p style={{
+                textAlign: "center",
+                fontSize: "0.9rem",
+                color: "rgba(255,255,255,0.7)",
+                marginBottom: 8,
+              }}>
+                {totalCount} tasks for today
+              </p>
+
+              {/* Task cards */}
+              <div style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "0.875rem",
+                marginBottom: "1.25rem",
+              }}>
+                {displayedTasks.map(({ dt, task }) => (
+                  <div key={task.id} className="slide-up">
+                    <GamifiedTaskCard
+                      task={task}
+                      onToggle={(taskItemId, isCompleted) =>
+                        handleToggle(dt.id, taskItemId, isCompleted)
+                      }
+                      animatingId={animatingTaskId}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Task view: all done state */}
+          {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && showTasks && allDone && celebrationDismissed && (
+            <div className="slide-up" style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "1rem",
+            }}>
+              <button
+                onClick={() => setShowTasks(false)}
+                style={{
+                  background: "none", border: "none", color: "rgba(255,255,255,0.85)",
+                  cursor: "pointer", fontSize: "0.95rem", fontWeight: 600,
+                  padding: "8px 0", alignSelf: "flex-start",
+                  display: "flex", alignItems: "center", gap: 6, minHeight: 44,
+                  transition: "color 0.15s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.color = "#D4A843"; }}
+                onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.85)"; }}
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                Back to path
+              </button>
+
+              <div style={{
+                textAlign: "center",
+                padding: "2rem",
+              }}>
+                <div style={{ fontSize: "3rem", marginBottom: 16 }}>{"✓"}</div>
+                <h2 style={{
+                  fontSize: "1.5rem",
+                  fontWeight: 800,
+                  color: "var(--text)",
+                  marginBottom: 8,
+                  letterSpacing: "-0.02em",
+                }}>
+                  All done for today
+                </h2>
+                <p style={{
+                  color: "rgba(255,255,255,0.85)",
+                  fontSize: "1rem",
+                  lineHeight: 1.6,
+                  marginBottom: 16,
+                }}>
+                  {getCompletionMessage(goalDayNumber)}
+                </p>
+                <MidnightCountdown dayNumber={goalDayNumber} />
+                <button
+                  onClick={() => setShowTasks(false)}
+                  style={{
+                    marginTop: 24,
+                    padding: "14px 36px",
+                    borderRadius: 12,
+                    background: "#D4A843",
+                    color: "#000",
+                    fontSize: "1rem",
+                    fontWeight: 700,
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "filter 0.15s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.filter = "brightness(1.1)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.filter = "brightness(1)"; }}
+                >
+                  View path
+                </button>
+              </div>
+            </div>
           )}
         </>
       )}
@@ -1286,6 +1392,7 @@ function DashboardPageInner() {
           onDismiss={() => {
             setShowCelebration(false);
             setCelebrationDismissed(true);
+            setShowTasks(false);
           }}
         />,
         document.body

@@ -2,11 +2,9 @@
 
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { goalsApi, tasksApi, type Goal, type ParsedGoal, type GoalChatMessage, type GoalChatResult, type TaskItem } from "@/lib/api-client";
+import { goalsApi, profileApi, tasksApi, type Goal, type ParsedGoal, type TaskItem } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/Skeleton";
-import GoalTemplatesComponent from "@/components/GoalTemplates";
 import BuildingProgress from "@/components/BuildingProgress";
-import type { GoalCategory } from "@/lib/goal-templates";
 import { useToast } from "@/components/ToastProvider";
 import { useSubscription } from "@/lib/subscription-context";
 import { MOCK_TUTORIAL_GOAL } from "@/lib/mock-tutorial-data";
@@ -14,22 +12,20 @@ import { MOCK_TUTORIAL_GOAL } from "@/lib/mock-tutorial-data";
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const CATEGORY_EMOJI: Record<string, string> = {
-  fitness: "💪", business: "💼", learning: "📚", creative: "🎨",
-  financial: "💰", health: "🌱", relationships: "🤝", productivity: "⚡",
-  spiritual: "🙏", religion: "🙏", mindfulness: "🧠", career: "💼",
-  wealth: "💰", other: "🎯",
+  fitness: "\uD83D\uDCAA", business: "\uD83D\uDCBC", learning: "\uD83D\uDCDA", creative: "\uD83C\uDFA8",
+  financial: "\uD83D\uDCB0", health: "\uD83C\uDF31", relationships: "\uD83E\uDD1D", productivity: "\u26A1",
+  spiritual: "\uD83D\uDE4F", religion: "\uD83D\uDE4F", mindfulness: "\uD83E\uDDE0", career: "\uD83D\uDCBC",
+  wealth: "\uD83D\uDCB0", other: "\uD83C\uDFAF",
 };
 
 function CategoryBadge({ category }: { category: string | null }) {
   const cat = category ?? "other";
   return (
     <span className="badge" style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-      {CATEGORY_EMOJI[cat] ?? "🎯"} {cat}
+      {CATEGORY_EMOJI[cat] ?? "\uD83C\uDFAF"} {cat}
     </span>
   );
 }
-
-const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
 function formatWorkDays(days: number[] | undefined | null): string {
   if (!days || days.length === 0 || days.length === 7) return "Every day";
@@ -43,1032 +39,377 @@ function formatWorkDays(days: number[] | undefined | null): string {
   return sorted.map(d => names[d]).join(", ");
 }
 
-// ─── Add Goal Flow (full-screen, matches mobile onboarding) ──────────────────
+// ─── 3-Step Funnel for "Add Goal" (same as /start) ───────────────────────────
 
-type FlowStep = "goal" | "confirm" | "deadline" | "time" | "workdays" | "intensity" | "building" | "done";
+type FunnelCategory = "business" | "health" | "other";
 
-const TOTAL_STEPS = 1;
+interface StepConfig {
+  question: string;
+  buttons?: string[];
+  isTextInput?: boolean;
+  placeholder?: string;
+  skippable?: boolean;
+  continueButton?: string;
+}
 
-const WORK_DAY_PRESETS_WEB = [
-  { label: "Every day", value: [1, 2, 3, 4, 5, 6, 7] },
-  { label: "Weekdays (Mon\u2013Fri)", value: [1, 2, 3, 4, 5] },
-  { label: "Weekends (Sat\u2013Sun)", value: [6, 7] },
-  { label: "Mon, Wed, Fri", value: [1, 3, 5] },
-] as const;
+const FUNNEL_STEPS: Record<FunnelCategory, StepConfig[]> = {
+  business: [
+    { question: "How much do you want to make per month?", buttons: ["$500", "$1K-$5K", "$10K+"] },
+    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
+    { question: "Got a business idea?", isTextInput: true, placeholder: "Enter your idea...", skippable: true },
+  ],
+  health: [
+    { question: "What do you want?", buttons: ["Lose weight", "Glow up", "Gain more muscle"] },
+    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
+    { question: "Do you have a specific target goal?", isTextInput: true, placeholder: "Enter my goal...", skippable: true },
+  ],
+  other: [
+    { question: "What's your goal?", isTextInput: true, placeholder: "Describe your goal...", continueButton: "Continue" },
+    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
+    { question: "Anything specific?", isTextInput: true, placeholder: "Enter details...", skippable: true },
+  ],
+};
 
-const DAY_LABELS_WEB = [
-  { iso: 1, short: "M", full: "Mon" },
-  { iso: 2, short: "T", full: "Tue" },
-  { iso: 3, short: "W", full: "Wed" },
-  { iso: 4, short: "T", full: "Thu" },
-  { iso: 5, short: "F", full: "Fri" },
-  { iso: 6, short: "S", full: "Sat" },
-  { iso: 7, short: "S", full: "Sun" },
-];
+function buildGoalText(category: FunnelCategory, answers: string[]): string {
+  switch (category) {
+    case "business":
+      return `I want to make ${answers[0]} per month. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `My business idea: ${answers[2]}` : "I need help finding a business idea."}`;
+    case "health":
+      return `I want to ${answers[0].toLowerCase()}. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `My target: ${answers[2]}` : ""}`.trim();
+    case "other":
+      return `My goal: ${answers[0]}. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `Details: ${answers[2]}` : ""}`.trim();
+  }
+}
 
-const TIME_OPTIONS_WEB = [
-  { label: "15 min", value: 15 },
-  { label: "30 min", value: 30 },
-  { label: "1 hour", value: 60 },
-  { label: "2 hours", value: 120 },
-  { label: "Custom", value: -1 },
-];
+const EFFORT_TO_MINUTES: Record<string, number> = {
+  mild: 30,
+  moderate: 60,
+  heavy: 120,
+};
 
-const INTENSITY_OPTIONS_WEB = [
-  { level: 1, emoji: "\uD83C\uDF31", label: "Building the habit", description: "Steady, sustainable progress. Short daily wins." },
-  { level: 2, emoji: "\uD83C\uDFAF", label: "Making real progress", description: "Committed and consistent. This is getting done." },
-  { level: 3, emoji: "\uD83D\uDE80", label: "All in", description: "Maximum effort. Push limits every day." },
-];
+const EFFORT_TO_INTENSITY: Record<string, number> = {
+  mild: 1,
+  moderate: 2,
+  heavy: 3,
+};
 
-function AddGoalFlow({ onDone, onClose, editGoal }: { onDone: (goal: Goal) => void; onClose: () => void; editGoal?: Goal | null }) {
-  const [step, setStep] = useState<FlowStep>("goal");
-  const [showTemplates, setShowTemplates] = useState(!editGoal);
-
-  // Goal input
-  const [rawInput, setRawInput] = useState("");
-  const [parsed, setParsed] = useState<ParsedGoal | null>(null);
-  const [parsing, setParsing] = useState(false);
-  const [parseError, setParseError] = useState("");
-
-  // AI Plan chat
-  const [showAiChat, setShowAiChat] = useState(!!editGoal);
-  const [chatHistory, setChatHistory] = useState<Array<{ role: "user" | "assistant" | "loading" | "goal"; text: string; options?: string[] }>>([]);
-  const [chatMessages, setChatMessages] = useState<GoalChatMessage[]>([]);
-  const [chatLoading, setChatLoading] = useState(false);
-  const [chatDone, setChatDone] = useState(false);
-  const [chatGoalText, setChatGoalText] = useState<string | null>(null);
-  const [customInput, setCustomInput] = useState("");
-  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
-  const chatEndRef = useRef<HTMLDivElement>(null);
-  const chatInputRef = useRef<HTMLInputElement>(null);
-
-  // Deadline (default: 1 month from today)
-  const [hasDeadline, setHasDeadline] = useState(true);
-  const now = new Date();
-  const defaultDeadline = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
-  const [deadlineYear, setDeadlineYear] = useState(defaultDeadline.getFullYear());
-  const [deadlineMonth, setDeadlineMonth] = useState(defaultDeadline.getMonth() + 1);
-  const [deadlineDay, setDeadlineDay] = useState(defaultDeadline.getDate());
-  const currentYear = now.getFullYear();
-
-  // Time & intensity (per-goal)
-  const [timeMinutes, setTimeMinutes] = useState<number | null>(null);
-  const [intensityLevel, setIntensityLevel] = useState<number | null>(null);
-
-  // Work days
-  const [workDays, setWorkDays] = useState<number[]>([1, 2, 3, 4, 5, 6, 7]);
-  const [showCustomDays, setShowCustomDays] = useState(false);
-
-  // Building
+function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClose: () => void }) {
+  const [category, setCategory] = useState<FunnelCategory | null>(null);
+  const [funnelStep, setFunnelStep] = useState(0);
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [textValue, setTextValue] = useState("");
+  const [fadeKey, setFadeKey] = useState(0);
+  const [building, setBuilding] = useState(false);
   const [buildError, setBuildError] = useState("");
-  const [builtTasks, setBuiltTasks] = useState<TaskItem[]>([]);
-  const [coachNote, setCoachNote] = useState("");
-  const [savedGoal, setSavedGoal] = useState<Goal | null>(null);
-  const [offDayMessage, setOffDayMessage] = useState<string | null>(null);
 
-  // Progress
-  const stepIndex = 1;
-  const progressPercent = step === "building" || step === "done" ? 100 : Math.round((stepIndex / TOTAL_STEPS) * 100);
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatHistory, chatLoading, selectedOptions.size]);
-
-  // Auto-open AI chat when editing an existing goal
-  const editGoalTriggered = useRef(false);
-  useEffect(() => {
-    if (editGoal && !editGoalTriggered.current) {
-      editGoalTriggered.current = true;
-      setRawInput(editGoal.rawInput || editGoal.title);
-      startAiChatWithMessage(`I have an existing goal: "${editGoal.title}"${editGoal.structuredSummary ? ` — ${editGoal.structuredSummary}` : ""}. I'd like to make some changes to it. Ask me what I'd like to change and offer a few options like: change the deadline/timeline, adjust daily time commitment, change which days I work on it, refine the goal itself, or something else.`);
-    }
-  }, [editGoal]);
-
-  // ─── Category selection → opens AI chat ─────────────────────────────────
-
-  function handleCategorySelect(category: GoalCategory) {
-    setShowTemplates(false);
-    startAiChatWithMessage(category.starterMessage);
+  function animateStep(newStep: number) {
+    setFadeKey(k => k + 1);
+    setFunnelStep(newStep);
   }
 
-  // ─── Parse goal ────────────────────────────────────────────────────────────
+  function handleCategorySelect(cat: FunnelCategory) {
+    setCategory(cat);
+    setAnswers([]);
+    setTextValue("");
+    animateStep(1);
+  }
 
-  async function handleParse() {
-    const text = rawInput.trim();
-    if (!text) return;
-    setParsing(true);
-    setParseError("");
-    try {
-      const result = await goalsApi.parse(text);
-      setParsed(result);
-      if (result.deadline_detected) {
-        const d = new Date(result.deadline_detected + "T12:00:00");
-        setHasDeadline(true);
-        setDeadlineYear(d.getFullYear());
-        setDeadlineMonth(d.getMonth() + 1);
-        setDeadlineDay(d.getDate());
-      }
-      if (result.work_days_detected && result.work_days_detected.length > 0) {
-        setWorkDays(result.work_days_detected);
-        const isCustom = !WORK_DAY_PRESETS_WEB.some(
-          (p) => p.value.length === result.work_days_detected!.length && p.value.every((d) => result.work_days_detected!.includes(d))
-        );
-        setShowCustomDays(isCustom);
-      }
-      setStep("confirm");
-    } catch {
-      setParseError("Failed to analyze your goal. Please try again.");
-    } finally {
-      setParsing(false);
+  function handleButtonAnswer(answer: string) {
+    const newAnswers = [...answers, answer];
+    setAnswers(newAnswers);
+    setTextValue("");
+    if (newAnswers.length >= 3) {
+      startBuild(category!, newAnswers);
+    } else {
+      animateStep(funnelStep + 1);
     }
   }
 
-  // ─── AI Plan chat ──────────────────────────────────────────────────────────
-
-  async function startAiChat() {
-    startAiChatWithMessage("Help me define my goal.");
-  }
-
-  async function startAiChatWithMessage(initialMessage: string) {
-    setShowAiChat(true);
-    setChatHistory([]);
-    setChatMessages([]);
-    setChatDone(false);
-    setChatGoalText(null);
-    setCustomInput("");
-    setChatLoading(true);
-    try {
-      const seedMessages: GoalChatMessage[] = [{ role: "user", content: initialMessage }];
-      const result = await goalsApi.chat(seedMessages);
-      setChatMessages([
-        { role: "user", content: initialMessage },
-        { role: "assistant", content: result.raw_reply },
-      ]);
-      setChatHistory([
-        { role: "user", text: initialMessage },
-        { role: "assistant", text: result.message, options: result.options },
-      ]);
-      if (result.done) {
-        setChatDone(true);
-        setChatGoalText(result.goal_text);
-      }
-    } catch (err) {
-      if (err instanceof Error && err.message?.includes("pro_required")) {
-        onClose();
-      } else {
-        setChatHistory([{ role: "assistant", text: "Something went wrong. Please close and try again." }]);
-      }
-    } finally {
-      setChatLoading(false);
+  function handleTextSubmit(value: string) {
+    const newAnswers = [...answers, value];
+    setAnswers(newAnswers);
+    setTextValue("");
+    if (newAnswers.length >= 3) {
+      startBuild(category!, newAnswers);
+    } else {
+      animateStep(funnelStep + 1);
     }
   }
 
-  async function sendChatAnswer(answer: string) {
-    setChatHistory(prev => [...prev, { role: "user", text: answer }]);
-    setCustomInput("");
-    setSelectedOptions(new Set());
-    setChatLoading(true);
+  function handleSkip() {
+    handleTextSubmit("");
+  }
 
-    const newMessages: GoalChatMessage[] = [...chatMessages, { role: "user", content: answer }];
-    setChatMessages(newMessages);
-
-    try {
-      const result = await goalsApi.chat(newMessages);
-      setChatMessages(prev => [...prev, { role: "assistant", content: result.raw_reply }]);
-      setChatHistory(prev => [
-        ...prev,
-        { role: "assistant", text: result.message, options: result.done ? [] : result.options },
-      ]);
-      if (result.done) {
-        setChatDone(true);
-        setChatGoalText(result.goal_text);
-      }
-    } catch (err) {
-      if (err instanceof Error && err.message?.includes("pro_required")) {
-        onClose();
-      } else {
-        setChatHistory(prev => [...prev, { role: "assistant", text: "Something went wrong. Please try again." }]);
-      }
-    } finally {
-      setChatLoading(false);
-      setTimeout(() => chatInputRef.current?.focus(), 100);
+  function handleBack() {
+    if (funnelStep === 1) {
+      setCategory(null);
+      setAnswers([]);
+      animateStep(0);
+    } else if (funnelStep > 1) {
+      setAnswers(prev => prev.slice(0, -1));
+      animateStep(funnelStep - 1);
     }
   }
 
-  async function handleUseGoal() {
-    if (!chatGoalText) return;
-    const goalText = chatGoalText.trim();
-    setRawInput(goalText);
-    setShowAiChat(false);
-    // Go straight to building — AI chat already covered all details
+  async function startBuild(cat: FunnelCategory, allAnswers: string[]) {
+    setBuilding(true);
     setBuildError("");
-    setStep("building");
+    const goalText = buildGoalText(cat, allAnswers);
+    // Determine effort from the "Level of work?" answer (always index 1 for business/health, index 1 for other)
+    const effortAnswer = cat === "other" ? allAnswers[1] : allAnswers[1];
+    const effortKey = effortAnswer.toLowerCase();
+    const dailyMinutes = EFFORT_TO_MINUTES[effortKey] ?? 60;
+    const intensity = EFFORT_TO_INTENSITY[effortKey] ?? 2;
+
     try {
-      const result = await goalsApi.parse(goalText);
-      setParsed(result);
-      if (result.deadline_detected) {
-        setHasDeadline(true);
-      }
-      if (result.work_days_detected && result.work_days_detected.length > 0) {
-        setWorkDays(result.work_days_detected);
-      }
-      // Build immediately with parsed data — use defaults for anything AI didn't extract
-      await handleBuild({ goalText, parsedGoal: result });
-    } catch (err) {
-      if (err instanceof Error && err.message?.includes("pro_required")) {
-        onClose();
-      } else {
-        setBuildError("Failed to analyze goal. Try again.");
-        setStep("goal");
-      }
-    }
-  }
+      // 1. Parse the goal
+      const parsed = await goalsApi.parse(goalText);
 
-  // ─── Build (save goal + generate tasks) ────────────────────────────────────
+      // 2. Save profile preferences
+      await profileApi.save({ dailyTimeMinutes: dailyMinutes, intensityLevel: intensity });
 
-  async function handleBuild(overrides?: { goalText?: string; parsedGoal?: ParsedGoal }) {
-    setBuildError("");
-    setStep("building");
-    try {
-      const effectiveRawInput = overrides?.goalText ?? rawInput.trim();
-      const effectiveParsed = overrides?.parsedGoal ?? parsed;
-      const goalTitle = effectiveParsed?.short_title ?? (effectiveRawInput.slice(0, 40) || "My Goal");
-      // Use AI-detected deadline, or manual entry, or default 90-day rolling
-      const deadline = effectiveParsed?.deadline_detected
-        ?? (hasDeadline ? `${deadlineYear}-${String(deadlineMonth).padStart(2, "0")}-${String(deadlineDay).padStart(2, "0")}` : null);
-      const effectiveWorkDays = (effectiveParsed?.work_days_detected && effectiveParsed.work_days_detected.length > 0)
-        ? effectiveParsed.work_days_detected : workDays;
-      const effectiveTime = (effectiveParsed?.daily_time_detected && effectiveParsed.daily_time_detected > 0)
-        ? effectiveParsed.daily_time_detected : (timeMinutes ?? 60);
+      // 3. Create the goal
+      const { goal } = await goalsApi.create({
+        title: parsed.short_title ?? goalText.slice(0, 40),
+        rawInput: goalText,
+        structuredSummary: parsed.structured_summary,
+        category: parsed.category,
+        deadline: parsed.deadline_detected ?? null,
+        dailyTimeMinutes: dailyMinutes,
+        intensityLevel: intensity,
+        workDays: parsed.work_days_detected && parsed.work_days_detected.length > 0
+          ? parsed.work_days_detected
+          : [1, 2, 3, 4, 5, 6, 7],
+      });
 
-      let goal: Goal;
-      if (editGoal) {
-        const res = await goalsApi.update(editGoal.id, {
-          title: goalTitle,
-          rawInput: effectiveRawInput,
-          structuredSummary: effectiveParsed?.structured_summary,
-          category: effectiveParsed?.category,
-          deadline,
-          dailyTimeMinutes: effectiveTime,
-          intensityLevel: intensityLevel ?? 2,
-          workDays: effectiveWorkDays,
-        });
-        goal = res.goal;
-      } else {
-        const res = await goalsApi.create({
-          title: goalTitle,
-          rawInput: effectiveRawInput,
-          structuredSummary: effectiveParsed?.structured_summary,
-          category: effectiveParsed?.category,
-          deadline,
-          dailyTimeMinutes: effectiveTime,
-          intensityLevel: intensityLevel ?? 2,
-          workDays: effectiveWorkDays,
-        });
-        goal = res.goal;
-      }
-      setSavedGoal(goal);
+      // 4. Generate tasks
+      await tasksApi.generate({ goalId: goal.id });
 
-      // Check if today is a work day for this goal
-      const todayIso = new Date().getDay();
-      const todayIsoDay = todayIso === 0 ? 7 : todayIso;
-      const isTodayWorkDay = effectiveWorkDays.length === 0 || effectiveWorkDays.length === 7 || effectiveWorkDays.includes(todayIsoDay);
-
-      if (isTodayWorkDay) {
-        const result = await tasksApi.generate({ goalId: goal.id });
-        const tasks = result.dailyTasks.flatMap(dt => dt.tasks).slice(0, 3);
-        setBuiltTasks(tasks);
-        if (result.coachNote) setCoachNote(result.coachNote);
-      } else {
-        // Find next work day name
-        const dayNames = ["", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-        const sorted = [...effectiveWorkDays].sort((a, b) => a - b);
-        const nextDay = sorted.find(d => d > todayIsoDay) ?? sorted[0];
-        setOffDayMessage(`Your first tasks will appear on ${dayNames[nextDay]}!`);
-      }
-      setStep("done");
+      // Done — close modal and return the goal
+      onDone(goal);
     } catch (e) {
       if (e instanceof Error && e.message?.includes("pro_required")) {
         onClose();
       } else {
-        setBuildError(e instanceof Error ? e.message : "Something went wrong.");
-        setStep("goal");
+        setBuildError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
+        setBuilding(false);
       }
     }
   }
 
-  // ─── Render: Goal input step ───────────────────────────────────────────────
-
-  function renderGoalStep() {
-    if (showTemplates) {
-      return (
-        <GoalTemplatesComponent
-          onSelect={handleCategorySelect}
-          onClose={onClose}
-          onOther={() => {
-            setShowTemplates(false);
-            startAiChatWithMessage("Help me define my goal.");
-          }}
-        />
-      );
-    }
-
-    // Templates dismissed — AI chat is open. Show nothing behind the modal.
-    return null;
-  }
-
-  // ─── Render: Confirmation step ─────────────────────────────────────────────
-
-  function renderConfirmStep() {
-    if (!parsed) return null;
-    return (
-      <>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: "1.25rem" }}>
-          Review your goal
-        </h2>
-
-        <div className="card" style={{ padding: "1.25rem", background: "var(--bg)", marginBottom: "1rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                        <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-              Threely Intelligence read your goal
-            </span>
-          </div>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-            <CategoryBadge category={parsed.category} />
-            {parsed.deadline_detected && (
-              <span style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
-                📅 {new Date(parsed.deadline_detected + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-              </span>
-            )}
-          </div>
-
-          <p style={{ fontSize: "0.95rem", color: "var(--text)", lineHeight: 1.6 }}>
-            {parsed.structured_summary}
-          </p>
-        </div>
-
-        {parsed.needs_more_context && parsed.recommendations && (
-          <div style={{
-            background: "#FFF8EC", borderRadius: "var(--radius)",
-            padding: "1rem", border: "1px solid rgba(245,166,35,0.3)", marginBottom: "1rem",
-          }}>
-            <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#B45309", marginBottom: 6 }}>
-              ⚠ Your plan could be more personalized
-            </p>
-            <p style={{ fontSize: "0.85rem", color: "#92400E", lineHeight: 1.7, whiteSpace: "pre-line" }}>
-              {parsed.recommendations}
-            </p>
-          </div>
-        )}
-
-        {parsed.needs_more_context ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: "0.5rem" }}>
-            <button className="btn btn-primary" onClick={() => { setStep("goal"); }} style={{ width: "100%", padding: "0.75rem" }}>
-              Edit goal &#8594;
-            </button>
-            <button
-              onClick={() => handleBuild()}
-              style={{
-                display: "block", margin: "0.25rem auto 0", fontSize: "0.8rem",
-                color: "var(--muted)", textDecoration: "underline", background: "none", border: "none", cursor: "pointer",
-              }}
-            >
-              Continue anyway
-            </button>
-          </div>
-        ) : (
-          <button className="btn btn-primary" onClick={() => handleBuild()} style={{ width: "100%", padding: "0.75rem", marginTop: "0.5rem" }}>
-            Build my plan &#8594;
-          </button>
-        )}
-      </>
-    );
-  }
-
-  // ─── Render: Deadline step ─────────────────────────────────────────────────
-
-  function renderDeadlineStep() {
-    return (
-      <>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>
-          Do you have a deadline?
-        </h2>
-        <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
-          A deadline helps Threely Intelligence pace your tasks. If you skip this, we'll use a 90-day rolling horizon.
-        </p>
-
-        <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", marginBottom: "1rem" }}>
-          <input
-            type="checkbox"
-            checked={hasDeadline}
-            onChange={e => setHasDeadline(e.target.checked)}
-            style={{ width: 18, height: 18 }}
-          />
-          <span style={{ fontWeight: 600, fontSize: "0.95rem" }}>I have a target date</span>
-        </label>
-
-        {hasDeadline && (
-          <div style={{ display: "flex", gap: 8, marginBottom: "1rem" }}>
-            <select
-              className="field-input"
-              value={deadlineMonth}
-              onChange={e => setDeadlineMonth(Number(e.target.value))}
-              style={{ flex: 2 }}
-            >
-              {MONTHS.map((m, i) => <option key={m} value={i + 1}>{m}</option>)}
-            </select>
-            <select
-              className="field-input"
-              value={deadlineDay}
-              onChange={e => setDeadlineDay(Number(e.target.value))}
-              style={{ flex: 1 }}
-            >
-              {Array.from({ length: 31 }, (_, i) => i + 1).map(d => (
-                <option key={d} value={d}>{d}</option>
-              ))}
-            </select>
-            <select
-              className="field-input"
-              value={deadlineYear}
-              onChange={e => setDeadlineYear(Number(e.target.value))}
-              style={{ flex: 2 }}
-            >
-              {[currentYear, currentYear + 1, currentYear + 2, currentYear + 3, currentYear + 4].map(y => (
-                <option key={y} value={y}>{y}</option>
-              ))}
-            </select>
-          </div>
-        )}
-
-        {buildError && <p style={{ color: "var(--danger)", fontSize: "0.85rem", marginBottom: "0.75rem" }}>{buildError}</p>}
-
-        <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn btn-outline" onClick={() => setStep("confirm")} style={{ flex: 1 }}>
-            &#8592; Back
-          </button>
-          <button className="btn btn-primary" onClick={() => handleBuild()} style={{ flex: 2 }}>
-            {hasDeadline
-              ? `Set deadline & build my plan \u2192`
-              : "No deadline \u2014 build my plan \u2192"}
-          </button>
-        </div>
-      </>
-    );
-  }
-
-  // ─── Render: Time step ───────────────────────────────────────────────────
-
-  const [showCustomTime, setShowCustomTime] = useState(false);
-  const [customHours, setCustomHours] = useState(3);
-
-  function renderTimeStep() {
-    const isCustomSelected = showCustomTime;
-    const effectiveTime = isCustomSelected ? customHours * 60 : timeMinutes;
-
-    return (
-      <>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>
-          How much time daily for this goal?
-        </h2>
-        <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
-          Threely Intelligence will size your tasks to fit this window.
-        </p>
-
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: showCustomTime ? "0.75rem" : "1.5rem" }}>
-          {TIME_OPTIONS_WEB.map(opt => {
-            const isSelected = opt.value === -1
-              ? showCustomTime
-              : !showCustomTime && timeMinutes === opt.value;
-            return (
-              <button
-                key={opt.value}
-                onClick={() => {
-                  if (opt.value === -1) {
-                    setShowCustomTime(true);
-                    setTimeMinutes(customHours * 60);
-                  } else {
-                    setShowCustomTime(false);
-                    setTimeMinutes(opt.value);
-                  }
-                }}
-                style={{
-                  padding: "0.6rem 1.25rem", borderRadius: 20, fontSize: "0.875rem", fontWeight: 600,
-                  border: `1.5px solid ${isSelected ? "var(--primary)" : "var(--border)"}`,
-                  background: isSelected ? "var(--primary-light)" : "var(--card)",
-                  color: isSelected ? "var(--primary)" : "var(--subtext)", cursor: "pointer",
-                }}
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {showCustomTime && (
-          <div style={{ marginBottom: "1.5rem" }}>
-            <label style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <select
-                className="field-input"
-                value={customHours}
-                onChange={e => {
-                  const h = Number(e.target.value);
-                  setCustomHours(h);
-                  setTimeMinutes(h * 60);
-                }}
-                style={{ width: 120 }}
-              >
-                {Array.from({ length: 12 }, (_, i) => i + 3).map(h => (
-                  <option key={h} value={h}>{h} hours</option>
-                ))}
-              </select>
-              <span style={{ fontSize: "0.85rem", color: "var(--subtext)" }}>per day</span>
-            </label>
-          </div>
-        )}
-
-        <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn btn-outline" onClick={() => setStep("deadline")} style={{ flex: 1 }}>
-            &#8592; Back
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => effectiveTime && setStep("workdays")}
-            disabled={!effectiveTime}
-            style={{ flex: 2, opacity: effectiveTime ? 1 : 0.5 }}
-          >
-            Continue &#8594;
-          </button>
-        </div>
-      </>
-    );
-  }
-
-  // ─── Render: Work days step ─────────────────────────────────────────────────
-
-  function renderWorkDaysStep() {
-    const matchesPreset = WORK_DAY_PRESETS_WEB.find(
-      (p) => p.value.length === workDays.length && p.value.every((d) => workDays.includes(d))
-    );
-
-    function toggleDay(iso: number) {
-      setWorkDays((prev) => {
-        if (prev.includes(iso)) {
-          if (prev.length <= 1) return prev;
-          return prev.filter((d) => d !== iso);
-        }
-        return [...prev, iso].sort();
-      });
-    }
-
-    return (
-      <>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>
-          Which days will you work on this?
-        </h2>
-        <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
-          Pick a schedule that fits your routine.
-        </p>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: "1.5rem" }}>
-          {WORK_DAY_PRESETS_WEB.map((preset) => {
-            const isActive = !showCustomDays && matchesPreset?.label === preset.label;
-            return (
-              <button
-                key={preset.label}
-                onClick={() => { setShowCustomDays(false); setWorkDays([...preset.value]); }}
-                style={{
-                  padding: "0.85rem 1.25rem", borderRadius: "var(--radius-lg)", cursor: "pointer",
-                  border: `1.5px solid ${isActive ? "var(--primary)" : "var(--border)"}`,
-                  background: isActive ? "var(--primary-light)" : "var(--card)",
-                  textAlign: "center", fontWeight: 600, fontSize: "0.95rem",
-                  color: isActive ? "var(--primary)" : "var(--text)",
-                }}
-              >
-                {preset.label}
-              </button>
-            );
-          })}
-
-          <button
-            onClick={() => setShowCustomDays(true)}
-            style={{
-              padding: "0.85rem 1.25rem", borderRadius: "var(--radius-lg)", cursor: "pointer",
-              border: `1.5px solid ${showCustomDays ? "var(--primary)" : "var(--border)"}`,
-              background: showCustomDays ? "var(--primary-light)" : "var(--card)",
-              textAlign: "center", fontWeight: 600, fontSize: "0.95rem",
-              color: showCustomDays ? "var(--primary)" : "var(--text)",
-            }}
-          >
-            Custom
-          </button>
-
-          {showCustomDays && (
-            <div style={{ display: "flex", justifyContent: "center", gap: 8, marginTop: 8 }}>
-              {DAY_LABELS_WEB.map((day) => {
-                const isActive = workDays.includes(day.iso);
-                return (
-                  <button
-                    key={day.iso}
-                    onClick={() => toggleDay(day.iso)}
-                    title={day.full}
-                    style={{
-                      width: 44, height: 44, borderRadius: "50%", cursor: "pointer",
-                      border: `1.5px solid ${isActive ? "var(--primary)" : "var(--border)"}`,
-                      background: isActive ? "var(--primary-light)" : "var(--card)",
-                      fontWeight: 700, fontSize: "0.9rem",
-                      color: isActive ? "var(--primary)" : "var(--subtext)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                    }}
-                  >
-                    {day.short}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn btn-outline" onClick={() => setStep("time")} style={{ flex: 1 }}>
-            &#8592; Back
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => setStep("intensity")}
-            style={{ flex: 2 }}
-          >
-            Continue &#8594;
-          </button>
-        </div>
-      </>
-    );
-  }
-
-  // ─── Render: Intensity step ─────────────────────────────────────────────────
-
-  function renderIntensityStep() {
-    return (
-      <>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>
-          What's your pace for this goal?
-        </h2>
-        <p style={{ color: "var(--subtext)", fontSize: "0.9rem", lineHeight: 1.6, marginBottom: "1.5rem" }}>
-          This shapes how ambitious Threely Intelligence makes your tasks.
-        </p>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: "1.5rem" }}>
-          {INTENSITY_OPTIONS_WEB.map(opt => {
-            const isSelected = intensityLevel === opt.level;
-            return (
-              <button
-                key={opt.level}
-                onClick={() => setIntensityLevel(opt.level)}
-                style={{
-                  display: "flex", alignItems: "center", gap: 12,
-                  padding: "1rem 1.25rem", borderRadius: "var(--radius-lg)", cursor: "pointer",
-                  border: `1.5px solid ${isSelected ? "var(--primary)" : "var(--border)"}`,
-                  background: isSelected ? "var(--primary-light)" : "var(--card)",
-                  textAlign: "left",
-                }}
-              >
-                <span style={{ fontSize: 28, flexShrink: 0 }}>{opt.emoji}</span>
-                <div style={{ flex: 1 }}>
-                  <p style={{ fontWeight: 600, fontSize: "0.95rem", color: isSelected ? "var(--primary)" : "var(--text)", marginBottom: 2 }}>
-                    {opt.label}
-                  </p>
-                  <p style={{ fontSize: "0.82rem", color: "var(--subtext)", lineHeight: 1.4 }}>
-                    {opt.description}
-                  </p>
-                </div>
-                {isSelected && <span style={{ color: "var(--primary)", fontWeight: 700 }}>&#10003;</span>}
-              </button>
-            );
-          })}
-        </div>
-
-        <div style={{ display: "flex", gap: 8 }}>
-          <button className="btn btn-outline" onClick={() => setStep("workdays")} style={{ flex: 1 }}>
-            &#8592; Back
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => intensityLevel && handleBuild()}
-            disabled={!intensityLevel}
-            style={{ flex: 2, opacity: intensityLevel ? 1 : 0.5 }}
-          >
-            Build my plan &#8594;
-          </button>
-        </div>
-      </>
-    );
-  }
-
-  // ─── Render: Building step ─────────────────────────────────────────────────
-
-  function renderBuildingStep() {
-    return <BuildingProgress />;
-  }
-
-  // ─── Render: Done step (task reveal) ───────────────────────────────────────
-
-  function renderDoneStep() {
-    return (
-      <>
-        <h2 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 8 }}>
-          {offDayMessage ? "Goal created" : "Your plan is ready"}
-        </h2>
-        {coachNote && (
-          <p style={{ fontSize: "0.9rem", color: "var(--subtext)", fontStyle: "italic", lineHeight: 1.6, marginBottom: "1.25rem" }}>
-            {coachNote}
-          </p>
-        )}
-
-        {offDayMessage ? (
-          <div className="card fade-in" style={{
-            padding: "2rem 1.5rem", textAlign: "center", marginBottom: "1.5rem",
-            background: "rgba(99,91,255,0.08)", border: "1px solid rgba(99,91,255,0.2)",
-          }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>&#128197;</div>
-            <p style={{ fontSize: "1.1rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-              {offDayMessage}
-            </p>
-            <p style={{ fontSize: "0.85rem", color: "var(--subtext)", lineHeight: 1.5 }}>
-              We'll generate your first 3 tasks on your next scheduled day.
-            </p>
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: "1.5rem" }}>
-            {builtTasks.map((task, i) => (
-              <div
-                key={task.id}
-                className="card fade-in"
-                style={{ padding: "1rem 1.25rem", animationDelay: `${i * 0.15}s` }}
-              >
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 8 }}>
-                  <p style={{ fontWeight: 600, fontSize: "0.95rem", color: "var(--text)", lineHeight: 1.4 }}>
-                    {task.task}
-                  </p>
-                  {task.estimated_minutes > 0 && (
-                    <span className="badge" style={{ flexShrink: 0 }}>~{task.estimated_minutes}m</span>
-                  )}
-                </div>
-                {task.why && (
-                  <p style={{ fontSize: "0.82rem", color: "var(--subtext)", fontStyle: "italic", marginTop: 6, lineHeight: 1.5 }}>
-                    {task.why}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-
-        <button
-          className="btn btn-primary"
-          onClick={() => { if (savedGoal) onDone(savedGoal); }}
-          style={{ width: "100%", padding: "0.75rem" }}
-        >
-          Done &#8594;
-        </button>
-      </>
-    );
-  }
-
-  // ─── Render: AI Chat modal ─────────────────────────────────────────────────
-
-  function renderAiChat() {
-    if (!showAiChat) return null;
-    return (
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          position: "fixed", inset: 0, background: "rgba(10,37,64,0.35)", backdropFilter: "blur(2px)",
-          zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: "1rem",
-        }}
-      >
-        <div style={{
-          background: "var(--card)", borderRadius: "var(--radius-xl)", boxShadow: "var(--shadow-lg)",
-          width: "100%", maxWidth: "min(520px, calc(100vw - 1.5rem))", maxHeight: "85vh", display: "flex", flexDirection: "column",
-          overflow: "hidden",
-        }}>
-          {/* Header */}
-          <div style={{
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            padding: "1rem 1.25rem", borderBottom: "1px solid var(--border)",
-          }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                            <span style={{ fontWeight: 700, fontSize: "0.95rem" }}>Threely Intelligence</span>
-            </div>
-            <button
-              onClick={() => { if (editGoal) { onClose(); } else { setShowAiChat(false); setShowTemplates(true); } }}
-              style={{
-                width: 30, height: 30, borderRadius: "var(--radius-sm)",
-                background: "var(--bg)", border: "1px solid var(--border)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 16, color: "var(--subtext)", cursor: "pointer",
-              }}
-            >
-              &#x2715;
-            </button>
-          </div>
-
-          {/* Chat messages */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "1rem 1.25rem 1.5rem", display: "flex", flexDirection: "column", gap: 12 }}>
-            {chatHistory.map((msg, i) => {
-              const isAssistant = msg.role === "assistant";
-              const isLastAssistant = isAssistant && i === chatHistory.length - 1;
-              return (
-                <div key={i}>
-                  <div style={{
-                    maxWidth: "90%", padding: "0.65rem 1rem", borderRadius: 14,
-                    ...(isAssistant
-                      ? { background: "var(--primary-light)", color: "var(--text)", borderBottomLeftRadius: 4, alignSelf: "flex-start" }
-                      : { background: "var(--primary)", color: "var(--primary-text)", borderBottomRightRadius: 4, alignSelf: "flex-end", marginLeft: "auto" }),
-                    fontSize: "0.9rem", lineHeight: 1.6,
-                  }}>
-                    {msg.text}
-                  </div>
-                  {isLastAssistant && msg.options && msg.options.length > 0 && !chatLoading && !chatDone && (
-                    <div style={{ marginTop: 8 }}>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                        {msg.options.map((opt, j) => {
-                          const isSelected = selectedOptions.has(opt);
-                          return (
-                            <button
-                              key={j}
-                              onClick={() => {
-                                setSelectedOptions((prev) => {
-                                  const next = new Set(prev);
-                                  if (next.has(opt)) next.delete(opt);
-                                  else next.add(opt);
-                                  return next;
-                                });
-                              }}
-                              style={{
-                                padding: "0.45rem 0.85rem", borderRadius: 20,
-                                border: `1.5px solid ${isSelected ? "var(--primary)" : "rgba(99,91,255,0.25)"}`,
-                                background: isSelected ? "var(--primary)" : "var(--card)",
-                                color: isSelected ? "var(--primary-text)" : "var(--text)",
-                                fontSize: "0.82rem", fontWeight: 600,
-                                cursor: "pointer", transition: "all 0.15s",
-                              }}
-                            >
-                              {isSelected ? `✓ ${opt}` : opt}
-                            </button>
-                          );
-                        })}
-                        <button
-                          onClick={() => chatInputRef.current?.focus()}
-                          style={{
-                            padding: "0.45rem 0.85rem", borderRadius: 20,
-                            border: "1.5px solid var(--border)", background: "var(--bg)",
-                            fontSize: "0.82rem", fontWeight: 600, color: "var(--subtext)",
-                            cursor: "pointer",
-                          }}
-                        >
-                          Type my own
-                        </button>
-                      </div>
-                      {selectedOptions.size > 0 && (
-                        <button
-                          onClick={() => sendChatAnswer(Array.from(selectedOptions).join(" + "))}
-                          className="btn btn-primary"
-                          style={{
-                            marginTop: 8, height: 36, width: "100%",
-                            fontSize: "0.82rem", fontWeight: 700,
-                          }}
-                        >
-                          Continue with {selectedOptions.size} selected →
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-            {chatLoading && (
-              <div style={{
-                background: "var(--primary-light)", borderRadius: 14, borderBottomLeftRadius: 4,
-                padding: "0.65rem 1rem", maxWidth: "85%", alignSelf: "flex-start",
-              }}>
-                <span className="spinner spinner-dark" style={{ width: 18, height: 18 }} />
-              </div>
-            )}
-            {chatDone && chatGoalText && (
-              <div style={{
-                background: "var(--card)", borderRadius: "var(--radius-lg)",
-                border: "1.5px solid rgba(99,91,255,0.25)", padding: "1rem", marginTop: 4,
-              }}>
-                <p style={{ fontSize: "0.7rem", fontWeight: 700, color: "var(--primary)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>
-                  Your goal
-                </p>
-                <p style={{ fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.6 }}>
-                  {chatGoalText}
-                </p>
-              </div>
-            )}
-            <div ref={chatEndRef} />
-          </div>
-
-          {/* Footer */}
-          <div style={{ padding: "0.75rem 1.25rem", borderTop: "1px solid var(--border)", background: "var(--card)" }}>
-            {chatDone ? (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <button className="btn btn-primary" onClick={handleUseGoal} style={{ width: "100%", padding: "0.7rem" }}>
-                  Use this goal &#8594;
-                </button>
-                <button
-                  onClick={() => {
-                    setChatDone(false);
-                    setChatGoalText(null);
-                    sendChatAnswer("I'd like to change something about my goal.");
-                  }}
-                  style={{
-                    fontSize: "0.8rem", color: "var(--subtext)", textDecoration: "underline",
-                    background: "none", border: "none", cursor: "pointer", textAlign: "center",
-                  }}
-                >
-                  Edit goal
-                </button>
-              </div>
-            ) : (
-              <div style={{ display: "flex", gap: 8 }}>
-                <input
-                  ref={chatInputRef}
-                  id="chat-custom-input"
-                  className="field-input"
-                  placeholder="Type your own answer..."
-                  value={customInput}
-                  onChange={e => setCustomInput(e.target.value)}
-                  disabled={chatLoading}
-                  onKeyDown={e => {
-                    if (e.key === "Enter" && customInput.trim() && !chatLoading) {
-                      sendChatAnswer(customInput.trim());
-                    }
-                  }}
-                  style={{ flex: 1 }}
-                />
-                <button
-                  className="btn btn-primary"
-                  onClick={() => customInput.trim() && !chatLoading && sendChatAnswer(customInput.trim())}
-                  disabled={!customInput.trim() || chatLoading}
-                  style={{ padding: "0.65rem 1rem" }}
-                >
-                  Send
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ─── Main render ───────────────────────────────────────────────────────────
+  const currentStepConfig = category && funnelStep >= 1 && funnelStep <= 3
+    ? FUNNEL_STEPS[category][funnelStep - 1]
+    : null;
 
   return (
-    <div className="modal-overlay" onClick={() => { if (!showAiChat) onClose(); }}>
-      {/* Hide the modal box entirely when AI chat is open (edit mode) */}
-      {!showAiChat && (
-        <div
-          className="modal-box"
-          onClick={e => e.stopPropagation()}
-          style={{ maxWidth: "min(560px, calc(100vw - 2rem))", width: "100%", padding: 0, overflow: "hidden" }}
-        >
-          {/* Close button */}
-          {step !== "building" && step !== "done" && (
-            <div style={{ padding: "1rem 1.25rem 0", display: "flex", justifyContent: "flex-end" }}>
-              <button
-                onClick={onClose}
-                style={{ fontSize: 18, color: "var(--muted)", padding: 4, cursor: "pointer", background: "none", border: "none" }}
-              >
-                &#x2715;
-              </button>
-            </div>
-          )}
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "var(--bg)",
+        zIndex: 200,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "clamp(1rem, 4vw, 2rem)",
+        overflowY: "auto",
+      }}
+    >
+      <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 560 }}>
 
-          {/* Content */}
-          <div style={{ padding: "1.25rem clamp(1rem, 5vw, 2rem) 2rem" }}>
-            {step === "goal" && renderGoalStep()}
-            {step === "confirm" && renderConfirmStep()}
-            {step === "deadline" && renderDeadlineStep()}
-            {step === "time" && renderTimeStep()}
-            {step === "workdays" && renderWorkDaysStep()}
-            {step === "intensity" && renderIntensityStep()}
-            {step === "building" && renderBuildingStep()}
-            {step === "done" && renderDoneStep()}
+        {/* Building state */}
+        {building && (
+          <div className="fade-in">
+            <BuildingProgress />
+            {buildError && (
+              <p style={{ color: "var(--danger)", textAlign: "center", marginTop: 16, fontSize: "0.9rem" }}>
+                {buildError}
+              </p>
+            )}
           </div>
-        </div>
-      )}
+        )}
 
-      {renderAiChat()}
+        {/* Step 0: Category picker */}
+        {!building && funnelStep === 0 && (
+          <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            {/* Close button */}
+            <button
+              onClick={onClose}
+              style={{
+                background: "none", border: "none", color: "rgba(255,255,255,0.85)",
+                cursor: "pointer", fontSize: "1rem", padding: "4px 0",
+                alignSelf: "flex-end", display: "flex", alignItems: "center", gap: 6, minHeight: 48,
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div style={{ textAlign: "center" }}>
+              <h1 style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
+                What do you want to achieve?
+              </h1>
+              <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.85)" }}>
+                Pick a category to get started
+              </p>
+            </div>
+
+            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+              {([
+                { id: "business" as FunnelCategory, label: "\uD83E\uDD11 Business", subtitle: "Start or grow a business" },
+                { id: "health" as FunnelCategory, label: "\uD83D\uDCAA Health", subtitle: "Transform your body" },
+                { id: "other" as FunnelCategory, label: "Other", subtitle: "Set any goal" },
+              ]).map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategorySelect(cat.id)}
+                  style={{
+                    padding: "1.5rem 1.25rem", borderRadius: 16,
+                    border: "1.5px solid var(--border)", background: "var(--card)",
+                    cursor: "pointer", textAlign: "left", transition: "all 0.15s",
+                    minHeight: 80, display: "flex", flexDirection: "column", justifyContent: "center",
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#D4A843"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
+                >
+                  <div style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--text)", marginBottom: 4 }}>
+                    {cat.label}
+                  </div>
+                  <div style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.4 }}>
+                    {cat.subtitle}
+                  </div>
+                </button>
+              ))}
+            </div>
+
+            {buildError && (
+              <p style={{ color: "var(--danger)", textAlign: "center", fontSize: "0.9rem" }}>{buildError}</p>
+            )}
+          </div>
+        )}
+
+        {/* Steps 1-3: Funnel questions */}
+        {!building && funnelStep >= 1 && funnelStep <= 3 && currentStepConfig && (
+          <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            <button
+              onClick={handleBack}
+              style={{
+                background: "none", border: "none", color: "rgba(255,255,255,0.85)",
+                cursor: "pointer", fontSize: "1rem", padding: "4px 0",
+                alignSelf: "flex-start", display: "flex", alignItems: "center", gap: 6, minHeight: 48,
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              Back
+            </button>
+
+            <div style={{ textAlign: "center" }}>
+              <h2 style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
+                {currentStepConfig.question}
+              </h2>
+              <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 12 }}>
+                {[1, 2, 3].map((dot) => (
+                  <div key={dot} style={{
+                    width: 8, height: 8, borderRadius: "50%",
+                    background: dot <= funnelStep ? "#D4A843" : "var(--border)",
+                    transition: "background 0.2s",
+                  }} />
+                ))}
+              </div>
+            </div>
+
+            {currentStepConfig.buttons && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {currentStepConfig.buttons.map((btn) => (
+                  <button
+                    key={btn}
+                    onClick={() => handleButtonAnswer(btn)}
+                    style={{
+                      padding: "1rem 1.25rem", borderRadius: 14,
+                      border: "1.5px solid var(--border)", background: "var(--card)",
+                      color: "var(--text)", fontSize: "1rem", fontWeight: 600,
+                      cursor: "pointer", transition: "all 0.15s", minHeight: 56, textAlign: "center",
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#D4A843"; e.currentTarget.style.color = "#D4A843"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text)"; }}
+                  >
+                    {btn}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {currentStepConfig.isTextInput && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                <input
+                  className="field-input"
+                  placeholder={currentStepConfig.placeholder}
+                  value={textValue}
+                  onChange={(e) => setTextValue(e.target.value)}
+                  onKeyDown={(e) => { if (e.key === "Enter" && textValue.trim()) handleTextSubmit(textValue.trim()); }}
+                  autoFocus
+                  style={{
+                    fontSize: "1rem", padding: "1rem 1.25rem", borderRadius: 14, minHeight: 56,
+                    background: "var(--card)", border: "1.5px solid var(--border)", color: "var(--text)",
+                  }}
+                />
+                {currentStepConfig.continueButton && (
+                  <button
+                    onClick={() => textValue.trim() && handleTextSubmit(textValue.trim())}
+                    disabled={!textValue.trim()}
+                    style={{
+                      padding: "1rem 1.25rem", borderRadius: 14, border: "none",
+                      background: textValue.trim()
+                        ? "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)"
+                        : "var(--border)",
+                      color: textValue.trim() ? "#000" : "rgba(255,255,255,0.5)",
+                      fontSize: "1rem", fontWeight: 700,
+                      cursor: textValue.trim() ? "pointer" : "default",
+                      minHeight: 56, transition: "all 0.15s",
+                    }}
+                  >
+                    {currentStepConfig.continueButton}
+                  </button>
+                )}
+                {currentStepConfig.skippable && (
+                  <button
+                    onClick={handleSkip}
+                    style={{
+                      background: "none", border: "none", color: "rgba(255,255,255,0.85)",
+                      cursor: "pointer", fontSize: "0.95rem", fontWeight: 600,
+                      padding: "0.75rem", minHeight: 48,
+                      textDecoration: "underline", textUnderlineOffset: 3,
+                    }}
+                  >
+                    Skip
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      <style>{`
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+          animation: fadeInUp 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 }
 
 // ─── Goal Card ────────────────────────────────────────────────────────────────
 
-function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onDeleted: () => void; onUpdated: (goal: Goal) => void; onAddDetail: (goal: Goal) => void }) {
+function GoalCard({ goal, onDeleted, onUpdated }: { goal: Goal; onDeleted: () => void; onUpdated: (goal: Goal) => void }) {
   const goalRouter = useRouter();
   const { hasPro } = useSubscription();
   const [showMenu, setShowMenu] = useState(false);
@@ -1125,11 +466,6 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
     } catch {
       setCompleting(false);
     }
-  }
-
-  function handleEditDetail() {
-    setShowMenu(false);
-    onAddDetail(goal);
   }
 
   const daysLeft = goal.deadline
@@ -1207,16 +543,6 @@ function GoalCard({ goal, onDeleted, onUpdated, onAddDetail }: { goal: Goal; onD
                 minWidth: 160, maxWidth: "calc(100vw - 3rem)", overflow: "hidden",
               }}
             >
-              <button
-                onClick={handleEditDetail}
-                style={{
-                  display: "block", width: "100%", padding: "0.6rem 0.875rem",
-                  textAlign: "left", color: "var(--text)", fontSize: "0.875rem",
-                  fontWeight: 500, cursor: "pointer", background: "none", border: "none",
-                }}
-              >
-                {"\u270F\uFE0F"} Edit goal
-              </button>
               <button
                 onClick={handleTogglePause}
                 disabled={toggling}
@@ -1318,7 +644,6 @@ function GoalsPageInner() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(searchParams.get("add") === "true");
-  const [editGoal, setEditGoal] = useState<Goal | null>(null);
   const [showGoalLimit, setShowGoalLimit] = useState(false);
 
   // During tutorial walkthrough, always use mock data for consistent spotlight targets
@@ -1349,18 +674,10 @@ function GoalsPageInner() {
   }
 
   function handleGoalAdded(goal: Goal) {
-    const isEdit = editGoal !== null;
     setShowAdd(false);
-    setEditGoal(null);
-    if (isEdit) {
-      // Update existing goal in the list
-      setGoals(prev => prev.map(g => g.id === goal.id ? goal : g));
-    } else {
-      // New goal: add to list and redirect to dashboard
-      setGoals(prev => [...prev, goal]);
-      localStorage.setItem(`threely_focus_${new Date().toLocaleDateString("en-CA")}`, goal.id);
-      router.push("/dashboard");
-    }
+    setGoals(prev => [...prev, goal]);
+    localStorage.setItem(`threely_focus_${new Date().toLocaleDateString("en-CA")}`, goal.id);
+    router.push("/dashboard");
   }
 
   function handleGoalDeleted(id: string) {
@@ -1369,11 +686,6 @@ function GoalsPageInner() {
 
   function handleGoalUpdated(updated: Goal) {
     setGoals(prev => prev.map(g => g.id === updated.id ? updated : g));
-  }
-
-  function handleAddDetail(goal: Goal) {
-    setEditGoal(goal);
-    setShowAdd(true);
   }
 
   const activeGoals = effectiveGoals.filter(g => !g.isPaused);
@@ -1447,7 +759,6 @@ function GoalsPageInner() {
                   goal={goal}
                   onDeleted={() => handleGoalDeleted(goal.id)}
                   onUpdated={handleGoalUpdated}
-                  onAddDetail={handleAddDetail}
                 />
               </div>
             ))}
@@ -1470,7 +781,6 @@ function GoalsPageInner() {
                       goal={goal}
                       onDeleted={() => handleGoalDeleted(goal.id)}
                       onUpdated={handleGoalUpdated}
-                      onAddDetail={handleAddDetail}
                     />
                   </div>
                 ))}
@@ -1483,8 +793,7 @@ function GoalsPageInner() {
       {showAdd && (
         <AddGoalFlow
           onDone={handleGoalAdded}
-          onClose={() => { setShowAdd(false); setEditGoal(null); }}
-          editGoal={editGoal}
+          onClose={() => setShowAdd(false)}
         />
       )}
 

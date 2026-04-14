@@ -22,9 +22,12 @@ const GREY_NODE = "rgba(255,255,255,0.15)";
 const NODE_SIZE = 50;
 const TODAY_SIZE = 68;
 const MILESTONE_SIZE = 58;
+const CROWN_SIZE = 62;
 const ZIGZAG_OFFSET = 80;
+const ZIGZAG_DESKTOP = 140;
 const ZIGZAG_MOBILE = 48;
 const NODE_SPACING = 108;
+const NODE_SPACING_DESKTOP = 120;
 const VISIBLE_NODES = 20;
 
 // ─── Section banner helper ───────────────────────────────────────────────────
@@ -51,6 +54,7 @@ export default function PathView({
   const todayRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const [containerWidth, setContainerWidth] = useState(400);
   const [todayPopup, setTodayPopup] = useState(false);
   const [lockedModal, setLockedModal] = useState(false);
@@ -60,6 +64,7 @@ export default function PathView({
   for (let i = 0; i < VISIBLE_NODES; i++) {
     days.push(windowStart + i);
   }
+  const lastVisibleDay = days[days.length - 1];
 
   const { week, phase } = getWeekPhase(dayNumber);
 
@@ -79,7 +84,9 @@ export default function PathView({
 
   useEffect(() => {
     function handleResize() {
-      setIsMobileView(window.innerWidth < 500);
+      const w = window.innerWidth;
+      setIsMobileView(w < 500);
+      setIsDesktop(w >= 900);
       if (scrollRef.current) {
         setContainerWidth(scrollRef.current.clientWidth);
       }
@@ -102,7 +109,9 @@ export default function PathView({
     return () => document.removeEventListener("mousedown", handleClick);
   }, [todayPopup]);
 
-  const zigzag = isMobileView ? ZIGZAG_MOBILE : ZIGZAG_OFFSET;
+  // Responsive zigzag: mobile < 500, tablet 500-899, desktop 900+
+  const zigzag = isMobileView ? ZIGZAG_MOBILE : isDesktop ? ZIGZAG_DESKTOP : ZIGZAG_OFFSET;
+  const spacing = isDesktop ? NODE_SPACING_DESKTOP : NODE_SPACING;
   const centerX = containerWidth / 2;
 
   const getNodeType = useCallback((day: number): "completed" | "today" | "next" | "locked" => {
@@ -116,8 +125,13 @@ export default function PathView({
     return MILESTONE_DAYS.includes(day);
   }
 
+  function isCrownNode(day: number): boolean {
+    return day === lastVisibleDay;
+  }
+
   function getNodeSize(day: number): number {
     if (day === dayNumber) return TODAY_SIZE;
+    if (isCrownNode(day)) return CROWN_SIZE;
     if (isMilestone(day)) return MILESTONE_SIZE;
     return NODE_SIZE;
   }
@@ -128,7 +142,7 @@ export default function PathView({
   }
 
   function getNodeY(index: number): number {
-    return 60 + index * NODE_SPACING;
+    return 60 + index * spacing;
   }
 
   function handleNodeClick(day: number, nodeType: "completed" | "today" | "next" | "locked") {
@@ -176,6 +190,10 @@ export default function PathView({
           from { opacity: 0; transform: translateY(20px) scale(0.95); }
           to { opacity: 1; transform: translateY(0) scale(1); }
         }
+        @keyframes crownGlow {
+          0%, 100% { box-shadow: 0 0 16px 4px rgba(212,168,67,0.3), 0 0 40px 8px rgba(212,168,67,0.1); }
+          50% { box-shadow: 0 0 24px 8px rgba(212,168,67,0.45), 0 0 60px 16px rgba(212,168,67,0.15); }
+        }
         .path-scroll::-webkit-scrollbar { display: none; }
         .path-node-btn { font-family: inherit; }
         .path-node-btn:hover { filter: brightness(1.12); }
@@ -201,7 +219,7 @@ export default function PathView({
           style={{
             position: "relative",
             width: "100%",
-            height: days.length * NODE_SPACING + 80,
+            height: days.length * spacing + 80,
           }}
         >
           {/* Connecting lines */}
@@ -247,6 +265,7 @@ export default function PathView({
           {days.map((day, i) => {
             const nodeType = getNodeType(day);
             const milestone = isMilestone(day);
+            const crown = isCrownNode(day);
             const size = getNodeSize(day);
             const xPos = getNodeX(i);
             const yPos = getNodeY(i);
@@ -263,11 +282,11 @@ export default function PathView({
                   transform: "translate(-50%, 0)",
                   display: "flex",
                   alignItems: "center",
-                  gap: 12,
+                  gap: isDesktop ? 18 : 12,
                   flexDirection: isRight ? "row" : "row-reverse",
                   opacity: mounted ? 1 : 0,
                   animation: mounted ? `pathFadeIn 0.35s ease ${i * 0.035}s both` : "none",
-                  zIndex: nodeType === "today" ? 10 : 1,
+                  zIndex: nodeType === "today" ? 10 : crown ? 5 : 1,
                 }}
               >
                 {/* Node circle */}
@@ -286,6 +305,8 @@ export default function PathView({
                       ? `2.5px solid ${GOLD}`
                       : nodeType === "next"
                       ? `2.5px dashed ${GOLD_DIM}`
+                      : crown
+                      ? `2.5px solid ${GOLD_DIM}`
                       : `2px solid ${GREY}`,
                     background: nodeType === "completed"
                       ? GOLD
@@ -293,6 +314,8 @@ export default function PathView({
                       ? "rgba(212,168,67,0.15)"
                       : nodeType === "next"
                       ? "rgba(212,168,67,0.06)"
+                      : crown
+                      ? "rgba(212,168,67,0.1)"
                       : GREY_NODE,
                     display: "flex",
                     alignItems: "center",
@@ -300,29 +323,40 @@ export default function PathView({
                     cursor: "pointer",
                     padding: 0,
                     flexShrink: 0,
-                    opacity: nodeType === "locked" ? 0.45 : 1,
+                    opacity: (nodeType === "locked" && !crown) ? 0.45 : 1,
                     transition: "all 0.25s ease",
-                    animation: nodeType === "today" ? "pathPulse 2.5s ease-in-out infinite" : "none",
+                    animation: nodeType === "today"
+                      ? "pathPulse 2.5s ease-in-out infinite"
+                      : crown
+                      ? "crownGlow 3s ease-in-out infinite"
+                      : "none",
                     boxShadow: nodeType === "today"
                       ? "0 0 32px 8px rgba(212,168,67,0.25), 0 0 60px 12px rgba(212,168,67,0.1)"
                       : nodeType === "completed"
                       ? "0 2px 10px rgba(212,168,67,0.15)"
+                      : crown
+                      ? "0 0 16px 4px rgba(212,168,67,0.3), 0 0 40px 8px rgba(212,168,67,0.1)"
                       : "none",
                   }}
-                  aria-label={`Day ${day}`}
+                  aria-label={crown ? "Huge Progress" : `Day ${day}`}
                 >
+                  {/* Crown node: crown emoji */}
+                  {crown && (
+                    <span style={{ fontSize: size * 0.45, lineHeight: 1 }}>{"\uD83D\uDC51"}</span>
+                  )}
+
                   {/* Completed: checkmark */}
-                  {nodeType === "completed" && !milestone && (
+                  {!crown && nodeType === "completed" && !milestone && (
                     <svg width={size * 0.4} height={size * 0.4} viewBox="0 0 14 14" fill="none">
                       <path d="M3 7L6 10L11 4" stroke="#000" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
                   )}
-                  {nodeType === "completed" && milestone && (
-                    <span style={{ fontSize: size * 0.42, lineHeight: 1 }}>{"🏆"}</span>
+                  {!crown && nodeType === "completed" && milestone && (
+                    <span style={{ fontSize: size * 0.42, lineHeight: 1 }}>{"\uD83C\uDFC6"}</span>
                   )}
 
                   {/* Today: star/play icon or checkmark if done */}
-                  {nodeType === "today" && !milestone && (
+                  {!crown && nodeType === "today" && !milestone && (
                     allDoneToday ? (
                       <svg width={size * 0.38} height={size * 0.38} viewBox="0 0 14 14" fill="none">
                         <path d="M3 7L6 10L11 4" stroke={GOLD} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -334,12 +368,12 @@ export default function PathView({
                       </svg>
                     )
                   )}
-                  {nodeType === "today" && milestone && (
-                    <span style={{ fontSize: size * 0.42, lineHeight: 1 }}>{"⭐"}</span>
+                  {!crown && nodeType === "today" && milestone && (
+                    <span style={{ fontSize: size * 0.42, lineHeight: 1 }}>{"\u2B50"}</span>
                   )}
 
-                  {/* Locked: lock icon inside node */}
-                  {(nodeType === "locked" || nodeType === "next") && !milestone && (
+                  {/* Locked: lock icon inside node (not crown) */}
+                  {!crown && (nodeType === "locked" || nodeType === "next") && !milestone && (
                     <svg
                       width={size * 0.3}
                       height={size * 0.3}
@@ -354,8 +388,8 @@ export default function PathView({
                       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
                     </svg>
                   )}
-                  {(nodeType === "locked" || nodeType === "next") && milestone && (
-                    <span style={{ fontSize: size * 0.38, lineHeight: 1, opacity: 0.5 }}>{"🏆"}</span>
+                  {!crown && (nodeType === "locked" || nodeType === "next") && milestone && (
+                    <span style={{ fontSize: size * 0.38, lineHeight: 1, opacity: 0.5 }}>{"\uD83C\uDFC6"}</span>
                   )}
                 </button>
 
@@ -366,7 +400,26 @@ export default function PathView({
                   alignItems: isRight ? "flex-start" : "flex-end",
                   whiteSpace: "nowrap",
                 }}>
-                  {nodeType === "today" ? (
+                  {crown ? (
+                    <>
+                      <span style={{
+                        fontSize: "0.92rem",
+                        fontWeight: 800,
+                        color: GOLD,
+                        letterSpacing: "-0.01em",
+                      }}>
+                        Huge Progress
+                      </span>
+                      <span style={{
+                        fontSize: "0.7rem",
+                        fontWeight: 600,
+                        color: GOLD,
+                        opacity: 0.8,
+                      }}>
+                        Keep going!
+                      </span>
+                    </>
+                  ) : nodeType === "today" ? (
                     <>
                       <span style={{
                         fontSize: "1rem",
