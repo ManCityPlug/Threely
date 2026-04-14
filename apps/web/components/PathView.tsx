@@ -127,11 +127,8 @@ export default function PathView({
 
   function handleNodeClick(day: number, nodeType: "completed" | "today" | "next" | "locked") {
     if (nodeType === "today") {
-      if (tasksVisible) {
-        onDayClick(day, nodeType);
-        return;
-      }
-      setTodayPopup((prev) => !prev);
+      if (onStartDay) onStartDay();
+      else onDayClick(day, nodeType);
       return;
     }
     if (nodeType === "locked") {
@@ -460,7 +457,7 @@ export default function PathView({
           position: "relative",
           width: "100%",
           maxHeight: "70vh",
-          paddingTop: 20,
+          paddingTop: 60,
           overflowY: "auto",
           overflowX: "hidden",
           scrollbarWidth: "none",
@@ -548,13 +545,16 @@ export default function PathView({
                     : "none",
                 }}
               >
-                {/* START / COMPLETE badge above today's node */}
+                {/* START / COMPLETE badge BELOW today's node */}
                 {isToday && (
                   <div
-                    onClick={() => handleNodeClick(day, nodeType)}
+                    onClick={() => {
+                      if (onStartDay) onStartDay();
+                      else onDayClick(day, nodeType);
+                    }}
                     style={{
                       position: "absolute",
-                      bottom: "calc(100% + 8px)",
+                      top: "calc(100% + 8px)",
                       left: "50%",
                       transform: "translateX(-50%)",
                       zIndex: 20,
@@ -578,17 +578,8 @@ export default function PathView({
                         ? "0 2px 12px rgba(62,207,142,0.35)"
                         : "0 2px 12px rgba(212,168,67,0.4)",
                     }}>
-                      {allDoneToday ? "COMPLETE \u2713" : "START"}
+                      {allDoneToday ? "COMPLETE ✓" : "START"}
                     </div>
-                    {/* Small connector line */}
-                    <div style={{
-                      width: 2,
-                      height: 8,
-                      background: allDoneToday
-                        ? "rgba(62,207,142,0.4)"
-                        : "rgba(212,168,67,0.4)",
-                      margin: "0 auto",
-                    }} />
                   </div>
                 )}
 
