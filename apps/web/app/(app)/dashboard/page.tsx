@@ -298,6 +298,86 @@ function CelebrationOverlay({
   );
 }
 
+// ─── Midnight Countdown ──────────────────────────────────────────────────────
+
+function MidnightCountdown({ dayNumber }: { dayNumber: number }) {
+  const [timeLeft, setTimeLeft] = useState("");
+  const [expired, setExpired] = useState(false);
+
+  useEffect(() => {
+    function calcTimeLeft() {
+      const now = Date.now();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0);
+      const diff = midnight.getTime() - now;
+
+      if (diff <= 0) {
+        setExpired(true);
+        setTimeLeft("");
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      setTimeLeft(`${hours}h ${minutes}m`);
+    }
+
+    calcTimeLeft();
+    const interval = setInterval(calcTimeLeft, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (expired) {
+    return (
+      <div style={{
+        marginTop: 16,
+        textAlign: "center",
+      }}>
+        <p style={{
+          color: "#D4A843",
+          fontSize: "0.95rem",
+          fontWeight: 600,
+        }}>
+          New tasks available! Refresh to start Day {dayNumber + 1}
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            marginTop: 10,
+            padding: "8px 24px",
+            borderRadius: 10,
+            background: "#D4A843",
+            color: "#000",
+            fontSize: "0.85rem",
+            fontWeight: 700,
+            border: "none",
+            cursor: "pointer",
+            transition: "filter 0.15s",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.filter = "brightness(1.1)"; }}
+          onMouseLeave={e => { e.currentTarget.style.filter = "brightness(1)"; }}
+        >
+          Refresh
+        </button>
+      </div>
+    );
+  }
+
+  if (!timeLeft) return null;
+
+  return (
+    <p style={{
+      marginTop: 16,
+      color: "#D4A843",
+      fontSize: "0.9rem",
+      fontWeight: 600,
+      opacity: 0.85,
+    }}>
+      Next day unlocks in {timeLeft}
+    </p>
+  );
+}
+
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 
 export default function DashboardPage() {
@@ -1025,6 +1105,7 @@ function DashboardPageInner() {
                   }}>
                     {getCompletionMessage(goalDayNumber)}
                   </p>
+                  <MidnightCountdown dayNumber={goalDayNumber} />
                 </div>
               )}
 

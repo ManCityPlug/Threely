@@ -39,33 +39,16 @@ const NAV = [
   { href: "/profile", label: "Profile", iconKey: "profile" },
 ];
 
-function isTabletDevice(): boolean {
-  if (typeof navigator === "undefined") return false;
-  const ua = navigator.userAgent;
-  // iPadOS 13+ reports as Macintosh with touch support
-  if (/iPad/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1)) return true;
-  // Android tablets don't have "Mobile" in UA
-  if (/Android/i.test(ua) && !/Mobile/i.test(ua)) return true;
-  return false;
-}
-
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const [checkingOnboarding, setCheckingOnboarding] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
   const [subStatus, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
   const [showTutorial, setShowTutorial] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [notifOpen, setNotifOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    setIsTablet(isTabletDevice());
-  }, []);
 
   // Force dark theme in the app — entire app is designed for dark mode
   useEffect(() => {
@@ -162,21 +145,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     notificationsApi.dismiss(id).catch(() => {});
   }
 
-  // Close menu on outside click
-  useEffect(() => {
-    if (!menuOpen) return;
-    function handleClick(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [menuOpen]);
-
-  // Close menu on route change
-  useEffect(() => { setMenuOpen(false); }, [pathname]);
-
   if (loading || !user || checkingOnboarding) {
     return (
       <div style={{
@@ -188,240 +156,60 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     );
   }
 
-  const nicknameRaw = getNickname() || (user.user_metadata?.display_name as string) || user.email?.split("@")[0] || "You";
-  const nickname = formatDisplayName(nicknameRaw);
-  const initials = nickname[0]?.toUpperCase() ?? "?";
-
-  const subBadge = subStatus === "trialing"
-    ? { label: "Pro", bg: "rgba(5,150,105,0.15)", color: "#34d399" }
-    : subStatus === "active"
-    ? { label: "Pro", bg: "var(--primary-light)", color: "var(--primary)" }
-    : subStatus !== undefined
-    ? { label: "No plan", bg: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)" }
-    : null;
-
-  async function handleSignOut() {
-    await signOut();
-    router.replace("/login");
-  }
-
   return (
     <ToastProvider>
     <SubscriptionProvider>
     <AppTutorial visible={showTutorial} onComplete={handleTutorialComplete} />
-    <div className={`app-shell${isTablet ? " force-mobile" : ""}`}>
-      {/* ── Mobile top bar ──────────────────────────────────────────────────── */}
-      <div className="mobile-topbar" ref={menuRef}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/favicon.png" alt="Threely" width={32} height={32} style={{ borderRadius: 8, flexShrink: 0 }} />
-          <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.02em", color: "var(--text)" }}>
-            Threely
-          </span>
-        </div>
-        <button
-          onClick={() => setMenuOpen(o => !o)}
-          style={{
-            background: "none", border: "none", cursor: "pointer",
-            padding: 6, display: "flex", flexDirection: "column", gap: 4,
-          }}
-          aria-label="Menu"
-        >
-          {menuOpen ? (
-            <span style={{ fontSize: 20, color: "var(--text)", lineHeight: 1 }}>&#x2715;</span>
-          ) : (
-            <>
-              <span style={{ width: 20, height: 2, background: "var(--text)", borderRadius: 1, display: "block" }} />
-              <span style={{ width: 20, height: 2, background: "var(--text)", borderRadius: 1, display: "block" }} />
-              <span style={{ width: 20, height: 2, background: "var(--text)", borderRadius: 1, display: "block" }} />
-            </>
-          )}
-        </button>
-
-        {/* Dropdown */}
-        {menuOpen && (
-          <div style={{
-            position: "absolute", top: "100%", left: 0, right: 0,
-            background: "var(--card)", borderBottom: "1px solid var(--border)",
-            boxShadow: "0 4px 16px rgba(0,0,0,0.08)",
-            padding: "0.5rem 1rem",
-            zIndex: 101,
-          }}>
-            {NAV.map(item => {
-              const active = pathname === item.href || (item.href === "/dashboard" && pathname === "/");
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 10,
-                    padding: "0.7rem 0.5rem",
-                    borderBottom: "1px solid var(--border)",
-                    color: active ? "var(--primary)" : "var(--text)",
-                    fontWeight: active ? 600 : 500,
-                    fontSize: "0.9rem",
-                    textDecoration: "none",
-                  }}
-                >
-                  <span style={{ fontSize: 16, width: 20, height: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>{NAV_ICONS[item.iconKey]}</span>
-                  {item.label}
-                </Link>
-              );
-            })}
-            <div style={{
-              display: "flex", alignItems: "center", gap: 10,
-              padding: "0.75rem 0.5rem 0.5rem",
-            }}>
-              <div style={{
-                width: 30, height: 30, borderRadius: "50%",
-                background: "var(--primary-light)", color: "var(--primary)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontWeight: 700, fontSize: "0.8rem", flexShrink: 0,
-              }}>{user?.email?.[0]?.toUpperCase() ?? "?"}</div>
-              <div style={{ flex: 1, overflow: "hidden" }}>
-                <span style={{ fontSize: "0.75rem", fontWeight: 500, color: "var(--text)", display: "block", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                  {user?.email ?? ""}
-                </span>
-                {subBadge && (
-                  <span style={{
-                    display: "inline-block",
-                    padding: "1px 8px",
-                    borderRadius: 999,
-                    background: subBadge.bg,
-                    color: subBadge.color,
-                    fontSize: "0.65rem",
-                    fontWeight: 600,
-                    marginTop: 2,
-                  }}>
-                    {subBadge.label}
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={handleSignOut}
-                style={{
-                  fontSize: "0.8rem", fontWeight: 600, color: "var(--danger)",
-                  background: "none", border: "none", cursor: "pointer",
-                  padding: "0.3rem 0.5rem",
-                }}
-              >
-                Sign out
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* ── Sidebar (desktop) ──────────────────────────────────────────────── */}
-      <aside className="sidebar">
-        {/* Nav */}
-        <nav style={{ padding: "1.5rem 0.75rem 1rem", flex: 1 }}>
+    <div className="app-shell">
+      {/* ── Top navigation bar ──────────────────────────────────────────────── */}
+      <nav className="top-nav">
+        <div className="top-nav-inner">
           {NAV.map(item => {
             const active = pathname === item.href || (item.href === "/dashboard" && pathname === "/");
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`sidebar-nav-link${active ? " active" : ""}`}
+                className={`top-nav-item${active ? " active" : ""}`}
               >
-                <span className="nav-icon">
+                <span className="top-nav-icon">
                   {NAV_ICONS[item.iconKey]}
                 </span>
-                {item.label}
+                <span className="top-nav-label">{item.label}</span>
               </Link>
             );
           })}
-        </nav>
 
-        {/* User + signout */}
-        <div style={{
-          padding: "1rem 1.25rem",
-          borderTop: "1px solid var(--border)",
-        }}>
-          {subBadge && (
-            <div style={{
-              display: "inline-block",
-              padding: "2px 10px",
-              borderRadius: 999,
-              background: subBadge.bg,
-              color: subBadge.color,
-              fontSize: "0.7rem",
-              fontWeight: 600,
-              marginBottom: "0.5rem",
-            }}>
-              {subBadge.label}
-            </div>
-          )}
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: "0.75rem" }}>
-            <div style={{
-              width: 34, height: 34, borderRadius: "50%",
-              background: "var(--primary-light)", color: "var(--primary)",
-              display: "flex", alignItems: "center", justifyContent: "center",
-              fontWeight: 700, fontSize: "0.9rem", flexShrink: 0,
-            }}>{user?.email?.[0]?.toUpperCase() ?? "?"}</div>
-            <div style={{ overflow: "hidden", flex: 1 }}>
-              <div style={{ fontWeight: 500, fontSize: "0.75rem", color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                {user.email}
-              </div>
-            </div>
-            {/* Notification bell */}
-            <button
-              onClick={() => setNotifOpen(o => !o)}
-              style={{
-                background: "none", border: "none", cursor: "pointer",
-                padding: 4, display: "flex", alignItems: "center", justifyContent: "center",
-                position: "relative", borderRadius: 8, flexShrink: 0,
-              }}
-              aria-label="Notifications"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--subtext)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-              </svg>
-              {notifications.length > 0 && (
-                <span style={{
-                  position: "absolute", top: -2, right: -2,
-                  minWidth: 16, height: 16, borderRadius: "50%",
-                  background: "#ef4444", color: "#fff",
-                  fontSize: "0.6rem", fontWeight: 700,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  padding: "0 3px",
-                }}>
-                  {notifications.length > 9 ? "9+" : notifications.length}
-                </span>
-              )}
-            </button>
-          </div>
+          {/* Notification bell — far right */}
           <button
-            onClick={handleSignOut}
-            className="btn btn-outline"
-            style={{ width: "100%", fontSize: "0.8rem", padding: "0.5rem", height: 34 }}
+            onClick={() => setNotifOpen(o => !o)}
+            className="top-nav-bell"
+            aria-label="Notifications"
           >
-            Sign out
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            {notifications.length > 0 && (
+              <span style={{
+                position: "absolute", top: -2, right: -2,
+                minWidth: 16, height: 16, borderRadius: "50%",
+                background: "#ef4444", color: "#fff",
+                fontSize: "0.6rem", fontWeight: 700,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                padding: "0 3px",
+              }}>
+                {notifications.length > 9 ? "9+" : notifications.length}
+              </span>
+            )}
           </button>
         </div>
-      </aside>
+      </nav>
 
       {/* ── Main content ────────────────────────────────────────────────────── */}
       <main className="main-content">
         {children}
       </main>
-
-      {/* ── Bottom nav (mobile) ──────────────────────────────────────────────── */}
-      <nav className="bottom-nav">
-        {NAV.map(item => {
-          const active = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`bottom-nav-item${active ? " active" : ""}`}
-            >
-              <span style={{ width: 22, height: 22, display: "flex", alignItems: "center", justifyContent: "center" }}>{NAV_ICONS[item.iconKey]}</span>
-              <span>{item.label}</span>
-            </Link>
-          );
-        })}
-      </nav>
 
       {/* ── Notification Center Modal ──────────────────────────────────────────── */}
       {notifOpen && (

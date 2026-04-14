@@ -21,7 +21,6 @@
   --danger-light: #fff0f0;
   --warning: #f59e0b;
   --warning-light: #fef3c7;
-  --sidebar-w: 240px;
   --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --radius-sm: 6px;
   --radius: 10px;
@@ -119,32 +118,20 @@ input, textarea, select {
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-/* ─── Sidebar layout ─────────────────────────────────────────────────────────── */
+/* ─── App shell layout ───────────────────────────────────────────────────────── */
 .app-shell {
   display: flex;
-  min-height: 100vh;
-}
-
-.sidebar {
-  width: var(--sidebar-w);
-  min-height: 100vh;
-  background: var(--card);
-  border-right: 1px solid var(--border);
-  display: flex;
   flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 50;
+  min-height: 100vh;
 }
 
 .main-content {
-  margin-left: var(--sidebar-w);
   flex: 1;
-  min-height: 100vh;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+  padding-top: 64px;
+  overflow-y: auto;
 }
 
 .page-inner {
@@ -154,39 +141,119 @@ input, textarea, select {
   padding: 2.5rem 2rem;
 }
 
-/* ─── Bottom nav (mobile) ────────────────────────────────────────────────────── */
-.bottom-nav {
-  display: none;
+/* ─── Top navigation bar ─────────────────────────────────────────────────────── */
+.top-nav {
   position: fixed;
-  bottom: 0;
+  top: 0;
   left: 0;
   right: 0;
-  height: 60px;
+  height: 64px;
   background: var(--card);
-  border-top: 1px solid var(--border);
-  z-index: 50;
-  justify-content: space-around;
+  border-bottom: 1px solid var(--border);
+  z-index: 100;
+  display: flex;
   align-items: center;
+  justify-content: center;
 }
 
-.bottom-nav-item {
+.top-nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  height: 100%;
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  padding: 0 1rem;
+}
+
+.top-nav-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 8px 16px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: color 0.15s;
-  background: none;
-  border: none;
+  gap: 3px;
+  padding: 6px 16px;
   text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-radius: 12px;
+  position: relative;
 }
 
-.bottom-nav-item.active {
-  color: var(--primary);
+.top-nav-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.06);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.top-nav-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.top-nav-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: rgba(255,255,255,0.5);
+  transition: color 0.2s ease;
+  letter-spacing: 0.01em;
+}
+
+.top-nav-item:hover .top-nav-icon {
+  background: rgba(255,255,255,0.1);
+}
+
+.top-nav-item:hover .top-nav-label {
+  color: rgba(255,255,255,0.85);
+}
+
+/* Active state — gold highlight */
+.top-nav-item.active .top-nav-icon {
+  background: rgba(212,168,67,0.15);
+  border: 2px solid #D4A843;
+  box-shadow: 0 0 12px rgba(212,168,67,0.2);
+}
+
+.top-nav-item.active .top-nav-label {
+  color: #D4A843;
+  font-weight: 700;
+}
+
+/* Inactive icon dimmer */
+.top-nav-item:not(.active) .top-nav-icon {
+  opacity: 0.7;
+}
+
+.top-nav-item:not(.active):hover .top-nav-icon {
+  opacity: 1;
+}
+
+/* Notification bell in top nav */
+.top-nav-bell {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+
+.top-nav-bell:hover {
+  background: rgba(255,255,255,0.08);
 }
 
 /* ─── Card ───────────────────────────────────────────────────────────────────── */
@@ -207,56 +274,7 @@ input, textarea, select {
   border-color: rgba(99,91,255,0.2);
 }
 
-/* ─── Sidebar nav link ───────────────────────────────────────────────────────── */
-.sidebar-nav-link {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0.65rem 0.75rem;
-  border-radius: var(--radius);
-  margin-bottom: 2px;
-  font-weight: 500;
-  font-size: 0.9rem;
-  transition: all 0.15s ease;
-  text-decoration: none;
-  color: var(--subtext);
-  background: transparent;
-}
-.sidebar-nav-link:hover {
-  background: var(--bg);
-  color: var(--text);
-}
-.sidebar-nav-link.active {
-  color: var(--primary);
-  background: var(--primary-light);
-  font-weight: 600;
-}
-.sidebar-nav-link .nav-icon {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  transition: all 0.15s ease;
-}
-.sidebar-nav-link .nav-icon {
-  background: var(--bg);
-  color: var(--subtext);
-}
-.sidebar-nav-link:hover .nav-icon {
-  background: var(--border);
-  color: var(--text);
-}
-.sidebar-nav-link.active .nav-icon {
-  background: var(--primary);
-  color: var(--primary-text);
-}
-.sidebar-nav-link .nav-icon svg {
-  width: 16px;
-  height: 16px;
-}
+/* (sidebar nav link styles removed — replaced by top-nav) */
 
 /* ─── Give me more footer bar ────────────────────────────────────────────────── */
 .give-more-bar {
@@ -763,27 +781,15 @@ input, textarea, select {
   .paused-banner-cta { width: 100%; }
 }
 
-/* ─── Mobile top bar ─────────────────────────────────────────────────────────── */
-.mobile-topbar {
-  display: none;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: var(--card);
-  border-bottom: 1px solid var(--border);
-  padding: 0 1rem;
-  height: 52px;
-  align-items: center;
-  justify-content: space-between;
-}
-
 /* ─── Responsive breakpoints ─────────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  .app-shell { flex-direction: column; }
-  .sidebar { display: none !important; }
-  .mobile-topbar { display: flex !important; width: 100%; }
-  .main-content { margin-left: 0 !important; padding-bottom: 70px; padding-top: 0; }
-  .bottom-nav { display: flex !important; }
+  .top-nav { height: 56px; }
+  .main-content { padding-top: 56px; }
+  .top-nav-inner { gap: 1rem; }
+  .top-nav-icon { width: 32px; height: 32px; }
+  .top-nav-icon svg { width: 17px; height: 17px; }
+  .top-nav-label { font-size: 0.65rem; }
+  .top-nav-item { padding: 4px 12px; }
   .page-inner { padding: 1.25rem 1rem; }
   .modal-box { padding: 1.5rem; border-radius: var(--radius-lg); max-width: calc(100vw - 2rem); }
   .desktop-only { display: none !important; }
@@ -806,29 +812,14 @@ input, textarea, select {
   .paywall-plan-card { padding: 0.75rem; }
   .paywall-cta-btn { height: 48px; line-height: 48px; font-size: 0.9rem; }
   .modal-overlay { padding: 0.5rem; }
-}
-
-@media (min-width: 769px) {
-  .bottom-nav { display: none; }
-  .mobile-topbar { display: none; }
+  .top-nav-inner { gap: 0.5rem; }
+  .top-nav-item { padding: 4px 8px; }
 }
 
 /* ─── Small desktop / tablet landscape ─────────────────────────────────────── */
 @media (min-width: 769px) and (max-width: 1100px) {
-  .sidebar { width: 200px; }
-  .main-content { margin-left: 200px; }
   .page-inner { padding: 2rem 1.25rem; }
 }
-
-/* ─── Force mobile layout for tablets (iPad/Android tablets) ─────────────── */
-.force-mobile { flex-direction: column !important; }
-.force-mobile .sidebar { display: none !important; }
-.force-mobile .mobile-topbar { display: flex !important; width: 100%; }
-.force-mobile .main-content { margin-left: 0 !important; padding-bottom: 70px !important; padding-top: 0 !important; }
-.force-mobile .bottom-nav { display: flex !important; }
-.force-mobile .page-inner { padding: 1.25rem 1rem !important; }
-.force-mobile .modal-box { padding: 1.5rem !important; border-radius: var(--radius-lg) !important; }
-.force-mobile .desktop-only { display: none !important; }
 
 /* ─── Slide-up animation ────────────────────────────────────────────────────── */
 @keyframes slideUp {
