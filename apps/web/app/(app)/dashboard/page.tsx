@@ -1221,11 +1221,12 @@ function DashboardPageInner() {
                           try {
                             const res = await tasksApi.generate(
                               effectiveSelectedGoalId
-                                ? { goalId: effectiveSelectedGoalId, requestingAdditional: true }
-                                : { requestingAdditional: true }
+                                ? { goalId: effectiveSelectedGoalId }
+                                : undefined
                             );
                             if (res.dailyTasks.length > 0) {
                               setDailyTasks(prev => [...prev, ...res.dailyTasks]);
+                              setCelebrationDismissed(false);
                             }
                           } catch {
                             showToast("Couldn't generate tasks", "error");
