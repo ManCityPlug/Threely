@@ -736,16 +736,23 @@ function DashboardPageInner() {
 
   if (loading) {
     return (
-      <div className="page-inner">
-        <div style={{ marginBottom: "1.75rem" }}>
-          <div className="skeleton" style={{ width: 160, height: 14, marginBottom: 8, borderRadius: "var(--radius-sm)" }} />
-          <div className="skeleton" style={{ width: 220, height: 28, borderRadius: "var(--radius-sm)" }} />
+      <div className="page-inner" style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "3rem" }}>
+        {/* Skeleton path nodes */}
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 32, opacity: 0.4 }}>
+          {[0, 1, 2, 3, 4].map(i => (
+            <div key={i} style={{
+              width: i === 0 ? 68 : 56,
+              height: i === 0 ? 68 : 56,
+              borderRadius: "50%",
+              background: i === 0 ? "rgba(212,168,67,0.15)" : "rgba(255,255,255,0.06)",
+              border: i === 0 ? "3px solid rgba(212,168,67,0.3)" : "3px solid rgba(255,255,255,0.08)",
+              marginLeft: i % 2 === 0 ? 0 : i % 4 === 1 ? -60 : 60,
+              animation: "pulse 1.5s ease-in-out infinite",
+              animationDelay: `${i * 0.15}s`,
+            }} />
+          ))}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.875rem" }}>
-          <SkeletonCard />
-          <SkeletonCard />
-          <SkeletonCard />
-        </div>
+        <style>{`@keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }`}</style>
       </div>
     );
   }
@@ -857,21 +864,19 @@ function DashboardPageInner() {
 
       {/* ─── No goals: empty state ─── */}
       {effectiveGoals.length === 0 && (
-        <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"🎯"}</div>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>
-            Get started
-          </h2>
-          <p style={{ color: "rgba(255,255,255,0.7)", marginBottom: "1.5rem", lineHeight: 1.6 }}>
-            Create your first goal and we&apos;ll generate daily tasks to help you achieve it.
-          </p>
-          <a
-            href="/start"
-            className="btn btn-primary"
-            style={{ fontSize: "1rem", padding: "0.75rem 2rem", textDecoration: "none" }}
+        <div style={{ padding: "4rem 2rem", textAlign: "center" }}>
+          <div style={{ fontSize: 64, marginBottom: "1rem" }}>{"🚀"}</div>
+          <button
+            onClick={() => router.push("/goals")}
+            style={{
+              fontSize: "1.1rem", fontWeight: 700, padding: "1rem 2.5rem",
+              background: "linear-gradient(135deg, #E8C547, #D4A843)",
+              color: "#000", borderRadius: 14, border: "none", cursor: "pointer",
+              boxShadow: "0 4px 16px rgba(212,168,67,0.3)",
+            }}
           >
-            Create your first goal {"→"}
-          </a>
+            Create your first goal →
+          </button>
         </div>
       )}
 

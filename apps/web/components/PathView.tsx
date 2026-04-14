@@ -78,7 +78,11 @@ export default function PathView({
     const container = scrollRef.current;
     if (!container) return;
     function handleScroll() {
-      setShowScrollHint(false);
+      // Hide scroll hint only when near the bottom
+      const el = scrollRef.current;
+      if (el && (el.scrollTop + el.clientHeight >= el.scrollHeight - 50)) {
+        setShowScrollHint(false);
+      }
     }
     container.addEventListener("scroll", handleScroll, { once: true });
     return () => container.removeEventListener("scroll", handleScroll);
@@ -455,7 +459,8 @@ export default function PathView({
         style={{
           position: "relative",
           width: "100%",
-          maxHeight: 560,
+          maxHeight: "70vh",
+          paddingTop: 20,
           overflowY: "auto",
           overflowX: "hidden",
           scrollbarWidth: "none",
@@ -546,12 +551,14 @@ export default function PathView({
                 {/* START / COMPLETE badge above today's node */}
                 {isToday && (
                   <div
+                    onClick={() => handleNodeClick(day, nodeType)}
                     style={{
                       position: "absolute",
                       bottom: "calc(100% + 8px)",
                       left: "50%",
                       transform: "translateX(-50%)",
                       zIndex: 20,
+                      cursor: "pointer",
                       animation: !allDoneToday ? "startBadgePulse 2s ease-in-out infinite" : "none",
                     }}
                   >
@@ -621,13 +628,13 @@ export default function PathView({
                         : isToday
                         ? {
                             border: `3px solid ${GOLD}`,
-                            background: "rgba(19,31,36,0.95)",
+                            background: "rgba(20,20,20,0.95)",
                             animation: "breathe 3s ease-in-out infinite",
                           }
                         : nodeType === "next"
                         ? {
                             border: `2.5px dashed ${GOLD}`,
-                            background: "#1a2a32",
+                            background: "#1e1e1e",
                             boxShadow: `0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.03)`,
                             opacity: 0.6,
                           }
@@ -637,10 +644,18 @@ export default function PathView({
                             background: `linear-gradient(145deg, #E8C547, ${GOLD})`,
                             animation: "crownGlow 4s ease-in-out infinite",
                           }
+                        : milestone
+                        ? {
+                            // locked milestone — gold tint + glow
+                            border: `3px solid ${GOLD_DARK}`,
+                            background: "rgba(212,168,67,0.08)",
+                            boxShadow: `0 0 16px 4px rgba(212,168,67,0.15), 0 4px 8px rgba(0,0,0,0.3)`,
+                            opacity: 0.7,
+                          }
                         : {
                             // locked
-                            border: "4px solid #1a2a32",
-                            background: "#1a2a32",
+                            border: "4px solid #1e1e1e",
+                            background: "#1e1e1e",
                             boxShadow: `0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.03)`,
                             opacity: 0.45,
                           }),
@@ -694,14 +709,19 @@ export default function PathView({
                           Huge Progress
                         </div>
                         <div style={{ fontSize: "0.68rem", fontWeight: 600, color: GOLD, opacity: 0.8 }}>
-                          Keep going!
+                          Enter next stage →
                         </div>
                       </>
                     )}
                     {milestone && !isToday && !crown && (
-                      <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>
-                        Day {day}
-                      </div>
+                      <>
+                        <div style={{ fontSize: "0.8rem", fontWeight: 800, color: GOLD }}>
+                          {day === 7 ? "1 Week!" : day === 14 ? "2 Weeks!" : day === 30 ? "1 Month!" : day === 60 ? "2 Months!" : day === 100 ? "100 Days!" : `Day ${day}`}
+                        </div>
+                        <div style={{ fontSize: "0.65rem", fontWeight: 600, color: "rgba(212,168,67,0.7)" }}>
+                          Milestone
+                        </div>
+                      </>
                     )}
                     {nodeType === "next" && allDoneToday && !milestone && !crown && (
                       <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>
@@ -726,7 +746,7 @@ export default function PathView({
             left: 0,
             right: 0,
             height: 60,
-            background: "linear-gradient(transparent, var(--bg, #131F24))",
+            background: "linear-gradient(transparent, var(--bg, #141414))",
             display: "flex",
             alignItems: "flex-end",
             justifyContent: "center",

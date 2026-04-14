@@ -36,8 +36,8 @@
 /* ─── Dark mode (forced via data-theme or system preference) ────────────────── */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #131F24;
-    --card: #1a2a32;
+    --bg: #141414;
+    --card: #1e1e1e;
     --primary: #FFFFFF;
     --primary-text: #000000;
     --primary-light: rgba(255,255,255,0.08);
@@ -45,7 +45,7 @@
     --text: #e8eaf0;
     --subtext: #9ba3b5;
     --muted: #6b7280;
-    --border: #2a3a42;
+    --border: #2a2a2a;
     --success: #3ecf8e;
     --success-light: rgba(62,207,142,0.12);
     --danger: #ff6b6b;
@@ -62,8 +62,8 @@
 }
 
 [data-theme="dark"] {
-  --bg: #131F24;
-  --card: #1a2a32;
+  --bg: #141414;
+  --card: #1e1e1e;
   --primary: #FFFFFF;
   --primary-text: #000000;
   --primary-light: rgba(255,255,255,0.08);
@@ -71,7 +71,7 @@
   --text: #e8eaf0;
   --subtext: #9ba3b5;
   --muted: #6b7280;
-  --border: #2a3a42;
+  --border: #2a2a2a;
   --success: #3ecf8e;
   --success-light: rgba(62,207,142,0.12);
   --danger: #ff6b6b;
@@ -88,13 +88,13 @@
 
 html {
   height: 100%;
-  background: #131F24;
+  background: #141414;
 }
 
 body {
   min-height: 100%;
   font-family: var(--font);
-  background: #131F24;
+  background: #141414;
   color: var(--text);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
