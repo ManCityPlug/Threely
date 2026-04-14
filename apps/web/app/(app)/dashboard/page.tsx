@@ -867,7 +867,7 @@ function DashboardPageInner() {
         <div style={{ padding: "4rem 2rem", textAlign: "center" }}>
           <div style={{ fontSize: 64, marginBottom: "1rem" }}>{"🚀"}</div>
           <button
-            onClick={() => router.push("/goals")}
+            onClick={() => router.push("/goals?add=true")}
             style={{
               fontSize: "1.1rem", fontWeight: 700, padding: "1rem 2.5rem",
               background: "linear-gradient(135deg, #E8C547, #D4A843)",
