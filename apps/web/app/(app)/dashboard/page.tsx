@@ -426,7 +426,11 @@ function DashboardPageInner() {
 
   // Gamification state
   const [showCelebration, setShowCelebration] = useState(false);
-  const [celebrationDismissed, setCelebrationDismissed] = useState(false);
+  const celebratedKey = `threely_celebrated_${new Date().toLocaleDateString("en-CA")}`;
+  const [celebrationDismissed, setCelebrationDismissed] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem(celebratedKey) === "true";
+  });
   const [animatingTaskId, setAnimatingTaskId] = useState<string | null>(null);
 
   // Path view state — false = path/roadmap view, true = fullscreen task view

@@ -206,7 +206,7 @@ export default function PathView({
         style={{
           position: "relative",
           width: "100%",
-          maxHeight: 480,
+          maxHeight: isDesktop ? "70vh" : 480,
           overflowY: "auto",
           overflowX: "hidden",
           scrollbarWidth: "none",
