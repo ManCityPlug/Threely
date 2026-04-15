@@ -1182,8 +1182,8 @@ function DashboardPageInner() {
                   if (type === "today" || type === "completed") {
                     // Fetch/show tasks for this day
                     setViewingDay(day);
-                    if (day === goalDayNumber && !viewingTasks) {
-                      // It's the real today and we have tasks loaded — just show them
+                    if (day === goalDayNumber && !todayAllDone && !viewingTasks) {
+                      // It's the real today, tasks not done — show loaded tasks
                       setShowTasks(true);
                       return;
                     }
@@ -1224,8 +1224,8 @@ function DashboardPageInner() {
                 onStartDay={async () => {
                   const day = pathDayNumber;
                   setViewingDay(day);
-                  if (day === goalDayNumber) {
-                    // Real today — tasks already loaded
+                  if (day === goalDayNumber && !todayAllDone) {
+                    // Real today, tasks not done — show loaded tasks
                     setShowTasks(true);
                     return;
                   }
