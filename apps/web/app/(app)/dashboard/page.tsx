@@ -666,20 +666,22 @@ function DashboardPageInner() {
     }
   }, [viewingTasks, viewingDay, goalDayNumber, effectiveSelectedGoalId, aheadDoneKey, workAheadDone]);
 
-  // Show celebration when all tasks just completed — only once per session
+  // Show celebration when all DISPLAYED tasks go from not-done → done
   const userToggledRef = useRef(false);
   const hasTriggeredCelebration = useRef(false);
+  const prevViewAllDone = useRef(false);
   const [completedInSession, setCompletedInSession] = useState(false);
   useEffect(() => {
-    // Trigger for today's tasks OR work-ahead tasks
-    const justCompleted = (todayAllDone || (viewAllDone && viewingTasks)) && userToggledRef.current && !hasTriggeredCelebration.current;
-    if (justCompleted && (todayItems.length > 0 || (viewingTasks && totalCount > 0))) {
+    // Only trigger on transition: was NOT all done → now IS all done
+    // AND only when user manually toggled (checked, not unchecked)
+    if (viewAllDone && !prevViewAllDone.current && totalCount > 0 && userToggledRef.current && !hasTriggeredCelebration.current) {
       setShowCelebration(true);
       setCelebrationDismissed(false);
       setCompletedInSession(true);
       hasTriggeredCelebration.current = true;
     }
-  }, [todayAllDone, viewAllDone, todayItems.length, totalCount, viewingTasks]);
+    prevViewAllDone.current = viewAllDone;
+  }, [viewAllDone, totalCount]);
 
   function pickGoal(val: string) {
     setSelectedGoalId(val);
@@ -1534,15 +1536,6 @@ function DashboardPageInner() {
               }}>
                 Day {viewingDay ?? goalDayNumber}
               </h1>
-
-              <p style={{
-                textAlign: "center",
-                fontSize: "0.9rem",
-                color: "rgba(255,255,255,0.7)",
-                marginBottom: 8,
-              }}>
-                {totalCount} tasks for today
-              </p>
 
               {/* Task cards */}
               <div style={{
