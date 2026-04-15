@@ -77,11 +77,29 @@ function getCompletionMessage(day: number): string {
   return generic[day % generic.length];
 }
 
+// Get local date string (YYYY-MM-DD) — consistent across all date operations
+function toLocalDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+// Compute the date string for a given day number relative to goal creation
+function getDayDateStr(goal: Goal, dayNum: number): string {
+  const created = new Date(goal.createdAt);
+  // Reset to local midnight of the creation date
+  const base = new Date(created.getFullYear(), created.getMonth(), created.getDate());
+  const target = new Date(base);
+  target.setDate(target.getDate() + dayNum - 1);
+  return toLocalDateStr(target);
+}
+
 function getGoalDayNumber(goal: Goal): number {
   const created = new Date(goal.createdAt);
+  // Use local dates for consistent day counting
+  const createdLocal = new Date(created.getFullYear(), created.getMonth(), created.getDate());
   const now = new Date();
-  const diff = now.getTime() - created.getTime();
-  return Math.max(1, Math.floor(diff / (1000 * 60 * 60 * 24)) + 1);
+  const nowLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffMs = nowLocal.getTime() - createdLocal.getTime();
+  return Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1);
 }
 
 function getStreakFromGoals(goals: Goal[]): number {
@@ -1198,11 +1216,7 @@ function DashboardPageInner() {
                     if (!selectedGoal) return;
                     setGenerating(true);
                     try {
-                      const goalCreated = new Date(selectedGoal.createdAt);
-                      goalCreated.setHours(0, 0, 0, 0);
-                      const targetDate = new Date(goalCreated);
-                      targetDate.setDate(targetDate.getDate() + day - 1);
-                      const dateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-${String(targetDate.getDate()).padStart(2, "0")}`;
+                      const dateStr = getDayDateStr(selectedGoal, day);
                       const existing = await tasksApi.today(false, dateStr);
                       const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
                       if (goalTasks.length > 0) {
@@ -1260,11 +1274,7 @@ function DashboardPageInner() {
                   if (!selectedGoal) return;
                   setGenerating(true);
                   try {
-                    const goalCreated = new Date(selectedGoal.createdAt);
-                    goalCreated.setHours(0, 0, 0, 0);
-                    const targetDate = new Date(goalCreated);
-                    targetDate.setDate(targetDate.getDate() + day - 1);
-                    const dateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-${String(targetDate.getDate()).padStart(2, "0")}`;
+                    const dateStr = getDayDateStr(selectedGoal, day);
                     const existing = await tasksApi.today(false, dateStr);
                     const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
                     if (goalTasks.length > 0) {
@@ -1363,12 +1373,7 @@ function DashboardPageInner() {
                           setWorkAheadUsed(true);
                           // The work-ahead day = goalDayNumber + 1
                           const workAheadDay = goalDayNumber + 1;
-                          // Compute actual date from goal creation
-                          const goalCreated = new Date(selectedGoal.createdAt);
-                          goalCreated.setHours(0, 0, 0, 0);
-                          const targetDate = new Date(goalCreated);
-                          targetDate.setDate(targetDate.getDate() + workAheadDay - 1);
-                          const dateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-${String(targetDate.getDate()).padStart(2, "0")}`;
+                          const dateStr = getDayDateStr(selectedGoal, workAheadDay);
 
                           setGenerating(true);
                           try {
