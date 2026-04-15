@@ -1151,44 +1151,8 @@ function DashboardPageInner() {
           {/* ─── Path view + task area ─── */}
           {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && !showTasks && (
             <>
-              {/* All done state — shown ABOVE the path only when completed this session */}
-              {todayAllDone && celebrationDismissed && completedInSession && (
-                <div style={{
-                  textAlign: "center",
-                  padding: "1.5rem 2rem",
-                  marginBottom: 8,
-                }}>
-                  <div style={{
-                    fontSize: "2rem",
-                    marginBottom: 12,
-                    color: "#D4A843",
-                    fontWeight: 800,
-                  }}>
-                    {"✓"}
-                  </div>
-                  <h2 style={{
-                    fontSize: "1.25rem",
-                    fontWeight: 700,
-                    color: "var(--text)",
-                    marginBottom: 6,
-                    letterSpacing: "-0.02em",
-                  }}>
-                    All done for today
-                  </h2>
-                  <p style={{
-                    color: "rgba(255,255,255,0.85)",
-                    fontSize: "0.95rem",
-                    lineHeight: 1.6,
-                  }}>
-                    {getCompletionMessage(goalDayNumber)}
-                  </p>
-                  <MidnightCountdown dayNumber={goalDayNumber} />
-                </div>
-              )}
-
               {/* Day heading */}
-              {(!todayAllDone || !completedInSession) && (
-                <h1 style={{
+              <h1 style={{
                   fontSize: "2.5rem",
                   fontWeight: 800,
                   letterSpacing: "-0.04em",
@@ -1198,7 +1162,6 @@ function DashboardPageInner() {
                 }}>
                   Day {pathDayNumber}
                 </h1>
-              )}
 
               {/* Path View */}
               <PathView
