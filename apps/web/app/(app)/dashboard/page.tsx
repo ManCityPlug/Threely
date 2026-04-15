@@ -612,10 +612,10 @@ function DashboardPageInner() {
   const streak = getStreakFromGoals(effectiveGoals);
   const goalDayNumber = selectedGoal ? getGoalDayNumber(selectedGoal) : 1;
 
-  // Track work-ahead state in localStorage
+  // Track work-ahead state in localStorage (scoped by goalDayNumber so it resets on day change)
   const todayStr = new Date().toLocaleDateString("en-CA");
-  const aheadUsedKey = `threely_work_ahead_${todayStr}_${effectiveSelectedGoalId}`;
-  const aheadDoneKey = `threely_ahead_done_${todayStr}_${effectiveSelectedGoalId}`;
+  const aheadUsedKey = `threely_ahead_used_${todayStr}_${effectiveSelectedGoalId}_d${goalDayNumber}`;
+  const aheadDoneKey = `threely_ahead_done_${todayStr}_${effectiveSelectedGoalId}_d${goalDayNumber}`;
   const [workAheadUsed, setWorkAheadUsed] = useState(false);
   const [workAheadDone, setWorkAheadDone] = useState(false);
 
@@ -1209,7 +1209,27 @@ function DashboardPageInner() {
                         setViewingTasks(goalTasks);
                         setShowTasks(true);
                       } else {
-                        showToast(`Day ${day}: No tasks found`, "error");
+                        // No tasks for this day — generate them
+                        const { getSupabase } = await import("@/lib/supabase-client");
+                        const supabase = getSupabase();
+                        const { data: { session } } = await supabase.auth.getSession();
+                        const res = await fetch("/api/tasks/generate", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+                          },
+                          body: JSON.stringify({ localDate: dateStr, goalId: effectiveSelectedGoalId }),
+                        });
+                        if (res.ok) {
+                          const data = await res.json();
+                          if (data.dailyTasks?.length > 0) {
+                            setViewingTasks(data.dailyTasks);
+                            setShowTasks(true);
+                          }
+                        } else {
+                          showToast("Couldn't generate tasks", "error");
+                        }
                       }
                     } catch {
                       showToast(`Day ${day}: Couldn't load tasks`, "error");
