@@ -491,8 +491,8 @@ export default function PathView({
 
             const xOffset = getHorizontalOffset(i);
 
-            // Determine if label should show
-            const showLabel = isToday || crown || milestone || (nodeType === "next" && allDoneToday);
+            // Determine if label should show — all nodes get labels
+            const showLabel = true;
 
             // Section divider: every 7 nodes, between week boundaries
             const weekNumber = Math.floor((day - windowStart) / 7) + 1;
@@ -679,6 +679,16 @@ export default function PathView({
                     )}
                     {nodeType === "next" && allDoneToday && !milestone && !crown && (
                       <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>
+                        Day {day}
+                      </div>
+                    )}
+                    {nodeType === "completed" && !milestone && !crown && (
+                      <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "rgba(212,168,67,0.6)" }}>
+                        Day {day}
+                      </div>
+                    )}
+                    {nodeType === "locked" && !milestone && !crown && (
+                      <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "rgba(255,255,255,0.25)" }}>
                         Day {day}
                       </div>
                     )}

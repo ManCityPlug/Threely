@@ -1221,8 +1221,52 @@ function DashboardPageInner() {
                 }}
                 allDoneToday={pathAllDone}
                 totalTasks={totalCount}
-                onStartDay={() => {
-                  setShowTasks(true);
+                onStartDay={async () => {
+                  const day = pathDayNumber;
+                  setViewingDay(day);
+                  if (day === goalDayNumber) {
+                    // Real today — tasks already loaded
+                    setShowTasks(true);
+                    return;
+                  }
+                  // Different day — fetch/generate tasks
+                  if (!selectedGoal) return;
+                  setGenerating(true);
+                  try {
+                    const goalCreated = new Date(selectedGoal.createdAt);
+                    goalCreated.setHours(0, 0, 0, 0);
+                    const targetDate = new Date(goalCreated);
+                    targetDate.setDate(targetDate.getDate() + day - 1);
+                    const dateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-${String(targetDate.getDate()).padStart(2, "0")}`;
+                    const existing = await tasksApi.today(false, dateStr);
+                    const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
+                    if (goalTasks.length > 0) {
+                      setViewingTasks(goalTasks);
+                      setShowTasks(true);
+                    } else {
+                      // Generate tasks for this day
+                      const { getSupabase } = await import("@/lib/supabase-client");
+                      const supabase = getSupabase();
+                      const { data: { session } } = await supabase.auth.getSession();
+                      const res = await fetch("/api/tasks/generate", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+                        },
+                        body: JSON.stringify({ localDate: dateStr, goalId: effectiveSelectedGoalId }),
+                      });
+                      if (res.ok) {
+                        const data = await res.json();
+                        if (data.dailyTasks?.length > 0) {
+                          setViewingTasks(data.dailyTasks);
+                          setShowTasks(true);
+                        }
+                      }
+                    }
+                  } catch { /* ignore */ } finally {
+                    setGenerating(false);
+                  }
                 }}
                 tasksVisible={showTasks}
               />
