@@ -426,11 +426,7 @@ function DashboardPageInner() {
 
   // Gamification state
   const [showCelebration, setShowCelebration] = useState(false);
-  const celebratedKey = `threely_celebrated_${new Date().toLocaleDateString("en-CA")}`;
-  const [celebrationDismissed, setCelebrationDismissed] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return localStorage.getItem(celebratedKey) === "true";
-  });
+  const [celebrationDismissed, setCelebrationDismissed] = useState(false);
   const [animatingTaskId, setAnimatingTaskId] = useState<string | null>(null);
 
   // Path view state — false = path/roadmap view, true = fullscreen task view
@@ -611,17 +607,17 @@ function DashboardPageInner() {
   const goalDayNumber = selectedGoal ? getGoalDayNumber(selectedGoal) : 1;
 
   // Show celebration when all tasks just completed — only once per day
-  const prevAllDone = useRef(allDone);
-  const celebrationShownKey = `threely_celebrated_${new Date().toLocaleDateString("en-CA")}_${effectiveSelectedGoalId ?? "all"}`;
+  const prevAllDone = useRef(false);
+  const hasTriggeredCelebration = useRef(false);
   useEffect(() => {
-    const alreadyShown = localStorage.getItem(celebrationShownKey) === "true";
-    if (allDone && !prevAllDone.current && totalCount > 0 && !alreadyShown) {
+    // Only trigger when transitioning from not-done to done (user just completed last task)
+    if (allDone && !prevAllDone.current && totalCount > 0 && !hasTriggeredCelebration.current) {
       setShowCelebration(true);
       setCelebrationDismissed(false);
-      localStorage.setItem(celebrationShownKey, "true");
+      hasTriggeredCelebration.current = true;
     }
     prevAllDone.current = allDone;
-  }, [allDone, totalCount, celebrationShownKey]);
+  }, [allDone, totalCount]);
 
   function pickGoal(val: string) {
     setSelectedGoalId(val);
