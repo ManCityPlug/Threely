@@ -290,7 +290,7 @@ export default function PathView({
         data-today-popup="true"
         style={{
           position: "absolute",
-          bottom: "calc(100% + 12px)",
+          bottom: "calc(100% + 6px)",
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: 100,
@@ -306,33 +306,31 @@ export default function PathView({
         <div
           style={{
             background: `linear-gradient(135deg, ${GOLD}, #C49A3C)`,
-            borderRadius: 10,
-            padding: "8px 20px",
+            borderRadius: 8,
+            padding: "4px 12px",
             textAlign: "center",
-            boxShadow: `0 6px 20px rgba(212,168,67,0.3)`,
+            boxShadow: `0 4px 12px rgba(212,168,67,0.25)`,
             position: "relative",
-            animation: "startPulse 2s ease-in-out infinite",
           }}
         >
-          {/* Triangle arrow pointing down */}
           <div
             style={{
               position: "absolute",
-              bottom: -7,
+              bottom: -5,
               left: "50%",
               transform: "translateX(-50%)",
               width: 0,
               height: 0,
-              borderLeft: "7px solid transparent",
-              borderRight: "7px solid transparent",
-              borderTop: `7px solid ${GOLD}`,
+              borderLeft: "5px solid transparent",
+              borderRight: "5px solid transparent",
+              borderTop: `5px solid ${GOLD}`,
             }}
           />
           <span style={{
-            fontSize: "0.8rem",
+            fontSize: "0.65rem",
             fontWeight: 800,
             color: "#000",
-            letterSpacing: "0.08em",
+            letterSpacing: "0.06em",
             textTransform: "uppercase",
           }}>
             START
