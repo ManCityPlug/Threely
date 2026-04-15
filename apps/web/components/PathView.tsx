@@ -103,18 +103,20 @@ export default function PathView({
     return () => clearTimeout(timer);
   }, [mounted, tasksVisible, dayNumber]);
 
-  // Hide scroll hint on first scroll
+  // Hide scroll hint when near bottom
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
     function handleScroll() {
-      // Hide scroll hint only when near the bottom
       const el = scrollRef.current;
       if (el && (el.scrollTop + el.clientHeight >= el.scrollHeight - 50)) {
         setShowScrollHint(false);
+      } else {
+        setShowScrollHint(true);
       }
     }
-    container.addEventListener("scroll", handleScroll, { once: true });
+    handleScroll(); // Check immediately
+    container.addEventListener("scroll", handleScroll);
     return () => container.removeEventListener("scroll", handleScroll);
   }, [mounted]);
 
