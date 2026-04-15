@@ -306,8 +306,8 @@ export default function PathView({
         <div
           style={{
             background: `linear-gradient(135deg, ${GOLD}, #C49A3C)`,
-            borderRadius: 8,
-            padding: "4px 12px",
+            borderRadius: 10,
+            padding: "6px 18px",
             textAlign: "center",
             boxShadow: `0 4px 12px rgba(212,168,67,0.25)`,
             position: "relative",
@@ -327,7 +327,7 @@ export default function PathView({
             }}
           />
           <span style={{
-            fontSize: "0.65rem",
+            fontSize: "0.75rem",
             fontWeight: 800,
             color: "#000",
             letterSpacing: "0.06em",
