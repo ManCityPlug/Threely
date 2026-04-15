@@ -282,8 +282,17 @@ export default function PathView({
 
   // ─── Today popup ──────────────────────────────────────────────────────────
 
+  const [startedOnce, setStartedOnce] = useState(false);
+  const prevDayNumber = useRef(dayNumber);
+  useEffect(() => {
+    if (dayNumber !== prevDayNumber.current) {
+      setStartedOnce(false);
+      prevDayNumber.current = dayNumber;
+    }
+  }, [dayNumber]);
+
   function renderTodayPopup(day: number) {
-    if (day !== dayNumber || allDoneToday) return null;
+    if (day !== dayNumber || allDoneToday || startedOnce) return null;
 
     return (
       <div
@@ -299,6 +308,7 @@ export default function PathView({
         }}
         onClick={(e) => {
           e.stopPropagation();
+          setStartedOnce(true);
           if (onStartDay) onStartDay();
           onDayClick(day, "today");
         }}
