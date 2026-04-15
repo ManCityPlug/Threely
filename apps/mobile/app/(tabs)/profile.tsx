@@ -604,44 +604,6 @@ export default function ProfileScreen() {
 
           <View style={styles.divider} />
 
-          {/* Tutorial */}
-          <TouchableOpacity
-            style={styles.menuRow}
-            onPress={() => {
-              Alert.alert(
-                "App Tutorial",
-                "Would you like to go through the guided tutorial? It will walk you through all the features.",
-                [
-                  { text: "Not now", style: "cancel" },
-                  {
-                    text: "Start tutorial",
-                    onPress: async () => {
-                      const { data: { user } } = await supabase.auth.getUser();
-                      if (user) {
-                        await AsyncStorage.removeItem(`@threely_tutorial_done_${user.id}`);
-                      }
-                      // Set flag BEFORE navigating so Today tab picks it up on focus
-                      await AsyncStorage.setItem("@threely_restart_tutorial", "true");
-                      router.push("/(tabs)" as never);
-                    },
-                  },
-                ]
-              );
-            }}
-            activeOpacity={0.7}
-          >
-            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="book-outline" size={18} color={colors.primary} />
-            </View>
-            <View style={styles.menuText}>
-              <Text style={styles.menuLabel}>Tutorial</Text>
-              <Text style={styles.menuValue}>Learn how Threely works</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
-          </TouchableOpacity>
-
-          <View style={styles.divider} />
-
           {/* Payments */}
           <TouchableOpacity
             style={styles.menuRow}

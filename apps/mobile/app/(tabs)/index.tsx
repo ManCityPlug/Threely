@@ -814,11 +814,13 @@ function GamifiedTaskCard({
   onToggle,
   colors,
   isAnimating,
+  readOnly,
 }: {
   task: TaskItem;
   onToggle: (isCompleted: boolean) => void;
   colors: Colors;
   isAnimating: boolean;
+  readOnly?: boolean;
 }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const checkScaleAnim = useRef(new Animated.Value(1)).current;
@@ -842,7 +844,7 @@ function GamifiedTaskCard({
     <TouchableOpacity
       activeOpacity={0.85}
       onPress={() => {
-        if (!task.isSkipped) {
+        if (!readOnly && !task.isSkipped) {
           if (Platform.OS !== "web") {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           }
@@ -887,8 +889,7 @@ function GamifiedTaskCard({
             fontWeight: "600",
             fontSize: typography.base,
             color: task.isCompleted ? colors.textTertiary : colors.text,
-            textDecorationLine: task.isCompleted ? "line-through" : "none",
-            textDecorationColor: colors.textTertiary,
+            textDecorationLine: "none",
             lineHeight: 22,
           }}>
             {taskTitle}
@@ -1882,6 +1883,7 @@ export default function DashboardScreen() {
                           }
                           colors={colors}
                           isAnimating={animatingTaskId === task.id}
+                          readOnly={allDone}
                         />
                       </View>
                     ))}

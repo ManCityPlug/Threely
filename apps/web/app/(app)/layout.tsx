@@ -8,7 +8,7 @@ import { profileApi, goalsApi, subscriptionApi, notificationsApi, type Subscript
 import { formatDisplayName } from "@/lib/format-name";
 import ToastProvider from "@/components/ToastProvider";
 import { SubscriptionProvider } from "@/lib/subscription-context";
-import AppTutorial from "@/components/AppTutorial";
+
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
   today: (
@@ -45,7 +45,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [checkingOnboarding, setCheckingOnboarding] = useState(false);
   const [subStatus, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
-  const [showTutorial, setShowTutorial] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
@@ -85,37 +84,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       saveNickname(user.user_metadata.display_name as string);
     }
   }, [user]);
-
-  // Show tutorial after onboarding or when requested from profile
-  useEffect(() => {
-    // Manual restart from profile — check immediately, skip all guards
-    let requestedFromProfile = false;
-    try { requestedFromProfile = localStorage.getItem("threely_start_tutorial") === "true"; } catch {}
-    if (requestedFromProfile) {
-      try { localStorage.removeItem("threely_start_tutorial"); } catch {}
-      const timer = setTimeout(() => setShowTutorial(true), 800);
-      return () => clearTimeout(timer);
-    }
-
-    // Onboarding flow — needs user to be loaded and onboarded
-    if (!user || loading || checkingOnboarding) return;
-    if (!isOnboarded(user.id)) return;
-    const params = new URLSearchParams(window.location.search);
-    if (!params.has("welcome")) return;
-    const tutorialKey = `threely_tutorial_done_${user.id}`;
-    try { if (localStorage.getItem(tutorialKey)) return; } catch {}
-    const timer = setTimeout(() => setShowTutorial(true), 600);
-    return () => clearTimeout(timer);
-  }, [user, loading, checkingOnboarding]);
-
-  function handleTutorialComplete() {
-    if (user) {
-      try { localStorage.setItem(`threely_tutorial_done_${user.id}`, "true"); } catch { /* ignore */ }
-    }
-    setShowTutorial(false);
-    // Navigate to Today tab after tutorial
-    router.replace("/dashboard");
-  }
 
   // Fetch notifications
   useEffect(() => {
