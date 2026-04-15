@@ -418,6 +418,7 @@ function DashboardPageInner() {
   // Path view state — false = path/roadmap view, true = fullscreen task view
   const [showTasks, setShowTasks] = useState(false);
   const [workAheadModal, setWorkAheadModal] = useState(false);
+  const [lockedTimerModal, setLockedTimerModal] = useState(false);
   const [viewingDay, setViewingDay] = useState<number | null>(null);
   // Separate state for viewing other days' tasks (so we don't corrupt today's dailyTasks)
   const [viewingTasks, setViewingTasks] = useState<DailyTask[] | null>(null);
@@ -1194,7 +1195,15 @@ function DashboardPageInner() {
                       setShowTasks(true);
                     }
                   } else if (type === "next") {
-                    setWorkAheadModal(true);
+                    // Check if work ahead already used today
+                    const todayKey = `threely_work_ahead_${new Date().toLocaleDateString("en-CA")}_${effectiveSelectedGoalId}`;
+                    if (localStorage.getItem(todayKey)) {
+                      setLockedTimerModal(true);
+                    } else {
+                      setWorkAheadModal(true);
+                    }
+                  } else if (type === "locked") {
+                    setLockedTimerModal(true);
                   } else if (type === "completed") {
                     // Fetch and show past day's completed tasks
                     try {
@@ -1284,6 +1293,9 @@ function DashboardPageInner() {
                           setWorkAheadModal(false);
                           if (!hasPro) { router.push("/checkout?plan=yearly"); return; }
                           if (!selectedGoal) return;
+                          // Mark work ahead as used today for this goal
+                          const todayKey = `threely_work_ahead_${new Date().toLocaleDateString("en-CA")}_${effectiveSelectedGoalId}`;
+                          localStorage.setItem(todayKey, "true");
                           // The "next" day on path = current path day + 1
                           const pathDay = todayAllDone ? goalDayNumber + 1 : goalDayNumber;
                           const workAheadDay = pathDay + 1;
@@ -1347,6 +1359,65 @@ function DashboardPageInner() {
                         Work ahead
                       </button>
                     </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Locked timer modal — shown when work ahead already used or day locked */}
+              {lockedTimerModal && (
+                <div
+                  style={{
+                    position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    zIndex: 9999, backdropFilter: "blur(4px)",
+                  }}
+                  onClick={() => setLockedTimerModal(false)}
+                >
+                  <div
+                    className="card"
+                    style={{
+                      padding: "2rem",
+                      width: "calc(100vw - 2rem)",
+                      maxWidth: 380,
+                      textAlign: "center",
+                    }}
+                    onClick={e => e.stopPropagation()}
+                  >
+                    <div style={{ fontSize: 40, marginBottom: 16 }}>{"🔒"}</div>
+                    <h3 style={{
+                      fontSize: "1.15rem",
+                      fontWeight: 700,
+                      marginBottom: 8,
+                      letterSpacing: "-0.02em",
+                      color: "var(--text)",
+                    }}>
+                      This day is locked
+                    </h3>
+                    <p style={{
+                      color: "rgba(255,255,255,0.85)",
+                      fontSize: "0.9rem",
+                      lineHeight: 1.6,
+                      marginBottom: "1.5rem",
+                    }}>
+                      Complete the current day first. You can work ahead once per day.
+                    </p>
+                    <MidnightCountdown dayNumber={goalDayNumber} />
+                    <button
+                      onClick={() => setLockedTimerModal(false)}
+                      style={{
+                        marginTop: 16,
+                        padding: "12px 32px",
+                        borderRadius: 10,
+                        background: "var(--border)",
+                        color: "rgba(255,255,255,0.85)",
+                        fontSize: "0.9rem",
+                        fontWeight: 600,
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Got it
+                    </button>
                   </div>
                 </div>
               )}
