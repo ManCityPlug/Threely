@@ -446,6 +446,10 @@ export default function PathView({
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(4px); }
         }
+        @keyframes startPulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.4; }
+        }
 
         .path-container::-webkit-scrollbar { display: none; }
 
@@ -695,6 +699,17 @@ export default function PathView({
                         >
                           {allDoneToday ? "Complete!" : "TODAY"}
                         </div>
+                        {!allDoneToday && (
+                          <div style={{
+                            fontSize: "0.7rem",
+                            fontWeight: 700,
+                            color: GOLD,
+                            marginTop: 6,
+                            animation: "startPulse 2s ease-in-out infinite",
+                          }}>
+                            Tap to start →
+                          </div>
+                        )}
                       </>
                     )}
                     {isToday && crown && !allDoneToday && (
@@ -704,6 +719,15 @@ export default function PathView({
                         </div>
                         <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "rgba(255,255,255,0.9)", marginTop: 1, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                           TODAY
+                        </div>
+                        <div style={{
+                          fontSize: "0.7rem",
+                          fontWeight: 700,
+                          color: GOLD,
+                          marginTop: 6,
+                          animation: "startPulse 2s ease-in-out infinite",
+                        }}>
+                          Tap to start →
                         </div>
                       </>
                     )}
