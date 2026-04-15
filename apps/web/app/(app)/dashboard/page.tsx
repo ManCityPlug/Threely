@@ -1454,7 +1454,7 @@ function DashboardPageInner() {
                     }}
                     onClick={e => e.stopPropagation()}
                   >
-                    <div style={{ fontSize: 40, marginBottom: 16 }}>{"🔒"}</div>
+                    <div style={{ fontSize: 40, marginBottom: 16 }}>{workAheadUsed ? "⏰" : "🔒"}</div>
                     <h3 style={{
                       fontSize: "1.15rem",
                       fontWeight: 700,
@@ -1462,7 +1462,7 @@ function DashboardPageInner() {
                       letterSpacing: "-0.02em",
                       color: "var(--text)",
                     }}>
-                      This day is locked
+                      {workAheadUsed ? "Nice work today!" : "This day is locked"}
                     </h3>
                     <p style={{
                       color: "rgba(255,255,255,0.85)",
@@ -1470,7 +1470,9 @@ function DashboardPageInner() {
                       lineHeight: 1.6,
                       marginBottom: "1.5rem",
                     }}>
-                      Complete the current day first. You can work ahead once per day.
+                      {workAheadUsed
+                        ? "You've already worked ahead once today. This day unlocks at midnight."
+                        : "Complete the current day first to unlock the next one."}
                     </p>
                     <MidnightCountdown dayNumber={goalDayNumber} />
                     <button
