@@ -290,93 +290,53 @@ export default function PathView({
         data-today-popup="true"
         style={{
           position: "absolute",
-          bottom: "calc(100% + 18px)",
+          bottom: "calc(100% + 12px)",
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: 100,
           animation: "popupFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+          cursor: "pointer",
+        }}
+        onClick={(e) => {
+          e.stopPropagation();
+          if (onStartDay) onStartDay();
+          onDayClick(day, "today");
         }}
       >
         <div
           style={{
-            background: "rgba(22,22,22,0.97)",
-            border: `1.5px solid ${GOLD}`,
-            borderRadius: 16,
-            padding: "20px 28px",
+            background: `linear-gradient(135deg, ${GOLD}, #C49A3C)`,
+            borderRadius: 10,
+            padding: "8px 20px",
             textAlign: "center",
-            minWidth: 190,
-            boxShadow: `0 12px 40px rgba(0,0,0,0.5), 0 0 24px rgba(212,168,67,0.08)`,
+            boxShadow: `0 6px 20px rgba(212,168,67,0.3)`,
             position: "relative",
+            animation: "startPulse 2s ease-in-out infinite",
           }}
         >
-          {/* Triangle arrow */}
+          {/* Triangle arrow pointing down */}
           <div
             style={{
               position: "absolute",
-              bottom: -8,
+              bottom: -7,
               left: "50%",
               transform: "translateX(-50%)",
               width: 0,
               height: 0,
-              borderLeft: "9px solid transparent",
-              borderRight: "9px solid transparent",
-              borderTop: "9px solid rgba(22,22,22,0.97)",
-              filter: `drop-shadow(0 1px 0 ${GOLD})`,
+              borderLeft: "7px solid transparent",
+              borderRight: "7px solid transparent",
+              borderTop: `7px solid ${GOLD}`,
             }}
           />
-          <div
-            style={{
-              fontSize: "1rem",
-              fontWeight: 800,
-              color: "#fff",
-              marginBottom: 4,
-            }}
-          >
-            Day {day}
-          </div>
-          <div
-            style={{
-              fontSize: "0.84rem",
-              fontWeight: 600,
-              color: "rgba(255,255,255,0.85)",
-              marginBottom: 16,
-            }}
-          >
-            {totalTasks} tasks ready
-          </div>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setTodayPopup(false);
-              if (onStartDay) onStartDay();
-              onDayClick(day, "today");
-            }}
-            style={{
-              width: "100%",
-              padding: "11px 24px",
-              borderRadius: 12,
-              background: `linear-gradient(135deg, ${GOLD}, #C49A3C)`,
-              color: "#000",
-              fontSize: "0.92rem",
-              fontWeight: 800,
-              border: "none",
-              cursor: "pointer",
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              transition: "filter 0.2s, transform 0.2s",
-              fontFamily: "inherit",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.filter = "brightness(1.12)";
-              e.currentTarget.style.transform = "scale(1.02)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.filter = "brightness(1)";
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-          >
+          <span style={{
+            fontSize: "0.8rem",
+            fontWeight: 800,
+            color: "#000",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+          }}>
             START
-          </button>
+          </span>
         </div>
       </div>
     );

@@ -1384,11 +1384,9 @@ function DashboardPageInner() {
                             const existing = await tasksApi.today(false, dateStr);
                             const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
                             if (goalTasks.length > 0) {
-                              setViewingDay(workAheadDay);
-                              setViewingTasks(goalTasks);
-                              setShowTasks(true);
+                              // Tasks already exist — path will show START
                             } else {
-                              // Generate tasks for this day
+                              // Generate tasks for this day (path will show START after)
                               const { getSupabase } = await import("@/lib/supabase-client");
                               const supabase = getSupabase();
                               const { data: { session } } = await supabase.auth.getSession();
@@ -1400,14 +1398,7 @@ function DashboardPageInner() {
                                 },
                                 body: JSON.stringify({ localDate: dateStr, goalId: effectiveSelectedGoalId }),
                               });
-                              if (res.ok) {
-                                const data = await res.json();
-                                if (data.dailyTasks?.length > 0) {
-                                  setViewingDay(workAheadDay);
-                                  setViewingTasks(data.dailyTasks);
-                                  setShowTasks(true);
-                                }
-                              } else {
+                              if (!res.ok) {
                                 showToast("Couldn't generate tasks", "error");
                               }
                             }
