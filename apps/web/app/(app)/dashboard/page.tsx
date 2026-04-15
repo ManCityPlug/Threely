@@ -1255,8 +1255,14 @@ function DashboardPageInner() {
                             });
 
                             if (res.ok) {
-                              // Reload to show the fresh state with tomorrow's tasks
-                              window.location.reload();
+                              // Fetch tomorrow's tasks and show them
+                              const tmrRes = await tasksApi.today(false, tomorrowStr);
+                              if (tmrRes.dailyTasks?.length > 0) {
+                                setDailyTasks(tmrRes.dailyTasks);
+                                setShowTasks(true);
+                              } else {
+                                window.location.reload();
+                              }
                             } else {
                               showToast("Couldn't generate tasks", "error");
                             }
