@@ -75,7 +75,7 @@ const S_CURVE_OFFSETS = [50, 35, 25, 35, 50, 65, 75, 65];
 
 function getCompletionMessage(day: number): string {
   const messages: Record<number, string> = {
-    1: "This is where it all starts.",
+    1: "Day 1 done. You're already ahead of most people.",
     2: "You're already ahead of most people.",
     3: "This is becoming a habit.",
     5: "You're not the same person you were Monday.",
@@ -1476,24 +1476,15 @@ export default function DashboardScreen() {
     }
   }, [loading, buildNotifContext, goals.length]);
 
-  // Show celebration when all tasks just completed (only once per day)
-  const prevAllDone = useRef(false);
+  // Show celebration when user manually completes all tasks (not on page load)
+  const userToggledRef = useRef(false);
+  const hasTriggeredCelebration = useRef(false);
   useEffect(() => {
-    if (allDone && !prevAllDone.current && newTaskItems.length > 0 && !celebrationDismissed) {
-      // Check if celebration was already shown today
-      const todayStr = new Date().toISOString().slice(0, 10);
-      const celebKey = `@threely_celebration_${todayStr}_${effectiveSelectedGoal}`;
-      AsyncStorage.getItem(celebKey).then((shown) => {
-        if (!shown) {
-          setShowCelebration(true);
-          AsyncStorage.setItem(celebKey, "true");
-        } else {
-          setCelebrationDismissed(true);
-        }
-      });
+    if (allDone && newTaskItems.length > 0 && userToggledRef.current && !hasTriggeredCelebration.current) {
+      setShowCelebration(true);
+      hasTriggeredCelebration.current = true;
     }
-    prevAllDone.current = allDone;
-  }, [allDone, newTaskItems.length, celebrationDismissed, effectiveSelectedGoal]);
+  }, [allDone, newTaskItems.length]);
 
   // When all done and celebration dismissed, switch back to path
   useEffect(() => {
@@ -1553,6 +1544,7 @@ export default function DashboardScreen() {
   }
 
   async function handleToggleTask(dailyTaskId: string, taskItemId: string, isCompleted: boolean) {
+    userToggledRef.current = true;
     if (isCompleted) {
       setAnimatingTaskId(taskItemId);
       setTimeout(() => setAnimatingTaskId(null), 500);
@@ -1790,8 +1782,8 @@ export default function DashboardScreen() {
         ) : viewMode === "path" ? (
           /* ═══ PATH VIEW ═══ */
           <>
-            {/* All done state above path */}
-            {allDone && celebrationDismissed && (
+            {/* All done state above path — only when completed in this session */}
+            {allDone && celebrationDismissed && hasTriggeredCelebration.current && (
               <View style={styles.allDoneContainer}>
                 <Text style={styles.allDoneCheck}>{"✓"}</Text>
                 <Text style={styles.allDoneTitle}>All done for today</Text>
@@ -1804,7 +1796,7 @@ export default function DashboardScreen() {
 
             {/* S-curve path */}
             <SCurvePathView
-              goalDayNumber={goalDayNumber}
+              goalDayNumber={allDone ? goalDayNumber + 1 : goalDayNumber}
               allDone={allDone && celebrationDismissed}
               onTapToday={() => {
                 if (allDone && celebrationDismissed) return;
@@ -1854,18 +1846,8 @@ export default function DashboardScreen() {
               <Text style={styles.dayLabel}>Day {goalDayNumber}</Text>
             </View>
 
-            {/* All done state */}
-            {allDone && celebrationDismissed ? (
-              <View style={styles.allDoneContainer}>
-                <Text style={styles.allDoneCheck}>{"✓"}</Text>
-                <Text style={styles.allDoneTitle}>All done for today</Text>
-                <Text style={styles.allDoneMessage}>{getCompletionMessage(goalDayNumber)}</Text>
-                <View style={styles.countdownContainer}>
-                  <Text style={styles.countdownText}>Next day unlocks in {midnightCountdown}</Text>
-                </View>
-              </View>
-            ) : (
-              /* Task cards */
+            {/* Task cards — always shown, read-only when all done */}
+            {(
               <>
                 {displayVisibleTasks.map((dt) => (
                   <View key={dt.id} style={{ marginBottom: 0 }}>
