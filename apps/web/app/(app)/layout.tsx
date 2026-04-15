@@ -159,7 +159,6 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <ToastProvider>
     <SubscriptionProvider>
-    <AppTutorial visible={showTutorial} onComplete={handleTutorialComplete} />
     <div className="app-shell">
       {/* ── Top navigation bar ──────────────────────────────────────────────── */}
       <nav className="top-nav">

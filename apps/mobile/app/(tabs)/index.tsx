@@ -8,18 +8,17 @@ import {
   ScrollView,
   RefreshControl,
   Alert,
-  ActivityIndicator,
   AppState,
   TouchableOpacity,
   Animated,
-  TextInput,
   Platform,
-  KeyboardAvoidingView,
   Modal,
   Pressable,
   LayoutAnimation,
   UIManager,
   useWindowDimensions,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SwipeNavigator } from "@/components/SwipeNavigator";
@@ -29,8 +28,6 @@ import {
   tasksApi,
   goalsApi,
   profileApi,
-  reviewsApi,
-  insightsApi,
   statsApi,
   focusApi,
   type DailyTask,
@@ -38,65 +35,83 @@ import {
   type TaskItem,
   type GoalStat,
 } from "@/lib/api";
-import { TaskCard } from "@/components/TaskCard";
 import { AppTutorial } from "@/components/AppTutorial";
 import { MOCK_TUTORIAL_GOAL, MOCK_TUTORIAL_DAILY_TASK } from "@/lib/mock-tutorial-data";
 import { Button } from "@/components/ui/Button";
-import { SkeletonCard } from "@/components/Skeleton";
 import { useToast } from "@/lib/toast";
-import { useStaggeredEntrance } from "@/lib/animations";
 import { scheduleNotifications, onTaskCompleted, sendInstantNotification, type NotifContext } from "@/lib/notifications";
 import { useTheme } from "@/lib/theme";
 import { useSubscription } from "@/lib/subscription-context";
 import { useWalkthroughRegistry } from "@/lib/walkthrough-registry";
 import Paywall from "@/components/Paywall";
 import type { Colors } from "@/constants/theme";
-import { spacing, typography, radius, shadow } from "@/constants/theme";
+import { spacing, typography, radius } from "@/constants/theme";
 
-const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-
-function formatDate(d: Date) {
-  return `${DAYS[d.getDay()]}, ${MONTHS[d.getMonth()]} ${d.getDate()}`;
+// Enable LayoutAnimation on Android
+if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
+  UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-function getGreeting() {
-  const h = new Date().getHours();
-  if (h < 12) return "Good morning";
-  if (h < 17) return "Good afternoon";
-  return "Good evening";
+// iPad-friendly max content width
+const MAX_CONTENT_WIDTH = 600;
+
+// ─── Gamification Helpers ─────────────────────────────────────────────────────
+
+const GOLD = "#D4A843";
+const GOLD_DARK = "#9A7A2A";
+const GOLD_GRADIENT_TOP = "#E8C547";
+
+const MILESTONE_DAYS = [7, 14, 30, 60, 100];
+const MILESTONE_LABELS: Record<number, string> = {
+  7: "1 Week!",
+  14: "2 Weeks!",
+  30: "1 Month!",
+  60: "2 Months!",
+  100: "100 Days!",
+};
+
+// S-curve horizontal offsets (% of path width) matching web
+const S_CURVE_OFFSETS = [50, 35, 25, 35, 50, 65, 75, 65];
+
+function getCompletionMessage(day: number): string {
+  const messages: Record<number, string> = {
+    1: "This is where it all starts.",
+    2: "You're already ahead of most people.",
+    3: "This is becoming a habit.",
+    5: "You're not the same person you were Monday.",
+    7: "One full week. Most people quit by now. You didn't.",
+    10: "You're building something real.",
+    14: "Two weeks in. The old you wouldn't recognize this.",
+    21: "21 days. Science says this is a habit now.",
+    30: "One month. You're not dreaming anymore — you're doing.",
+    60: "Two months. This is who you are now.",
+    100: "100 days. Legend.",
+  };
+  if (messages[day]) return messages[day];
+  const generic = [
+    "These are building you for tomorrow.",
+    "Every day you show up, you level up.",
+    "Small steps. Big results. See you tomorrow.",
+    "You showed up. That's what matters.",
+  ];
+  return generic[day % generic.length];
 }
 
-function formatMinutes(min: number): string {
-  if (min < 60) return `${min}m`;
-  const h = Math.floor(min / 60);
-  const m = min % 60;
-  return m > 0 ? `${h}h ${m}m` : `${h}h`;
+function getGoalDayNumber(goal: Goal): number {
+  const created = new Date(goal.createdAt);
+  const now = new Date();
+  const diff = now.getTime() - created.getTime();
+  return Math.max(1, Math.floor(diff / (1000 * 60 * 60 * 24)) + 1);
 }
 
-// ─── Review types ─────────────────────────────────────────────────────────────
-
-type DifficultyRating = "too_easy" | "just_right" | "challenging" | "overwhelming";
-
-const DIFFICULTY_OPTIONS: { value: DifficultyRating; emoji: string; label: string }[] = [
-  { value: "too_easy", emoji: "😴", label: "Too easy" },
-  { value: "just_right", emoji: "✅", label: "Just right" },
-  { value: "challenging", emoji: "💪", label: "Challenging" },
-  { value: "overwhelming", emoji: "🔥", label: "Overwhelming" },
-];
-
-function daysSince(dateStr: string | null): number | null {
-  if (!dateStr) return null;
-  const diff = Date.now() - new Date(dateStr).getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
-}
-
-function stalenessLabel(days: number | null): string {
-  if (days === null) return "Never worked on";
-  if (days === 0) return "Worked today";
-  if (days === 1) return "Worked yesterday";
-  return `${days}d ago`;
+function getStreakFromGoals(goals: Goal[]): number {
+  if (goals.length === 0) return 0;
+  const earliest = goals.reduce((min, g) => {
+    const d = new Date(g.createdAt).getTime();
+    return d < min ? d : min;
+  }, Infinity);
+  const diff = Date.now() - earliest;
+  return Math.max(1, Math.floor(diff / (1000 * 60 * 60 * 24)) + 1);
 }
 
 function getTodayIsoDay(): number {
@@ -114,13 +129,1017 @@ function formatWorkDaysList(workDays: number[]): string {
   return [...workDays].sort((a, b) => a - b).map(d => names[d]).join(", ");
 }
 
-// Enable LayoutAnimation on Android
-if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
+function getMidnightCountdown(): string {
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  const diff = midnight.getTime() - now.getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  return `${hours}h ${minutes}m`;
 }
 
-// iPad-friendly max content width
-const MAX_CONTENT_WIDTH = 600;
+function isMilestone(day: number): boolean {
+  return MILESTONE_DAYS.includes(day);
+}
+
+// ─── Progress Ring (simple View-based) ────────────────────────────────────────
+
+function NodeProgressRing({
+  size,
+  progress,
+  color,
+  trackColor,
+}: {
+  size: number;
+  progress: number; // 0-1
+  color: string;
+  trackColor: string;
+}) {
+  const borderW = 3;
+  const ringSize = size + 14;
+  // Simple ring using border approach. For RN without SVG, use two half-circles.
+  const pct = Math.min(100, Math.max(0, progress * 100));
+  const rightRotation = pct <= 50 ? (pct / 50) * 180 : 180;
+  const leftRotation = pct > 50 ? ((pct - 50) / 50) * 180 : 0;
+
+  return (
+    <View style={{
+      position: "absolute",
+      width: ringSize,
+      height: ringSize,
+    }}>
+      {/* Track */}
+      <View style={{
+        position: "absolute",
+        width: ringSize,
+        height: ringSize,
+        borderRadius: ringSize / 2,
+        borderWidth: borderW,
+        borderColor: trackColor,
+      }} />
+      {/* Right half 0-180 */}
+      <View style={{
+        position: "absolute",
+        top: 0,
+        left: ringSize / 2,
+        width: ringSize / 2,
+        height: ringSize,
+        overflow: "hidden",
+      }}>
+        <View style={{
+          position: "absolute",
+          top: 0,
+          left: -(ringSize / 2),
+          width: ringSize,
+          height: ringSize,
+          borderRadius: ringSize / 2,
+          borderWidth: borderW,
+          borderColor: color,
+          borderLeftColor: "transparent",
+          borderBottomColor: "transparent",
+          transform: [{ rotate: `${rightRotation}deg` }],
+        }} />
+      </View>
+      {/* Left half 180-360 */}
+      {pct > 50 && (
+        <View style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: ringSize / 2,
+          height: ringSize,
+          overflow: "hidden",
+        }}>
+          <View style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: ringSize,
+            height: ringSize,
+            borderRadius: ringSize / 2,
+            borderWidth: borderW,
+            borderColor: color,
+            borderLeftColor: "transparent",
+            borderBottomColor: "transparent",
+            transform: [{ rotate: `${leftRotation}deg` }],
+          }} />
+        </View>
+      )}
+    </View>
+  );
+}
+
+// ─── Path Node Component ──────────────────────────────────────────────────────
+
+function PathNode({
+  day,
+  type,
+  isToday,
+  isCrown,
+  isMilestoneNode,
+  onPress,
+  colors,
+  allDoneToday,
+  workAheadReady,
+  taskProgress,
+}: {
+  day: number;
+  type: "completed" | "today" | "locked" | "work-ahead";
+  isToday: boolean;
+  isCrown: boolean;
+  isMilestoneNode: boolean;
+  onPress?: () => void;
+  colors: Colors;
+  allDoneToday: boolean;
+  workAheadReady: boolean;
+  taskProgress: number; // 0-1
+}) {
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const glowAnim = useRef(new Animated.Value(0.35)).current;
+
+  useEffect(() => {
+    if (isToday && !allDoneToday) {
+      const pulse = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 1.08, duration: 1500, useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 1, duration: 1500, useNativeDriver: true }),
+        ])
+      );
+      pulse.start();
+      const glow = Animated.loop(
+        Animated.sequence([
+          Animated.timing(glowAnim, { toValue: 0.6, duration: 1500, useNativeDriver: true }),
+          Animated.timing(glowAnim, { toValue: 0.35, duration: 1500, useNativeDriver: true }),
+        ])
+      );
+      glow.start();
+      return () => { pulse.stop(); glow.stop(); };
+    }
+  }, [isToday, allDoneToday, pulseAnim, glowAnim]);
+
+  // Node sizes matching spec
+  const nodeSize = isToday ? 68 : isCrown ? 64 : isMilestoneNode ? 60 : type === "completed" ? 56 : 50;
+  const isCompleted = type === "completed";
+  const isLocked = type === "locked";
+  const isWorkAhead = type === "work-ahead";
+
+  // Determine node style
+  let bgColor: string;
+  let borderColor: string;
+  let borderWidth: number;
+  let borderStyle: "solid" | "dashed" = "solid";
+  let nodeOpacity = 1;
+  let shadowConfig: object = {};
+
+  if (isCompleted) {
+    bgColor = GOLD_GRADIENT_TOP; // Gold fill
+    borderColor = GOLD_DARK;
+    borderWidth = 4;
+    shadowConfig = {
+      shadowColor: GOLD,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 12,
+      elevation: 6,
+    };
+  } else if (isToday) {
+    bgColor = allDoneToday ? GOLD : "rgba(20,20,20,0.95)";
+    borderColor = GOLD;
+    borderWidth = 3;
+    shadowConfig = {
+      shadowColor: GOLD,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.4,
+      shadowRadius: 20,
+      elevation: 8,
+    };
+  } else if (isWorkAhead) {
+    bgColor = "#1e1e1e";
+    borderColor = GOLD;
+    borderWidth = 2.5;
+    borderStyle = "dashed";
+    nodeOpacity = 0.6;
+    shadowConfig = {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 4,
+    };
+  } else if (isCrown) {
+    bgColor = GOLD_GRADIENT_TOP;
+    borderColor = GOLD_DARK;
+    borderWidth = 4;
+    shadowConfig = {
+      shadowColor: GOLD,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.35,
+      shadowRadius: 16,
+      elevation: 8,
+    };
+  } else if (isMilestoneNode) {
+    // Locked milestone — gold tint + glow
+    bgColor = "rgba(212,168,67,0.08)";
+    borderColor = GOLD_DARK;
+    borderWidth = 3;
+    nodeOpacity = 0.7;
+    shadowConfig = {
+      shadowColor: GOLD,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.15,
+      shadowRadius: 16,
+      elevation: 4,
+    };
+  } else {
+    // Locked
+    bgColor = "#1e1e1e";
+    borderColor = "#1e1e1e";
+    borderWidth = 4;
+    nodeOpacity = 0.45;
+    shadowConfig = {
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 3,
+    };
+  }
+
+  // Icon content
+  let icon: React.ReactNode;
+  if (isCrown) {
+    icon = <Text style={{ fontSize: nodeSize * 0.42 }}>{"👑"}</Text>;
+  } else if (isMilestoneNode && (isCompleted || isToday)) {
+    icon = <Text style={{ fontSize: nodeSize * 0.4 }}>{"🏆"}</Text>;
+  } else if (isMilestoneNode && (isLocked || isWorkAhead)) {
+    icon = <Text style={{ fontSize: nodeSize * 0.36, opacity: 0.5 }}>{"🏆"}</Text>;
+  } else if (isCompleted) {
+    icon = <Text style={{ fontSize: nodeSize * 0.35, color: "#fff", fontWeight: "800" }}>{"✓"}</Text>;
+  } else if (isToday) {
+    if (allDoneToday) {
+      icon = <Text style={{ fontSize: nodeSize * 0.35, color: GOLD, fontWeight: "800" }}>{"✓"}</Text>;
+    } else {
+      icon = <Text style={{ fontSize: nodeSize * 0.4 }}>{"⭐"}</Text>;
+    }
+  } else if (isWorkAhead) {
+    icon = <Text style={{ fontSize: nodeSize * 0.32 }}>{"⭐"}</Text>;
+  } else {
+    icon = <Text style={{ fontSize: nodeSize * 0.28, opacity: 0.4 }}>{"🔒"}</Text>;
+  }
+
+  // Label below node
+  let label: React.ReactNode = null;
+  if (isCrown && !isToday) {
+    label = (
+      <View style={{ alignItems: "center", marginTop: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: "800", color: GOLD }}>Huge Progress</Text>
+        <Text style={{ fontSize: 11, fontWeight: "600", color: GOLD, opacity: 0.8, marginTop: 1 }}>
+          Enter next stage {"→"}
+        </Text>
+      </View>
+    );
+  } else if (isMilestoneNode && !isToday && !isCrown) {
+    label = (
+      <View style={{ alignItems: "center", marginTop: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: "800", color: GOLD }}>
+          {MILESTONE_LABELS[day] ?? `Day ${day}`}
+        </Text>
+        <Text style={{ fontSize: 10, fontWeight: "600", color: "rgba(212,168,67,0.7)", marginTop: 1 }}>
+          Milestone
+        </Text>
+      </View>
+    );
+  } else if (isToday) {
+    label = (
+      <View style={{ alignItems: "center", marginTop: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: "800", color: GOLD, letterSpacing: -0.3 }}>
+          Day {day}
+        </Text>
+        <Text style={{
+          fontSize: 11,
+          fontWeight: "700",
+          color: allDoneToday ? GOLD : "rgba(255,255,255,0.9)",
+          marginTop: 1,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+        }}>
+          {allDoneToday ? "Complete!" : "TODAY"}
+        </Text>
+      </View>
+    );
+  } else if (isWorkAhead && !isMilestoneNode && !isCrown) {
+    label = (
+      <View style={{ alignItems: "center", marginTop: 6 }}>
+        <Text style={{ fontSize: 12, fontWeight: "700", color: "rgba(255,255,255,0.7)" }}>
+          Day {day}
+        </Text>
+      </View>
+    );
+  } else if (isCompleted) {
+    label = (
+      <Text style={{ fontSize: 11, fontWeight: "600", color: GOLD, marginTop: 4, textAlign: "center" }}>
+        {day}
+      </Text>
+    );
+  } else {
+    // Locked - minimal label
+    label = (
+      <Text style={{ fontSize: 10, fontWeight: "500", color: "rgba(255,255,255,0.25)", marginTop: 4, textAlign: "center" }}>
+        {day}
+      </Text>
+    );
+  }
+
+  return (
+    <View style={{ alignItems: "center" }}>
+      <TouchableOpacity
+        onPress={onPress}
+        disabled={isLocked && !isWorkAhead && !isCrown}
+        activeOpacity={0.7}
+        style={{ alignItems: "center" }}
+      >
+        {/* Progress ring - today only */}
+        <View style={{ alignItems: "center", justifyContent: "center" }}>
+          {isToday && (
+            <NodeProgressRing
+              size={nodeSize}
+              progress={taskProgress}
+              color={GOLD}
+              trackColor="rgba(212,168,67,0.15)"
+            />
+          )}
+          <Animated.View style={{
+            width: nodeSize,
+            height: nodeSize,
+            borderRadius: nodeSize / 2,
+            backgroundColor: bgColor,
+            borderWidth: borderWidth,
+            borderColor: borderColor,
+            borderStyle: borderStyle,
+            alignItems: "center",
+            justifyContent: "center",
+            opacity: nodeOpacity,
+            transform: [{ scale: isToday && !allDoneToday ? pulseAnim : 1 }],
+            ...shadowConfig,
+          }}>
+            {icon}
+          </Animated.View>
+        </View>
+
+        {label}
+      </TouchableOpacity>
+    </View>
+  );
+}
+
+// ─── START / COMPLETE Badge ─────────────────────────────────────────────────
+
+function StartBadge({
+  allDone,
+  onPress,
+}: {
+  allDone: boolean;
+  onPress: () => void;
+}) {
+  const pulseAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (!allDone) {
+      const pulse = Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, { toValue: 1.06, duration: 1000, useNativeDriver: true }),
+          Animated.timing(pulseAnim, { toValue: 1, duration: 1000, useNativeDriver: true }),
+        ])
+      );
+      pulse.start();
+      return () => pulse.stop();
+    }
+  }, [allDone, pulseAnim]);
+
+  return (
+    <TouchableOpacity onPress={onPress} activeOpacity={0.85} style={{ alignItems: "center", marginBottom: 6 }}>
+      <Animated.View style={{
+        paddingHorizontal: 18,
+        paddingVertical: 6,
+        borderRadius: 20,
+        backgroundColor: allDone ? "#3ecf8e" : GOLD,
+        transform: [{ scale: allDone ? 1 : pulseAnim }],
+        shadowColor: allDone ? "#3ecf8e" : GOLD,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.4,
+        shadowRadius: 12,
+        elevation: 6,
+      }}>
+        <Text style={{
+          fontSize: 12,
+          fontWeight: "800",
+          letterSpacing: 1,
+          textTransform: "uppercase",
+          color: allDone ? "#fff" : "#000",
+        }}>
+          {allDone ? "COMPLETE \u2713" : "START"}
+        </Text>
+      </Animated.View>
+      {/* Small connector line */}
+      <View style={{
+        width: 2,
+        height: 8,
+        backgroundColor: allDone ? "rgba(62,207,142,0.4)" : "rgba(212,168,67,0.4)",
+      }} />
+    </TouchableOpacity>
+  );
+}
+
+// ─── S-Curve Path View ───────────────────────────────────────────────────────
+
+function SCurvePathView({
+  goalDayNumber,
+  allDone,
+  onTapToday,
+  onTapWorkAhead,
+  onTapLocked,
+  colors,
+  screenWidth,
+  taskProgress,
+}: {
+  goalDayNumber: number;
+  allDone: boolean;
+  onTapToday: () => void;
+  onTapWorkAhead: () => void;
+  onTapLocked: (day: number) => void;
+  colors: Colors;
+  screenWidth: number;
+  taskProgress: number;
+}) {
+  const scrollRef = useRef<ScrollView>(null);
+  const [showScrollHint, setShowScrollHint] = useState(true);
+
+  // Show 20 nodes starting from a window around today
+  const VISIBLE_NODES = 20;
+  const windowStart = Math.max(1, goalDayNumber - Math.min(goalDayNumber - 1, 5));
+  const days: number[] = [];
+  for (let i = 0; i < VISIBLE_NODES; i++) {
+    days.push(windowStart + i);
+  }
+  const lastVisibleDay = days[days.length - 1];
+
+  // Scroll to today's node on mount
+  useEffect(() => {
+    const todayIndex = days.indexOf(goalDayNumber);
+    if (todayIndex >= 0 && scrollRef.current) {
+      const nodeSpacing = 100;
+      const scrollTarget = Math.max(0, todayIndex * nodeSpacing - 200);
+      setTimeout(() => {
+        scrollRef.current?.scrollTo({ y: scrollTarget, animated: true });
+      }, 300);
+    }
+  }, [goalDayNumber]);
+
+  // Path container width (leave margin on each side)
+  const pathWidth = Math.min(screenWidth - 40, 500);
+  const nodeSpacing = 100;
+
+  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+    if (contentOffset.y + layoutMeasurement.height >= contentSize.height - 50) {
+      setShowScrollHint(false);
+    }
+  };
+
+  return (
+    <View style={{ flex: 1, position: "relative" }}>
+      <ScrollView
+        ref={scrollRef}
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={100}
+        contentContainerStyle={{
+          paddingTop: 30,
+          paddingBottom: 80,
+          minHeight: days.length * nodeSpacing + 100,
+        }}
+      >
+        <View style={{
+          width: pathWidth,
+          alignSelf: "center",
+          position: "relative",
+          height: days.length * nodeSpacing + 60,
+        }}>
+          {days.map((day, i) => {
+            const isCompleted = day < goalDayNumber;
+            const isToday = day === goalDayNumber;
+            const isWorkAhead = day === goalDayNumber + 1 && allDone;
+            const isLocked = day > goalDayNumber && !isWorkAhead;
+            const isCrown = day === lastVisibleDay && day > goalDayNumber;
+            const isMilestoneNode = isMilestone(day);
+
+            let type: "completed" | "today" | "locked" | "work-ahead" = "locked";
+            if (isCompleted) type = "completed";
+            else if (isToday) type = "today";
+            else if (isWorkAhead) type = "work-ahead";
+
+            // S-curve positioning
+            const xOffsetPct = S_CURVE_OFFSETS[i % S_CURVE_OFFSETS.length];
+            const xPos = (xOffsetPct / 100) * pathWidth;
+            const yPos = 40 + i * nodeSpacing;
+
+            // Week dividers
+            const isWeekBoundary = i > 0 && i % 7 === 0;
+            const weekNumber = Math.floor(i / 7) + 1;
+
+            return (
+              <View key={day}>
+                {/* Week divider */}
+                {isWeekBoundary && (
+                  <View style={{
+                    position: "absolute",
+                    top: yPos - 20,
+                    left: "10%",
+                    right: "10%",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 12,
+                    zIndex: 2,
+                  }}>
+                    <View style={{ flex: 1, height: 1, backgroundColor: "rgba(255,255,255,0.08)" }} />
+                    <Text style={{
+                      fontSize: 10,
+                      fontWeight: "700",
+                      color: "rgba(255,255,255,0.3)",
+                      textTransform: "uppercase",
+                      letterSpacing: 0.8,
+                    }}>
+                      Week {weekNumber}
+                    </Text>
+                    <View style={{ flex: 1, height: 1, backgroundColor: "rgba(255,255,255,0.08)" }} />
+                  </View>
+                )}
+
+                {/* Node positioned absolutely */}
+                <View style={{
+                  position: "absolute",
+                  top: yPos,
+                  left: xPos,
+                  transform: [{ translateX: isToday ? -34 : type === "completed" ? -28 : isCrown ? -32 : isMilestoneNode ? -30 : -25 }],
+                  zIndex: isToday ? 10 : isCrown ? 5 : 1,
+                  alignItems: "center",
+                }}>
+                  {/* START/COMPLETE badge above today's node */}
+                  {isToday && (
+                    <StartBadge
+                      allDone={allDone}
+                      onPress={() => {
+                        if (allDone) return;
+                        if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        onTapToday();
+                      }}
+                    />
+                  )}
+
+                  <PathNode
+                    day={day}
+                    type={type}
+                    isToday={isToday}
+                    isCrown={isCrown && !isToday}
+                    isMilestoneNode={isMilestoneNode}
+                    colors={colors}
+                    allDoneToday={allDone}
+                    workAheadReady={isWorkAhead}
+                    taskProgress={taskProgress}
+                    onPress={
+                      isToday ? () => {
+                        if (allDone) return;
+                        if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                        onTapToday();
+                      }
+                      : isWorkAhead ? onTapWorkAhead
+                      : isLocked ? () => onTapLocked(day)
+                      : undefined
+                    }
+                  />
+                </View>
+              </View>
+            );
+          })}
+        </View>
+      </ScrollView>
+
+      {/* Scroll hint arrow */}
+      {showScrollHint && (
+        <View style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 50,
+          alignItems: "center",
+          justifyContent: "flex-end",
+          paddingBottom: 8,
+          pointerEvents: "none",
+        }}>
+          <ScrollArrow />
+        </View>
+      )}
+    </View>
+  );
+}
+
+function ScrollArrow() {
+  const bounceAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(bounceAnim, { toValue: 4, duration: 750, useNativeDriver: true }),
+        Animated.timing(bounceAnim, { toValue: 0, duration: 750, useNativeDriver: true }),
+      ])
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [bounceAnim]);
+
+  return (
+    <Animated.View style={{ transform: [{ translateY: bounceAnim }] }}>
+      <Text style={{ fontSize: 20, color: "rgba(255,255,255,0.35)" }}>{"▼"}</Text>
+    </Animated.View>
+  );
+}
+
+// ─── Skeleton Path Loading ───────────────────────────────────────────────────
+
+function SkeletonPath({ screenWidth }: { screenWidth: number }) {
+  const pulseAnim = useRef(new Animated.Value(0.3)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, { toValue: 0.7, duration: 800, useNativeDriver: true }),
+        Animated.timing(pulseAnim, { toValue: 0.3, duration: 800, useNativeDriver: true }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [pulseAnim]);
+
+  const pathWidth = Math.min(screenWidth - 40, 500);
+  const skeletonNodes = [0, 1, 2, 3, 4, 5, 6];
+
+  return (
+    <View style={{ alignItems: "center", paddingVertical: spacing.xl }}>
+      {skeletonNodes.map((i) => {
+        const xOffsetPct = S_CURVE_OFFSETS[i % S_CURVE_OFFSETS.length];
+        const xPos = (xOffsetPct / 100) * pathWidth - pathWidth / 2;
+        const size = i === 2 ? 60 : i === 0 || i === 6 ? 42 : 48;
+        return (
+          <Animated.View key={i} style={{
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            backgroundColor: "rgba(255,255,255,0.1)",
+            opacity: pulseAnim,
+            marginBottom: 48,
+            marginLeft: xPos,
+          }} />
+        );
+      })}
+    </View>
+  );
+}
+
+// ─── Gamified Task Card ──────────────────────────────────────────────────────
+
+function GamifiedTaskCard({
+  task,
+  onToggle,
+  colors,
+  isAnimating,
+}: {
+  task: TaskItem;
+  onToggle: (isCompleted: boolean) => void;
+  colors: Colors;
+  isAnimating: boolean;
+}) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+  const checkScaleAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (isAnimating) {
+      Animated.sequence([
+        Animated.timing(scaleAnim, { toValue: 1.02, duration: 150, useNativeDriver: true }),
+        Animated.timing(scaleAnim, { toValue: 1, duration: 150, useNativeDriver: true }),
+      ]).start();
+      Animated.sequence([
+        Animated.spring(checkScaleAnim, { toValue: 1.3, friction: 3, tension: 200, useNativeDriver: true }),
+        Animated.spring(checkScaleAnim, { toValue: 1, friction: 5, tension: 100, useNativeDriver: true }),
+      ]).start();
+    }
+  }, [isAnimating, scaleAnim, checkScaleAnim]);
+
+  const taskTitle = (task as unknown as { title?: string }).title ?? task.task;
+
+  return (
+    <TouchableOpacity
+      activeOpacity={0.85}
+      onPress={() => {
+        if (!task.isSkipped) {
+          if (Platform.OS !== "web") {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+          }
+          onToggle(!task.isCompleted);
+        }
+      }}
+    >
+      <Animated.View style={{
+        transform: [{ scale: scaleAnim }],
+        backgroundColor: colors.card,
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: task.isCompleted ? GOLD : colors.border,
+        padding: spacing.md,
+        flexDirection: "row",
+        alignItems: "flex-start",
+        gap: spacing.md,
+        opacity: task.isSkipped ? 0.5 : 1,
+      }}>
+        {/* Checkbox */}
+        <View style={{ marginTop: 2 }}>
+          <Animated.View style={{
+            width: 28,
+            height: 28,
+            borderRadius: 8,
+            borderWidth: 2,
+            borderColor: task.isCompleted ? GOLD : colors.border,
+            backgroundColor: task.isCompleted ? GOLD : "transparent",
+            alignItems: "center",
+            justifyContent: "center",
+            transform: [{ scale: checkScaleAnim }],
+          }}>
+            {task.isCompleted && (
+              <Text style={{ color: "#000", fontSize: 14, fontWeight: "800" }}>{"✓"}</Text>
+            )}
+          </Animated.View>
+        </View>
+
+        {/* Content */}
+        <View style={{ flex: 1 }}>
+          <Text style={{
+            fontWeight: "600",
+            fontSize: typography.base,
+            color: task.isCompleted ? colors.textTertiary : colors.text,
+            textDecorationLine: task.isCompleted ? "line-through" : "none",
+            textDecorationColor: colors.textTertiary,
+            lineHeight: 22,
+          }}>
+            {taskTitle}
+          </Text>
+          {task.description ? (
+            <Text style={{
+              fontSize: typography.sm,
+              color: task.isCompleted ? colors.textTertiary : colors.textSecondary,
+              marginTop: 4,
+              lineHeight: 20,
+            }}>
+              {task.description}
+            </Text>
+          ) : null}
+        </View>
+      </Animated.View>
+    </TouchableOpacity>
+  );
+}
+
+// ─── Today Popup Card ────────────────────────────────────────────────────────
+
+function TodayPopup({
+  visible,
+  dayNumber,
+  taskCount,
+  onStart,
+  onDismiss,
+  colors,
+}: {
+  visible: boolean;
+  dayNumber: number;
+  taskCount: number;
+  onStart: () => void;
+  onDismiss: () => void;
+  colors: Colors;
+}) {
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.spring(scaleAnim, { toValue: 1, friction: 5, tension: 80, useNativeDriver: true }),
+        Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+      ]).start();
+    } else {
+      scaleAnim.setValue(0.8);
+      fadeAnim.setValue(0);
+    }
+  }, [visible, scaleAnim, fadeAnim]);
+
+  if (!visible) return null;
+
+  return (
+    <Modal visible={visible} transparent animationType="none">
+      <Pressable
+        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center" }}
+        onPress={onDismiss}
+      >
+        <Animated.View style={{
+          transform: [{ scale: scaleAnim }],
+          opacity: fadeAnim,
+          backgroundColor: colors.card,
+          borderRadius: radius.xl,
+          borderWidth: 2,
+          borderColor: GOLD,
+          padding: spacing.xl,
+          width: "80%",
+          maxWidth: 320,
+          alignItems: "center",
+          shadowColor: GOLD,
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: 0.3,
+          shadowRadius: 20,
+          elevation: 10,
+        }}>
+          <Text style={{ fontSize: 48, marginBottom: spacing.md }}>{"⭐"}</Text>
+          <Text style={{
+            fontSize: typography.xxl,
+            fontWeight: "800",
+            color: colors.text,
+            marginBottom: spacing.xs,
+            letterSpacing: -0.5,
+          }}>
+            Day {dayNumber}
+          </Text>
+          <Text style={{
+            fontSize: typography.base,
+            color: colors.textSecondary,
+            marginBottom: spacing.lg,
+            textAlign: "center",
+          }}>
+            {taskCount} tasks ready
+          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              onStart();
+            }}
+            activeOpacity={0.85}
+            style={{
+              backgroundColor: GOLD,
+              paddingHorizontal: 48,
+              paddingVertical: 14,
+              borderRadius: 14,
+              width: "100%",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{
+              fontSize: typography.md,
+              fontWeight: "700",
+              color: "#000",
+              letterSpacing: 0.5,
+              textTransform: "uppercase",
+            }}>
+              START
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </Pressable>
+    </Modal>
+  );
+}
+
+// ─── Celebration Overlay ─────────────────────────────────────────────────────
+
+function CelebrationOverlay({
+  visible,
+  dayNumber,
+  goalTitle,
+  onDismiss,
+  colors,
+}: {
+  visible: boolean;
+  dayNumber: number;
+  goalTitle: string;
+  onDismiss: () => void;
+  colors: Colors;
+}) {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.5)).current;
+  const slideAnim = useRef(new Animated.Value(30)).current;
+
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
+        Animated.spring(scaleAnim, { toValue: 1, friction: 4, tension: 80, useNativeDriver: true, delay: 200 }),
+        Animated.timing(slideAnim, { toValue: 0, duration: 600, useNativeDriver: true, delay: 400 }),
+      ]).start();
+      if (Platform.OS !== "web") {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }
+    } else {
+      fadeAnim.setValue(0);
+      scaleAnim.setValue(0.5);
+      slideAnim.setValue(30);
+    }
+  }, [visible, fadeAnim, scaleAnim, slideAnim]);
+
+  return (
+    <Modal visible={visible} transparent animationType="none">
+      <Animated.View style={{
+        flex: 1,
+        backgroundColor: "rgba(0,0,0,0.85)",
+        alignItems: "center",
+        justifyContent: "center",
+        opacity: fadeAnim,
+        padding: spacing.xl,
+      }}>
+        {/* Gold glow */}
+        <View style={{
+          position: "absolute",
+          width: 300,
+          height: 300,
+          borderRadius: 150,
+          backgroundColor: "rgba(212,168,67,0.12)",
+        }} />
+
+        <Animated.Text style={{
+          fontSize: 80,
+          marginBottom: 24,
+          transform: [{ scale: scaleAnim }],
+        }}>
+          {"🔥"}
+        </Animated.Text>
+
+        <Animated.Text style={{
+          fontSize: typography.xxxl + 4,
+          fontWeight: "800",
+          color: "#fff",
+          letterSpacing: -1,
+          marginBottom: 12,
+          textAlign: "center",
+          transform: [{ translateY: slideAnim }],
+          opacity: fadeAnim,
+        }}>
+          Day {dayNumber} Complete
+        </Animated.Text>
+
+        <Animated.Text style={{
+          fontSize: typography.md,
+          color: "rgba(255,255,255,0.85)",
+          textAlign: "center",
+          lineHeight: 26,
+          marginBottom: 16,
+          maxWidth: 340,
+          transform: [{ translateY: slideAnim }],
+          opacity: fadeAnim,
+        }}>
+          {getCompletionMessage(dayNumber)}
+        </Animated.Text>
+
+        <Animated.Text style={{
+          fontSize: typography.base,
+          color: GOLD,
+          marginBottom: 40,
+          transform: [{ translateY: slideAnim }],
+          opacity: fadeAnim,
+        }}>
+          {"→"} {goalTitle}
+        </Animated.Text>
+
+        <Animated.View style={{ transform: [{ translateY: slideAnim }], opacity: fadeAnim }}>
+          <TouchableOpacity
+            onPress={onDismiss}
+            activeOpacity={0.85}
+            style={{
+              paddingHorizontal: 48,
+              paddingVertical: 16,
+              borderRadius: 14,
+              backgroundColor: GOLD,
+            }}
+          >
+            <Text style={{
+              fontSize: typography.md,
+              fontWeight: "700",
+              color: "#000",
+            }}>
+              See you tomorrow
+            </Text>
+          </TouchableOpacity>
+        </Animated.View>
+      </Animated.View>
+    </Modal>
+  );
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────────
 
 export default function DashboardScreen() {
   const router = useRouter();
@@ -145,38 +1164,36 @@ export default function DashboardScreen() {
   const [nickname, setNickname] = useState("");
   const [selectedGoal, setSelectedGoal] = useState("");
   const [dailyTimeMinutes, setDailyTimeMinutes] = useState(0);
-  const [goalPickerVisible, setGoalPickerVisible] = useState(false);
-  const [goalPickerShownToday, setGoalPickerShownToday] = useState(false);
-  // ─── Review state ──────────────────────────────────────────────────────────
-  const [reviewOpen, setReviewOpen] = useState(false);
-  const [reviewStep, setReviewStep] = useState<1 | 2>(1);
-  const [reviewDifficulty, setReviewDifficulty] = useState<DifficultyRating | null>(null);
-  const [reviewNote, setReviewNote] = useState("");
-  const [reviewSubmitting, setReviewSubmitting] = useState(false);
-  const [reviewDailyTaskId, setReviewDailyTaskId] = useState<string | null>(null);
-  const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
-  // ─── Insight state ─────────────────────────────────────────────────────────
-  const [insightText, setInsightText] = useState("");
-  const [showInsightCard, setShowInsightCard] = useState(false);
-  const [insightLoading, setInsightLoading] = useState(false);
-
+  // Gamification state
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [celebrationDismissed, setCelebrationDismissed] = useState(false);
+  const [animatingTaskId, setAnimatingTaskId] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"path" | "tasks">("path");
+  const [showTodayPopup, setShowTodayPopup] = useState(false);
+  const [midnightCountdown, setMidnightCountdown] = useState(getMidnightCountdown());
 
   // ─── Pro / trial state ────────────────────────────────────────────────────────
   const [showTutorial, setShowTutorial] = useState(false);
-  const [showGenLimit, setShowGenLimit] = useState(false);
   const { isLimitedMode, walkthroughActive, setWalkthroughActive, refreshSubscription } = useSubscription();
   const [showPaywall, setShowPaywall] = useState(false);
 
   const hasLoadedOnce = useRef(false);
   const hasAutoGenerated = useRef(false);
   const pendingSwitchGoal = useRef<string | null>(null);
-  const reviewShownForDate = useRef<string>("");
   const recentlyToggledRef = useRef<Set<string>>(new Set());
   const userIdRef = useRef<string>("");
   const [sortTrigger, setSortTrigger] = useState(0);
 
-  // Load nickname + email eagerly (outside loadData) so greeting never shows "there"
+  // Midnight countdown timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setMidnightCountdown(getMidnightCountdown());
+    }, 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Load nickname + email eagerly
   useEffect(() => {
     (async () => {
       const [saved, { data: sessionData }] = await Promise.all([
@@ -186,7 +1203,6 @@ export default function DashboardScreen() {
       if (saved) {
         setNickname(saved);
       } else {
-        // Fallback: check Supabase user metadata for name (e.g. from Apple Sign In)
         const meta = sessionData?.session?.user?.user_metadata;
         const metaName = meta?.display_name || meta?.full_name || meta?.name;
         if (metaName) {
@@ -214,7 +1230,7 @@ export default function DashboardScreen() {
       setGoalStats(statsRes.goalStats ?? []);
       if (profileRes.profile) setDailyTimeMinutes(profileRes.profile.dailyTimeMinutes);
 
-      // Check if any generate is in progress (user may have closed/backgrounded app)
+      // Check if any generate is in progress
       const todayStr = new Date().toISOString().slice(0, 10);
       const restGenFlag = await AsyncStorage.getItem(`@threely_restday_gen_${todayStr}`);
       const moreGenFlag = await AsyncStorage.getItem(`@threely_generating_${todayStr}`);
@@ -260,32 +1276,23 @@ export default function DashboardScreen() {
         setRestDay(tasksRes.restDay ?? false);
       }
 
-      // Restore saved focus: prefer server, fallback to AsyncStorage
+      // Restore saved focus
       const serverFocus = focusRes.focus?.focusGoalId;
       const restoredFocus = serverFocus ?? savedFocus;
       const activeGoalIds = new Set(goalsRes.goals.map(g => g.id));
       const isValidFocus = restoredFocus && activeGoalIds.has(restoredFocus);
       if (isValidFocus) {
         setSelectedGoal(restoredFocus);
-        setGoalPickerShownToday(true);
-        // Sync AsyncStorage with server
         if (serverFocus && !savedFocus) {
           await AsyncStorage.setItem(todayKey, serverFocus);
         }
       } else if (goalsRes.goals.length === 1) {
-        // Only one goal — auto-select it, no need to show picker
         setSelectedGoal(goalsRes.goals[0].id);
-        setGoalPickerShownToday(true);
       } else if (goalsRes.goals.length > 1) {
-        // Multiple goals, no valid focus — auto-open the focus picker on first visit
         setSelectedGoal(goalsRes.goals[0].id);
-        if (!hasLoadedOnce.current) {
-          setGoalPickerShownToday(false);
-        }
       }
 
       // Auto-generate tasks if none exist and user has goals
-      // Skip if already generating (polling in progress) or already auto-generated
       if (
         tasksRes.dailyTasks.length === 0 &&
         goalsRes.goals.length > 0 &&
@@ -319,10 +1326,9 @@ export default function DashboardScreen() {
         }
       }
 
-      // Apply pending goal switch from "View Tasks" in Goals tab (must happen after focus restoration)
+      // Apply pending goal switch
       if (pendingSwitchGoal.current) {
         setSelectedGoal(pendingSwitchGoal.current);
-        setGoalPickerShownToday(true);
         pendingSwitchGoal.current = null;
       }
     } catch (e) {
@@ -332,11 +1338,9 @@ export default function DashboardScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      // Check if we should switch to a specific goal (from Goals tab "View today's tasks")
       AsyncStorage.getItem("@threely_switch_goal").then((switchGoalId) => {
         if (switchGoalId) {
           AsyncStorage.removeItem("@threely_switch_goal");
-          // Set it AFTER loadData so it doesn't get overwritten by focus restoration
           pendingSwitchGoal.current = switchGoalId;
         }
       });
@@ -349,7 +1353,7 @@ export default function DashboardScreen() {
     }, [loadData])
   );
 
-  // Refetch when app comes to foreground (sync across devices)
+  // Refetch when app comes to foreground
   useEffect(() => {
     const sub = AppState.addEventListener("change", (state) => {
       if (state === "active" && hasLoadedOnce.current) loadData();
@@ -380,27 +1384,6 @@ export default function DashboardScreen() {
     if (goals.length >= 1 && !selectedGoal) setSelectedGoal(goals[0].id);
   }, [goals.length]);
 
-  // Auto-open focus picker on first visit of the day if no focus was set
-  useEffect(() => {
-    if (!loading && goals.length > 1 && !goalPickerShownToday) {
-      setGoalPickerVisible(true);
-    }
-  }, [loading, goals.length, goalPickerShownToday]);
-
-  // Open focus picker when navigating from Profile → "Change today's focus"
-  useFocusEffect(
-    useCallback(() => {
-      AsyncStorage.getItem("@threely_open_focus_picker").then((val) => {
-        if (val === "1") {
-          AsyncStorage.removeItem("@threely_open_focus_picker");
-          if (goals.length > 1) {
-            setGoalPickerVisible(true);
-          }
-        }
-      });
-    }, [goals.length])
-  );
-
   // Restart tutorial when triggered from Profile settings
   useFocusEffect(
     useCallback(() => {
@@ -420,7 +1403,7 @@ export default function DashboardScreen() {
     setRefreshing(false);
   }, [loadData]);
 
-  // During tutorial walkthrough, always use mock data for consistent spotlight targets
+  // During tutorial walkthrough, always use mock data
   const effectiveGoals = walkthroughActive ? [MOCK_TUTORIAL_GOAL] : goals;
   const effectiveDailyTasks = walkthroughActive ? [MOCK_TUTORIAL_DAILY_TASK] : dailyTasks;
   const effectiveSelectedGoal = walkthroughActive ? MOCK_TUTORIAL_GOAL.id : selectedGoal;
@@ -428,17 +1411,13 @@ export default function DashboardScreen() {
   // ─── Derived state ─────────────────────────────────────────────────────────
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _sort = sortTrigger; // subscribe to sort trigger for delayed reorder
+  const _sort = sortTrigger;
 
   const visibleTasks: DailyTask[] =
     effectiveDailyTasks.filter((dt) => dt.goalId === effectiveSelectedGoal);
 
-  const allTaskItems =
-    visibleTasks.flatMap((dt) => (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []));
-
   const displayVisibleTasks: DailyTask[] = visibleTasks.map((dt) => {
     const tasks = (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).slice(-3);
-    // Sort: incomplete first, completed last (recently toggled stay in place)
     const incomplete = tasks.filter(t => !t.isCompleted || recentlyToggledRef.current.has(t.id));
     const completed = tasks.filter(t => t.isCompleted && !recentlyToggledRef.current.has(t.id));
     return { ...dt, tasks: [...incomplete, ...completed] };
@@ -447,37 +1426,28 @@ export default function DashboardScreen() {
   const newTaskItems =
     displayVisibleTasks.flatMap((dt) => (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []));
 
-  const selectedLabel =
-    effectiveGoals.find((g) => g.id === effectiveSelectedGoal)?.title ?? "Select goal";
-
-  const hasAnyTasks = effectiveGoals.length > 0;
-
+  const currentGoalObj = effectiveGoals.find((g) => g.id === effectiveSelectedGoal);
   const hasVisibleTasks = visibleTasks.length > 0;
+  const allDone = newTaskItems.length > 0 && newTaskItems.every((t) => t.isCompleted || t.isSkipped);
 
-  const allDisplayedItems = newTaskItems;
-  const allDone = allDisplayedItems.length > 0 && allDisplayedItems.every((t) => t.isCompleted || t.isSkipped);
-  const completedCount = allDisplayedItems.filter((t) => t.isCompleted || t.isSkipped).length;
-  const totalCount = allDisplayedItems.length;
+  const streak = getStreakFromGoals(effectiveGoals);
+  const goalDayNumber = currentGoalObj ? getGoalDayNumber(currentGoalObj) : 1;
 
-  const totalEstimatedMinutes = (() => {
-    const displayed = displayVisibleTasks.flatMap(dt => Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []);
-    return displayed
-      .filter(t => !t.isCompleted && !t.isSkipped)
-      .reduce((sum, t) => sum + (t.estimated_minutes || 0), 0);
-  })();
+  // Task progress for progress ring (0-1)
+  const taskProgress = newTaskItems.length > 0
+    ? newTaskItems.filter(t => t.isCompleted || t.isSkipped).length / newTaskItems.length
+    : 0;
 
-  // Build notification context from current state
+  // Build notification context
   const buildNotifContext = useCallback((): NotifContext => {
     const focusGoalName = goals.find(g => g.id === selectedGoal)?.title ?? null;
     const incomplete = newTaskItems.filter(t => !t.isCompleted && !t.isSkipped);
 
-    // Count goals that are active today (not off-day)
     const activeGoalsToday = goals.filter(g => {
       const stat = goalStats.find(s => s.goalId === g.id);
       return isGoalWorkDay(stat?.workDays);
     });
 
-    // Total time across ALL active goals today (not just focused)
     const allIncompleteTasks = dailyTasks
       .filter(dt => activeGoalsToday.some(g => g.id === dt.goalId))
       .flatMap(dt => (dt.tasks as TaskItem[]).filter(t => !t.isCompleted && !t.isSkipped));
@@ -495,7 +1465,7 @@ export default function DashboardScreen() {
     };
   }, [selectedGoal, goals, newTaskItems, allDone, restDay, goalStats, dailyTasks]);
 
-  // Schedule notifications after data loads (debounced to avoid rapid re-scheduling)
+  // Schedule notifications after data loads
   useEffect(() => {
     if (!loading && goals.length > 0) {
       const timer = setTimeout(() => {
@@ -505,47 +1475,45 @@ export default function DashboardScreen() {
     }
   }, [loading, buildNotifContext, goals.length]);
 
-  // Track when all tasks become done
+  // Show celebration when all tasks just completed (only once per day)
   const prevAllDone = useRef(false);
-  const goalKey = selectedGoal ?? "none";
   useEffect(() => {
-    prevAllDone.current = allDone;
-  }, [allDone, newTaskItems.length]);
-
-  // Review is now triggered by "Give me more" button — no auto-open
-
-  // ─── Goal picker ───────────────────────────────────────────────────────────
-
-  async function persistFocus(val: string) {
-    if (Platform.OS !== "web") Haptics.selectionAsync();
-    setSelectedGoal(val);
-    setGoalPickerVisible(false);
-    setGoalPickerShownToday(true);
-    // Persist locally + server
-    const todayKey = `@threely_focus_${new Date().toISOString().slice(0, 10)}`;
-    await AsyncStorage.setItem(todayKey, val);
-    focusApi.save(val).catch(() => {});
-  }
-
-  function selectGoal(val: string) {
-    // Check if this is an off-day goal
-    const stat = goalStats.find(s => s.goalId === val);
-    if (stat && !isGoalWorkDay(stat.workDays)) {
-      const dayNames = formatWorkDaysList(stat.workDays);
-      Alert.alert(
-        "Off-Day Goal",
-        `This goal is scheduled for ${dayNames}. Would you like to work on it today?`,
-        [
-          { text: "Cancel", style: "cancel" },
-          { text: "Work on it", onPress: () => persistFocus(val) },
-        ]
-      );
-      return;
+    if (allDone && !prevAllDone.current && newTaskItems.length > 0 && !celebrationDismissed) {
+      // Check if celebration was already shown today
+      const todayStr = new Date().toISOString().slice(0, 10);
+      const celebKey = `@threely_celebration_${todayStr}_${effectiveSelectedGoal}`;
+      AsyncStorage.getItem(celebKey).then((shown) => {
+        if (!shown) {
+          setShowCelebration(true);
+          AsyncStorage.setItem(celebKey, "true");
+        } else {
+          setCelebrationDismissed(true);
+        }
+      });
     }
-    persistFocus(val);
-  }
+    prevAllDone.current = allDone;
+  }, [allDone, newTaskItems.length, celebrationDismissed, effectiveSelectedGoal]);
+
+  // When all done and celebration dismissed, switch back to path
+  useEffect(() => {
+    if (allDone && celebrationDismissed && viewMode === "tasks") {
+      setViewMode("path");
+    }
+  }, [allDone, celebrationDismissed, viewMode]);
 
   // ─── Handlers ──────────────────────────────────────────────────────────────
+
+  function selectGoalTab(goalId: string) {
+    if (Platform.OS !== "web") Haptics.selectionAsync();
+    setSelectedGoal(goalId);
+    setCelebrationDismissed(false);
+    setShowCelebration(false);
+    setViewMode("path");
+    // Persist locally + server
+    const todayKey = `@threely_focus_${new Date().toISOString().slice(0, 10)}`;
+    AsyncStorage.setItem(todayKey, goalId);
+    focusApi.save(goalId).catch(() => {});
+  }
 
   async function handleFirstGenerate() {
     if (goals.length === 0) {
@@ -583,41 +1551,10 @@ export default function DashboardScreen() {
     }
   }
 
-  function handleGiveMoreTasks() {
-    if (isLimitedMode) { setShowPaywall(true); return; }
-    if (!allDone) return;
-    // Pre-check: if tasks already have > 3 items, this goal already got extra tasks today
-    const dt = visibleTasks[0];
-    if (dt) {
-      const taskCount = Array.isArray(dt.tasks) ? (dt.tasks as unknown[]).length : 0;
-      if (taskCount > 3) {
-        setShowGenLimit(true);
-        return;
-      }
-    }
-    Alert.alert(
-      "Work Ahead?",
-      "We automatically create new tasks for you each day. Are you sure you want to generate more now?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Generate More",
-          onPress: () => {
-            if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            const targetDt = visibleTasks[0];
-            if (targetDt) {
-              setReviewDailyTaskId(targetDt.id);
-              setReviewOpen(true);
-            }
-          },
-        },
-      ]
-    );
-  }
-
   async function handleToggleTask(dailyTaskId: string, taskItemId: string, isCompleted: boolean) {
-    // Delay sort when completing (so user sees checkmark first); sort immediately when unchecking
     if (isCompleted) {
+      setAnimatingTaskId(taskItemId);
+      setTimeout(() => setAnimatingTaskId(null), 500);
       recentlyToggledRef.current.add(taskItemId);
       setTimeout(() => {
         recentlyToggledRef.current.delete(taskItemId);
@@ -630,7 +1567,6 @@ export default function DashboardScreen() {
       const res = await tasksApi.completeItem(dailyTaskId, taskItemId, isCompleted);
       const newDailyTasks = dailyTasks.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt));
       setDailyTasks(newDailyTasks);
-      // Update notifications after task completion
       if (isCompleted) {
         onTaskCompleted(buildNotifContext());
       }
@@ -639,148 +1575,7 @@ export default function DashboardScreen() {
     }
   }
 
-  async function handleRefineTask(dailyTaskId: string, taskItemId: string, userRequest: string) {
-    try {
-      const res = await tasksApi.refineItem(dailyTaskId, taskItemId, userRequest);
-      setDailyTasks((prev) =>
-        prev.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt))
-      );
-      showToast("Task refined by AI", "success");
-    } catch (e) {
-      if (e instanceof Error && e.message?.includes("pro_required")) {
-        setShowPaywall(true);
-      } else {
-        showToast("Couldn't refine task. Try again.", "error");
-      }
-    }
-  }
-
-  async function handleAskAboutTask(dailyTaskId: string, taskItemId: string, messages: { role: "user" | "assistant"; content: string }[]) {
-    try {
-      const res = await tasksApi.askAboutTask(dailyTaskId, taskItemId, messages);
-      return { answer: res.answer, options: res.options ?? [] };
-    } catch (e) {
-      if (e instanceof Error && e.message?.includes("pro_required")) {
-        setShowPaywall(true);
-        return { answer: "", options: [] };
-      }
-      throw e;
-    }
-  }
-
-  async function handleCompleteAll() {
-    const incompleteTasks = newTaskItems.filter((t) => !t.isCompleted);
-    if (incompleteTasks.length === 0) return;
-
-    try {
-      for (const task of incompleteTasks) {
-        // Find the dailyTaskId for this task
-        let dtId: string | undefined;
-        for (const dt of visibleTasks) {
-          const items = Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : [];
-          if (items.find((t) => t.id === task.id)) {
-            dtId = dt.id;
-            break;
-          }
-        }
-        if (dtId) {
-          const res = await tasksApi.completeItem(dtId, task.id, true);
-          setDailyTasks((prev) =>
-            prev.map((dt) => (dt.id === dtId ? res.dailyTask : dt))
-          );
-        }
-      }
-      // Clear any stale generation state so completed tasks show properly
-      setGenerating(false);
-      const genTodayStr = new Date().toISOString().slice(0, 10);
-      AsyncStorage.removeItem(`@threely_generating_${genTodayStr}`);
-    } catch {
-      showToast("Couldn't complete all tasks. Try again.", "error");
-    }
-  }
-
-  // ─── Review handlers ───────────────────────────────────────────────────────
-
-  function closeReview() {
-    setReviewOpen(false);
-    setReviewStep(1);
-    setReviewDifficulty(null);
-    setReviewNote("");
-  }
-
-  async function handleSubmitReview() {
-    if (!reviewDailyTaskId || !reviewDifficulty) return;
-    setReviewSubmitting(true);
-    try {
-      await reviewsApi.create({
-        dailyTaskId: reviewDailyTaskId,
-        difficultyRating: reviewDifficulty,
-        userNote: reviewNote.trim() || undefined,
-      });
-
-      closeReview();
-      setReviewSubmitted(true);
-
-      // Generate insight then auto-generate next tasks
-      setInsightLoading(true);
-      setShowInsightCard(true);
-      try {
-        const res = await insightsApi.generate(reviewDailyTaskId);
-        setInsightText(res.insight);
-      } catch {
-        setInsightText("Great work completing your tasks today! Keep the momentum going.");
-      } finally {
-        setInsightLoading(false);
-      }
-
-      // Auto-generate next tasks after review
-      setGenerating(true);
-      const genTodayStr = new Date().toISOString().slice(0, 10);
-      AsyncStorage.setItem(`@threely_generating_${genTodayStr}`, String(Date.now()));
-      try {
-        const res = await tasksApi.generate(selectedGoal || undefined, { requestingAdditional: true });
-        setDailyTasks((prev) => {
-          const updatedGoalIds = new Set(res.dailyTasks.map((dt) => dt.goalId));
-          return [
-            ...prev.filter((dt) => !updatedGoalIds.has(dt.goalId)),
-            ...res.dailyTasks,
-          ];
-        });
-        AsyncStorage.removeItem(`@threely_generating_${genTodayStr}`);
-        sendInstantNotification(
-          "Your next tasks are ready!",
-          "New tasks have been generated based on your review. Keep the momentum going!"
-        );
-      } catch (err: unknown) {
-        AsyncStorage.removeItem(`@threely_generating_${genTodayStr}`);
-        if (err instanceof Error && err.message?.includes("pro_required")) {
-          setShowPaywall(true);
-        } else if (err instanceof Error && err.message?.includes("generation_limit_reached")) {
-          setShowGenLimit(true);
-        }
-      } finally {
-        setGenerating(false);
-      }
-    } catch (e) {
-      Alert.alert("Error", e instanceof Error ? e.message : "Failed to save review");
-    } finally {
-      setReviewSubmitting(false);
-    }
-  }
-
-  function dismissInsight() {
-    setShowInsightCard(false);
-  }
-
   // ─── Render ────────────────────────────────────────────────────────────────
-
-  const today = new Date();
-  const rawName = nickname || (userEmail ? userEmail.split("@")[0] : "");
-  const firstNameRaw = rawName.split(/\s+/)[0] || "there";
-  const firstName = firstNameRaw.charAt(0).toUpperCase() + firstNameRaw.slice(1);
-
-  // Staggered entrance animations for task cards
-  const staggerAnims = useStaggeredEntrance(loading ? 0 : newTaskItems.length);
 
   const wideContentStyle = isWide ? { maxWidth: MAX_CONTENT_WIDTH, alignSelf: "center" as const, width: "100%" as const } : undefined;
 
@@ -790,17 +1585,12 @@ export default function DashboardScreen() {
         <View style={[styles.header, { paddingTop: insets.top }]}>
           <View style={[styles.headerRow, wideContentStyle]}>
             <View>
-              <Text style={styles.date}>{formatDate(today)}</Text>
-              <Text style={styles.greeting}>
-                Today
-              </Text>
+              <Text style={styles.streakText}>{"🔥"} --</Text>
             </View>
           </View>
         </View>
         <View style={[{ paddingHorizontal: spacing.lg, paddingTop: spacing.sm }, wideContentStyle]}>
-          <SkeletonCard />
-          <SkeletonCard />
-          <SkeletonCard />
+          <SkeletonPath screenWidth={screenWidth} />
         </View>
       </View>
     );
@@ -809,16 +1599,68 @@ export default function DashboardScreen() {
   return (
     <SwipeNavigator currentIndex={0}>
     <View style={styles.container}>
-      {/* Fixed header — outside ScrollView so it never hides under Dynamic Island */}
+      {/* Fixed header */}
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <View style={[styles.headerRow, wideContentStyle]}>
-          <View>
-            <Text style={styles.date}>{formatDate(today)}</Text>
-            <Text style={styles.greeting}>
-              {getGreeting()}, {firstName}
+          {/* Streak counter */}
+          <Text style={styles.streakText}>{"🔥"} {streak}</Text>
+
+          {/* Goal name (single goal) */}
+          {currentGoalObj && effectiveGoals.length === 1 && (
+            <Text style={styles.goalNameSingle} numberOfLines={1} ellipsizeMode="tail">
+              {currentGoalObj.title}
             </Text>
-          </View>
+          )}
         </View>
+
+        {/* Goal tab pills (multiple goals) */}
+        {effectiveGoals.length > 1 && (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={[styles.goalTabsContainer, wideContentStyle]}
+            style={{ marginTop: spacing.sm }}
+          >
+            {effectiveGoals.map(g => {
+              const isActive = g.id === effectiveSelectedGoal;
+              return (
+                <TouchableOpacity
+                  key={g.id}
+                  onPress={() => selectGoalTab(g.id)}
+                  activeOpacity={0.7}
+                  style={[
+                    styles.goalTab,
+                    isActive && styles.goalTabActive,
+                  ]}
+                >
+                  <Text style={[
+                    styles.goalTabText,
+                    isActive && styles.goalTabTextActive,
+                  ]} numberOfLines={1}>
+                    {g.title}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+            {/* Add goal button */}
+            <TouchableOpacity
+              onPress={() => {
+                if (effectiveGoals.length >= 3) {
+                  Alert.alert(
+                    "Focus beats hustle",
+                    "3 goals is the sweet spot. Finish or remove one to add another."
+                  );
+                } else {
+                  router.navigate("/(tabs)/goals");
+                }
+              }}
+              activeOpacity={0.7}
+              style={styles.goalTabAdd}
+            >
+              <Text style={styles.goalTabAddText}>+</Text>
+            </TouchableOpacity>
+          </ScrollView>
+        )}
       </View>
 
       <ScrollView
@@ -826,7 +1668,7 @@ export default function DashboardScreen() {
         contentContainerStyle={[styles.scroll, wideContentStyle]}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={GOLD} />
         }
       >
 
@@ -841,56 +1683,39 @@ export default function DashboardScreen() {
           </Pressable>
         )}
 
-        {/* Goal selector */}
-        {effectiveGoals.length > 0 && (
-          <View style={styles.selectorRow}>
-            <View style={styles.dropdown}>
-              <Text style={styles.dropdownLabel} numberOfLines={1} ellipsizeMode="tail">
-                {selectedLabel}
-              </Text>
-              {totalEstimatedMinutes > 0 && (
-                <View style={styles.taskTimeBadge}>
-                  <Text style={styles.taskTimeBadgeText}>
-                    {formatMinutes(totalEstimatedMinutes)}
-                  </Text>
-                </View>
-              )}
-            </View>
-            {effectiveGoals.length > 1 && (
-              <TouchableOpacity
-                style={styles.changePill}
-                onPress={() => setGoalPickerVisible(true)}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.changeText}>Change</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        )}
-
-        {/* Progress pill removed — no task progress indicators */}
-
-        {/* Complete All button removed — users check tasks off individually */}
-
-        {/* Insight card — shown after review submission */}
-
-        {/* Task sections */}
+        {/* ─── No goals: empty state ─── */}
         {effectiveGoals.length === 0 ? (
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>{""}</Text>
+            <Text style={{ fontSize: 48, marginBottom: spacing.md }}>{"🚀"}</Text>
             <Text style={styles.emptyTitle}>Get started</Text>
             <Text style={styles.emptySubtitle}>
               Create your first goal and we'll generate daily tasks to help you achieve it.
             </Text>
-            <Button
-              title="Create your first goal"
+            <TouchableOpacity
               onPress={() => router.navigate("/(tabs)/goals")}
-              style={styles.generateBtn}
-            />
+              activeOpacity={0.85}
+              style={{
+                backgroundColor: GOLD,
+                paddingHorizontal: 32,
+                paddingVertical: 14,
+                borderRadius: 14,
+                width: "100%",
+                alignItems: "center",
+              }}
+            >
+              <Text style={{
+                fontSize: typography.md,
+                fontWeight: "700",
+                color: "#000",
+              }}>
+                Create your first goal {"→"}
+              </Text>
+            </TouchableOpacity>
           </View>
         ) : restDay && !generating ? (
+          /* Rest day */
           <View style={styles.empty}>
-            <Text style={styles.emptyIcon}>{""}</Text>
+            <Text style={{ fontSize: 48, marginBottom: spacing.md }}>{"😴"}</Text>
             <Text style={styles.emptyTitle}>No goals scheduled for today</Text>
             <Text style={styles.emptySubtitle}>
               Enjoy your rest day — or keep the momentum going!
@@ -928,19 +1753,21 @@ export default function DashboardScreen() {
             </TouchableOpacity>
           </View>
         ) : generating && !hasVisibleTasks ? (
+          /* Generating skeleton */
           <View style={{ alignItems: "center", paddingVertical: spacing.xl * 2, paddingHorizontal: spacing.lg }}>
             <Text style={{ fontSize: 36, marginBottom: spacing.md }}>{"\u2726"}</Text>
             <Text style={{ fontSize: typography.lg, fontWeight: "700", color: colors.text, textAlign: "center", marginBottom: spacing.sm }}>
               Your tasks are being generated...
             </Text>
             <View style={{ width: "70%", maxWidth: 300, height: 5, backgroundColor: colors.border, borderRadius: 3, marginBottom: spacing.md, overflow: "hidden" }}>
-              <View style={{ height: "100%", width: "60%", backgroundColor: colors.primary, borderRadius: 3 }} />
+              <View style={{ height: "100%", width: "60%", backgroundColor: GOLD, borderRadius: 3 }} />
             </View>
             <Text style={{ textAlign: "center", fontSize: typography.sm, color: colors.textSecondary, lineHeight: 20 }}>
               This can take up to 30 seconds.{"\n"}We'll notify you when ready.
             </Text>
           </View>
         ) : !hasVisibleTasks ? (
+          /* No tasks for today */
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>No tasks for today</Text>
             <Text style={styles.emptySubtitle}>
@@ -959,75 +1786,125 @@ export default function DashboardScreen() {
               </Text>
             )}
           </View>
-        ) : (
+        ) : viewMode === "path" ? (
+          /* ═══ PATH VIEW ═══ */
           <>
-            {/* Get more tasks — above task cards */}
-            <View ref={r => register("get-more-button", r)} collapsable={false}>
-              {allDone ? (
-                <TouchableOpacity
-                  style={styles.getMoreBar}
-                  onPress={handleGiveMoreTasks}
-                  disabled={generating}
-                  activeOpacity={0.85}
-                >
-                  {generating ? (
-                    <ActivityIndicator color={colors.primaryText} size="small" />
-                  ) : (
-                    <Text style={styles.getMoreTitle}>Get more tasks</Text>
-                  )}
-                </TouchableOpacity>
-              ) : (
-                <View style={styles.getMoreBarLocked}>
-                  <Text style={styles.getMoreTitleLocked}>Complete all tasks to unlock more</Text>
+            {/* All done state above path */}
+            {allDone && celebrationDismissed && (
+              <View style={styles.allDoneContainer}>
+                <Text style={styles.allDoneCheck}>{"✓"}</Text>
+                <Text style={styles.allDoneTitle}>All done for today</Text>
+                <Text style={styles.allDoneMessage}>{getCompletionMessage(goalDayNumber)}</Text>
+                <View style={styles.countdownContainer}>
+                  <Text style={styles.countdownText}>Next day unlocks in {midnightCountdown}</Text>
                 </View>
-              )}
+              </View>
+            )}
+
+            {/* S-curve path */}
+            <SCurvePathView
+              goalDayNumber={goalDayNumber}
+              allDone={allDone && celebrationDismissed}
+              onTapToday={() => {
+                if (allDone && celebrationDismissed) return;
+                if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                setShowTodayPopup(true);
+              }}
+              onTapWorkAhead={() => {
+                Alert.alert(
+                  "Work Ahead",
+                  "We recommend doing one day's work per day. Want to work ahead?",
+                  [
+                    { text: "I'll wait", style: "cancel" },
+                    {
+                      text: "Work ahead",
+                      onPress: () => {
+                        setViewMode("tasks");
+                      },
+                    },
+                  ]
+                );
+              }}
+              onTapLocked={(day) => {
+                Alert.alert("Locked", "Complete the previous day first.");
+              }}
+              colors={colors}
+              screenWidth={screenWidth}
+              taskProgress={taskProgress}
+            />
+          </>
+        ) : (
+          /* ═══ TASK VIEW ═══ */
+          <>
+            {/* Back to path */}
+            <TouchableOpacity
+              onPress={() => {
+                if (Platform.OS !== "web") Haptics.selectionAsync();
+                setViewMode("path");
+              }}
+              activeOpacity={0.7}
+              style={styles.backButton}
+            >
+              <Text style={styles.backButtonText}>{"←"} Back to path</Text>
+            </TouchableOpacity>
+
+            {/* Day heading */}
+            <View style={styles.dayLabelContainer}>
+              <Text style={styles.dayLabel}>Day {goalDayNumber}</Text>
             </View>
 
-            {(() => {
-              let globalTaskIdx = 0;
-              return displayVisibleTasks.map((dt) => {
-                let taskIdx = 0;
-                return (
-                  <View key={dt.id} style={styles.section}>
-                    {(Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).map((task) => {
-                      const animIdx = taskIdx++;
-                      const isFirst = globalTaskIdx === 0;
-                      globalTaskIdx++;
-                      const card = (
-                        <TaskCard
+            {/* All done state */}
+            {allDone && celebrationDismissed ? (
+              <View style={styles.allDoneContainer}>
+                <Text style={styles.allDoneCheck}>{"✓"}</Text>
+                <Text style={styles.allDoneTitle}>All done for today</Text>
+                <Text style={styles.allDoneMessage}>{getCompletionMessage(goalDayNumber)}</Text>
+                <View style={styles.countdownContainer}>
+                  <Text style={styles.countdownText}>Next day unlocks in {midnightCountdown}</Text>
+                </View>
+              </View>
+            ) : (
+              /* Task cards */
+              <>
+                {displayVisibleTasks.map((dt) => (
+                  <View key={dt.id} style={{ marginBottom: 0 }}>
+                    {(Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).map((task) => (
+                      <View
+                        key={task.id}
+                        ref={newTaskItems.indexOf(task) === 0 ? r => register("first-task-card", r) : undefined}
+                        collapsable={false}
+                        style={{ marginBottom: spacing.sm + 4 }}
+                      >
+                        <GamifiedTaskCard
                           task={task}
                           onToggle={(isCompleted) =>
                             handleToggleTask(dt.id, task.id, isCompleted)
                           }
-                          onRefine={(userRequest) => handleRefineTask(dt.id, task.id, userRequest)}
-                          onAsk={(messages) => handleAskAboutTask(dt.id, task.id, messages)}
-                          paywalled={isLimitedMode}
-                          onShowPaywall={() => setShowPaywall(true)}
+                          colors={colors}
+                          isAnimating={animatingTaskId === task.id}
                         />
-                      );
-                      return (
-                        <Animated.View
-                          key={task.id}
-                          style={staggerAnims[animIdx] ? {
-                            opacity: staggerAnims[animIdx],
-                            transform: [{ translateY: staggerAnims[animIdx].interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }],
-                          } : undefined}
-                        >
-                          {isFirst ? (
-                            <View ref={r => register("first-task-card", r)} collapsable={false}>
-                              {card}
-                            </View>
-                          ) : card}
-                        </Animated.View>
-                      );
-                    })}
+                      </View>
+                    ))}
                   </View>
-                );
-              });
-            })()}
+                ))}
+              </>
+            )}
           </>
         )}
       </ScrollView>
+
+      {/* ── Today popup ─────────────────────────────────────────────────────── */}
+      <TodayPopup
+        visible={showTodayPopup}
+        dayNumber={goalDayNumber}
+        taskCount={newTaskItems.length}
+        onStart={() => {
+          setShowTodayPopup(false);
+          setViewMode("tasks");
+        }}
+        onDismiss={() => setShowTodayPopup(false)}
+        colors={colors}
+      />
 
       {/* ── Rest day goal picker ────────────────────────────────────────────── */}
       <Modal visible={restDayPickerOpen} transparent animationType="fade">
@@ -1094,250 +1971,18 @@ export default function DashboardScreen() {
         </Pressable>
       </Modal>
 
-      {/* ── Review bottom sheet ─────────────────────────────────────────────── */}
-      {reviewOpen && (
-        <KeyboardAvoidingView
-          style={styles.historyOverlay}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-        >
-          <View style={{ flex: 1 }} />
-          <View style={styles.reviewSheet}>
-
-            <View style={{ alignItems: "center", paddingVertical: 8 }}>
-              <View style={styles.historyHandle} />
-            </View>
-
-            <View style={styles.reviewHeaderRow}>
-              <Text style={styles.reviewTitle}>Daily Review</Text>
-              <TouchableOpacity
-                onPress={closeReview}
-                hitSlop={12}
-                style={{ position: "absolute", right: 0, top: 0, padding: 4 }}
-              >
-                <Text style={{ fontSize: 20, color: colors.textSecondary, fontWeight: "600" }}>✕</Text>
-              </TouchableOpacity>
-            </View>
-
-            {reviewStep === 1 && (
-              <>
-                <Text style={styles.reviewQuestion}>How did the difficulty feel?</Text>
-                <View style={styles.reviewChips}>
-                  {DIFFICULTY_OPTIONS.map((opt) => (
-                    <TouchableOpacity
-                      key={opt.value}
-                      style={[
-                        styles.reviewChip,
-                        reviewDifficulty === opt.value && styles.reviewChipSelected,
-                      ]}
-                      onPress={() => {
-                        if (Platform.OS !== "web") Haptics.selectionAsync();
-                        setReviewDifficulty(opt.value);
-                      }}
-                      activeOpacity={0.75}
-                    >
-                      <Text style={styles.reviewChipEmoji}>{opt.emoji}</Text>
-                      <Text
-                        style={[
-                          styles.reviewChipLabel,
-                          reviewDifficulty === opt.value && styles.reviewChipLabelSelected,
-                        ]}
-                      >
-                        {opt.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                <TouchableOpacity
-                  style={[
-                    styles.reviewNextBtn,
-                    !reviewDifficulty && styles.reviewNextBtnDisabled,
-                  ]}
-                  onPress={() => reviewDifficulty && setReviewStep(2)}
-                  activeOpacity={reviewDifficulty ? 0.85 : 1}
-                >
-                  <Text
-                    style={[
-                      styles.reviewNextBtnText,
-                      !reviewDifficulty && styles.reviewNextBtnTextDisabled,
-                    ]}
-                  >
-                    Next
-                  </Text>
-                </TouchableOpacity>
-              </>
-            )}
-
-            {reviewStep === 2 && (
-              <>
-                <Text style={styles.reviewQuestion}>Anything we should know for tomorrow?</Text>
-                <TextInput
-                  style={styles.reviewNoteInput}
-                  placeholder="Optional — obstacles, wins, changes in your life…"
-                  placeholderTextColor={colors.textTertiary}
-                  value={reviewNote}
-                  onChangeText={setReviewNote}
-                  multiline
-                  numberOfLines={3}
-                  textAlignVertical="top"
-                />
-                <TouchableOpacity
-                  style={[styles.reviewNextBtn, reviewSubmitting && styles.reviewNextBtnDisabled]}
-                  onPress={handleSubmitReview}
-                  activeOpacity={reviewSubmitting ? 1 : 0.85}
-                  disabled={reviewSubmitting}
-                >
-                  {reviewSubmitting ? (
-                    <ActivityIndicator color={colors.primaryText} size="small" />
-                  ) : (
-                    <Text style={styles.reviewNextBtnText}>Submit review</Text>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.reviewSkipBtn}
-                  onPress={handleSubmitReview}
-                  disabled={reviewSubmitting}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.reviewSkipText}>Skip note and submit</Text>
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
-        </KeyboardAvoidingView>
-      )}
-
-      {/* Goal picker popup */}
-      <Modal
-        visible={goalPickerVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setGoalPickerVisible(false)}
-      >
-        <Pressable style={styles.modalOverlay} onPress={() => setGoalPickerVisible(false)}>
-          <Pressable style={styles.pickerCard} onPress={() => {}}>
-            <Text style={styles.pickerTitle}>What are you working on today?</Text>
-            <Text style={styles.pickerSubtitle}>Pick a goal to focus on</Text>
-            {goals.map((goal) => {
-              const isSelected = selectedGoal === goal.id;
-              const stat = goalStats.find(s => s.goalId === goal.id);
-              const days = daysSince(stat?.lastWorkedAt ?? null);
-              const staleColor = days === null ? colors.textTertiary
-                : days < 7 ? colors.success
-                : days < 14 ? colors.warning
-                : colors.danger;
-              const offDay = stat ? !isGoalWorkDay(stat.workDays) : false;
-              // Calculate remaining time from incomplete tasks for this goal
-              const goalDt = dailyTasks.find(dt => dt.goalId === goal.id);
-              const goalItems = goalDt && Array.isArray(goalDt.tasks) ? (goalDt.tasks as unknown as TaskItem[]) : [];
-              const remainingMin = goalItems.filter(t => !t.isCompleted).reduce((s, t) => s + (t.estimated_minutes || 0), 0);
-              // Show remaining time if tasks exist, otherwise fall back to daily budget
-              const displayTime = goalItems.length > 0 ? remainingMin : (goal.dailyTimeMinutes ?? 0);
-              const timeLabel = goalItems.length > 0 ? formatMinutes(remainingMin) : (goal.dailyTimeMinutes ? `~${formatMinutes(goal.dailyTimeMinutes)}/day` : null);
-              return (
-                <TouchableOpacity
-                  key={goal.id}
-                  style={[styles.menuItem, isSelected && styles.menuItemSelected, { flexDirection: "column", alignItems: "stretch", opacity: offDay && !isSelected ? 0.5 : 1 }]}
-                  onPress={() => selectGoal(goal.id)}
-                  activeOpacity={0.7}
-                >
-                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
-                    <Text
-                      style={[styles.menuItemText, isSelected && styles.menuItemTextSelected, offDay && !isSelected && { color: colors.textTertiary }, { flex: 1 }]}
-                      numberOfLines={2}
-                      ellipsizeMode="tail"
-                    >
-                      {goal.title}
-                    </Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 6, flexShrink: 0 }}>
-                      {isSelected && <Text style={styles.menuCheck}>✓</Text>}
-                    </View>
-                  </View>
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 6, marginTop: 6, flexWrap: "wrap" }}>
-                    <Text style={[styles.menuStaleness, { color: staleColor, marginTop: 0 }]}>
-                      {stalenessLabel(days)}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
-          </Pressable>
-        </Pressable>
-      </Modal>
-      {/* ── Generation limit modal ────────────────────────────────────────── */}
-      <Modal visible={showGenLimit} transparent animationType="fade">
-        <Pressable style={styles.welcomeOverlay} onPress={() => setShowGenLimit(false)}>
-          <Pressable style={[styles.welcomeBox, { alignItems: "flex-start" }]} onPress={() => {}}>
-            <Text style={{ fontSize: 32, textAlign: "center", alignSelf: "center", marginBottom: spacing.md }}>{""}</Text>
-            <Text style={[styles.welcomeTitle, { textAlign: "center", alignSelf: "center", color: colors.text }]}>You're on a roll!</Text>
-            <Text style={[styles.welcomeSubtitle, { textAlign: "center", alignSelf: "center" }]}>
-              You've already gotten extra tasks for this goal today. Instead of generating more, try these:
-            </Text>
-
-            <Text style={{ fontSize: typography.base, fontWeight: typography.bold, color: colors.text, marginBottom: 6 }}>
-              Refine a task
-            </Text>
-            <Text style={{ fontSize: typography.sm, color: colors.textSecondary, lineHeight: 20, marginBottom: spacing.md }}>
-              Tap on any task to open it, then hit the{" "}
-              <Text style={{ fontWeight: typography.bold, color: colors.primary }}>Refine</Text>
-              {" "}button and tell the AI what to change. Need it harder? Shorter? More specific? Just ask.
-            </Text>
-
-            <Text style={{ fontSize: typography.base, fontWeight: typography.bold, color: colors.text, marginBottom: 6 }}>
-              ⚙ Adjust your plan
-            </Text>
-            <Text style={{ fontSize: typography.sm, color: colors.textSecondary, lineHeight: 20, marginBottom: spacing.lg }}>
-              Increase your daily time or intensity in goal settings for automatically tougher, more in-depth tasks tomorrow.
-            </Text>
-
-            <View style={{ flexDirection: "row", gap: spacing.sm, width: "100%" }}>
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  height: 48,
-                  borderRadius: radius.lg,
-                  borderWidth: 1.5,
-                  borderColor: colors.primary,
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-                onPress={() => {
-                  setShowGenLimit(false);
-                  router.push("/(tabs)/goals" as never);
-                }}
-                activeOpacity={0.85}
-              >
-                <Text style={{ fontSize: typography.sm, fontWeight: typography.bold, color: colors.primary }}>Adjust my plan</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{
-                  flex: 1,
-                  height: 48,
-                  backgroundColor: colors.primary,
-                  borderRadius: radius.lg,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  ...shadow.sm,
-                }}
-                onPress={() => setShowGenLimit(false)}
-                activeOpacity={0.85}
-              >
-                <Text style={{ fontSize: typography.sm, fontWeight: typography.bold, color: colors.primaryText }}>Got it</Text>
-              </TouchableOpacity>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
-      {/* ── App tutorial walkthrough ──────────────────────────────────────── */}
-      <AppTutorial
-        visible={showTutorial}
-        onComplete={async () => {
-          setShowTutorial(false);
-          setWalkthroughActive(false);
-          if (userIdRef.current) {
-            await AsyncStorage.setItem(`@threely_tutorial_done_${userIdRef.current}`, "true");
-          }
+      {/* ── Celebration overlay ─────────────────────────────────────────────── */}
+      <CelebrationOverlay
+        visible={showCelebration}
+        dayNumber={goalDayNumber}
+        goalTitle={currentGoalObj?.title ?? ""}
+        onDismiss={() => {
+          setShowCelebration(false);
+          setCelebrationDismissed(true);
         }}
+        colors={colors}
       />
+
       <Paywall visible={showPaywall} onDismiss={() => { setShowPaywall(false); refreshSubscription(); }} />
     </View>
     </SwipeNavigator>
@@ -1347,7 +1992,6 @@ export default function DashboardScreen() {
 function createStyles(c: Colors) {
   return StyleSheet.create({
     container: { flex: 1, backgroundColor: c.bg },
-    center: { alignItems: "center", justifyContent: "center" },
     scroll: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: spacing.xxl },
     header: {
       paddingHorizontal: spacing.lg,
@@ -1357,163 +2001,126 @@ function createStyles(c: Colors) {
     headerRow: {
       flexDirection: "row",
       justifyContent: "space-between",
-      alignItems: "flex-end",
+      alignItems: "center",
       paddingTop: spacing.sm,
     },
-    date: {
-      fontSize: typography.sm,
-      fontWeight: typography.medium,
-      color: c.textTertiary,
-      textTransform: "uppercase",
-      letterSpacing: 0.8,
-      marginBottom: spacing.xs,
+    streakText: {
+      fontSize: typography.xxl,
+      fontWeight: "800",
+      color: GOLD,
+      letterSpacing: -0.5,
     },
-    greeting: {
-      fontSize: typography.xxxl,
-      fontWeight: typography.bold,
-      color: c.text,
-      letterSpacing: -0.8,
-      lineHeight: 42,
-    },
-    selectorRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: spacing.sm,
-      marginBottom: spacing.md,
-    },
-    dropdown: {
-      flex: 1,
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: c.card,
-      borderRadius: radius.md,
-      borderWidth: 1,
-      borderColor: c.border,
-      paddingHorizontal: spacing.md,
-      paddingVertical: 10,
-      gap: spacing.xs,
-      ...shadow.sm,
-    },
-    dropdownLabel: {
-      flex: 1,
+    goalNameSingle: {
       fontSize: typography.base,
-      fontWeight: typography.semibold,
-      color: c.text,
+      fontWeight: "600",
+      color: c.textSecondary,
+      maxWidth: "55%",
+      textAlign: "right",
     },
-    chevron: {
-      fontSize: 18,
-      color: c.textTertiary,
-      transform: [{ rotate: "90deg" }],
-      lineHeight: 20,
+    // Goal tab pills
+    goalTabsContainer: {
+      flexDirection: "row",
+      gap: spacing.sm,
+      paddingBottom: 4,
     },
-    taskTimeBadge: {
-      backgroundColor: c.primaryLight,
-      borderRadius: radius.full,
-      paddingHorizontal: 8,
-      paddingVertical: 2,
-      flexShrink: 0,
-    },
-    taskTimeBadgeText: {
-      fontSize: typography.xs,
-      fontWeight: typography.semibold,
-      color: c.primary,
-    },
-    dailyTimePill: {
-      backgroundColor: c.card,
-      borderRadius: radius.full,
-      paddingHorizontal: spacing.sm,
-      paddingVertical: 6,
-      borderWidth: 1,
+    goalTab: {
+      paddingHorizontal: 18,
+      paddingVertical: 8,
+      borderRadius: 9999,
+      borderWidth: 1.5,
       borderColor: c.border,
-      flexShrink: 0,
     },
-    dailyTimePillText: {
-      fontSize: typography.xs,
-      fontWeight: typography.semibold,
+    goalTabActive: {
+      borderColor: GOLD,
+      borderWidth: 2,
+      backgroundColor: "rgba(212,168,67,0.1)",
+    },
+    goalTabText: {
+      fontSize: typography.sm,
+      fontWeight: "500",
       color: c.textSecondary,
     },
-    changePill: {
-      backgroundColor: c.primaryLight,
-      borderRadius: radius.full,
-      paddingHorizontal: spacing.md,
-      paddingVertical: 10,
-      borderWidth: 1,
-      borderColor: c.primary + "33",
+    goalTabTextActive: {
+      fontWeight: "700",
+      color: GOLD,
     },
-    changeText: {
-      fontSize: typography.sm,
-      fontWeight: typography.semibold,
-      color: c.primary,
-    },
-    progressPill: {
-      backgroundColor: c.card,
-      borderRadius: 50,
+    goalTabAdd: {
+      width: 36,
       height: 36,
-      marginBottom: spacing.lg,
-      overflow: "hidden",
-      justifyContent: "center",
-      borderWidth: 1,
-      borderColor: c.border,
-    },
-    progressBar: {
-      position: "absolute",
-      left: 0,
-      top: 0,
-      bottom: 0,
-      backgroundColor: c.primaryLight,
-      borderRadius: 50,
-    },
-    progressText: {
-      textAlign: "center",
-      fontSize: typography.sm,
-      fontWeight: typography.semibold,
-      color: c.text,
-    },
-    // ── Insight card ────────────────────────────────────────────────────────
-    insightCard: {
-      backgroundColor: c.primaryLight,
-      borderRadius: radius.xl,
+      borderRadius: 9999,
       borderWidth: 1.5,
-      borderColor: c.primary + "44",
-      padding: spacing.md,
-      marginBottom: spacing.lg,
-      gap: spacing.sm,
-    },
-    insightHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: spacing.sm,
-    },
-    insightIcon: {
-      fontSize: 16,
-      color: c.primary,
-    },
-    insightTitle: {
-      fontSize: typography.sm,
-      fontWeight: typography.semibold,
-      color: c.primary,
-      textTransform: "uppercase",
-      letterSpacing: 0.6,
-    },
-    insightText: {
-      fontSize: typography.base,
-      color: c.text,
-      lineHeight: 22,
-    },
-    insightBtn: {
-      backgroundColor: c.primary,
-      borderRadius: radius.md,
-      height: 44,
+      borderColor: c.border,
       alignItems: "center",
       justifyContent: "center",
-      marginTop: spacing.xs,
-      ...shadow.sm,
     },
-    insightBtnText: {
+    goalTabAddText: {
+      fontSize: 18,
+      color: c.textTertiary,
+      fontWeight: "400",
+    },
+    // Back button
+    backButton: {
+      paddingVertical: spacing.sm,
+      marginBottom: spacing.sm,
+    },
+    backButtonText: {
+      fontSize: typography.base,
+      fontWeight: "600",
+      color: GOLD,
+    },
+    // Day label
+    dayLabelContainer: {
+      alignItems: "center",
+      marginBottom: spacing.lg + 4,
+      marginTop: spacing.sm,
+    },
+    dayLabel: {
+      fontSize: typography.xxxl + 4,
+      fontWeight: "800",
+      color: c.text,
+      letterSpacing: -1,
+    },
+    // All done state
+    allDoneContainer: {
+      alignItems: "center",
+      paddingVertical: spacing.xxl,
+    },
+    allDoneCheck: {
+      fontSize: typography.xxxl,
+      color: GOLD,
+      marginBottom: spacing.md,
+    },
+    allDoneTitle: {
+      fontSize: typography.xl,
+      fontWeight: "700",
+      color: c.text,
+      marginBottom: spacing.sm,
+      letterSpacing: -0.3,
+    },
+    allDoneMessage: {
+      fontSize: typography.base,
+      color: c.textSecondary,
+      textAlign: "center",
+      lineHeight: 22,
+      paddingHorizontal: spacing.lg,
+    },
+    // Midnight countdown
+    countdownContainer: {
+      marginTop: spacing.md,
+      paddingHorizontal: spacing.lg,
+      paddingVertical: spacing.sm,
+      borderRadius: radius.lg,
+      backgroundColor: "rgba(212,168,67,0.1)",
+      borderWidth: 1,
+      borderColor: "rgba(212,168,67,0.25)",
+    },
+    countdownText: {
       fontSize: typography.sm,
-      fontWeight: typography.bold,
-      color: c.primaryText,
+      fontWeight: "600",
+      color: GOLD,
+      textAlign: "center",
     },
+    // Common styles
     primaryBtn: {
       backgroundColor: c.primary,
       borderRadius: radius.lg,
@@ -1526,9 +2133,7 @@ function createStyles(c: Colors) {
       fontWeight: typography.bold,
       color: c.primaryText,
     },
-    section: { marginBottom: 0 },
     empty: { alignItems: "center", paddingVertical: spacing.xxl },
-    emptyIcon: { fontSize: 40, marginBottom: spacing.md, color: c.primary },
     emptyTitle: {
       fontSize: typography.lg,
       fontWeight: typography.bold,
@@ -1544,406 +2149,7 @@ function createStyles(c: Colors) {
       marginBottom: spacing.xl,
     },
     generateBtn: { width: "100%" },
-    // Get more tasks — unlocked (all tasks done)
-    getMoreBar: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      height: 52,
-      paddingHorizontal: spacing.xl,
-      borderRadius: radius.full,
-      backgroundColor: c.primary,
-      marginBottom: spacing.lg,
-      ...shadow.md,
-    },
-    getMoreTitle: {
-      fontSize: typography.base,
-      fontWeight: typography.bold,
-      color: c.primaryText,
-      letterSpacing: -0.3,
-    },
-    // Get more tasks — locked
-    getMoreBarLocked: {
-      alignItems: "center",
-      justifyContent: "center",
-      paddingVertical: spacing.md,
-      paddingHorizontal: spacing.lg,
-      marginBottom: spacing.md,
-    },
-    getMoreTitleLocked: {
-      fontSize: typography.sm,
-      fontWeight: typography.medium,
-      color: c.textTertiary,
-      textAlign: "center",
-    },
-    getMoreSubtitleLocked: {
-      fontSize: typography.xs,
-      color: c.textTertiary,
-      marginTop: 2,
-      textAlign: "center",
-    },
-    reviewPromptBtn: {
-      paddingVertical: spacing.sm,
-    },
-    reviewPromptText: {
-      fontSize: typography.sm,
-      color: c.primary,
-      fontWeight: typography.medium,
-      textDecorationLine: "underline",
-    },
-    // ── Goal picker modal ────────────────────────────────────────────────────
-    modalOverlay: {
-      ...StyleSheet.absoluteFillObject,
-      backgroundColor: c.overlay,
-      justifyContent: "center",
-      alignItems: "center",
-      paddingHorizontal: spacing.lg,
-    },
-    pickerCard: {
-      width: "100%",
-      maxWidth: 500,
-      backgroundColor: c.card,
-      borderRadius: radius.xl,
-      padding: spacing.lg,
-      ...shadow.lg,
-    },
-    pickerTitle: {
-      fontSize: typography.xl,
-      fontWeight: typography.bold,
-      color: c.text,
-      letterSpacing: -0.3,
-      marginBottom: 4,
-    },
-    pickerSubtitle: {
-      fontSize: typography.sm,
-      color: c.textSecondary,
-      marginBottom: spacing.lg,
-    },
-    menuHeader: {
-      fontSize: typography.xs,
-      fontWeight: typography.semibold,
-      color: c.textTertiary,
-      textTransform: "uppercase",
-      letterSpacing: 0.8,
-      paddingHorizontal: spacing.md,
-      paddingTop: spacing.md,
-      paddingBottom: spacing.sm,
-    },
-    menuItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      paddingHorizontal: spacing.md,
-      paddingVertical: 16,
-      borderRadius: radius.md,
-      marginBottom: 4,
-    },
-    menuItemSelected: { backgroundColor: c.primaryLight },
-    menuItemText: {
-      flex: 1,
-      fontSize: typography.base,
-      fontWeight: typography.medium,
-      color: c.text,
-    },
-    menuItemTextSelected: { color: c.primary, fontWeight: typography.semibold },
-    menuItemRight: { flexDirection: "row", alignItems: "center", gap: spacing.xs, flexShrink: 0 },
-    menuNoTasksBadge: {
-      fontSize: typography.xs,
-      color: c.textTertiary,
-      backgroundColor: c.bg,
-      borderRadius: radius.full,
-      paddingHorizontal: 8,
-      paddingVertical: 2,
-      overflow: "hidden",
-    },
-    menuTimeBadge: {
-      backgroundColor: c.primaryLight,
-      borderRadius: radius.full,
-      paddingHorizontal: 8,
-      paddingVertical: 2,
-      flexShrink: 0,
-    },
-    menuTimeBadgeText: {
-      fontSize: typography.xs,
-      fontWeight: typography.semibold,
-      color: c.primary,
-    },
-    menuCheck: { fontSize: typography.base, color: c.primary, fontWeight: typography.bold },
-    menuStaleness: {
-      fontSize: typography.xs,
-      fontWeight: typography.medium,
-      marginTop: 2,
-    },
-    menuDivider: { height: 1, backgroundColor: c.border, marginHorizontal: spacing.md },
-    // ── Catch up on more button ─────────────────────────────────────────────
-    catchUpBtn: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: spacing.sm,
-      width: "100%",
-      height: 44,
-      borderRadius: radius.md,
-      borderWidth: 1.5,
-      borderColor: c.warning,
-      backgroundColor: c.warningLight,
-      marginTop: spacing.xs,
-      marginBottom: spacing.xs,
-    },
-    catchUpIcon: { fontSize: 14 },
-    catchUpText: {
-      fontSize: typography.sm,
-      fontWeight: typography.semibold,
-      color: c.warning,
-      letterSpacing: -0.2,
-    },
-    // ── Review sheet ─────────────────────────────────────────────────────────
-    historyOverlay: {
-      ...StyleSheet.absoluteFillObject,
-      backgroundColor: c.overlay,
-      justifyContent: "flex-end",
-    },
-    reviewSheet: {
-      backgroundColor: c.card,
-      borderTopLeftRadius: radius.xl,
-      borderTopRightRadius: radius.xl,
-      padding: spacing.lg,
-      paddingBottom: spacing.xxl,
-      maxWidth: 600,
-      alignSelf: "center" as const,
-      width: "100%",
-      ...shadow.lg,
-    },
-    reviewHeaderRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: spacing.lg,
-    },
-    reviewTitle: {
-      fontSize: typography.lg,
-      fontWeight: typography.bold,
-      color: c.text,
-      letterSpacing: -0.3,
-    },
-    reviewQuestion: {
-      fontSize: typography.base,
-      fontWeight: typography.semibold,
-      color: c.text,
-      marginBottom: spacing.md,
-      lineHeight: 22,
-    },
-    reviewChips: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: spacing.sm,
-      marginBottom: spacing.lg,
-    },
-    reviewChip: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 6,
-      paddingHorizontal: spacing.md,
-      paddingVertical: 10,
-      borderRadius: radius.full,
-      borderWidth: 1.5,
-      borderColor: c.border,
-      backgroundColor: c.bg,
-    },
-    reviewChipSelected: {
-      borderColor: c.primary,
-      backgroundColor: c.primaryLight,
-    },
-    reviewChipEmoji: { fontSize: 16 },
-    reviewChipLabel: {
-      fontSize: typography.sm,
-      fontWeight: typography.semibold,
-      color: c.text,
-    },
-    reviewChipLabelSelected: { color: c.primary },
-    reviewNextBtn: {
-      height: 48,
-      backgroundColor: c.primary,
-      borderRadius: radius.lg,
-      alignItems: "center",
-      justifyContent: "center",
-      ...shadow.sm,
-    },
-    reviewNextBtnDisabled: {
-      backgroundColor: c.border,
-    },
-    reviewNextBtnText: {
-      fontSize: typography.base,
-      fontWeight: typography.bold,
-      color: c.primaryText,
-    },
-    reviewNextBtnTextDisabled: { color: c.textTertiary },
-    reviewNoteInput: {
-      backgroundColor: c.bg,
-      borderWidth: 1.5,
-      borderColor: c.border,
-      borderRadius: radius.md,
-      padding: spacing.md,
-      fontSize: typography.base,
-      color: c.text,
-      lineHeight: 22,
-      minHeight: 80,
-      marginBottom: spacing.md,
-    },
-    reviewSkipBtn: {
-      alignItems: "center",
-      paddingVertical: spacing.sm,
-      marginTop: spacing.xs,
-    },
-    reviewSkipText: {
-      fontSize: typography.sm,
-      color: c.textTertiary,
-    },
-    // ── History sheet ────────────────────────────────────────────────────────
-    historySheet: {
-      backgroundColor: c.card,
-      borderTopLeftRadius: radius.xl,
-      borderTopRightRadius: radius.xl,
-      padding: spacing.lg,
-      paddingBottom: spacing.xxl,
-      maxHeight: "80%",
-      maxWidth: 600,
-      alignSelf: "center" as const,
-      width: "100%",
-      ...shadow.lg,
-    },
-    historyHandle: {
-      width: 36,
-      height: 4,
-      borderRadius: 2,
-      backgroundColor: c.border,
-      alignSelf: "center",
-      marginBottom: spacing.lg,
-    },
-    historyHeaderRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: spacing.lg,
-    },
-    historyTitle: {
-      fontSize: typography.lg,
-      fontWeight: typography.bold,
-      color: c.text,
-      letterSpacing: -0.3,
-    },
-    historyEmpty: {
-      fontSize: typography.base,
-      color: c.textSecondary,
-      textAlign: "center",
-      marginTop: spacing.xl,
-      lineHeight: 22,
-    },
-    historyDay: { marginBottom: spacing.lg },
-    historyDayLabel: {
-      fontSize: typography.xs,
-      fontWeight: typography.semibold,
-      color: c.textTertiary,
-      textTransform: "uppercase",
-      letterSpacing: 0.8,
-      marginBottom: spacing.sm,
-    },
-    historyGoalSection: {
-      marginBottom: spacing.md,
-    },
-    historyGoalHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: spacing.xs,
-    },
-    historyGoalName: {
-      flex: 1,
-      fontSize: typography.sm,
-      color: c.textSecondary,
-      fontWeight: typography.semibold,
-      textTransform: "uppercase",
-      letterSpacing: 0.5,
-    },
-    historyCount: {
-      fontSize: typography.xs,
-      color: c.textTertiary,
-      fontWeight: typography.semibold,
-    },
-    viewAllBtn: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 4,
-      marginTop: spacing.lg,
-      paddingVertical: spacing.sm,
-      borderTopWidth: 1,
-      borderTopColor: c.border,
-    },
-    viewAllText: {
-      fontSize: typography.sm,
-      fontWeight: typography.semibold,
-      color: c.primary,
-    },
-    // ── Welcome to Pro modal ──────────────────────────────────────────────────
-    welcomeOverlay: {
-      flex: 1,
-      backgroundColor: c.overlay,
-      justifyContent: "center",
-      alignItems: "center",
-      padding: spacing.lg,
-    },
-    welcomeBox: {
-      width: "100%",
-      maxWidth: 500,
-      backgroundColor: c.card,
-      borderRadius: radius.xl,
-      padding: spacing.xl,
-      alignItems: "center",
-      ...shadow.lg,
-    },
-    welcomeTitle: {
-      fontSize: typography.xxl,
-      fontWeight: typography.bold,
-      color: c.text,
-      letterSpacing: -0.5,
-      marginBottom: spacing.sm,
-      textAlign: "center",
-    },
-    welcomeSubtitle: {
-      fontSize: typography.base,
-      color: c.textSecondary,
-      textAlign: "center",
-      lineHeight: 22,
-      marginBottom: spacing.lg,
-    },
-    welcomeFeature: {
-      fontSize: typography.sm,
-      fontWeight: typography.medium,
-      color: c.text,
-      lineHeight: 22,
-    },
-    welcomeNote: {
-      fontSize: typography.xs,
-      color: c.textTertiary,
-      textAlign: "center",
-      marginBottom: spacing.lg,
-    },
-    welcomeBtn: {
-      width: "100%",
-      height: 50,
-      backgroundColor: c.primary,
-      borderRadius: radius.lg,
-      alignItems: "center",
-      justifyContent: "center",
-      ...shadow.sm,
-    },
-    welcomeBtnText: {
-      fontSize: typography.md,
-      fontWeight: typography.bold,
-      color: c.primaryText,
-      letterSpacing: -0.2,
-    },
-    // ── Pro expired banner ────────────────────────────────────────────────────
+    // Pro expired banner
     expiredBanner: {
       flexDirection: "row",
       alignItems: "center",
@@ -1964,12 +2170,6 @@ function createStyles(c: Colors) {
     expiredSubtitle: {
       fontSize: typography.xs,
       color: c.textSecondary,
-    },
-    expiredCta: {
-      fontSize: typography.sm,
-      fontWeight: typography.bold,
-      color: c.primary,
-      flexShrink: 0,
     },
   });
 }

@@ -1,19 +1,54 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, Platform } from "react-native";
-import { colors, typography } from "@/constants/theme";
+import { typography } from "@/constants/theme";
+import { useTheme } from "@/lib/theme";
 import { NotificationProvider, useNotifications } from "@/lib/notification-context";
 
 const IS_TABLET = Platform.OS === "ios" && Platform.isPad;
+const GOLD_ACTIVE = "#D4A843";
+const ICON_BG_SIZE = IS_TABLET ? 36 : 32;
+
+function TabIcon({
+  focused,
+  name,
+  focusedName,
+  size,
+  inactiveColor,
+}: {
+  focused: boolean;
+  name: string;
+  focusedName: string;
+  size: number;
+  inactiveColor: string;
+}) {
+  return (
+    <View style={{
+      width: ICON_BG_SIZE,
+      height: ICON_BG_SIZE,
+      borderRadius: ICON_BG_SIZE / 2,
+      backgroundColor: focused ? "rgba(212,168,67,0.15)" : "transparent",
+      alignItems: "center",
+      justifyContent: "center",
+    }}>
+      <Ionicons
+        name={(focused ? focusedName : name) as any}
+        size={size - 2}
+        color={focused ? GOLD_ACTIVE : inactiveColor}
+      />
+    </View>
+  );
+}
 
 function TabsContent() {
   const { unreadCount } = useNotifications();
+  const { colors } = useTheme();
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
+        tabBarActiveTintColor: GOLD_ACTIVE,
         tabBarInactiveTintColor: colors.textTertiary,
         tabBarHideOnKeyboard: true,
         tabBarStyle: {
@@ -34,11 +69,7 @@ function TabsContent() {
         options={{
           title: "Today",
           tabBarIcon: ({ focused, size }) => (
-            <Ionicons
-              name={focused ? "flash" : "flash-outline"}
-              size={size}
-              color={focused ? "#F59E0B" : colors.textTertiary}
-            />
+            <TabIcon focused={focused} name="flash-outline" focusedName="flash" size={size} inactiveColor={colors.textTertiary} />
           ),
         }}
       />
@@ -47,11 +78,7 @@ function TabsContent() {
         options={{
           title: "Goals",
           tabBarIcon: ({ focused, size }) => (
-            <Ionicons
-              name={focused ? "disc" : "disc-outline"}
-              size={size}
-              color={focused ? "#EF4444" : colors.textTertiary}
-            />
+            <TabIcon focused={focused} name="aperture-outline" focusedName="aperture" size={size} inactiveColor={colors.textTertiary} />
           ),
         }}
       />
@@ -60,26 +87,33 @@ function TabsContent() {
         options={{
           title: "Profile",
           tabBarIcon: ({ focused, size }) => (
-            <View>
+            <View style={{
+              width: ICON_BG_SIZE,
+              height: ICON_BG_SIZE,
+              borderRadius: ICON_BG_SIZE / 2,
+              backgroundColor: focused ? "rgba(212,168,67,0.15)" : "transparent",
+              alignItems: "center",
+              justifyContent: "center",
+            }}>
               <Ionicons
                 name={focused ? "person" : "person-outline"}
-                size={size}
-                color={focused ? "#635BFF" : colors.textTertiary}
+                size={size - 2}
+                color={focused ? GOLD_ACTIVE : colors.textTertiary}
               />
               {unreadCount > 0 && (
                 <View style={{
                   position: "absolute",
-                  top: IS_TABLET ? -6 : -4,
-                  right: IS_TABLET ? -10 : -8,
-                  minWidth: IS_TABLET ? 20 : 16,
-                  height: IS_TABLET ? 20 : 16,
-                  borderRadius: IS_TABLET ? 10 : 8,
+                  top: IS_TABLET ? -2 : -1,
+                  right: IS_TABLET ? -4 : -3,
+                  minWidth: IS_TABLET ? 18 : 14,
+                  height: IS_TABLET ? 18 : 14,
+                  borderRadius: IS_TABLET ? 9 : 7,
                   backgroundColor: "#ef4444",
                   alignItems: "center",
                   justifyContent: "center",
-                  paddingHorizontal: IS_TABLET ? 4 : 3,
+                  paddingHorizontal: IS_TABLET ? 3 : 2,
                 }}>
-                  <Text style={{ color: "#fff", fontSize: IS_TABLET ? 11 : 9, fontWeight: "700" }}>
+                  <Text style={{ color: "#fff", fontSize: IS_TABLET ? 10 : 8, fontWeight: "700" }}>
                     {unreadCount > 9 ? "9+" : unreadCount}
                   </Text>
                 </View>
