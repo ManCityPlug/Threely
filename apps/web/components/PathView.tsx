@@ -58,7 +58,7 @@ export default function PathView({
     setMounted(true);
   }, []);
 
-  // Scroll today into view
+  // Scroll today's node into view on mount and whenever path becomes visible
   useEffect(() => {
     if (!mounted) return;
     const timer = setTimeout(() => {
@@ -71,7 +71,7 @@ export default function PathView({
       }
     }, 250);
     return () => clearTimeout(timer);
-  }, [mounted]);
+  }, [mounted, tasksVisible, dayNumber]);
 
   // Hide scroll hint on first scroll
   useEffect(() => {
