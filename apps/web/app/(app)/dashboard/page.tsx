@@ -651,9 +651,11 @@ function DashboardPageInner() {
   const pathCompletedDays = workAheadUsed ? goalDayNumber : goalDayNumber - 1;
   const pathAllDone = workAheadUsed ? workAheadDone : todayAllDone;
 
-  // Detect when work-ahead tasks are all completed
+  const userToggledRef = useRef(false);
+
+  // Detect when work-ahead tasks are all completed (only after user manually toggles)
   useEffect(() => {
-    if (viewingTasks && viewingDay && viewingDay > goalDayNumber) {
+    if (viewingTasks && viewingDay && viewingDay > goalDayNumber && userToggledRef.current) {
       const dt = viewingTasks.find(d => d.goalId === effectiveSelectedGoalId);
       if (dt) {
         const items = dt.tasks.slice(-3);
@@ -667,7 +669,6 @@ function DashboardPageInner() {
   }, [viewingTasks, viewingDay, goalDayNumber, effectiveSelectedGoalId, aheadDoneKey, workAheadDone]);
 
   // Show celebration when all DISPLAYED tasks go from not-done → done
-  const userToggledRef = useRef(false);
   const hasTriggeredCelebration = useRef(false);
   const prevViewAllDone = useRef(false);
   const [completedInSession, setCompletedInSession] = useState(false);
