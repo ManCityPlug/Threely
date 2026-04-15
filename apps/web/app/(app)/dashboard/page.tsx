@@ -259,21 +259,6 @@ function CelebrationOverlay({
         Day {dayNumber} Complete
       </h1>
 
-      <p style={{
-        fontSize: "1.1rem",
-        color: "rgba(255,255,255,0.85)",
-        maxWidth: 400,
-        textAlign: "center",
-        lineHeight: 1.6,
-        marginBottom: 16,
-        transform: visible ? "translateY(0)" : "translateY(20px)",
-        opacity: visible ? 1 : 0,
-        transition: "all 0.5s ease",
-        transitionDelay: "0.6s",
-      }}>
-        {getCompletionMessage(dayNumber)}
-      </p>
-
       <button
         onClick={onDismiss}
         style={{
@@ -1298,42 +1283,49 @@ function DashboardPageInner() {
                         onClick={async () => {
                           setWorkAheadModal(false);
                           if (!hasPro) { router.push("/checkout?plan=yearly"); return; }
+                          if (!selectedGoal) return;
+                          // The "next" day on path = current path day + 1
+                          const pathDay = todayAllDone ? goalDayNumber + 1 : goalDayNumber;
+                          const workAheadDay = pathDay + 1;
+                          // Compute actual date from goal creation
+                          const goalCreated = new Date(selectedGoal.createdAt);
+                          goalCreated.setHours(0, 0, 0, 0);
+                          const targetDate = new Date(goalCreated);
+                          targetDate.setDate(targetDate.getDate() + workAheadDay - 1);
+                          const dateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-${String(targetDate.getDate()).padStart(2, "0")}`;
+
                           setGenerating(true);
                           try {
-                            // Generate for TOMORROW's date
-                            const tomorrow = new Date();
-                            tomorrow.setDate(tomorrow.getDate() + 1);
-                            const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
-
-                            const { getSupabase } = await import("@/lib/supabase-client");
-                            const supabase = getSupabase();
-                            const { data: { session } } = await supabase.auth.getSession();
-
-                            const res = await fetch("/api/tasks/generate", {
-                              method: "POST",
-                              headers: {
-                                "Content-Type": "application/json",
-                                ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
-                              },
-                              body: JSON.stringify({
-                                localDate: tomorrowStr,
-                                ...(effectiveSelectedGoalId ? { goalId: effectiveSelectedGoalId } : {}),
-                              }),
-                            });
-
-                            if (res.ok) {
-                              // Fetch tomorrow's tasks and show them
-                              const tmrRes = await tasksApi.today(false, tomorrowStr);
-                              if (tmrRes.dailyTasks?.length > 0) {
-                                const nextDay = goalDayNumber + 1;
-                                setViewingDay(nextDay);
-                                setViewingTasks(tmrRes.dailyTasks);
-                                setShowTasks(true);
-                              } else {
-                                window.location.reload();
-                              }
+                            // Check if tasks already exist
+                            const existing = await tasksApi.today(false, dateStr);
+                            const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
+                            if (goalTasks.length > 0) {
+                              setViewingDay(workAheadDay);
+                              setViewingTasks(goalTasks);
+                              setShowTasks(true);
                             } else {
-                              showToast("Couldn't generate tasks", "error");
+                              // Generate tasks for this day
+                              const { getSupabase } = await import("@/lib/supabase-client");
+                              const supabase = getSupabase();
+                              const { data: { session } } = await supabase.auth.getSession();
+                              const res = await fetch("/api/tasks/generate", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                  ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+                                },
+                                body: JSON.stringify({ localDate: dateStr, goalId: effectiveSelectedGoalId }),
+                              });
+                              if (res.ok) {
+                                const data = await res.json();
+                                if (data.dailyTasks?.length > 0) {
+                                  setViewingDay(workAheadDay);
+                                  setViewingTasks(data.dailyTasks);
+                                  setShowTasks(true);
+                                }
+                              } else {
+                                showToast("Couldn't generate tasks", "error");
+                              }
                             }
                           } catch {
                             showToast("Couldn't generate tasks", "error");
