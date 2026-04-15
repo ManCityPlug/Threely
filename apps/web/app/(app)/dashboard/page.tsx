@@ -1234,19 +1234,34 @@ function DashboardPageInner() {
                           if (!hasPro) { router.push("/checkout?plan=yearly"); return; }
                           setGenerating(true);
                           try {
-                            const res = await tasksApi.generate(
-                              effectiveSelectedGoalId
-                                ? { goalId: effectiveSelectedGoalId, requestingAdditional: true }
-                                : { requestingAdditional: true }
-                            );
-                            if (res.dailyTasks.length > 0) {
-                              // Merge new tasks with existing (don't replace)
-                              setDailyTasks(prev => {
-                                const newIds = new Set(res.dailyTasks.map(dt => dt.id));
-                                return [...prev.filter(dt => !newIds.has(dt.id)), ...res.dailyTasks];
-                              });
-                              setCelebrationDismissed(false);
-                              setShowTasks(true);
+                            // Generate for TOMORROW's date
+                            const tomorrow = new Date();
+                            tomorrow.setDate(tomorrow.getDate() + 1);
+                            const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+
+                            const { getSupabase } = await import("@/lib/supabase-client");
+                            const supabase = getSupabase();
+                            const { data: { session } } = await supabase.auth.getSession();
+
+                            const res = await fetch("/api/tasks/generate", {
+                              method: "POST",
+                              headers: {
+                                "Content-Type": "application/json",
+                                ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+                              },
+                              body: JSON.stringify({
+                                localDate: tomorrowStr,
+                                ...(effectiveSelectedGoalId ? { goalId: effectiveSelectedGoalId } : {}),
+                              }),
+                            });
+
+                            if (res.ok) {
+                              const data = await res.json();
+                              if (data.dailyTasks?.length > 0) {
+                                setDailyTasks(prev => [...prev, ...data.dailyTasks]);
+                                setCelebrationDismissed(false);
+                                setShowTasks(true);
+                              }
                             } else {
                               window.location.reload();
                             }
