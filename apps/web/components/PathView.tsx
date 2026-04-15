@@ -24,6 +24,35 @@ const GOLD_DARK = "#9A7A2A";
 // center → slight left → left → slight left → center → slight right → right → slight right → repeat
 const S_CURVE_OFFSETS = [50, 38, 28, 35, 50, 62, 72, 65];
 
+// ─── Inline Countdown (shows under next locked day) ──────────────────────────
+
+function InlineCountdown() {
+  const [timeLeft, setTimeLeft] = useState("");
+
+  useEffect(() => {
+    function calc() {
+      const now = Date.now();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0);
+      const diff = midnight.getTime() - now;
+      if (diff <= 0) { setTimeLeft(""); return; }
+      const h = Math.floor(diff / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      setTimeLeft(`${h}h ${m}m`);
+    }
+    calc();
+    const interval = setInterval(calc, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (!timeLeft) return null;
+  return (
+    <div style={{ fontSize: "0.62rem", fontWeight: 600, color: "rgba(212,168,67,0.5)", marginTop: 2 }}>
+      Unlocks in {timeLeft}
+    </div>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function PathView({
@@ -42,9 +71,10 @@ export default function PathView({
   const [lockedModal, setLockedModal] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(true);
 
-  // Show 20 nodes: some before today, rest after
+  // Stage system: 20 nodes per stage (1-20, 21-40, 41-60, ...)
   const VISIBLE_NODES = 20;
-  const windowStart = Math.max(1, dayNumber - Math.min(dayNumber - 1, 5));
+  const stage = Math.ceil(dayNumber / VISIBLE_NODES) || 1;
+  const windowStart = (stage - 1) * VISIBLE_NODES + 1;
 
   const days: number[] = [];
   for (let i = 0; i < VISIBLE_NODES; i++) {
@@ -210,7 +240,7 @@ export default function PathView({
     if (nodeType === "completed") {
       return (
         <svg width={size * 0.38} height={size * 0.38} viewBox="0 0 14 14" fill="none">
-          <path d="M3 7L6 10L11 4" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M3 7L6 10L11 4" stroke={GOLD_DARK} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       );
     }
@@ -631,7 +661,17 @@ export default function PathView({
                       whiteSpace: "nowrap",
                     }}
                   >
-                    {isToday && (
+                    {isToday && crown && allDoneToday && (
+                      <>
+                        <div style={{ fontSize: "0.82rem", fontWeight: 800, color: GOLD }}>
+                          Stage {stage} Complete!
+                        </div>
+                        <div style={{ fontSize: "0.68rem", fontWeight: 600, color: GOLD, opacity: 0.8 }}>
+                          Next stage unlocks soon
+                        </div>
+                      </>
+                    )}
+                    {isToday && !crown && (
                       <>
                         <div
                           style={{
@@ -657,6 +697,16 @@ export default function PathView({
                         </div>
                       </>
                     )}
+                    {isToday && crown && !allDoneToday && (
+                      <>
+                        <div style={{ fontSize: "0.82rem", fontWeight: 800, color: GOLD }}>
+                          Day {day}
+                        </div>
+                        <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "rgba(255,255,255,0.9)", marginTop: 1, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                          TODAY
+                        </div>
+                      </>
+                    )}
                     {crown && !isToday && (
                       <>
                         <div style={{ fontSize: "0.82rem", fontWeight: 800, color: GOLD }}>
@@ -678,9 +728,12 @@ export default function PathView({
                       </>
                     )}
                     {nodeType === "next" && allDoneToday && !milestone && !crown && (
-                      <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>
-                        Day {day}
-                      </div>
+                      <>
+                        <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>
+                          Day {day}
+                        </div>
+                        <InlineCountdown />
+                      </>
                     )}
                     {nodeType === "completed" && !milestone && !crown && (
                       <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "rgba(212,168,67,0.6)" }}>
@@ -688,9 +741,12 @@ export default function PathView({
                       </div>
                     )}
                     {nodeType === "locked" && !milestone && !crown && (
-                      <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "rgba(255,255,255,0.25)" }}>
-                        Day {day}
-                      </div>
+                      <>
+                        <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "rgba(255,255,255,0.25)" }}>
+                          Day {day}
+                        </div>
+                        {day === dayNumber + 1 && <InlineCountdown />}
+                      </>
                     )}
                   </div>
                 )}

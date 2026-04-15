@@ -46,6 +46,13 @@ function formatWorkDaysList(workDays: number[]): string {
 
 // ─── Gamification Helpers ─────────────────────────────────────────────────────
 
+function getCelebrationEmoji(day: number): string {
+  if ([7, 14, 30, 60, 100].includes(day)) return "👑";
+  if (day === 3) return "🚀";
+  if (day % 20 === 0) return "🏆";
+  return "🔥";
+}
+
 function getCompletionMessage(day: number): string {
   const messages: Record<number, string> = {
     1: "Day 1 done. You're already ahead of most people.",
@@ -242,7 +249,7 @@ function CelebrationOverlay({
         transition: "transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)",
         transitionDelay: "0.2s",
       }}>
-        {"🔥"}
+        {getCelebrationEmoji(dayNumber)}
       </div>
 
       <h1 style={{
