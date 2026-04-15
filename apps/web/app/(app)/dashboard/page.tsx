@@ -697,11 +697,11 @@ function DashboardPageInner() {
 
     try {
       const res = await tasksApi.toggleTask(dailyTaskId, taskItemId, isCompleted);
-      const updater = (prev: DailyTask[]) => prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt);
+      const updated = (prev: DailyTask[]) => prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt);
       if (viewingTasks) {
-        setViewingTasks(updater);
+        setViewingTasks(updated(viewingTasks));
       } else {
-        setDailyTasks(updater);
+        setDailyTasks(updated);
       }
     } catch {
       showToast("Failed to update task", "error");
