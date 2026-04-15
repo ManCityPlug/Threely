@@ -48,7 +48,7 @@ function formatWorkDaysList(workDays: number[]): string {
 
 function getCompletionMessage(day: number): string {
   const messages: Record<number, string> = {
-    1: "This is where it all starts.",
+    1: "Day 1 done. You're already ahead of most people.",
     2: "You're already ahead of most people.",
     3: "This is becoming a habit.",
     5: "You're not the same person you were Monday.",
@@ -1356,76 +1356,6 @@ function DashboardPageInner() {
             </div>
           )}
 
-          {/* Task view: all done state — only when completed this session */}
-          {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && showTasks && allDone && celebrationDismissed && completedInSession && (
-            <div className="slide-up" style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "1rem",
-            }}>
-              <button
-                onClick={() => setShowTasks(false)}
-                style={{
-                  background: "none", border: "none", color: "rgba(255,255,255,0.85)",
-                  cursor: "pointer", fontSize: "0.95rem", fontWeight: 600,
-                  padding: "8px 0", alignSelf: "flex-start",
-                  display: "flex", alignItems: "center", gap: 6, minHeight: 44,
-                  transition: "color 0.15s",
-                }}
-                onMouseEnter={e => { e.currentTarget.style.color = "#D4A843"; }}
-                onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.85)"; }}
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                Back to path
-              </button>
-
-              <div style={{
-                textAlign: "center",
-                padding: "2rem",
-              }}>
-                <div style={{ fontSize: "3rem", marginBottom: 16 }}>{"✓"}</div>
-                <h2 style={{
-                  fontSize: "1.5rem",
-                  fontWeight: 800,
-                  color: "var(--text)",
-                  marginBottom: 8,
-                  letterSpacing: "-0.02em",
-                }}>
-                  All done for today
-                </h2>
-                <p style={{
-                  color: "rgba(255,255,255,0.85)",
-                  fontSize: "1rem",
-                  lineHeight: 1.6,
-                  marginBottom: 16,
-                }}>
-                  {getCompletionMessage(goalDayNumber)}
-                </p>
-                <MidnightCountdown dayNumber={goalDayNumber} />
-                <button
-                  onClick={() => setShowTasks(false)}
-                  style={{
-                    marginTop: 24,
-                    padding: "14px 36px",
-                    borderRadius: 12,
-                    background: "#D4A843",
-                    color: "#000",
-                    fontSize: "1rem",
-                    fontWeight: 700,
-                    border: "none",
-                    cursor: "pointer",
-                    transition: "filter 0.15s",
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.filter = "brightness(1.1)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.filter = "brightness(1)"; }}
-                >
-                  View path
-                </button>
-              </div>
-            </div>
-          )}
         </>
       )}
 
