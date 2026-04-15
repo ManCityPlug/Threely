@@ -7,22 +7,17 @@ export default function BuildingProgress() {
 
   useEffect(() => {
     let cancelled = false;
-    let current = 0;
     const startTime = Date.now();
+    const DURATION = 6000; // 6 seconds to fill
 
-    // Smooth progress: fast start, slows down, never quite reaches 100%
     const animate = () => {
       if (cancelled) return;
       const elapsed = Date.now() - startTime;
-      // Fast to 60% in 3s, slow to 90% by 10s, crawl to 95% by 20s
-      const t = elapsed / 1000;
-      current = t < 3
-        ? (t / 3) * 0.6
-        : t < 10
-        ? 0.6 + ((t - 3) / 7) * 0.3
-        : Math.min(0.9 + ((t - 10) / 20) * 0.05, 0.96);
-      setProgress(current);
-      requestAnimationFrame(animate);
+      const t = Math.min(elapsed / DURATION, 0.98);
+      // Ease out — fast start, slows at end
+      const eased = 1 - Math.pow(1 - t, 2.5);
+      setProgress(eased);
+      if (t < 0.98) requestAnimationFrame(animate);
     };
     animate();
 
@@ -36,23 +31,23 @@ export default function BuildingProgress() {
       textAlign: "center", padding: "3rem 1.5rem",
       maxWidth: 400, margin: "0 auto",
     }}>
-      {/* Animated emoji */}
       <div style={{ fontSize: 48, marginBottom: 24, animation: "bounce 1.5s ease-in-out infinite" }}>
         {"🚀"}
       </div>
 
-      {/* Progress bar */}
+      {/* Progress bar — blue */}
       <div style={{
-        width: "100%", maxWidth: 320, height: 8,
-        background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden",
+        width: "100%", maxWidth: 320, height: 10,
+        background: "rgba(255,255,255,0.1)", borderRadius: 999, overflow: "hidden",
         marginBottom: 16,
       }}>
         <div style={{
           height: "100%",
           width: `${progress * 100}%`,
-          background: "linear-gradient(90deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)",
+          background: "linear-gradient(90deg, #4A90D9 0%, #5B9FE6 50%, #3B7DD8 100%)",
           borderRadius: 999,
-          transition: "width 0.1s linear",
+          transition: "width 0.05s linear",
+          boxShadow: "0 0 12px rgba(74,144,217,0.4)",
         }} />
       </div>
 

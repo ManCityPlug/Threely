@@ -140,7 +140,11 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
 
       // 3. Create the goal
       const { goal } = await goalsApi.create({
-        title: parsed.short_title ?? goalText.slice(0, 40),
+        title: cat === "business"
+          ? `${allAnswers[0]}/Month${allAnswers[2] ? ` — ${allAnswers[2].slice(0, 30)}` : ""}`
+          : cat === "health"
+          ? allAnswers[0]
+          : allAnswers[0]?.slice(0, 40) || "My Goal",
         rawInput: goalText,
         structuredSummary: parsed.structured_summary,
         category: parsed.category,
