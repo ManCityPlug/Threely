@@ -434,6 +434,8 @@ function DashboardPageInner() {
   const [showTasks, setShowTasks] = useState(false);
   const [workAheadModal, setWorkAheadModal] = useState(false);
   const [viewingDay, setViewingDay] = useState<number | null>(null);
+  // Separate state for viewing other days' tasks (so we don't corrupt today's dailyTasks)
+  const [viewingTasks, setViewingTasks] = useState<DailyTask[] | null>(null);
   const tasksRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
@@ -590,9 +592,11 @@ function DashboardPageInner() {
 
   const selectedGoal = effectiveGoals.find(g => g.id === effectiveSelectedGoalId);
 
+  // Use viewingTasks when viewing a different day, otherwise today's tasks
+  const activeTasks = viewingTasks ?? effectiveDailyTasks;
   const displayedTasks = (() => {
     if (effectiveSelectedGoalId === null) return [];
-    const dt = effectiveDailyTasks.find(d => d.goalId === effectiveSelectedGoalId);
+    const dt = activeTasks.find(d => d.goalId === effectiveSelectedGoalId);
     if (!dt) return [];
     const items = dt.tasks.slice(-3).map(task => ({ dt, task }));
     const incomplete = items.filter(x => !x.task.isCompleted || recentlyToggledRef.current.has(x.task.id));
@@ -603,23 +607,18 @@ function DashboardPageInner() {
   const displayedItems = displayedTasks.map(x => x.task);
   const completedCount = displayedItems.filter(t => t.isCompleted || t.isSkipped).length;
   const totalCount = displayedItems.length;
-  const allDone = totalCount > 0 && completedCount === totalCount;
+
+  // allDone for TODAY's tasks only (drives path state) — never use viewingTasks
+  const todayDt = effectiveDailyTasks.find(d => d.goalId === effectiveSelectedGoalId);
+  const todayItems = todayDt ? todayDt.tasks.slice(-3) : [];
+  const todayAllDone = todayItems.length > 0 && todayItems.every(t => t.isCompleted || t.isSkipped);
+
+  // allDone for whatever is currently displayed (drives task view UI)
+  const viewAllDone = totalCount > 0 && completedCount === totalCount;
 
   const streak = getStreakFromGoals(effectiveGoals);
+  // goalDayNumber = stable time-based day number (never changes within a session)
   const goalDayNumber = selectedGoal ? getGoalDayNumber(selectedGoal) : 1;
-
-  // Compute actual day number from the displayed task's date (handles work-ahead)
-  const displayDayNumber = (() => {
-    if (!selectedGoal) return goalDayNumber;
-    const dt = effectiveDailyTasks.find(d => d.goalId === effectiveSelectedGoalId);
-    if (!dt?.date) return goalDayNumber;
-    const created = new Date(selectedGoal.createdAt);
-    created.setHours(0, 0, 0, 0);
-    const taskDate = new Date(dt.date);
-    taskDate.setHours(0, 0, 0, 0);
-    const diff = taskDate.getTime() - created.getTime();
-    return Math.max(1, Math.floor(diff / (1000 * 60 * 60 * 24)) + 1);
-  })();
 
   // Show celebration when all tasks just completed — only once per session
   // Track whether user has manually toggled any task (prevents triggering on page load)
@@ -628,13 +627,13 @@ function DashboardPageInner() {
   const [completedInSession, setCompletedInSession] = useState(false);
   useEffect(() => {
     // Only trigger when user manually completed the last task, not on initial data load
-    if (allDone && totalCount > 0 && userToggledRef.current && !hasTriggeredCelebration.current) {
+    if (todayAllDone && todayItems.length > 0 && userToggledRef.current && !hasTriggeredCelebration.current) {
       setShowCelebration(true);
       setCelebrationDismissed(false);
       setCompletedInSession(true);
       hasTriggeredCelebration.current = true;
     }
-  }, [allDone, totalCount]);
+  }, [todayAllDone, todayItems.length]);
 
   function pickGoal(val: string) {
     setSelectedGoalId(val);
@@ -698,8 +697,12 @@ function DashboardPageInner() {
 
     try {
       const res = await tasksApi.toggleTask(dailyTaskId, taskItemId, isCompleted);
-      const newDailyTasks = dailyTasks.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt);
-      setDailyTasks(newDailyTasks);
+      const updater = (prev: DailyTask[]) => prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt);
+      if (viewingTasks) {
+        setViewingTasks(updater);
+      } else {
+        setDailyTasks(updater);
+      }
     } catch {
       showToast("Failed to update task", "error");
     }
@@ -1102,7 +1105,7 @@ function DashboardPageInner() {
           {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && !showTasks && (
             <>
               {/* All done state — shown ABOVE the path only when completed this session */}
-              {allDone && celebrationDismissed && completedInSession && (
+              {todayAllDone && celebrationDismissed && completedInSession && (
                 <div style={{
                   textAlign: "center",
                   padding: "1.5rem 2rem",
@@ -1130,14 +1133,14 @@ function DashboardPageInner() {
                     fontSize: "0.95rem",
                     lineHeight: 1.6,
                   }}>
-                    {getCompletionMessage(displayDayNumber)}
+                    {getCompletionMessage(goalDayNumber)}
                   </p>
-                  <MidnightCountdown dayNumber={displayDayNumber} />
+                  <MidnightCountdown dayNumber={goalDayNumber} />
                 </div>
               )}
 
               {/* Day heading */}
-              {(!allDone || !completedInSession) && (
+              {(!todayAllDone || !completedInSession) && (
                 <h1 style={{
                   fontSize: "2.5rem",
                   fontWeight: 800,
@@ -1146,18 +1149,18 @@ function DashboardPageInner() {
                   textAlign: "center",
                   marginBottom: 8,
                 }}>
-                  Day {displayDayNumber}
+                  Day {goalDayNumber}
                 </h1>
               )}
 
               {/* Path View */}
               <PathView
-                dayNumber={allDone ? displayDayNumber + 1 : displayDayNumber}
-                completedDays={allDone ? displayDayNumber : displayDayNumber - 1}
+                dayNumber={todayAllDone ? goalDayNumber + 1 : goalDayNumber}
+                completedDays={todayAllDone ? goalDayNumber : goalDayNumber - 1}
                 onDayClick={async (day, type) => {
                   if (type === "today") {
-                    // If current tasks are already done (path advanced), generate for this day
-                    if (allDone && selectedGoal) {
+                    // If today's tasks are done (path advanced), generate/fetch for the next day
+                    if (todayAllDone && selectedGoal) {
                       setViewingDay(day);
                       setGenerating(true);
                       try {
@@ -1170,12 +1173,8 @@ function DashboardPageInner() {
                         // Try fetching existing tasks for this day first
                         const existing = await tasksApi.today(false, dateStr);
                         const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
-                        if (goalTasks.length > 0 && goalTasks[0].tasks.some((t: TaskItem) => !t.isCompleted)) {
-                          setDailyTasks(goalTasks);
-                          setShowTasks(true);
-                        } else if (goalTasks.length > 0) {
-                          // Tasks exist but all completed — show them read-only
-                          setDailyTasks(goalTasks);
+                        if (goalTasks.length > 0) {
+                          setViewingTasks(goalTasks);
                           setShowTasks(true);
                         } else {
                           // No tasks for this day — generate them
@@ -1193,7 +1192,7 @@ function DashboardPageInner() {
                           if (res.ok) {
                             const data = await res.json();
                             if (data.dailyTasks?.length > 0) {
-                              setDailyTasks(data.dailyTasks);
+                              setViewingTasks(data.dailyTasks);
                               setShowTasks(true);
                             }
                           } else {
@@ -1222,7 +1221,7 @@ function DashboardPageInner() {
                       const goalTasks = res.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
                       if (goalTasks.length > 0) {
                         setViewingDay(day);
-                        setDailyTasks(goalTasks);
+                        setViewingTasks(goalTasks);
                         setShowTasks(true);
                       } else {
                         showToast(`Day ${day}: No tasks found`, "error");
@@ -1232,7 +1231,7 @@ function DashboardPageInner() {
                     }
                   }
                 }}
-                allDoneToday={allDone}
+                allDoneToday={todayAllDone}
                 totalTasks={totalCount}
                 onStartDay={() => {
                   setShowTasks(true);
@@ -1326,9 +1325,9 @@ function DashboardPageInner() {
                               // Fetch tomorrow's tasks and show them
                               const tmrRes = await tasksApi.today(false, tomorrowStr);
                               if (tmrRes.dailyTasks?.length > 0) {
-                                const nextDay = (allDone ? displayDayNumber + 1 : displayDayNumber) + 1;
+                                const nextDay = goalDayNumber + 1;
                                 setViewingDay(nextDay);
-                                setDailyTasks(tmrRes.dailyTasks);
+                                setViewingTasks(tmrRes.dailyTasks);
                                 setShowTasks(true);
                               } else {
                                 window.location.reload();
@@ -1371,14 +1370,10 @@ function DashboardPageInner() {
             }}>
               {/* Back to path button */}
               <button
-                onClick={async () => {
+                onClick={() => {
                   setShowTasks(false);
                   setViewingDay(null);
-                  // Reload today's tasks so path state is correct
-                  try {
-                    const res = await tasksApi.today(false);
-                    setDailyTasks(res.dailyTasks);
-                  } catch { /* ignore */ }
+                  setViewingTasks(null);
                 }}
                 style={{
                   background: "none", border: "none", color: "rgba(255,255,255,0.85)",
@@ -1405,7 +1400,7 @@ function DashboardPageInner() {
                 textAlign: "center",
                 marginBottom: 4,
               }}>
-                Day {viewingDay ?? displayDayNumber}
+                Day {viewingDay ?? goalDayNumber}
               </h1>
 
               <p style={{
@@ -1432,7 +1427,7 @@ function DashboardPageInner() {
                         handleToggle(dt.id, taskItemId, isCompleted)
                       }
                       animatingId={animatingTaskId}
-                      readOnly={allDone}
+                      readOnly={viewAllDone}
                     />
                   </div>
                 ))}
@@ -1446,13 +1441,14 @@ function DashboardPageInner() {
       {/* Celebration overlay */}
       {showCelebration && selectedGoal && typeof document !== "undefined" && createPortal(
         <CelebrationOverlay
-          dayNumber={displayDayNumber}
+          dayNumber={goalDayNumber}
           goalTitle={selectedGoal.title}
           onDismiss={() => {
             setShowCelebration(false);
             setCelebrationDismissed(true);
             setShowTasks(false);
             setViewingDay(null);
+            setViewingTasks(null);
           }}
         />,
         document.body
