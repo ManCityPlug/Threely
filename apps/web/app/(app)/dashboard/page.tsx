@@ -1274,7 +1274,7 @@ function DashboardPageInner() {
           )}
 
           {/* ─── Fullscreen Task View ─── */}
-          {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && showTasks && !allDone && (
+          {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && showTasks && (
             <div ref={tasksRef} className="slide-up" style={{
               display: "flex",
               flexDirection: "column",
