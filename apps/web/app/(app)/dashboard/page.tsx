@@ -95,18 +95,20 @@ function GamifiedTaskCard({
   onToggle,
   onTap,
   animatingId,
+  readOnly,
 }: {
   task: TaskItem;
   onToggle: (id: string, done: boolean) => void;
   onTap?: () => void;
   animatingId: string | null;
+  readOnly?: boolean;
 }) {
   const isAnimating = animatingId === task.id;
 
   return (
     <div
       onClick={() => {
-        if (!task.isSkipped) onToggle(task.id, !task.isCompleted);
+        if (!readOnly && !task.isSkipped) onToggle(task.id, !task.isCompleted);
       }}
       style={{
         display: "flex",
@@ -116,7 +118,7 @@ function GamifiedTaskCard({
         background: "var(--card)",
         border: "1px solid var(--border)",
         borderRadius: 14,
-        cursor: "pointer",
+        cursor: readOnly ? "default" : "pointer",
         transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
         transform: isAnimating ? "scale(1.02)" : "scale(1)",
         borderColor: task.isCompleted ? "#D4A843" : "var(--border)",
@@ -139,7 +141,7 @@ function GamifiedTaskCard({
       <button
         onClick={(e) => {
           e.stopPropagation();
-          if (!task.isSkipped) onToggle(task.id, !task.isCompleted);
+          if (!readOnly && !task.isSkipped) onToggle(task.id, !task.isCompleted);
         }}
         style={{
           width: 28,
@@ -150,7 +152,7 @@ function GamifiedTaskCard({
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          cursor: task.isSkipped ? "not-allowed" : "pointer",
+          cursor: readOnly ? "default" : task.isSkipped ? "not-allowed" : "pointer",
           flexShrink: 0,
           marginTop: 2,
           transition: "all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -170,8 +172,7 @@ function GamifiedTaskCard({
           fontWeight: 600,
           fontSize: "1rem",
           color: task.isCompleted ? "rgba(255,255,255,0.5)" : "var(--text)",
-          textDecoration: task.isCompleted ? "line-through" : "none",
-          textDecorationColor: "rgba(255,255,255,0.3)",
+          textDecoration: "none",
           lineHeight: 1.45,
           transition: "color 0.3s, text-decoration 0.3s",
         }}>
@@ -606,14 +607,16 @@ function DashboardPageInner() {
   const streak = getStreakFromGoals(effectiveGoals);
   const goalDayNumber = selectedGoal ? getGoalDayNumber(selectedGoal) : 1;
 
-  // Show celebration when all tasks just completed — only once per day
+  // Show celebration when all tasks just completed — only once per session
   const prevAllDone = useRef(false);
   const hasTriggeredCelebration = useRef(false);
+  const [completedInSession, setCompletedInSession] = useState(false);
   useEffect(() => {
     // Only trigger when transitioning from not-done to done (user just completed last task)
     if (allDone && !prevAllDone.current && totalCount > 0 && !hasTriggeredCelebration.current) {
       setShowCelebration(true);
       setCelebrationDismissed(false);
+      setCompletedInSession(true);
       hasTriggeredCelebration.current = true;
     }
     prevAllDone.current = allDone;
@@ -1083,8 +1086,8 @@ function DashboardPageInner() {
           {/* ─── Path view + task area ─── */}
           {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && !showTasks && (
             <>
-              {/* All done state — shown ABOVE the path */}
-              {allDone && celebrationDismissed && (
+              {/* All done state — shown ABOVE the path only when completed this session */}
+              {allDone && celebrationDismissed && completedInSession && (
                 <div style={{
                   textAlign: "center",
                   padding: "1.5rem 2rem",
@@ -1119,7 +1122,7 @@ function DashboardPageInner() {
               )}
 
               {/* Day heading */}
-              {!allDone && (
+              {(!allDone || !completedInSession) && (
                 <h1 style={{
                   fontSize: "2.5rem",
                   fontWeight: 800,
@@ -1252,14 +1255,10 @@ function DashboardPageInner() {
                             });
 
                             if (res.ok) {
-                              const data = await res.json();
-                              if (data.dailyTasks?.length > 0) {
-                                setDailyTasks(prev => [...prev, ...data.dailyTasks]);
-                                setCelebrationDismissed(false);
-                                setShowTasks(true);
-                              }
-                            } else {
+                              // Reload to show the fresh state with tomorrow's tasks
                               window.location.reload();
+                            } else {
+                              showToast("Couldn't generate tasks", "error");
                             }
                           } catch {
                             showToast("Couldn't generate tasks", "error");
@@ -1349,6 +1348,7 @@ function DashboardPageInner() {
                         handleToggle(dt.id, taskItemId, isCompleted)
                       }
                       animatingId={animatingTaskId}
+                      readOnly={allDone}
                     />
                   </div>
                 ))}
@@ -1356,8 +1356,8 @@ function DashboardPageInner() {
             </div>
           )}
 
-          {/* Task view: all done state */}
-          {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && showTasks && allDone && celebrationDismissed && (
+          {/* Task view: all done state — only when completed this session */}
+          {effectiveDailyTasks.length > 0 && effectiveSelectedGoalId !== null && showTasks && allDone && celebrationDismissed && completedInSession && (
             <div className="slide-up" style={{
               display: "flex",
               flexDirection: "column",
