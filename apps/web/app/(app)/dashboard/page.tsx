@@ -433,6 +433,7 @@ function DashboardPageInner() {
   // Path view state — false = path/roadmap view, true = fullscreen task view
   const [showTasks, setShowTasks] = useState(false);
   const [workAheadModal, setWorkAheadModal] = useState(false);
+  const [viewingDay, setViewingDay] = useState<number | null>(null);
   const tasksRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async () => {
@@ -1155,26 +1156,79 @@ function DashboardPageInner() {
                 completedDays={allDone ? displayDayNumber : displayDayNumber - 1}
                 onDayClick={async (day, type) => {
                   if (type === "today") {
-                    setShowTasks(true);
+                    // If current tasks are already done (path advanced), generate for this day
+                    if (allDone && selectedGoal) {
+                      setViewingDay(day);
+                      setGenerating(true);
+                      try {
+                        const goalCreated = new Date(selectedGoal.createdAt);
+                        goalCreated.setHours(0, 0, 0, 0);
+                        const targetDate = new Date(goalCreated);
+                        targetDate.setDate(targetDate.getDate() + day - 1);
+                        const dateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-${String(targetDate.getDate()).padStart(2, "0")}`;
+
+                        // Try fetching existing tasks for this day first
+                        const existing = await tasksApi.today(false, dateStr);
+                        const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
+                        if (goalTasks.length > 0 && goalTasks[0].tasks.some((t: TaskItem) => !t.isCompleted)) {
+                          setDailyTasks(goalTasks);
+                          setShowTasks(true);
+                        } else if (goalTasks.length > 0) {
+                          // Tasks exist but all completed — show them read-only
+                          setDailyTasks(goalTasks);
+                          setShowTasks(true);
+                        } else {
+                          // No tasks for this day — generate them
+                          const { getSupabase } = await import("@/lib/supabase-client");
+                          const supabase = getSupabase();
+                          const { data: { session } } = await supabase.auth.getSession();
+                          const res = await fetch("/api/tasks/generate", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                              ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+                            },
+                            body: JSON.stringify({ localDate: dateStr, goalId: effectiveSelectedGoalId }),
+                          });
+                          if (res.ok) {
+                            const data = await res.json();
+                            if (data.dailyTasks?.length > 0) {
+                              setDailyTasks(data.dailyTasks);
+                              setShowTasks(true);
+                            }
+                          } else {
+                            showToast("Couldn't generate tasks", "error");
+                          }
+                        }
+                      } catch {
+                        showToast("Couldn't load tasks", "error");
+                      } finally {
+                        setGenerating(false);
+                      }
+                    } else {
+                      setViewingDay(day);
+                      setShowTasks(true);
+                    }
                   } else if (type === "next") {
                     setWorkAheadModal(true);
                   } else if (type === "completed") {
-                    // Fetch and show past day's tasks in read-only mode
+                    // Fetch and show past day's completed tasks
                     try {
                       const goalCreated = selectedGoal?.createdAt ? new Date(selectedGoal.createdAt) : new Date();
                       const pastDate = new Date(goalCreated);
                       pastDate.setDate(pastDate.getDate() + day - 1);
                       const dateStr = pastDate.toISOString().split("T")[0];
                       const res = await tasksApi.today(false, dateStr);
-                      const goalTasks = res.dailyTasks.filter(dt => dt.goalId === effectiveSelectedGoalId);
+                      const goalTasks = res.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
                       if (goalTasks.length > 0) {
-                        const items = goalTasks[0].tasks.slice(-3);
-                        alert(`Day ${day} Tasks:\n\n${items.map((t: { task?: string; title?: string; isCompleted?: boolean }, i: number) => `${(t as { isCompleted?: boolean }).isCompleted ? "✓" : "○"} ${(t as { task?: string; title?: string }).task || (t as { task?: string; title?: string }).title}`).join("\n")}`);
+                        setViewingDay(day);
+                        setDailyTasks(goalTasks);
+                        setShowTasks(true);
                       } else {
-                        alert(`Day ${day}: No tasks found for this day.`);
+                        showToast(`Day ${day}: No tasks found`, "error");
                       }
                     } catch {
-                      alert(`Day ${day}: Couldn't load tasks.`);
+                      showToast(`Day ${day}: Couldn't load tasks`, "error");
                     }
                   }
                 }}
@@ -1272,6 +1326,8 @@ function DashboardPageInner() {
                               // Fetch tomorrow's tasks and show them
                               const tmrRes = await tasksApi.today(false, tomorrowStr);
                               if (tmrRes.dailyTasks?.length > 0) {
+                                const nextDay = (allDone ? displayDayNumber + 1 : displayDayNumber) + 1;
+                                setViewingDay(nextDay);
                                 setDailyTasks(tmrRes.dailyTasks);
                                 setShowTasks(true);
                               } else {
@@ -1315,7 +1371,15 @@ function DashboardPageInner() {
             }}>
               {/* Back to path button */}
               <button
-                onClick={() => setShowTasks(false)}
+                onClick={async () => {
+                  setShowTasks(false);
+                  setViewingDay(null);
+                  // Reload today's tasks so path state is correct
+                  try {
+                    const res = await tasksApi.today(false);
+                    setDailyTasks(res.dailyTasks);
+                  } catch { /* ignore */ }
+                }}
                 style={{
                   background: "none", border: "none", color: "rgba(255,255,255,0.85)",
                   cursor: "pointer", fontSize: "0.95rem", fontWeight: 600,
@@ -1341,7 +1405,7 @@ function DashboardPageInner() {
                 textAlign: "center",
                 marginBottom: 4,
               }}>
-                Day {displayDayNumber}
+                Day {viewingDay ?? displayDayNumber}
               </h1>
 
               <p style={{
@@ -1388,6 +1452,7 @@ function DashboardPageInner() {
             setShowCelebration(false);
             setCelebrationDismissed(true);
             setShowTasks(false);
+            setViewingDay(null);
           }}
         />,
         document.body
