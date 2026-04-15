@@ -141,7 +141,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
       // 3. Create the goal
       const { goal } = await goalsApi.create({
         title: cat === "business"
-          ? `${allAnswers[0]}/Month${allAnswers[2] ? ` — ${allAnswers[2].slice(0, 30)}` : ""}`
+          ? `Make ${allAnswers[0]} per month`
           : cat === "health"
           ? allAnswers[0]
           : allAnswers[0]?.slice(0, 40) || "My Goal",
