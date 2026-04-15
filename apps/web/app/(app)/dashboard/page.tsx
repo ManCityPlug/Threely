@@ -670,19 +670,17 @@ function DashboardPageInner() {
 
   // Show celebration when all DISPLAYED tasks go from not-done → done
   const hasTriggeredCelebration = useRef(false);
-  const prevViewAllDone = useRef(false);
   const [completedInSession, setCompletedInSession] = useState(false);
   useEffect(() => {
-    // Only trigger on transition: was NOT all done → now IS all done
-    // AND only when user manually toggled (checked, not unchecked)
-    if (viewAllDone && !prevViewAllDone.current && totalCount > 0 && userToggledRef.current && !hasTriggeredCelebration.current) {
+    // Only trigger when user just checked off the LAST task (all 3 done)
+    // Must be showing tasks, user must have toggled, and all must be complete
+    if (viewAllDone && showTasks && totalCount > 0 && userToggledRef.current && !hasTriggeredCelebration.current) {
       setShowCelebration(true);
       setCelebrationDismissed(false);
       setCompletedInSession(true);
       hasTriggeredCelebration.current = true;
     }
-    prevViewAllDone.current = viewAllDone;
-  }, [viewAllDone, totalCount]);
+  }, [viewAllDone, totalCount, showTasks]);
 
   function pickGoal(val: string) {
     setSelectedGoalId(val);
@@ -1502,6 +1500,7 @@ function DashboardPageInner() {
                   setShowTasks(false);
                   setViewingDay(null);
                   setViewingTasks(null);
+                  userToggledRef.current = false;
                 }}
                 style={{
                   background: "none", border: "none", color: "rgba(255,255,255,0.85)",
@@ -1568,6 +1567,7 @@ function DashboardPageInner() {
             setShowTasks(false);
             setViewingDay(null);
             setViewingTasks(null);
+            userToggledRef.current = false;
           }}
         />,
         document.body
