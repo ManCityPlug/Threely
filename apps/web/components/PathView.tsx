@@ -283,7 +283,7 @@ export default function PathView({
   // ─── Today popup ──────────────────────────────────────────────────────────
 
   function renderTodayPopup(day: number) {
-    if (day !== dayNumber || !todayPopup || allDoneToday) return null;
+    if (day !== dayNumber || allDoneToday) return null;
 
     return (
       <div
@@ -701,17 +701,6 @@ export default function PathView({
                         >
                           {allDoneToday ? "Complete!" : "TODAY"}
                         </div>
-                        {!allDoneToday && (
-                          <div style={{
-                            fontSize: "0.7rem",
-                            fontWeight: 700,
-                            color: GOLD,
-                            marginTop: 6,
-                            animation: "startPulse 2s ease-in-out infinite",
-                          }}>
-                            Tap to start →
-                          </div>
-                        )}
                       </>
                     )}
                     {isToday && crown && !allDoneToday && (
