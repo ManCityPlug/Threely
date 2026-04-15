@@ -603,23 +603,58 @@ function DashboardPageInner() {
   const viewAllDone = totalCount > 0 && completedCount === totalCount;
 
   const streak = getStreakFromGoals(effectiveGoals);
-  // goalDayNumber = stable time-based day number (never changes within a session)
   const goalDayNumber = selectedGoal ? getGoalDayNumber(selectedGoal) : 1;
 
+  // Track work-ahead state in localStorage
+  const todayStr = new Date().toLocaleDateString("en-CA");
+  const aheadUsedKey = `threely_work_ahead_${todayStr}_${effectiveSelectedGoalId}`;
+  const aheadDoneKey = `threely_ahead_done_${todayStr}_${effectiveSelectedGoalId}`;
+  const [workAheadUsed, setWorkAheadUsed] = useState(false);
+  const [workAheadDone, setWorkAheadDone] = useState(false);
+
+  useEffect(() => {
+    setWorkAheadUsed(!!localStorage.getItem(aheadUsedKey));
+    setWorkAheadDone(!!localStorage.getItem(aheadDoneKey));
+  }, [aheadUsedKey, aheadDoneKey]);
+
+  // Path state: compute which day is active and how many are completed
+  // - Before today done: active = goalDayNumber, completed = goalDayNumber - 1
+  // - Today done, no work ahead: active = goalDayNumber (shows COMPLETE!), next available
+  // - Work ahead started: active = goalDayNumber + 1 (Day 2 is active)
+  // - Work ahead completed: active = goalDayNumber + 1 (Day 2 shows COMPLETE!), Day 3 locked
+  const pathDayNumber = workAheadUsed ? goalDayNumber + 1 : goalDayNumber;
+  const pathCompletedDays = workAheadUsed ? goalDayNumber : goalDayNumber - 1;
+  const pathAllDone = workAheadUsed ? workAheadDone : todayAllDone;
+
+  // Detect when work-ahead tasks are all completed
+  useEffect(() => {
+    if (viewingTasks && viewingDay && viewingDay > goalDayNumber) {
+      const dt = viewingTasks.find(d => d.goalId === effectiveSelectedGoalId);
+      if (dt) {
+        const items = dt.tasks.slice(-3);
+        const allComplete = items.length > 0 && items.every(t => t.isCompleted || t.isSkipped);
+        if (allComplete && !workAheadDone) {
+          localStorage.setItem(aheadDoneKey, "true");
+          setWorkAheadDone(true);
+        }
+      }
+    }
+  }, [viewingTasks, viewingDay, goalDayNumber, effectiveSelectedGoalId, aheadDoneKey, workAheadDone]);
+
   // Show celebration when all tasks just completed — only once per session
-  // Track whether user has manually toggled any task (prevents triggering on page load)
   const userToggledRef = useRef(false);
   const hasTriggeredCelebration = useRef(false);
   const [completedInSession, setCompletedInSession] = useState(false);
   useEffect(() => {
-    // Only trigger when user manually completed the last task, not on initial data load
-    if (todayAllDone && todayItems.length > 0 && userToggledRef.current && !hasTriggeredCelebration.current) {
+    // Trigger for today's tasks OR work-ahead tasks
+    const justCompleted = (todayAllDone || (viewAllDone && viewingTasks)) && userToggledRef.current && !hasTriggeredCelebration.current;
+    if (justCompleted && (todayItems.length > 0 || (viewingTasks && totalCount > 0))) {
       setShowCelebration(true);
       setCelebrationDismissed(false);
       setCompletedInSession(true);
       hasTriggeredCelebration.current = true;
     }
-  }, [todayAllDone, todayItems.length]);
+  }, [todayAllDone, viewAllDone, todayItems.length, totalCount, viewingTasks]);
 
   function pickGoal(val: string) {
     setSelectedGoalId(val);
@@ -1135,86 +1170,35 @@ function DashboardPageInner() {
                   textAlign: "center",
                   marginBottom: 8,
                 }}>
-                  Day {goalDayNumber}
+                  Day {pathDayNumber}
                 </h1>
               )}
 
               {/* Path View */}
               <PathView
-                dayNumber={todayAllDone ? goalDayNumber + 1 : goalDayNumber}
-                completedDays={todayAllDone ? goalDayNumber : goalDayNumber - 1}
+                dayNumber={pathDayNumber}
+                completedDays={pathCompletedDays}
                 onDayClick={async (day, type) => {
-                  if (type === "today") {
-                    // If today's tasks are done (path advanced), generate/fetch for the next day
-                    if (todayAllDone && selectedGoal) {
-                      setViewingDay(day);
-                      setGenerating(true);
-                      try {
-                        const goalCreated = new Date(selectedGoal.createdAt);
-                        goalCreated.setHours(0, 0, 0, 0);
-                        const targetDate = new Date(goalCreated);
-                        targetDate.setDate(targetDate.getDate() + day - 1);
-                        const dateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-${String(targetDate.getDate()).padStart(2, "0")}`;
-
-                        // Try fetching existing tasks for this day first
-                        const existing = await tasksApi.today(false, dateStr);
-                        const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
-                        if (goalTasks.length > 0) {
-                          setViewingTasks(goalTasks);
-                          setShowTasks(true);
-                        } else {
-                          // No tasks for this day — generate them
-                          const { getSupabase } = await import("@/lib/supabase-client");
-                          const supabase = getSupabase();
-                          const { data: { session } } = await supabase.auth.getSession();
-                          const res = await fetch("/api/tasks/generate", {
-                            method: "POST",
-                            headers: {
-                              "Content-Type": "application/json",
-                              ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
-                            },
-                            body: JSON.stringify({ localDate: dateStr, goalId: effectiveSelectedGoalId }),
-                          });
-                          if (res.ok) {
-                            const data = await res.json();
-                            if (data.dailyTasks?.length > 0) {
-                              setViewingTasks(data.dailyTasks);
-                              setShowTasks(true);
-                            }
-                          } else {
-                            showToast("Couldn't generate tasks", "error");
-                          }
-                        }
-                      } catch {
-                        showToast("Couldn't load tasks", "error");
-                      } finally {
-                        setGenerating(false);
-                      }
-                    } else {
-                      setViewingDay(day);
+                  if (type === "today" || type === "completed") {
+                    // Fetch/show tasks for this day
+                    setViewingDay(day);
+                    if (day === goalDayNumber && !viewingTasks) {
+                      // It's the real today and we have tasks loaded — just show them
                       setShowTasks(true);
+                      return;
                     }
-                  } else if (type === "next") {
-                    // Check if work ahead already used today
-                    const todayKey = `threely_work_ahead_${new Date().toLocaleDateString("en-CA")}_${effectiveSelectedGoalId}`;
-                    if (localStorage.getItem(todayKey)) {
-                      setLockedTimerModal(true);
-                    } else {
-                      setWorkAheadModal(true);
-                    }
-                  } else if (type === "locked") {
-                    setLockedTimerModal(true);
-                  } else if (type === "completed") {
-                    // Fetch and show past day's completed tasks
+                    // Fetch tasks for this day's date
+                    if (!selectedGoal) return;
+                    setGenerating(true);
                     try {
-                      const goalCreated = selectedGoal?.createdAt ? new Date(selectedGoal.createdAt) : new Date();
-                      const pastDate = new Date(goalCreated);
-                      pastDate.setDate(pastDate.getDate() + day - 1);
-                      const dateStr = pastDate.toISOString().split("T")[0];
-                      const res = await tasksApi.today(false, dateStr);
-                      const goalTasks = res.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
+                      const goalCreated = new Date(selectedGoal.createdAt);
+                      goalCreated.setHours(0, 0, 0, 0);
+                      const targetDate = new Date(goalCreated);
+                      targetDate.setDate(targetDate.getDate() + day - 1);
+                      const dateStr = `${targetDate.getFullYear()}-${String(targetDate.getMonth() + 1).padStart(2, "0")}-${String(targetDate.getDate()).padStart(2, "0")}`;
+                      const existing = await tasksApi.today(false, dateStr);
+                      const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
                       if (goalTasks.length > 0) {
-                        setViewingDay(day);
                         setViewingTasks(goalTasks);
                         setShowTasks(true);
                       } else {
@@ -1222,10 +1206,20 @@ function DashboardPageInner() {
                       }
                     } catch {
                       showToast(`Day ${day}: Couldn't load tasks`, "error");
+                    } finally {
+                      setGenerating(false);
                     }
+                  } else if (type === "next") {
+                    if (workAheadUsed) {
+                      setLockedTimerModal(true);
+                    } else {
+                      setWorkAheadModal(true);
+                    }
+                  } else if (type === "locked") {
+                    setLockedTimerModal(true);
                   }
                 }}
-                allDoneToday={todayAllDone}
+                allDoneToday={pathAllDone}
                 totalTasks={totalCount}
                 onStartDay={() => {
                   setShowTasks(true);
@@ -1293,12 +1287,11 @@ function DashboardPageInner() {
                           setWorkAheadModal(false);
                           if (!hasPro) { router.push("/checkout?plan=yearly"); return; }
                           if (!selectedGoal) return;
-                          // Mark work ahead as used today for this goal
-                          const todayKey = `threely_work_ahead_${new Date().toLocaleDateString("en-CA")}_${effectiveSelectedGoalId}`;
-                          localStorage.setItem(todayKey, "true");
-                          // The "next" day on path = current path day + 1
-                          const pathDay = todayAllDone ? goalDayNumber + 1 : goalDayNumber;
-                          const workAheadDay = pathDay + 1;
+                          // Mark work ahead as used
+                          localStorage.setItem(aheadUsedKey, "true");
+                          setWorkAheadUsed(true);
+                          // The work-ahead day = goalDayNumber + 1
+                          const workAheadDay = goalDayNumber + 1;
                           // Compute actual date from goal creation
                           const goalCreated = new Date(selectedGoal.createdAt);
                           goalCreated.setHours(0, 0, 0, 0);
@@ -1504,7 +1497,7 @@ function DashboardPageInner() {
       {/* Celebration overlay */}
       {showCelebration && selectedGoal && typeof document !== "undefined" && createPortal(
         <CelebrationOverlay
-          dayNumber={goalDayNumber}
+          dayNumber={viewingDay ?? goalDayNumber}
           goalTitle={selectedGoal.title}
           onDismiss={() => {
             setShowCelebration(false);
