@@ -607,19 +607,32 @@ function DashboardPageInner() {
   const streak = getStreakFromGoals(effectiveGoals);
   const goalDayNumber = selectedGoal ? getGoalDayNumber(selectedGoal) : 1;
 
+  // Compute actual day number from the displayed task's date (handles work-ahead)
+  const displayDayNumber = (() => {
+    if (!selectedGoal) return goalDayNumber;
+    const dt = effectiveDailyTasks.find(d => d.goalId === effectiveSelectedGoalId);
+    if (!dt?.date) return goalDayNumber;
+    const created = new Date(selectedGoal.createdAt);
+    created.setHours(0, 0, 0, 0);
+    const taskDate = new Date(dt.date);
+    taskDate.setHours(0, 0, 0, 0);
+    const diff = taskDate.getTime() - created.getTime();
+    return Math.max(1, Math.floor(diff / (1000 * 60 * 60 * 24)) + 1);
+  })();
+
   // Show celebration when all tasks just completed — only once per session
-  const prevAllDone = useRef(false);
+  // Track whether user has manually toggled any task (prevents triggering on page load)
+  const userToggledRef = useRef(false);
   const hasTriggeredCelebration = useRef(false);
   const [completedInSession, setCompletedInSession] = useState(false);
   useEffect(() => {
-    // Only trigger when transitioning from not-done to done (user just completed last task)
-    if (allDone && !prevAllDone.current && totalCount > 0 && !hasTriggeredCelebration.current) {
+    // Only trigger when user manually completed the last task, not on initial data load
+    if (allDone && totalCount > 0 && userToggledRef.current && !hasTriggeredCelebration.current) {
       setShowCelebration(true);
       setCelebrationDismissed(false);
       setCompletedInSession(true);
       hasTriggeredCelebration.current = true;
     }
-    prevAllDone.current = allDone;
   }, [allDone, totalCount]);
 
   function pickGoal(val: string) {
@@ -671,6 +684,7 @@ function DashboardPageInner() {
   }
 
   async function handleToggle(dailyTaskId: string, taskItemId: string, isCompleted: boolean) {
+    userToggledRef.current = true;
     if (isCompleted) {
       setAnimatingTaskId(taskItemId);
       setTimeout(() => setAnimatingTaskId(null), 400);
@@ -1115,9 +1129,9 @@ function DashboardPageInner() {
                     fontSize: "0.95rem",
                     lineHeight: 1.6,
                   }}>
-                    {getCompletionMessage(goalDayNumber)}
+                    {getCompletionMessage(displayDayNumber)}
                   </p>
-                  <MidnightCountdown dayNumber={goalDayNumber} />
+                  <MidnightCountdown dayNumber={displayDayNumber} />
                 </div>
               )}
 
@@ -1131,14 +1145,14 @@ function DashboardPageInner() {
                   textAlign: "center",
                   marginBottom: 8,
                 }}>
-                  Day {goalDayNumber}
+                  Day {displayDayNumber}
                 </h1>
               )}
 
               {/* Path View */}
               <PathView
-                dayNumber={goalDayNumber}
-                completedDays={goalDayNumber - 1}
+                dayNumber={allDone ? displayDayNumber + 1 : displayDayNumber}
+                completedDays={allDone ? displayDayNumber : displayDayNumber - 1}
                 onDayClick={async (day, type) => {
                   if (type === "today") {
                     setShowTasks(true);
@@ -1164,7 +1178,7 @@ function DashboardPageInner() {
                     }
                   }
                 }}
-                allDoneToday={allDone && completedInSession}
+                allDoneToday={allDone}
                 totalTasks={totalCount}
                 onStartDay={() => {
                   setShowTasks(true);
@@ -1327,7 +1341,7 @@ function DashboardPageInner() {
                 textAlign: "center",
                 marginBottom: 4,
               }}>
-                Day {goalDayNumber}
+                Day {displayDayNumber}
               </h1>
 
               <p style={{
@@ -1368,7 +1382,7 @@ function DashboardPageInner() {
       {/* Celebration overlay */}
       {showCelebration && selectedGoal && typeof document !== "undefined" && createPortal(
         <CelebrationOverlay
-          dayNumber={goalDayNumber}
+          dayNumber={displayDayNumber}
           goalTitle={selectedGoal.title}
           onDismiss={() => {
             setShowCelebration(false);
