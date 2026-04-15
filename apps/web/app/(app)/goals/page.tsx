@@ -572,9 +572,6 @@ function GoalsPageInner() {
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.75rem" }}>
         <div>
           <h1 style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.03em" }}>Goals</h1>
-          <p style={{ color: "var(--subtext)", fontSize: "0.875rem", marginTop: 2 }}>
-            {activeGoals.length} goal{activeGoals.length !== 1 ? "s" : ""}
-          </p>
         </div>
         <button
           className="btn btn-primary"
@@ -587,21 +584,18 @@ function GoalsPageInner() {
 
       {/* Goals list */}
       {effectiveGoals.length === 0 ? (
-        <div className="card" style={{ padding: "3rem 2rem", textAlign: "center" }}>
-          <div style={{ fontSize: 48, marginBottom: "1rem" }}>{"\uD83C\uDFAF"}</div>
-          <h2 style={{ fontSize: "1.25rem", fontWeight: 700, marginBottom: 8, letterSpacing: "-0.02em" }}>What will you achieve?</h2>
-          <p style={{ color: "var(--subtext)", marginBottom: "1rem", fontSize: "0.9rem", lineHeight: 1.6 }}>
-            Set a goal and your AI coach will break it into 3 small daily tasks — the proven way to make real progress.
-          </p>
-          <div style={{ display: "flex", justifyContent: "center", gap: 16, marginBottom: "1.5rem", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>AI-powered tasks</span>
-            <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{"·"}</span>
-            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>Daily coaching</span>
-            <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{"·"}</span>
-            <span style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>Progress tracking</span>
-          </div>
-          <button className="btn btn-primary" onClick={handleTryAddGoal} style={{ fontSize: "0.95rem", padding: "0.75rem 2rem" }}>
-            Create your first goal {"\u2192"}
+        <div style={{ padding: "4rem 2rem", textAlign: "center" }}>
+          <div style={{ fontSize: 64, marginBottom: "1rem" }}>{"🚀"}</div>
+          <button
+            onClick={handleTryAddGoal}
+            style={{
+              fontSize: "1.1rem", fontWeight: 700, padding: "1rem 2.5rem",
+              background: "linear-gradient(135deg, #E8C547, #D4A843)",
+              color: "#000", borderRadius: 14, border: "none", cursor: "pointer",
+              boxShadow: "0 4px 16px rgba(212,168,67,0.3)",
+            }}
+          >
+            Create your first goal →
           </button>
         </div>
       ) : (
