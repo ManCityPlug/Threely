@@ -1092,30 +1092,7 @@ function CelebrationOverlay({
           Day {dayNumber} Complete
         </Animated.Text>
 
-        <Animated.Text style={{
-          fontSize: typography.md,
-          color: "rgba(255,255,255,0.85)",
-          textAlign: "center",
-          lineHeight: 26,
-          marginBottom: 16,
-          maxWidth: 340,
-          transform: [{ translateY: slideAnim }],
-          opacity: fadeAnim,
-        }}>
-          {getCompletionMessage(dayNumber)}
-        </Animated.Text>
-
-        <Animated.Text style={{
-          fontSize: typography.base,
-          color: GOLD,
-          marginBottom: 40,
-          transform: [{ translateY: slideAnim }],
-          opacity: fadeAnim,
-        }}>
-          {"→"} {goalTitle}
-        </Animated.Text>
-
-        <Animated.View style={{ transform: [{ translateY: slideAnim }], opacity: fadeAnim }}>
+        <Animated.View style={{ transform: [{ translateY: slideAnim }], opacity: fadeAnim, marginTop: 24 }}>
           <TouchableOpacity
             onPress={onDismiss}
             activeOpacity={0.85}
@@ -1787,7 +1764,6 @@ export default function DashboardScreen() {
               <View style={styles.allDoneContainer}>
                 <Text style={styles.allDoneCheck}>{"✓"}</Text>
                 <Text style={styles.allDoneTitle}>All done for today</Text>
-                <Text style={styles.allDoneMessage}>{getCompletionMessage(goalDayNumber)}</Text>
                 <View style={styles.countdownContainer}>
                   <Text style={styles.countdownText}>Next day unlocks in {midnightCountdown}</Text>
                 </View>
