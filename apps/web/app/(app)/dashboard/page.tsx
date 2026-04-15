@@ -1164,7 +1164,7 @@ function DashboardPageInner() {
                     }
                   }
                 }}
-                allDoneToday={allDone}
+                allDoneToday={allDone && completedInSession}
                 totalTasks={totalCount}
                 onStartDay={() => {
                   setShowTasks(true);
