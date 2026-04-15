@@ -385,36 +385,6 @@ export default function ProfilePage() {
       <div style={{ marginBottom: "2rem" }}>
         {true && (
           <>
-            {/* Tutorial */}
-            <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <div>
-                  <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", margin: 0 }}>
-                    Tutorial
-                  </h3>
-                  <p style={{ fontSize: "0.8rem", color: "var(--subtext)", margin: "4px 0 0 0" }}>
-                    Learn how Threely works
-                  </p>
-                </div>
-                <button
-                  className="btn btn-outline"
-                  onClick={() => {
-                    if (confirm("Would you like to go through the guided tutorial? It will walk you through all the features.")) {
-                      if (user) {
-                        try {
-                          localStorage.removeItem(`threely_tutorial_done_${user.id}`);
-                          localStorage.setItem("threely_start_tutorial", "true");
-                        } catch {}
-                      }
-                      window.location.href = "/dashboard?welcome=1";
-                    }
-                  }}
-                  style={{ fontSize: "0.82rem", padding: "6px 16px" }}
-                >
-                  Start tutorial
-                </button>
-              </div>
-            </div>
 
             {/* Notifications */}
             <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
