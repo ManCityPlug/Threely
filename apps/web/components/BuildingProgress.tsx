@@ -8,15 +8,14 @@ export default function BuildingProgress() {
   useEffect(() => {
     let cancelled = false;
     const startTime = Date.now();
-    const DURATION = 6000; // 6 seconds to fill
+    const DURATION = 8000; // 8 seconds to fill
 
     const animate = () => {
       if (cancelled) return;
       const elapsed = Date.now() - startTime;
       const t = Math.min(elapsed / DURATION, 0.98);
-      // Ease out — fast start, slows at end
-      const eased = 1 - Math.pow(1 - t, 2.5);
-      setProgress(eased);
+      // Linear steady fill — slow and consistent
+      setProgress(t);
       if (t < 0.98) requestAnimationFrame(animate);
     };
     animate();
