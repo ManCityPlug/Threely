@@ -1236,15 +1236,18 @@ function DashboardPageInner() {
                           try {
                             const res = await tasksApi.generate(
                               effectiveSelectedGoalId
-                                ? { goalId: effectiveSelectedGoalId }
-                                : undefined
+                                ? { goalId: effectiveSelectedGoalId, requestingAdditional: true }
+                                : { requestingAdditional: true }
                             );
                             if (res.dailyTasks.length > 0) {
-                              setDailyTasks(res.dailyTasks);
+                              // Merge new tasks with existing (don't replace)
+                              setDailyTasks(prev => {
+                                const newIds = new Set(res.dailyTasks.map(dt => dt.id));
+                                return [...prev.filter(dt => !newIds.has(dt.id)), ...res.dailyTasks];
+                              });
                               setCelebrationDismissed(false);
                               setShowTasks(true);
                             } else {
-                              // Reload all data if generate returned empty
                               window.location.reload();
                             }
                           } catch {
