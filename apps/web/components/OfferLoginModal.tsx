@@ -134,7 +134,7 @@ export default function OfferLoginModal({ firstName }: Props) {
               marginBottom: 6,
             }}
           >
-            {firstName}, we have a gift for you
+            {firstName ? `${firstName}, we have a gift for you` : "We have a gift for you"}
           </h2>
           <p
             style={{
