@@ -1186,8 +1186,8 @@ function DashboardPageInner() {
                       if (goalTasks.length > 0) {
                         setViewingTasks(goalTasks);
                         setShowTasks(true);
-                      } else {
-                        // No tasks for this day — generate them
+                      } else if (type === "today") {
+                        // Only generate for the active "today" node, not past completed days
                         const { getSupabase } = await import("@/lib/supabase-client");
                         const supabase = getSupabase();
                         const { data: { session } } = await supabase.auth.getSession();
@@ -1208,6 +1208,9 @@ function DashboardPageInner() {
                         } else {
                           showToast("Couldn't generate tasks", "error");
                         }
+                      } else {
+                        // Past completed day with no tasks — just show empty state
+                        showToast(`Day ${day}: No tasks recorded`, "error");
                       }
                     } catch {
                       showToast(`Day ${day}: Couldn't load tasks`, "error");
