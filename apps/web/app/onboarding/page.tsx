@@ -27,6 +27,26 @@ interface StepConfig {
   continueButton?: string;
 }
 
+function cleanFallbackTitle(rawInput: string): string {
+  let text = rawInput.trim();
+  const stripPatterns = [
+    /^i\s+(want|need|would\s+like|plan|aim|intend|hope|wish)\s+to\s+/i,
+    /^i'd\s+like\s+to\s+/i,
+    /^i'm\s+(trying|going|planning|hoping|looking)\s+to\s+/i,
+    /^my\s+goal\s+is\s+(to\s+)?/i,
+    /^i\s+want\s+/i,
+  ];
+  for (const p of stripPatterns) text = text.replace(p, "");
+  text = text.replace(/[.!?,;:\s]+$/, "").trim();
+  if (text.length > 0) text = text.charAt(0).toUpperCase() + text.slice(1);
+  if (text.length > 25) {
+    const cut = text.slice(0, 25);
+    const lastSpace = cut.lastIndexOf(" ");
+    text = lastSpace > 10 ? cut.slice(0, lastSpace) : cut;
+  }
+  return text || "My Goal";
+}
+
 // ─── Step configurations per category ─────────────────────────────────────────
 
 const STEPS: Record<Category, StepConfig[]> = {
@@ -215,7 +235,7 @@ export default function OnboardingPage() {
 
     try {
       const result: ParsedGoal = await goalsApi.parse(goalText);
-      const goalTitle = result.short_title ?? goalText.slice(0, 40);
+      const goalTitle = result.short_title ?? cleanFallbackTitle(goalText);
       const detectedTime = result.daily_time_detected && result.daily_time_detected > 0
         ? result.daily_time_detected : null;
 

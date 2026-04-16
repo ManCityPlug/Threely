@@ -106,9 +106,11 @@ function getCompletionMessage(day: number): string {
 
 function getGoalDayNumber(goal: Goal): number {
   const created = new Date(goal.createdAt);
+  const createdLocal = new Date(created.getFullYear(), created.getMonth(), created.getDate());
   const now = new Date();
-  const diff = now.getTime() - created.getTime();
-  return Math.max(1, Math.floor(diff / (1000 * 60 * 60 * 24)) + 1);
+  const nowLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const diffMs = nowLocal.getTime() - createdLocal.getTime();
+  return Math.max(1, Math.floor(diffMs / (1000 * 60 * 60 * 24)) + 1);
 }
 
 function getStreakFromGoals(goals: Goal[]): number {
@@ -566,25 +568,30 @@ function SCurvePathView({
   onTapToday,
   onTapWorkAhead,
   onTapLocked,
+  onTapCompleted,
   colors,
   screenWidth,
   taskProgress,
+  startedDays,
 }: {
   goalDayNumber: number;
   allDone: boolean;
   onTapToday: () => void;
   onTapWorkAhead: () => void;
   onTapLocked: (day: number) => void;
+  onTapCompleted: (day: number) => void;
   colors: Colors;
   screenWidth: number;
   taskProgress: number;
+  startedDays: Set<number>;
 }) {
   const scrollRef = useRef<ScrollView>(null);
   const [showScrollHint, setShowScrollHint] = useState(true);
 
-  // Show 20 nodes starting from a window around today
+  // Stage system: 20 nodes per stage (1-20, 21-40, 41-60, ...) — match web PathView
   const VISIBLE_NODES = 20;
-  const windowStart = Math.max(1, goalDayNumber - Math.min(goalDayNumber - 1, 5));
+  const stage = Math.ceil(goalDayNumber / VISIBLE_NODES) || 1;
+  const windowStart = (stage - 1) * VISIBLE_NODES + 1;
   const days: number[] = [];
   for (let i = 0; i < VISIBLE_NODES; i++) {
     days.push(windowStart + i);
@@ -692,8 +699,8 @@ function SCurvePathView({
                   zIndex: isToday ? 10 : isCrown ? 5 : 1,
                   alignItems: "center",
                 }}>
-                  {/* START/COMPLETE badge above today's node */}
-                  {isToday && (
+                  {/* START/COMPLETE badge above today's node — only before user has tapped */}
+                  {isToday && (allDone || !startedDays.has(day)) && (
                     <StartBadge
                       allDone={allDone}
                       onPress={() => {
@@ -719,6 +726,10 @@ function SCurvePathView({
                         if (allDone) return;
                         if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         onTapToday();
+                      }
+                      : isCompleted ? () => {
+                        if (Platform.OS !== "web") Haptics.selectionAsync();
+                        onTapCompleted(day);
                       }
                       : isWorkAhead ? onTapWorkAhead
                       : isLocked ? () => onTapLocked(day)
@@ -822,12 +833,16 @@ function GamifiedTaskCard({
   colors,
   isAnimating,
   readOnly,
+  paywalled,
+  onPaywall,
 }: {
   task: TaskItem;
   onToggle: (isCompleted: boolean) => void;
   colors: Colors;
   isAnimating: boolean;
   readOnly?: boolean;
+  paywalled?: boolean;
+  onPaywall?: () => void;
 }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const checkScaleAnim = useRef(new Animated.Value(1)).current;
@@ -848,72 +863,76 @@ function GamifiedTaskCard({
   const taskTitle = (task as unknown as { title?: string }).title ?? task.task;
 
   return (
-    <TouchableOpacity
-      activeOpacity={0.85}
-      onPress={() => {
-        if (!readOnly && !task.isSkipped) {
-          if (Platform.OS !== "web") {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    <View style={{ position: "relative" }}>
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={() => {
+          if (paywalled) { onPaywall?.(); return; }
+          if (!readOnly && !task.isSkipped) {
+            if (Platform.OS !== "web") {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+            }
+            onToggle(!task.isCompleted);
           }
-          onToggle(!task.isCompleted);
-        }
-      }}
-    >
-      <Animated.View style={{
-        transform: [{ scale: scaleAnim }],
-        backgroundColor: colors.card,
-        borderRadius: 14,
-        borderWidth: 1,
-        borderColor: task.isCompleted ? GOLD : colors.border,
-        padding: spacing.md,
-        flexDirection: "row",
-        alignItems: "flex-start",
-        gap: spacing.md,
-        opacity: task.isSkipped ? 0.5 : 1,
-      }}>
-        {/* Checkbox */}
-        <View style={{ marginTop: 2 }}>
-          <Animated.View style={{
-            width: 28,
-            height: 28,
-            borderRadius: 8,
-            borderWidth: 2,
-            borderColor: task.isCompleted ? GOLD : colors.border,
-            backgroundColor: task.isCompleted ? GOLD : "transparent",
-            alignItems: "center",
-            justifyContent: "center",
-            transform: [{ scale: checkScaleAnim }],
-          }}>
-            {task.isCompleted && (
-              <Text style={{ color: "#000", fontSize: 14, fontWeight: "800" }}>{"✓"}</Text>
-            )}
-          </Animated.View>
-        </View>
-
-        {/* Content */}
-        <View style={{ flex: 1 }}>
-          <Text style={{
-            fontWeight: "600",
-            fontSize: typography.base,
-            color: task.isCompleted ? colors.textTertiary : colors.text,
-            textDecorationLine: "none",
-            lineHeight: 22,
-          }}>
-            {taskTitle}
-          </Text>
-          {task.description ? (
-            <Text style={{
-              fontSize: typography.sm,
-              color: task.isCompleted ? colors.textTertiary : colors.textSecondary,
-              marginTop: 4,
-              lineHeight: 20,
+        }}
+      >
+        <Animated.View style={{
+          transform: [{ scale: scaleAnim }],
+          backgroundColor: colors.card,
+          borderRadius: 14,
+          borderWidth: 1,
+          borderColor: task.isCompleted ? GOLD : colors.border,
+          padding: spacing.md,
+          flexDirection: "row",
+          alignItems: "flex-start",
+          gap: spacing.md,
+          opacity: task.isSkipped ? 0.5 : 1,
+        }}>
+          {/* Checkbox */}
+          <View style={{ marginTop: 2 }}>
+            <Animated.View style={{
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              borderWidth: 2,
+              borderColor: task.isCompleted ? GOLD : colors.border,
+              backgroundColor: task.isCompleted ? GOLD : "transparent",
+              alignItems: "center",
+              justifyContent: "center",
+              transform: [{ scale: checkScaleAnim }],
             }}>
-              {task.description}
+              {task.isCompleted && (
+                <Text style={{ color: "#000", fontSize: 14, fontWeight: "800" }}>{"✓"}</Text>
+              )}
+            </Animated.View>
+          </View>
+
+          {/* Content */}
+          <View style={{ flex: 1 }}>
+            <Text style={{
+              fontWeight: "600",
+              fontSize: typography.base,
+              color: task.isCompleted ? colors.textTertiary : colors.text,
+              textDecorationLine: "none",
+              lineHeight: 22,
+            }}>
+              {taskTitle}
             </Text>
-          ) : null}
-        </View>
-      </Animated.View>
-    </TouchableOpacity>
+            {task.description ? (
+              <Text style={{
+                fontSize: typography.sm,
+                color: task.isCompleted ? colors.textTertiary : colors.textSecondary,
+                marginTop: 4,
+                lineHeight: 20,
+              }}>
+                {task.description}
+              </Text>
+            ) : null}
+          </View>
+        </Animated.View>
+      </TouchableOpacity>
+
+    </View>
   );
 }
 
@@ -1158,9 +1177,18 @@ export default function DashboardScreen() {
   const [showTodayPopup, setShowTodayPopup] = useState(false);
   const [midnightCountdown, setMidnightCountdown] = useState(getMidnightCountdown());
 
+  // Persisted "started" days (Gap 2): remove START badge once user taps today
+  const [startedDays, setStartedDays] = useState<Set<number>>(new Set());
+  // Completed-day modal (Gap 3): show that day's tasks read-only
+  const [viewingDay, setViewingDay] = useState<{ day: number; tasks: TaskItem[] } | null>(null);
+  const [viewingDayLoading, setViewingDayLoading] = useState(false);
+  // Stage-complete celebration (Gap 4)
+  const [showStageCelebration, setShowStageCelebration] = useState(false);
+  const [stageCelebrationNumber, setStageCelebrationNumber] = useState(1);
+
   // ─── Pro / trial state ────────────────────────────────────────────────────────
   const [showTutorial, setShowTutorial] = useState(false);
-  const { isLimitedMode, walkthroughActive, setWalkthroughActive, refreshSubscription } = useSubscription();
+  const { hasPro, isLimitedMode, walkthroughActive, setWalkthroughActive, refreshSubscription } = useSubscription();
   const [showPaywall, setShowPaywall] = useState(false);
 
   const hasLoadedOnce = useRef(false);
@@ -1415,10 +1443,66 @@ export default function DashboardScreen() {
   const streak = getStreakFromGoals(effectiveGoals);
   const goalDayNumber = currentGoalObj ? getGoalDayNumber(currentGoalObj) : 1;
 
+  // Gap 1 — completion-gated next-day unlock.
+  // The calendar day can advance at midnight, but if the loaded tasks are for
+  // an earlier day AND are not all done, the user should still perceive that
+  // earlier day as "today". We derive the effective day from the loaded task's
+  // date so it never bumps past an unfinished day.
+  const effectiveDayNumber = (() => {
+    if (!currentGoalObj) return goalDayNumber;
+    const dt = visibleTasks[0];
+    if (!dt || allDone) return goalDayNumber;
+    // Compute goal day from the DailyTask.date (local midnight diff)
+    const created = new Date(currentGoalObj.createdAt);
+    const createdLocal = new Date(created.getFullYear(), created.getMonth(), created.getDate());
+    const taskDate = new Date(dt.date);
+    const taskLocal = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
+    const diffDays = Math.floor((taskLocal.getTime() - createdLocal.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const derived = Math.max(1, diffDays);
+    // Cap at calendar to avoid future-dated tasks bumping the path
+    return Math.min(derived, goalDayNumber);
+  })();
+
   // Task progress for progress ring (0-1)
   const taskProgress = newTaskItems.length > 0
     ? newTaskItems.filter(t => t.isCompleted || t.isSkipped).length / newTaskItems.length
     : 0;
+
+  // Gap 2 — load persisted "started" days when goal changes
+  useEffect(() => {
+    if (!effectiveSelectedGoal) { setStartedDays(new Set()); return; }
+    let cancelled = false;
+    (async () => {
+      try {
+        const allKeys = await AsyncStorage.getAllKeys();
+        const prefix = `@threely_started_${effectiveSelectedGoal}_d`;
+        const mine = allKeys.filter((k) => k.startsWith(prefix));
+        const nums = mine
+          .map((k) => parseInt(k.slice(prefix.length), 10))
+          .filter((n) => !Number.isNaN(n));
+        if (!cancelled) setStartedDays(new Set(nums));
+      } catch {
+        if (!cancelled) setStartedDays(new Set());
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [effectiveSelectedGoal]);
+
+  const markDayStarted = useCallback((day: number) => {
+    if (!effectiveSelectedGoal) return;
+    const key = `@threely_started_${effectiveSelectedGoal}_d${day}`;
+    AsyncStorage.setItem(key, "1").catch(() => {});
+    setStartedDays((prev) => {
+      if (prev.has(day)) return prev;
+      const next = new Set(prev);
+      next.add(day);
+      return next;
+    });
+  }, [effectiveSelectedGoal]);
+
+  // Gap 4 — stage-complete celebration: fires after regular day-complete,
+  // declared later once `userToggledRef` exists.
+  const prevStageCompleteRef = useRef<{ goalId: string | null; day: number | null }>({ goalId: null, day: null });
 
   // Build notification context
   const buildNotifContext = useCallback((): NotifContext => {
@@ -1459,6 +1543,21 @@ export default function DashboardScreen() {
       hasTriggeredCelebration.current = true;
     }
   }, [allDone, newTaskItems.length]);
+
+  // Gap 4 — stage-complete celebration: when user completes day 20 / 40 / 60 / ...
+  useEffect(() => {
+    if (!allDone || !effectiveSelectedGoal || !userToggledRef.current) return;
+    if (goalDayNumber % 20 !== 0) return;
+    if (
+      prevStageCompleteRef.current.goalId === effectiveSelectedGoal &&
+      prevStageCompleteRef.current.day === goalDayNumber
+    ) return;
+    prevStageCompleteRef.current = { goalId: effectiveSelectedGoal, day: goalDayNumber };
+    setStageCelebrationNumber(Math.ceil(goalDayNumber / 20));
+    // Let the regular day-complete celebration fire first, then stage one
+    const t = setTimeout(() => setShowStageCelebration(true), 600);
+    return () => clearTimeout(t);
+  }, [allDone, goalDayNumber, effectiveSelectedGoal]);
 
   // When all done and celebration dismissed, switch back to path
   useEffect(() => {
@@ -1764,11 +1863,13 @@ export default function DashboardScreen() {
 
             {/* S-curve path */}
             <SCurvePathView
-              goalDayNumber={allDone ? goalDayNumber + 1 : goalDayNumber}
+              goalDayNumber={allDone ? effectiveDayNumber + 1 : effectiveDayNumber}
               allDone={allDone && celebrationDismissed}
+              startedDays={startedDays}
               onTapToday={() => {
                 if (allDone && celebrationDismissed) return;
                 if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                markDayStarted(effectiveDayNumber);
                 setShowTodayPopup(true);
               }}
               onTapWorkAhead={async () => {
@@ -1809,6 +1910,31 @@ export default function DashboardScreen() {
                 const h = Math.floor(diff / (1000 * 60 * 60));
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 Alert.alert("This day is locked", `Complete the current day first.\nUnlocks in ${h}h ${m}m.`);
+              }}
+              onTapCompleted={async (day) => {
+                if (!currentGoalObj) return;
+                // Stage guard (Gap 4): only allow viewing completed days in the current stage
+                const currentStage = Math.ceil(effectiveDayNumber / 20) || 1;
+                const tapStage = Math.ceil(day / 20) || 1;
+                if (tapStage !== currentStage) return;
+                // Compute the date for this day based on goal.createdAt
+                const created = new Date(currentGoalObj.createdAt);
+                const base = new Date(created.getFullYear(), created.getMonth(), created.getDate());
+                const target = new Date(base);
+                target.setDate(target.getDate() + day - 1);
+                const dateStr = `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, "0")}-${String(target.getDate()).padStart(2, "0")}`;
+                setViewingDayLoading(true);
+                setViewingDay({ day, tasks: [] });
+                try {
+                  const res = await tasksApi.today(false, dateStr);
+                  const goalTasks = res.dailyTasks.filter((dt) => dt.goalId === effectiveSelectedGoal);
+                  const items = goalTasks.flatMap((dt) => (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : [])).slice(-3);
+                  setViewingDay({ day, tasks: items });
+                } catch {
+                  setViewingDay({ day, tasks: [] });
+                } finally {
+                  setViewingDayLoading(false);
+                }
               }}
               colors={colors}
               screenWidth={screenWidth}
@@ -1855,6 +1981,8 @@ export default function DashboardScreen() {
                           colors={colors}
                           isAnimating={animatingTaskId === task.id}
                           readOnly={allDone}
+                          paywalled={!hasPro && !walkthroughActive}
+                          onPaywall={() => setShowPaywall(true)}
                         />
                       </View>
                     ))}
@@ -1956,7 +2084,171 @@ export default function DashboardScreen() {
         colors={colors}
       />
 
-      <Paywall visible={showPaywall} onDismiss={() => { setShowPaywall(false); refreshSubscription(); }} />
+      {/* ── Stage-complete celebration (Gap 4) ──────────────────────────────── */}
+      <Modal visible={showStageCelebration} transparent animationType="fade">
+        <Pressable
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.85)", alignItems: "center", justifyContent: "center", padding: spacing.xl }}
+          onPress={() => setShowStageCelebration(false)}
+        >
+          <View style={{
+            position: "absolute",
+            width: 300,
+            height: 300,
+            borderRadius: 150,
+            backgroundColor: "rgba(212,168,67,0.12)",
+          }} />
+          <Text style={{ fontSize: 80, marginBottom: 24 }}>{"🏆"}</Text>
+          <Text style={{
+            fontSize: typography.xxxl + 4,
+            fontWeight: "800",
+            color: "#fff",
+            letterSpacing: -1,
+            marginBottom: 12,
+            textAlign: "center",
+          }}>
+            Stage {stageCelebrationNumber} Complete!
+          </Text>
+          <Text style={{
+            fontSize: typography.base,
+            color: "rgba(255,255,255,0.8)",
+            textAlign: "center",
+            marginBottom: spacing.lg,
+            paddingHorizontal: spacing.lg,
+          }}>
+            A new path unlocks tomorrow.
+          </Text>
+          <TouchableOpacity
+            onPress={() => setShowStageCelebration(false)}
+            activeOpacity={0.85}
+            style={{
+              paddingHorizontal: 48,
+              paddingVertical: 16,
+              borderRadius: 14,
+              backgroundColor: GOLD,
+            }}
+          >
+            <Text style={{ fontSize: typography.md, fontWeight: "700", color: "#000" }}>
+              Keep going
+            </Text>
+          </TouchableOpacity>
+        </Pressable>
+      </Modal>
+
+      {/* ── Completed-day read-only modal (Gap 3) ───────────────────────────── */}
+      <Modal visible={viewingDay !== null} transparent animationType="fade">
+        <Pressable
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.55)", justifyContent: "center", alignItems: "center", padding: spacing.lg }}
+          onPress={() => setViewingDay(null)}
+        >
+          <Pressable
+            style={{
+              backgroundColor: colors.card,
+              borderRadius: radius.xl,
+              padding: spacing.xl,
+              width: "100%",
+              maxWidth: 420,
+              borderWidth: 1,
+              borderColor: "rgba(212,168,67,0.25)",
+            }}
+            onPress={() => {}}
+          >
+            <View style={{ alignItems: "center", marginBottom: spacing.md }}>
+              <Text style={{ fontSize: 36, marginBottom: spacing.xs }}>{"🏆"}</Text>
+              <Text style={{ fontSize: typography.xxl, fontWeight: "800", color: colors.text, letterSpacing: -0.5 }}>
+                Day {viewingDay?.day ?? ""}
+              </Text>
+              <Text style={{ fontSize: typography.sm, fontWeight: "600", color: GOLD, marginTop: 2, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                Completed
+              </Text>
+            </View>
+
+            {viewingDayLoading ? (
+              <Text style={{ textAlign: "center", color: colors.textSecondary, paddingVertical: spacing.lg }}>
+                Loading…
+              </Text>
+            ) : viewingDay && viewingDay.tasks.length === 0 ? (
+              <Text style={{ textAlign: "center", color: colors.textSecondary, paddingVertical: spacing.md, lineHeight: 20 }}>
+                No tasks recorded for this day.
+              </Text>
+            ) : (
+              <View style={{ gap: spacing.sm }}>
+                {(viewingDay?.tasks ?? []).map((t) => (
+                  <View key={t.id} style={{
+                    flexDirection: "row",
+                    alignItems: "flex-start",
+                    gap: spacing.md,
+                    padding: spacing.md,
+                    borderRadius: radius.md,
+                    borderWidth: 1,
+                    borderColor: t.isCompleted ? GOLD : colors.border,
+                    backgroundColor: colors.bg,
+                  }}>
+                    <View style={{
+                      width: 24,
+                      height: 24,
+                      borderRadius: 6,
+                      borderWidth: 2,
+                      borderColor: t.isCompleted ? GOLD : colors.border,
+                      backgroundColor: t.isCompleted ? GOLD : "transparent",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginTop: 2,
+                    }}>
+                      {t.isCompleted && (
+                        <Text style={{ color: "#000", fontSize: 13, fontWeight: "800" }}>{"✓"}</Text>
+                      )}
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{
+                        fontSize: typography.base,
+                        fontWeight: "600",
+                        color: t.isCompleted ? colors.textTertiary : colors.text,
+                        lineHeight: 20,
+                      }}>
+                        {(t as unknown as { title?: string }).title ?? t.task}
+                      </Text>
+                      {t.description ? (
+                        <Text style={{
+                          fontSize: typography.sm,
+                          color: t.isCompleted ? colors.textTertiary : colors.textSecondary,
+                          marginTop: 2,
+                          lineHeight: 18,
+                        }}>
+                          {t.description}
+                        </Text>
+                      ) : null}
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+
+            <TouchableOpacity
+              onPress={() => setViewingDay(null)}
+              activeOpacity={0.85}
+              style={{
+                marginTop: spacing.lg,
+                paddingVertical: 12,
+                borderRadius: radius.lg,
+                backgroundColor: GOLD,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ fontSize: typography.base, fontWeight: "700", color: "#000" }}>
+                Close
+              </Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      </Modal>
+
+      <Paywall
+        visible={showPaywall}
+        onDismiss={() => {
+          setShowPaywall(false);
+          refreshSubscription();
+        }}
+      />
     </View>
     </SwipeNavigator>
   );

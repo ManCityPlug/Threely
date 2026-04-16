@@ -805,6 +805,26 @@ When wrapping up (done: true):
  * Parse raw free-text goal input into a structured summary.
  * Used in onboarding Step 1 after user types their goal.
  */
+function cleanFallbackTitle(rawInput: string): string {
+  let text = rawInput.trim();
+  const stripPatterns = [
+    /^i\s+(want|need|would\s+like|plan|aim|intend|hope|wish)\s+to\s+/i,
+    /^i'd\s+like\s+to\s+/i,
+    /^i'm\s+(trying|going|planning|hoping|looking)\s+to\s+/i,
+    /^my\s+goal\s+is\s+(to\s+)?/i,
+    /^i\s+want\s+/i,
+  ];
+  for (const p of stripPatterns) text = text.replace(p, "");
+  text = text.replace(/[.!?,;:\s]+$/, "").trim();
+  if (text.length > 0) text = text.charAt(0).toUpperCase() + text.slice(1);
+  if (text.length > 25) {
+    const cut = text.slice(0, 25);
+    const lastSpace = cut.lastIndexOf(" ");
+    text = lastSpace > 10 ? cut.slice(0, lastSpace) : cut;
+  }
+  return text || "My Goal";
+}
+
 export async function parseGoal(rawInput: string, userId?: string): Promise<ParsedGoal> {
   const today = new Date().toISOString().split("T")[0]; // YYYY-MM-DD
   const prompt = `${IDENTITY_COMPACT}You are Threely Intelligence, a goal-setting assistant. Today's date is ${today}. Parse the following goal text and return structured JSON.
@@ -840,7 +860,7 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
   }
 
   const result = {
-    short_title: (parsed.short_title ?? rawInput.slice(0, 25)).slice(0, 25),
+    short_title: (parsed.short_title ?? cleanFallbackTitle(rawInput)).slice(0, 25),
     structured_summary: parsed.structured_summary ?? rawInput,
     category: parsed.category ?? "other",
     deadline_detected: parsed.deadline_detected ?? null,

@@ -77,6 +77,7 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, pa
 
   function handleCheckPress() {
     if (readonly) return;
+    if (paywalled) { onShowPaywall?.(); return; }
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     // Enhanced checkbox animation — larger scale pop (1 -> 1.15 -> 1)
     Animated.sequence([
@@ -87,6 +88,7 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, pa
   }
 
   function handleTextPress() {
+    if (paywalled) { onShowPaywall?.(); return; }
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setModalVisible(true);
   }
@@ -716,6 +718,7 @@ function createStyles(c: Colors) {
       borderColor: c.border,
       marginBottom: spacing.md,
       overflow: "hidden",
+      position: "relative",
       ...shadow.sm,
     },
     cardDone: {

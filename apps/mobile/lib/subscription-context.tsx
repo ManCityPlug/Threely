@@ -104,8 +104,8 @@ export function SubscriptionProvider({ userId, children }: SubscriptionProviderP
       setHasPro(false);
       setLoaded(true);
     } catch {
-      // Backend unreachable — be lenient
-      setHasPro(true);
+      // Backend unreachable — deny on failure; user can retry by reopening
+      setHasPro(false);
       setLoaded(true);
     }
   }, [userId]);
@@ -130,7 +130,9 @@ export function SubscriptionProvider({ userId, children }: SubscriptionProviderP
       }
     };
     Purchases.addCustomerInfoUpdateListener(listener);
-    return () => Purchases.removeCustomerInfoUpdateListener(listener);
+    return () => {
+      Purchases.removeCustomerInfoUpdateListener(listener);
+    };
   }, [checkSubscription]);
 
   const purchasePro = useCallback(async (): Promise<boolean> => {
