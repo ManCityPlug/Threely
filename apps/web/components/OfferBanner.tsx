@@ -143,94 +143,134 @@ export default function OfferBanner({ onActiveChange }: Props) {
         </button>
       </div>
 
-      {/* Confirmation modal */}
+      {/* Gift offer modal — matches OfferLoginModal style */}
       {confirming && (
-        <div
-          onClick={() => !claiming && setConfirming(false)}
-          style={{
-            position: "fixed",
-            inset: 0,
-            background: "rgba(0,0,0,0.65)",
-            backdropFilter: "blur(4px)",
-            zIndex: 10000,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: "1rem",
-          }}
-        >
+        <>
           <div
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => !claiming && setConfirming(false)}
             style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.7)",
+              backdropFilter: "blur(4px)",
+              zIndex: 10000,
+            }}
+          />
+          <div
+            style={{
+              position: "fixed",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "calc(100vw - 2rem)",
+              maxWidth: 460,
               background: "#141414",
               border: "1.5px solid #D4A843",
-              borderRadius: 16,
-              padding: "1.75rem 1.5rem",
-              maxWidth: 380,
-              width: "100%",
+              borderRadius: 18,
+              padding: "2rem 1.75rem",
+              zIndex: 10001,
               color: "#fff",
-              boxShadow: "0 16px 48px rgba(0,0,0,0.6)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(212,168,67,0.15)",
             }}
           >
-            <h3
+            <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
+              <div style={{ fontSize: 48, marginBottom: 8 }}>{"\uD83C\uDF81"}</div>
+              <h2
+                style={{
+                  fontSize: "1.55rem",
+                  fontWeight: 800,
+                  color: "#fff",
+                  letterSpacing: "-0.02em",
+                  marginBottom: 6,
+                }}
+              >
+                We have a gift for you
+              </h2>
+              <p
+                style={{
+                  fontSize: "1rem",
+                  color: "#D4A843",
+                  fontWeight: 700,
+                  lineHeight: 1.4,
+                }}
+              >
+                {offer.description}
+              </p>
+            </div>
+
+            <div
               style={{
-                fontSize: "1.2rem",
-                fontWeight: 800,
-                marginBottom: "0.5rem",
-                color: "#fff",
-              }}
-            >
-              Apply this offer?
-            </h3>
-            <p
-              style={{
-                fontSize: "0.9rem",
-                color: "#a1a1aa",
-                lineHeight: 1.55,
+                background: "rgba(212,168,67,0.08)",
+                border: "1px solid rgba(212,168,67,0.25)",
+                borderRadius: 12,
+                padding: "0.875rem 1rem",
                 marginBottom: "1.25rem",
+                textAlign: "center",
               }}
             >
-              {offer.description}
-            </p>
-            <div style={{ display: "flex", gap: 8 }}>
+              <div
+                style={{
+                  fontSize: "0.7rem",
+                  fontWeight: 700,
+                  color: "#a1a1aa",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.08em",
+                  marginBottom: 4,
+                }}
+              >
+                Expires in
+              </div>
+              <div
+                style={{
+                  fontSize: "1.3rem",
+                  fontWeight: 800,
+                  color: countdown.urgent ? "#f87171" : "#fff",
+                  fontFeatureSettings: '"tnum"',
+                }}
+              >
+                {countdown.text || "..."}
+              </div>
+            </div>
+
+            <button
+              onClick={handleClaim}
+              disabled={claiming}
+              style={{
+                width: "100%",
+                padding: "0.95rem 1.5rem",
+                borderRadius: 12,
+                background: "linear-gradient(135deg, #D4A843, #B8862D)",
+                color: "#fff",
+                fontWeight: 800,
+                fontSize: "1rem",
+                border: "none",
+                cursor: claiming ? "not-allowed" : "pointer",
+                opacity: claiming ? 0.7 : 1,
+                boxShadow: "0 4px 16px rgba(212,168,67,0.3)",
+              }}
+            >
+              {claiming ? "Applying..." : "Claim now"}
+            </button>
+
+            <div style={{ textAlign: "center", marginTop: "0.875rem" }}>
               <button
                 onClick={() => setConfirming(false)}
                 disabled={claiming}
                 style={{
-                  flex: 1,
-                  padding: "0.7rem",
-                  borderRadius: 10,
-                  background: "transparent",
-                  color: "#a1a1aa",
-                  fontWeight: 700,
-                  fontSize: "0.85rem",
-                  border: "1px solid #3f3f46",
-                  cursor: claiming ? "not-allowed" : "pointer",
-                }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleClaim}
-                disabled={claiming}
-                style={{
-                  flex: 2,
-                  padding: "0.7rem",
-                  borderRadius: 10,
-                  background: "linear-gradient(135deg, #D4A843, #B8862D)",
-                  color: "#fff",
-                  fontWeight: 800,
-                  fontSize: "0.85rem",
+                  background: "none",
                   border: "none",
+                  color: "#71717a",
+                  fontSize: "0.85rem",
                   cursor: claiming ? "not-allowed" : "pointer",
-                  opacity: claiming ? 0.7 : 1,
+                  padding: "0.25rem 0.5rem",
+                  textDecoration: "underline",
                 }}
               >
-                {claiming ? "Applying..." : "Confirm & Apply"}
+                Maybe later
               </button>
             </div>
           </div>
-        </div>
+        </>
       )}
     </>
   );
