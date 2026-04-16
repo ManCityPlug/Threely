@@ -11,6 +11,114 @@ import WeeklySummaryModal from "@/components/WeeklySummary";
 import { useToast } from "@/components/ToastProvider";
 import { useSubscription } from "@/lib/subscription-context";
 
+// ─── Email Card (with inline edit) ────────────────────────────────────────────
+
+function EmailCard({ currentEmail }: { currentEmail: string }) {
+  const [editing, setEditing] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ kind: "success" | "error"; text: string } | null>(null);
+
+  async function handleSave() {
+    const trimmed = newEmail.trim();
+    if (!trimmed || trimmed === currentEmail) {
+      setEditing(false);
+      return;
+    }
+    if (!/^\S+@\S+\.\S+$/.test(trimmed)) {
+      setMessage({ kind: "error", text: "That doesn't look like a valid email." });
+      return;
+    }
+    setSaving(true);
+    setMessage(null);
+    try {
+      const { error } = await getSupabase().auth.updateUser({ email: trimmed });
+      if (error) throw error;
+      setMessage({ kind: "success", text: `Check ${trimmed} for a confirmation link. Your email won't change until you click it.` });
+      setEditing(false);
+      setNewEmail("");
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : "Couldn't update email";
+      setMessage({ kind: "error", text: msg });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
+      <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
+        Email
+      </h3>
+      {!editing ? (
+        <>
+          <p style={{
+            fontSize: "0.95rem", color: "var(--text)", margin: 0, marginBottom: 10,
+            fontWeight: 500, wordBreak: "break-all",
+          }}>
+            {currentEmail || "—"}
+          </p>
+          <button
+            onClick={() => { setEditing(true); setNewEmail(currentEmail); setMessage(null); }}
+            style={{
+              background: "transparent", border: "1px solid var(--border)", color: "var(--text)",
+              padding: "0.4rem 0.85rem", borderRadius: 8, fontSize: "0.82rem", fontWeight: 500, cursor: "pointer",
+            }}
+          >
+            Change email
+          </button>
+        </>
+      ) : (
+        <>
+          <input
+            type="email"
+            value={newEmail}
+            onChange={(e) => setNewEmail(e.target.value)}
+            placeholder="you@example.com"
+            style={{
+              width: "100%", padding: "0.65rem 0.85rem", borderRadius: 8,
+              border: "1px solid var(--border)", background: "var(--bg)", color: "var(--text)",
+              fontSize: "0.95rem", marginBottom: 10, boxSizing: "border-box",
+            }}
+            autoFocus
+          />
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              style={{
+                background: "var(--primary)", border: "none", color: "var(--primary-text, #000)",
+                padding: "0.5rem 1rem", borderRadius: 8, fontSize: "0.85rem", fontWeight: 600,
+                cursor: saving ? "default" : "pointer", opacity: saving ? 0.6 : 1,
+              }}
+            >
+              {saving ? "Saving…" : "Save"}
+            </button>
+            <button
+              onClick={() => { setEditing(false); setMessage(null); }}
+              disabled={saving}
+              style={{
+                background: "transparent", border: "1px solid var(--border)", color: "var(--text)",
+                padding: "0.5rem 1rem", borderRadius: 8, fontSize: "0.85rem", fontWeight: 500, cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </>
+      )}
+      {message && (
+        <p style={{
+          marginTop: 10, marginBottom: 0, fontSize: "0.8rem",
+          color: message.kind === "success" ? "var(--success, #10b981)" : "var(--error, #ef4444)",
+        }}>
+          {message.text}
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function localDate(dateStr: string): Date {
@@ -366,6 +474,8 @@ export default function ProfilePage() {
     );
   }
 
+  const isAppleUser = user?.app_metadata?.provider === "apple";
+
   return (
     <div className="page-inner">
       {/* Header */}
@@ -374,6 +484,40 @@ export default function ProfilePage() {
           <h1 style={{ fontSize: "1.75rem", fontWeight: 700, letterSpacing: "-0.03em" }}>Profile</h1>
         </div>
       </div>
+
+      {/* Apple sign-in set-password CTA */}
+      {isAppleUser && !hasPassword && (
+        <div
+          className="card"
+          style={{
+            padding: "1.25rem",
+            marginBottom: "1rem",
+            border: "1.5px solid var(--primary)",
+            background: "var(--primary-light)",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+            <div style={{ flex: 1, minWidth: 220 }}>
+              <h3 style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--primary)", margin: 0, marginBottom: 4 }}>
+                Set a password to log in on the web
+              </h3>
+              <p style={{ fontSize: "0.82rem", color: "var(--subtext)", margin: 0 }}>
+                You signed in with Apple. Sign In with Apple only works on iOS — add a password so you can sign in from any browser.
+              </p>
+            </div>
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowChangePassword(true)}
+              style={{ fontSize: "0.85rem", whiteSpace: "nowrap" }}
+            >
+              Set password
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Email */}
+      <EmailCard currentEmail={user?.email ?? ""} />
 
       {/* Tabs */}
       <div style={{

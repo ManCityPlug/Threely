@@ -535,6 +535,42 @@ export default function ProfileScreen() {
           )}
         </View>
 
+        {/* Apple sign-in set-password CTA (shown when no password is set) */}
+        {authProvider === "apple" && !hasPassword && (
+          <TouchableOpacity
+            style={{
+              backgroundColor: colors.primaryLight,
+              borderRadius: radius.lg,
+              padding: spacing.md,
+              marginBottom: spacing.lg,
+              flexDirection: "row",
+              alignItems: "center",
+              gap: spacing.md,
+              borderWidth: 1,
+              borderColor: colors.primary,
+            }}
+            onPress={() => setPwSheetOpen(true)}
+            activeOpacity={0.85}
+          >
+            <View style={{
+              width: 36, height: 36, borderRadius: radius.md,
+              backgroundColor: colors.primary,
+              alignItems: "center", justifyContent: "center",
+            }}>
+              <Ionicons name="key" size={18} color={colors.primaryText} />
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: typography.base, fontWeight: typography.semibold, color: colors.primary, marginBottom: 2 }}>
+                Set a password to log in on the web
+              </Text>
+              <Text style={{ fontSize: typography.xs, color: colors.textSecondary }}>
+                You signed in with Apple. Add a password to sign in from any browser.
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={colors.primary} />
+          </TouchableOpacity>
+        )}
+
         {/* Settings */}
         <Text style={styles.sectionLabel}>Settings</Text>
         <View style={styles.menuCard}>
@@ -634,11 +670,67 @@ export default function ProfileScreen() {
         {/* Account */}
         <Text style={styles.sectionLabel}>Account</Text>
         <View style={styles.menuCard}>
+          <TouchableOpacity
+            style={styles.menuRow}
+            onPress={() => {
+              const onChange = async (newEmail?: string) => {
+                const trimmed = (newEmail ?? "").trim();
+                if (!trimmed || trimmed === email) return;
+                if (!/^\S+@\S+\.\S+$/.test(trimmed)) {
+                  Alert.alert("Invalid email", "That doesn't look like a valid email address.");
+                  return;
+                }
+                try {
+                  const { error } = await supabase.auth.updateUser({ email: trimmed });
+                  if (error) throw error;
+                  Alert.alert(
+                    "Check your inbox",
+                    `We sent a confirmation link to ${trimmed}. Your email won't change until you click it.`
+                  );
+                } catch (e) {
+                  const msg = e instanceof Error ? e.message : "Couldn't update email. Try again.";
+                  Alert.alert("Couldn't change email", msg);
+                }
+              };
+              if (Platform.OS === "ios" && typeof Alert.prompt === "function") {
+                Alert.prompt(
+                  "Change email",
+                  `Current: ${email || "(none)"}\n\nWe'll send a confirmation link to the new address.`,
+                  [
+                    { text: "Cancel", style: "cancel" },
+                    { text: "Change", onPress: onChange },
+                  ],
+                  "plain-text",
+                  email,
+                  "email-address"
+                );
+              } else {
+                Alert.alert(
+                  "Change email",
+                  `Your account email is ${email}. To change it on Android, contact support at support@threely.app.`,
+                  [{ text: "OK", style: "cancel" }]
+                );
+              }
+            }}
+            activeOpacity={0.7}
+          >
+            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
+              <Ionicons name="mail-outline" size={18} color={colors.primary} />
+            </View>
+            <View style={styles.menuText}>
+              <Text style={styles.menuLabel}>Email</Text>
+              <Text style={styles.menuValue} numberOfLines={1}>{email || "—"}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} />
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
           <TouchableOpacity style={styles.menuRow} onPress={() => setPwSheetOpen(true)} activeOpacity={0.7}>
             <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
               <Ionicons name="key-outline" size={18} color={colors.primary} />
             </View>
-            <Text style={styles.menuLabel}>Change password</Text>
+            <Text style={styles.menuLabel}>{hasPassword ? "Change password" : "Set password"}</Text>
             <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} style={{ marginLeft: "auto" }} />
           </TouchableOpacity>
 

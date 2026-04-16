@@ -17,7 +17,7 @@ async function callDeepSeek(opts: {
   messages: { role: "user" | "assistant"; content: string }[];
   maxTokens?: number;
   temperature?: number;
-}): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
+}): Promise<{ text: string; inputTokens: number; outputTokens: number; model: string }> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), DEEPSEEK_TIMEOUT);
 
@@ -50,6 +50,7 @@ async function callDeepSeek(opts: {
     text: choice.message?.content ?? "",
     inputTokens: data.usage?.prompt_tokens ?? 0,
     outputTokens: data.usage?.completion_tokens ?? 0,
+    model: "deepseek-chat",
   };
 }
 
@@ -60,7 +61,7 @@ async function callGemini(opts: {
   messages: { role: "user" | "assistant"; content: string }[];
   maxTokens?: number;
   temperature?: number;
-}): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
+}): Promise<{ text: string; inputTokens: number; outputTokens: number; model: string }> {
   const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash",
     ...(opts.system ? { systemInstruction: opts.system } : {}),
@@ -84,6 +85,7 @@ async function callGemini(opts: {
     text: response.text(),
     inputTokens: response.usageMetadata?.promptTokenCount ?? 0,
     outputTokens: response.usageMetadata?.candidatesTokenCount ?? 0,
+    model: "gemini-2.5-flash",
   };
 }
 
@@ -94,7 +96,7 @@ async function callLLM(opts: {
   messages: { role: "user" | "assistant"; content: string }[];
   maxTokens?: number;
   temperature?: number;
-}): Promise<{ text: string; inputTokens: number; outputTokens: number }> {
+}): Promise<{ text: string; inputTokens: number; outputTokens: number; model: string }> {
   // Try DeepSeek first (cheaper) - skip if circuit breaker is open
   const circuitOpen = Date.now() < deepseekCircuitOpenUntil;
   if (DEEPSEEK_API_KEY && !circuitOpen) {
@@ -630,7 +632,7 @@ End with a brief note about what success looks like when ALL phases are complete
     logAICall({
       userId,
       functionName: 'generateRoadmap',
-      modelUsed: 'deepseek-chat',
+      modelUsed: llmResult.model,
       inputData: { title, rawInput, category, deadline: deadline?.toISOString() ?? null, dailyTimeMinutes, intensityLevel },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -787,7 +789,7 @@ When wrapping up (done: true):
     logAICall({
       userId,
       functionName: 'goalChat',
-      modelUsed: 'deepseek-chat',
+      modelUsed: llmResult.model,
       inputData: { turnCount, messageCount: messages.length },
       outputData: { message: result.message, done: result.done, goal_text: result.goal_text },
       inputTokens: llmResult.inputTokens,
@@ -874,7 +876,7 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
     logAICall({
       userId,
       functionName: 'parseGoal',
-      modelUsed: 'deepseek-chat',
+      modelUsed: llmResult.model,
       inputData: { rawInput },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -1018,7 +1020,7 @@ ${previousTasksSection}`;
     logAICall({
       userId,
       functionName: 'generateTasks',
-      modelUsed: 'deepseek-chat',
+      modelUsed: llmResult.model,
       inputData: { goalId: goal.id, goalTitle: goal.title, requestingAdditional, focusShifted, postReview, newTaskCount, daysActive, tasksCompletedTotal },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -1101,7 +1103,7 @@ Return ONLY valid JSON matching this exact shape:
     logAICall({
       userId,
       functionName: 'updateCoachingContext',
-      modelUsed: 'deepseek-chat',
+      modelUsed: llmResult.model,
       inputData: { goalTitle, tasksCompletedToday, tasksTotalToday, difficultyRating, completionStatus },
       outputData: parsed,
       inputTokens: llmResult.inputTokens,
@@ -1178,7 +1180,7 @@ Keep it under 60 words. Punchy, direct, specific. No bullet points - just prose.
     logAICall({
       userId,
       functionName: 'generateInsight',
-      modelUsed: 'deepseek-chat',
+      modelUsed: llmResult.model,
       inputData: { goalTitle, difficultyRating, completionStatus, tasksCompletedToday, tasksTotalToday, daysActive },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -1254,7 +1256,7 @@ Return ONLY valid JSON (no markdown):
     logAICall({
       userId,
       functionName: 'refineTask',
-      modelUsed: 'deepseek-chat',
+      modelUsed: llmResult.model,
       inputData: { task, goalTitle, goalCategory, userRequest },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -1366,7 +1368,7 @@ RESPONSE FORMAT - respond with ONLY valid JSON, no markdown:
     logAICall({
       userId,
       functionName: 'askAboutTask',
-      modelUsed: 'deepseek-chat',
+      modelUsed: llmResult.model,
       inputData: { task, goalTitle, goalCategory, messageCount: messages.length },
       outputData: result,
       inputTokens: llmResult.inputTokens,
@@ -1451,7 +1453,7 @@ Keep it under 80 words. Conversational, warm, specific. No bullet points - just 
     logAICall({
       userId,
       functionName: 'generateWeeklySummary',
-      modelUsed: 'deepseek-chat',
+      modelUsed: llmResult.model,
       inputData: { totalTasksCompleted, totalTasksGenerated, totalMinutesInvested, currentStreak, goalsCount: goalsWorkedOn.length },
       outputData: result,
       inputTokens: llmResult.inputTokens,

@@ -217,6 +217,197 @@ function GamifiedTaskCard({
   );
 }
 
+// ─── Stage-Complete Celebration (Day 20 / 40 / 60...) ───────────────────────
+
+function StageCelebrationOverlay({
+  stage,
+  onDismiss,
+}: {
+  stage: number;
+  onDismiss: () => void;
+}) {
+  // 30 confetti dots with random angles + distances
+  const dots = useRef(
+    Array.from({ length: 30 }, (_, i) => {
+      const angle = (Math.PI * 2 * i) / 30 + (Math.random() - 0.5) * 0.4;
+      const distance = 180 + Math.random() * 160;
+      return {
+        cx: Math.cos(angle) * distance,
+        cy: Math.sin(angle) * distance,
+        delay: Math.random() * 0.25,
+      };
+    })
+  ).current;
+
+  return (
+    <div
+      onClick={onDismiss}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 10001,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "rgba(0,0,0,0.9)",
+        backdropFilter: "blur(12px)",
+        WebkitBackdropFilter: "blur(12px)",
+        animation: "stageFadeIn 0.5s ease both",
+        overflow: "hidden",
+      }}
+    >
+      {/* Gold radial glow */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          width: 520,
+          height: 520,
+          borderRadius: "50%",
+          background: "radial-gradient(circle, rgba(212,168,67,0.35) 0%, rgba(212,168,67,0.1) 45%, transparent 70%)",
+          pointerEvents: "none",
+          animation: "stageGlowPulse 3s ease-in-out infinite",
+        }}
+      />
+
+      {/* Confetti burst */}
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          pointerEvents: "none",
+        }}
+      >
+        {dots.map((d, i) => (
+          <span
+            key={i}
+            className="stage-confetti-dot"
+            style={{
+              // Inject destination into custom props
+              ...({ "--cx": `${d.cx}px`, "--cy": `${d.cy}px` } as React.CSSProperties),
+              animationDelay: `${d.delay}s`,
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Content (stop click to avoid dismiss when tapping text) */}
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          textAlign: "center",
+          padding: "0 1.5rem",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 120,
+            lineHeight: 1,
+            marginBottom: 20,
+            animation: "stageTrophyBounce 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both",
+            filter: "drop-shadow(0 8px 24px rgba(212,168,67,0.45))",
+          }}
+        >
+          {"\uD83C\uDFC6"}
+        </div>
+
+        <h1
+          className="stage-gold-text"
+          style={{
+            fontSize: "2.5rem",
+            fontWeight: 900,
+            letterSpacing: "-0.04em",
+            marginBottom: 14,
+            animation: "stageTitleRise 600ms ease 250ms both",
+          }}
+        >
+          Stage {stage} Complete!
+        </h1>
+
+        <p
+          style={{
+            fontSize: "1.05rem",
+            fontWeight: 500,
+            color: "rgba(255,255,255,0.85)",
+            lineHeight: 1.55,
+            maxWidth: 440,
+            marginBottom: 32,
+            animation: "stageTitleRise 600ms ease 400ms both",
+          }}
+        >
+          You&apos;ve unlocked Stage {stage + 1}. A brand new path starts tomorrow.
+        </p>
+
+        <button
+          onClick={onDismiss}
+          style={{
+            padding: "16px 44px",
+            borderRadius: 14,
+            background: "linear-gradient(135deg, #F5D37E 0%, #D4A843 55%, #B8862D 100%)",
+            color: "#1a1100",
+            fontSize: "1.05rem",
+            fontWeight: 800,
+            border: "none",
+            cursor: "pointer",
+            letterSpacing: "-0.01em",
+            animation: "stageTitleRise 600ms ease 600ms both, stageButtonPulse 2.5s ease-in-out 1.2s infinite",
+            transition: "transform 0.15s ease, filter 0.15s ease",
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.transform = "scale(1.04)";
+            e.currentTarget.style.filter = "brightness(1.08)";
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.transform = "scale(1)";
+            e.currentTarget.style.filter = "brightness(1)";
+          }}
+        >
+          Let&apos;s keep going
+        </button>
+      </div>
+
+      {/* Close X */}
+      <button
+        onClick={onDismiss}
+        aria-label="Dismiss"
+        style={{
+          position: "absolute",
+          top: 20,
+          right: 20,
+          width: 40,
+          height: 40,
+          borderRadius: "50%",
+          background: "rgba(255,255,255,0.08)",
+          color: "rgba(255,255,255,0.7)",
+          border: "none",
+          cursor: "pointer",
+          fontSize: 18,
+          lineHeight: 1,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          transition: "background 0.15s ease",
+        }}
+        onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.16)"; }}
+        onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; }}
+      >
+        {"\u2715"}
+      </button>
+    </div>
+  );
+}
+
 // ─── Celebration Overlay ──────────────────────────────────────────────────────
 
 function CelebrationOverlay({
@@ -527,39 +718,68 @@ function DashboardPageInner() {
         setSelectedGoalId(goalsRes.goals[0].id);
       }
 
-      // Auto-generate tasks if none exist and user has goals
-      if (
-        hasPro &&
-        tasksRes.dailyTasks.length === 0 &&
-        goalsRes.goals.length > 0 &&
-        !tasksRes.restDay &&
-        !hasAutoGenerated.current
-      ) {
-        hasAutoGenerated.current = true;
-        setGenerating(true);
-        localStorage.setItem(flagKey, String(Date.now()));
-        try {
-          const genRes = await tasksApi.generate();
-          localStorage.removeItem(flagKey);
-          if (genRes.restDay) {
-            setRestDay(true);
-          } else {
-            setDailyTasks(genRes.dailyTasks);
-          }
-        } catch {
-          localStorage.removeItem(flagKey);
-        } finally {
-          setGenerating(false);
-        }
-      }
     } catch {
       showToast("Failed to load dashboard data", "error");
     } finally {
       setLoading(false);
     }
-  }, [showToast, walkthroughActive, hasPro]);
+  }, [showToast, walkthroughActive]);
 
   useEffect(() => { load(); return () => { if (pollingRef.current) clearInterval(pollingRef.current); }; }, [load]);
+
+  // ── Auto-generate today's tasks on mount (matches mobile Today tab behavior) ──
+  // After initial load: if user has goals but no tasks for today (and it's not a
+  // rest day), auto-call generate so users always have tasks every day.
+  useEffect(() => {
+    if (loading) return;
+    if (walkthroughActive) return;
+    if (generating) return;
+    if (restDay) return;
+    if (goals.length === 0) return;
+    if (dailyTasks.length > 0) return;
+    if (hasAutoGenerated.current) return;
+
+    // Respect an in-flight generation flag (e.g. another tab already started one)
+    const todayKey = new Date().toLocaleDateString("en-CA");
+    const liveFlag =
+      localStorage.getItem(`threely_generating_${todayKey}`) ||
+      localStorage.getItem(`threely_restday_gen_${todayKey}`);
+    if (liveFlag && (Date.now() - parseInt(liveFlag, 10)) < 90_000) return;
+
+    hasAutoGenerated.current = true;
+    const flagKey = `threely_generating_${todayKey}`;
+    localStorage.setItem(flagKey, String(Date.now()));
+    setGenerating(true);
+
+    (async () => {
+      try {
+        const genRes = await tasksApi.generate();
+        localStorage.removeItem(flagKey);
+        if (genRes.restDay) {
+          setRestDay(true);
+        } else if (genRes.dailyTasks.length > 0) {
+          setDailyTasks(genRes.dailyTasks);
+          if (genRes.dailyTasks.length === 1) {
+            setSelectedGoalId(genRes.dailyTasks[0].goalId);
+          }
+        }
+      } catch (err: unknown) {
+        localStorage.removeItem(flagKey);
+        // Allow retry on next mount / focus — do not block indefinitely.
+        hasAutoGenerated.current = false;
+        const msg = err instanceof Error ? err.message : "";
+        if (msg.toLowerCase().includes("rate limit")) {
+          showToast("Generating tasks too fast — try again in a moment.", "error");
+        } else if (msg.includes("pro_required")) {
+          // Silent — paywall banner already shown on dashboard.
+        } else {
+          showToast("Couldn't generate today's tasks. Will retry shortly.", "error");
+        }
+      } finally {
+        setGenerating(false);
+      }
+    })();
+  }, [loading, goals.length, dailyTasks.length, restDay, walkthroughActive, generating, showToast]);
 
   // Detect mobile for app nudge banner
   useEffect(() => {
@@ -681,6 +901,34 @@ function DashboardPageInner() {
       hasTriggeredCelebration.current = true;
     }
   }, [viewAllDone, totalCount, showTasks]);
+
+  // ── Stage-complete celebration (Day 20 / 40 / 60...) ──────────────────────
+  // Fires once per stage transition: when goalDayNumber % 20 === 0 and the user
+  // just finished today's tasks. Uses a ref so it does NOT refire on re-renders.
+  const [showStageCelebration, setShowStageCelebration] = useState(false);
+  const [stageNumber, setStageNumber] = useState(1);
+  const prevStageTransitionRef = useRef(false);
+  useEffect(() => {
+    const isStageDay = goalDayNumber > 0 && goalDayNumber % 20 === 0;
+    const transitionNow = isStageDay && todayAllDone && showTasks && userToggledRef.current;
+    // Fresh transition: not already showing, and previous tick wasn't transitioning.
+    if (transitionNow && !prevStageTransitionRef.current) {
+      setStageNumber(Math.floor(goalDayNumber / 20));
+      setShowStageCelebration(true);
+    }
+    prevStageTransitionRef.current = transitionNow;
+  }, [goalDayNumber, todayAllDone, showTasks]);
+
+  // ── Streak counter animation on increment ─────────────────────────────────
+  const prevStreakRef = useRef<number | null>(null);
+  const [streakBumpKey, setStreakBumpKey] = useState(0);
+  useEffect(() => {
+    // Skip first render (prev is null) — only animate on actual change.
+    if (prevStreakRef.current !== null && streak > prevStreakRef.current) {
+      setStreakBumpKey(k => k + 1);
+    }
+    prevStreakRef.current = streak;
+  }, [streak]);
 
   function pickGoal(val: string) {
     setSelectedGoalId(val);
@@ -954,15 +1202,21 @@ function DashboardPageInner() {
             alignItems: "center",
             marginBottom: effectiveGoals.length > 1 ? "0.75rem" : "1.5rem",
           }}>
-            <div style={{
-              fontSize: "1.5rem",
-              fontWeight: 800,
-              color: "#D4A843",
-              letterSpacing: "-0.02em",
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-            }}>
+            <div
+              key={streakBumpKey}
+              className={streakBumpKey > 0 ? "streak-bump" : undefined}
+              style={{
+                fontSize: "1.5rem",
+                fontWeight: 800,
+                color: "#D4A843",
+                letterSpacing: "-0.02em",
+                display: "flex",
+                alignItems: "center",
+                gap: 6,
+                transformOrigin: "center",
+                willChange: "transform",
+              }}
+            >
               {"🔥"} {streak}
             </div>
             {selectedGoal && effectiveGoals.length === 1 && (
@@ -1535,6 +1789,15 @@ function DashboardPageInner() {
             setViewingTasks(null);
             userToggledRef.current = false;
           }}
+        />,
+        document.body
+      )}
+
+      {/* Stage-complete celebration (Day 20 / 40 / 60…) — renders on top of the daily one. */}
+      {showStageCelebration && typeof document !== "undefined" && createPortal(
+        <StageCelebrationOverlay
+          stage={stageNumber}
+          onDismiss={() => setShowStageCelebration(false)}
         />,
         document.body
       )}

@@ -145,15 +145,27 @@ export async function GET(request: NextRequest) {
     estimatedTrainingReady,
     uniqueUsers: uniqueUsers.length,
     costBreakdown: (() => {
-      // Anthropic pricing per 1M tokens (March 2026)
+      // Pricing per 1M tokens. Keep in sync with apps/web/app/admin/costs/page.tsx.
+      // DeepSeek: https://api-docs.deepseek.com/quick_start/pricing
+      // Gemini:   https://ai.google.dev/gemini-api/docs/pricing
+      // Anthropic: https://www.anthropic.com/pricing
       const pricing: Record<string, { input: number; output: number }> = {
+        // DeepSeek (current primary)
+        "deepseek-chat": { input: 0.27, output: 1.10 },
+        // Gemini (current fallback). Flash pricing is the same across 1.5/2.0/2.5.
+        "gemini-2.5-flash": { input: 0.075, output: 0.30 },
+        "gemini-2.0-flash": { input: 0.075, output: 0.30 },
+        "gemini-1.5-flash": { input: 0.075, output: 0.30 },
+        // Anthropic (legacy — only relevant for historical rows)
         "claude-opus-4-6": { input: 15, output: 75 },
         "claude-sonnet-4-6": { input: 3, output: 15 },
-        "claude-haiku-4-5-20251001": { input: 0.80, output: 4 },
+        "claude-haiku-4-5-20251001": { input: 1.00, output: 5.00 },
       };
       let totalCost = 0;
       const perModel = tokensByModel.map((m) => {
-        const rates = pricing[m.modelUsed] ?? { input: 3, output: 15 };
+        // Unknown model → fall back to DeepSeek rates (current primary) rather than Sonnet,
+        // which overstated costs ~11x when DeepSeek rows were unmatched.
+        const rates = pricing[m.modelUsed] ?? { input: 0.27, output: 1.10 };
         const inputCost = ((m._sum.inputTokens ?? 0) / 1_000_000) * rates.input;
         const outputCost = ((m._sum.outputTokens ?? 0) / 1_000_000) * rates.output;
         const cost = inputCost + outputCost;

@@ -35,7 +35,6 @@ import {
   type TaskItem,
   type GoalStat,
 } from "@/lib/api";
-import { AppTutorial } from "@/components/AppTutorial";
 import { MOCK_TUTORIAL_GOAL, MOCK_TUTORIAL_DAILY_TASK } from "@/lib/mock-tutorial-data";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/lib/toast";
@@ -1143,6 +1142,211 @@ function CelebrationOverlay({
   );
 }
 
+// ─── Stage-complete Celebration Overlay (Fix 2) ──────────────────────────────
+// Bigger, more cinematic than the day-complete overlay: emoji spring-bounce,
+// sliding title/subtitle, pulsing CTA, confetti burst, double-tap haptic.
+
+const CONFETTI_COUNT = 20;
+
+function StageCelebrationOverlay({
+  visible,
+  stageNumber,
+  onDismiss,
+}: {
+  visible: boolean;
+  stageNumber: number;
+  onDismiss: () => void;
+}) {
+  const emojiScale = useRef(new Animated.Value(0)).current;
+  const titleSlide = useRef(new Animated.Value(50)).current;
+  const titleOpacity = useRef(new Animated.Value(0)).current;
+  const subtitleSlide = useRef(new Animated.Value(50)).current;
+  const subtitleOpacity = useRef(new Animated.Value(0)).current;
+  const buttonPulse = useRef(new Animated.Value(1)).current;
+  const backdropOpacity = useRef(new Animated.Value(0)).current;
+
+  // Pre-compute confetti particle config once per visibility cycle.
+  const confetti = useRef(
+    Array.from({ length: CONFETTI_COUNT }).map(() => ({
+      translate: new Animated.Value(0),
+      opacity: new Animated.Value(1),
+      angle: Math.random() * Math.PI * 2,
+      distance: 140 + Math.random() * 120,
+      size: 6 + Math.random() * 6,
+      delay: Math.random() * 120,
+    })),
+  ).current;
+
+  useEffect(() => {
+    if (!visible) {
+      emojiScale.setValue(0);
+      titleSlide.setValue(50);
+      titleOpacity.setValue(0);
+      subtitleSlide.setValue(50);
+      subtitleOpacity.setValue(0);
+      buttonPulse.setValue(1);
+      backdropOpacity.setValue(0);
+      confetti.forEach((p) => {
+        p.translate.setValue(0);
+        p.opacity.setValue(1);
+      });
+      return;
+    }
+
+    Animated.timing(backdropOpacity, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+
+    // Emoji: 0 → 1.4 → 1 with spring bounce (~700ms total).
+    Animated.sequence([
+      Animated.spring(emojiScale, { toValue: 1.4, friction: 6, tension: 40, useNativeDriver: true }),
+      Animated.spring(emojiScale, { toValue: 1, friction: 6, tension: 40, useNativeDriver: true }),
+    ]).start();
+
+    // Title slides up + fades in (500ms, 200ms delay).
+    Animated.parallel([
+      Animated.timing(titleSlide, { toValue: 0, duration: 500, delay: 200, useNativeDriver: true }),
+      Animated.timing(titleOpacity, { toValue: 1, duration: 500, delay: 200, useNativeDriver: true }),
+    ]).start();
+
+    // Subtitle slides up + fades in (500ms, 400ms delay).
+    Animated.parallel([
+      Animated.timing(subtitleSlide, { toValue: 0, duration: 500, delay: 400, useNativeDriver: true }),
+      Animated.timing(subtitleOpacity, { toValue: 1, duration: 500, delay: 400, useNativeDriver: true }),
+    ]).start();
+
+    // Button pulse loop.
+    const pulse = Animated.loop(
+      Animated.sequence([
+        Animated.timing(buttonPulse, { toValue: 1.05, duration: 700, useNativeDriver: true }),
+        Animated.timing(buttonPulse, { toValue: 1, duration: 700, useNativeDriver: true }),
+      ]),
+    );
+    pulse.start();
+
+    // Confetti burst — animate translation outward + fade.
+    confetti.forEach((p) => {
+      Animated.parallel([
+        Animated.timing(p.translate, { toValue: 1, duration: 1500, delay: p.delay, useNativeDriver: true }),
+        Animated.timing(p.opacity, { toValue: 0, duration: 1500, delay: p.delay, useNativeDriver: true }),
+      ]).start();
+    });
+
+    // Haptics: success feedback twice for emphasis.
+    if (Platform.OS !== "web") {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      const t = setTimeout(() => {
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      }, 400);
+      return () => {
+        clearTimeout(t);
+        pulse.stop();
+      };
+    }
+
+    return () => {
+      pulse.stop();
+    };
+  }, [visible, emojiScale, titleSlide, titleOpacity, subtitleSlide, subtitleOpacity, buttonPulse, backdropOpacity, confetti]);
+
+  return (
+    <Modal visible={visible} transparent animationType="none">
+      <Animated.View style={{ flex: 1, opacity: backdropOpacity }}>
+        <Pressable
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.9)", alignItems: "center", justifyContent: "center", padding: spacing.xl }}
+          onPress={onDismiss}
+        >
+          {/* Gold radial glow behind emoji */}
+          <View style={{
+            position: "absolute",
+            width: 360,
+            height: 360,
+            borderRadius: 9999,
+            backgroundColor: "rgba(212,168,67,0.18)",
+            shadowColor: GOLD,
+            shadowOpacity: 0.7,
+            shadowRadius: 60,
+            shadowOffset: { width: 0, height: 0 },
+          }} />
+
+          {/* Confetti — absolute-positioned gold dots animating outward */}
+          {confetti.map((p, i) => {
+            const dx = Math.cos(p.angle) * p.distance;
+            const dy = Math.sin(p.angle) * p.distance;
+            return (
+              <Animated.View
+                key={i}
+                pointerEvents="none"
+                style={{
+                  position: "absolute",
+                  width: p.size,
+                  height: p.size,
+                  borderRadius: p.size / 2,
+                  backgroundColor: GOLD,
+                  opacity: p.opacity,
+                  transform: [
+                    { translateX: p.translate.interpolate({ inputRange: [0, 1], outputRange: [0, dx] }) },
+                    { translateY: p.translate.interpolate({ inputRange: [0, 1], outputRange: [0, dy] }) },
+                  ],
+                }}
+              />
+            );
+          })}
+
+          <Animated.Text style={{
+            fontSize: 96,
+            marginBottom: 24,
+            transform: [{ scale: emojiScale }],
+          }}>
+            {"🏆"}
+          </Animated.Text>
+
+          <Animated.Text style={{
+            fontSize: typography.xxxl + 6,
+            fontWeight: "800",
+            color: "#fff",
+            letterSpacing: -1,
+            marginBottom: 12,
+            textAlign: "center",
+            transform: [{ translateY: titleSlide }],
+            opacity: titleOpacity,
+          }}>
+            Stage {stageNumber} Complete!
+          </Animated.Text>
+
+          <Animated.Text style={{
+            fontSize: typography.base,
+            color: "rgba(255,255,255,0.85)",
+            textAlign: "center",
+            marginBottom: spacing.lg,
+            paddingHorizontal: spacing.lg,
+            lineHeight: 22,
+            transform: [{ translateY: subtitleSlide }],
+            opacity: subtitleOpacity,
+          }}>
+            You've unlocked Stage {stageNumber + 1}. A brand new path starts tomorrow.
+          </Animated.Text>
+
+          <Animated.View style={{ transform: [{ scale: buttonPulse }], marginTop: spacing.md }}>
+            <TouchableOpacity
+              onPress={onDismiss}
+              activeOpacity={0.85}
+              style={{
+                paddingHorizontal: 48,
+                paddingVertical: 16,
+                borderRadius: 14,
+                backgroundColor: GOLD,
+              }}
+            >
+              <Text style={{ fontSize: typography.md, fontWeight: "700", color: "#000" }}>
+                Keep going
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
+        </Pressable>
+      </Animated.View>
+    </Modal>
+  );
+}
+
 // ─── Dashboard ────────────────────────────────────────────────────────────────
 
 export default function DashboardScreen() {
@@ -1185,10 +1389,11 @@ export default function DashboardScreen() {
   // Stage-complete celebration (Gap 4)
   const [showStageCelebration, setShowStageCelebration] = useState(false);
   const [stageCelebrationNumber, setStageCelebrationNumber] = useState(1);
+  // Auto-generation failure (Fix 1): show retry UI when background gen fails
+  const [autoGenFailed, setAutoGenFailed] = useState(false);
 
   // ─── Pro / trial state ────────────────────────────────────────────────────────
-  const [showTutorial, setShowTutorial] = useState(false);
-  const { hasPro, isLimitedMode, walkthroughActive, setWalkthroughActive, refreshSubscription } = useSubscription();
+  const { hasPro, isLimitedMode, walkthroughActive, refreshSubscription } = useSubscription();
   const [showPaywall, setShowPaywall] = useState(false);
 
   const hasLoadedOnce = useRef(false);
@@ -1197,6 +1402,10 @@ export default function DashboardScreen() {
   const recentlyToggledRef = useRef<Set<string>>(new Set());
   const userIdRef = useRef<string>("");
   const [sortTrigger, setSortTrigger] = useState(0);
+
+  // Streak increment animation (Fix 3): scales the streak text when it increments.
+  const streakScaleAnim = useRef(new Animated.Value(1)).current;
+  const prevStreakRef = useRef<number | null>(null);
 
   // Midnight countdown timer
   useEffect(() => {
@@ -1313,8 +1522,8 @@ export default function DashboardScreen() {
         !hasAutoGenerated.current &&
         !activeGenFlag
       ) {
-        hasAutoGenerated.current = true;
         setGenerating(true);
+        setAutoGenFailed(false);
         const autoGenKey = `@threely_generating_${todayStr}`;
         AsyncStorage.setItem(autoGenKey, String(Date.now()));
         try {
@@ -1326,10 +1535,16 @@ export default function DashboardScreen() {
             setDailyTasks(res.dailyTasks);
             // Notifications disabled
           }
+          // Only mark as generated AFTER success, so a failure allows retry.
+          hasAutoGenerated.current = true;
         } catch (err: unknown) {
           AsyncStorage.removeItem(autoGenKey);
+          // Reset so the user (or a subsequent load) can retry.
+          hasAutoGenerated.current = false;
           if (err instanceof Error && err.message?.includes("pro_required")) {
             setShowPaywall(true);
+          } else {
+            setAutoGenFailed(true);
           }
         } finally {
           setGenerating(false);
@@ -1374,38 +1589,17 @@ export default function DashboardScreen() {
     };
   }, [loadData]);
 
-  // ─── Launch tutorial after first onboarding ─────────────────────────────────
   useEffect(() => {
     if (loading) return;
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      userIdRef.current = user.id;
-      const tutorialKey = `@threely_tutorial_done_${user.id}`;
-      const done = await AsyncStorage.getItem(tutorialKey);
-      if (!done) {
-        setWalkthroughActive(true);
-        setTimeout(() => setShowTutorial(true), 600);
-      }
+      if (user) userIdRef.current = user.id;
     })();
-  }, [loading, setWalkthroughActive]);
+  }, [loading]);
 
   useMemo(() => {
     if (goals.length >= 1 && !selectedGoal) setSelectedGoal(goals[0].id);
   }, [goals.length]);
-
-  // Restart tutorial when triggered from Profile settings
-  useFocusEffect(
-    useCallback(() => {
-      AsyncStorage.getItem("@threely_restart_tutorial").then((val) => {
-        if (val === "true") {
-          AsyncStorage.removeItem("@threely_restart_tutorial");
-          setWalkthroughActive(true);
-          setTimeout(() => setShowTutorial(true), 350);
-        }
-      });
-    }, [setWalkthroughActive])
-  );
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -1544,6 +1738,25 @@ export default function DashboardScreen() {
     }
   }, [allDone, newTaskItems.length]);
 
+  // Fix 3 — animate streak text on increment (not on initial mount).
+  useEffect(() => {
+    const prev = prevStreakRef.current;
+    if (prev === null) {
+      prevStreakRef.current = streak;
+      return;
+    }
+    if (streak > prev) {
+      if (Platform.OS !== "web") {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      }
+      Animated.sequence([
+        Animated.spring(streakScaleAnim, { toValue: 1.3, friction: 6, tension: 300, useNativeDriver: true }),
+        Animated.spring(streakScaleAnim, { toValue: 1, friction: 6, tension: 300, useNativeDriver: true }),
+      ]).start();
+    }
+    prevStreakRef.current = streak;
+  }, [streak, streakScaleAnim]);
+
   // Gap 4 — stage-complete celebration: when user completes day 20 / 40 / 60 / ...
   useEffect(() => {
     if (!allDone || !effectiveSelectedGoal || !userToggledRef.current) return;
@@ -1586,6 +1799,7 @@ export default function DashboardScreen() {
       return;
     }
     setGenerating(true);
+    setAutoGenFailed(false);
     const genTodayStr = new Date().toISOString().slice(0, 10);
     AsyncStorage.setItem(`@threely_generating_${genTodayStr}`, String(Date.now()));
     try {
@@ -1600,12 +1814,15 @@ export default function DashboardScreen() {
           ...res.dailyTasks,
         ];
       });
+      hasAutoGenerated.current = true;
       // Notifications disabled
     } catch (e: unknown) {
       AsyncStorage.removeItem(`@threely_generating_${genTodayStr}`);
+      hasAutoGenerated.current = false;
       if (e instanceof Error && e.message?.includes("pro_required")) {
         setShowPaywall(true);
       } else {
+        setAutoGenFailed(true);
         showToast(e instanceof Error ? e.message : "Failed to generate tasks", "error");
       }
     } finally {
@@ -1664,7 +1881,9 @@ export default function DashboardScreen() {
       <View style={[styles.header, { paddingTop: insets.top }]}>
         <View style={[styles.headerRow, wideContentStyle]}>
           {/* Streak counter */}
-          <Text style={styles.streakText}>{"🔥"} {streak}</Text>
+          <Animated.Text style={[styles.streakText, { transform: [{ scale: streakScaleAnim }] }]}>
+            {"🔥"} {streak}
+          </Animated.Text>
 
           {/* Goal name (single goal) */}
           {currentGoalObj && effectiveGoals.length === 1 && (
@@ -1830,12 +2049,16 @@ export default function DashboardScreen() {
         ) : !hasVisibleTasks ? (
           /* No tasks for today */
           <View style={styles.empty}>
-            <Text style={styles.emptyTitle}>No tasks for today</Text>
+            <Text style={styles.emptyTitle}>
+              {autoGenFailed ? "We couldn't generate your tasks" : "No tasks for today"}
+            </Text>
             <Text style={styles.emptySubtitle}>
-              Tap below to generate 3 tasks for each of your goals.
+              {autoGenFailed
+                ? "Something went wrong reaching our servers. Tap below to try again."
+                : "Tap below to generate 3 tasks for each of your goals."}
             </Text>
             <Button
-              title={generating ? "Generating…" : "Generate today's tasks"}
+              title={generating ? "Generating…" : autoGenFailed ? "Try again" : "Generate today's tasks"}
               onPress={handleFirstGenerate}
               loading={generating}
               style={styles.generateBtn}
@@ -2084,55 +2307,12 @@ export default function DashboardScreen() {
         colors={colors}
       />
 
-      {/* ── Stage-complete celebration (Gap 4) ──────────────────────────────── */}
-      <Modal visible={showStageCelebration} transparent animationType="fade">
-        <Pressable
-          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.85)", alignItems: "center", justifyContent: "center", padding: spacing.xl }}
-          onPress={() => setShowStageCelebration(false)}
-        >
-          <View style={{
-            position: "absolute",
-            width: 300,
-            height: 300,
-            borderRadius: 150,
-            backgroundColor: "rgba(212,168,67,0.12)",
-          }} />
-          <Text style={{ fontSize: 80, marginBottom: 24 }}>{"🏆"}</Text>
-          <Text style={{
-            fontSize: typography.xxxl + 4,
-            fontWeight: "800",
-            color: "#fff",
-            letterSpacing: -1,
-            marginBottom: 12,
-            textAlign: "center",
-          }}>
-            Stage {stageCelebrationNumber} Complete!
-          </Text>
-          <Text style={{
-            fontSize: typography.base,
-            color: "rgba(255,255,255,0.8)",
-            textAlign: "center",
-            marginBottom: spacing.lg,
-            paddingHorizontal: spacing.lg,
-          }}>
-            A new path unlocks tomorrow.
-          </Text>
-          <TouchableOpacity
-            onPress={() => setShowStageCelebration(false)}
-            activeOpacity={0.85}
-            style={{
-              paddingHorizontal: 48,
-              paddingVertical: 16,
-              borderRadius: 14,
-              backgroundColor: GOLD,
-            }}
-          >
-            <Text style={{ fontSize: typography.md, fontWeight: "700", color: "#000" }}>
-              Keep going
-            </Text>
-          </TouchableOpacity>
-        </Pressable>
-      </Modal>
+      {/* ── Stage-complete celebration (Fix 2) ──────────────────────────────── */}
+      <StageCelebrationOverlay
+        visible={showStageCelebration}
+        stageNumber={stageCelebrationNumber}
+        onDismiss={() => setShowStageCelebration(false)}
+      />
 
       {/* ── Completed-day read-only modal (Gap 3) ───────────────────────────── */}
       <Modal visible={viewingDay !== null} transparent animationType="fade">

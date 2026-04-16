@@ -1,9 +1,11 @@
 "use client";
 
 // ─── Model Pricing (per million tokens) ──────────────────────────────────────
+// DeepSeek pricing: https://api-docs.deepseek.com/quick_start/pricing
+// Gemini pricing:   https://ai.google.dev/gemini-api/docs/pricing
 const PRICING = {
-  deepseek: { input: 0.28, output: 0.42, label: "DeepSeek V3 (primary)" },
-  gemini:   { input: 0.30, output: 2.50, label: "Gemini 2.5 Flash (fallback)" },
+  deepseek: { input: 0.27, output: 1.10, label: "DeepSeek V3 (primary)" },
+  gemini:   { input: 0.075, output: 0.30, label: "Gemini 2.5 Flash (fallback)" },
 };
 
 // ─── Per-function cost estimates ─────────────────────────────────────────────
@@ -419,7 +421,7 @@ export default function CostsPage() {
             },
             {
               label: "All functions on DeepSeek (Gemini fallback)",
-              value: "All AI functions use DeepSeek V3 ($0.28/$0.42 per 1M tokens) as primary. If DeepSeek is down/slow (15s timeout), falls back to Gemini 2.5 Flash. Circuit breaker skips DeepSeek for 5 min after 3 consecutive failures.",
+              value: "All AI functions use DeepSeek V3 ($0.27/$1.10 per 1M tokens) as primary. If DeepSeek is down/slow (15s timeout), falls back to Gemini 2.5 Flash ($0.075/$0.30). Circuit breaker skips DeepSeek for 5 min after 3 consecutive failures.",
               color: "#4ade80",
             },
             {
