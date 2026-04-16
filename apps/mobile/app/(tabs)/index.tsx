@@ -73,6 +73,13 @@ const MILESTONE_LABELS: Record<number, string> = {
 // S-curve horizontal offsets (% of path width) matching web
 const S_CURVE_OFFSETS = [50, 35, 25, 35, 50, 65, 75, 65];
 
+function getCelebrationEmoji(day: number): string {
+  if ([7, 14, 30, 60, 100].includes(day)) return "👑";
+  if (day === 3) return "🚀";
+  if (day % 20 === 0) return "🏆";
+  return "🔥";
+}
+
 function getCompletionMessage(day: number): string {
   const messages: Record<number, string> = {
     1: "Day 1 done. You're already ahead of most people.",
@@ -1076,7 +1083,7 @@ function CelebrationOverlay({
           marginBottom: 24,
           transform: [{ scale: scaleAnim }],
         }}>
-          {"🔥"}
+          {getCelebrationEmoji(dayNumber)}
         </Animated.Text>
 
         <Animated.Text style={{
@@ -1779,7 +1786,21 @@ export default function DashboardScreen() {
                 if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setShowTodayPopup(true);
               }}
-              onTapWorkAhead={() => {
+              onTapWorkAhead={async () => {
+                const todayStr = new Date().toLocaleDateString("en-CA");
+                const aheadKey = `@threely_ahead_${todayStr}_${effectiveSelectedGoal}_d${goalDayNumber}`;
+                const used = await AsyncStorage.getItem(aheadKey);
+                if (used) {
+                  // Compute hours until midnight
+                  const now = new Date();
+                  const midnight = new Date();
+                  midnight.setHours(24, 0, 0, 0);
+                  const diff = midnight.getTime() - now.getTime();
+                  const h = Math.floor(diff / (1000 * 60 * 60));
+                  const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                  Alert.alert("Nice work today!", `You've already worked ahead once today.\nNext day unlocks in ${h}h ${m}m.`);
+                  return;
+                }
                 Alert.alert(
                   "Work Ahead",
                   "We recommend doing one day's work per day. Want to work ahead?",
@@ -1787,7 +1808,8 @@ export default function DashboardScreen() {
                     { text: "I'll wait", style: "cancel" },
                     {
                       text: "Work ahead",
-                      onPress: () => {
+                      onPress: async () => {
+                        await AsyncStorage.setItem(aheadKey, "true");
                         setViewMode("tasks");
                       },
                     },
@@ -1795,7 +1817,13 @@ export default function DashboardScreen() {
                 );
               }}
               onTapLocked={(day) => {
-                Alert.alert("Locked", "Complete the previous day first.");
+                const now = new Date();
+                const midnight = new Date();
+                midnight.setHours(24, 0, 0, 0);
+                const diff = midnight.getTime() - now.getTime();
+                const h = Math.floor(diff / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                Alert.alert("This day is locked", `Complete the current day first.\nUnlocks in ${h}h ${m}m.`);
               }}
               colors={colors}
               screenWidth={screenWidth}
