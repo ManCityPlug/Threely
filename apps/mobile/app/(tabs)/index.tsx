@@ -53,7 +53,7 @@ if (Platform.OS === "android" && UIManager.setLayoutAnimationEnabledExperimental
 }
 
 // iPad-friendly max content width
-const MAX_CONTENT_WIDTH = 600;
+const MAX_CONTENT_WIDTH = 760;
 
 // ─── Gamification Helpers ─────────────────────────────────────────────────────
 
@@ -604,7 +604,7 @@ function SCurvePathView({
   }, [goalDayNumber]);
 
   // Path container width (leave margin on each side)
-  const pathWidth = Math.min(screenWidth - 40, 500);
+  const pathWidth = Math.min(screenWidth - 40, screenWidth >= 768 ? 600 : 500);
   const nodeSpacing = 100;
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -789,7 +789,7 @@ function SkeletonPath({ screenWidth }: { screenWidth: number }) {
     return () => loop.stop();
   }, [pulseAnim]);
 
-  const pathWidth = Math.min(screenWidth - 40, 500);
+  const pathWidth = Math.min(screenWidth - 40, screenWidth >= 768 ? 600 : 500);
   const skeletonNodes = [0, 1, 2, 3, 4, 5, 6];
 
   return (
@@ -1296,10 +1296,7 @@ export default function DashboardScreen() {
             setRestDay(true);
           } else {
             setDailyTasks(res.dailyTasks);
-            sendInstantNotification(
-              "Your tasks are ready!",
-              "Your personalized daily tasks have been generated. Open Threely to get started."
-            );
+            // Notifications disabled
           }
         } catch (err: unknown) {
           AsyncStorage.removeItem(autoGenKey);
@@ -1450,15 +1447,8 @@ export default function DashboardScreen() {
     };
   }, [selectedGoal, goals, newTaskItems, allDone, restDay, goalStats, dailyTasks]);
 
-  // Schedule notifications after data loads
-  useEffect(() => {
-    if (!loading && goals.length > 0) {
-      const timer = setTimeout(() => {
-        scheduleNotifications(buildNotifContext()).catch(() => {});
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [loading, buildNotifContext, goals.length]);
+  // Notifications disabled — primary channel is web, mobile is secondary
+  // Permission code stays in place; just don't schedule.
 
   // Show celebration when user manually completes all tasks (not on page load)
   const userToggledRef = useRef(false);
@@ -1511,10 +1501,7 @@ export default function DashboardScreen() {
           ...res.dailyTasks,
         ];
       });
-      sendInstantNotification(
-        "Your tasks are ready!",
-        "Your personalized daily tasks have been generated. Open Threely to get started."
-      );
+      // Notifications disabled
     } catch (e: unknown) {
       AsyncStorage.removeItem(`@threely_generating_${genTodayStr}`);
       if (e instanceof Error && e.message?.includes("pro_required")) {
@@ -1544,9 +1531,7 @@ export default function DashboardScreen() {
       const res = await tasksApi.completeItem(dailyTaskId, taskItemId, isCompleted);
       const newDailyTasks = dailyTasks.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt));
       setDailyTasks(newDailyTasks);
-      if (isCompleted) {
-        onTaskCompleted(buildNotifContext());
-      }
+      // Notifications disabled
     } catch {
       showToast("Couldn't update task. Try again.", "error");
     }

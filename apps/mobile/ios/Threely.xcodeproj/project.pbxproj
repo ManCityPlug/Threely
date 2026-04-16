@@ -7,26 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0194EBB431B0585CD0BCA8D8 /* libPods-Threely.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 16C3AEF00B0564B7DD28C74F /* libPods-Threely.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		1F21E61C04B05A29221EC6AA /* libPods-Threely.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 87B0B9A6C6CE8765E024FDAD /* libPods-Threely.a */; };
+		30C8D2258C230335800AD15C /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EDF60544B9CD70C4B34A062 /* ExpoModulesProvider.swift */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
-		6149F201001D0E55C965F904 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 9D9F5B93AD323D935DBB1EF3 /* PrivacyInfo.xcprivacy */; };
+		70DD3CA24DD039D4F6677C6B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 1698B4E8DE59151C11127252 /* PrivacyInfo.xcprivacy */; };
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
-		CF0B071074FCD5332DD37901 /* ExpoModulesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558091DCAB4C6D6ECCDD40FC /* ExpoModulesProvider.swift */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		03CA258F358A923FEF0302BB /* Pods-Threely.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Threely.debug.xcconfig"; path = "Target Support Files/Pods-Threely/Pods-Threely.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Threely.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Threely.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = Threely/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Threely/Info.plist; sourceTree = "<group>"; };
-		16C3AEF00B0564B7DD28C74F /* libPods-Threely.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Threely.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4CA61BFF5BCBD91771A4EB8B /* Pods-Threely.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Threely.release.xcconfig"; path = "Target Support Files/Pods-Threely/Pods-Threely.release.xcconfig"; sourceTree = "<group>"; };
-		558091DCAB4C6D6ECCDD40FC /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Threely/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
-		9D9F5B93AD323D935DBB1EF3 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Threely/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		A2FFCF873C1AFEDFB773434E /* Pods-Threely.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Threely.debug.xcconfig"; path = "Target Support Files/Pods-Threely/Pods-Threely.debug.xcconfig"; sourceTree = "<group>"; };
+		1698B4E8DE59151C11127252 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = Threely/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		3EDF60544B9CD70C4B34A062 /* ExpoModulesProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpoModulesProvider.swift; path = "Pods/Target Support Files/Pods-Threely/ExpoModulesProvider.swift"; sourceTree = "<group>"; };
+		87B0B9A6C6CE8765E024FDAD /* libPods-Threely.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Threely.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = SplashScreen.storyboard; path = Threely/SplashScreen.storyboard; sourceTree = "<group>"; };
 		BB2F792C24A3F905000567C9 /* Expo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Expo.plist; sourceTree = "<group>"; };
+		C41EFCF2C4FEB8611332CF30 /* Pods-Threely.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Threely.release.xcconfig"; path = "Target Support Files/Pods-Threely/Pods-Threely.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Threely/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* Threely-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Threely-Bridging-Header.h"; path = "Threely/Threely-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -37,13 +37,31 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0194EBB431B0585CD0BCA8D8 /* libPods-Threely.a in Frameworks */,
+				1F21E61C04B05A29221EC6AA /* libPods-Threely.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		051F03A2DBC3D19D6A4A55F1 /* ExpoModulesProviders */ = {
+			isa = PBXGroup;
+			children = (
+				B1415E4DC6D0F3FFAF2F93D5 /* Threely */,
+			);
+			name = ExpoModulesProviders;
+			sourceTree = "<group>";
+		};
+		097B2AEAF4D6F8C7A2E3F3C7 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				03CA258F358A923FEF0302BB /* Pods-Threely.debug.xcconfig */,
+				C41EFCF2C4FEB8611332CF30 /* Pods-Threely.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 		13B07FAE1A68108700A75B9A /* Threely */ = {
 			isa = PBXGroup;
 			children = (
@@ -53,7 +71,7 @@
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */,
-				9D9F5B93AD323D935DBB1EF3 /* PrivacyInfo.xcprivacy */,
+				1698B4E8DE59151C11127252 /* PrivacyInfo.xcprivacy */,
 			);
 			name = Threely;
 			sourceTree = "<group>";
@@ -62,7 +80,7 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				16C3AEF00B0564B7DD28C74F /* libPods-Threely.a */,
+				87B0B9A6C6CE8765E024FDAD /* libPods-Threely.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -81,8 +99,8 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				A4A9CA06EC73A6209A09E89F /* Pods */,
-				8AB178477F4193F1FFA4608A /* ExpoModulesProviders */,
+				097B2AEAF4D6F8C7A2E3F3C7 /* Pods */,
+				051F03A2DBC3D19D6A4A55F1 /* ExpoModulesProviders */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -97,28 +115,10 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		8AB178477F4193F1FFA4608A /* ExpoModulesProviders */ = {
+		B1415E4DC6D0F3FFAF2F93D5 /* Threely */ = {
 			isa = PBXGroup;
 			children = (
-				B5AEF12181D21CB2BD99C8B6 /* Threely */,
-			);
-			name = ExpoModulesProviders;
-			sourceTree = "<group>";
-		};
-		A4A9CA06EC73A6209A09E89F /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				A2FFCF873C1AFEDFB773434E /* Pods-Threely.debug.xcconfig */,
-				4CA61BFF5BCBD91771A4EB8B /* Pods-Threely.release.xcconfig */,
-			);
-			name = Pods;
-			path = Pods;
-			sourceTree = "<group>";
-		};
-		B5AEF12181D21CB2BD99C8B6 /* Threely */ = {
-			isa = PBXGroup;
-			children = (
-				558091DCAB4C6D6ECCDD40FC /* ExpoModulesProvider.swift */,
+				3EDF60544B9CD70C4B34A062 /* ExpoModulesProvider.swift */,
 			);
 			name = Threely;
 			sourceTree = "<group>";
@@ -140,14 +140,14 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Threely" */;
 			buildPhases = (
 				08A4A3CD28434E44B6B9DE2E /* [CP] Check Pods Manifest.lock */,
-				A82766B7F44CC50C16113CA2 /* [Expo] Configure project */,
+				C49615165F98AD16FE03372B /* [Expo] Configure project */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				800E24972A6A228C8D4807E9 /* [CP] Copy Pods Resources */,
-				D0CD473694574AB0B9ACD51E /* Upload Debug Symbols to Sentry */,
-				B6EAD8790237F94DAEDA6D50 /* [CP] Embed Pods Frameworks */,
+				A2E2E6716B8F46F284BD203F /* Upload Debug Symbols to Sentry */,
+				FDB19505D173362895BB95B2 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -197,7 +197,7 @@
 				BB2F792D24A3F905000567C9 /* Expo.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */,
-				6149F201001D0E55C965F904 /* PrivacyInfo.xcprivacy in Resources */,
+				70DD3CA24DD039D4F6677C6B /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,7 +285,21 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Threely/Pods-Threely-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A82766B7F44CC50C16113CA2 /* [Expo] Configure project */ = {
+		A2E2E6716B8F46F284BD203F /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Debug Symbols to Sentry";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh `${NODE_BINARY:-node} --print \"require('path').dirname(require.resolve('@sentry/react-native/package.json')) + '/scripts/sentry-xcode-debug-files.sh'\"`";
+		};
+		C49615165F98AD16FE03372B /* [Expo] Configure project */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
@@ -309,7 +323,7 @@
 			shellPath = /bin/sh;
 			shellScript = "# This script configures Expo modules and generates the modules provider file.\nbash -l -c \"./Pods/Target\\ Support\\ Files/Pods-Threely/expo-configure-project.sh\"\n";
 		};
-		B6EAD8790237F94DAEDA6D50 /* [CP] Embed Pods Frameworks */ = {
+		FDB19505D173362895BB95B2 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -333,20 +347,6 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Threely/Pods-Threely-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D0CD473694574AB0B9ACD51E /* Upload Debug Symbols to Sentry */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Upload Debug Symbols to Sentry";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/bin/sh `${NODE_BINARY:-node} --print \"require('path').dirname(require.resolve('@sentry/react-native/package.json')) + '/scripts/sentry-xcode-debug-files.sh'\"`";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -355,7 +355,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
-				CF0B071074FCD5332DD37901 /* ExpoModulesProvider.swift in Sources */,
+				30C8D2258C230335800AD15C /* ExpoModulesProvider.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -364,12 +364,12 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A2FFCF873C1AFEDFB773434E /* Pods-Threely.debug.xcconfig */;
+			baseConfigurationReference = 03CA258F358A923FEF0302BB /* Pods-Threely.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Threely/Threely.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = Y3U56GWWBJ;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -382,7 +382,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.3.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -401,12 +401,12 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 4CA61BFF5BCBD91771A4EB8B /* Pods-Threely.release.xcconfig */;
+			baseConfigurationReference = C41EFCF2C4FEB8611332CF30 /* Pods-Threely.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Threely/Threely.entitlements;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = Y3U56GWWBJ;
 				INFOPLIST_FILE = Threely/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -414,7 +414,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.3.0;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
