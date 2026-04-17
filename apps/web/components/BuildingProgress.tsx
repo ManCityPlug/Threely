@@ -2,25 +2,40 @@
 
 import { useEffect, useState } from "react";
 
+const STEPS = [
+  "Understanding your situation…",
+  "Mapping out your path…",
+  "Creating today's tasks…",
+  "Locking it in…",
+];
+const GOLD = "#D4A843";
+const DURATION_MS = 6000;
+
 export default function BuildingProgress() {
   const [progress, setProgress] = useState(0);
+  const [stepIdx, setStepIdx] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
     const startTime = Date.now();
-    const DURATION = 8000; // 8 seconds to fill
 
     const animate = () => {
       if (cancelled) return;
       const elapsed = Date.now() - startTime;
-      const t = Math.min(elapsed / DURATION, 0.98);
-      // Linear steady fill — slow and consistent
+      const t = Math.min(elapsed / DURATION_MS, 0.98);
       setProgress(t);
       if (t < 0.98) requestAnimationFrame(animate);
     };
     animate();
 
-    return () => { cancelled = true; };
+    const interval = setInterval(() => {
+      setStepIdx((prev) => Math.min(prev + 1, STEPS.length - 1));
+    }, 1500);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -28,36 +43,58 @@ export default function BuildingProgress() {
       display: "flex", flexDirection: "column",
       alignItems: "center", justifyContent: "center",
       textAlign: "center", padding: "3rem 1.5rem",
-      maxWidth: 400, margin: "0 auto",
+      maxWidth: 480, margin: "0 auto",
     }}>
-      <div style={{ fontSize: 48, marginBottom: 24, animation: "bounce 1.5s ease-in-out infinite" }}>
-        {"🚀"}
-      </div>
+      <h2 style={{
+        fontSize: "clamp(1.2rem, 3.5vw, 1.5rem)",
+        fontWeight: 700,
+        color: "var(--text)",
+        marginBottom: 8,
+        letterSpacing: "-0.02em",
+      }}>
+        Threely Intelligence is building your plan
+      </h2>
 
-      {/* Progress bar — blue */}
+      <p style={{
+        fontSize: "0.95rem",
+        color: "rgba(255,255,255,0.7)",
+        marginBottom: 28,
+        minHeight: "1.4em",
+        transition: "opacity 200ms ease",
+      }}>
+        {STEPS[stepIdx]}
+      </p>
+
+      {/* Progress bar — gold, themed */}
       <div style={{
-        width: "100%", maxWidth: 320, height: 10,
-        background: "rgba(255,255,255,0.1)", borderRadius: 999, overflow: "hidden",
-        marginBottom: 16,
+        position: "relative",
+        width: "100%", maxWidth: 360, height: 8,
+        background: "rgba(212,168,67,0.15)",
+        borderRadius: 999, overflow: "hidden",
       }}>
         <div style={{
           height: "100%",
           width: `${progress * 100}%`,
-          background: "linear-gradient(90deg, #4A90D9 0%, #5B9FE6 50%, #3B7DD8 100%)",
+          background: `linear-gradient(90deg, ${GOLD}, #E8C547)`,
           borderRadius: 999,
           transition: "width 0.05s linear",
-          boxShadow: "0 0 12px rgba(74,144,217,0.4)",
+          boxShadow: `0 0 12px rgba(212,168,67,0.5)`,
+        }} />
+        {/* Shimmer sweep */}
+        <div style={{
+          position: "absolute",
+          inset: 0,
+          background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.35) 50%, transparent 100%)",
+          animation: "shimmerSweep 1.6s linear infinite",
+          pointerEvents: "none",
+          borderRadius: 999,
         }} />
       </div>
 
-      <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.85)" }}>
-        This will only take a few seconds
-      </p>
-
       <style>{`
-        @keyframes bounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-8px); }
+        @keyframes shimmerSweep {
+          0%   { transform: translateX(-100%); }
+          100% { transform: translateX(100%); }
         }
       `}</style>
     </div>

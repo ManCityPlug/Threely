@@ -46,6 +46,10 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
   const sparkleAnims = useRef(
     Array.from({ length: 6 }, () => new Animated.Value(0))
   ).current;
+  // Per-word fade for the headline
+  const wordAnims = useRef(
+    Array.from({ length: 3 }, () => new Animated.Value(0))
+  ).current;
 
   useEffect(() => {
     // Persist welcome seen flag
@@ -57,6 +61,14 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
       duration: 600,
       useNativeDriver: true,
     }).start();
+
+    // Stagger the 3 headline words (REACH -> YOUR -> GOALS)
+    Animated.stagger(
+      220,
+      wordAnims.map((a) =>
+        Animated.timing(a, { toValue: 1, duration: 700, useNativeDriver: true })
+      )
+    ).start();
 
     const loops: Animated.CompositeAnimation[] = [];
 
@@ -131,11 +143,68 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
             <Image source={require("@/assets/icon.png")} style={styles.logo} />
           </Animated.View>
 
-          {/* Tagline */}
-          <Animated.View style={[{ alignItems: "center", marginTop: spacing.xl }, { opacity: fadeAnim }]}>
-            <Text style={styles.lockInLine1}>REACH YOUR</Text>
-            <Text style={styles.lockInLine2}>GOALS</Text>
-          </Animated.View>
+          {/* Tagline — each word fades in with its own color & stagger */}
+          <View style={{ alignItems: "center", marginTop: spacing.xl }}>
+            <View style={{ flexDirection: "row", gap: 10 }}>
+              <Animated.Text
+                style={[
+                  styles.lockInLine1,
+                  {
+                    color: "#FFFFFF",
+                    opacity: wordAnims[0],
+                    transform: [
+                      {
+                        translateY: wordAnims[0].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [14, 0],
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                REACH
+              </Animated.Text>
+              <Animated.Text
+                style={[
+                  styles.lockInLine1,
+                  {
+                    color: "#E5D5A8",
+                    opacity: wordAnims[1],
+                    transform: [
+                      {
+                        translateY: wordAnims[1].interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [14, 0],
+                        }),
+                      },
+                    ],
+                  },
+                ]}
+              >
+                YOUR
+              </Animated.Text>
+            </View>
+            <Animated.Text
+              style={[
+                styles.lockInLine2,
+                {
+                  color: PRIMARY,
+                  opacity: wordAnims[2],
+                  transform: [
+                    {
+                      translateY: wordAnims[2].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [14, 0],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              GOALS
+            </Animated.Text>
+          </View>
         </Animated.View>
 
         {/* Bottom section: auth buttons */}

@@ -64,27 +64,93 @@ function cleanFallbackTitle(rawInput: string): string {
 
 function BuildingProgressMobile({ styles, colors }: { styles: any; colors: Colors }) {
   const [stepIdx, setStepIdx] = useState(0);
+  const progressAnim = useRef(new Animated.Value(0)).current;
+  const shimmerAnim = useRef(new Animated.Value(0)).current;
+  const GOLD = "#D4A843";
 
   useEffect(() => {
+    // Step label rotates every 1.5s so all 4 steps show within the 6s window
     const interval = setInterval(() => {
       setStepIdx((prev) => Math.min(prev + 1, BUILDING_STEPS.length - 1));
-    }, 7000);
-    return () => clearInterval(interval);
-  }, []);
+    }, 1500);
+
+    // Bar slides 0 -> 100% over 6 seconds (just for feel, not a real indicator)
+    Animated.timing(progressAnim, {
+      toValue: 1,
+      duration: 6000,
+      useNativeDriver: false,
+    }).start();
+
+    // Shimmer overlay on the bar
+    const shimmerLoop = Animated.loop(
+      Animated.timing(shimmerAnim, {
+        toValue: 1,
+        duration: 1400,
+        useNativeDriver: false,
+      })
+    );
+    shimmerLoop.start();
+
+    return () => {
+      clearInterval(interval);
+      shimmerLoop.stop();
+    };
+  }, [progressAnim, shimmerAnim]);
+
+  const barFillWidth = progressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["0%", "100%"],
+  });
+  const shimmerTranslate = shimmerAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [-80, 320],
+  });
 
   return (
     <View style={styles.buildingCenter}>
       <Text style={styles.buildTitle}>Threely Intelligence is building your plan…</Text>
-      <Text style={styles.buildSubtitle}>{BUILDING_STEPS[stepIdx]}</Text>
-      <View style={{ flexDirection: "row", gap: 6, marginTop: spacing.md, marginBottom: spacing.sm }}>
-        {BUILDING_STEPS.map((_: string, i: number) => (
-          <View key={i} style={{
-            width: 8, height: 8, borderRadius: 4,
-            backgroundColor: i <= stepIdx ? colors.primary : colors.border,
-          }} />
-        ))}
+      <Text style={[styles.buildSubtitle, { marginBottom: spacing.lg }]}>
+        {BUILDING_STEPS[stepIdx]}
+      </Text>
+
+      {/* Progress bar — 6s slide, shimmer overlay */}
+      <View
+        style={{
+          width: "80%",
+          maxWidth: 320,
+          height: 8,
+          borderRadius: 999,
+          backgroundColor: "rgba(212,168,67,0.15)",
+          overflow: "hidden",
+          marginTop: spacing.sm,
+        }}
+      >
+        <Animated.View
+          style={{
+            width: barFillWidth,
+            height: "100%",
+            borderRadius: 999,
+            backgroundColor: GOLD,
+            shadowColor: GOLD,
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: 0.6,
+            shadowRadius: 8,
+          }}
+        />
+        <Animated.View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 80,
+            height: "100%",
+            transform: [{ translateX: shimmerTranslate }],
+            backgroundColor: "rgba(255,255,255,0.35)",
+            borderRadius: 999,
+          }}
+          pointerEvents="none"
+        />
       </View>
-      <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.sm }} />
     </View>
   );
 }
@@ -456,9 +522,6 @@ export default function OnboardingScreen() {
               activeOpacity={0.8}
             >
               <Text style={styles.optionBtnText}>{opt}</Text>
-              <Text style={styles.optionBtnSub}>
-                {opt === "Mild" ? "~30 min/day" : opt === "Moderate" ? "~1 hr/day" : "~2 hrs/day"}
-              </Text>
             </TouchableOpacity>
           ))}
         </View>
