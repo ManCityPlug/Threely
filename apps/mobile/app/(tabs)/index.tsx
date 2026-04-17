@@ -1796,12 +1796,13 @@ export default function DashboardScreen() {
     }
   }, [allDone, newTaskItems.length]);
 
-  // Pre-generate tomorrow's tasks in the background as soon as today's all done.
-  // Eliminates the LLM-call delay when the user taps work-ahead or the next day
-  // unlocks at midnight — the tasks are already in the DB, fetch is instant.
+  // Pre-generate tomorrow's tasks in the background as soon as today's tasks
+  // are loaded — regardless of whether the user has started or finished them.
+  // So tomorrow is ALWAYS ready while they work today: instant work-ahead,
+  // instant midnight unlock, no LLM-call delay.
   const preGenFiredForRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!allDone || !effectiveSelectedGoal || !tasksAreForToday) return;
+    if (!effectiveSelectedGoal || !tasksAreForToday) return;
     const now = new Date();
     const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const tomorrowLocal = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
@@ -1809,11 +1810,12 @@ export default function DashboardScreen() {
     if (preGenFiredForRef.current === dedupeKey) return;
     preGenFiredForRef.current = dedupeKey;
     // Fire and forget — silent failure is fine, on-demand generate still works.
+    // Server has a unique (goalId, date) constraint so repeated calls are no-ops.
     tasksApi.generate(effectiveSelectedGoal, { localDate: tomorrowLocal }).catch(() => {
       // Allow retry if it failed (e.g. network blip)
       preGenFiredForRef.current = null;
     });
-  }, [allDone, effectiveSelectedGoal, tasksAreForToday]);
+  }, [effectiveSelectedGoal, tasksAreForToday]);
 
   // Fix 3 — animate streak text on increment (not on initial mount).
   useEffect(() => {

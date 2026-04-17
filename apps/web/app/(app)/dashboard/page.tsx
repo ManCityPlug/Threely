@@ -945,23 +945,26 @@ function DashboardPageInner() {
     }
   }, [viewAllDone, totalCount, showTasks]);
 
-  // Pre-generate tomorrow's tasks in the background as soon as today's all done.
-  // Eliminates the LLM-call delay when the user clicks work-ahead or the next
-  // day unlocks — tasks are already in the DB, fetch is instant.
+  // Pre-generate tomorrow's tasks in the background as soon as today's tasks
+  // are loaded — regardless of whether the user has started or finished them.
+  // So tomorrow is ALWAYS ready while they work today: instant work-ahead,
+  // instant midnight unlock, no LLM-call delay.
   const preGenFiredForRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!todayAllDone || !effectiveSelectedGoalId) return;
+    if (!effectiveSelectedGoalId || !todayDtIsForToday) return;
     const now = new Date();
     const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
     const tomorrowLocal = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
     const dedupeKey = `${effectiveSelectedGoalId}:${tomorrowLocal}`;
     if (preGenFiredForRef.current === dedupeKey) return;
     preGenFiredForRef.current = dedupeKey;
+    // Fire and forget — silent failure is fine. Server has unique (goalId, date)
+    // constraint so repeated calls for the same day are no-ops.
     tasksApi.generate({ goalId: effectiveSelectedGoalId, localDate: tomorrowLocal }).catch(() => {
       // Allow retry if it failed (network blip, rate limit, etc.)
       preGenFiredForRef.current = null;
     });
-  }, [todayAllDone, effectiveSelectedGoalId]);
+  }, [effectiveSelectedGoalId, todayDtIsForToday]);
 
   // ── Stage-complete celebration (Day 20 / 40 / 60...) ──────────────────────
   // Fires once per stage transition: when goalDayNumber % 20 === 0 and the user
