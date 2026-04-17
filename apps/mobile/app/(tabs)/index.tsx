@@ -1796,6 +1796,25 @@ export default function DashboardScreen() {
     }
   }, [allDone, newTaskItems.length]);
 
+  // Pre-generate tomorrow's tasks in the background as soon as today's all done.
+  // Eliminates the LLM-call delay when the user taps work-ahead or the next day
+  // unlocks at midnight — the tasks are already in the DB, fetch is instant.
+  const preGenFiredForRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!allDone || !effectiveSelectedGoal || !tasksAreForToday) return;
+    const now = new Date();
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const tomorrowLocal = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+    const dedupeKey = `${effectiveSelectedGoal}:${tomorrowLocal}`;
+    if (preGenFiredForRef.current === dedupeKey) return;
+    preGenFiredForRef.current = dedupeKey;
+    // Fire and forget — silent failure is fine, on-demand generate still works.
+    tasksApi.generate(effectiveSelectedGoal, { localDate: tomorrowLocal }).catch(() => {
+      // Allow retry if it failed (e.g. network blip)
+      preGenFiredForRef.current = null;
+    });
+  }, [allDone, effectiveSelectedGoal, tasksAreForToday]);
+
   // Fix 3 — animate streak text on increment (not on initial mount).
   useEffect(() => {
     const prev = prevStreakRef.current;
@@ -2158,7 +2177,10 @@ export default function DashboardScreen() {
               onTapToday={() => {
                 if (allDone && celebrationDismissed) return;
                 if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                markDayStarted(effectiveDayNumber);
+                // Mark the displayed "today" day — which is effectiveDayNumber+1
+                // when path is bumped forward after allDone (work-ahead preview).
+                const displayedToday = allDone ? effectiveDayNumber + 1 : effectiveDayNumber;
+                markDayStarted(displayedToday);
                 setShowTodayPopup(true);
               }}
               onTapWorkAhead={async () => {
@@ -2185,6 +2207,9 @@ export default function DashboardScreen() {
                       text: "Work ahead",
                       onPress: async () => {
                         await AsyncStorage.setItem(aheadKey, "true");
+                        // Mark the work-ahead day as started so badge flips to CONTINUE
+                        const displayedToday = allDone ? effectiveDayNumber + 1 : effectiveDayNumber;
+                        markDayStarted(displayedToday + 1);
                         setViewMode("tasks");
                       },
                     },

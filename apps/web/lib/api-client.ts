@@ -204,12 +204,15 @@ export const tasksApi = {
     focusShifted?: boolean;
     postReview?: boolean;
     onboarding?: boolean;
+    localDate?: string;
   }) => {
     const now = new Date();
-    const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const defaultLocalDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    const { localDate: overrideLocalDate, ...rest } = opts ?? {};
+    const localDate = overrideLocalDate ?? defaultLocalDate;
     return apiFetch<{ dailyTasks: DailyTask[]; coachNote?: string; restDay?: boolean }>(
       "/api/tasks/generate",
-      { method: "POST", body: JSON.stringify({ localDate, ...(opts ?? {}) }) }
+      { method: "POST", body: JSON.stringify({ localDate, ...rest }) }
     );
   },
 
