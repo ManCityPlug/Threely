@@ -22,7 +22,6 @@ const AI_COSTS = {
   generateRoadmap: 0.093,
   generateTasks: 0.02,
   goalChat: 0.001,
-  generateInsight: 0.001,
   refineTask: 0.001,
   generateWeeklySummary: 0.001,
 };
@@ -38,7 +37,7 @@ export async function GET(
 
   const { id } = await params;
 
-  const [user, goals, allDailyTasks, reviews, weeklySummaries] =
+  const [user, goals, allDailyTasks, weeklySummaries] =
     await Promise.all([
       prisma.user.findUnique({
         where: { id },
@@ -49,7 +48,6 @@ export async function GET(
         orderBy: { createdAt: "desc" },
       }),
       prisma.dailyTask.findMany({ where: { userId: id } }),
-      prisma.dailyReview.findMany({ where: { userId: id } }),
       prisma.weeklySummary.count({ where: { userId: id } }),
     ]);
 
@@ -143,7 +141,6 @@ export async function GET(
 
   // AI cost estimate
   const goalCount = goals.length;
-  const reviewsWithInsight = reviews.filter((r) => r.insight).length;
   const aiCosts = {
     parseGoal: { calls: goalCount, cost: goalCount * AI_COSTS.parseGoal },
     generateRoadmap: {
@@ -157,10 +154,6 @@ export async function GET(
     goalChat: {
       calls: goalCount * 2,
       cost: goalCount * 2 * AI_COSTS.goalChat,
-    },
-    generateInsight: {
-      calls: reviewsWithInsight,
-      cost: reviewsWithInsight * AI_COSTS.generateInsight,
     },
     refineTask: {
       calls: Math.round(totalTaskItems * 0.1),

@@ -292,19 +292,7 @@ export default function PathView({
   }, [dayNumber]);
 
   function renderTodayPopup(day: number) {
-    if (day !== dayNumber) return null;
-
-    const label = allDoneToday ? "COMPLETE \u2713" : startedOnce ? "CONTINUE" : "START";
-    const GREEN = "#3ecf8e";
-    const GREEN_DARK = "#2fb87a";
-    const bg = allDoneToday
-      ? `linear-gradient(135deg, ${GREEN}, ${GREEN_DARK})`
-      : `linear-gradient(135deg, ${GOLD}, #C49A3C)`;
-    const shadow = allDoneToday
-      ? "0 4px 12px rgba(62,207,142,0.35)"
-      : "0 4px 12px rgba(212,168,67,0.25)";
-    const arrowColor = allDoneToday ? GREEN : GOLD;
-    const textColor = allDoneToday ? "#fff" : "#000";
+    if (day !== dayNumber || allDoneToday) return null;
 
     return (
       <div
@@ -315,12 +303,11 @@ export default function PathView({
           left: "50%",
           transform: "translateX(-50%)",
           zIndex: 100,
-          animation: allDoneToday ? undefined : "popupFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
-          cursor: allDoneToday ? "default" : "pointer",
+          animation: "popupFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1)",
+          cursor: "pointer",
         }}
         onClick={(e) => {
           e.stopPropagation();
-          if (allDoneToday) return;
           setStartedOnce(true);
           if (onStartDay) onStartDay();
           onDayClick(day, "today");
@@ -328,11 +315,11 @@ export default function PathView({
       >
         <div
           style={{
-            background: bg,
+            background: `linear-gradient(135deg, ${GOLD}, #C49A3C)`,
             borderRadius: 10,
             padding: "6px 18px",
             textAlign: "center",
-            boxShadow: shadow,
+            boxShadow: "0 4px 12px rgba(212,168,67,0.25)",
             position: "relative",
           }}
         >
@@ -346,17 +333,17 @@ export default function PathView({
               height: 0,
               borderLeft: "5px solid transparent",
               borderRight: "5px solid transparent",
-              borderTop: `5px solid ${arrowColor}`,
+              borderTop: `5px solid ${GOLD}`,
             }}
           />
           <span style={{
             fontSize: "0.75rem",
             fontWeight: 800,
-            color: textColor,
+            color: "#000",
             letterSpacing: "0.06em",
             textTransform: "uppercase",
           }}>
-            {label}
+            {startedOnce ? "CONTINUE" : "START"}
           </span>
         </div>
       </div>

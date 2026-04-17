@@ -19,7 +19,6 @@ const AI_COSTS = {
   generateRoadmap: 0.03,      // Sonnet — ~2.5K in, ~1.5K out
   generateTasks: 0.005,       // Haiku (cached) — ~5K in, ~3K out
   goalChat: 0.002,            // Haiku — ~800 in, ~400 out
-  generateInsight: 0.001,     // Haiku — ~500 in, ~150 out
   refineTask: 0.001,          // Haiku — ~500 in, ~250 out
   askAboutTask: 0.002,        // Haiku — ~1K in, ~400 out
   generateWeeklySummary: 0.002, // Haiku — ~800 in, ~200 out
@@ -45,7 +44,6 @@ export async function GET(request: NextRequest) {
     allDailyTasks,
     trialingCount,
     activeSubCount,
-    reviewsWithInsight,
     totalWeeklySummaries,
     recentActiveUserIds,
   ] = await Promise.all([
@@ -56,7 +54,6 @@ export async function GET(request: NextRequest) {
     prisma.dailyTask.findMany(),
     prisma.user.count({ where: { subscriptionStatus: "trialing" } }),
     prisma.user.count({ where: { subscriptionStatus: "active" } }),
-    prisma.dailyReview.count({ where: { insight: { not: null } } }),
     prisma.weeklySummary.count(),
     prisma.dailyTask.findMany({
       where: { generatedAt: { gte: sevenDaysAgo } },
@@ -97,10 +94,6 @@ export async function GET(request: NextRequest) {
     goalChat: {
       calls: goalCount * 2,
       cost: goalCount * 2 * AI_COSTS.goalChat,
-    },
-    generateInsight: {
-      calls: reviewsWithInsight,
-      cost: reviewsWithInsight * AI_COSTS.generateInsight,
     },
     refineTask: {
       calls: Math.round(totalTaskItems * 0.1),

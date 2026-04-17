@@ -245,7 +245,7 @@ model CancellationFeedback {
 model AICallLog {
   id              String   @id @default(cuid())
   userId          String
-  functionName    String   // "parseGoal" | "generateTasks" | "generateInsight" | "generateRoadmap" | "updateCoachingContext" | "goalChat"
+  functionName    String   // "parseGoal" | "generateTasks" | "generateRoadmap" | "goalChat"
   modelUsed       String   // "claude-opus-4-6" | "claude-sonnet-4-6" | "claude-haiku-4-5-20251001"
   inputData       String   @db.Text  // JSON string of the input parameters
   outputData      String   @db.Text  // JSON string of Claude's response
