@@ -60,22 +60,8 @@ function LoginPageInner() {
     const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
 
     if (authError) {
-      // Check if the email exists to show a more helpful message
-      try {
-        const res = await fetch("/api/auth/check-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: email.trim() }),
-        });
-        const { exists } = await res.json();
-        if (!exists) {
-          setLoading(false);
-          setError("no_account");
-          return;
-        }
-      } catch {
-        // If check fails, fall through to generic error
-      }
+      // Always show a generic error — we don't expose account existence
+      // to prevent enumeration attacks.
       setLoading(false);
       setError("Invalid login credentials");
       return;
@@ -165,21 +151,12 @@ function LoginPageInner() {
 
         {error && (
           <div style={{
-            background: error === "no_account" ? "var(--primary-light)" : "var(--danger-light)",
-            color: error === "no_account" ? "var(--primary)" : "var(--danger)",
+            background: "var(--danger-light)",
+            color: "var(--danger)",
             padding: "0.65rem 0.875rem", borderRadius: "var(--radius)",
             fontSize: "0.875rem",
           }}>
-            {error === "no_account" ? (
-              <>
-                We couldn't find an account with this email.{" "}
-                <Link href="/signup" style={{ color: "var(--primary)", fontWeight: 600, textDecoration: "underline" }}>
-                  Sign up
-                </Link>
-              </>
-            ) : (
-              error
-            )}
+            {error}
           </div>
         )}
 

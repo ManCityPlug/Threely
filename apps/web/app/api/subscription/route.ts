@@ -56,10 +56,32 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    // Eager trial-expiry check — if DB says trialing but the stored trial
+    // end is in the past, the trial_will_end / subscription.updated webhook
+    // may have been missed or delayed. Always hit Stripe fresh; if Stripe
+    // also still reports trialing despite time clearly being up, trust the
+    // DB date and override to canceled (conservative: both signals must
+    // agree trial is over before yanking pro).
+    const trialLikelyExpired =
+      dbUser.subscriptionStatus === "trialing" &&
+      dbUser.trialEndsAt != null &&
+      dbUser.trialEndsAt < new Date();
+
     // Re-sync status from Stripe to catch webhook misses
     try {
       const sub = await stripe.subscriptions.retrieve(dbUser.subscriptionId);
-      const status = sub.status; // trialing | active | past_due | canceled | etc.
+      let status = sub.status; // trialing | active | past_due | canceled | etc.
+      const stripeTrialEnd = sub.trial_end ? new Date(sub.trial_end * 1000) : null;
+      const stripeTrialEndedPast = stripeTrialEnd != null && stripeTrialEnd < new Date();
+
+      // Conservative override: only if both DB and Stripe agree trial time
+      // has passed but Stripe is still reporting "trialing" (stuck/stale).
+      if (trialLikelyExpired && status === "trialing" && stripeTrialEndedPast) {
+        status = "canceled";
+        console.log(
+          `[GET /api/subscription] Trial stuck in "trialing" past trialEndsAt for user ${user.id}; overriding to canceled`
+        );
+      }
 
       if (status !== dbUser.subscriptionStatus) {
         await prisma.user.update({
@@ -76,10 +98,12 @@ export async function GET(request: NextRequest) {
         pauseEndsAt: pauseEndsAt ? pauseEndsAt.toISOString() : null,
       });
     } catch {
-      // Stripe unreachable — return cached status
+      // Stripe unreachable — return cached status, but if we know the trial
+      // already expired by wall-clock time, don't keep reporting "trialing".
+      const cachedStatus = trialLikelyExpired ? "canceled" : dbUser.subscriptionStatus;
       return NextResponse.json({
-        status: isPaused ? "paused" : dbUser.subscriptionStatus,
-        trialEndsAt: null,
+        status: isPaused ? "paused" : cachedStatus,
+        trialEndsAt: dbUser.trialEndsAt ? dbUser.trialEndsAt.toISOString() : null,
         currentPeriodEnd: null,
         trialEligible: !dbUser?.trialClaimedAt,
         pauseEndsAt: pauseEndsAt ? pauseEndsAt.toISOString() : null,

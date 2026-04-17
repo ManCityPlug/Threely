@@ -7,6 +7,22 @@ import { notifySubscription, notifyTrialStarted, notifyCancellation, notifyTrial
 // Disable body parsing — Stripe needs the raw body to verify signature
 export const runtime = "nodejs";
 
+// ─── Idempotency: in-memory LRU of processed Stripe event IDs ─────────────────
+// Stripe retries webhooks on non-2xx responses; the same event.id can arrive
+// multiple times. This dedupes within a single process. Lost on deploy/restart
+// but covers the common 5-minute retry window for ~99% of duplicates.
+const processedEvents = new Map<string, number>();
+const MAX_EVENTS = 10000;
+function markProcessed(eventId: string): boolean {
+  if (processedEvents.has(eventId)) return false;
+  if (processedEvents.size >= MAX_EVENTS) {
+    const oldest = processedEvents.keys().next().value;
+    if (oldest) processedEvents.delete(oldest);
+  }
+  processedEvents.set(eventId, Date.now());
+  return true;
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.text();
   const sig = request.headers.get("stripe-signature");
@@ -23,6 +39,11 @@ export async function POST(request: NextRequest) {
     const msg = err instanceof Error ? err.message : "Webhook verification failed";
     console.error("Stripe webhook error:", msg);
     return NextResponse.json({ error: msg }, { status: 400 });
+  }
+
+  // Idempotency check — skip duplicate deliveries of the same event
+  if (!markProcessed(event.id)) {
+    return NextResponse.json({ received: true, duplicate: true });
   }
 
   try {
@@ -78,6 +99,29 @@ export async function POST(request: NextRequest) {
           data: { subscriptionStatus: "canceled" },
         });
         notifyCancellation(cancelledUser?.email ?? "unknown", sub.id);
+        break;
+      }
+
+      // Charge refunded — revoke pro access. Fires for both full and partial
+      // refunds; we revoke on any refund since Stripe doesn't cleanly
+      // differentiate. refund.created is handled as a defensive duplicate
+      // below (idempotency dedupe protects against double-processing).
+      case "charge.refunded":
+      case "refund.created": {
+        const charge = event.data.object as Stripe.Charge & {
+          subscription?: string | { id: string } | null;
+        };
+        const subId = typeof charge.subscription === "string"
+          ? charge.subscription
+          : charge.subscription?.id;
+        if (!subId) break;
+        const refundedUser = await prisma.user.findFirst({ where: { subscriptionId: subId } });
+        if (!refundedUser) break;
+        await prisma.user.update({
+          where: { id: refundedUser.id },
+          data: { subscriptionStatus: "canceled", subscriptionId: null },
+        });
+        console.log(`[stripe.webhook] ${event.type} -> revoked pro for user ${refundedUser.id}`);
         break;
       }
 

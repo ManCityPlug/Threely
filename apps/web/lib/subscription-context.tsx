@@ -16,8 +16,8 @@ interface SubscriptionContextValue {
 }
 
 const SubscriptionContext = createContext<SubscriptionContextValue>({
-  hasPro: true,
-  isLimitedMode: false,
+  hasPro: false,
+  isLimitedMode: true,
   walkthroughActive: false,
   loaded: false,
   trialEligible: true,
@@ -32,7 +32,10 @@ export function useSubscription() {
 }
 
 export function SubscriptionProvider({ children }: { children: React.ReactNode }) {
-  const [hasPro, setHasPro] = useState(true);
+  // Fail-closed: default to no pro access. If the status API fails (network,
+  // 500, etc.) we must not grant pro by default — this mirrors the mobile
+  // fix in apps/mobile/lib/subscription-context.tsx (deny on failure).
+  const [hasPro, setHasPro] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [trialEligible, setTrialEligible] = useState(true);
   const [walkthroughActive, setWalkthroughActiveState] = useState(false);
@@ -57,7 +60,10 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
         localStorage.removeItem("threely_limited_mode");
       }
     } catch {
-      // On error, assume pro to avoid blocking
+      // Backend unreachable — fail-closed. Deny pro access rather than
+      // granting it by default. User can retry by refreshing.
+      setHasPro(false);
+      setPauseEndsAt(null);
     } finally {
       setLoaded(true);
     }

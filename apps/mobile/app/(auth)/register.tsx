@@ -23,6 +23,7 @@ import {
   useAppleSignIn,
   isAppleSignInAvailable,
 } from "@/lib/auth-providers";
+import { validatePassword } from "@/lib/validate-password";
 
 const PRIMARY = "#635BFF";
 const FORM_MAX_WIDTH = 420;
@@ -43,8 +44,9 @@ export default function RegisterScreen() {
 
   async function handleRegister() {
     if (!email || !password) return;
-    if (password.length < 6) {
-      Alert.alert("Password too short", "Password must be at least 6 characters.");
+    const pwError = validatePassword(password);
+    if (pwError) {
+      Alert.alert("Password doesn't meet requirements", `${pwError}.`);
       return;
     }
     setLoading(true);
@@ -146,7 +148,7 @@ export default function RegisterScreen() {
                 autoComplete="new-password"
                 returnKeyType="go"
                 onSubmitEditing={handleRegister}
-                placeholder="At least 6 characters"
+                placeholder="8+ chars, incl. uppercase, lowercase, number"
                 placeholderTextColor="rgba(255,255,255,0.35)"
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { prisma } from "@/lib/prisma";
 import { notifyNewSignup } from "@/lib/discord";
+import { validatePassword } from "@/lib/validate-password";
 
 export async function POST(request: Request) {
   try {
@@ -10,11 +11,9 @@ export async function POST(request: Request) {
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password are required." }, { status: 400 });
     }
-    if (password.length < 8) {
-      return NextResponse.json({ error: "Password must be at least 8 characters." }, { status: 400 });
-    }
-    if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
-      return NextResponse.json({ error: "Password must include uppercase, lowercase, and a number." }, { status: 400 });
+    const pwError = validatePassword(password);
+    if (pwError) {
+      return NextResponse.json({ error: `${pwError}.` }, { status: 400 });
     }
 
     // Create user (requires email verification)

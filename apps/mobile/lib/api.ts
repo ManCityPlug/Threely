@@ -167,55 +167,113 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
   };
 }
 
+// ─── Token refresh coordination ──────────────────────────────────────────────
+// If several in-flight requests all hit a 401 at once, we only want a single
+// refresh call to run. Subsequent callers await the same promise.
+let refreshInFlight: Promise<void> | null = null;
+
+async function refreshOnce(): Promise<void> {
+  if (refreshInFlight) return refreshInFlight;
+  refreshInFlight = (async () => {
+    try {
+      await supabase.auth.refreshSession();
+    } catch {
+      // Swallow here; the caller will re-check the session and fail loudly
+      // if it's truly gone.
+    }
+  })().finally(() => {
+    refreshInFlight = null;
+  });
+  return refreshInFlight;
+}
+
+// Sentinel marker so the caller-facing throw can be recognized by the app
+// layout (which already listens for auth-related error strings).
+const AUTH_EXPIRED_MESSAGE = "Unauthorized";
+
 async function apiFetch<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const headers = await getAuthHeaders();
-
   const timeoutMs = isAiPath(path) ? AI_TIMEOUT_MS : DEFAULT_TIMEOUT_MS;
-  const controller = new AbortController();
-  // If the caller already provided a signal (e.g. for unmount cancellation),
-  // forward its abort to our internal controller so both can cancel the request.
-  if (options.signal) {
-    const externalSignal = options.signal;
-    if (externalSignal.aborted) {
-      controller.abort();
-    } else {
-      externalSignal.addEventListener("abort", () => controller.abort(), { once: true });
-    }
-  }
-  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  let res: Response;
-  try {
-    res = await fetch(`${BASE_URL}${path}`, {
-      ...options,
-      headers: { ...headers, ...(options.headers as Record<string, string>) },
-      signal: controller.signal,
-    });
-  } catch (e: unknown) {
-    clearTimeout(timeoutId);
-    if (e instanceof Error && e.name === "AbortError") {
-      // Distinguish caller-initiated cancellation from timeout
-      if (options.signal?.aborted) {
-        throw new Error("Request was cancelled");
+  // Each attempt builds its own controller/timeout so the retry has a fresh
+  // clock and the original abort/timeout bookkeeping is self-contained.
+  const attempt = async (): Promise<{ res: Response; text: string }> => {
+    const headers = await getAuthHeaders();
+
+    const controller = new AbortController();
+    // If the caller already provided a signal (e.g. for unmount cancellation),
+    // forward its abort to our internal controller so both can cancel the request.
+    if (options.signal) {
+      const externalSignal = options.signal;
+      if (externalSignal.aborted) {
+        controller.abort();
+      } else {
+        externalSignal.addEventListener("abort", () => controller.abort(), { once: true });
       }
-      throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
     }
-    throw new Error("Network error: unable to reach the server");
-  }
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
-  // Keep the timeout running while we read the response body — a slow body
-  // stream could otherwise hang the app indefinitely.
-  let text: string;
-  try {
-    text = await res.text();
-  } catch (e: unknown) {
-    clearTimeout(timeoutId);
-    if (e instanceof Error && e.name === "AbortError") {
-      throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
+    let res: Response;
+    try {
+      res = await fetch(`${BASE_URL}${path}`, {
+        ...options,
+        headers: { ...headers, ...(options.headers as Record<string, string>) },
+        signal: controller.signal,
+      });
+    } catch (e: unknown) {
+      clearTimeout(timeoutId);
+      if (e instanceof Error && e.name === "AbortError") {
+        // Distinguish caller-initiated cancellation from timeout
+        if (options.signal?.aborted) {
+          throw new Error("Request was cancelled");
+        }
+        throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
+      }
+      throw new Error("Network error: unable to reach the server");
     }
-    throw new Error("Network error: connection lost while reading response");
-  } finally {
-    clearTimeout(timeoutId);
+
+    // Keep the timeout running while we read the response body — a slow body
+    // stream could otherwise hang the app indefinitely.
+    let text: string;
+    try {
+      text = await res.text();
+    } catch (e: unknown) {
+      clearTimeout(timeoutId);
+      if (e instanceof Error && e.name === "AbortError") {
+        throw new Error(`Request timed out after ${timeoutMs / 1000}s`);
+      }
+      throw new Error("Network error: connection lost while reading response");
+    } finally {
+      clearTimeout(timeoutId);
+    }
+
+    return { res, text };
+  };
+
+  let { res, text } = await attempt();
+
+  // On 401, try to refresh the Supabase session once and retry the request
+  // with the fresh token. If the second attempt is also unauthorized, bubble
+  // up a recognizable error so the caller (typically the app's auth listener)
+  // can decide whether to redirect to login.
+  if (res.status === 401) {
+    await refreshOnce();
+
+    // Confirm we actually got a new session before wasting a retry on a
+    // guaranteed 401. If the refresh itself failed (e.g. the refresh token
+    // is expired), bail out immediately with the auth-expired signal.
+    const { data: { session: refreshed } } = await supabase.auth.getSession();
+    if (!refreshed) {
+      throw new Error(AUTH_EXPIRED_MESSAGE);
+    }
+
+    // Note: POST/PATCH bodies on `options` are strings in this codebase
+    // (JSON.stringify), so they're safe to reuse across attempts. If a caller
+    // ever passes a ReadableStream body, the retry here would fail — none do today.
+    ({ res, text } = await attempt());
+
+    if (res.status === 401) {
+      throw new Error(AUTH_EXPIRED_MESSAGE);
+    }
   }
 
   let json: Record<string, unknown>;

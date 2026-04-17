@@ -23,6 +23,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/lib/supabase";
 import { statsApi, accountApi, tasksApi, summaryApi, type Stats, type DailyTask, type TaskItem, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus } from "@/lib/api";
+import { validatePassword } from "@/lib/validate-password";
 import { TaskCard } from "@/components/TaskCard";
 
 import { WeeklySummary } from "@/components/WeeklySummary";
@@ -1053,7 +1054,8 @@ export default function ProfileScreen() {
                   onPress={async () => {
                     setPwError("");
                     if (hasPassword && !currentPw.trim()) { setPwError("Enter your current password."); return; }
-                    if (newPw.length < 8) { setPwError("New password must be at least 8 characters."); return; }
+                    const pwValidationError = validatePassword(newPw);
+                    if (pwValidationError) { setPwError(`${pwValidationError}.`); return; }
                     if (newPw !== confirmPw) { setPwError("New passwords do not match."); return; }
                     setPwLoading(true);
                     try {

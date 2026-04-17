@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
+import { validatePassword } from "@/lib/validate-password";
 
 // POST /api/auth/reset-password
 // Body: { token, type, password }
@@ -11,8 +12,9 @@ export async function POST(request: NextRequest) {
     if (!token || !password) {
       return NextResponse.json({ error: "Missing token or password" }, { status: 400 });
     }
-    if (password.length < 8) {
-      return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 });
+    const pwError = validatePassword(password);
+    if (pwError) {
+      return NextResponse.json({ error: pwError }, { status: 400 });
     }
 
     // Verify the recovery token via Supabase Auth API
