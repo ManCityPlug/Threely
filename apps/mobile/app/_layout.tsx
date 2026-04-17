@@ -42,18 +42,26 @@ import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { spacing, radius, typography } from "@/constants/theme";
 
 if (Platform.OS !== "web") {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: true,
-      shouldSetBadge: false,
-    }),
-  });
+  try {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: true,
+        shouldSetBadge: false,
+      }),
+    });
+  } catch (e) {
+    console.warn("[notifications] setNotificationHandler failed", e);
+  }
 
   try {
     const Clarity = require("@microsoft/react-native-clarity");
-    Clarity.initialize("vm4n4qax20");
+    try {
+      Clarity.initialize("vm4n4qax20");
+    } catch (e) {
+      console.warn("[clarity] initialize failed", e);
+    }
   } catch {
     // Clarity requires a native build — skip in Expo Go
   }
