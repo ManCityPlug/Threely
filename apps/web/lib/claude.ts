@@ -202,15 +202,6 @@ export interface GoalContext {
   roadmap: string | null;
 }
 
-export interface DayHistory {
-  date: string;
-  tasksCompleted: number;
-  tasksTotal: number;
-  difficultyRating: string | null;
-  completionStatus: string | null;
-  userNote: string | null;
-}
-
 export interface ThemeEntry {
   date: string;
   themes: string[];
@@ -232,37 +223,6 @@ export interface CoachingContext {
   recent_task_themes?: ThemeEntry[];
 }
 
-// --- Theme Tracking ----------------------------------------------------------
-
-const THEME_KEYWORDS: Record<string, string[]> = {
-  upper_body: ["push-up", "pushup", "bench press", "shoulder", "bicep", "tricep", "chest", "pull-up", "pullup", "overhead press", "dumbbell curl", "row"],
-  lower_body: ["squat", "lunge", "deadlift", "leg press", "calf", "hip thrust", "glute", "hamstring", "quad"],
-  cardio: ["run", "jog", "sprint", "hiit", "cycling", "bike", "swim", "jump rope", "cardio", "walk", "treadmill", "elliptical"],
-  flexibility: ["stretch", "yoga", "mobility", "foam roll", "flexibility", "warm-up", "cool-down"],
-  social_media: ["instagram", "tiktok", "twitter", "linkedin", "facebook", "youtube", "post", "reel", "story", "social media", "content calendar"],
-  market_research: ["competitor", "market research", "target audience", "survey", "customer", "niche", "trend", "alibaba", "amazon", "product research"],
-  content_creation: ["write", "blog", "article", "video", "edit", "record", "podcast", "script", "caption", "thumbnail", "design"],
-  outreach: ["email", "outreach", "cold call", "pitch", "network", "dm", "connect", "reach out", "follow up", "lead"],
-  study: ["read", "study", "textbook", "chapter", "flashcard", "notes", "lecture", "course", "lesson", "quiz", "exam"],
-  practice: ["practice", "drill", "exercise", "problem set", "coding challenge", "leetcode", "project", "build", "implement"],
-  project_work: ["prototype", "mvp", "wireframe", "deploy", "launch", "ship", "feature", "debug", "refactor", "test"],
-  planning: ["plan", "outline", "brainstorm", "strategy", "roadmap", "goal setting", "prioritize", "schedule", "organize"],
-  review: ["review", "analyze", "reflect", "evaluate", "audit", "assess", "feedback", "retrospective"],
-};
-
-export function deriveThemes(tasks: { task: string; description: string }[]): string[] {
-  const found = new Set<string>();
-  for (const t of tasks) {
-    const text = `${t.task} ${t.description}`.toLowerCase();
-    for (const [theme, keywords] of Object.entries(THEME_KEYWORDS)) {
-      if (keywords.some((kw) => text.includes(kw))) {
-        found.add(theme);
-      }
-    }
-  }
-  return Array.from(found);
-}
-
 export interface GenerateTasksInput {
   goal: GoalContext;
   profile: UserProfileContext;
@@ -282,33 +242,6 @@ export interface GenerateTasksInput {
 export interface GenerateTasksResult {
   tasks: TaskItem[];
   coach_note?: string;
-}
-
-export interface GenerateInsightInput {
-  difficultyRating: string;
-  completionStatus: string;
-  userNote: string | null;
-  goalTitle: string;
-  goalSummary: string | null;
-  tasksCompletedToday: number;
-  tasksTotalToday: number;
-  last7Days: DayHistory[];
-  intensityLevel?: number;
-  daysActive?: number;
-  tasksCompletedTotal?: number;
-  streak?: number;
-}
-
-export interface UpdateCoachingContextInput {
-  currentContext: CoachingContext | null;
-  difficultyRating: string;
-  completionStatus: string;
-  userNote: string | null;
-  tasksCompletedToday: number;
-  tasksTotalToday: number;
-  goalTitle: string;
-  insight: string;
-  todaysTasks?: { task: string; description: string }[];
 }
 
 // --- Identity & Scope Blocks ------------------------------------------------
@@ -1027,166 +960,6 @@ ${previousTasksSection}`;
       outputTokens: llmResult.outputTokens,
       responseTimeMs,
       goalId: goal.id,
-    }).catch(() => {});
-  }
-
-  return result;
-}
-
-// --- updateCoachingContext ----------------------------------------------------
-
-/**
- * Lightweight Haiku call to merge today's review data into a compact coaching profile.
- * Called once per daily review, after insight generation.
- */
-export async function updateCoachingContext(
-  input: UpdateCoachingContextInput,
-  userId?: string
-): Promise<CoachingContext> {
-  const { currentContext, difficultyRating, completionStatus, userNote, tasksCompletedToday, tasksTotalToday, goalTitle, insight, todaysTasks } = input;
-
-  const today = new Date().toISOString().split("T")[0];
-
-  const prompt = `${IDENTITY_COMPACT}You maintain a compact coaching profile for a productivity app user. Merge today's session data into the existing profile.
-
-${currentContext ? `CURRENT PROFILE:\n${JSON.stringify(currentContext)}` : "No existing profile - create a new one from today's data."}
-
-TODAY'S SESSION (goal: "${goalTitle}"):
-- Tasks: ${tasksCompletedToday}/${tasksTotalToday} completed
-- Difficulty: ${difficultyRating}
-- Completion: ${completionStatus}
-${userNote ? `- Note: "${userNote.slice(0, 100)}"` : ""}
-- Insight given: "${insight.slice(0, 120)}"
-
-Return ONLY valid JSON matching this exact shape:
-{
-  "v": 1,
-  "completionRate": <0-100 rolling avg, weight today 30% + previous 70%>,
-  "difficultyTrend": "<easing|steady|escalating>",
-  "avgTasksPerDay": <rolling avg tasks completed per session>,
-  "streak": <consecutive active days - increment if today is consecutive, else reset to 1>,
-  "lastDifficulty": "${difficultyRating}",
-  "lastCompletion": "${completionStatus}",
-  "lastNote": ${userNote ? `"${userNote.slice(0, 100).replace(/"/g, '\\"')}"` : "null"},
-  "patterns": "<1 sentence about behavioral patterns, or null if <3 sessions>",
-  "sessionsAnalyzed": ${(currentContext?.sessionsAnalyzed ?? 0) + 1},
-  "lastUpdated": "${today}"
-}`;
-
-  const startTime = Date.now();
-  const llmResult = await callLLM({
-    messages: [{ role: "user", content: prompt }],
-    maxTokens: 300,
-    temperature: 0.3,
-  });
-  const responseTimeMs = Date.now() - startTime;
-
-  const raw = llmResult.text.replace(/```json?\n?|```/g, "").trim();
-  const parsed: CoachingContext = JSON.parse(raw);
-
-  // Deterministically append theme entry from today's tasks
-  if (todaysTasks && todaysTasks.length > 0) {
-    const themes = deriveThemes(todaysTasks);
-    const existing = parsed.recent_task_themes ?? currentContext?.recent_task_themes ?? [];
-    const newEntry: ThemeEntry = { date: today, themes, difficultyRating };
-    // Append and prune to 14 days
-    const updated = [...existing.filter((e) => e.date !== today), newEntry];
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - 14);
-    const cutoffStr = cutoff.toISOString().split("T")[0];
-    parsed.recent_task_themes = updated.filter((e) => e.date >= cutoffStr);
-  } else {
-    parsed.recent_task_themes = currentContext?.recent_task_themes ?? [];
-  }
-
-  if (userId) {
-    logAICall({
-      userId,
-      functionName: 'updateCoachingContext',
-      modelUsed: llmResult.model,
-      inputData: { goalTitle, tasksCompletedToday, tasksTotalToday, difficultyRating, completionStatus },
-      outputData: parsed,
-      inputTokens: llmResult.inputTokens,
-      outputTokens: llmResult.outputTokens,
-      responseTimeMs,
-    }).catch(() => {});
-  }
-
-  return parsed;
-}
-
-// --- generateInsight ----------------------------------------------------------
-
-/**
- * Generate a 2-3 sentence coach insight after a daily review.
- * Returns plain text.
- */
-export async function generateInsight(input: GenerateInsightInput & { userId?: string; goalId?: string }): Promise<string> {
-  const { difficultyRating, completionStatus, userNote, goalTitle, goalSummary, tasksCompletedToday, tasksTotalToday, last7Days, intensityLevel, daysActive, tasksCompletedTotal, streak, userId, goalId } = input;
-
-  const recentStr =
-    last7Days.length > 0
-      ? last7Days
-          .slice(-3)
-          .map(
-            (d) =>
-              `${d.date}: ${d.tasksCompleted}/${d.tasksTotal} done` +
-              (d.difficultyRating ? ` (${d.difficultyRating})` : "")
-          )
-          .join(", ")
-      : "first session";
-
-  const intensity = intensityLevel ?? 2;
-  const toneGuide = intensity === 1
-    ? "Tone: Warm, encouraging, patient. Acknowledge the habit they're building. Supportive but not over the top. Speaks to someone building consistency."
-    : intensity === 3
-    ? "Tone: Intense, high expectations, no fluff. Talk to them like a serious athlete or entrepreneur. Short, sharp, earned praise only."
-    : "Tone: Direct, motivating, pushing slightly. Acknowledge effort, expect more. Speaks to someone serious about results.";
-
-  const prompt = `${IDENTITY_BLOCK}You are Threely Intelligence, a productivity coach. Write a brief response to a user's end-of-day review.
-
-Goal: "${goalTitle}"${goalSummary ? `\nGoal summary: ${goalSummary}` : ""}
-${daysActive != null ? `Days active on this goal: ${daysActive}` : ""}${tasksCompletedTotal != null ? ` | Total tasks completed: ${tasksCompletedTotal}` : ""}${streak != null ? ` | Current streak: ${streak} days` : ""}
-
-Today's review:
-- Tasks completed: ${tasksCompletedToday}/${tasksTotalToday}
-- Difficulty: ${difficultyRating}
-- Completion: ${completionStatus}
-${userNote ? `- User note: "${userNote}"` : ""}
-
-Recent history: ${recentStr}
-
-${toneGuide}
-
-Write 2-4 sentences that:
-1. Be specific to what the user actually did - never generic
-2. Never use filler phrases like "you got this", "amazing job", "fantastic start" unless backed by specific context
-3. Reference their actual progress - streak, completion rate, stage in the goal
-4. End with a forward-looking statement that connects today to tomorrow
-
-Keep it under 60 words. Punchy, direct, specific. No bullet points - just prose. Return plain text only.`;
-
-  const startTime = Date.now();
-  const llmResult = await callLLM({
-    messages: [{ role: "user", content: prompt }],
-    maxTokens: 200,
-    temperature: 0.8,
-  });
-  const responseTimeMs = Date.now() - startTime;
-
-  const result = llmResult.text.trim();
-
-  if (userId) {
-    logAICall({
-      userId,
-      functionName: 'generateInsight',
-      modelUsed: llmResult.model,
-      inputData: { goalTitle, difficultyRating, completionStatus, tasksCompletedToday, tasksTotalToday, daysActive },
-      outputData: result,
-      inputTokens: llmResult.inputTokens,
-      outputTokens: llmResult.outputTokens,
-      responseTimeMs,
-      goalId,
     }).catch(() => {});
   }
 

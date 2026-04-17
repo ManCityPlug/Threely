@@ -265,31 +265,6 @@ export const tasksApi = {
   },
 };
 
-// ─── Reviews API ──────────────────────────────────────────────────────────────
-
-export const reviewsApi = {
-  submit: (data: {
-    dailyTaskId: string;
-    difficultyRating: string;
-    completionStatus?: string;
-    userNote?: string;
-  }) =>
-    apiFetch<{ review: DailyReview }>("/api/reviews", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-};
-
-// ─── Insights API ─────────────────────────────────────────────────────────────
-
-export const insightsApi = {
-  generate: (dailyTaskId: string) =>
-    apiFetch<{ insight: string }>("/api/insights", {
-      method: "POST",
-      body: JSON.stringify({ dailyTaskId }),
-    }),
-};
-
 // ─── Profile API ──────────────────────────────────────────────────────────────
 
 export const profileApi = {

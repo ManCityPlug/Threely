@@ -6,7 +6,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useAuth, getNickname } from "@/lib/auth-context";
 import { formatDisplayName } from "@/lib/format-name";
 import {
-  tasksApi, goalsApi, reviewsApi, insightsApi, statsApi, focusApi, subscriptionApi,
+  tasksApi, goalsApi, statsApi, focusApi, subscriptionApi,
   type DailyTask, type TaskItem, type Goal, type GoalStat,
 } from "@/lib/api-client";
 import { SkeletonCard } from "@/components/Skeleton";
@@ -876,8 +876,11 @@ function DashboardPageInner() {
   const todayItems = todayDt ? todayDt.tasks.slice(-3) : [];
   const todayDtIsForToday = (() => {
     if (!todayDt?.date) return false;
+    // Server stores DailyTask.date as UTC midnight of the user's local date
+    // (e.g. "2026-04-17T00:00:00Z" = user's April 17 locally). Read with UTC
+    // components so the comparison holds in non-UTC timezones.
     const d = new Date(todayDt.date);
-    const s = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const s = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
     return s === todayCalendarStr;
   })();
   const todayAllDone = todayDtIsForToday && todayItems.length > 0 && todayItems.every(t => t.isCompleted || t.isSkipped);

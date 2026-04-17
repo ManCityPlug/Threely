@@ -47,28 +47,35 @@ function EmailCard({ currentEmail }: { currentEmail: string }) {
 
   return (
     <div className="card" style={{ padding: "1.25rem", marginBottom: "1rem" }}>
-      <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
-        Email
-      </h3>
       {!editing ? (
-        <>
-          <p style={{
-            fontSize: "0.95rem", color: "var(--text)", margin: 0, marginBottom: 10,
-            fontWeight: 500, wordBreak: "break-all",
-          }}>
-            {currentEmail || "—"}
-          </p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <div style={{ minWidth: 0, flex: 1 }}>
+            <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", margin: 0, marginBottom: 4 }}>
+              Email
+            </h3>
+            <p style={{
+              fontSize: "0.95rem", color: "var(--text)", margin: 0,
+              fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+            }}>
+              {currentEmail || "—"}
+            </p>
+          </div>
           <button
             onClick={() => { setEditing(true); setNewEmail(currentEmail); setMessage(null); }}
             style={{
               background: "transparent", border: "1px solid var(--border)", color: "var(--text)",
-              padding: "0.4rem 0.85rem", borderRadius: 8, fontSize: "0.82rem", fontWeight: 500, cursor: "pointer",
+              padding: "0.4rem 0.85rem", borderRadius: 8, fontSize: "0.82rem", fontWeight: 500,
+              cursor: "pointer", flexShrink: 0,
             }}
           >
-            Change email
+            Change
           </button>
-        </>
+        </div>
       ) : (
+        <>
+        <h3 style={{ fontSize: "0.9rem", fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>
+          Email
+        </h3>
         <>
           <input
             type="email"
@@ -105,6 +112,7 @@ function EmailCard({ currentEmail }: { currentEmail: string }) {
               Cancel
             </button>
           </div>
+        </>
         </>
       )}
       {message && (

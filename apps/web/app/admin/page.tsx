@@ -77,8 +77,6 @@ const AI_FUNCTIONS = [
   { name: "generateRoadmap",      model: "DeepSeek", frequency: "Once per goal",          inputTok: 1300, outputTok: 1500, inputRate: 0.28, outputRate: 0.42 },
   { name: "goalChat (per turn)",  model: "DeepSeek", frequency: "5-10× during goal setup",inputTok: 800,  outputTok: 400,  inputRate: 0.28, outputRate: 0.42 },
   { name: "generateTasks",        model: "DeepSeek", frequency: "1-2×/day per goal",      inputTok: 3500, outputTok: 2000, inputRate: 0.28, outputRate: 0.42 },
-  { name: "generateInsight",      model: "DeepSeek", frequency: "1×/day (after review)",  inputTok: 800,  outputTok: 150,  inputRate: 0.28, outputRate: 0.42 },
-  { name: "updateCoachingContext", model: "DeepSeek", frequency: "1×/day (after review)",  inputTok: 1000, outputTok: 250,  inputRate: 0.28, outputRate: 0.42 },
   { name: "refineTask",           model: "DeepSeek", frequency: "On demand (0-3×/day)",   inputTok: 500,  outputTok: 250,  inputRate: 0.28, outputRate: 0.42 },
   { name: "askAboutTask",         model: "DeepSeek", frequency: "On demand (0-5×/day)",   inputTok: 600,  outputTok: 300,  inputRate: 0.28, outputRate: 0.42 },
   { name: "generateWeeklySummary",model: "DeepSeek", frequency: "1×/week",                inputTok: 1500, outputTok: 200,  inputRate: 0.28, outputRate: 0.42 },
@@ -112,8 +110,6 @@ function CostEstimatorSection({ activeUsers, payingUsers }: { activeUsers: numbe
     const roadmap = costs.find((c) => c.name === "generateRoadmap")!;
     const goalChat = costs.find((c) => c.name === "goalChat (per turn)")!;
     const genTasks = costs.find((c) => c.name === "generateTasks")!;
-    const insight = costs.find((c) => c.name === "generateInsight")!;
-    const coaching = costs.find((c) => c.name === "updateCoachingContext")!;
     const refine = costs.find((c) => c.name === "refineTask")!;
     const askAi = costs.find((c) => c.name === "askAboutTask")!;
     const weekly = costs.find((c) => c.name === "generateWeeklySummary")!;
@@ -123,11 +119,9 @@ function CostEstimatorSection({ activeUsers, payingUsers }: { activeUsers: numbe
 
     // Daily recurring (30 days)
     const dailyTasks = goals * 1.5 * genTasks.cost; // avg 1.5 generations/day/goal
-    const dailyInsight = insight.cost; // 1 per day
-    const dailyCoaching = coaching.cost; // 1 per day
     const dailyRefine = refine.cost * 1; // avg 1 refine/day
     const dailyAskAi = askAi.cost * 2; // avg 2 ask-ai/day
-    const daily = dailyTasks + dailyInsight + dailyCoaching + dailyRefine + dailyAskAi;
+    const daily = dailyTasks + dailyRefine + dailyAskAi;
 
     const weeklyCost = weekly.cost * 4.3; // ~4.3 weeks/month
 
@@ -140,19 +134,15 @@ function CostEstimatorSection({ activeUsers, payingUsers }: { activeUsers: numbe
     const roadmap = costs.find((c) => c.name === "generateRoadmap")!;
     const goalChat = costs.find((c) => c.name === "goalChat (per turn)")!;
     const genTasks = costs.find((c) => c.name === "generateTasks")!;
-    const insight = costs.find((c) => c.name === "generateInsight")!;
-    const coaching = costs.find((c) => c.name === "updateCoachingContext")!;
     const refine = costs.find((c) => c.name === "refineTask")!;
     const askAi = costs.find((c) => c.name === "askAboutTask")!;
     const weekly = costs.find((c) => c.name === "generateWeeklySummary")!;
 
     const oneTime = goals * (parseGoal.cost + roadmap.cost + goalChat.cost * 10);
     const dailyTasks = goals * 2 * genTasks.cost; // 2 gens/day/goal (max)
-    const dailyInsight = insight.cost;
-    const dailyCoaching = coaching.cost;
     const dailyRefine = refine.cost * 3; // 3 refines/day
     const dailyAskAi = askAi.cost * 5; // 5 ask-ai/day
-    const daily = dailyTasks + dailyInsight + dailyCoaching + dailyRefine + dailyAskAi;
+    const daily = dailyTasks + dailyRefine + dailyAskAi;
     const weeklyCost = weekly.cost * 4.3;
 
     return oneTime + daily * 30 + weeklyCost;

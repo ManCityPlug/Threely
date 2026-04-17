@@ -44,22 +44,6 @@ const FUNCTIONS = [
     description: "Conversational goal refinement and Q&A",
   },
   {
-    name: "updateCoachingContext",
-    model: "deepseek" as const,
-    inputTokens: 1000,
-    outputTokens: 250,
-    frequency: "After each review",
-    description: "Updates coaching context with patterns and trends",
-  },
-  {
-    name: "generateInsight",
-    model: "deepseek" as const,
-    inputTokens: 800,
-    outputTokens: 150,
-    frequency: "After each review",
-    description: "2-3 sentence coaching note post-review",
-  },
-  {
     name: "refineTask",
     model: "deepseek" as const,
     inputTokens: 500,
@@ -107,15 +91,13 @@ function calculateCosts(goals: number) {
   // Worst case: user generates twice per goal per day (initial + 1 extra)
   const generateTasksDaily = generateTasks * MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY;
   const goalChat = costPerCall(FUNCTIONS[3]) * 0.5; // avg 0.5 chats/day
-  const updateCoaching = costPerCall(FUNCTIONS[4]);
-  const generateInsight = costPerCall(FUNCTIONS[5]);
-  const refineTask = costPerCall(FUNCTIONS[6]) * 0.3; // ~10% of 3 tasks
-  const askAboutTask = costPerCall(FUNCTIONS[7]) * 0.3; // ~0.3x/day per goal
-  const dailyPerGoal = generateTasksDaily + goalChat + updateCoaching + generateInsight + refineTask + askAboutTask;
+  const refineTask = costPerCall(FUNCTIONS[4]) * 0.3; // ~10% of 3 tasks
+  const askAboutTask = costPerCall(FUNCTIONS[5]) * 0.3; // ~0.3x/day per goal
+  const dailyPerGoal = generateTasksDaily + goalChat + refineTask + askAboutTask;
   const totalDaily = dailyPerGoal * goals;
 
   // Weekly (per user, not per goal)
-  const weeklySummary = costPerCall(FUNCTIONS[8]);
+  const weeklySummary = costPerCall(FUNCTIONS[6]);
   const weeklyPerDay = weeklySummary / 7;
 
   const dailyTotal = totalDaily + weeklyPerDay;

@@ -509,9 +509,11 @@ function PathNode({
 
 function StartBadge({
   allDone,
+  started,
   onPress,
 }: {
   allDone: boolean;
+  started: boolean;
   onPress: () => void;
 }) {
   const pulseAnim = useRef(new Animated.Value(1)).current;
@@ -528,6 +530,8 @@ function StartBadge({
       return () => pulse.stop();
     }
   }, [allDone, pulseAnim]);
+
+  const label = allDone ? "COMPLETE \u2713" : started ? "CONTINUE" : "START";
 
   return (
     <TouchableOpacity onPress={onPress} activeOpacity={0.85} style={{ alignItems: "center", marginBottom: 6 }}>
@@ -550,7 +554,7 @@ function StartBadge({
           textTransform: "uppercase",
           color: allDone ? "#fff" : "#000",
         }}>
-          {allDone ? "COMPLETE \u2713" : "START"}
+          {label}
         </Text>
       </Animated.View>
       {/* Small connector line */}
@@ -703,9 +707,10 @@ function SCurvePathView({
                   alignItems: "center",
                 }}>
                   {/* START/COMPLETE badge above today's node — only before user has tapped */}
-                  {isToday && (allDone || !startedDays.has(day)) && (
+                  {isToday && (
                     <StartBadge
                       allDone={allDone}
+                      started={startedDays.has(day)}
                       onPress={() => {
                         if (allDone) return;
                         if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -1674,8 +1679,11 @@ export default function DashboardScreen() {
     return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
   })();
   const tasksAreForToday = visibleTasks.some((dt) => {
+    // Server stores DailyTask.date as UTC midnight of the user's local date
+    // (e.g. "2026-04-17T00:00:00Z" represents the user's April 17 locally).
+    // Use UTC components when extracting the local date the task was generated for.
     const d = new Date(dt.date);
-    const s = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const s = `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}-${String(d.getUTCDate()).padStart(2, "0")}`;
     return s === todayLocalDateStr;
   });
   const allDone = tasksAreForToday && newTaskItems.length > 0 && newTaskItems.every((t) => t.isCompleted || t.isSkipped);

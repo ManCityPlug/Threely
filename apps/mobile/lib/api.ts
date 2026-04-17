@@ -139,7 +139,6 @@ const AI_PATHS = [
   "/api/goals/parse",
   "/api/goals/chat",
   "/api/tasks/generate",
-  "/api/insights",
   "/api/summary/weekly",
   "/api/summary/weekly-open",
 ];
@@ -427,31 +426,6 @@ export const tasksApi = {
     apiFetch<{ answer: string; options: string[] }>(`/api/tasks/${dailyTaskId}/ask`, {
       method: "POST",
       body: JSON.stringify({ taskItemId, messages }),
-    }),
-};
-
-// ─── Reviews API ──────────────────────────────────────────────────────────────
-
-export const reviewsApi = {
-  create: (data: {
-    dailyTaskId: string;
-    difficultyRating: string;
-    completionStatus?: string;
-    userNote?: string;
-  }) =>
-    apiFetch<{ review: DailyReview }>("/api/reviews", {
-      method: "POST",
-      body: JSON.stringify(data),
-    }),
-};
-
-// ─── Insights API ─────────────────────────────────────────────────────────────
-
-export const insightsApi = {
-  generate: (dailyTaskId: string) =>
-    apiFetch<{ insight: string }>("/api/insights", {
-      method: "POST",
-      body: JSON.stringify({ dailyTaskId }),
     }),
 };
 
