@@ -331,7 +331,7 @@ function StageCelebrationOverlay({
         <h1
           className="stage-gold-text"
           style={{
-            fontSize: "2.5rem",
+            fontSize: "clamp(1.75rem, 7vw, 2.5rem)",
             fontWeight: 900,
             letterSpacing: "-0.04em",
             marginBottom: 14,
@@ -468,7 +468,7 @@ function CelebrationOverlay({
       </div>
 
       <h1 style={{
-        fontSize: "2.5rem",
+        fontSize: "clamp(1.75rem, 7vw, 2.5rem)",
         fontWeight: 800,
         color: "#fff",
         letterSpacing: "-0.04em",
@@ -1785,7 +1785,7 @@ function DashboardPageInner() {
 
               {/* Day heading */}
               <h1 style={{
-                fontSize: "2.5rem",
+                fontSize: "clamp(1.75rem, 6vw, 2.5rem)",
                 fontWeight: 800,
                 letterSpacing: "-0.04em",
                 color: "var(--text)",

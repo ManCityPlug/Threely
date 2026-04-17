@@ -69,7 +69,7 @@ export default function PricingPage() {
               MONTHLY
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$12.99</span>
+              <span style={{ fontSize: "clamp(2rem, 7vw, 2.5rem)", fontWeight: 800, letterSpacing: "-0.03em" }}>$12.99</span>
               <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)" }}>/month</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.85)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
@@ -113,7 +113,7 @@ export default function PricingPage() {
               YEARLY — BEST VALUE
             </div>
             <div style={{ display: "flex", alignItems: "baseline", gap: 4, marginBottom: 4 }}>
-              <span style={{ fontSize: "2.5rem", fontWeight: 800, letterSpacing: "-0.03em" }}>$8.33</span>
+              <span style={{ fontSize: "clamp(2rem, 7vw, 2.5rem)", fontWeight: 800, letterSpacing: "-0.03em" }}>$8.33</span>
               <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)" }}>/month</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.85)", marginBottom: "1.5rem", lineHeight: 1.5 }}>

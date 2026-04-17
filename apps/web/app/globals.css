@@ -4,6 +4,18 @@
   padding: 0;
 }
 
+/* Prevent horizontal overflow from wide elements */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Images and media are always responsive by default */
+img, video, picture {
+  max-width: 100%;
+  height: auto;
+}
+
 :root {
   --bg: #f6f9fc;
   --card: #ffffff;
@@ -789,7 +801,7 @@ input, textarea, select {
   .top-nav-icon { width: 32px; height: 32px; }
   .top-nav-icon svg { width: 17px; height: 17px; }
   .top-nav-label { font-size: 0.65rem; }
-  .top-nav-item { padding: 4px 12px; }
+  .top-nav-item { padding: 4px 12px; min-width: 44px; min-height: 44px; }
   .page-inner { padding: 1.25rem 1rem; }
   .modal-box { padding: 1.5rem; border-radius: var(--radius-lg); max-width: calc(100vw - 2rem); }
   .desktop-only { display: none !important; }
@@ -799,6 +811,11 @@ input, textarea, select {
   .paywall-subheading { font-size: 0.85rem; margin-bottom: 1.5rem; }
   .paywall-fullscreen { padding: 1.5rem; }
   .modal-overlay { padding: 0.75rem; }
+}
+
+/* ─── iPad / tablet (769-1024px) ─────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .page-inner { padding: 2rem 1.5rem; max-width: 100%; }
 }
 
 /* ─── Narrow mobile (≤400px) ────────────────────────────────────────────────── */

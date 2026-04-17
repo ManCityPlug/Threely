@@ -17,15 +17,11 @@ const FAQ = [
 ];
 
 export default function LandingPage() {
-  const [isMobile, setIsMobile] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
   useEffect(() => {
-    const ua = navigator.userAgent;
-    const isIPad = /iPad/i.test(ua) || (/Macintosh/i.test(ua) && navigator.maxTouchPoints > 1);
-    setIsMobile(isIPad || /Android|webOS|iPhone|iPod|BlackBerry|IEMobile|Opera Mini/i.test(ua));
     getSupabase().auth.getSession().then(({ data: { session } }) => {
       if (session?.user && !session.user.is_anonymous) setLoggedIn(true);
     });
@@ -71,10 +67,36 @@ export default function LandingPage() {
         .reveal-d1 { transition-delay: 0.1s; }
         .reveal-d2 { transition-delay: 0.2s; }
         .reveal-d3 { transition-delay: 0.3s; }
+        /* Responsive show/hide for landing nav — avoids SSR hydration mismatch */
+        .landing-desktop-nav { display: flex; }
+        .landing-mobile-toggle { display: none; }
+        @media (max-width: 768px) {
+          .landing-desktop-nav { display: none !important; }
+          .landing-mobile-toggle { display: flex !important; }
+          .landing-nav { padding: 0 1rem !important; }
+        }
+        /* Testimonials grid: 3 cols on desktop, 1 on phone */
+        .landing-testimonials-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+        }
+        @media (max-width: 768px) {
+          .landing-testimonials-grid { grid-template-columns: 1fr; }
+        }
+        /* How-it-works grid: 3 cols on desktop, 1 on phone */
+        .landing-steps-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 48px;
+        }
+        @media (max-width: 768px) {
+          .landing-steps-grid { grid-template-columns: 1fr; gap: 40px; }
+        }
       `}</style>
 
       {/* ─── Nav ──────────────────────────────────────────────────────────────── */}
-      <nav style={{
+      <nav className="landing-nav" style={{
         position: "sticky", top: 0, zIndex: 100,
         background: "rgba(10,10,10,0.85)", backdropFilter: "blur(16px)",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
@@ -85,50 +107,53 @@ export default function LandingPage() {
         <div style={{ position: "absolute", left: "1.5rem", display: "flex", alignItems: "center", gap: 10 }}>
           <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "#fff", letterSpacing: "-0.02em" }}>Threely</span>
         </div>
-        {!isMobile ? (
-          <>
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              {[
-                { label: "How It Works", href: "#how-it-works" },
-                { label: "Pricing", href: "/pricing" },
-                { label: "Support", href: "/support" },
-              ].map(item => (
-                <Link key={item.label} href={item.href} style={{
-                  padding: "0.4rem 0.75rem", fontSize: "0.85rem", fontWeight: 500,
-                  color: "rgba(255,255,255,0.6)", textDecoration: "none", borderRadius: 6,
-                  transition: "color 0.15s",
-                }}>{item.label}</Link>
-              ))}
-            </div>
-            <div style={{ position: "absolute", right: "1.5rem", display: "flex", alignItems: "center", gap: 6 }}>
-              {!loggedIn && (
-                <Link href="/login" style={{
-                  padding: "0.4rem 0.875rem", fontSize: "0.85rem", fontWeight: 600,
-                  color: "rgba(255,255,255,0.7)", textDecoration: "none",
-                }}>Log In</Link>
-              )}
-              <Link href={ctaHref} style={{
-                padding: "0.5rem 1.25rem", fontSize: "0.85rem", fontWeight: 600,
-                color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 8,
-                textDecoration: "none",
-              }}>{ctaLabel}</Link>
-            </div>
-          </>
-        ) : (
-          <button onClick={() => setMenuOpen(!menuOpen)} style={{
-            position: "absolute", right: "1.5rem",
-            background: "none", border: "none", cursor: "pointer", padding: 6,
-            display: "flex", flexDirection: "column", gap: 5,
-          }} aria-label="Menu">
-            <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
-            <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
-            <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
-          </button>
-        )}
+        <div className="landing-desktop-nav" style={{ alignItems: "center", gap: 6 }}>
+          {[
+            { label: "How It Works", href: "#how-it-works" },
+            { label: "Pricing", href: "/pricing" },
+            { label: "Support", href: "/support" },
+          ].map(item => (
+            <Link key={item.label} href={item.href} style={{
+              padding: "0.5rem 0.75rem", fontSize: "0.85rem", fontWeight: 500,
+              color: "rgba(255,255,255,0.6)", textDecoration: "none", borderRadius: 6,
+              transition: "color 0.15s", minHeight: 44, display: "inline-flex", alignItems: "center",
+            }}>{item.label}</Link>
+          ))}
+        </div>
+        <div className="landing-desktop-nav" style={{ position: "absolute", right: "1.5rem", alignItems: "center", gap: 6 }}>
+          {!loggedIn && (
+            <Link href="/login" style={{
+              padding: "0.5rem 0.875rem", fontSize: "0.85rem", fontWeight: 600,
+              color: "rgba(255,255,255,0.7)", textDecoration: "none",
+              minHeight: 44, display: "inline-flex", alignItems: "center",
+            }}>Log In</Link>
+          )}
+          <Link href={ctaHref} style={{
+            padding: "0.6rem 1.25rem", fontSize: "0.85rem", fontWeight: 600,
+            color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 8,
+            textDecoration: "none", minHeight: 44, display: "inline-flex", alignItems: "center",
+          }}>{ctaLabel}</Link>
+        </div>
+        <button
+          className="landing-mobile-toggle"
+          onClick={() => setMenuOpen(!menuOpen)}
+          style={{
+            position: "absolute", right: "0.75rem",
+            background: "none", border: "none", cursor: "pointer",
+            width: 44, height: 44,
+            alignItems: "center", justifyContent: "center",
+            flexDirection: "column", gap: 5,
+          }}
+          aria-label="Menu"
+        >
+          <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
+          <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
+          <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
+        </button>
       </nav>
 
       {/* Mobile menu */}
-      {isMobile && menuOpen && (
+      {menuOpen && (
         <div style={{
           position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 200,
           background: "rgba(0,0,0,0.95)", backdropFilter: "blur(20px)",
@@ -162,13 +187,13 @@ export default function LandingPage() {
       <section className="reveal revealed" style={{
         minHeight: "90vh", display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center", textAlign: "center",
-        padding: isMobile ? "3rem 1.5rem" : "5rem 2rem",
+        padding: "clamp(3rem, 6vw, 5rem) clamp(1.25rem, 3vw, 2rem)",
         background: "radial-gradient(ellipse at 50% 0%, rgba(212,168,67,0.08) 0%, transparent 60%)",
         position: "relative",
       }}>
         {/* Breathing logo */}
         <div className="hero-logo" style={{ marginBottom: 28 }}>
-          <img src="/favicon.png" alt="" width={64} height={64} style={{ borderRadius: 18 }} />
+          <img src="/favicon.png" alt="" width={64} height={64} style={{ borderRadius: 18, maxWidth: "100%", height: "auto" }} />
         </div>
 
         {/* Pill badge */}
@@ -186,7 +211,7 @@ export default function LandingPage() {
 
         {/* Headline */}
         <h1 style={{
-          fontSize: isMobile ? "2.5rem" : "4.5rem",
+          fontSize: "clamp(2rem, 7vw, 4.5rem)",
           fontWeight: 800, lineHeight: 1.05,
           letterSpacing: "-0.03em", color: "#fff",
           maxWidth: 800, margin: "0 0 24px",
@@ -202,6 +227,7 @@ export default function LandingPage() {
           color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 14,
           textDecoration: "none", transition: "transform 0.15s, box-shadow 0.15s",
           boxShadow: "0 0 30px rgba(212,168,67,0.3)",
+          minHeight: 52,
         }}>
           {ctaLabel}
         </Link>
@@ -213,23 +239,23 @@ export default function LandingPage() {
 
       {/* ─── ChatGPT comparison ──────────────────────────────────────────────── */}
       <section className="reveal" style={{
-        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        padding: "clamp(4rem, 8vw, 6rem) clamp(1.25rem, 3vw, 2rem)",
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
         <div style={{ maxWidth: 800, margin: "0 auto" }}>
           <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 16, textAlign: "center" }}>
             How is this different from ChatGPT?
           </p>
-          <h2 style={{ fontSize: isMobile ? "1.6rem" : "2.4rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 24, lineHeight: 1.15, textAlign: "center" }}>
+          <h2 style={{ fontSize: "clamp(1.5rem, 4.5vw, 2.4rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 24, lineHeight: 1.15, textAlign: "center" }}>
             You{"'"}ve had ChatGPT for 4 years.<br />What have you accomplished?
           </h2>
           <div style={{
             background: "rgba(255,255,255,0.03)",
             border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 16, padding: isMobile ? "1.75rem" : "2.5rem 3rem",
+            borderRadius: 16, padding: "clamp(1.5rem, 4vw, 2.5rem) clamp(1.5rem, 4vw, 3rem)",
             marginBottom: 32, textAlign: "center",
           }}>
-            <p style={{ fontSize: isMobile ? "0.95rem" : "1.05rem", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0 }}>
+            <p style={{ fontSize: "clamp(0.9rem, 2vw, 1.05rem)", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0 }}>
               Threely tells you exactly what needs to be done, built around your life — not generic BS that{"'"}s keeping you stuck while everyone else moves forward.
             </p>
           </div>
@@ -238,7 +264,7 @@ export default function LandingPage() {
               display: "inline-flex", alignItems: "center", justifyContent: "center",
               padding: "0.85rem 2.5rem", fontSize: "1rem", fontWeight: 700,
               color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 12,
-              textDecoration: "none",
+              textDecoration: "none", minHeight: 48,
             }}>
               Start Today →
             </Link>
@@ -251,17 +277,13 @@ export default function LandingPage() {
 
       {/* ─── Results (Testimonials) ─────────────────────────────────────────── */}
       <section style={{
-        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        padding: "clamp(4rem, 8vw, 6rem) clamp(1.25rem, 3vw, 2rem)",
         background: "rgba(255,255,255,0.02)",
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
         <div style={{ maxWidth: 1000, margin: "0 auto" }}>
           <p className="reveal" style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 48, textAlign: "center" }}>Results</p>
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)",
-            gap: 20,
-          }}>
+          <div className="landing-testimonials-grid">
             {TESTIMONIALS.map((t, i) => (
               <div key={i} className={`reveal reveal-d${i + 1}`} style={{
                 background: "rgba(255,255,255,0.03)",
@@ -291,17 +313,17 @@ export default function LandingPage() {
 
       {/* ─── How It Works ─────────────────────────────────────────────────────── */}
       <section id="how-it-works" style={{
-        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        padding: "clamp(4rem, 8vw, 6rem) clamp(1.25rem, 3vw, 2rem)",
         maxWidth: 1000, margin: "0 auto",
       }}>
         <div className="reveal" style={{ textAlign: "center", marginBottom: 60 }}>
           <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>How It Works</p>
-          <h2 style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: "clamp(1.6rem, 5vw, 2.5rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
             Stop guessing.
           </h2>
         </div>
 
-        <div className="reveal" style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, 1fr)", gap: isMobile ? 40 : 48, textAlign: "center" }}>
+        <div className="reveal landing-steps-grid" style={{ textAlign: "center" }}>
           {[
             { step: "1", title: "Tell us your goal", desc: "Enter your goal \u2014 \"I want to launch my Shopify store and hit $5K in revenue.\" Threely asks the right questions to find the best path for you." },
             { step: "2", title: "Step by step plan", desc: "You'll get a real path based on where you currently are. Threely tells you daily what needs to be done to actually grow." },
@@ -322,11 +344,11 @@ export default function LandingPage() {
 
       {/* ─── FAQ ──────────────────────────────────────────────────────────────── */}
       <section style={{
-        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        padding: "clamp(4rem, 8vw, 6rem) clamp(1.25rem, 3vw, 2rem)",
         maxWidth: 700, margin: "0 auto",
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
-        <h2 className="reveal" style={{ fontSize: isMobile ? "1.8rem" : "2.5rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", textAlign: "center", marginBottom: 40 }}>
+        <h2 className="reveal" style={{ fontSize: "clamp(1.6rem, 5vw, 2.5rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", textAlign: "center", marginBottom: 40 }}>
           Questions
         </h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -338,6 +360,7 @@ export default function LandingPage() {
                   width: "100%", background: "none", border: "none", cursor: "pointer",
                   padding: "1.25rem 0", display: "flex", justifyContent: "space-between", alignItems: "center",
                   color: "#fff", fontSize: "1rem", fontWeight: 600, textAlign: "left",
+                  minHeight: 56,
                 }}
               >
                 {faq.q}
@@ -362,7 +385,7 @@ export default function LandingPage() {
                 padding: "0.75rem 2rem", fontSize: "0.95rem", fontWeight: 600,
                 color: "#fff", background: "none",
                 border: "1px solid rgba(255,255,255,0.15)", borderRadius: 10,
-                textDecoration: "none",
+                textDecoration: "none", minHeight: 48,
               }}
             >
               Support →
@@ -373,12 +396,12 @@ export default function LandingPage() {
 
       {/* ─── Final CTA ────────────────────────────────────────────────────────── */}
       <section style={{
-        padding: isMobile ? "4rem 1.5rem" : "6rem 2rem",
+        padding: "clamp(4rem, 8vw, 6rem) clamp(1.25rem, 3vw, 2rem)",
         textAlign: "center",
         background: "transparent",
         borderTop: "1px solid rgba(255,255,255,0.06)",
       }}>
-        <h2 className="reveal" style={{ fontSize: isMobile ? "1.8rem" : "2.8rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 32 }}>
+        <h2 className="reveal" style={{ fontSize: "clamp(1.6rem, 5vw, 2.8rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 32 }}>
           Make your first 10k this week.
         </h2>
         <Link href={ctaHref} style={{
@@ -387,6 +410,7 @@ export default function LandingPage() {
           color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 14,
           textDecoration: "none",
           boxShadow: "0 0 30px rgba(212,168,67,0.3)",
+          minHeight: 52,
         }}>
           {ctaLabel}
         </Link>
