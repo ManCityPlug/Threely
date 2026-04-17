@@ -346,7 +346,11 @@ export const tasksApi = {
   reschedule: (dailyTaskId: string, taskItemId: string) =>
     apiFetch<{ dailyTask: DailyTask }>(`/api/tasks/${dailyTaskId}`, {
       method: "PATCH",
-      body: JSON.stringify({ taskItemId, action: "reschedule" }),
+      body: JSON.stringify({
+        taskItemId,
+        action: "reschedule",
+        localDate: new Date().toLocaleDateString("en-CA"),
+      }),
     }),
 
   editItem: (dailyTaskId: string, taskItemId: string, editData: { task?: string; description?: string }) =>
@@ -441,7 +445,7 @@ export interface WeeklySummary {
 }
 
 export const statsApi = {
-  get: () => apiFetch<Stats>(`/api/stats?_t=${Date.now()}`),
+  get: () => apiFetch<Stats>(`/api/stats?localDate=${new Date().toLocaleDateString("en-CA")}&_t=${Date.now()}`),
 
   heatmap: (days = 90) => {
     const tz = new Date().getTimezoneOffset(); // minutes offset from UTC

@@ -868,6 +868,25 @@ export default function GoalsScreen() {
               setPausedGoals((prev) => prev.filter((g) => g.id !== goal.id));
               // Clear stale notifications referencing the deleted goal
               cancelAllNotifications().catch(() => {});
+              // Clear orphaned per-goal AsyncStorage keys so they don't accumulate.
+              try {
+                const keys = await AsyncStorage.getAllKeys();
+                const prefixes = [
+                  `@threely_started_${goal.id}_`,
+                  `@threely_ahead_`,
+                  `@threely_focus_`,
+                  `@threely_generating_`,
+                  `@threely_restday_gen_`,
+                ];
+                const orphaned = keys.filter((k) =>
+                  k.startsWith(`@threely_started_${goal.id}_`) || k.includes(`_${goal.id}_d`)
+                );
+                if (orphaned.length > 0) await AsyncStorage.multiRemove(orphaned);
+                // Silence unused-var lint for the local list that documents the key shapes.
+                void prefixes;
+              } catch {
+                // best-effort cleanup; ignore failures
+              }
             } catch (e: unknown) {
               Alert.alert("Error", e instanceof Error ? e.message : "Failed to delete goal");
             }

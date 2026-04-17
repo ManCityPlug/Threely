@@ -32,11 +32,12 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     if (!body || typeof body !== "object") {
       return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
     }
-    const { taskItemId, isCompleted, action, editData } = body as {
+    const { taskItemId, isCompleted, action, editData, localDate } = body as {
       taskItemId: string;
       isCompleted?: boolean;
       action?: "skip" | "reschedule" | "edit";
       editData?: { task?: string; description?: string };
+      localDate?: string;
     };
 
     if (!taskItemId) {
@@ -63,10 +64,20 @@ export async function PATCH(request: NextRequest, { params }: Params) {
         t.id === taskItemId ? { ...t, isRescheduled: true } : t
       );
 
-      // Copy task to tomorrow
-      const tomorrow = new Date();
-      tomorrow.setUTCHours(0, 0, 0, 0);
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      // Copy task to tomorrow relative to the user's local date, not server UTC.
+      // If the client didn't send localDate, fall back to server UTC midnight+1.
+      const tomorrow = (() => {
+        if (localDate && /^\d{4}-\d{2}-\d{2}$/.test(localDate)) {
+          const [y, m, d] = localDate.split("-").map(Number);
+          const base = new Date(Date.UTC(y, m - 1, d));
+          base.setUTCDate(base.getUTCDate() + 1);
+          return base;
+        }
+        const t = new Date();
+        t.setUTCHours(0, 0, 0, 0);
+        t.setUTCDate(t.getUTCDate() + 1);
+        return t;
+      })();
 
       const taskToCopy = tasks.find(t => t.id === taskItemId);
       if (taskToCopy) {

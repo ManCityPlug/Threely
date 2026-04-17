@@ -23,13 +23,20 @@ interface GoalStat {
   nextWorkDay: string | null;
 }
 
-// GET /api/stats — returns aggregate stats for the authenticated user
+// GET /api/stats?localDate=YYYY-MM-DD — returns aggregate stats for the authenticated user
+// localDate lets the client declare its own calendar "today" so streaks work
+// correctly across UTC day boundaries for non-UTC timezones.
 export async function GET(request: NextRequest) {
   try {
   const user = await getUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const cached = getCachedStats(user.id);
+  const url = new URL(request.url);
+  const localDateParam = url.searchParams.get("localDate");
+
+  // Cache key changes per-local-date to avoid cross-timezone cache bleed.
+  const cacheKey = localDateParam ? `${user.id}:${localDateParam}` : user.id;
+  const cached = getCachedStats(cacheKey);
   if (cached) return NextResponse.json(cached);
 
   const [allDailyTasks, activeGoals, activeGoalsList] = await Promise.all([
@@ -61,8 +68,16 @@ export async function GET(request: NextRequest) {
   }
 
   let streak = 0;
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
+  // "today" is the client's local calendar date if provided; otherwise server UTC midnight.
+  const today = (() => {
+    if (localDateParam && /^\d{4}-\d{2}-\d{2}$/.test(localDateParam)) {
+      const [y, m, d] = localDateParam.split("-").map(Number);
+      return new Date(Date.UTC(y, m - 1, d));
+    }
+    const t = new Date();
+    t.setUTCHours(0, 0, 0, 0);
+    return t;
+  })();
   for (let i = 0; i < 365; i++) {
     const d = new Date(today);
     d.setDate(d.getDate() - i);
@@ -174,7 +189,7 @@ export async function GET(request: NextRequest) {
   });
 
   const result = { totalCompleted, activeGoals, streak, bestStreak, totalHoursInvested, totalMinutesInvested, goalStats };
-  setCachedStats(user.id, result);
+  setCachedStats(cacheKey, result);
   return NextResponse.json(result, {
     headers: { "Cache-Control": "no-store, max-age=0" },
   });

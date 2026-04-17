@@ -25,8 +25,11 @@ function todayStr() {
 
 function daysSince(dateStr: string | null): number | null {
   if (!dateStr) return null;
-  const diff = Date.now() - new Date(dateStr).getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24));
+  const d = new Date(dateStr);
+  const past = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.floor((today.getTime() - past.getTime()) / (1000 * 60 * 60 * 24));
 }
 
 function getTodayIsoDay(): number {
@@ -105,12 +108,15 @@ function getGoalDayNumber(goal: Goal): number {
 function getStreakFromGoals(goals: Goal[]): number {
   if (goals.length === 0) return 0;
   // Streak = number of days since the user's earliest goal was created (never decreases)
-  const earliest = goals.reduce((min, g) => {
+  const earliestMs = goals.reduce((min, g) => {
     const d = new Date(g.createdAt).getTime();
     return d < min ? d : min;
   }, Infinity);
-  const diff = Date.now() - earliest;
-  return Math.max(1, Math.floor(diff / (1000 * 60 * 60 * 24)) + 1);
+  const earliest = new Date(earliestMs);
+  const earliestLocal = new Date(earliest.getFullYear(), earliest.getMonth(), earliest.getDate());
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.max(1, Math.floor((today.getTime() - earliestLocal.getTime()) / (1000 * 60 * 60 * 24)) + 1);
 }
 
 // ─── Task Card (simplified for gamified dashboard) ────────────────────────────
@@ -812,6 +818,26 @@ function DashboardPageInner() {
     return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, [load]);
 
+  // Refetch when the calendar day rolls over at midnight, so stale "all done"
+  // state from yesterday doesn't leak onto the new day's path node.
+  const lastCalendarDayRef = useRef<string>((() => {
+    const n = new Date();
+    return `${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}`;
+  })());
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const n = new Date();
+      const nowDayStr = `${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}`;
+      if (nowDayStr !== lastCalendarDayRef.current) {
+        lastCalendarDayRef.current = nowDayStr;
+        hasTriggeredCelebration.current = false;
+        userToggledRef.current = false;
+        load();
+      }
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [load]);
+
   // ── Derived data ─────────────────────────────────────────────────────────────
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -839,10 +865,22 @@ function DashboardPageInner() {
   const completedCount = displayedItems.filter(t => t.isCompleted || t.isSkipped).length;
   const totalCount = displayedItems.length;
 
-  // allDone for TODAY's tasks only (drives path state) — never use viewingTasks
+  // allDone for TODAY's tasks only (drives path state) — never use viewingTasks.
+  // Gate on the DailyTask's date matching today's calendar date so stale
+  // yesterday-data doesn't inherit a "completed" label onto a freshly-unlocked day.
+  const todayCalendarStr = (() => {
+    const n = new Date();
+    return `${n.getFullYear()}-${String(n.getMonth() + 1).padStart(2, "0")}-${String(n.getDate()).padStart(2, "0")}`;
+  })();
   const todayDt = effectiveDailyTasks.find(d => d.goalId === effectiveSelectedGoalId);
   const todayItems = todayDt ? todayDt.tasks.slice(-3) : [];
-  const todayAllDone = todayItems.length > 0 && todayItems.every(t => t.isCompleted || t.isSkipped);
+  const todayDtIsForToday = (() => {
+    if (!todayDt?.date) return false;
+    const d = new Date(todayDt.date);
+    const s = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    return s === todayCalendarStr;
+  })();
+  const todayAllDone = todayDtIsForToday && todayItems.length > 0 && todayItems.every(t => t.isCompleted || t.isSkipped);
 
   // allDone for whatever is currently displayed (drives task view UI)
   const viewAllDone = totalCount > 0 && completedCount === totalCount;
@@ -869,24 +907,26 @@ function DashboardPageInner() {
   // - Work ahead completed: active = goalDayNumber + 1 (Day 2 shows COMPLETE!), Day 3 locked
   const pathDayNumber = workAheadUsed ? goalDayNumber + 1 : goalDayNumber;
   const pathCompletedDays = workAheadUsed ? goalDayNumber : goalDayNumber - 1;
-  const pathAllDone = workAheadUsed ? workAheadDone : todayAllDone;
+  const pathAllDone = workAheadUsed ? (todayAllDone && workAheadDone) : todayAllDone;
 
   const userToggledRef = useRef(false);
 
-  // Detect when work-ahead tasks are all completed (only after user manually toggles)
+  // Detect when work-ahead tasks are all completed.
+  // Persist regardless of userToggledRef so reopening a mostly-done work-ahead
+  // view and finishing the last task still flips workAheadDone.
   useEffect(() => {
-    if (viewingTasks && viewingDay && viewingDay > goalDayNumber && userToggledRef.current) {
+    if (workAheadUsed && !workAheadDone && viewingTasks && viewingDay && viewingDay > goalDayNumber) {
       const dt = viewingTasks.find(d => d.goalId === effectiveSelectedGoalId);
       if (dt) {
         const items = dt.tasks.slice(-3);
         const allComplete = items.length > 0 && items.every(t => t.isCompleted || t.isSkipped);
-        if (allComplete && !workAheadDone) {
+        if (allComplete) {
           localStorage.setItem(aheadDoneKey, "true");
           setWorkAheadDone(true);
         }
       }
     }
-  }, [viewingTasks, viewingDay, goalDayNumber, effectiveSelectedGoalId, aheadDoneKey, workAheadDone]);
+  }, [viewingTasks, viewingDay, goalDayNumber, effectiveSelectedGoalId, aheadDoneKey, workAheadDone, workAheadUsed]);
 
   // Show celebration when all DISPLAYED tasks go from not-done → done
   const hasTriggeredCelebration = useRef(false);
@@ -934,6 +974,8 @@ function DashboardPageInner() {
     setSelectedGoalId(val);
     setCelebrationDismissed(false);
     setShowCelebration(false);
+    hasTriggeredCelebration.current = false;
+    userToggledRef.current = false;
     localStorage.setItem(`threely_focus_${new Date().toLocaleDateString("en-CA")}`, val);
     focusApi.save(val).catch(() => {});
   }
@@ -994,7 +1036,7 @@ function DashboardPageInner() {
       const res = await tasksApi.toggleTask(dailyTaskId, taskItemId, isCompleted);
       const updated = (prev: DailyTask[]) => prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt);
       if (viewingTasks) {
-        setViewingTasks(updated(viewingTasks));
+        setViewingTasks(prev => prev ? updated(prev) : prev);
       } else {
         setDailyTasks(updated);
       }
