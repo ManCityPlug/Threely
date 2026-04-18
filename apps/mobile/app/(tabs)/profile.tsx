@@ -495,27 +495,8 @@ export default function ProfileScreen() {
         }
       >
         {/* Header */}
-        <View style={[styles.header, { flexDirection: "row", justifyContent: "space-between", alignItems: "center" }]}>
+        <View style={styles.header}>
           <Text style={styles.title}>Profile</Text>
-          <TouchableOpacity
-            onPress={() => setNotifCenterOpen(true)}
-            style={{ position: "relative", padding: spacing.xs }}
-          >
-            <Ionicons name="notifications-outline" size={24} color={colors.text} />
-            {appNotifications.length > 0 && (
-              <View style={{
-                position: "absolute", top: 2, right: 2,
-                minWidth: 16, height: 16, borderRadius: 8,
-                backgroundColor: "#ef4444",
-                alignItems: "center", justifyContent: "center",
-                paddingHorizontal: 3,
-              }}>
-                <Text style={{ color: "#fff", fontSize: 9, fontWeight: "700" }}>
-                  {appNotifications.length > 9 ? "9+" : appNotifications.length}
-                </Text>
-              </View>
-            )}
-          </TouchableOpacity>
         </View>
 
         {/* Avatar + email */}

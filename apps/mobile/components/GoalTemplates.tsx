@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import {
   View,
   Text,
@@ -6,29 +6,27 @@ import {
   TouchableOpacity,
 } from "react-native";
 import {
-  goalCategories,
-  type GoalCategory,
+  FUNNEL_CATEGORIES,
+  type FunnelCategory,
 } from "@/constants/goal-templates";
 import { useTheme } from "@/lib/theme";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius, shadow } from "@/constants/theme";
 
 interface GoalTemplatesProps {
-  onSelect: (category: GoalCategory) => void;
+  onSelect: (category: FunnelCategory) => void;
   onClose: () => void;
-  onOther?: () => void;
-  closeLabel?: string;
 }
 
-export function GoalTemplates({ onSelect, onClose, onOther, closeLabel = "Back" }: GoalTemplatesProps) {
+// Category picker for the Add Goal funnel: 3 stacked cards (Business / Health / Other).
+export function GoalTemplates({ onSelect, onClose }: GoalTemplatesProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
     <View style={styles.container}>
-      {/* Header */}
       <View style={styles.headerRow}>
-        <Text style={styles.title}>What is your goal?</Text>
+        <View style={{ flex: 1 }} />
         <TouchableOpacity
           onPress={onClose}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
@@ -36,43 +34,26 @@ export function GoalTemplates({ onSelect, onClose, onOther, closeLabel = "Back" 
           accessibilityRole="button"
           accessibilityLabel="Close"
         >
-          <Text style={styles.closeBtn}>{closeLabel}</Text>
+          <Text style={styles.closeBtn}>{"\u2715"}</Text>
         </TouchableOpacity>
       </View>
-      <Text style={styles.subtitle}>
-        Pick a category and Threely Intelligence will ask personalized questions
-        to build your perfect plan.
-      </Text>
 
-      {/* Two category cards side by side */}
-      <View style={styles.row}>
-        {goalCategories.map((cat) => (
+      <Text style={styles.title}>What do you want to achieve?</Text>
+      <Text style={styles.subtitle}>Pick a category to get started</Text>
+
+      <View style={styles.list}>
+        {FUNNEL_CATEGORIES.map((cat) => (
           <TouchableOpacity
             key={cat.id}
             style={styles.categoryCard}
-            onPress={() => onSelect(cat)}
+            onPress={() => onSelect(cat.id)}
             activeOpacity={0.75}
           >
-            <Text style={styles.categoryEmoji}>{cat.emoji}</Text>
             <Text style={styles.categoryLabel}>{cat.label}</Text>
-            <Text style={styles.categoryDesc} numberOfLines={2}>
-              {cat.description}
-            </Text>
+            <Text style={styles.categorySubtitle}>{cat.subtitle}</Text>
           </TouchableOpacity>
         ))}
       </View>
-
-      {/* "Something else" full-width */}
-      {onOther && (
-        <TouchableOpacity
-          style={[styles.categoryCard, styles.otherCard]}
-          onPress={onOther}
-          activeOpacity={0.75}
-        >
-          <Text style={{ fontSize: 20 }}>✏️</Text>
-          <Text style={[styles.categoryLabel, { marginBottom: 0, fontSize: typography.sm }]}>Something else</Text>
-        </TouchableOpacity>
-      )}
     </View>
   );
 }
@@ -81,86 +62,64 @@ function createStyles(c: Colors) {
   return StyleSheet.create({
     container: {
       flex: 1,
+      paddingHorizontal: spacing.lg,
+      paddingTop: spacing.sm,
     },
     headerRow: {
       flexDirection: "row",
-      justifyContent: "space-between",
+      justifyContent: "flex-end",
       alignItems: "center",
-      marginBottom: 4,
-    },
-    title: {
-      fontSize: typography.xl,
-      fontWeight: typography.bold as "700",
-      color: c.text,
-      letterSpacing: -0.3,
+      marginBottom: spacing.md,
     },
     closeBtnWrap: {
       minHeight: 44,
-      justifyContent: "center" as const,
-      paddingHorizontal: spacing.xs,
+      minWidth: 44,
+      justifyContent: "center",
+      alignItems: "center",
     },
     closeBtn: {
-      fontSize: typography.base,
-      fontWeight: typography.semibold as "600",
-      color: c.primary,
+      fontSize: 22,
+      color: c.textSecondary,
+      fontWeight: typography.medium as "500",
+    },
+    title: {
+      fontSize: typography.xxl,
+      fontWeight: typography.bold as "700",
+      color: c.text,
+      letterSpacing: -0.5,
+      textAlign: "center",
+      marginBottom: spacing.xs,
     },
     subtitle: {
-      fontSize: typography.sm,
+      fontSize: typography.base,
       color: c.textSecondary,
-      lineHeight: 20,
-      marginBottom: spacing.lg,
+      textAlign: "center",
+      marginBottom: spacing.xl,
     },
-    row: {
-      flexDirection: "row",
+    list: {
       gap: spacing.sm,
-      marginBottom: spacing.sm,
     },
     categoryCard: {
-      flex: 1,
       backgroundColor: c.card,
       borderRadius: radius.lg,
-      borderWidth: 1,
+      borderWidth: 1.5,
       borderColor: c.border,
-      padding: spacing.lg,
-      alignItems: "center",
+      paddingVertical: spacing.lg,
+      paddingHorizontal: spacing.lg,
+      minHeight: 80,
       justifyContent: "center",
-      height: 140,
       ...shadow.sm,
     },
-    categoryEmoji: {
-      fontSize: 36,
-      marginBottom: spacing.sm,
-    },
     categoryLabel: {
-      fontSize: typography.base,
-      fontWeight: typography.semibold as "600",
+      fontSize: typography.lg,
+      fontWeight: typography.bold as "700",
       color: c.text,
       marginBottom: 4,
     },
-    categoryDesc: {
-      fontSize: typography.xs,
-      color: c.textSecondary,
-      textAlign: "center",
-      lineHeight: 16,
-    },
-    otherCard: {
-      flex: 0,
-      width: "100%" as any,
-      height: 60,
-      flexDirection: "row" as const,
-      gap: spacing.sm,
-      padding: spacing.md,
-    },
-    otherEmoji: {
-      fontSize: 22,
-      marginBottom: 0,
-    },
-    otherLabel: {
+    categorySubtitle: {
       fontSize: typography.sm,
-      marginBottom: 0,
-    },
-    otherDesc: {
-      display: "none" as any,
+      color: c.textSecondary,
+      lineHeight: 20,
     },
   });
 }

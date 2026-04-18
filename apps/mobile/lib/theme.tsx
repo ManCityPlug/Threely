@@ -65,14 +65,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => clearTimeout(timeout);
   }, []);
 
-  // Determine dark mode from preference + system scheme
-  const isDark = preference === "dark"
-    ? true
-    : preference === "light"
-      ? false
-      : systemColorScheme === "dark";
+  // Force dark mode on mobile to match the web app (which is dark-only).
+  // Preference still tracked for settings UI but no longer drives the colors.
+  void preference; void systemColorScheme;
+  const isDark = true;
 
-  const colors = (isDark ? darkColors : lightColors) as Colors;
+  const colors = darkColors as unknown as Colors;
 
   const setPreference = useCallback(async (pref: ColorSchemePreference) => {
     setPreferenceState(pref);

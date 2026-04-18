@@ -599,21 +599,24 @@ function SCurvePathView({
   }
   const lastVisibleDay = days[days.length - 1];
 
+  // Path container width (leave margin on each side)
+  const pathWidth = Math.min(screenWidth - 40, screenWidth >= 768 ? 600 : 500);
+  // Spacing between nodes — needs enough room for:
+  //   node (max 68px) + START/label (~40px) + breathing room (~20px)
+  //   + milestone labels on adjacent rows
+  // so nothing stacks on the row below.
+  const nodeSpacing = 140;
+
   // Scroll to today's node on mount
   useEffect(() => {
     const todayIndex = days.indexOf(goalDayNumber);
     if (todayIndex >= 0 && scrollRef.current) {
-      const nodeSpacing = 100;
       const scrollTarget = Math.max(0, todayIndex * nodeSpacing - 200);
       setTimeout(() => {
         scrollRef.current?.scrollTo({ y: scrollTarget, animated: true });
       }, 300);
     }
-  }, [goalDayNumber]);
-
-  // Path container width (leave margin on each side)
-  const pathWidth = Math.min(screenWidth - 40, screenWidth >= 768 ? 600 : 500);
-  const nodeSpacing = 100;
+  }, [goalDayNumber, nodeSpacing]);
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
