@@ -574,6 +574,7 @@ function SCurvePathView({
   screenWidth,
   taskProgress,
   startedDays,
+  scrollTrigger,
 }: {
   goalDayNumber: number;
   allDone: boolean;
@@ -585,6 +586,7 @@ function SCurvePathView({
   screenWidth: number;
   taskProgress: number;
   startedDays: Set<number>;
+  scrollTrigger: number;
 }) {
   const scrollRef = useRef<ScrollView>(null);
   const [showScrollHint, setShowScrollHint] = useState(true);
@@ -606,7 +608,9 @@ function SCurvePathView({
   // above it. 170px gives ~50px visual gap even at the tightest cluster.
   const nodeSpacing = 170;
 
-  // Scroll to today's node whenever it changes — centers it in the viewport.
+  // Scroll to today's node — fires on mount, on day change, AND every time the
+  // parent bumps `scrollTrigger` (e.g. when Today tab is re-focused or user
+  // returns to path view from tasks view). Matches web's PathView behavior.
   useEffect(() => {
     const todayIndex = days.indexOf(goalDayNumber);
     if (todayIndex < 0) return;
@@ -615,7 +619,7 @@ function SCurvePathView({
       scrollRef.current?.scrollTo({ y: scrollTarget, animated: true });
     }, 350);
     return () => clearTimeout(t);
-  }, [goalDayNumber, nodeSpacing, days]);
+  }, [goalDayNumber, nodeSpacing, days, scrollTrigger]);
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
@@ -1381,6 +1385,11 @@ export default function DashboardScreen() {
   const [celebrationDismissed, setCelebrationDismissed] = useState(false);
   const [animatingTaskId, setAnimatingTaskId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"path" | "tasks">("path");
+  // Increment to force a re-center on the path view (on focus / viewMode->path).
+  const [pathScrollTrigger, setPathScrollTrigger] = useState(0);
+  useEffect(() => {
+    if (viewMode === "path") setPathScrollTrigger((n) => n + 1);
+  }, [viewMode]);
   const [midnightCountdown, setMidnightCountdown] = useState(getMidnightCountdown());
 
   // Persisted "started" days (Gap 2): remove START badge once user taps today
@@ -1610,6 +1619,8 @@ export default function DashboardScreen() {
           pendingSwitchGoal.current = switchGoalId;
         }
       });
+      // Re-center the path on today's node every time Today tab is focused.
+      setPathScrollTrigger((n) => n + 1);
       if (!hasLoadedOnce.current) {
         hasLoadedOnce.current = true;
         loadData().finally(() => setLoading(false));
@@ -2177,6 +2188,7 @@ export default function DashboardScreen() {
               goalDayNumber={allDone ? effectiveDayNumber + 1 : effectiveDayNumber}
               allDone={allDone && celebrationDismissed}
               startedDays={startedDays}
+              scrollTrigger={pathScrollTrigger}
               onTapToday={() => {
                 if (allDone && celebrationDismissed) return;
                 if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
