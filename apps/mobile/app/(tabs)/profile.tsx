@@ -499,23 +499,6 @@ export default function ProfileScreen() {
           <Text style={styles.title}>Profile</Text>
         </View>
 
-        {/* Avatar + email */}
-        <View style={styles.avatarSection}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials}</Text>
-          </View>
-          <Text style={styles.displayName}>{email}</Text>
-          <Text style={styles.memberSince}>Member since {memberSince}</Text>
-          {hasPro ? (
-            <View style={{ backgroundColor: colors.primaryLight, paddingHorizontal: 12, paddingVertical: 3, borderRadius: 999, marginTop: spacing.xs }}>
-              <Text style={{ color: colors.primary, fontSize: typography.xs, fontWeight: typography.semibold }}>Pro</Text>
-            </View>
-          ) : (
-            <View style={{ backgroundColor: colors.bg, paddingHorizontal: 12, paddingVertical: 3, borderRadius: 999, marginTop: spacing.xs }}>
-              <Text style={{ color: colors.textTertiary, fontSize: typography.xs, fontWeight: typography.semibold }}>Free</Text>
-            </View>
-          )}
-        </View>
 
         {/* Apple sign-in set-password CTA (shown when no password is set) */}
         {authProvider === "apple" && !hasPassword && (
@@ -562,8 +545,8 @@ export default function ProfileScreen() {
             onPress={() => setNotifSheetOpen(true)}
             activeOpacity={0.7}
           >
-            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="notifications-outline" size={18} color={colors.primary} />
+            <View style={styles.menuIcon}>
+              <Ionicons name="notifications-outline" size={18} color={colors.text} />
             </View>
             <View style={styles.menuText}>
               <Text style={styles.menuLabel}>Notifications</Text>
@@ -592,8 +575,8 @@ export default function ProfileScreen() {
             }}
             activeOpacity={0.7}
           >
-            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="flag-outline" size={18} color={colors.primary} />
+            <View style={styles.menuIcon}>
+              <Ionicons name="flag-outline" size={18} color={colors.text} />
             </View>
             <View style={styles.menuText}>
               <Text style={styles.menuLabel}>Focus goal</Text>
@@ -610,8 +593,8 @@ export default function ProfileScreen() {
             onPress={() => setAppearanceSheetOpen(true)}
             activeOpacity={0.7}
           >
-            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name={schemeCurrent.icon} size={18} color={colors.primary} />
+            <View style={styles.menuIcon}>
+              <Ionicons name={schemeCurrent.icon} size={18} color={colors.text} />
             </View>
             <View style={styles.menuText}>
               <Text style={styles.menuLabel}>Appearance</Text>
@@ -696,8 +679,8 @@ export default function ProfileScreen() {
             }}
             activeOpacity={0.7}
           >
-            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="mail-outline" size={18} color={colors.primary} />
+            <View style={styles.menuIcon}>
+              <Ionicons name="mail-outline" size={18} color={colors.text} />
             </View>
             <View style={styles.menuText}>
               <Text style={styles.menuLabel}>Email</Text>
@@ -709,8 +692,8 @@ export default function ProfileScreen() {
           <View style={styles.divider} />
 
           <TouchableOpacity style={styles.menuRow} onPress={() => setPwSheetOpen(true)} activeOpacity={0.7}>
-            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="key-outline" size={18} color={colors.primary} />
+            <View style={styles.menuIcon}>
+              <Ionicons name="key-outline" size={18} color={colors.text} />
             </View>
             <Text style={styles.menuLabel}>{hasPassword ? "Change password" : "Set password"}</Text>
             <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} style={{ marginLeft: "auto" }} />
@@ -719,8 +702,8 @@ export default function ProfileScreen() {
           <View style={styles.divider} />
 
           <TouchableOpacity style={styles.menuRow} onPress={handleSignOut} activeOpacity={0.7}>
-            <View style={[styles.menuIcon, { backgroundColor: colors.primaryLight }]}>
-              <Ionicons name="log-out-outline" size={18} color={colors.primary} />
+            <View style={styles.menuIcon}>
+              <Ionicons name="log-out-outline" size={18} color={colors.text} />
             </View>
             <Text style={styles.menuLabel}>Sign out</Text>
             <Ionicons name="chevron-forward" size={16} color={colors.textTertiary} style={{ marginLeft: "auto" }} />
@@ -1138,7 +1121,7 @@ export default function ProfileScreen() {
                         backgroundColor: colors.primaryLight,
                         alignItems: "center", justifyContent: "center",
                       }}>
-                        <Ionicons name="notifications-outline" size={18} color={colors.primary} />
+                        <Ionicons name="notifications-outline" size={18} color={colors.text} />
                       </View>
                       <View style={{ flex: 1 }}>
                         <Text style={{ fontWeight: "700", fontSize: typography.base, color: colors.text, marginBottom: 2 }}>
@@ -1345,6 +1328,7 @@ function createStyles(c: Colors) {
       borderRadius: radius.sm,
       alignItems: "center",
       justifyContent: "center",
+      backgroundColor: c.cardPressed,
     },
     menuText: { flex: 1 },
     menuLabel: {

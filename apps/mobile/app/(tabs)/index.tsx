@@ -601,22 +601,21 @@ function SCurvePathView({
 
   // Path container width (leave margin on each side)
   const pathWidth = Math.min(screenWidth - 40, screenWidth >= 768 ? 600 : 500);
-  // Spacing between nodes — needs enough room for:
-  //   node (max 68px) + START/label (~40px) + breathing room (~20px)
-  //   + milestone labels on adjacent rows
-  // so nothing stacks on the row below.
-  const nodeSpacing = 140;
+  // Spacing between nodes — must fit node (68px max) + START badge/label (~55px)
+  // + small breathing room so the badge above one node never touches the node
+  // above it. 170px gives ~50px visual gap even at the tightest cluster.
+  const nodeSpacing = 170;
 
-  // Scroll to today's node on mount
+  // Scroll to today's node whenever it changes — centers it in the viewport.
   useEffect(() => {
     const todayIndex = days.indexOf(goalDayNumber);
-    if (todayIndex >= 0 && scrollRef.current) {
-      const scrollTarget = Math.max(0, todayIndex * nodeSpacing - 200);
-      setTimeout(() => {
-        scrollRef.current?.scrollTo({ y: scrollTarget, animated: true });
-      }, 300);
-    }
-  }, [goalDayNumber, nodeSpacing]);
+    if (todayIndex < 0) return;
+    const t = setTimeout(() => {
+      const scrollTarget = Math.max(0, todayIndex * nodeSpacing - 180);
+      scrollRef.current?.scrollTo({ y: scrollTarget, animated: true });
+    }, 350);
+    return () => clearTimeout(t);
+  }, [goalDayNumber, nodeSpacing, days]);
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
@@ -1382,7 +1381,6 @@ export default function DashboardScreen() {
   const [celebrationDismissed, setCelebrationDismissed] = useState(false);
   const [animatingTaskId, setAnimatingTaskId] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"path" | "tasks">("path");
-  const [showTodayPopup, setShowTodayPopup] = useState(false);
   const [midnightCountdown, setMidnightCountdown] = useState(getMidnightCountdown());
 
   // Persisted "started" days (Gap 2): remove START badge once user taps today
@@ -2186,7 +2184,8 @@ export default function DashboardScreen() {
                 // when path is bumped forward after allDone (work-ahead preview).
                 const displayedToday = allDone ? effectiveDayNumber + 1 : effectiveDayNumber;
                 markDayStarted(displayedToday);
-                setShowTodayPopup(true);
+                // Go straight to tasks view (matches web — no intermediate popup).
+                setViewMode("tasks");
               }}
               onTapWorkAhead={async () => {
                 const todayStr = new Date().toLocaleDateString("en-CA");
@@ -2312,19 +2311,6 @@ export default function DashboardScreen() {
           </>
         )}
       </ScrollView>
-
-      {/* ── Today popup ─────────────────────────────────────────────────────── */}
-      <TodayPopup
-        visible={showTodayPopup}
-        dayNumber={goalDayNumber}
-        taskCount={newTaskItems.length}
-        onStart={() => {
-          setShowTodayPopup(false);
-          setViewMode("tasks");
-        }}
-        onDismiss={() => setShowTodayPopup(false)}
-        colors={colors}
-      />
 
       {/* ── Rest day goal picker ────────────────────────────────────────────── */}
       <Modal visible={restDayPickerOpen} transparent animationType="fade">
