@@ -680,7 +680,8 @@ function SCurvePathView({
         width: pathWidth,
         alignSelf: "center",
         position: "relative",
-        height: days.length * nodeSpacing + 60,
+        // +35 accounts for the future-day yPos bump below
+        height: days.length * nodeSpacing + 60 + 35,
       }}>
         {days.map((day, i) => {
             const isCompleted = day < goalDayNumber;
@@ -695,10 +696,16 @@ function SCurvePathView({
             else if (isToday) type = "today";
             else if (isWorkAhead) type = "work-ahead";
 
-            // S-curve positioning
+            // S-curve positioning. Future days get a +35 offset so today's
+            // expanded label ("Day N / TODAY" or "Day N / Complete!" with
+            // the CONTINUE badge above) can't collide with day+1 when they
+            // land on the same side of the S-curve. Past days keep their
+            // standard spacing. Scroll-to-today math is unaffected (today
+            // is not "future").
             const xOffsetPct = S_CURVE_OFFSETS[i % S_CURVE_OFFSETS.length];
             const xPos = (xOffsetPct / 100) * pathWidth;
-            const yPos = 40 + i * nodeSpacing;
+            const futureBump = day > goalDayNumber ? 35 : 0;
+            const yPos = 40 + i * nodeSpacing + futureBump;
 
             // Week dividers
             const isWeekBoundary = i > 0 && i % 7 === 0;
