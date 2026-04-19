@@ -316,7 +316,9 @@ function PathNode({
       elevation: 6,
     };
   } else if (isToday) {
-    bgColor = allDoneToday ? GOLD : "rgba(20,20,20,0.95)";
+    // Match web: keep today's background dark even when allDone so the gold
+    // check inside stays visible. Web never fills the today node gold.
+    bgColor = "rgba(20,20,20,0.95)";
     borderColor = GOLD;
     borderWidth = 3;
     shadowConfig = {
@@ -608,36 +610,24 @@ function SCurvePathView({
   // above it. 170px gives ~50px visual gap even at the tightest cluster.
   const nodeSpacing = 170;
 
-  // Scroll to today's node. scrollTo on a just-focused/just-mounted ScrollView
-  // is a no-op on iOS until content is measured AND the view is actually on
-  // screen. We belt-and-suspenders this:
-  //  - onContentSizeChange fires after initial layout (first mount)
-  //  - a queued rAF + short-timeout cascade covers re-focus of a tab that
-  //    stayed mounted (content size didn't change → onContentSizeChange won't
-  //    fire, but we still need to re-center on today)
-  // Don't depend on the re-created `days` array — it thrashes the effect and
-  // the setTimeout keeps getting cleared before firing.
-  const pendingScrollRef = useRef(false);
+  // Scroll to today's node — mirrors web PathView exactly: captures the
+  // today node's actual y position via onLayout (equivalent to web's
+  // todayRef.offsetTop) and scrolls so it sits centered in the viewport.
+  // Firing on mount + scrollTrigger (focus) + dayNumber change matches web.
+  const todayYRef = useRef<number | null>(null);
+  const viewportHeightRef = useRef<number>(0);
   const scrollToToday = useCallback((animated: boolean = true) => {
-    const todayIndex = goalDayNumber - windowStart;
-    if (todayIndex < 0 || todayIndex >= VISIBLE_NODES) return;
-    const scrollTarget = Math.max(0, todayIndex * nodeSpacing - 180);
-    scrollRef.current?.scrollTo({ y: scrollTarget, animated });
-  }, [goalDayNumber, windowStart, nodeSpacing]);
+    if (todayYRef.current == null || viewportHeightRef.current === 0) return;
+    const nodeSize = 68; // today node diameter
+    const scrollTarget = todayYRef.current - viewportHeightRef.current / 2 + nodeSize / 2;
+    scrollRef.current?.scrollTo({ y: Math.max(0, scrollTarget), animated });
+  }, []);
 
   useEffect(() => {
-    pendingScrollRef.current = true;
-    // Try immediately, on next frame, and again after a short delay to cover:
-    //   (a) first mount before layout measurement
-    //   (b) tab re-focus where content size didn't change
-    //   (c) iOS queuing scrollTo until the view is on screen
-    scrollToToday(false);
-    const raf = requestAnimationFrame(() => scrollToToday(false));
+    // 250ms delay matches web. Retry on next frame and again after layout
+    // settles to cover iOS queueing scrollTo before the view is on screen.
     const t = setTimeout(() => scrollToToday(true), 250);
-    return () => {
-      cancelAnimationFrame(raf);
-      clearTimeout(t);
-    };
+    return () => clearTimeout(t);
   }, [goalDayNumber, scrollTrigger, scrollToToday]);
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -648,18 +638,16 @@ function SCurvePathView({
   };
 
   return (
-    <View style={{ flex: 1, position: "relative" }}>
+    <View
+      style={{ flex: 1, position: "relative" }}
+      onLayout={(e) => { viewportHeightRef.current = e.nativeEvent.layout.height; }}
+    >
       <ScrollView
         ref={scrollRef}
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={100}
-        onContentSizeChange={() => {
-          if (pendingScrollRef.current) {
-            pendingScrollRef.current = false;
-            scrollToToday();
-          }
-        }}
+        onContentSizeChange={() => scrollToToday(false)}
         contentContainerStyle={{
           paddingTop: 30,
           paddingBottom: 80,
@@ -723,6 +711,13 @@ function SCurvePathView({
                 )}
 
                 {/* Node positioned absolutely */}
+                {isToday && (() => {
+                  // Capture today node's y in the content (equivalent to
+                  // web's todayRef.offsetTop). yPos is deterministic, so no
+                  // measurement needed.
+                  todayYRef.current = yPos;
+                  return null;
+                })()}
                 <View style={{
                   position: "absolute",
                   top: yPos,
