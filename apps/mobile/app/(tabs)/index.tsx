@@ -154,6 +154,35 @@ function isMilestone(day: number): boolean {
   return MILESTONE_DAYS.includes(day);
 }
 
+// ─── Inline countdown under the next locked day node ────────────────────────
+// Mirrors web's InlineCountdown (apps/web/components/PathView.tsx:29-54) so
+// mobile and web show the same "Unlocks in Xh Ym" hint under the very next
+// locked day on the path. Re-renders every 60s.
+function InlineCountdown() {
+  const [label, setLabel] = useState("");
+  useEffect(() => {
+    function tick() {
+      const now = Date.now();
+      const midnight = new Date();
+      midnight.setHours(24, 0, 0, 0);
+      const diff = midnight.getTime() - now;
+      if (diff <= 0) { setLabel(""); return; }
+      const h = Math.floor(diff / (1000 * 60 * 60));
+      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      setLabel(`Unlocks in ${h}h ${m}m`);
+    }
+    tick();
+    const interval = setInterval(tick, 60000);
+    return () => clearInterval(interval);
+  }, []);
+  if (!label) return null;
+  return (
+    <Text style={{ fontSize: 10, fontWeight: "600", color: "rgba(212,168,67,0.5)", marginTop: 2 }}>
+      {label}
+    </Text>
+  );
+}
+
 // ─── Progress Ring (View-based, mirrors web's SVG ring visually) ─────────────
 // Web draws an SVG stroke ring at radius = size/2 + 6. When allDoneToday
 // (progress=1) the full gold ring is visible; otherwise only the faint track.
@@ -219,6 +248,7 @@ function PathNode({
   isToday,
   isCrown,
   isMilestoneNode,
+  isNextLocked,
   onPress,
   colors,
   allDoneToday,
@@ -230,6 +260,7 @@ function PathNode({
   isToday: boolean;
   isCrown: boolean;
   isMilestoneNode: boolean;
+  isNextLocked: boolean;
   onPress?: () => void;
   colors: Colors;
   allDoneToday: boolean;
@@ -426,11 +457,15 @@ function PathNode({
       </Text>
     );
   } else {
-    // Locked - minimal label
+    // Locked - minimal label, plus unlock countdown if this is the very next
+    // locked day (day === goalDayNumber + 1) — mirrors web PathView.
     label = (
-      <Text style={{ fontSize: 10, fontWeight: "500", color: "rgba(255,255,255,0.25)", marginTop: 4, textAlign: "center" }}>
-        {day}
-      </Text>
+      <View style={{ alignItems: "center", marginTop: 4 }}>
+        <Text style={{ fontSize: 10, fontWeight: "500", color: "rgba(255,255,255,0.25)", textAlign: "center" }}>
+          {day}
+        </Text>
+        {isNextLocked && <InlineCountdown />}
+      </View>
     );
   }
 
@@ -718,6 +753,7 @@ function SCurvePathView({
                     isToday={isToday}
                     isCrown={isCrown && !isToday}
                     isMilestoneNode={isMilestoneNode}
+                    isNextLocked={day === goalDayNumber + 1 && isLocked}
                     colors={colors}
                     allDoneToday={allDone}
                     workAheadReady={isWorkAhead}
@@ -1680,25 +1716,14 @@ export default function DashboardScreen() {
   const streak = getStreakFromGoals(effectiveGoals);
   const goalDayNumber = currentGoalObj ? getGoalDayNumber(currentGoalObj) : 1;
 
-  // Gap 1 — completion-gated next-day unlock.
-  // The calendar day can advance at midnight, but if the loaded tasks are for
-  // an earlier day AND are not all done, the user should still perceive that
-  // earlier day as "today". We derive the effective day from the loaded task's
-  // date so it never bumps past an unfinished day.
-  const effectiveDayNumber = (() => {
-    if (!currentGoalObj) return goalDayNumber;
-    const dt = visibleTasks[0];
-    if (!dt || allDone) return goalDayNumber;
-    // Compute goal day from the DailyTask.date (local midnight diff)
-    const created = new Date(currentGoalObj.createdAt);
-    const createdLocal = new Date(created.getFullYear(), created.getMonth(), created.getDate());
-    const taskDate = new Date(dt.date);
-    const taskLocal = new Date(taskDate.getFullYear(), taskDate.getMonth(), taskDate.getDate());
-    const diffDays = Math.floor((taskLocal.getTime() - createdLocal.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-    const derived = Math.max(1, diffDays);
-    // Cap at calendar to avoid future-dated tasks bumping the path
-    return Math.min(derived, goalDayNumber);
-  })();
+  // Path day number — always the raw calendar day since goal.createdAt,
+  // matching web (apps/web/app/(app)/dashboard/page.tsx → getGoalDayNumber).
+  // Previous "effectiveDayNumber" capped this down to the loaded task's day
+  // which caused mobile to show "Day 6" while web (same account) showed
+  // "Day 7" right after midnight. Parity > the cap's stale-task guard; when
+  // tasks for today haven't loaded yet, loadData()'s next 60s tick or
+  // app-focus refetch resolves it.
+  const effectiveDayNumber = goalDayNumber;
 
   // Task progress for progress ring (0-1)
   const taskProgress = newTaskItems.length > 0
