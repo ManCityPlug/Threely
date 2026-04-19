@@ -608,24 +608,36 @@ function SCurvePathView({
   // above it. 170px gives ~50px visual gap even at the tightest cluster.
   const nodeSpacing = 170;
 
-  // Scroll to today's node. Uses a ref-tracked trigger so onContentSizeChange
-  // can run the scroll once the ScrollView has actually laid out its children
-  // (scrollTo is a no-op before measurement on iOS). Don't depend on the
-  // re-created `days` array — it thrashes the effect and the setTimeout
-  // keeps getting cleared before firing.
+  // Scroll to today's node. scrollTo on a just-focused/just-mounted ScrollView
+  // is a no-op on iOS until content is measured AND the view is actually on
+  // screen. We belt-and-suspenders this:
+  //  - onContentSizeChange fires after initial layout (first mount)
+  //  - a queued rAF + short-timeout cascade covers re-focus of a tab that
+  //    stayed mounted (content size didn't change → onContentSizeChange won't
+  //    fire, but we still need to re-center on today)
+  // Don't depend on the re-created `days` array — it thrashes the effect and
+  // the setTimeout keeps getting cleared before firing.
   const pendingScrollRef = useRef(false);
-  const scrollToToday = useCallback(() => {
+  const scrollToToday = useCallback((animated: boolean = true) => {
     const todayIndex = goalDayNumber - windowStart;
     if (todayIndex < 0 || todayIndex >= VISIBLE_NODES) return;
     const scrollTarget = Math.max(0, todayIndex * nodeSpacing - 180);
-    scrollRef.current?.scrollTo({ y: scrollTarget, animated: true });
+    scrollRef.current?.scrollTo({ y: scrollTarget, animated });
   }, [goalDayNumber, windowStart, nodeSpacing]);
 
   useEffect(() => {
     pendingScrollRef.current = true;
-    // Attempt immediately; if content isn't measured yet, onContentSizeChange
-    // will run scrollToToday as soon as it is.
-    scrollToToday();
+    // Try immediately, on next frame, and again after a short delay to cover:
+    //   (a) first mount before layout measurement
+    //   (b) tab re-focus where content size didn't change
+    //   (c) iOS queuing scrollTo until the view is on screen
+    scrollToToday(false);
+    const raf = requestAnimationFrame(() => scrollToToday(false));
+    const t = setTimeout(() => scrollToToday(true), 250);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearTimeout(t);
+    };
   }, [goalDayNumber, scrollTrigger, scrollToToday]);
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -2199,7 +2211,7 @@ export default function DashboardScreen() {
             {/* S-curve path */}
             <SCurvePathView
               goalDayNumber={effectiveDayNumber}
-              allDone={allDone && celebrationDismissed}
+              allDone={allDone}
               startedDays={startedDays}
               scrollTrigger={pathScrollTrigger}
               onTapToday={() => {
