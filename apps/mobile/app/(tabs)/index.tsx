@@ -17,8 +17,6 @@ import {
   LayoutAnimation,
   UIManager,
   useWindowDimensions,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   InteractionManager,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -545,6 +543,7 @@ function SCurvePathView({
   onTapCompleted,
   colors,
   screenWidth,
+  screenHeight,
   taskProgress,
   startedDays,
   scrollTrigger,
@@ -557,12 +556,12 @@ function SCurvePathView({
   onTapCompleted: (day: number) => void;
   colors: Colors;
   screenWidth: number;
+  screenHeight: number;
   taskProgress: number;
   startedDays: Set<number>;
   scrollTrigger: number;
 }) {
-  const scrollRef = useRef<ScrollView>(null);
-  const [showScrollHint, setShowScrollHint] = useState(true);
+  const { scrollToOffset } = useWalkthroughRegistry();
 
   // Stage system: 20 nodes per stage (1-20, 21-40, 41-60, ...) — match web PathView
   const VISIBLE_NODES = 20;
@@ -581,33 +580,38 @@ function SCurvePathView({
   // above it. 170px gives ~50px visual gap even at the tightest cluster.
   const nodeSpacing = 170;
 
-  // Scroll to today's node — mirrors web PathView: we know the exact y of the
-  // today node from the deterministic path layout (40 + todayIndex*nodeSpacing)
-  // so no measurement is needed. Viewport height is captured via onLayout.
-  // Multiple fire windows cover the various tab-switch / mount / focus timings
-  // where the ScrollView may not be ready at the first call.
-  const viewportHeightRef = useRef<number>(0);
+  // Scroll-to-today via the OUTER "today-scroll" ScrollView registered in the
+  // walkthrough registry. The old implementation used a nested inner ScrollView
+  // whose scrollTo calls never moved the screen (RN: nested ScrollViews of the
+  // same axis break — only the outer one actually scrolls). Now we compute
+  // the today node's absolute Y inside the outer scroll content by summing:
+  //   (a) this component's own y offset (onLayout)
+  //   (b) the node's y within the path layout (40 + todayIndex*nodeSpacing)
+  // Viewport height is approximated from screenHeight minus header+tabbar chrome.
+  const containerYRef = useRef<number>(0);
   const todayIndex = goalDayNumber - windowStart;
   const todayY = 40 + todayIndex * nodeSpacing;
   const TODAY_NODE_SIZE = 68;
+  // Approximate outer-scroll viewport: screen minus top safe area + header
+  // (~60px) + goal tabs (~50px) + tab bar (~80px). Being ~20px off just moves
+  // today a hair off center — still visible. Web uses +36 offset; we use +34.
+  const approxViewportH = Math.max(300, screenHeight - 190);
 
   const scrollToToday = useCallback((animated: boolean = true) => {
-    if (viewportHeightRef.current === 0) return;
-    const scrollTarget = todayY - viewportHeightRef.current / 2 + TODAY_NODE_SIZE / 2;
-    scrollRef.current?.scrollTo({ y: Math.max(0, scrollTarget), animated });
-  }, [todayY]);
+    const absoluteY = containerYRef.current + todayY;
+    const target = absoluteY - approxViewportH / 2 + TODAY_NODE_SIZE / 2;
+    scrollToOffset("today-scroll", Math.max(0, target));
+  }, [todayY, approxViewportH, scrollToOffset]);
 
   useEffect(() => {
-    // Fire at multiple timing windows to cover every tab-switch scenario:
-    // - rAF: next paint (covers immediate re-focus where layout is ready)
-    // - 100ms: after most iOS animation easing
-    // - 300ms: after any screen transition animation
-    // - InteractionManager: after all interactions/animations settle
+    // Fire at multiple windows to cover every mount/focus scenario. The outer
+    // ScrollView may not have its ref registered at first rAF on cold launch,
+    // so we retry.
     let raf = 0;
     const fires: Array<ReturnType<typeof setTimeout>> = [];
     raf = requestAnimationFrame(() => scrollToToday(false));
-    fires.push(setTimeout(() => scrollToToday(true), 100));
-    fires.push(setTimeout(() => scrollToToday(true), 300));
+    fires.push(setTimeout(() => scrollToToday(true), 150));
+    fires.push(setTimeout(() => scrollToToday(true), 400));
     const interactionHandle = InteractionManager.runAfterInteractions(() => {
       scrollToToday(true);
     });
@@ -618,48 +622,26 @@ function SCurvePathView({
     };
   }, [goalDayNumber, scrollTrigger, scrollToToday]);
 
-  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
-    if (contentOffset.y + layoutMeasurement.height >= contentSize.height - 50) {
-      setShowScrollHint(false);
-    }
-  };
-
   return (
     <View
-      style={{ flex: 1, position: "relative" }}
+      style={{ width: "100%", position: "relative", paddingTop: 30, paddingBottom: 60 }}
       onLayout={(e) => {
-        const h = e.nativeEvent.layout.height;
-        // Guard against transient 0-height layouts during tab transitions —
-        // we only overwrite once we have a real viewport.
-        if (h > 0) {
-          const wasUnset = viewportHeightRef.current === 0;
-          viewportHeightRef.current = h;
-          // If this is the first valid layout, fire scroll now so the first
-          // frame the user sees after opening/focusing is already centered.
-          if (wasUnset) scrollToToday(false);
-        }
+        const y = e.nativeEvent.layout.y;
+        const wasUnset = containerYRef.current === 0;
+        containerYRef.current = y;
+        // First valid layout — fire scroll so the first visible frame is centered.
+        if (wasUnset || y > 0) scrollToToday(false);
       }}
     >
-      <ScrollView
-        ref={scrollRef}
-        showsVerticalScrollIndicator={false}
-        onScroll={handleScroll}
-        scrollEventThrottle={100}
-        onContentSizeChange={() => scrollToToday(false)}
-        contentContainerStyle={{
-          paddingTop: 30,
-          paddingBottom: 80,
-          minHeight: days.length * nodeSpacing + 100,
-        }}
-      >
-        <View style={{
-          width: pathWidth,
-          alignSelf: "center",
-          position: "relative",
-          height: days.length * nodeSpacing + 60,
-        }}>
-          {days.map((day, i) => {
+      {/* Path field — rendered in outer scroll coordinate space. No nested
+          ScrollView (that blocked scroll on iOS). */}
+      <View style={{
+        width: pathWidth,
+        alignSelf: "center",
+        position: "relative",
+        height: days.length * nodeSpacing + 60,
+      }}>
+        {days.map((day, i) => {
             const isCompleted = day < goalDayNumber;
             const isToday = day === goalDayNumber;
             const isWorkAhead = day === goalDayNumber + 1 && allDone;
@@ -741,8 +723,11 @@ function SCurvePathView({
                     workAheadReady={isWorkAhead}
                     taskProgress={taskProgress}
                     onPress={
+                      // Today is always tappable — matches web. When all done,
+                      // the tasks view opens in read-only visual state (toggles
+                      // show completed). Previously a hard gate swallowed the
+                      // tap silently when allDone was true.
                       isToday ? () => {
-                        if (allDone) return;
                         if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                         onTapToday();
                       }
@@ -760,46 +745,7 @@ function SCurvePathView({
             );
           })}
         </View>
-      </ScrollView>
-
-      {/* Scroll hint arrow */}
-      {showScrollHint && (
-        <View style={{
-          position: "absolute",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 50,
-          alignItems: "center",
-          justifyContent: "flex-end",
-          paddingBottom: 8,
-          pointerEvents: "none",
-        }}>
-          <ScrollArrow />
-        </View>
-      )}
     </View>
-  );
-}
-
-function ScrollArrow() {
-  const bounceAnim = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const anim = Animated.loop(
-      Animated.sequence([
-        Animated.timing(bounceAnim, { toValue: 4, duration: 750, useNativeDriver: true }),
-        Animated.timing(bounceAnim, { toValue: 0, duration: 750, useNativeDriver: true }),
-      ])
-    );
-    anim.start();
-    return () => anim.stop();
-  }, [bounceAnim]);
-
-  return (
-    <Animated.View style={{ transform: [{ translateY: bounceAnim }] }}>
-      <Text style={{ fontSize: 20, color: "rgba(255,255,255,0.35)" }}>{"▼"}</Text>
-    </Animated.View>
   );
 }
 
@@ -1373,7 +1319,7 @@ export default function DashboardScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const isWide = screenWidth >= 768;
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { showToast } = useToast();
@@ -1415,6 +1361,17 @@ export default function DashboardScreen() {
   const [stageCelebrationNumber, setStageCelebrationNumber] = useState(1);
   // Auto-generation failure (Fix 1): show retry UI when background gen fails
   const [autoGenFailed, setAutoGenFailed] = useState(false);
+
+  // ─── Work-ahead state ──────────────────────────────────────────────────────
+  // Mirrors web: when the user confirms work-ahead on the Day+1 node, we fetch
+  // (or generate) tomorrow's DailyTask records for the selected goal and stash
+  // them here. The tasks view branches on this: if present, it renders these
+  // tasks with a "Day N+1" header and toggles them via handleToggleTask.
+  const [workAheadTasks, setWorkAheadTasks] = useState<DailyTask[] | null>(null);
+  const [workAheadDate, setWorkAheadDate] = useState<string | null>(null);
+  const [loadingWorkAhead, setLoadingWorkAhead] = useState(false);
+  // Suppress unused-var warning for loadingWorkAhead (reserved for future spinner).
+  void loadingWorkAhead;
 
   // ─── Pro / trial state ────────────────────────────────────────────────────────
   const { hasPro, isLimitedMode, walkthroughActive, refreshSubscription } = useSubscription();
@@ -1748,6 +1705,19 @@ export default function DashboardScreen() {
     ? newTaskItems.filter(t => t.isCompleted || t.isSkipped).length / newTaskItems.length
     : 0;
 
+  // Clear stale work-ahead tasks when the real day rolls over (so yesterday's
+  // "Day N+1" tasks don't bleed into today's path) or when the user switches
+  // goals (work-ahead is per-goal).
+  const workAheadClearDepRef = useRef<string>("");
+  useEffect(() => {
+    const key = `${effectiveSelectedGoal}:${effectiveDayNumber}`;
+    if (workAheadClearDepRef.current && workAheadClearDepRef.current !== key) {
+      setWorkAheadTasks(null);
+      setWorkAheadDate(null);
+    }
+    workAheadClearDepRef.current = key;
+  }, [effectiveSelectedGoal, effectiveDayNumber]);
+
   // Gap 2 — load persisted "started" days when goal changes
   useEffect(() => {
     if (!effectiveSelectedGoal) { setStartedDays(new Set()); return; }
@@ -1957,8 +1927,19 @@ export default function DashboardScreen() {
 
     try {
       const res = await tasksApi.completeItem(dailyTaskId, taskItemId, isCompleted);
-      const newDailyTasks = dailyTasks.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt));
-      setDailyTasks(newDailyTasks);
+      // Update whichever state holds this DailyTask — regular today-tasks or
+      // work-ahead tasks (tomorrow's tasks fetched when user entered work-ahead
+      // mode). Using `some` to decide avoids updating the wrong list.
+      setDailyTasks((prev) =>
+        prev.some((dt) => dt.id === dailyTaskId)
+          ? prev.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt))
+          : prev
+      );
+      setWorkAheadTasks((prev) =>
+        prev && prev.some((dt) => dt.id === dailyTaskId)
+          ? prev.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt))
+          : prev
+      );
       // Notifications disabled
     } catch {
       showToast("Couldn't update task. Try again.", "error");
@@ -2209,11 +2190,24 @@ export default function DashboardScreen() {
                 setViewMode("tasks");
               }}
               onTapWorkAhead={async () => {
+                if (!effectiveSelectedGoal) return;
                 const todayStr = new Date().toLocaleDateString("en-CA");
                 const aheadKey = `@threely_ahead_${todayStr}_${effectiveSelectedGoal}_d${goalDayNumber}`;
+
+                // If we already have work-ahead tasks loaded (user went back to
+                // the path then tapped the node again), just re-open them —
+                // don't re-fetch or re-prompt.
+                if (workAheadTasks && workAheadTasks.length > 0) {
+                  setViewMode("tasks");
+                  return;
+                }
+
+                // If user already burned their one work-ahead for the day
+                // without us having tasks in memory (e.g. app restart), show
+                // the "already done" message — matches web's locked-timer
+                // modal UX.
                 const used = await AsyncStorage.getItem(aheadKey);
                 if (used) {
-                  // Compute hours until midnight
                   const now = new Date();
                   const midnight = new Date();
                   midnight.setHours(24, 0, 0, 0);
@@ -2223,6 +2217,7 @@ export default function DashboardScreen() {
                   Alert.alert("Nice work today!", `You've already worked ahead once today.\nNext day unlocks in ${h}h ${m}m.`);
                   return;
                 }
+
                 Alert.alert(
                   "Work Ahead",
                   "We recommend doing one day's work per day. Want to work ahead?",
@@ -2231,9 +2226,50 @@ export default function DashboardScreen() {
                     {
                       text: "Work ahead",
                       onPress: async () => {
-                        await AsyncStorage.setItem(aheadKey, "true");
-                        markDayStarted(effectiveDayNumber + 1);
-                        setViewMode("tasks");
+                        // Compute tomorrow's local date (matches web's
+                        // getDayDateStr(goal, goalDayNumber + 1)).
+                        const tomorrow = new Date();
+                        tomorrow.setDate(tomorrow.getDate() + 1);
+                        const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+
+                        setLoadingWorkAhead(true);
+                        try {
+                          // 1) Try existing DailyTask records for tomorrow
+                          let goalTasks: DailyTask[] = [];
+                          try {
+                            const existing = await tasksApi.today(false, tomorrowStr);
+                            goalTasks = existing.dailyTasks.filter((dt) => dt.goalId === effectiveSelectedGoal);
+                          } catch {
+                            goalTasks = [];
+                          }
+                          // 2) Generate if none exist yet
+                          if (goalTasks.length === 0) {
+                            const gen = await tasksApi.generate(effectiveSelectedGoal, { localDate: tomorrowStr });
+                            goalTasks = (gen.dailyTasks || []).filter((dt) => dt.goalId === effectiveSelectedGoal);
+                          }
+                          if (goalTasks.length === 0) {
+                            Alert.alert("Couldn't load tomorrow's tasks", "Please try again in a moment.");
+                            return;
+                          }
+                          // Successfully loaded — THEN flip the state. Setting
+                          // the aheadKey before now would mean a failed load
+                          // still burned the user's one work-ahead.
+                          setWorkAheadTasks(goalTasks);
+                          setWorkAheadDate(tomorrowStr);
+                          await AsyncStorage.setItem(aheadKey, "true");
+                          markDayStarted(effectiveDayNumber + 1);
+                          setViewMode("tasks");
+                        } catch (e) {
+                          const msg = e instanceof Error && e.message?.includes("pro_required")
+                            ? "This requires Threely Pro."
+                            : "Couldn't load tomorrow's tasks. Please try again.";
+                          Alert.alert("Work ahead", msg);
+                          if (e instanceof Error && e.message?.includes("pro_required")) {
+                            setShowPaywall(true);
+                          }
+                        } finally {
+                          setLoadingWorkAhead(false);
+                        }
                       },
                     },
                   ]
@@ -2275,38 +2311,69 @@ export default function DashboardScreen() {
               }}
               colors={colors}
               screenWidth={screenWidth}
+              screenHeight={screenHeight}
               taskProgress={taskProgress}
             />
           </>
         ) : (
           /* ═══ TASK VIEW ═══ */
-          <>
-            {/* Back to path */}
-            <TouchableOpacity
-              onPress={() => {
-                if (Platform.OS !== "web") Haptics.selectionAsync();
-                setViewMode("path");
-              }}
-              activeOpacity={0.7}
-              style={styles.backButton}
-            >
-              <Text style={styles.backButtonText}>{"←"} Back to path</Text>
-            </TouchableOpacity>
-
-            {/* Day heading */}
-            <View style={styles.dayLabelContainer}>
-              <Text style={styles.dayLabel}>Day {goalDayNumber}</Text>
-            </View>
-
-            {/* Task cards — always shown, read-only when all done */}
-            {(
+          (() => {
+            // Work-ahead branch: if user entered work-ahead mode, render the
+            // tomorrow-DailyTasks we fetched (with Day N+1 header) instead of
+            // today's tasks. Toggles flow through the same handleToggleTask
+            // path — it routes to setWorkAheadTasks vs setDailyTasks based on
+            // which state owns the DailyTask id.
+            const inWorkAhead = !!(workAheadTasks && workAheadTasks.length > 0);
+            const activeTasks = inWorkAhead
+              ? workAheadTasks!.map((dt) => ({
+                  ...dt,
+                  tasks: (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).slice(-3),
+                }))
+              : displayVisibleTasks;
+            const activeDayNumber = inWorkAhead ? goalDayNumber + 1 : goalDayNumber;
+            const activeAllDone = inWorkAhead
+              ? activeTasks.every((dt) =>
+                  (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).every((t) => t.isCompleted)
+                )
+              : allDone;
+            return (
               <>
-                {displayVisibleTasks.map((dt) => (
+                {/* Back to path */}
+                <TouchableOpacity
+                  onPress={() => {
+                    if (Platform.OS !== "web") Haptics.selectionAsync();
+                    setViewMode("path");
+                  }}
+                  activeOpacity={0.7}
+                  style={styles.backButton}
+                >
+                  <Text style={styles.backButtonText}>{"←"} Back to path</Text>
+                </TouchableOpacity>
+
+                {/* Day heading */}
+                <View style={styles.dayLabelContainer}>
+                  <Text style={styles.dayLabel}>Day {activeDayNumber}</Text>
+                  {inWorkAhead && (
+                    <Text style={{
+                      fontSize: typography.xs,
+                      fontWeight: "700",
+                      color: GOLD,
+                      textTransform: "uppercase",
+                      letterSpacing: 0.8,
+                      marginTop: 4,
+                    }}>
+                      Working ahead
+                    </Text>
+                  )}
+                </View>
+
+                {/* Task cards — always shown, read-only when all done */}
+                {activeTasks.map((dt) => (
                   <View key={dt.id} style={{ marginBottom: 0 }}>
                     {(Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).map((task) => (
                       <View
                         key={task.id}
-                        ref={newTaskItems.indexOf(task) === 0 ? r => register("first-task-card", r) : undefined}
+                        ref={!inWorkAhead && newTaskItems.indexOf(task) === 0 ? r => register("first-task-card", r) : undefined}
                         collapsable={false}
                         style={{ marginBottom: spacing.sm + 4 }}
                       >
@@ -2317,7 +2384,7 @@ export default function DashboardScreen() {
                           }
                           colors={colors}
                           isAnimating={animatingTaskId === task.id}
-                          readOnly={allDone}
+                          readOnly={activeAllDone}
                           paywalled={!hasPro && !walkthroughActive}
                           onPaywall={() => setShowPaywall(true)}
                         />
@@ -2326,8 +2393,8 @@ export default function DashboardScreen() {
                   </View>
                 ))}
               </>
-            )}
-          </>
+            );
+          })()
         )}
       </ScrollView>
 
