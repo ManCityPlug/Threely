@@ -19,6 +19,7 @@ import {
   useWindowDimensions,
   NativeScrollEvent,
   NativeSyntheticEvent,
+  InteractionManager,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SwipeNavigator } from "@/components/SwipeNavigator";
@@ -155,8 +156,13 @@ function isMilestone(day: number): boolean {
   return MILESTONE_DAYS.includes(day);
 }
 
-// ─── Progress Ring (simple View-based) ────────────────────────────────────────
-
+// ─── Progress Ring (View-based, mirrors web's SVG ring visually) ─────────────
+// Web draws an SVG stroke ring at radius = size/2 + 6. When allDoneToday
+// (progress=1) the full gold ring is visible; otherwise only the faint track.
+// We match that visual with pure Views (no SVG dep): a track ring plus a
+// gold ring that only renders at 100%. Partial-progress split-circle hack
+// removed — it never rendered cleanly on RN and the app only ever surfaces
+// 0% or 100% in practice (tasks view tracks per-task progress separately).
 function NodeProgressRing({
   size,
   progress,
@@ -169,19 +175,21 @@ function NodeProgressRing({
   trackColor: string;
 }) {
   const borderW = 3;
-  const ringSize = size + 14;
-  // Simple ring using border approach. For RN without SVG, use two half-circles.
-  const pct = Math.min(100, Math.max(0, progress * 100));
-  const rightRotation = pct <= 50 ? (pct / 50) * 180 : 180;
-  const leftRotation = pct > 50 ? ((pct - 50) / 50) * 180 : 0;
+  const ringSize = size + 20; // matches web's visual offset
+  const isFull = progress >= 0.999;
 
   return (
-    <View style={{
-      position: "absolute",
-      width: ringSize,
-      height: ringSize,
-    }}>
-      {/* Track */}
+    <View
+      pointerEvents="none"
+      style={{
+        position: "absolute",
+        width: ringSize,
+        height: ringSize,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {/* Track (always shown, like web) */}
       <View style={{
         position: "absolute",
         width: ringSize,
@@ -190,53 +198,16 @@ function NodeProgressRing({
         borderWidth: borderW,
         borderColor: trackColor,
       }} />
-      {/* Right half 0-180 */}
-      <View style={{
-        position: "absolute",
-        top: 0,
-        left: ringSize / 2,
-        width: ringSize / 2,
-        height: ringSize,
-        overflow: "hidden",
-      }}>
+      {/* Gold progress ring — only when 100% complete (matches web's progress=1) */}
+      {isFull && (
         <View style={{
           position: "absolute",
-          top: 0,
-          left: -(ringSize / 2),
           width: ringSize,
           height: ringSize,
           borderRadius: ringSize / 2,
           borderWidth: borderW,
           borderColor: color,
-          borderLeftColor: "transparent",
-          borderBottomColor: "transparent",
-          transform: [{ rotate: `${rightRotation}deg` }],
         }} />
-      </View>
-      {/* Left half 180-360 */}
-      {pct > 50 && (
-        <View style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: ringSize / 2,
-          height: ringSize,
-          overflow: "hidden",
-        }}>
-          <View style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            width: ringSize,
-            height: ringSize,
-            borderRadius: ringSize / 2,
-            borderWidth: borderW,
-            borderColor: color,
-            borderLeftColor: "transparent",
-            borderBottomColor: "transparent",
-            transform: [{ rotate: `${leftRotation}deg` }],
-          }} />
-        </View>
       )}
     </View>
   );
@@ -610,24 +581,41 @@ function SCurvePathView({
   // above it. 170px gives ~50px visual gap even at the tightest cluster.
   const nodeSpacing = 170;
 
-  // Scroll to today's node — mirrors web PathView exactly: captures the
-  // today node's actual y position via onLayout (equivalent to web's
-  // todayRef.offsetTop) and scrolls so it sits centered in the viewport.
-  // Firing on mount + scrollTrigger (focus) + dayNumber change matches web.
-  const todayYRef = useRef<number | null>(null);
+  // Scroll to today's node — mirrors web PathView: we know the exact y of the
+  // today node from the deterministic path layout (40 + todayIndex*nodeSpacing)
+  // so no measurement is needed. Viewport height is captured via onLayout.
+  // Multiple fire windows cover the various tab-switch / mount / focus timings
+  // where the ScrollView may not be ready at the first call.
   const viewportHeightRef = useRef<number>(0);
+  const todayIndex = goalDayNumber - windowStart;
+  const todayY = 40 + todayIndex * nodeSpacing;
+  const TODAY_NODE_SIZE = 68;
+
   const scrollToToday = useCallback((animated: boolean = true) => {
-    if (todayYRef.current == null || viewportHeightRef.current === 0) return;
-    const nodeSize = 68; // today node diameter
-    const scrollTarget = todayYRef.current - viewportHeightRef.current / 2 + nodeSize / 2;
+    if (viewportHeightRef.current === 0) return;
+    const scrollTarget = todayY - viewportHeightRef.current / 2 + TODAY_NODE_SIZE / 2;
     scrollRef.current?.scrollTo({ y: Math.max(0, scrollTarget), animated });
-  }, []);
+  }, [todayY]);
 
   useEffect(() => {
-    // 250ms delay matches web. Retry on next frame and again after layout
-    // settles to cover iOS queueing scrollTo before the view is on screen.
-    const t = setTimeout(() => scrollToToday(true), 250);
-    return () => clearTimeout(t);
+    // Fire at multiple timing windows to cover every tab-switch scenario:
+    // - rAF: next paint (covers immediate re-focus where layout is ready)
+    // - 100ms: after most iOS animation easing
+    // - 300ms: after any screen transition animation
+    // - InteractionManager: after all interactions/animations settle
+    let raf = 0;
+    const fires: Array<ReturnType<typeof setTimeout>> = [];
+    raf = requestAnimationFrame(() => scrollToToday(false));
+    fires.push(setTimeout(() => scrollToToday(true), 100));
+    fires.push(setTimeout(() => scrollToToday(true), 300));
+    const interactionHandle = InteractionManager.runAfterInteractions(() => {
+      scrollToToday(true);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      fires.forEach((t) => clearTimeout(t));
+      interactionHandle.cancel?.();
+    };
   }, [goalDayNumber, scrollTrigger, scrollToToday]);
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -640,7 +628,18 @@ function SCurvePathView({
   return (
     <View
       style={{ flex: 1, position: "relative" }}
-      onLayout={(e) => { viewportHeightRef.current = e.nativeEvent.layout.height; }}
+      onLayout={(e) => {
+        const h = e.nativeEvent.layout.height;
+        // Guard against transient 0-height layouts during tab transitions —
+        // we only overwrite once we have a real viewport.
+        if (h > 0) {
+          const wasUnset = viewportHeightRef.current === 0;
+          viewportHeightRef.current = h;
+          // If this is the first valid layout, fire scroll now so the first
+          // frame the user sees after opening/focusing is already centered.
+          if (wasUnset) scrollToToday(false);
+        }
+      }}
     >
       <ScrollView
         ref={scrollRef}
@@ -710,14 +709,8 @@ function SCurvePathView({
                   </View>
                 )}
 
-                {/* Node positioned absolutely */}
-                {isToday && (() => {
-                  // Capture today node's y in the content (equivalent to
-                  // web's todayRef.offsetTop). yPos is deterministic, so no
-                  // measurement needed.
-                  todayYRef.current = yPos;
-                  return null;
-                })()}
+                {/* Node positioned absolutely.
+                    yPos (40 + i*nodeSpacing) matches todayY used by scroll. */}
                 <View style={{
                   position: "absolute",
                   top: yPos,
