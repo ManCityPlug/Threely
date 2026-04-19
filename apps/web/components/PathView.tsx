@@ -161,16 +161,20 @@ export default function PathView({
 
   function handleNodeClick(day: number, nodeType: "completed" | "today" | "next" | "locked") {
     if (nodeType === "today") {
-      // Mark the day as started so the badge flips to CONTINUE on return from
-      // the tasks view. Covers the case where the user taps the node itself
-      // instead of the START popup above it.
       if (day === dayNumber) markStarted();
       if (onStartDay) onStartDay();
       else onDayClick(day, nodeType);
       return;
     }
     if (nodeType === "locked") {
-      setLockedModal(true);
+      // Only the immediate next day (dayNumber + 1) is interactive when
+      // locked — it surfaces the unlock-timer modal via the parent. Any
+      // further future day (including the crown / last visible) is no-op
+      // so users can't reach the generic "complete current day first"
+      // message from nodes they'll never legitimately tap.
+      if (day === dayNumber + 1) {
+        onDayClick(day, "locked");
+      }
       return;
     }
     onDayClick(day, nodeType);
@@ -580,6 +584,10 @@ export default function PathView({
                   <button
                     data-today-node={isToday ? "true" : undefined}
                     onClick={() => handleNodeClick(day, nodeType)}
+                    // Lock out every locked node that isn't the immediate
+                    // next day. Prevents the crown + all further future
+                    // days from swallowing taps and surfacing modals.
+                    disabled={nodeType === "locked" && day !== dayNumber + 1}
                     className="path-node-btn"
                     aria-label={crown ? "Huge Progress" : `Day ${day}`}
                     style={{

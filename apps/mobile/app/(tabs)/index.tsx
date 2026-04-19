@@ -473,7 +473,13 @@ function PathNode({
     <View style={{ alignItems: "center" }}>
       <TouchableOpacity
         onPress={onPress}
-        disabled={isLocked && !isWorkAhead && !isCrown}
+        // Only the NEXT locked day (day+1) is tappable among locked/future
+        // nodes. Today's node, completed days, and the work-ahead node are
+        // tappable via their own branches. The crown is intentionally NOT
+        // tappable — the whitelist used to include it, which is why tapping
+        // the far-future day surfaced the generic "complete current day
+        // first" alert the user reported.
+        disabled={isLocked && !isWorkAhead && !isNextLocked}
         activeOpacity={0.7}
         style={{ alignItems: "center" }}
       >
@@ -610,10 +616,10 @@ function SCurvePathView({
 
   // Path container width (leave margin on each side)
   const pathWidth = Math.min(screenWidth - 40, screenWidth >= 768 ? 600 : 500);
-  // Spacing between nodes — must fit node (68px max) + START badge/label (~55px)
-  // + small breathing room so the badge above one node never touches the node
-  // above it. 170px gives ~50px visual gap even at the tightest cluster.
-  const nodeSpacing = 170;
+  // Spacing between nodes — matches web PathView (130px) so mobile looks as
+  // dense as web. Previously 170px which left huge gaps (visible as extra
+  // black space between consecutive locked nodes).
+  const nodeSpacing = 130;
 
   // Scroll-to-today via the OUTER "today-scroll" ScrollView registered in the
   // walkthrough registry. The old implementation used a nested inner ScrollView
@@ -659,7 +665,7 @@ function SCurvePathView({
 
   return (
     <View
-      style={{ width: "100%", position: "relative", paddingTop: 30, paddingBottom: 60 }}
+      style={{ width: "100%", position: "relative", paddingTop: 20, paddingBottom: 20 }}
       onLayout={(e) => {
         const y = e.nativeEvent.layout.y;
         const wasUnset = containerYRef.current === 0;
