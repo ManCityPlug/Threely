@@ -1468,6 +1468,7 @@ function DashboardPageInner() {
 
               {/* Path View */}
               <PathView
+                goalId={effectiveSelectedGoalId}
                 dayNumber={pathDayNumber}
                 completedDays={pathCompletedDays}
                 onDayClick={async (day, type) => {

@@ -12,6 +12,7 @@ interface PathViewProps {
   totalTasks: number;
   onStartDay?: () => void;
   tasksVisible?: boolean;
+  goalId?: string | null;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -63,6 +64,7 @@ export default function PathView({
   totalTasks,
   onStartDay,
   tasksVisible,
+  goalId,
 }: PathViewProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const todayRef = useRef<HTMLDivElement>(null);
@@ -159,6 +161,10 @@ export default function PathView({
 
   function handleNodeClick(day: number, nodeType: "completed" | "today" | "next" | "locked") {
     if (nodeType === "today") {
+      // Mark the day as started so the badge flips to CONTINUE on return from
+      // the tasks view. Covers the case where the user taps the node itself
+      // instead of the START popup above it.
+      if (day === dayNumber) markStarted();
       if (onStartDay) onStartDay();
       else onDayClick(day, nodeType);
       return;
@@ -282,14 +288,28 @@ export default function PathView({
 
   // ─── Today popup ──────────────────────────────────────────────────────────
 
+  // "Started" state is persisted in localStorage per (goalId, dayNumber) so the
+  // CONTINUE badge survives the unmount/remount cycle that happens when the
+  // user clicks START, goes to the tasks view, and comes back. Previous
+  // implementation used local useState which was destroyed on unmount — that's
+  // why the badge kept flipping back to START. Mirrors the mobile
+  // AsyncStorage approach at apps/mobile/app/(tabs)/index.tsx:1741 so web and
+  // mobile use the same storage key shape.
+  const startedStorageKey = goalId ? `@threely_started_${goalId}_d${dayNumber}` : null;
   const [startedOnce, setStartedOnce] = useState(false);
-  const prevDayNumber = useRef(dayNumber);
   useEffect(() => {
-    if (dayNumber !== prevDayNumber.current) {
+    if (typeof window === "undefined" || !startedStorageKey) {
       setStartedOnce(false);
-      prevDayNumber.current = dayNumber;
+      return;
     }
-  }, [dayNumber]);
+    setStartedOnce(window.localStorage.getItem(startedStorageKey) === "1");
+  }, [startedStorageKey]);
+  const markStarted = () => {
+    setStartedOnce(true);
+    if (typeof window !== "undefined" && startedStorageKey) {
+      try { window.localStorage.setItem(startedStorageKey, "1"); } catch {}
+    }
+  };
 
   function renderTodayPopup(day: number) {
     if (day !== dayNumber || allDoneToday) return null;
@@ -308,7 +328,7 @@ export default function PathView({
         }}
         onClick={(e) => {
           e.stopPropagation();
-          setStartedOnce(true);
+          markStarted();
           if (onStartDay) onStartDay();
           onDayClick(day, "today");
         }}
