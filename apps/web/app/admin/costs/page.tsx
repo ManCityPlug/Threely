@@ -20,9 +20,10 @@ const PRICING = {
 // work-ahead). Weekly summary runs once per user per week.
 //
 // Removed from this estimator (not part of the current mobile product):
-//   - goalChat       (legacy multi-turn onboarding chat)
-//   - refineTask     (per-task refine)
-//   - askAboutTask   (task Q&A)
+//   - goalChat              (legacy multi-turn onboarding chat — web onboarding only)
+//   - refineTask            (per-task refine — fully removed)
+//   - askAboutTask          (task Q&A — fully removed)
+//   - generateWeeklySummary (weekly coaching note — fully removed)
 const FUNCTIONS = [
   {
     name: "parseGoal",
@@ -51,15 +52,6 @@ const FUNCTIONS = [
     frequency: "Up to 3x per goal per 24h",
     description: "Generates 3 short daily tasks (under 2 min each, 1-2 sentences). Up to 3 calls per goal per 24h: initial daily + 1 \"Give me more\" + 1 work-ahead (Day N+1).",
   },
-  {
-    name: "generateWeeklySummary",
-    model: "deepseek" as const,
-    inputTokens: 1500,
-    outputTokens: 200,
-    source: "estimate",
-    frequency: "1x per user per week",
-    description: "Weekly progress summary with trends and a short recommendation.",
-  },
 ];
 
 function costPerCall(fn: typeof FUNCTIONS[number]): number {
@@ -87,17 +79,12 @@ function calculateCosts(goals: number) {
   const totalSetup = setupPerGoal * goals;
 
   // Daily recurring per goal (worst case — matches in-app limits).
-  // Only generateTasks runs daily. Refine / Ask were removed from the
-  // product so they no longer contribute.
+  // generateTasks is the ONLY ongoing LLM call in the current product.
   const generateTasksDaily = costPerCall(FN.generateTasks) * MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY;
   const dailyPerGoal = generateTasksDaily;
   const totalDaily = dailyPerGoal * goals;
 
-  // Weekly (per user, not per goal) — amortised to per-day for rollups
-  const weeklySummaryCost = costPerCall(FN.generateWeeklySummary);
-  const weeklyPerDay = weeklySummaryCost / 7;
-
-  const dailyTotal    = totalDaily + weeklyPerDay;
+  const dailyTotal    = totalDaily;
   const weeklyOngoing = dailyTotal * 7;
   const monthlyOngoing = dailyTotal * 30;
   const monthlyFirstMonth = monthlyOngoing + totalSetup;
@@ -313,7 +300,7 @@ export default function CostsPage() {
           Cost Per User by Number of Goals <span style={limitBadge}>Max {MAX_GOALS}</span>
         </h2>
         <p style={{ color: "#71717a", fontSize: "0.78rem", marginBottom: 16 }}>
-          Worst case: {MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} generateTasks calls/goal/24h (initial + &quot;Give me more&quot; + work-ahead) + weekly summary amortised. One-time setup per goal is parseGoal + generateRoadmap. Weekly and monthly figures are the per-day number × 7 / × 30.
+          Worst case: {MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} generateTasks calls/goal/24h (initial + &quot;Give me more&quot; + work-ahead). One-time setup per goal is parseGoal + generateRoadmap. Weekly and monthly figures are the per-day number × 7 / × 30. No other ongoing LLM calls in the current product.
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={tableStyle}>

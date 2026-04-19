@@ -139,12 +139,9 @@ const AI_PATHS = [
   "/api/goals/parse",
   "/api/goals/chat",
   "/api/tasks/generate",
-  "/api/summary/weekly",
-  "/api/summary/weekly-open",
 ];
 
 function isAiPath(path: string): boolean {
-  if (path.includes("/refine") || path.includes("/ask")) return true;
   return AI_PATHS.some((p) => path.startsWith(p));
 }
 
@@ -419,17 +416,6 @@ export const tasksApi = {
       body: JSON.stringify({ taskItemId, action: "edit", editData }),
     }),
 
-  refineItem: (dailyTaskId: string, taskItemId: string, userRequest: string) =>
-    apiFetch<{ dailyTask: DailyTask }>(`/api/tasks/${dailyTaskId}/refine`, {
-      method: "POST",
-      body: JSON.stringify({ taskItemId, userRequest }),
-    }),
-
-  askAboutTask: (dailyTaskId: string, taskItemId: string, messages: { role: "user" | "assistant"; content: string }[]) =>
-    apiFetch<{ answer: string; options: string[] }>(`/api/tasks/${dailyTaskId}/ask`, {
-      method: "POST",
-      body: JSON.stringify({ taskItemId, messages }),
-    }),
 };
 
 // ─── Focus API ───────────────────────────────────────────────────────────────
@@ -470,15 +456,6 @@ export interface HeatmapDay {
   percentage: number;
 }
 
-export interface WeeklySummary {
-  tasksCompleted: number;
-  tasksGenerated: number;
-  hoursInvested: number;
-  goalsWorkedOn: number;
-  dailyBreakdown: { date: string; completed: number; total: number }[];
-  insight?: string;
-}
-
 export const statsApi = {
   get: () => apiFetch<Stats>(`/api/stats?localDate=${new Date().toLocaleDateString("en-CA")}&_t=${Date.now()}`),
 
@@ -486,25 +463,6 @@ export const statsApi = {
     const tz = new Date().getTimezoneOffset(); // minutes offset from UTC
     return apiFetch<{ heatmap: HeatmapDay[] }>(`/api/stats/heatmap?days=${days}&tz=${tz}&_t=${Date.now()}`);
   },
-};
-
-export interface WeeklySummaryStatus {
-  status: "locked" | "ready" | "available" | "expired";
-  unlocksAt?: string;
-  weekStart?: string;
-  summary?: WeeklySummary;
-}
-
-export const summaryApi = {
-  weekly: (withInsight = false) =>
-    apiFetch<WeeklySummary>(`/api/summary/weekly${withInsight ? "?withInsight=true" : ""}`),
-  weeklyStatus: (tz: string) =>
-    apiFetch<WeeklySummaryStatus>(`/api/summary/weekly-status?tz=${encodeURIComponent(tz)}`),
-  weeklyOpen: (tz: string) =>
-    apiFetch<WeeklySummary>("/api/summary/weekly-open", {
-      method: "POST",
-      body: JSON.stringify({ tz }),
-    }),
 };
 
 // ─── Account API ──────────────────────────────────────────────────────────────

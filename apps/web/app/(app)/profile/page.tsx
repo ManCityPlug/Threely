@@ -4,10 +4,9 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getSupabase } from "@/lib/supabase-client";
 import { useAuth } from "@/lib/auth-context";
-import { tasksApi, statsApi, accountApi, summaryApi, subscriptionApi, goalsApi, type DailyTask, type Stats, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus, type SubscriptionStatus, type Goal } from "@/lib/api-client";
+import { tasksApi, statsApi, accountApi, subscriptionApi, goalsApi, type DailyTask, type Stats, type SubscriptionStatus, type Goal } from "@/lib/api-client";
 import { SkeletonStatCard, SkeletonCard } from "@/components/Skeleton";
 
-import WeeklySummaryModal from "@/components/WeeklySummary";
 import { useToast } from "@/components/ToastProvider";
 import { useSubscription } from "@/lib/subscription-context";
 
@@ -270,11 +269,6 @@ export default function ProfilePage() {
       if (pwSet === "true") setHasPassword(true);
     }
   }, [isOAuthProvider]);
-  const [showWeeklySummary, setShowWeeklySummary] = useState(false);
-  const [weeklyStatus, setWeeklyStatus] = useState<WeeklySummaryStatus | null>(null);
-  const [weeklyFrozenData, setWeeklyFrozenData] = useState<WeeklySummaryType | null>(null);
-  const [weeklyOpening, setWeeklyOpening] = useState(false);
-  const [countdown, setCountdown] = useState("");
   const [subStatus, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
   const [subTrialEnd, setSubTrialEnd] = useState<string | null>(null);
   const [subPeriodEnd, setSubPeriodEnd] = useState<string | null>(null);
@@ -371,60 +365,6 @@ export default function ProfilePage() {
     document.addEventListener("visibilitychange", onVisibility);
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, [load]);
-
-  // Weekly analysis status
-  useEffect(() => {
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    summaryApi.weeklyStatus(tz).then((res) => {
-      setWeeklyStatus(res);
-      if (res.status === "available" && res.summary) {
-        setWeeklyFrozenData(res.summary);
-      }
-    }).catch(() => {});
-  }, []);
-
-  // Countdown timer
-  useEffect(() => {
-    const unlocksAt = weeklyStatus?.unlocksAt;
-    if (!unlocksAt || (weeklyStatus?.status !== "locked" && weeklyStatus?.status !== "expired")) {
-      setCountdown("");
-      return;
-    }
-    function update() {
-      const diff = new Date(unlocksAt!).getTime() - Date.now();
-      if (diff <= 0) { setCountdown("Available now"); return; }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const mins = Math.floor((diff / (1000 * 60)) % 60);
-      if (days > 0) setCountdown(`Unlocks in ${days}d ${hours}h`);
-      else if (hours > 0) setCountdown(`Unlocks in ${hours}h ${mins}m`);
-      else setCountdown(`Unlocks in ${mins}m`);
-    }
-    update();
-    const interval = setInterval(update, 60000);
-    return () => clearInterval(interval);
-  }, [weeklyStatus]);
-
-  async function handleOpenWeekly() {
-    if (!hasPro) { return; }
-    if (weeklyStatus?.status === "available" && weeklyFrozenData) {
-      setShowWeeklySummary(true);
-      return;
-    }
-    if (weeklyStatus?.status !== "ready") return;
-    setWeeklyOpening(true);
-    try {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const data = await summaryApi.weeklyOpen(tz);
-      setWeeklyFrozenData(data);
-      setWeeklyStatus({ status: "available", summary: data });
-      setShowWeeklySummary(true);
-    } catch {
-      // Silently fail — user can retry
-    } finally {
-      setWeeklyOpening(false);
-    }
-  }
 
   async function handleDeleteAccount() {
     if (!deletePassword) {
@@ -1057,10 +997,6 @@ export default function ProfilePage() {
         )}
       </div>
 
-      {/* Weekly Summary modal */}
-      {showWeeklySummary && (
-        <WeeklySummaryModal onClose={() => setShowWeeklySummary(false)} frozenData={weeklyFrozenData} />
-      )}
     </div>
   );
 }

@@ -21,10 +21,9 @@ interface TaskItem {
 // priced against DeepSeek V3.2 ($0.28 in / $0.42 out per 1M). Must stay in sync
 // with /api/admin/overview/route.ts. Only current-product functions are tracked.
 const AI_COSTS = {
-  parseGoal:             0.000305,
-  generateRoadmap:       0.000749,
-  generateTasks:         0.000962,
-  generateWeeklySummary: 0.000504,
+  parseGoal:       0.000305,
+  generateRoadmap: 0.000749,
+  generateTasks:   0.000962,
 };
 
 export async function GET(
@@ -38,7 +37,7 @@ export async function GET(
 
   const { id } = await params;
 
-  const [user, goals, allDailyTasks, weeklySummaries] =
+  const [user, goals, allDailyTasks] =
     await Promise.all([
       prisma.user.findUnique({
         where: { id },
@@ -49,7 +48,6 @@ export async function GET(
         orderBy: { createdAt: "desc" },
       }),
       prisma.dailyTask.findMany({ where: { userId: id } }),
-      prisma.weeklySummary.count({ where: { userId: id } }),
     ]);
 
   if (!user) {
@@ -144,10 +142,9 @@ export async function GET(
   // a separate DailyTask for tomorrow, already included in the count).
   const goalCount = goals.length;
   const aiCosts = {
-    parseGoal:             { calls: goalCount,            cost: goalCount * AI_COSTS.parseGoal },
-    generateRoadmap:       { calls: goalCount,            cost: goalCount * AI_COSTS.generateRoadmap },
-    generateTasks:         { calls: allDailyTasks.length, cost: allDailyTasks.length * AI_COSTS.generateTasks },
-    generateWeeklySummary: { calls: weeklySummaries,      cost: weeklySummaries * AI_COSTS.generateWeeklySummary },
+    parseGoal:       { calls: goalCount,            cost: goalCount            * AI_COSTS.parseGoal },
+    generateRoadmap: { calls: goalCount,            cost: goalCount            * AI_COSTS.generateRoadmap },
+    generateTasks:   { calls: allDailyTasks.length, cost: allDailyTasks.length * AI_COSTS.generateTasks },
   };
   const totalAICost = Object.values(aiCosts).reduce(
     (sum, v) => sum + v.cost,

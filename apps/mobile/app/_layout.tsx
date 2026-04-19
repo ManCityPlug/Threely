@@ -108,20 +108,6 @@ function AppContent() {
   const pendingDestination = useRef<"login" | "register" | null>(null);
   const routingResolved = useRef(false);
 
-  // Listen for notification responses (deep links)
-  useEffect(() => {
-    if (Platform.OS === "web") return;
-    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
-      const data = response.notification.request.content.data as Record<string, unknown> | undefined;
-      if (data?.action === "weekly-summary") {
-        AsyncStorage.setItem("@threely_open_weekly_summary", "1").then(() => {
-          router.push("/(tabs)/profile" as never);
-        });
-      }
-    });
-    return () => sub.remove();
-  }, []);
-
   // ── Forced app update check (runs once on launch) ──────────────────────────
   useEffect(() => {
     // Skip version gate during development

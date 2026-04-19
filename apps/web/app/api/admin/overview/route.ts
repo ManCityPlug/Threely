@@ -16,13 +16,13 @@ interface TaskItem {
 //   DeepSeek V3.2: $0.28 input / $0.42 output per 1M tokens
 //
 // Only the functions that ship in the current mobile product are tracked here:
-//   parseGoal, generateRoadmap, generateTasks, generateWeeklySummary.
-// Removed: goalChat, refineTask, askAboutTask (no longer part of the product).
+//   parseGoal, generateRoadmap, generateTasks.
+// Removed from product (and from this estimator): goalChat, refineTask,
+// askAboutTask, generateWeeklySummary.
 const AI_COSTS = {
-  parseGoal:             0.000305, // measured: 812 in / 185 out
-  generateRoadmap:       0.000749, // measured: 716 in / 1305 out
-  generateTasks:         0.000962, // measured: 2765 in / 447 out
-  generateWeeklySummary: 0.000504, // estimate: 1500 in / 200 out
+  parseGoal:       0.000305, // measured: 812 in / 185 out
+  generateRoadmap: 0.000749, // measured: 716 in / 1305 out
+  generateTasks:   0.000962, // measured: 2765 in / 447 out
 };
 
 export async function GET(request: NextRequest) {
@@ -45,7 +45,6 @@ export async function GET(request: NextRequest) {
     allDailyTasks,
     trialingCount,
     activeSubCount,
-    totalWeeklySummaries,
     recentActiveUserIds,
   ] = await Promise.all([
     prisma.user.count(),
@@ -55,7 +54,6 @@ export async function GET(request: NextRequest) {
     prisma.dailyTask.findMany(),
     prisma.user.count({ where: { subscriptionStatus: "trialing" } }),
     prisma.user.count({ where: { subscriptionStatus: "active" } }),
-    prisma.weeklySummary.count(),
     prisma.dailyTask.findMany({
       where: { generatedAt: { gte: sevenDaysAgo } },
       select: { userId: true },
@@ -85,10 +83,9 @@ export async function GET(request: NextRequest) {
   const goalCount = totalGoals;
   const taskRecordCount = allDailyTasks.length;
   const aiCosts = {
-    parseGoal:             { calls: goalCount,            cost: goalCount * AI_COSTS.parseGoal },
-    generateRoadmap:       { calls: goalCount,            cost: goalCount * AI_COSTS.generateRoadmap },
-    generateTasks:         { calls: taskRecordCount,      cost: taskRecordCount * AI_COSTS.generateTasks },
-    generateWeeklySummary: { calls: totalWeeklySummaries, cost: totalWeeklySummaries * AI_COSTS.generateWeeklySummary },
+    parseGoal:       { calls: goalCount,       cost: goalCount       * AI_COSTS.parseGoal },
+    generateRoadmap: { calls: goalCount,       cost: goalCount       * AI_COSTS.generateRoadmap },
+    generateTasks:   { calls: taskRecordCount, cost: taskRecordCount * AI_COSTS.generateTasks },
   };
   const totalAICost = Object.values(aiCosts).reduce(
     (sum, v) => sum + v.cost,

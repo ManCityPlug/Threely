@@ -1069,23 +1069,6 @@ function DashboardPageInner() {
     }
   }
 
-  async function handleRefineTask(dailyTaskId: string, taskItemId: string, userRequest: string) {
-    try {
-      const res = await tasksApi.refineItem(dailyTaskId, taskItemId, userRequest);
-      setDailyTasks(prev =>
-        prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt)
-      );
-      showToast("Task refined by AI", "success");
-    } catch {
-      showToast("Failed to refine task", "error");
-    }
-  }
-
-  async function handleAskAboutTask(dailyTaskId: string, taskItemId: string, messages: { role: "user" | "assistant"; content: string }[]) {
-    const res = await tasksApi.askAboutTask(dailyTaskId, taskItemId, messages);
-    return { answer: res.answer, options: res.options ?? [] };
-  }
-
   async function handleSkipToday(dailyTaskId: string, taskItemId: string) {
     try {
       const res = await tasksApi.skip(dailyTaskId, taskItemId);

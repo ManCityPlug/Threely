@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -22,11 +22,10 @@ import { useFocusEffect, useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { supabase } from "@/lib/supabase";
-import { statsApi, accountApi, tasksApi, summaryApi, type Stats, type DailyTask, type TaskItem, type WeeklySummary as WeeklySummaryType, type WeeklySummaryStatus } from "@/lib/api";
+import { statsApi, accountApi, tasksApi, type Stats, type DailyTask, type TaskItem } from "@/lib/api";
 import { validatePassword } from "@/lib/validate-password";
 import { TaskCard } from "@/components/TaskCard";
 
-import { WeeklySummary } from "@/components/WeeklySummary";
 import { SkeletonStatCard } from "@/components/Skeleton";
 import { useCountUp } from "@/lib/animations";
 import { useTheme } from "@/lib/theme";
@@ -194,13 +193,6 @@ export default function ProfileScreen() {
 
   const [refreshing, setRefreshing] = useState(false);
 
-  // Weekly summary
-  const [weeklySummaryOpen, setWeeklySummaryOpen] = useState(false);
-  const [weeklyStatus, setWeeklyStatus] = useState<WeeklySummaryStatus | null>(null);
-  const [weeklyFrozenData, setWeeklyFrozenData] = useState<WeeklySummaryType | null>(null);
-  const [weeklyOpening, setWeeklyOpening] = useState(false);
-  const [countdown, setCountdown] = useState("");
-
   // History
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyTasks, setHistoryTasks] = useState<DailyTask[]>([]);
@@ -282,89 +274,6 @@ export default function ProfileScreen() {
     setRefreshing(true);
     await loadProfileData();
     setRefreshing(false);
-  }
-
-  // ── Weekly analysis status ───────────────────────────────────────────────────
-
-  useFocusEffect(
-    useCallback(() => {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      summaryApi.weeklyStatus(tz).then((res) => {
-        setWeeklyStatus(res);
-        if (res.status === "available" && res.summary) {
-          setWeeklyFrozenData(res.summary);
-        }
-      }).catch(() => {});
-      return () => {};
-    }, [])
-  );
-
-  // Countdown timer for locked/expired states (with client-side fallback)
-  useEffect(() => {
-    // Use server-provided unlocksAt, or compute next Monday locally as fallback
-    let targetDate: string | undefined = weeklyStatus?.unlocksAt;
-
-    if (!targetDate) {
-      // Compute next Monday 00:00 local time
-      const now = new Date();
-      const day = now.getDay(); // 0=Sun
-      const daysUntilMon = day === 0 ? 1 : day === 1 ? 7 : 8 - day;
-      const nextMon = new Date(now.getFullYear(), now.getMonth(), now.getDate() + daysUntilMon);
-      targetDate = nextMon.toISOString();
-    }
-
-    const isLockState = !weeklyStatus || weeklyStatus.status === "locked" || weeklyStatus.status === "expired";
-    if (!isLockState) {
-      setCountdown("");
-      return;
-    }
-
-    function updateCountdown() {
-      const diff = new Date(targetDate!).getTime() - Date.now();
-      if (diff <= 0) {
-        setCountdown("Available now");
-        return;
-      }
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const mins = Math.floor((diff / (1000 * 60)) % 60);
-      if (days > 0) setCountdown(`Unlocks in ${days}d ${hours}h`);
-      else if (hours > 0) setCountdown(`Unlocks in ${hours}h ${mins}m`);
-      else setCountdown(`Unlocks in ${mins}m`);
-    }
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 60000);
-    return () => clearInterval(interval);
-  }, [weeklyStatus]);
-
-  async function handleOpenWeekly() {
-    // Gate behind subscription
-    if (isLimitedMode) {
-      setShowPaywall(true);
-      return;
-    }
-    if (weeklyStatus?.status === "available" && weeklyFrozenData) {
-      setWeeklySummaryOpen(true);
-      return;
-    }
-    if (weeklyStatus?.status !== "ready") return;
-    setWeeklyOpening(true);
-    try {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      const data = await summaryApi.weeklyOpen(tz);
-      setWeeklyFrozenData(data);
-      setWeeklyStatus({ status: "available", summary: data });
-      setWeeklySummaryOpen(true);
-    } catch (err) {
-      if (err instanceof Error && err.message?.includes("pro_required")) {
-        setShowPaywall(true);
-      } else {
-        Alert.alert("Error", "Failed to load weekly analysis.");
-      }
-    } finally {
-      setWeeklyOpening(false);
-    }
   }
 
   // ── Handlers ─────────────────────────────────────────────────────────────────
@@ -1058,13 +967,6 @@ export default function ProfileScreen() {
         </Modal>
       )}
 
-      {/* ── Weekly Summary Modal ───────────────────────────────────────────────── */}
-      <WeeklySummary
-        visible={weeklySummaryOpen}
-        onClose={() => setWeeklySummaryOpen(false)}
-        frozenData={weeklyFrozenData}
-      />
-
       {/* ── Notification Center Modal ──────────────────────────────────────────── */}
       <Modal
         visible={notifCenterOpen}
@@ -1287,25 +1189,6 @@ function createStyles(c: Colors) {
       fontSize: typography.xs - 1,
       color: c.textSecondary,
       textAlign: "center",
-    },
-    weeklyCard: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: c.card,
-      borderRadius: radius.lg,
-      borderWidth: 1,
-      borderColor: c.border,
-      padding: spacing.md,
-      gap: spacing.md,
-      marginBottom: spacing.xl,
-      ...shadow.sm,
-    },
-    weeklyIconWrap: {
-      width: 40,
-      height: 40,
-      borderRadius: radius.md,
-      alignItems: "center",
-      justifyContent: "center",
     },
     menuCard: {
       backgroundColor: c.card,
