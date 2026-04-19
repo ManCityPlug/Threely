@@ -32,8 +32,8 @@ const FUNCTIONS = [
     model: "deepseek" as const,
     inputTokens: 3500,
     outputTokens: 2000,
-    frequency: "Daily per goal (max 2x/day)",
-    description: "Generates 3 specific tasks; 1 extra generation allowed per goal per day",
+    frequency: "Daily per goal (worst case 3x/24h)",
+    description: "Generates 3 specific tasks. Up to 3 calls per goal per 24h: initial daily + 1 extra (\"Give me more\") + 1 work-ahead (Day N+1) when user finishes today early.",
   },
   {
     name: "goalChat",
@@ -76,7 +76,13 @@ function costPerCall(fn: typeof FUNCTIONS[number]): number {
 
 // ─── Limits ─────────────────────────────────────────────────────────────────
 const MAX_GOALS = 3;
-const MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY = 2; // 1 initial + 1 extra
+// Worst-case generateTasks calls per goal within any 24h window:
+//   1. Initial daily generation (auto)
+//   2. One "Give me more" extra today
+//   3. One work-ahead (Day N+1) — user finished today early and tapped the
+//      next-day node to pull tomorrow's tasks forward
+// Each call hits /api/tasks/generate with the same token envelope.
+const MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY = 3;
 
 // ─── Per-user daily/monthly cost calculator ──────────────────────────────────
 function calculateCosts(goals: number) {
@@ -215,8 +221,8 @@ export default function CostsPage() {
           <div style={{ display: "flex", gap: 12, alignItems: "flex-start", padding: "10px 12px", background: "#1e1e21", borderRadius: 8 }}>
             <div style={{ width: 8, height: 8, borderRadius: 4, background: "#fbbf24", marginTop: 6, flexShrink: 0 }} />
             <div>
-              <span style={{ fontWeight: 600, fontSize: "0.85rem" }}>Max {MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} task generations per goal per day: </span>
-              <span style={{ color: "#a1a1aa", fontSize: "0.85rem" }}>1 initial daily generation + 1 extra &quot;Give me more&quot; generation. After that, users see a popup guiding them to refine tasks or adjust their plan instead.</span>
+              <span style={{ fontWeight: 600, fontSize: "0.85rem" }}>Max {MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} task generations per goal per 24h: </span>
+              <span style={{ color: "#a1a1aa", fontSize: "0.85rem" }}>1 initial daily generation + 1 extra &quot;Give me more&quot; generation + 1 work-ahead generation (tapping Day N+1 after finishing today). Work-ahead is gated to once per day per goal via an <code style={{ fontFamily: "monospace", fontSize: "0.78rem" }}>aheadKey</code> in device storage. After these limits, users see a popup guiding them to refine tasks or wait for the next day.</span>
             </div>
           </div>
         </div>
@@ -296,7 +302,7 @@ export default function CostsPage() {
           Cost Per User by Number of Goals <span style={limitBadge}>Max {MAX_GOALS}</span>
         </h2>
         <p style={{ color: "#71717a", fontSize: "0.78rem", marginBottom: 16 }}>
-          Worst case: 2 task generations/goal/day, daily review, ~0.5 chats/day, ~10% task refinement, ~0.3 task Q&amp;A, weekly summary.
+          Worst case: {MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} task generations/goal/24h (initial + &quot;Give me more&quot; + work-ahead), daily review, ~0.5 chats/day, ~10% task refinement, ~0.3 task Q&amp;A, weekly summary.
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={tableStyle}>
@@ -398,7 +404,7 @@ export default function CostsPage() {
             },
             {
               label: "Generation cap enforced",
-              value: `Max ${MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} task generations per goal per day (initial + 1 extra). Users guided to refine tasks instead of regenerating.`,
+              value: `Max ${MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} task generations per goal per 24h (initial + "Give me more" + work-ahead). Work-ahead is limited to one pull-forward per day per goal via the aheadKey device flag. Users guided to refine tasks instead of regenerating once the cap is hit.`,
               color: "#4ade80",
             },
             {
@@ -413,7 +419,7 @@ export default function CostsPage() {
             },
             {
               label: "Biggest cost driver",
-              value: "generateTasks (DeepSeek) -- runs up to 2x/day per goal. Cheapest per call but highest frequency of any function.",
+              value: `generateTasks (DeepSeek) -- runs up to ${MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY}x/24h per goal (initial + extra + work-ahead). Mid-priced per call but by far the highest frequency of any function.`,
               color: "#f59e0b",
             },
             {
