@@ -14,13 +14,14 @@ interface TaskItem {
 // AI cost estimates per call (USD), computed from real AICallLog token averages
 // priced against the current primary model:
 //   DeepSeek V3.2: $0.28 input / $0.42 output per 1M tokens
-// Tokens marked "measured" are DB averages. "estimate" = no data yet, upper bound.
+//
+// Only the functions that ship in the current mobile product are tracked here:
+//   parseGoal, generateRoadmap, generateTasks, generateWeeklySummary.
+// Removed: goalChat, refineTask, askAboutTask (no longer part of the product).
 const AI_COSTS = {
   parseGoal:             0.000305, // measured: 812 in / 185 out
   generateRoadmap:       0.000749, // measured: 716 in / 1305 out
   generateTasks:         0.000962, // measured: 2765 in / 447 out
-  refineTask:            0.000245, // estimate: 500 in / 250 out
-  askAboutTask:          0.000187, // measured: 506 in / 107 out
   generateWeeklySummary: 0.000504, // estimate: 1500 in / 200 out
 };
 
@@ -83,13 +84,11 @@ export async function GET(request: NextRequest) {
   // separate DailyTask for tomorrow's date).
   const goalCount = totalGoals;
   const taskRecordCount = allDailyTasks.length;
-  const refineCalls = Math.round(totalTaskItems * 0.1);
   const aiCosts = {
-    parseGoal:             { calls: goalCount,              cost: goalCount * AI_COSTS.parseGoal },
-    generateRoadmap:       { calls: goalCount,              cost: goalCount * AI_COSTS.generateRoadmap },
-    generateTasks:         { calls: taskRecordCount,        cost: taskRecordCount * AI_COSTS.generateTasks },
-    refineTask:            { calls: refineCalls,            cost: refineCalls * AI_COSTS.refineTask },
-    generateWeeklySummary: { calls: totalWeeklySummaries,   cost: totalWeeklySummaries * AI_COSTS.generateWeeklySummary },
+    parseGoal:             { calls: goalCount,            cost: goalCount * AI_COSTS.parseGoal },
+    generateRoadmap:       { calls: goalCount,            cost: goalCount * AI_COSTS.generateRoadmap },
+    generateTasks:         { calls: taskRecordCount,      cost: taskRecordCount * AI_COSTS.generateTasks },
+    generateWeeklySummary: { calls: totalWeeklySummaries, cost: totalWeeklySummaries * AI_COSTS.generateWeeklySummary },
   };
   const totalAICost = Object.values(aiCosts).reduce(
     (sum, v) => sum + v.cost,

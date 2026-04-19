@@ -11,9 +11,18 @@ const PRICING = {
 };
 
 // ─── Per-function cost estimates ─────────────────────────────────────────────
-// Token counts are real averages from the AICallLog table (last 90 days,
-// deepseek-chat only). Where we don't have data yet we use a conservative
-// estimate flagged in the `source` field.
+// Current product AI surface (mobile). Token counts are real averages from
+// AICallLog (deepseek-chat only); where we have no data yet we use a
+// conservative estimate flagged as such.
+//
+// Goal creation is a 3-question funnel → parseGoal → generateRoadmap (async).
+// Daily flow → generateTasks (up to 3x/24h: initial + "Give me more" +
+// work-ahead). Weekly summary runs once per user per week.
+//
+// Removed from this estimator (not part of the current mobile product):
+//   - goalChat       (legacy multi-turn onboarding chat)
+//   - refineTask     (per-task refine)
+//   - askAboutTask   (task Q&A)
 const FUNCTIONS = [
   {
     name: "parseGoal",
@@ -21,8 +30,8 @@ const FUNCTIONS = [
     inputTokens: 812,
     outputTokens: 185,
     source: "measured",
-    frequency: "Once per goal",
-    description: "Extracts structure, category, deadline from raw goal input.",
+    frequency: "Once per goal (3-question funnel)",
+    description: "Extracts structure, category, deadline from the 3 funnel answers.",
   },
   {
     name: "generateRoadmap",
@@ -30,8 +39,8 @@ const FUNCTIONS = [
     inputTokens: 716,
     outputTokens: 1305,
     source: "measured",
-    frequency: "Once per goal",
-    description: "Creates multi-phase roadmap with milestones.",
+    frequency: "Once per goal (async after create)",
+    description: "Multi-phase roadmap with milestones. Runs async so goal creation isn't blocked.",
   },
   {
     name: "generateTasks",
@@ -40,25 +49,7 @@ const FUNCTIONS = [
     outputTokens: 447,
     source: "measured",
     frequency: "Up to 3x per goal per 24h",
-    description: "Generates 3 daily tasks. Called up to 3x per goal per 24h: initial daily + 1 \"Give me more\" + 1 work-ahead (Day N+1) when user finishes today early.",
-  },
-  {
-    name: "refineTask",
-    model: "deepseek" as const,
-    inputTokens: 500,
-    outputTokens: 250,
-    source: "estimate",
-    frequency: "~10% of tasks",
-    description: "Breaks down or adjusts a single task on request.",
-  },
-  {
-    name: "askAboutTask",
-    model: "deepseek" as const,
-    inputTokens: 506,
-    outputTokens: 107,
-    source: "measured",
-    frequency: "~0.3x per goal per day",
-    description: "Task Q&A — answers questions about a specific task.",
+    description: "Generates 3 short daily tasks (under 2 min each, 1-2 sentences). Up to 3 calls per goal per 24h: initial daily + 1 \"Give me more\" + 1 work-ahead (Day N+1).",
   },
   {
     name: "generateWeeklySummary",
@@ -66,8 +57,8 @@ const FUNCTIONS = [
     inputTokens: 1500,
     outputTokens: 200,
     source: "estimate",
-    frequency: "Weekly per user",
-    description: "Weekly progress summary with trends and recommendations.",
+    frequency: "1x per user per week",
+    description: "Weekly progress summary with trends and a short recommendation.",
   },
 ];
 
@@ -91,15 +82,15 @@ const MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY = 3;
 const FN = Object.fromEntries(FUNCTIONS.map((f) => [f.name, f]));
 
 function calculateCosts(goals: number) {
-  // One-time per-goal setup
+  // One-time per-goal setup: 3-question funnel → parseGoal → generateRoadmap
   const setupPerGoal = costPerCall(FN.parseGoal) + costPerCall(FN.generateRoadmap);
   const totalSetup = setupPerGoal * goals;
 
-  // Daily recurring per goal (worst case — matches in-app limits)
+  // Daily recurring per goal (worst case — matches in-app limits).
+  // Only generateTasks runs daily. Refine / Ask were removed from the
+  // product so they no longer contribute.
   const generateTasksDaily = costPerCall(FN.generateTasks) * MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY;
-  const refineTaskDaily    = costPerCall(FN.refineTask)    * 0.3; // ~10% of 3 daily tasks
-  const askAboutTaskDaily  = costPerCall(FN.askAboutTask)  * 0.3; // ~0.3x/day/goal
-  const dailyPerGoal = generateTasksDaily + refineTaskDaily + askAboutTaskDaily;
+  const dailyPerGoal = generateTasksDaily;
   const totalDaily = dailyPerGoal * goals;
 
   // Weekly (per user, not per goal) — amortised to per-day for rollups
@@ -322,7 +313,7 @@ export default function CostsPage() {
           Cost Per User by Number of Goals <span style={limitBadge}>Max {MAX_GOALS}</span>
         </h2>
         <p style={{ color: "#71717a", fontSize: "0.78rem", marginBottom: 16 }}>
-          Worst case: {MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} generateTasks calls/goal/24h (initial + &quot;Give me more&quot; + work-ahead) · ~10% refineTask · ~0.3 askAboutTask · weekly summary. Daily figures shown per-day, weekly and monthly are multiples of that.
+          Worst case: {MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} generateTasks calls/goal/24h (initial + &quot;Give me more&quot; + work-ahead) + weekly summary amortised. One-time setup per goal is parseGoal + generateRoadmap. Weekly and monthly figures are the per-day number × 7 / × 30.
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={tableStyle}>

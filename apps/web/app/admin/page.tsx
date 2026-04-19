@@ -77,12 +77,10 @@ function StatCard({
 const DEEPSEEK_RATES = { inputRate: 0.28, outputRate: 0.42 };
 const GEMINI_RATES   = { inputRate: 0.10, outputRate: 0.40 };
 const AI_FUNCTIONS = [
-  { name: "parseGoal",             frequency: "Once per goal",                 inputTok:  812, outputTok:  185, source: "measured" },
-  { name: "generateRoadmap",       frequency: "Once per goal",                 inputTok:  716, outputTok: 1305, source: "measured" },
-  { name: "generateTasks",         frequency: "Up to 3×/24h per goal",         inputTok: 2765, outputTok:  447, source: "measured" },
-  { name: "refineTask",            frequency: "On demand (~10% of tasks)",     inputTok:  500, outputTok:  250, source: "estimate" },
-  { name: "askAboutTask",          frequency: "On demand (~0.3×/goal/day)",    inputTok:  506, outputTok:  107, source: "measured" },
-  { name: "generateWeeklySummary", frequency: "1×/week per user",              inputTok: 1500, outputTok:  200, source: "estimate" },
+  { name: "parseGoal",             frequency: "Once per goal (3-question funnel)", inputTok:  812, outputTok:  185, source: "measured" },
+  { name: "generateRoadmap",       frequency: "Once per goal (async)",             inputTok:  716, outputTok: 1305, source: "measured" },
+  { name: "generateTasks",         frequency: "Up to 3×/24h per goal",             inputTok: 2765, outputTok:  447, source: "measured" },
+  { name: "generateWeeklySummary", frequency: "1×/week per user",                  inputTok: 1500, outputTok:  200, source: "estimate" },
 ] as const;
 
 function costPerCall(f: typeof AI_FUNCTIONS[number]) {
@@ -107,24 +105,17 @@ function CostEstimatorSection({ payingUsers }: { activeUsers: number; payingUser
   const byName = Object.fromEntries(costs.map((c) => [c.name, c]));
 
   // ── Scenario builder ──
-  // Average: user generates today once/day (skips "Give me more" and work-ahead).
+  // Only generateTasks runs daily in the current product. Refine / Ask were
+  // removed. Setup (parse + roadmap) is one-time per goal.
   function monthlyAiCost(goals: number) {
     const oneTime = goals * (byName.parseGoal.cost + byName.generateRoadmap.cost);
-    const dailyTasks = goals * 1 * byName.generateTasks.cost; // avg 1 gen/day/goal
-    const dailyRefine = byName.refineTask.cost * 0.3 * goals; // ~10% of 3 tasks
-    const dailyAskAi = byName.askAboutTask.cost * 0.3 * goals; // ~0.3x/day/goal
-    const daily = dailyTasks + dailyRefine + dailyAskAi;
+    const daily = goals * 1 * byName.generateTasks.cost; // avg 1 gen/day/goal
     const weeklyCost = byName.generateWeeklySummary.cost * 4.3; // ~4.3 wks/mo
     return oneTime + daily * 30 + weeklyCost;
   }
-
-  // Worst case: user hits every cap every day.
   function monthlyAiCostMax(goals: number) {
     const oneTime = goals * (byName.parseGoal.cost + byName.generateRoadmap.cost);
-    const dailyTasks = goals * MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY * byName.generateTasks.cost;
-    const dailyRefine = byName.refineTask.cost * 3; // 3 refines/day total
-    const dailyAskAi = byName.askAboutTask.cost * 5; // 5 ask/day total
-    const daily = dailyTasks + dailyRefine + dailyAskAi;
+    const daily = goals * MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY * byName.generateTasks.cost;
     const weeklyCost = byName.generateWeeklySummary.cost * 4.3;
     return oneTime + daily * 30 + weeklyCost;
   }
