@@ -63,7 +63,7 @@ async function callGemini(opts: {
   temperature?: number;
 }): Promise<{ text: string; inputTokens: number; outputTokens: number; model: string }> {
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash",
+    model: "gemini-2.5-flash-lite",
     ...(opts.system ? { systemInstruction: opts.system } : {}),
     generationConfig: {
       maxOutputTokens: opts.maxTokens ?? 1024,
@@ -85,7 +85,7 @@ async function callGemini(opts: {
     text: response.text(),
     inputTokens: response.usageMetadata?.promptTokenCount ?? 0,
     outputTokens: response.usageMetadata?.candidatesTokenCount ?? 0,
-    model: "gemini-2.5-flash",
+    model: "gemini-2.5-flash-lite",
   };
 }
 
@@ -97,7 +97,11 @@ async function callLLM(opts: {
   maxTokens?: number;
   temperature?: number;
 }): Promise<{ text: string; inputTokens: number; outputTokens: number; model: string }> {
-  // Try DeepSeek first (cheaper) - skip if circuit breaker is open
+  // Primary: DeepSeek V3.2 ($0.28 in / $0.42 out per 1M). Cheaper than
+  // Gemini 2.5 Flash ($0.30/$2.50) by a wide margin on output, and stronger
+  // on structured JSON. Skip if circuit breaker is open.
+  // Fallback: Gemini 2.5 Flash-Lite ($0.10 in / $0.40 out per 1M) — the
+  // cheapest actively-supported Gemini model. Used only when DeepSeek fails.
   const circuitOpen = Date.now() < deepseekCircuitOpenUntil;
   if (DEEPSEEK_API_KEY && !circuitOpen) {
     try {

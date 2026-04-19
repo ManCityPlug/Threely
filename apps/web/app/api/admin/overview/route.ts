@@ -11,17 +11,17 @@ interface TaskItem {
   estimated_minutes?: number;
 }
 
-// AI cost estimates per call (USD) — based on actual token usage
-// Sonnet 4.6: $3/$15 per 1M tokens (input/output)
-// Haiku 4.5: $0.80/$4 per 1M tokens (input/output)
+// AI cost estimates per call (USD), computed from real AICallLog token averages
+// priced against the current primary model:
+//   DeepSeek V3.2: $0.28 input / $0.42 output per 1M tokens
+// Tokens marked "measured" are DB averages. "estimate" = no data yet, upper bound.
 const AI_COSTS = {
-  parseGoal: 0.002,           // Haiku — ~1.5K in, ~300 out
-  generateRoadmap: 0.03,      // Sonnet — ~2.5K in, ~1.5K out
-  generateTasks: 0.005,       // Haiku (cached) — ~5K in, ~3K out
-  goalChat: 0.002,            // Haiku — ~800 in, ~400 out
-  refineTask: 0.001,          // Haiku — ~500 in, ~250 out
-  askAboutTask: 0.002,        // Haiku — ~1K in, ~400 out
-  generateWeeklySummary: 0.002, // Haiku — ~800 in, ~200 out
+  parseGoal:             0.000305, // measured: 812 in / 185 out
+  generateRoadmap:       0.000749, // measured: 716 in / 1305 out
+  generateTasks:         0.000962, // measured: 2765 in / 447 out
+  refineTask:            0.000245, // estimate: 500 in / 250 out
+  askAboutTask:          0.000187, // measured: 506 in / 107 out
+  generateWeeklySummary: 0.000504, // estimate: 1500 in / 200 out
 };
 
 export async function GET(request: NextRequest) {
@@ -78,31 +78,18 @@ export async function GET(request: NextRequest) {
   // Revenue estimates (blended: ~$12.99 monthly + ~$8.33/mo yearly)
   const estimatedMRR = activeSubCount * 10.66;
 
-  // AI cost estimates
+  // AI cost estimates. One DailyTask record = one generateTasks call, so
+  // taskRecordCount already includes work-ahead generations (they create a
+  // separate DailyTask for tomorrow's date).
   const goalCount = totalGoals;
   const taskRecordCount = allDailyTasks.length;
+  const refineCalls = Math.round(totalTaskItems * 0.1);
   const aiCosts = {
-    parseGoal: { calls: goalCount, cost: goalCount * AI_COSTS.parseGoal },
-    generateRoadmap: {
-      calls: goalCount,
-      cost: goalCount * AI_COSTS.generateRoadmap,
-    },
-    generateTasks: {
-      calls: taskRecordCount,
-      cost: taskRecordCount * AI_COSTS.generateTasks,
-    },
-    goalChat: {
-      calls: goalCount * 2,
-      cost: goalCount * 2 * AI_COSTS.goalChat,
-    },
-    refineTask: {
-      calls: Math.round(totalTaskItems * 0.1),
-      cost: Math.round(totalTaskItems * 0.1) * AI_COSTS.refineTask,
-    },
-    generateWeeklySummary: {
-      calls: totalWeeklySummaries,
-      cost: totalWeeklySummaries * AI_COSTS.generateWeeklySummary,
-    },
+    parseGoal:             { calls: goalCount,              cost: goalCount * AI_COSTS.parseGoal },
+    generateRoadmap:       { calls: goalCount,              cost: goalCount * AI_COSTS.generateRoadmap },
+    generateTasks:         { calls: taskRecordCount,        cost: taskRecordCount * AI_COSTS.generateTasks },
+    refineTask:            { calls: refineCalls,            cost: refineCalls * AI_COSTS.refineTask },
+    generateWeeklySummary: { calls: totalWeeklySummaries,   cost: totalWeeklySummaries * AI_COSTS.generateWeeklySummary },
   };
   const totalAICost = Object.values(aiCosts).reduce(
     (sum, v) => sum + v.cost,

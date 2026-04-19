@@ -3,69 +3,71 @@
 // ─── Model Pricing (per million tokens) ──────────────────────────────────────
 // DeepSeek pricing: https://api-docs.deepseek.com/quick_start/pricing
 // Gemini pricing:   https://ai.google.dev/gemini-api/docs/pricing
+// Verified 2026-04-19 against official docs. Earlier values were ~6 months
+// stale — DeepSeek had dropped output prices and Gemini 2.5 Flash raised them.
 const PRICING = {
-  deepseek: { input: 0.27, output: 1.10, label: "DeepSeek V3 (primary)" },
-  gemini:   { input: 0.075, output: 0.30, label: "Gemini 2.5 Flash (fallback)" },
+  deepseek: { input: 0.28, output: 0.42, label: "DeepSeek V3.2 (primary)" },
+  gemini:   { input: 0.10, output: 0.40, label: "Gemini 2.5 Flash-Lite (fallback)" },
 };
 
 // ─── Per-function cost estimates ─────────────────────────────────────────────
-// Based on actual system prompts, context sizes, and max_tokens in claude.ts
+// Token counts are real averages from the AICallLog table (last 90 days,
+// deepseek-chat only). Where we don't have data yet we use a conservative
+// estimate flagged in the `source` field.
 const FUNCTIONS = [
   {
     name: "parseGoal",
     model: "deepseek" as const,
-    inputTokens: 600,
-    outputTokens: 300,
+    inputTokens: 812,
+    outputTokens: 185,
+    source: "measured",
     frequency: "Once per goal",
-    description: "Extracts structure, category, deadline from raw goal input",
+    description: "Extracts structure, category, deadline from raw goal input.",
   },
   {
     name: "generateRoadmap",
     model: "deepseek" as const,
-    inputTokens: 1300,
-    outputTokens: 1500,
+    inputTokens: 716,
+    outputTokens: 1305,
+    source: "measured",
     frequency: "Once per goal",
-    description: "Creates multi-phase roadmap with milestones",
+    description: "Creates multi-phase roadmap with milestones.",
   },
   {
     name: "generateTasks",
     model: "deepseek" as const,
-    inputTokens: 3500,
-    outputTokens: 2000,
-    frequency: "Daily per goal (worst case 3x/24h)",
-    description: "Generates 3 specific tasks. Up to 3 calls per goal per 24h: initial daily + 1 extra (\"Give me more\") + 1 work-ahead (Day N+1) when user finishes today early.",
-  },
-  {
-    name: "goalChat",
-    model: "deepseek" as const,
-    inputTokens: 800,
-    outputTokens: 400,
-    frequency: "~0.5x/day per goal",
-    description: "Conversational goal refinement and Q&A",
+    inputTokens: 2765,
+    outputTokens: 447,
+    source: "measured",
+    frequency: "Up to 3x per goal per 24h",
+    description: "Generates 3 daily tasks. Called up to 3x per goal per 24h: initial daily + 1 \"Give me more\" + 1 work-ahead (Day N+1) when user finishes today early.",
   },
   {
     name: "refineTask",
     model: "deepseek" as const,
     inputTokens: 500,
     outputTokens: 250,
+    source: "estimate",
     frequency: "~10% of tasks",
-    description: "Breaks down or adjusts a single task on request",
+    description: "Breaks down or adjusts a single task on request.",
   },
   {
     name: "askAboutTask",
     model: "deepseek" as const,
-    inputTokens: 600,
-    outputTokens: 300,
-    frequency: "~0.3x/day per goal",
-    description: "Task Q&A — answers questions about a specific task",
+    inputTokens: 506,
+    outputTokens: 107,
+    source: "measured",
+    frequency: "~0.3x per goal per day",
+    description: "Task Q&A — answers questions about a specific task.",
   },
   {
     name: "generateWeeklySummary",
     model: "deepseek" as const,
     inputTokens: 1500,
     outputTokens: 200,
+    source: "estimate",
     frequency: "Weekly per user",
-    description: "Weekly progress summary with trends and recommendations",
+    description: "Weekly progress summary with trends and recommendations.",
   },
 ];
 
@@ -84,37 +86,38 @@ const MAX_GOALS = 3;
 // Each call hits /api/tasks/generate with the same token envelope.
 const MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY = 3;
 
-// ─── Per-user daily/monthly cost calculator ──────────────────────────────────
+// ─── Per-user daily/weekly/monthly cost calculator ───────────────────────────
+// Map functions by name so refactors don't break array-index math.
+const FN = Object.fromEntries(FUNCTIONS.map((f) => [f.name, f]));
+
 function calculateCosts(goals: number) {
-  // One-time setup per goal
-  const parseGoal = costPerCall(FUNCTIONS[0]);
-  const generateRoadmap = costPerCall(FUNCTIONS[1]);
-  const setupPerGoal = parseGoal + generateRoadmap;
+  // One-time per-goal setup
+  const setupPerGoal = costPerCall(FN.parseGoal) + costPerCall(FN.generateRoadmap);
   const totalSetup = setupPerGoal * goals;
 
-  // Daily recurring per goal
-  const generateTasks = costPerCall(FUNCTIONS[2]);
-  // Worst case: user generates twice per goal per day (initial + 1 extra)
-  const generateTasksDaily = generateTasks * MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY;
-  const goalChat = costPerCall(FUNCTIONS[3]) * 0.5; // avg 0.5 chats/day
-  const refineTask = costPerCall(FUNCTIONS[4]) * 0.3; // ~10% of 3 tasks
-  const askAboutTask = costPerCall(FUNCTIONS[5]) * 0.3; // ~0.3x/day per goal
-  const dailyPerGoal = generateTasksDaily + goalChat + refineTask + askAboutTask;
+  // Daily recurring per goal (worst case — matches in-app limits)
+  const generateTasksDaily = costPerCall(FN.generateTasks) * MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY;
+  const refineTaskDaily    = costPerCall(FN.refineTask)    * 0.3; // ~10% of 3 daily tasks
+  const askAboutTaskDaily  = costPerCall(FN.askAboutTask)  * 0.3; // ~0.3x/day/goal
+  const dailyPerGoal = generateTasksDaily + refineTaskDaily + askAboutTaskDaily;
   const totalDaily = dailyPerGoal * goals;
 
-  // Weekly (per user, not per goal)
-  const weeklySummary = costPerCall(FUNCTIONS[6]);
-  const weeklyPerDay = weeklySummary / 7;
+  // Weekly (per user, not per goal) — amortised to per-day for rollups
+  const weeklySummaryCost = costPerCall(FN.generateWeeklySummary);
+  const weeklyPerDay = weeklySummaryCost / 7;
 
-  const dailyTotal = totalDaily + weeklyPerDay;
+  const dailyTotal    = totalDaily + weeklyPerDay;
+  const weeklyOngoing = dailyTotal * 7;
   const monthlyOngoing = dailyTotal * 30;
   const monthlyFirstMonth = monthlyOngoing + totalSetup;
 
   return {
     setupPerGoal,
     totalSetup,
+    generateTasksDaily,
     dailyPerGoal,
     dailyTotal,
+    weeklyOngoing,
     monthlyOngoing,
     monthlyFirstMonth,
   };
@@ -257,17 +260,20 @@ export default function CostsPage() {
 
       {/* ─── Per-Function Cost Breakdown ──────────────────────────────── */}
       <div style={cardStyle}>
-        <h2 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 12 }}>
+        <h2 style={{ fontSize: "1rem", fontWeight: 700, marginBottom: 4 }}>
           Per-Function Cost Breakdown
         </h2>
+        <p style={{ color: "#71717a", fontSize: "0.78rem", marginBottom: 12 }}>
+          Tokens marked <span style={{ color: "#4ade80" }}>measured</span> are averages from AICallLog. <span style={{ color: "#f59e0b" }}>estimate</span> = no production data yet, reasonable upper bound.
+        </p>
         <div style={{ overflowX: "auto" }}>
           <table style={tableStyle}>
             <thead>
               <tr>
                 <th style={thStyle}>Function</th>
                 <th style={thStyle}>Tokens (in/out)</th>
-                <th style={thStyle}>DeepSeek $/Call</th>
-                <th style={thStyle}>Gemini $/Call</th>
+                <th style={thStyle}>DeepSeek $/call</th>
+                <th style={thStyle}>Gemini $/call</th>
                 <th style={thStyle}>Frequency</th>
               </tr>
             </thead>
@@ -277,10 +283,24 @@ export default function CostsPage() {
                 return (
                 <tr key={fn.name}>
                   <td style={tdStyle}>
-                    <div style={{ fontWeight: 600 }}>{fn.name}</div>
+                    <div style={{ fontWeight: 600 }}>
+                      {fn.name}
+                      {" "}
+                      <span style={{
+                        fontSize: "0.65rem",
+                        fontWeight: 600,
+                        padding: "1px 6px",
+                        borderRadius: 4,
+                        background: fn.source === "measured" ? "rgba(74,222,128,0.15)" : "rgba(245,158,11,0.15)",
+                        color: fn.source === "measured" ? "#4ade80" : "#f59e0b",
+                        marginLeft: 4,
+                      }}>
+                        {fn.source}
+                      </span>
+                    </div>
                     <div style={{ fontSize: "0.72rem", color: "#71717a", marginTop: 2 }}>{fn.description}</div>
                   </td>
-                  <td style={tdStyle}>~{fn.inputTokens.toLocaleString()} / ~{fn.outputTokens.toLocaleString()}</td>
+                  <td style={tdStyle}>{fn.inputTokens.toLocaleString()} / {fn.outputTokens.toLocaleString()}</td>
                   <td style={{ ...tdStyle, fontWeight: 600, fontFamily: "monospace", color: "#4ade80" }}>
                     {fmt(costPerCall(fn))}
                   </td>
@@ -302,17 +322,18 @@ export default function CostsPage() {
           Cost Per User by Number of Goals <span style={limitBadge}>Max {MAX_GOALS}</span>
         </h2>
         <p style={{ color: "#71717a", fontSize: "0.78rem", marginBottom: 16 }}>
-          Worst case: {MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} task generations/goal/24h (initial + &quot;Give me more&quot; + work-ahead), daily review, ~0.5 chats/day, ~10% task refinement, ~0.3 task Q&amp;A, weekly summary.
+          Worst case: {MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} generateTasks calls/goal/24h (initial + &quot;Give me more&quot; + work-ahead) · ~10% refineTask · ~0.3 askAboutTask · weekly summary. Daily figures shown per-day, weekly and monthly are multiples of that.
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={tableStyle}>
             <thead>
               <tr>
                 <th style={thStyle}>Goals</th>
-                <th style={thStyle}>Setup (One-Time)</th>
-                <th style={thStyle}>Daily Cost</th>
-                <th style={thStyle}>Monthly (Ongoing)</th>
-                <th style={thStyle}>Month 1 (w/ Setup)</th>
+                <th style={thStyle}>Setup (one-time)</th>
+                <th style={thStyle}>Per day</th>
+                <th style={thStyle}>Per week</th>
+                <th style={thStyle}>Per month (ongoing)</th>
+                <th style={thStyle}>Month 1 (w/ setup)</th>
               </tr>
             </thead>
             <tbody>
@@ -321,10 +342,11 @@ export default function CostsPage() {
                 return (
                   <tr key={g} style={g === MAX_GOALS ? { background: "#1e1e21" } : {}}>
                     <td style={{ ...tdStyle, fontWeight: 700 }}>{g} goal{g > 1 ? "s" : ""}</td>
-                    <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.totalSetup, 2)}</td>
-                    <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.dailyTotal, 3)}</td>
-                    <td style={{ ...tdStyle, fontFamily: "monospace", fontWeight: 600 }}>{fmt(c.monthlyOngoing, 2)}</td>
-                    <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.monthlyFirstMonth, 2)}</td>
+                    <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.totalSetup, 4)}</td>
+                    <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.dailyTotal, 4)}</td>
+                    <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.weeklyOngoing, 4)}</td>
+                    <td style={{ ...tdStyle, fontFamily: "monospace", fontWeight: 600 }}>{fmt(c.monthlyOngoing, 3)}</td>
+                    <td style={{ ...tdStyle, fontFamily: "monospace" }}>{fmt(c.monthlyFirstMonth, 3)}</td>
                   </tr>
                 );
               })}
@@ -408,18 +430,18 @@ export default function CostsPage() {
               color: "#4ade80",
             },
             {
-              label: "All functions on DeepSeek (Gemini fallback)",
-              value: "All AI functions use DeepSeek V3 ($0.27/$1.10 per 1M tokens) as primary. If DeepSeek is down/slow (15s timeout), falls back to Gemini 2.5 Flash ($0.075/$0.30). Circuit breaker skips DeepSeek for 5 min after 3 consecutive failures.",
+              label: "DeepSeek primary, Gemini Flash-Lite fallback",
+              value: `All AI calls hit DeepSeek V3.2 (${fmt(PRICING.deepseek.input, 2).replace("$", "$")} / ${fmt(PRICING.deepseek.output, 2).replace("$", "$")} per 1M tokens). If DeepSeek is down or slow (15s timeout), we fall back to Gemini 2.5 Flash-Lite (${fmt(PRICING.gemini.input, 2).replace("$", "$")} / ${fmt(PRICING.gemini.output, 2).replace("$", "$")} per 1M). Circuit breaker skips DeepSeek for 5 min after 3 consecutive failures.`,
               color: "#4ade80",
             },
             {
-              label: "Worst-case profit (3 goals, yearly)",
-              value: `AI cost ~${fmt(calculateCosts(3).monthlyOngoing, 2)}/mo per user. After Apple's 15% cut, yearly plan profit: ~$${(PLANS[0].monthly * (1 - APPLE_COMMISSION) - calculateCosts(3).monthlyOngoing).toFixed(2)}/mo. Monthly plan: ~$${(PLANS[1].monthly * (1 - APPLE_COMMISSION) - calculateCosts(3).monthlyOngoing).toFixed(2)}/mo.`,
+              label: "Worst-case profit (3 goals)",
+              value: `AI cost ~${fmt(calculateCosts(3).monthlyOngoing, 3)}/mo per user at the cap. After Apple's 15% cut, App Monthly plan profit: ~$${(PLANS[0].monthly * (1 - APPLE_COMMISSION) - calculateCosts(3).monthlyOngoing).toFixed(2)}/mo. Web Monthly: ~$${(PLANS[1].monthly - calculateCosts(3).monthlyOngoing).toFixed(2)}/mo. Web Yearly (${fmtCents(PLANS[2].monthly)}/mo equivalent): ~$${(PLANS[2].monthly - calculateCosts(3).monthlyOngoing).toFixed(2)}/mo.`,
               color: "#fbbf24",
             },
             {
               label: "Biggest cost driver",
-              value: `generateTasks (DeepSeek) -- runs up to ${MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY}x/24h per goal (initial + extra + work-ahead). Mid-priced per call but by far the highest frequency of any function.`,
+              value: `generateTasks (DeepSeek) — up to ${MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY}× per goal per 24h (initial + "Give me more" + work-ahead). ${fmt(costPerCall(FN.generateTasks))} per call with real measured tokens. At 3 goals × 3 calls × 30 days = ${fmt(calculateCosts(3).generateTasksDaily * 30, 2)} per user per month at the cap.`,
               color: "#f59e0b",
             },
             {

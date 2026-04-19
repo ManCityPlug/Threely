@@ -68,29 +68,28 @@ function StatCard({
 }
 
 // ── Per-User Cost Estimator ──────────────────────────────────────────────────
-// DeepSeek V3 (primary): $0.28/M input, $0.42/M output
-// Gemini 2.5 Flash (fallback): $0.30/M input, $2.50/M output
+// Pricing verified 2026-04-19:
+//   DeepSeek V3.2 (primary):          $0.28/M input, $0.42/M output
+//   Gemini 2.5 Flash-Lite (fallback): $0.10/M input, $0.40/M output
 //
-// Estimated tokens per call (input/output) based on prompt lengths:
+// Tokens flagged "measured" come from AICallLog averages (deepseek-chat only).
+// "estimate" = no production data yet.
+const DEEPSEEK_RATES = { inputRate: 0.28, outputRate: 0.42 };
+const GEMINI_RATES   = { inputRate: 0.10, outputRate: 0.40 };
 const AI_FUNCTIONS = [
-  { name: "parseGoal",            model: "DeepSeek", frequency: "Once per goal",          inputTok: 600,  outputTok: 300,  inputRate: 0.28, outputRate: 0.42 },
-  { name: "generateRoadmap",      model: "DeepSeek", frequency: "Once per goal",          inputTok: 1300, outputTok: 1500, inputRate: 0.28, outputRate: 0.42 },
-  { name: "goalChat (per turn)",  model: "DeepSeek", frequency: "5-10× during goal setup",inputTok: 800,  outputTok: 400,  inputRate: 0.28, outputRate: 0.42 },
-  { name: "generateTasks",        model: "DeepSeek", frequency: "1-2×/day per goal",      inputTok: 3500, outputTok: 2000, inputRate: 0.28, outputRate: 0.42 },
-  { name: "refineTask",           model: "DeepSeek", frequency: "On demand (0-3×/day)",   inputTok: 500,  outputTok: 250,  inputRate: 0.28, outputRate: 0.42 },
-  { name: "askAboutTask",         model: "DeepSeek", frequency: "On demand (0-5×/day)",   inputTok: 600,  outputTok: 300,  inputRate: 0.28, outputRate: 0.42 },
-  { name: "generateWeeklySummary",model: "DeepSeek", frequency: "1×/week",                inputTok: 1500, outputTok: 200,  inputRate: 0.28, outputRate: 0.42 },
-];
+  { name: "parseGoal",             frequency: "Once per goal",                 inputTok:  812, outputTok:  185, source: "measured" },
+  { name: "generateRoadmap",       frequency: "Once per goal",                 inputTok:  716, outputTok: 1305, source: "measured" },
+  { name: "generateTasks",         frequency: "Up to 3×/24h per goal",         inputTok: 2765, outputTok:  447, source: "measured" },
+  { name: "refineTask",            frequency: "On demand (~10% of tasks)",     inputTok:  500, outputTok:  250, source: "estimate" },
+  { name: "askAboutTask",          frequency: "On demand (~0.3×/goal/day)",    inputTok:  506, outputTok:  107, source: "measured" },
+  { name: "generateWeeklySummary", frequency: "1×/week per user",              inputTok: 1500, outputTok:  200, source: "estimate" },
+] as const;
 
-// Gemini fallback rates (used if DeepSeek fails — 15s timeout, circuit breaker after 3 failures)
-const GEMINI_RATES = { inputRate: 0.30, outputRate: 2.50 };
+function costPerCall(f: typeof AI_FUNCTIONS[number]) {
+  return (f.inputTok * DEEPSEEK_RATES.inputRate + f.outputTok * DEEPSEEK_RATES.outputRate) / 1_000_000;
+}
 function costPerCallGemini(f: typeof AI_FUNCTIONS[number]) {
   return (f.inputTok * GEMINI_RATES.inputRate + f.outputTok * GEMINI_RATES.outputRate) / 1_000_000;
-}
-
-// Cost per call in USD
-function costPerCall(f: typeof AI_FUNCTIONS[number]) {
-  return (f.inputTok * f.inputRate + f.outputTok * f.outputRate) / 1_000_000;
 }
 
 // Pricing
@@ -100,51 +99,33 @@ const WEB_YEARLY = 99.99;    // Stripe (web)
 const WEB_YEARLY_MONTHLY = WEB_YEARLY / 12;
 const APPLE_COMMISSION = 0.15; // Apple Small Business Program (under $1M/yr)
 
-function CostEstimatorSection({ activeUsers, payingUsers }: { activeUsers: number; payingUsers: number }) {
+// Hard product limits — match in-app enforcement.
+const MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY = 3; // initial + "Give me more" + work-ahead
+
+function CostEstimatorSection({ payingUsers }: { activeUsers: number; payingUsers: number }) {
   const costs = AI_FUNCTIONS.map((f) => ({ ...f, cost: costPerCall(f) }));
+  const byName = Object.fromEntries(costs.map((c) => [c.name, c]));
 
   // ── Scenario builder ──
-  // For each goal count (1, 2, 3) calculate monthly AI cost
+  // Average: user generates today once/day (skips "Give me more" and work-ahead).
   function monthlyAiCost(goals: number) {
-    const parseGoal = costs.find((c) => c.name === "parseGoal")!;
-    const roadmap = costs.find((c) => c.name === "generateRoadmap")!;
-    const goalChat = costs.find((c) => c.name === "goalChat (per turn)")!;
-    const genTasks = costs.find((c) => c.name === "generateTasks")!;
-    const refine = costs.find((c) => c.name === "refineTask")!;
-    const askAi = costs.find((c) => c.name === "askAboutTask")!;
-    const weekly = costs.find((c) => c.name === "generateWeeklySummary")!;
-
-    // One-time per goal (amortised over month)
-    const oneTime = goals * (parseGoal.cost + roadmap.cost + goalChat.cost * 8);
-
-    // Daily recurring (30 days)
-    const dailyTasks = goals * 1.5 * genTasks.cost; // avg 1.5 generations/day/goal
-    const dailyRefine = refine.cost * 1; // avg 1 refine/day
-    const dailyAskAi = askAi.cost * 2; // avg 2 ask-ai/day
+    const oneTime = goals * (byName.parseGoal.cost + byName.generateRoadmap.cost);
+    const dailyTasks = goals * 1 * byName.generateTasks.cost; // avg 1 gen/day/goal
+    const dailyRefine = byName.refineTask.cost * 0.3 * goals; // ~10% of 3 tasks
+    const dailyAskAi = byName.askAboutTask.cost * 0.3 * goals; // ~0.3x/day/goal
     const daily = dailyTasks + dailyRefine + dailyAskAi;
-
-    const weeklyCost = weekly.cost * 4.3; // ~4.3 weeks/month
-
+    const weeklyCost = byName.generateWeeklySummary.cost * 4.3; // ~4.3 wks/mo
     return oneTime + daily * 30 + weeklyCost;
   }
 
-  // Worst case: max usage
+  // Worst case: user hits every cap every day.
   function monthlyAiCostMax(goals: number) {
-    const parseGoal = costs.find((c) => c.name === "parseGoal")!;
-    const roadmap = costs.find((c) => c.name === "generateRoadmap")!;
-    const goalChat = costs.find((c) => c.name === "goalChat (per turn)")!;
-    const genTasks = costs.find((c) => c.name === "generateTasks")!;
-    const refine = costs.find((c) => c.name === "refineTask")!;
-    const askAi = costs.find((c) => c.name === "askAboutTask")!;
-    const weekly = costs.find((c) => c.name === "generateWeeklySummary")!;
-
-    const oneTime = goals * (parseGoal.cost + roadmap.cost + goalChat.cost * 10);
-    const dailyTasks = goals * 2 * genTasks.cost; // 2 gens/day/goal (max)
-    const dailyRefine = refine.cost * 3; // 3 refines/day
-    const dailyAskAi = askAi.cost * 5; // 5 ask-ai/day
+    const oneTime = goals * (byName.parseGoal.cost + byName.generateRoadmap.cost);
+    const dailyTasks = goals * MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY * byName.generateTasks.cost;
+    const dailyRefine = byName.refineTask.cost * 3; // 3 refines/day total
+    const dailyAskAi = byName.askAboutTask.cost * 5; // 5 ask/day total
     const daily = dailyTasks + dailyRefine + dailyAskAi;
-    const weeklyCost = weekly.cost * 4.3;
-
+    const weeklyCost = byName.generateWeeklySummary.cost * 4.3;
     return oneTime + daily * 30 + weeklyCost;
   }
 
@@ -176,7 +157,7 @@ function CostEstimatorSection({ activeUsers, payingUsers }: { activeUsers: numbe
           AI Cost Per Call
         </h3>
         <div style={{ fontSize: "0.72rem", color: "#71717a", marginBottom: "0.75rem" }}>
-          Primary: DeepSeek V3 ($0.28/$0.42 per 1M tokens) · Fallback: Gemini 2.5 Flash ($0.30/$2.50 per 1M tokens)
+          {`Primary: DeepSeek V3.2 ($${DEEPSEEK_RATES.inputRate}/$${DEEPSEEK_RATES.outputRate} per 1M tokens) · Fallback: Gemini 2.5 Flash-Lite ($${GEMINI_RATES.inputRate}/$${GEMINI_RATES.outputRate} per 1M tokens). Tokens = real averages from AICallLog.`}
         </div>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.8rem" }}>
           <thead>
@@ -268,11 +249,11 @@ function CostEstimatorSection({ activeUsers, payingUsers }: { activeUsers: numbe
         <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.8rem" }}>
           {[
             { color: "#3ecf8e", label: "Goal cap enforced", text: "Max 3 active goals per user. Prevents runaway costs from power users." },
-            { color: "#3ecf8e", label: "Generation cap enforced", text: "Max 2 task generations per goal per day (initial + 1 extra)." },
-            { color: "#4ade80", label: "DeepSeek primary, Gemini fallback", text: "All functions use DeepSeek V3 ($0.28/$0.42/M). Falls back to Gemini 2.5 Flash ($0.30/$2.50/M) on failure. 15s timeout, circuit breaker after 3 consecutive failures (5 min cooldown)." },
-            { color: "#f59e0b", label: "Biggest cost driver", text: `generateTasks (DeepSeek) — runs up to 2×/day per goal. ~$${costs.find(c => c.name === "generateTasks")!.cost.toFixed(4)}/call (DeepSeek) or ~$${costPerCallGemini(costs.find(c => c.name === "generateTasks")!).toFixed(4)}/call (Gemini fallback).` },
-            { color: "#D4A843", label: "Setup cost", text: `parseGoal + generateRoadmap + goalChat — ~$${(costs.find(c => c.name === "parseGoal")!.cost + costs.find(c => c.name === "generateRoadmap")!.cost + costs.find(c => c.name === "goalChat (per turn)")!.cost * 8).toFixed(4)} per goal (DeepSeek), one-time only.` },
-            { color: "#ef4444", label: "Apple commission (app only)", text: `15% via Small Business Program (under $1M/yr). ~$${(APP_MONTHLY * APPLE_COMMISSION).toFixed(2)}/mo. Web subscriptions via Stripe have no Apple cut.` },
+            { color: "#3ecf8e", label: "Generation cap enforced", text: `Max ${MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY} task generations per goal per 24h (initial + \"Give me more\" + work-ahead).` },
+            { color: "#4ade80", label: "DeepSeek primary, Gemini Flash-Lite fallback", text: `All functions use DeepSeek V3.2 ($${DEEPSEEK_RATES.inputRate}/$${DEEPSEEK_RATES.outputRate} per 1M). Falls back to Gemini 2.5 Flash-Lite ($${GEMINI_RATES.inputRate}/$${GEMINI_RATES.outputRate} per 1M) on failure. 15s timeout, circuit breaker after 3 consecutive failures (5 min cooldown).` },
+            { color: "#f59e0b", label: "Biggest cost driver", text: `generateTasks — runs up to ${MAX_TASK_GENERATIONS_PER_GOAL_PER_DAY}×/24h per goal. ~$${byName.generateTasks.cost.toFixed(4)}/call (DeepSeek) · ~$${costPerCallGemini(byName.generateTasks).toFixed(4)}/call (Gemini fallback). Measured tokens.` },
+            { color: "#D4A843", label: "Setup cost per goal", text: `parseGoal + generateRoadmap — ~$${(byName.parseGoal.cost + byName.generateRoadmap.cost).toFixed(4)} per goal (DeepSeek), one-time only.` },
+            { color: "#ef4444", label: "Apple commission (app only)", text: `15% via Small Business Program (under $1M/yr). ~$${(APP_MONTHLY * APPLE_COMMISSION).toFixed(2)}/mo on App Monthly. Web subscriptions via Stripe have no Apple cut.` },
           ].map((item) => (
             <div key={item.label} style={{ display: "flex", gap: "0.75rem", alignItems: "flex-start" }}>
               <div style={{ width: 8, height: 8, borderRadius: "50%", background: item.color, marginTop: 5, flexShrink: 0 }} />

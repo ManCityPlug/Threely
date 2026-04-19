@@ -17,13 +17,16 @@ interface TaskItem {
   isSkipped?: boolean;
 }
 
+// AI cost estimates per call (USD), computed from real AICallLog token averages
+// priced against DeepSeek V3.2 ($0.28 in / $0.42 out per 1M). Must stay in sync
+// with /api/admin/overview/route.ts.
 const AI_COSTS = {
-  parseGoal: 0.027,
-  generateRoadmap: 0.093,
-  generateTasks: 0.02,
-  goalChat: 0.001,
-  refineTask: 0.001,
-  generateWeeklySummary: 0.001,
+  parseGoal:             0.000305,
+  generateRoadmap:       0.000749,
+  generateTasks:         0.000962,
+  refineTask:            0.000245,
+  askAboutTask:          0.000187,
+  generateWeeklySummary: 0.000504,
 };
 
 export async function GET(
@@ -139,30 +142,16 @@ export async function GET(
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
   const goalsLast30d = goals.filter((g) => g.createdAt >= thirtyDaysAgo).length;
 
-  // AI cost estimate
+  // AI cost estimate. One DailyTask = one generateTasks call (work-ahead creates
+  // a separate DailyTask for tomorrow, already included in the count).
   const goalCount = goals.length;
+  const refineCalls = Math.round(totalTaskItems * 0.1);
   const aiCosts = {
-    parseGoal: { calls: goalCount, cost: goalCount * AI_COSTS.parseGoal },
-    generateRoadmap: {
-      calls: goalCount,
-      cost: goalCount * AI_COSTS.generateRoadmap,
-    },
-    generateTasks: {
-      calls: allDailyTasks.length,
-      cost: allDailyTasks.length * AI_COSTS.generateTasks,
-    },
-    goalChat: {
-      calls: goalCount * 2,
-      cost: goalCount * 2 * AI_COSTS.goalChat,
-    },
-    refineTask: {
-      calls: Math.round(totalTaskItems * 0.1),
-      cost: Math.round(totalTaskItems * 0.1) * AI_COSTS.refineTask,
-    },
-    generateWeeklySummary: {
-      calls: weeklySummaries,
-      cost: weeklySummaries * AI_COSTS.generateWeeklySummary,
-    },
+    parseGoal:             { calls: goalCount,              cost: goalCount * AI_COSTS.parseGoal },
+    generateRoadmap:       { calls: goalCount,              cost: goalCount * AI_COSTS.generateRoadmap },
+    generateTasks:         { calls: allDailyTasks.length,   cost: allDailyTasks.length * AI_COSTS.generateTasks },
+    refineTask:            { calls: refineCalls,            cost: refineCalls * AI_COSTS.refineTask },
+    generateWeeklySummary: { calls: weeklySummaries,        cost: weeklySummaries * AI_COSTS.generateWeeklySummary },
   };
   const totalAICost = Object.values(aiCosts).reduce(
     (sum, v) => sum + v.cost,
