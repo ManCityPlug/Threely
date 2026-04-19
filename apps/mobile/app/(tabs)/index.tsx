@@ -608,18 +608,25 @@ function SCurvePathView({
   // above it. 170px gives ~50px visual gap even at the tightest cluster.
   const nodeSpacing = 170;
 
-  // Scroll to today's node — fires on mount, on day change, AND every time the
-  // parent bumps `scrollTrigger` (e.g. when Today tab is re-focused or user
-  // returns to path view from tasks view). Matches web's PathView behavior.
+  // Scroll to today's node. Uses a ref-tracked trigger so onContentSizeChange
+  // can run the scroll once the ScrollView has actually laid out its children
+  // (scrollTo is a no-op before measurement on iOS). Don't depend on the
+  // re-created `days` array — it thrashes the effect and the setTimeout
+  // keeps getting cleared before firing.
+  const pendingScrollRef = useRef(false);
+  const scrollToToday = useCallback(() => {
+    const todayIndex = goalDayNumber - windowStart;
+    if (todayIndex < 0 || todayIndex >= VISIBLE_NODES) return;
+    const scrollTarget = Math.max(0, todayIndex * nodeSpacing - 180);
+    scrollRef.current?.scrollTo({ y: scrollTarget, animated: true });
+  }, [goalDayNumber, windowStart, nodeSpacing]);
+
   useEffect(() => {
-    const todayIndex = days.indexOf(goalDayNumber);
-    if (todayIndex < 0) return;
-    const t = setTimeout(() => {
-      const scrollTarget = Math.max(0, todayIndex * nodeSpacing - 180);
-      scrollRef.current?.scrollTo({ y: scrollTarget, animated: true });
-    }, 350);
-    return () => clearTimeout(t);
-  }, [goalDayNumber, nodeSpacing, days, scrollTrigger]);
+    pendingScrollRef.current = true;
+    // Attempt immediately; if content isn't measured yet, onContentSizeChange
+    // will run scrollToToday as soon as it is.
+    scrollToToday();
+  }, [goalDayNumber, scrollTrigger, scrollToToday]);
 
   const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
@@ -635,6 +642,12 @@ function SCurvePathView({
         showsVerticalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={100}
+        onContentSizeChange={() => {
+          if (pendingScrollRef.current) {
+            pendingScrollRef.current = false;
+            scrollToToday();
+          }
+        }}
         contentContainerStyle={{
           paddingTop: 30,
           paddingBottom: 80,
@@ -2185,17 +2198,13 @@ export default function DashboardScreen() {
 
             {/* S-curve path */}
             <SCurvePathView
-              goalDayNumber={allDone ? effectiveDayNumber + 1 : effectiveDayNumber}
+              goalDayNumber={effectiveDayNumber}
               allDone={allDone && celebrationDismissed}
               startedDays={startedDays}
               scrollTrigger={pathScrollTrigger}
               onTapToday={() => {
-                if (allDone && celebrationDismissed) return;
                 if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                // Mark the displayed "today" day — which is effectiveDayNumber+1
-                // when path is bumped forward after allDone (work-ahead preview).
-                const displayedToday = allDone ? effectiveDayNumber + 1 : effectiveDayNumber;
-                markDayStarted(displayedToday);
+                markDayStarted(effectiveDayNumber);
                 // Go straight to tasks view (matches web — no intermediate popup).
                 setViewMode("tasks");
               }}
@@ -2223,9 +2232,7 @@ export default function DashboardScreen() {
                       text: "Work ahead",
                       onPress: async () => {
                         await AsyncStorage.setItem(aheadKey, "true");
-                        // Mark the work-ahead day as started so badge flips to CONTINUE
-                        const displayedToday = allDone ? effectiveDayNumber + 1 : effectiveDayNumber;
-                        markDayStarted(displayedToday + 1);
+                        markDayStarted(effectiveDayNumber + 1);
                         setViewMode("tasks");
                       },
                     },
