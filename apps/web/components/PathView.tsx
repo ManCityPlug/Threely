@@ -500,7 +500,9 @@ export default function PathView({
             width: "100%",
             maxWidth: "var(--max-path-width, 500px)",
             margin: "0 auto",
-            height: `calc(${days.length} * var(--node-spacing, 100px) + 80px)`,
+            // +40px accounts for the future-day bump applied below so the
+            // last node stays inside the container.
+            height: `calc(${days.length} * var(--node-spacing, 100px) + 120px)`,
           }}
         >
           {days.map((day, i) => {
@@ -560,7 +562,12 @@ export default function PathView({
                 ref={isToday ? todayRef : undefined}
                 style={{
                   position: "absolute",
-                  top: `calc(40px + ${i} * var(--node-spacing, 100px))`,
+                  // Future days (day > dayNumber) get an extra +40px so
+                  // today's START badge + "Day N / TODAY" label doesn't
+                  // overlap the previous day's node or label — especially
+                  // noticeable at milestone boundaries where the previous
+                  // label reads "1 Week!" and stacks above the badge.
+                  top: `calc(40px + ${i} * var(--node-spacing, 100px) + ${day > dayNumber ? 40 : 0}px)`,
                   left: `${xOffset}%`,
                   transform: "translateX(-50%)",
                   display: "flex",
