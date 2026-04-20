@@ -32,9 +32,13 @@ export default function MarketingNav() {
   return (
     <>
       <nav style={{
+        // Opaque #141414 to match body. Previously rgba(10,10,10,0.85) with
+        // blur, which compositing over the #141414 body produced a visibly
+        // darker band — on mobile Safari that read as a mismatched strip
+        // between the iOS chrome and the rest of the page. Matching body
+        // makes the top of the viewport uniform.
         position: "sticky", top: 0, zIndex: 100,
-        background: "rgba(10,10,10,0.85)", backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
+        background: "#141414",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
         padding: "0 1.5rem",
         height: 64,
