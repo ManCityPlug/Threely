@@ -1,10 +1,54 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { loadStripe, type Stripe, type PaymentRequest } from "@stripe/stripe-js";
+import {
+  Elements,
+  CardNumberElement,
+  CardExpiryElement,
+  CardCvcElement,
+  PaymentRequestButtonElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
 import { getSupabase } from "@/lib/supabase-client";
 import type { TaskItem } from "@/lib/api-client";
+
+type PlanId = "monthly" | "yearly";
+
+const PLAN_INFO: Record<PlanId, { label: string; priceDisplay: string; subLine: string; badge?: string; priceYearly?: string }> = {
+  yearly:  { label: "Yearly",  priceDisplay: "$8.33/mo",  subLine: "Billed annually at $99.99", badge: "40% OFF", priceYearly: "$99.99/yr" },
+  monthly: { label: "Monthly", priceDisplay: "$12.99/mo", subLine: "Billed monthly" },
+};
+
+let _stripePromise: Promise<Stripe | null> | null = null;
+function getStripePromise() {
+  if (!_stripePromise) {
+    _stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+  }
+  return _stripePromise;
+}
+
+async function safeJson(res: Response) {
+  const text = await res.text();
+  if (!text) return {};
+  try { return JSON.parse(text); } catch { return { error: text.slice(0, 200) }; }
+}
+
+function getElementStyle(): Record<string, unknown> {
+  return {
+    base: {
+      fontSize: "16px",
+      color: "#e4e8ee",
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      fontSmoothing: "antialiased",
+      "::placeholder": { color: "#6b7280" },
+    },
+    invalid: { color: "#ff4d4f" },
+  };
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -69,84 +113,355 @@ const EFFORT_TO_INTENSITY: Record<string, number> = {
   heavy: 3,
 };
 
-// ─── Plan CTA — Apple Pay (if available) + card fallback ─────────────────────
-// Detects Apple Pay support via ApplePaySession and shows a branded Apple Pay
-// primary button on Safari (iPhone / iPad / Mac). Below: "Enter card manually"
-// opens a secondary continue button. Both route to /checkout where the actual
-// Stripe confirmation happens. Once Stripe's apple-pay-domain-association is
-// set up, we can move the PaymentRequestButton inline here.
-function PlanCta() {
-  const router = useRouter();
-  const [hasApplePay, setHasApplePay] = useState(false);
-  const [cardOpen, setCardOpen] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    try {
-      const w = window as unknown as { ApplePaySession?: { canMakePayments: () => boolean } };
-      if (w.ApplePaySession?.canMakePayments?.()) setHasApplePay(true);
-    } catch { /* ignore */ }
-  }, []);
-
-  const goCheckout = (method: "apple" | "card") =>
-    router.push(`/checkout?plan=monthly&from=start&method=${method}`);
-
-  const applePayButton = (
-    <button
-      onClick={() => goCheckout("apple")}
-      aria-label="Pay with Apple Pay"
-      style={{
-        height: 56, width: "100%",
-        background: "#000", color: "#fff",
-        borderRadius: 14, border: "1px solid rgba(255,255,255,0.15)",
-        cursor: "pointer",
-        display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-        fontSize: "1.05rem", fontWeight: 500, letterSpacing: "-0.01em",
-      }}
-    >
-      <span style={{ fontSize: "1.25rem" }}></span>
-      <span>Pay</span>
-    </button>
-  );
-
-  const cardButton = (
-    <button
-      onClick={() => goCheckout("card")}
-      style={{
-        height: 56, width: "100%", fontSize: "1rem", fontWeight: 700,
-        background: "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)",
-        color: "#000", borderRadius: 14, border: "none", cursor: "pointer",
-      }}
-    >
-      Start For $1 →
-    </button>
-  );
-
-  // Non-Apple devices: single card button (same as before).
-  if (!hasApplePay) return <div style={{ marginTop: 8 }}>{cardButton}</div>;
-
-  // Apple devices: Apple Pay primary, "Enter card manually" expander below.
-  return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8 }}>
-      {applePayButton}
+// ─── Plan Selector (Monthly | Yearly) ────────────────────────────────────────
+function PlanSelector({ plan, onChange }: { plan: PlanId; onChange: (p: PlanId) => void }) {
+  const renderOption = (id: PlanId) => {
+    const info = PLAN_INFO[id];
+    const selected = plan === id;
+    return (
       <button
+        key={id}
+        type="button"
+        onClick={() => onChange(id)}
+        style={{
+          flex: 1,
+          padding: "0.85rem 0.9rem",
+          borderRadius: 12,
+          border: `1.5px solid ${selected ? "#D4A843" : "rgba(255,255,255,0.1)"}`,
+          background: selected ? "rgba(212,168,67,0.08)" : "rgba(255,255,255,0.02)",
+          color: "var(--text)",
+          cursor: "pointer",
+          textAlign: "left",
+          position: "relative",
+          transition: "all 0.15s",
+        }}
+      >
+        {info.badge && (
+          <span style={{
+            position: "absolute", top: -10, right: 10,
+            background: "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)",
+            color: "#000", fontSize: "0.65rem", fontWeight: 800,
+            padding: "2px 8px", borderRadius: 10, letterSpacing: "0.04em",
+          }}>{info.badge}</span>
+        )}
+        <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 3 }}>
+          {info.label}
+        </div>
+        <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)" }}>
+          {info.priceDisplay}
+        </div>
+        <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.55)", marginTop: 2 }}>
+          {info.subLine}
+        </div>
+      </button>
+    );
+  };
+  return (
+    <div style={{ display: "flex", gap: 10 }}>
+      {renderOption("yearly")}
+      {renderOption("monthly")}
+    </div>
+  );
+}
+
+// ─── Inline payment (Apple Pay / Google Pay + card fallback) ─────────────────
+// Mounts inside Stripe <Elements>. On mount, creates a SetupIntent via the
+// existing /api/subscription/checkout endpoint (anon user already set up by
+// outer /start flow). PaymentRequestButton handles Apple Pay + Google Pay
+// detection — Stripe shows the right brand automatically. If device supports
+// neither, only the "Enter card manually" form is offered.
+interface InlinePaymentProps {
+  plan: PlanId;
+  onPlanChange: (p: PlanId) => void;
+  onSuccess: (payerEmail: string | null) => void;
+}
+function InlinePayment({ plan, onPlanChange, onSuccess }: InlinePaymentProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
+  const [cardOpen, setCardOpen] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [cardNumberComplete, setCardNumberComplete] = useState(false);
+  const [cardExpiryComplete, setCardExpiryComplete] = useState(false);
+  const [cardCvcComplete, setCardCvcComplete] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const initRan = useRef(false);
+
+  const cardReady = fullName.trim().length > 0 && cardNumberComplete && cardExpiryComplete && cardCvcComplete;
+
+  // Fetch SetupIntent once (plan changes don't re-issue the SetupIntent — it's
+  // card-only; the actual subscription price is chosen at /confirm time).
+  useEffect(() => {
+    if (initRan.current) return;
+    initRan.current = true;
+    (async () => {
+      try {
+        const supabase = getSupabase();
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) { setError("Session expired. Please refresh."); return; }
+        const res = await fetch("/api/subscription/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ plan }),
+        });
+        const data = await safeJson(res);
+        if (!res.ok) throw new Error(data.error || "Failed to initialize payment");
+        setClientSecret(data.clientSecret);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Something went wrong");
+      }
+    })();
+  }, [plan]);
+
+  // Wire PaymentRequest (Apple Pay / Google Pay) once both stripe + secret are ready.
+  useEffect(() => {
+    if (!stripe || !clientSecret) return;
+    const pr = stripe.paymentRequest({
+      country: "US",
+      currency: "usd",
+      total: { label: "Threely Trial", amount: 100 },
+      requestPayerEmail: true,
+      requestPayerName: true,
+    });
+    pr.canMakePayment().then((result) => {
+      if (result) setPaymentRequest(pr);
+    });
+    pr.on("paymentmethod", async (ev) => {
+      if (!stripe || !clientSecret) { ev.complete("fail"); return; }
+      setSubmitting(true);
+      const { error: confirmErr } = await stripe.confirmCardSetup(
+        clientSecret,
+        { payment_method: ev.paymentMethod.id },
+        { handleActions: false },
+      );
+      if (confirmErr) {
+        ev.complete("fail");
+        setError(confirmErr.message ?? "Payment failed");
+        setSubmitting(false);
+        return;
+      }
+      ev.complete("success");
+      try {
+        await confirmSubscription(plan);
+        onSuccess(ev.payerEmail ?? null);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Subscription failed");
+      } finally {
+        setSubmitting(false);
+      }
+    });
+  }, [stripe, clientSecret, plan, onSuccess]);
+
+  async function confirmSubscription(planId: PlanId) {
+    const supabase = getSupabase();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) throw new Error("Session expired");
+    const res = await fetch("/api/subscription/confirm", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ plan: planId }),
+    });
+    const data = await safeJson(res);
+    if (!res.ok) throw new Error(data.error || "Failed to create subscription");
+    return data;
+  }
+
+  async function handleCardSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!stripe || !elements || !clientSecret) return;
+    setSubmitting(true);
+    setError(null);
+    const cardNumber = elements.getElement(CardNumberElement);
+    if (!cardNumber) { setError("Card element not found"); setSubmitting(false); return; }
+    const { error: setupErr } = await stripe.confirmCardSetup(clientSecret, {
+      payment_method: { card: cardNumber, billing_details: { name: fullName.trim() } },
+    });
+    if (setupErr) { setError(setupErr.message ?? "Card setup failed"); setSubmitting(false); return; }
+    try {
+      await confirmSubscription(plan);
+      onSuccess(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Subscription failed");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12,
+    padding: "0.75rem 0.9rem", background: "rgba(255,255,255,0.02)", fontSize: "16px",
+    color: "var(--text)", outline: "none", boxSizing: "border-box",
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <PlanSelector plan={plan} onChange={onPlanChange} />
+
+      {error && (
+        <div style={{ padding: "0.6rem 0.8rem", borderRadius: 10, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", fontSize: "0.82rem", color: "#fca5a5" }}>
+          {error}
+        </div>
+      )}
+
+      {/* Apple Pay / Google Pay (Stripe auto-detects the brand) */}
+      {paymentRequest && (
+        <div>
+          <PaymentRequestButtonElement
+            options={{
+              paymentRequest,
+              style: { paymentRequestButton: { theme: "dark", height: "52px", type: "default" } },
+            }}
+          />
+        </div>
+      )}
+
+      {/* Enter card manually — collapsible */}
+      <button
+        type="button"
         onClick={() => setCardOpen((o) => !o)}
         style={{
           background: "none", border: "none", cursor: "pointer",
-          color: "rgba(255,255,255,0.7)", fontSize: "0.9rem", fontWeight: 600,
-          padding: "8px 0",
+          color: "rgba(255,255,255,0.75)", fontSize: "0.9rem", fontWeight: 600,
+          padding: "6px 0",
           display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
         }}
       >
         Enter card manually
-        <span style={{
-          display: "inline-block",
-          transition: "transform 0.2s",
-          transform: cardOpen ? "rotate(180deg)" : "rotate(0deg)",
-        }}>▾</span>
+        <span style={{ transition: "transform 0.2s", transform: cardOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
       </button>
-      {cardOpen && cardButton}
+
+      {cardOpen && (
+        <form onSubmit={handleCardSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <input
+            type="text" value={fullName} onChange={(e) => setFullName(e.target.value)}
+            placeholder="Name on card" autoComplete="cc-name" style={inputStyle}
+          />
+          <div style={{ ...inputStyle, padding: "0.85rem 0.9rem" }}>
+            <CardNumberElement options={{ style: getElementStyle(), showIcon: true }}
+              onChange={(e) => setCardNumberComplete(e.complete)} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div style={{ ...inputStyle, padding: "0.85rem 0.9rem" }}>
+              <CardExpiryElement options={{ style: getElementStyle() }}
+                onChange={(e) => setCardExpiryComplete(e.complete)} />
+            </div>
+            <div style={{ ...inputStyle, padding: "0.85rem 0.9rem" }}>
+              <CardCvcElement options={{ style: getElementStyle() }}
+                onChange={(e) => setCardCvcComplete(e.complete)} />
+            </div>
+          </div>
+          <button
+            type="submit"
+            disabled={!cardReady || submitting || !clientSecret}
+            style={{
+              height: 54, fontSize: "1rem", fontWeight: 700,
+              background: cardReady && !submitting
+                ? "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)"
+                : "rgba(255,255,255,0.08)",
+              color: cardReady && !submitting ? "#000" : "rgba(255,255,255,0.5)",
+              borderRadius: 14, border: "none",
+              cursor: cardReady && !submitting ? "pointer" : "default",
+            }}
+          >
+            {submitting ? "Processing…" : "Start For $1 →"}
+          </button>
+        </form>
+      )}
+    </div>
+  );
+}
+
+// ─── Account finalize — shown after payment succeeds ─────────────────────────
+// Converts the anonymous Supabase user into a real one. If Apple Pay / Google
+// Pay returned a payer email we pre-fill it and only ask for a password.
+// Otherwise the full email + password form is shown.
+function AccountFinalize({ preFilledEmail }: { preFilledEmail: string | null }) {
+  const router = useRouter();
+  const [email, setEmail] = useState(preFilledEmail ?? "");
+  const [password, setPassword] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    if (!email.includes("@")) { setError("Enter a valid email."); return; }
+    if (password.length < 8) { setError("Password must be at least 8 characters."); return; }
+    setSubmitting(true);
+    setError(null);
+    try {
+      const supabase = getSupabase();
+      const { error: updErr } = await supabase.auth.updateUser({ email, password });
+      if (updErr) {
+        if (updErr.message?.toLowerCase().includes("already")) {
+          throw new Error("An account with this email already exists. Please sign in.");
+        }
+        throw new Error(updErr.message ?? "Couldn't create account");
+      }
+      router.replace("/dashboard?subscribed=1");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+      setSubmitting(false);
+    }
+  }
+
+  const inputStyle: React.CSSProperties = {
+    width: "100%", border: "1.5px solid rgba(255,255,255,0.12)", borderRadius: 12,
+    padding: "0.85rem 0.95rem", background: "rgba(255,255,255,0.02)", fontSize: "16px",
+    color: "var(--text)", outline: "none", boxSizing: "border-box",
+  };
+
+  return (
+    <div style={{ width: "100%", maxWidth: 420, margin: "0 auto", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ fontSize: 40, marginBottom: 12 }}>{"\u2728"}</div>
+        <h1 style={{ fontSize: "clamp(1.4rem, 4vw, 1.75rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 6 }}>
+          {preFilledEmail ? "One last step" : "Create your account"}
+        </h1>
+        <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)" }}>
+          {preFilledEmail ? "Set a password so you can log back in." : "Save your plan with an email and password."}
+        </p>
+      </div>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {!preFilledEmail && (
+          <input
+            type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+            placeholder="Email" autoComplete="email" required style={inputStyle}
+          />
+        )}
+        {preFilledEmail && (
+          <div style={{ ...inputStyle, color: "rgba(255,255,255,0.65)", fontSize: "0.9rem" }}>
+            {preFilledEmail}
+          </div>
+        )}
+        <input
+          type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+          placeholder="Password (8+ characters)" autoComplete="new-password" required style={inputStyle}
+        />
+        {error && (
+          <div style={{ padding: "0.6rem 0.8rem", borderRadius: 10, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", fontSize: "0.82rem", color: "#fca5a5" }}>
+            {error}
+          </div>
+        )}
+        <button
+          type="submit" disabled={submitting}
+          style={{
+            height: 54, fontSize: "1rem", fontWeight: 700,
+            background: submitting ? "rgba(255,255,255,0.08)" : "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)",
+            color: submitting ? "rgba(255,255,255,0.5)" : "#000",
+            borderRadius: 14, border: "none", cursor: submitting ? "default" : "pointer", marginTop: 4,
+          }}
+        >
+          {submitting ? "Creating account…" : "Finish →"}
+        </button>
+      </form>
     </div>
   );
 }
@@ -306,108 +621,6 @@ export default function StartPage() {
       </div>
     );
   }
-
-  // ── Plan Ready screen ──
-  if (planReady) {
-    return (
-      <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <div style={{ width: "100%", maxWidth: 640, display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-          <div style={{ textAlign: "center" }}>
-            <img src="/favicon.png" alt="Threely" width={56} height={56} style={{ borderRadius: 14, marginBottom: 16 }} />
-            <h1 style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 0 }}>
-              Your plan is ready
-            </h1>
-          </div>
-
-          <div className="card" style={{ padding: "1.25rem 1.5rem", borderRadius: 16, border: "1px solid var(--border)" }}>
-            <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Your Goal</div>
-            <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)" }}>{generatedGoalTitle}</div>
-          </div>
-
-          {/* Plan preview — Task 1 fully visible (category-specific), Tasks 2 & 3
-              rendered as blurred cards with a gradient fade + "Start for $1 to
-              unlock your plan" overlay at the bottom. Blurred cards use the
-              same shape as the visible one so the silhouette reads as real. */}
-          {(() => {
-            const SAMPLE_TASKS: Record<Category, string> = {
-              business:   "Write down 3 things you're already good at",
-              daytrading: "Open a free paper trading account (Webull or Thinkorswim)",
-              health:     "Take a Day 1 photo and save it on your phone",
-              other:      "Google one person who's done what you want and save their name",
-            };
-            const BLURRED_PLACEHOLDERS = [
-              "Your next personalized step, made for your goal",
-              "A simple action to build momentum today",
-            ];
-            const visibleTask = category ? SAMPLE_TASKS[category] : SAMPLE_TASKS.other;
-            return (
-              <div style={{ position: "relative" }}>
-                {/* Day total time — shown ONCE above the task stack, not per task.
-                    Tasks themselves don't show individual minutes to reduce
-                    friction / cognitive load. */}
-                <div style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  fontSize: "0.75rem", color: "rgba(255,255,255,0.55)",
-                  marginBottom: 8, padding: "0 4px",
-                }}>
-                  <span style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Day 1</span>
-                  <span>~15 min total</span>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  {/* Task 1 — fully visible */}
-                  <div className="card" style={{ padding: "1rem 1.25rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
-                    <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
-                    <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0 }}>
-                      {visibleTask}
-                    </div>
-                  </div>
-
-                  {/* Tasks 2 & 3 — same card shape, blurred */}
-                  <div style={{ filter: "blur(6px)", pointerEvents: "none", userSelect: "none", display: "flex", flexDirection: "column", gap: 12 }}>
-                    {BLURRED_PLACEHOLDERS.map((placeholder, i) => (
-                      <div key={i} className="card" style={{ padding: "1rem 1.25rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
-                        <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
-                        <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0 }}>
-                          {placeholder}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Gradient fade + unlock message overlay — anchored over the
-                    blurred portion only. */}
-                <div style={{
-                  position: "absolute", left: 0, right: 0, bottom: 0,
-                  height: "75%",
-                  background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.6) 55%, rgba(10,10,10,0.95) 100%)",
-                  display: "flex", alignItems: "flex-end", justifyContent: "center",
-                  paddingBottom: 16, borderRadius: 14,
-                  pointerEvents: "none",
-                }}>
-                  <p style={{ fontSize: "0.9rem", fontWeight: 600, color: "rgba(255,255,255,0.95)", margin: 0 }}>
-                    Start for $1 to unlock your plan
-                  </p>
-                </div>
-              </div>
-            );
-          })()}
-
-          <PlanCta />
-          <p style={{ textAlign: "center", fontSize: "0.8rem", color: "rgba(255,255,255,0.85)", marginTop: 10 }}>
-            Cancel anytime.
-          </p>
-
-          <div style={{ textAlign: "center", marginTop: 8 }}>
-            <Link href="/login" style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.85)" }}>
-              Already have an account? <span style={{ color: "var(--text)", fontWeight: 600 }}>Sign in</span>
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
 
   // ── Hype screen ──
   if (showHype) {
@@ -614,6 +827,110 @@ export default function StartPage() {
           animation: fadeInUp 0.3s ease-out;
         }
       `}</style>
+    </div>
+  );
+}
+
+// ─── Plan Ready screen (wrapped in Elements by parent) ───────────────────────
+// Shows: goal card → blurred preview → plan selector → Apple/Google Pay +
+// card fallback → on success, swaps to AccountFinalize for email/password.
+function PlanReadyScreen({ category, generatedGoalTitle }: { category: Category | null; generatedGoalTitle: string }) {
+  const [plan, setPlan] = useState<PlanId>("yearly");
+  const [paymentDone, setPaymentDone] = useState(false);
+  const [payerEmail, setPayerEmail] = useState<string | null>(null);
+
+  const SAMPLE_TASKS: Record<Category, string> = {
+    business:   "Write down 3 things you're already good at",
+    daytrading: "Open a free paper trading account (Webull or Thinkorswim)",
+    health:     "Take a Day 1 photo and save it on your phone",
+    other:      "Google one person who's done what you want and save their name",
+  };
+  const BLURRED_PLACEHOLDERS = [
+    "Your next personalized step, made for your goal",
+    "A simple action to build momentum today",
+  ];
+  const visibleTask = category ? SAMPLE_TASKS[category] : SAMPLE_TASKS.other;
+
+  if (paymentDone) {
+    return (
+      <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <AccountFinalize preFilledEmail={payerEmail} />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: "100%", maxWidth: 480, display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+        <div style={{ textAlign: "center" }}>
+          <img src="/favicon.png" alt="Threely" width={56} height={56} style={{ borderRadius: 14, marginBottom: 16 }} />
+          <h1 style={{ fontSize: "clamp(1.4rem, 4vw, 1.85rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 0 }}>
+            Your plan is ready
+          </h1>
+        </div>
+
+        <div className="card" style={{ padding: "1.1rem 1.25rem", borderRadius: 16, border: "1px solid var(--border)" }}>
+          <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Your Goal</div>
+          <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)" }}>{generatedGoalTitle}</div>
+        </div>
+
+        {/* Plan preview — 1 task visible + 2 blurred */}
+        <div style={{ position: "relative" }}>
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            fontSize: "0.72rem", color: "rgba(255,255,255,0.55)",
+            marginBottom: 8, padding: "0 4px",
+          }}>
+            <span style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Day 1</span>
+            <span>~15 min total</span>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            <div className="card" style={{ padding: "0.9rem 1.1rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
+              <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0 }}>
+                {visibleTask}
+              </div>
+            </div>
+            <div style={{ filter: "blur(6px)", pointerEvents: "none", userSelect: "none", display: "flex", flexDirection: "column", gap: 10 }}>
+              {BLURRED_PLACEHOLDERS.map((placeholder, i) => (
+                <div key={i} className="card" style={{ padding: "0.9rem 1.1rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
+                  <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0 }}>
+                    {placeholder}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div style={{
+            position: "absolute", left: 0, right: 0, bottom: 0,
+            height: "65%",
+            background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.6) 55%, rgba(10,10,10,0.95) 100%)",
+            display: "flex", alignItems: "flex-end", justifyContent: "center",
+            paddingBottom: 12, borderRadius: 14, pointerEvents: "none",
+          }}>
+            <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "rgba(255,255,255,0.95)", margin: 0 }}>
+              Start for $1 to unlock your plan
+            </p>
+          </div>
+        </div>
+
+        {/* Inline payment — plan selector + Apple/Google Pay + card fallback */}
+        <InlinePayment
+          plan={plan}
+          onPlanChange={setPlan}
+          onSuccess={(email) => { setPayerEmail(email); setPaymentDone(true); }}
+        />
+
+        <p style={{ textAlign: "center", fontSize: "0.78rem", color: "rgba(255,255,255,0.75)" }}>
+          Cancel anytime.
+        </p>
+        <div style={{ textAlign: "center" }}>
+          <Link href="/login" style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.85)" }}>
+            Already have an account? <span style={{ color: "var(--text)", fontWeight: 600 }}>Sign in</span>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
