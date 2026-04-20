@@ -449,7 +449,17 @@ export default function StartPage() {
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter" && textValue.trim()) handleTextSubmit(textValue.trim()); }}
-                  autoFocus
+                  // No autoFocus — user should see Skip before being forced
+                  // into the keyboard. Safari autofill / password-manager
+                  // hints (^v✓) happen when autoComplete is unset; we
+                  // explicitly opt out of all of them so the box just holds
+                  // the user's typed text.
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
+                  data-1p-ignore
+                  data-lpignore="true"
+                  name="goalText"
                   style={{
                     fontSize: "1rem", padding: "1rem 1.25rem", borderRadius: 14, minHeight: 56,
                     background: "var(--card)", border: "1.5px solid var(--border)", color: "var(--text)",
