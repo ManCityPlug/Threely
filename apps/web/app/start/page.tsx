@@ -242,39 +242,63 @@ export default function StartPage() {
             <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)" }}>{generatedGoalTitle}</div>
           </div>
 
-          {/* Blurred tasks — fake preview to tease the plan */}
-          <div style={{ position: "relative" }}>
-            <div style={{ filter: "blur(6px)", pointerEvents: "none", userSelect: "none" }}>
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {["Your personalized first step toward your goal", "A quick action to build momentum today", "Something small that moves you forward"].map((placeholder, i) => (
-                  <div key={i} className="card" style={{ padding: "1.25rem 1.5rem", borderRadius: 16, border: "1px solid var(--border)" }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: "50%", border: "2px solid var(--border)", flexShrink: 0 }} />
-                      <div style={{ flex: 1 }}>
-                        <h3 style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text)", lineHeight: 1.35, margin: 0, marginBottom: 6 }}>
-                          Task {i + 1}: {placeholder}
-                        </h3>
-                        <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.6, margin: 0 }}>
-                          This task is personalized to your specific goal and situation.
-                        </p>
+          {/* Plan preview — Day 1, Task 1 fully visible; Tasks 2 & 3 locked.
+              Replaces the old heavy-blur teaser that stretched the page
+              and told the user nothing. Sample task is category-specific
+              so it reads as "the real thing" for their goal. */}
+          {(() => {
+            const SAMPLE_TASKS: Record<Category, string> = {
+              business:   "Write down your business idea in one sentence",
+              daytrading: "Open a free paper trading account (Webull or Thinkorswim)",
+              health:     "Take a Day 1 photo and save it on your phone",
+              other:      "Write what your life looks like when you've achieved your goal",
+            };
+            const visibleTask = category ? SAMPLE_TASKS[category] : SAMPLE_TASKS.other;
+            return (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {/* Task 1 — fully visible */}
+                <div className="card" style={{ padding: "1rem 1.25rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35 }}>
+                      {visibleTask}
+                    </div>
+                    <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 3 }}>
+                      Day 1 · ~2 min
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tasks 2 & 3 — locked rows (compact, no fake description text) */}
+                {[2, 3].map((n) => (
+                  <div key={n} style={{
+                    padding: "0.85rem 1.25rem",
+                    borderRadius: 14,
+                    border: "1px dashed rgba(255,255,255,0.12)",
+                    background: "rgba(255,255,255,0.02)",
+                    display: "flex", alignItems: "center", gap: 12,
+                  }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "rgba(255,255,255,0.4)" }}>
+                        Task {n} · Locked
+                      </div>
+                      <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.3)", marginTop: 2 }}>
+                        Day 1 · ~2 min
                       </div>
                     </div>
                   </div>
                 ))}
+
+                <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.55)", textAlign: "center", marginTop: 6 }}>
+                  Start your free trial to unlock today's plan — and every day after.
+                </p>
               </div>
-            </div>
-            {/* Overlay gradient fade */}
-            <div style={{
-              position: "absolute", inset: 0,
-              background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.7) 80%, rgba(10,10,10,0.95) 100%)",
-              display: "flex", alignItems: "flex-end", justifyContent: "center",
-              paddingBottom: 20, borderRadius: 16,
-            }}>
-              <p style={{ fontSize: "0.9rem", fontWeight: 600, color: "rgba(255,255,255,0.85)" }}>
-                Start your free trial to unlock your plan
-              </p>
-            </div>
-          </div>
+            );
+          })()}
 
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 8 }}>
             <button
