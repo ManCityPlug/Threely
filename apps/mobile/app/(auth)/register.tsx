@@ -89,7 +89,7 @@ export default function RegisterScreen() {
           <Image source={require("@/assets/icon.png")} style={styles.logo} />
 
           <Text style={styles.title}>Create your account</Text>
-          <Text style={styles.subtitle}>Start your free 3-day trial</Text>
+          <Text style={styles.subtitle}>Start for $1</Text>
 
           {/* Social sign-in buttons */}
           <View style={styles.socialButtons}>

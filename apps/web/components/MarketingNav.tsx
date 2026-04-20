@@ -106,7 +106,7 @@ export default function MarketingNav() {
                 borderRadius: 8,
                 textDecoration: "none",
               }}>
-                Start Free →
+                Start For $1 →
               </Link>
             </>
           )}

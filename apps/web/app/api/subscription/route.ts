@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
       });
       if (deviceClaimed) {
         return NextResponse.json(
-          { error: "Free trial already used on this device. Please subscribe to continue." },
+          { error: "Trial already used on this device. Please subscribe to continue." },
           { status: 403 }
         );
       }

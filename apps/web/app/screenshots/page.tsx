@@ -33,7 +33,7 @@ const DEFAULT_SLIDES: Slide[] = [
   { id: "1", image: null, headline: "Your goals, broken into\n3 daily tasks", subtitle: "AI builds your personalized plan", imageOffsetY: 0 },
   { id: "2", image: null, headline: "AI-powered coaching\nfor every task", subtitle: "Ask AI anything about your tasks", imageOffsetY: 0 },
   { id: "3", image: null, headline: "Track all your goals\nin one place", subtitle: "Stay organized and focused", imageOffsetY: 0 },
-  { id: "4", image: null, headline: "Start free\nfor 3 days", subtitle: "No commitment required", imageOffsetY: 0 },
+  { id: "4", image: null, headline: "Start for\n$1", subtitle: "No commitment required", imageOffsetY: 0 },
   { id: "5", image: null, headline: "Personalized plans\nbuilt by AI", subtitle: "Adapted to your schedule and level", imageOffsetY: 0 },
   { id: "6", image: null, headline: "Review your day,\ngrow every week", subtitle: "Build lasting habits with daily reviews", imageOffsetY: 0 },
 ];

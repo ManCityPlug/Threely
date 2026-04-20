@@ -51,9 +51,9 @@ export default function PaymentScreen() {
         {/* Hero */}
         <View style={styles.hero}>
           <View style={styles.logoWrap} />
-          <Text style={styles.heroTitle}>Start Your Free Trial</Text>
+          <Text style={styles.heroTitle}>Start For $1</Text>
           <Text style={styles.heroSubtitle}>
-            3 days free, then your chosen plan.{"\n"}Cancel anytime before the trial ends.
+            Just $1 to get started.{"\n"}Cancel anytime.
           </Text>
         </View>
 
@@ -100,11 +100,11 @@ export default function PaymentScreen() {
         <View style={styles.trialCard}>
           <View style={styles.trialRow}>
             <Ionicons name="gift-outline" size={18} color={colors.success} />
-            <Text style={styles.trialText}>3-day free trial — no charge today</Text>
+            <Text style={styles.trialText}>$1 today — full access unlocked</Text>
           </View>
           <View style={styles.trialRow}>
             <Ionicons name="close-circle-outline" size={18} color={colors.textSecondary} />
-            <Text style={styles.trialTextSub}>Cancel anytime in Settings before trial ends</Text>
+            <Text style={styles.trialTextSub}>Cancel anytime in Settings</Text>
           </View>
         </View>
 
@@ -122,13 +122,13 @@ export default function PaymentScreen() {
           disabled
           activeOpacity={0.85}
         >
-          <Text style={styles.ctaBtnText}>Start Free Trial</Text>
+          <Text style={styles.ctaBtnText}>Start For $1</Text>
         </TouchableOpacity>
 
         <Text style={styles.ctaSub}>
           {plan === "yearly"
-            ? `Then ${yearlyPrice}/year after 3 days`
-            : `Then ${monthlyPrice}/month after 3 days`}
+            ? `Then ${yearlyPrice}/year`
+            : `Then ${monthlyPrice}/month`}
         </Text>
 
         {/* Footer */}

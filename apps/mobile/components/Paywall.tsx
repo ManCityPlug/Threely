@@ -157,7 +157,7 @@ export default function Paywall({ visible, onDismiss }: PaywallProps) {
             <View style={{ flex: 1 }}>
               <Text style={[styles.planName, { color: colors.text }]}>Monthly</Text>
               <Text style={styles.planSub}>
-                {trialEligible ? "7 Day Free Trial · per month" : "per month"}
+                {trialEligible ? "$1 to start · per month" : "per month"}
               </Text>
             </View>
             <Text style={[styles.planPrice, { color: colors.text }]}>
@@ -170,7 +170,7 @@ export default function Paywall({ visible, onDismiss }: PaywallProps) {
         {trialEligible && (
           <View style={[styles.totalDueRow, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <Text style={[styles.totalDueLabel, { color: colors.textSecondary }]}>Total due today</Text>
-            <Text style={styles.totalDueAmount}>$0.00</Text>
+            <Text style={styles.totalDueAmount}>$1.00</Text>
           </View>
         )}
 
@@ -184,14 +184,14 @@ export default function Paywall({ visible, onDismiss }: PaywallProps) {
           {loading ? (
             <ActivityIndicator color={colors.primaryText} size="small" />
           ) : (
-            <Text style={styles.ctaBtnText}>{trialEligible ? "Start Free Trial" : "Subscribe"}</Text>
+            <Text style={styles.ctaBtnText}>{trialEligible ? "Start For $1" : "Subscribe"}</Text>
           )}
         </TouchableOpacity>
 
         {trialEligible ? (
           <>
             <Text style={styles.trialNote}>
-              No charge for 3 days. Cancel anytime in Settings.
+              Cancel anytime in Settings.
             </Text>
             <Text style={styles.ctaSub}>
               Then {priceString}/month

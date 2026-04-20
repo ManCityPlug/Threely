@@ -48,7 +48,7 @@ function StatusBanner({ details }: { details: SubscriptionDetails }) {
         marginBottom: "1.25rem",
       }}>
         <div style={{ fontWeight: 600, fontSize: "0.875rem", color: "var(--text)", marginBottom: 2 }}>
-          Free trial — {days} day{days !== 1 ? "s" : ""} remaining
+          Trial — {days} day{days !== 1 ? "s" : ""} remaining
         </div>
         <div style={{ fontSize: "0.8rem", color: "var(--subtext)" }}>
           Your trial ends on {formatDate(details.trialEnd)}. You won&apos;t be charged until then.

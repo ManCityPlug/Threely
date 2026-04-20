@@ -306,10 +306,10 @@ export default function StartPage() {
                 color: "#000", borderRadius: 14, border: "none", cursor: "pointer",
               }}
             >
-              Start Free Trial →
+              Start For $1 →
             </button>
             <p style={{ textAlign: "center", fontSize: "0.8rem", color: "rgba(255,255,255,0.85)" }}>
-              3-day free trial. Cancel anytime.
+              Cancel anytime.
             </p>
           </div>
 

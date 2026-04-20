@@ -799,9 +799,9 @@ function DashboardPageInner() {
     if (searchParams.get("subscribed") === "1") {
       refreshSubscription();
       if (searchParams.get("trial") === "denied") {
-        showToast("Welcome to Pro! This card was already used for a free trial, so your subscription starts today.", "success");
+        showToast("Welcome to Pro! This card was already used for a trial, so your subscription starts today.", "success");
       } else {
-        showToast("Welcome to Pro! Your 3-day free trial has started.", "success");
+        showToast("Welcome to Pro! Your 3-day trial has started.", "success");
       }
       router.replace("/dashboard");
     }
@@ -1213,7 +1213,7 @@ function DashboardPageInner() {
                 Unlock Threely Pro
               </div>
               <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>
-                Get Pro free for 3 days — Achieve your goals
+                Get Pro for $1 — Achieve your goals
               </div>
             </div>
             <div style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--primary)" }}>
