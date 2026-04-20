@@ -241,8 +241,8 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
               {([
-                { id: "business" as FunnelCategory, label: "\uD83E\uDD11 Business", subtitle: "Start or grow a business" },
                 { id: "daytrading" as FunnelCategory, label: "\uD83D\uDCC8 Day Trading", subtitle: "Grow a trading account" },
+                { id: "business" as FunnelCategory, label: "\uD83E\uDD11 Business", subtitle: "Start or grow a business" },
                 { id: "health" as FunnelCategory, label: "\uD83D\uDCAA Health", subtitle: "Transform your body" },
                 { id: "other" as FunnelCategory, label: "Other", subtitle: "Set any goal" },
               ]).map((cat) => (

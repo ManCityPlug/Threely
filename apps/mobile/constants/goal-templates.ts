@@ -7,8 +7,8 @@ export interface FunnelCategoryMeta {
 }
 
 export const FUNNEL_CATEGORIES: FunnelCategoryMeta[] = [
-  { id: "business", label: "\u{1F911} Business", subtitle: "Start or grow a business" },
   { id: "daytrading", label: "\u{1F4C8} Day Trading", subtitle: "Grow a trading account" },
+  { id: "business", label: "\u{1F911} Business", subtitle: "Start or grow a business" },
   { id: "health", label: "\u{1F4AA} Health", subtitle: "Transform your body" },
   { id: "other", label: "Other", subtitle: "Set any goal" },
 ];
