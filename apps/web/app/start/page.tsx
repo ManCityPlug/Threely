@@ -30,7 +30,7 @@ const STEPS: Record<Category, StepConfig[]> = {
   daytrading: [
     { question: "How much do you want to make per month?", buttons: ["$500", "$1K-$5K", "$10K+"] },
     { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
-    { question: "Any previous experience?", isTextInput: true, placeholder: "e.g. traded stocks for 6 months, complete beginner...", skippable: true },
+    { question: "Any previous experience?", isTextInput: true, placeholder: "", skippable: true },
   ],
   health: [
     { question: "What do you want?", buttons: ["Lose weight", "Glow up", "Gain more muscle"] },
