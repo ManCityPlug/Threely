@@ -242,10 +242,10 @@ export default function StartPage() {
             <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)" }}>{generatedGoalTitle}</div>
           </div>
 
-          {/* Plan preview — Day 1, Task 1 fully visible; Tasks 2 & 3 locked.
-              Replaces the old heavy-blur teaser that stretched the page
-              and told the user nothing. Sample task is category-specific
-              so it reads as "the real thing" for their goal. */}
+          {/* Plan preview — Task 1 fully visible (category-specific), Tasks 2 & 3
+              rendered as blurred cards with a gradient fade + "Start for $1 to
+              unlock your plan" overlay at the bottom. Blurred cards use the
+              same shape as the visible one so the silhouette reads as real. */}
           {(() => {
             const SAMPLE_TASKS: Record<Category, string> = {
               business:   "Write down 3 things you're already good at",
@@ -253,46 +253,59 @@ export default function StartPage() {
               health:     "Take a Day 1 photo and save it on your phone",
               other:      "Google one person who's done what you want and save their name",
             };
+            const BLURRED_PLACEHOLDERS = [
+              "Your next personalized step, made for your goal",
+              "A simple action to build momentum today",
+            ];
             const visibleTask = category ? SAMPLE_TASKS[category] : SAMPLE_TASKS.other;
             return (
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {/* Task 1 — fully visible */}
-                <div className="card" style={{ padding: "1rem 1.25rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35 }}>
-                      {visibleTask}
-                    </div>
-                    <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 3 }}>
-                      Day 1 · ~2 min
-                    </div>
-                  </div>
-                </div>
-
-                {/* Tasks 2 & 3 — locked rows (compact, no fake description text) */}
-                {[2, 3].map((n) => (
-                  <div key={n} style={{
-                    padding: "0.85rem 1.25rem",
-                    borderRadius: 14,
-                    border: "1px dashed rgba(255,255,255,0.12)",
-                    background: "rgba(255,255,255,0.02)",
-                    display: "flex", alignItems: "center", gap: 12,
-                  }}>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.35)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
+              <div style={{ position: "relative" }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                  {/* Task 1 — fully visible */}
+                  <div className="card" style={{ padding: "1rem 1.25rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: "0.9rem", fontWeight: 600, color: "rgba(255,255,255,0.4)" }}>
-                        Task {n} · Locked
+                      <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35 }}>
+                        {visibleTask}
                       </div>
-                      <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.3)", marginTop: 2 }}>
+                      <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 3 }}>
                         Day 1 · ~2 min
                       </div>
                     </div>
                   </div>
-                ))}
 
+                  {/* Tasks 2 & 3 — same card shape, blurred */}
+                  <div style={{ filter: "blur(6px)", pointerEvents: "none", userSelect: "none", display: "flex", flexDirection: "column", gap: 12 }}>
+                    {BLURRED_PLACEHOLDERS.map((placeholder, i) => (
+                      <div key={i} className="card" style={{ padding: "1rem 1.25rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
+                        <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35 }}>
+                            {placeholder}
+                          </div>
+                          <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 3 }}>
+                            Day 1 · ~2 min
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Gradient fade + unlock message overlay — anchored over the
+                    blurred portion only. */}
+                <div style={{
+                  position: "absolute", left: 0, right: 0, bottom: 0,
+                  height: "75%",
+                  background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.6) 55%, rgba(10,10,10,0.95) 100%)",
+                  display: "flex", alignItems: "flex-end", justifyContent: "center",
+                  paddingBottom: 16, borderRadius: 14,
+                  pointerEvents: "none",
+                }}>
+                  <p style={{ fontSize: "0.9rem", fontWeight: 600, color: "rgba(255,255,255,0.95)", margin: 0 }}>
+                    Start for $1 to unlock your plan
+                  </p>
+                </div>
               </div>
             );
           })()}
