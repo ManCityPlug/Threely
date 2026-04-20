@@ -295,7 +295,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
               </div>
             </div>
             <span style={{ fontWeight: 700, fontSize: "1.15rem", color: trialEligible ? "#3ecf8e" : "var(--text)", letterSpacing: "-0.02em" }}>
-              {trialEligible ? "$0.00" : info.price}
+              {trialEligible ? "$1.00" : info.price}
             </span>
           </div>
 
@@ -537,7 +537,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
                 border: "1px solid var(--border)",
               }}>
                 <span style={{ fontSize: "0.85rem", color: "var(--subtext)", fontWeight: 500 }}>Total due today</span>
-                <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3ecf8e" }}>$0.00</span>
+                <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3ecf8e" }}>$1.00</span>
               </div>
             )}
 

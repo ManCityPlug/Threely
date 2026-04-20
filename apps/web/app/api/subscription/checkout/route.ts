@@ -21,13 +21,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid plan. Use 'monthly' or 'yearly'." }, { status: 400 });
     }
 
-    // Ensure user record exists (anon users may not have one yet)
+    // Ensure user record exists (anon users may not have one yet).
+    // If the email is already claimed by a different row (stale anon record
+    // from a previous visit), return a clean "sign in" error instead of
+    // surfacing the raw Prisma P2002.
     const userEmail = user.email ?? `anon-${user.id}@anon.threely.local`;
-    await prisma.user.upsert({
-      where: { id: user.id },
-      create: { id: user.id, email: userEmail },
-      update: user.email ? { email: user.email } : {},
-    });
+    try {
+      await prisma.user.upsert({
+        where: { id: user.id },
+        create: { id: user.id, email: userEmail },
+        update: user.email ? { email: user.email } : {},
+      });
+    } catch (upsertErr: unknown) {
+      const msg = upsertErr instanceof Error ? upsertErr.message : "";
+      if (msg.includes("Unique constraint") && msg.includes("email")) {
+        return NextResponse.json(
+          { error: "An account with this email already exists. Please sign in instead." },
+          { status: 409 }
+        );
+      }
+      throw upsertErr;
+    }
     const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
 
     // ── Anti-abuse: if already active, block ──────────────────────────────────
@@ -86,7 +100,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (err: unknown) {
     console.error("[checkout] Error:", err);
-    const message = err instanceof Error ? err.message : "Internal server error";
-    return NextResponse.json({ error: message }, { status: 500 });
+    // Never surface raw ORM / Stripe internals to the client.
+    return NextResponse.json(
+      { error: "Something went wrong starting checkout. Please try again." },
+      { status: 500 }
+    );
   }
 }
