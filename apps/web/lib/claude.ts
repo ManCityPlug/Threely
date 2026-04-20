@@ -361,6 +361,20 @@ Failure points: Perfectionism → enforce "publish before ready" tasks. Comparis
 Quick win day 1: Create one thing in 15 minutes - a sketch, 200 words, a photo, a 30-second recording. Done > perfect.
 Key methodology: Ship often. Feedback from audience > self-criticism. Quantity produces quality (see: ceramics class study).`,
 
+  daytrading: `PLAYBOOK - DAY TRADING (stocks / options / futures / forex)
+CRITICAL: Day trading is high-risk. Never assign tasks that involve putting real money on the line in the first 3+ weeks. Paper trading, education, and a clear process come first. Every task completable in about 2 minutes (whole day's plan ~5 min).
+
+Phases (milestone-based, not time-based):
+1. EDUCATION: Learn the basics. Pick ONE market (stocks, options, or futures — not all three). Open a free paper-trading account (Thinkorswim paperMoney, Webull paper, or TradingView paper). Bookmark 1-2 educational sources (Investopedia, one reputable YouTube channel). Tasks are tiny: "Google what a candlestick is and write down the 4 parts", "Watch one 10-min video on support/resistance", "Open a paper trading account and log in".
+2. PAPER PRACTICE: Execute 20-30 simulated trades before risking any real money. Keep a simple journal — entry, exit, reason, result. One trade per day or so. Tasks like "Enter one paper trade on SPY today and write down why", "Review yesterday's paper trade in one sentence".
+3. STRATEGY DEFINE: Pick ONE specific setup (e.g. opening range breakout, VWAP bounce, 9/20 EMA crossover). Define entry rule, exit rule, stop loss rule. Write it on one index card. Tasks: "Write your one trading rule on a note", "Screen 3 tickers premarket using your rule".
+4. SMALL LIVE: Deposit only what you can afford to lose completely (e.g. $100-$500). Risk max 1% per trade. Trade the exact same setup from phase 3. Journal every trade. Tasks: "Log one real trade result, win or loss", "Review this week's P&L in one sentence".
+5. SCALE: Only after 30+ live trades with positive expectancy, increase position size gradually. Never risk more than 1-2% per trade. Tasks stay about review and discipline, not more complexity.
+
+Failure points: Jumping to real money before paper practice → enforce paper phase. Revenge trading after a loss → rest-of-day tasks become "review yesterday" not "trade today". Overtrading → one trade per day max in early phases. No journal → every live task includes "log the trade". Chasing hot tips → every task references THEIR specific setup.
+Quick win day 1: Open a paper-trading account. That's it. Takes 2 minutes.
+Key methodology: Paper before live. One setup before many. Tiny size before big size. Journal every trade. Process > P&L.`,
+
   financial: `PLAYBOOK - FINANCE (saving / investing / debt payoff / budgeting)
 Phases:
 1. AWARENESS: Track every dollar for 7 days using an app (Mint, YNAB, or a simple spreadsheet). See exactly where money goes. No judgment, just data.
@@ -454,6 +468,12 @@ Their goal category, specific goal, and work level will be provided. Every task 
 - Days 1-7: Visualization and motivation. Writing down what they'd buy, googling someone who made it with their exact idea, writing why they started.
 - Days 8-20: Light research. Watch one short video about their idea, google one thing, save one link, write one idea down.
 - Days 21+: Tiny micro-actions. Make one free account, write a one-sentence pitch, send one message to someone in the space.
+
+## DAY TRADING GOALS
+Day trading is risky and lazy/beginner users should NOT be risking real money for weeks. Every task is tiny (~2 min) and builds discipline BEFORE risk.
+- Days 1-7: Motivation + absolute basics. "Open a free paper trading account (Thinkorswim paperMoney or Webull paper) and log in." "Google what a candlestick is and save one diagram." "Watch one 5-min YouTube about support and resistance." "Write down why you want to day trade in one sentence."
+- Days 8-20: Paper practice + one setup. "Enter one paper trade on SPY today and write down your reason in one sentence." "Watch one 10-min video on ONE setup (e.g. opening range breakout) and save the link." "Write your one trading rule on a note: entry, exit, stop." "Review yesterday's paper trade — win or loss, one sentence why."
+- Days 21+: Live with tiny size + journal. "Log one real trade result (paper or live) in one sentence." "Screen 3 tickers premarket using your rule." "Write this week's P&L in one line." Never tell them to risk more than 1-2% per trade or to switch strategies.
 
 ## HEALTH GOALS
 - Days 1-7: Visualization and identity. "Take a photo of yourself today and save it as Day 1." "Write down how you want to feel in 90 days." "Google one transformation photo for motivation and save it."
@@ -774,7 +794,7 @@ Return ONLY valid JSON with this exact shape (no markdown, no explanation):
 {
   "short_title": "MAX 3-5 words, 25 chars. Start with an ACTION VERB (Make, Get, Lose, Build, Launch, Learn) and make it feel like the user's own goal. Examples: 'Make $10k+ / Month', 'Get Shredded', 'Get Fit', 'Lose 30lb', 'Build My App', 'Launch My Store', 'Learn Piano'. Use $ + K/M and / Month or / Week for money goals. Use lb/lbs for weight. NEVER full sentences, NEVER 'I want to', NEVER 'Achieve...' or 'Become...'. Punchy, personal, specific.",
   "structured_summary": "A clear 1-sentence restatement of the core goal in second person starting with 'You want to...'. Keep it under 15 words - just the outcome, no method details or timeframes.",
-  "category": "One of: fitness, business, learning, creative, financial, health, relationships, productivity, spiritual, religion, mindfulness, career, other",
+  "category": "One of: fitness, business, daytrading, learning, creative, financial, health, relationships, productivity, spiritual, religion, mindfulness, career, other. Use 'daytrading' specifically for day trading / stock trading / options trading / futures / forex goals. Use 'business' for ecommerce, freelancing, startups, side hustles. Use 'financial' for saving, investing long-term, budgeting, debt payoff.",
   "deadline_detected": "ISO date string YYYY-MM-DD calculated from today's date (${today}) if a specific deadline or timeframe is mentioned (e.g. 'in 3 months' = add 3 months to today, 'by summer' = ${new Date().getFullYear()}-09-01, 'by December' = ${new Date().getFullYear()}-12-01), otherwise null",
   "daily_time_detected": "Integer number of minutes per day if the user mentions a daily time commitment (e.g. '2 hours a day' = 120, '30 minutes daily' = 30, '3 hours per day' = 180). Only extract if they explicitly mention a daily/per-day time amount. null if not mentioned",
   "work_days_detected": "Array of day numbers (1=Monday, 2=Tuesday, ..., 7=Sunday) if the user mentions specific days or schedule. Examples: 'weekdays' = [1,2,3,4,5], 'weekends' = [6,7], 'Mon Wed Fri' = [1,3,5], 'every day' = [1,2,3,4,5,6,7]. null if not mentioned",

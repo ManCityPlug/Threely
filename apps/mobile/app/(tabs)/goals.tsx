@@ -263,9 +263,11 @@ function AddGoalFlow({ onDone, onClose, onProRequired }: AddGoalFlowProps) {
       const title =
         cat === "business"
           ? `Make ${allAnswers[0]} per month`
-          : cat === "health"
-            ? allAnswers[0]
-            : (allAnswers[0]?.slice(0, 40) || "My Goal");
+          : cat === "daytrading"
+            ? `Day trade to ${allAnswers[0]}/mo`
+            : cat === "health"
+              ? allAnswers[0]
+              : (allAnswers[0]?.slice(0, 40) || "My Goal");
 
       const { goal } = await goalsApi.create(title, {
         rawInput: goalText,

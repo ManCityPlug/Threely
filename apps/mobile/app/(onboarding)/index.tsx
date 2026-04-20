@@ -24,7 +24,7 @@ import { useTheme } from "@/lib/theme";
 
 const GOLD = "#D4A843";
 
-type Category = "business" | "health" | "other";
+type Category = "business" | "daytrading" | "health" | "other";
 type EffortLevel = "Mild" | "Moderate" | "Heavy";
 
 const EFFORT_MAP: Record<EffortLevel, { dailyTimeMinutes: number; intensityLevel: number }> = {
@@ -165,6 +165,10 @@ function buildGoalText(
   if (category === "business") {
     const idea = answers.q3.trim() || "no specific idea yet";
     return `I want to make ${answers.q1} per month. I can put in ${effortLower} work. My business idea: ${idea}`;
+  }
+  if (category === "daytrading") {
+    const exp = answers.q3.trim() || "complete beginner with no day trading experience";
+    return `I want to day trade to make ${answers.q1} per month. I can put in ${effortLower} work. Previous experience: ${exp}`;
   }
   if (category === "health") {
     const target = answers.q3.trim() || "no specific target";
@@ -422,7 +426,7 @@ export default function OnboardingScreen() {
   // ─── Render: Step 1 ────────────────────────────────────────────────────────
 
   function renderStep1() {
-    if (category === "business") {
+    if (category === "business" || category === "daytrading") {
       return (
         <View style={styles.stepContainer}>
           <ProgressDots current={1} />
@@ -535,9 +539,11 @@ export default function OnboardingScreen() {
     const prompt =
       category === "business"
         ? "Got a business idea?"
-        : category === "health"
-          ? "Do you have a specific target goal?"
-          : "Anything specific?";
+        : category === "daytrading"
+          ? "Any previous experience?"
+          : category === "health"
+            ? "Do you have a specific target goal?"
+            : "Anything specific?";
 
     return (
       <KeyboardAvoidingView

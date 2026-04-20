@@ -11,7 +11,7 @@ import { MOCK_TUTORIAL_GOAL } from "@/lib/mock-tutorial-data";
 
 // ─── 3-Step Funnel for "Add Goal" (same as /start) ───────────────────────────
 
-type FunnelCategory = "business" | "health" | "other";
+type FunnelCategory = "business" | "daytrading" | "health" | "other";
 
 interface StepConfig {
   question: string;
@@ -27,6 +27,11 @@ const FUNNEL_STEPS: Record<FunnelCategory, StepConfig[]> = {
     { question: "How much do you want to make per month?", buttons: ["$500", "$1K-$5K", "$10K+"] },
     { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
     { question: "Got a business idea?", isTextInput: true, placeholder: "Enter your idea...", skippable: true },
+  ],
+  daytrading: [
+    { question: "How much do you want to make per month?", buttons: ["$500", "$1K-$5K", "$10K+"] },
+    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
+    { question: "Any previous experience?", isTextInput: true, placeholder: "e.g. traded stocks for 6 months, complete beginner...", skippable: true },
   ],
   health: [
     { question: "What do you want?", buttons: ["Lose weight", "Glow up", "Gain more muscle"] },
@@ -44,6 +49,8 @@ function buildGoalText(category: FunnelCategory, answers: string[]): string {
   switch (category) {
     case "business":
       return `I want to make ${answers[0]} per month. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `My business idea: ${answers[2]}` : "I need help finding a business idea."}`;
+    case "daytrading":
+      return `I want to day trade to make ${answers[0]} per month. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `Previous experience: ${answers[2]}` : "I'm a complete beginner with no day trading experience."}`;
     case "health":
       return `I want to ${answers[0].toLowerCase()}. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `My target: ${answers[2]}` : ""}`.trim();
     case "other":
@@ -142,6 +149,8 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
       const { goal } = await goalsApi.create({
         title: cat === "business"
           ? `Make ${allAnswers[0]} per month`
+          : cat === "daytrading"
+          ? `Day trade to ${allAnswers[0]}/mo`
           : cat === "health"
           ? allAnswers[0]
           : allAnswers[0]?.slice(0, 40) || "My Goal",
@@ -233,6 +242,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
               {([
                 { id: "business" as FunnelCategory, label: "\uD83E\uDD11 Business", subtitle: "Start or grow a business" },
+                { id: "daytrading" as FunnelCategory, label: "\uD83D\uDCC8 Day Trading", subtitle: "Grow a trading account" },
                 { id: "health" as FunnelCategory, label: "\uD83D\uDCAA Health", subtitle: "Transform your body" },
                 { id: "other" as FunnelCategory, label: "Other", subtitle: "Set any goal" },
               ]).map((cat) => (
