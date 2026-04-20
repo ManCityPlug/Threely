@@ -293,9 +293,6 @@ export default function StartPage() {
                   </div>
                 ))}
 
-                <p style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.55)", textAlign: "center", marginTop: 6 }}>
-                  Start your free trial to unlock today's plan — and every day after.
-                </p>
               </div>
             );
           })()}
