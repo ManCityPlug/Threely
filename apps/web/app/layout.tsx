@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.json",
   other: {
-    "theme-color": "#141414",
+    "theme-color": "#000000",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
   },
 };
@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#141414" />
+        <meta name="theme-color" content="#000000" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />

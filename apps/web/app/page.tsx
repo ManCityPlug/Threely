@@ -97,11 +97,12 @@ export default function LandingPage() {
 
       {/* ─── Nav ──────────────────────────────────────────────────────────────── */}
       <nav className="landing-nav" style={{
-        // Opaque #141414 to match body so iOS Safari doesn't show a lighter
-        // strip between the status bar and the nav. Was rgba(10,10,10,0.85)
-        // with blur, which composited darker than the body.
+        // Pure black so the nav + Safari chrome above it (matched via the
+        // theme-color meta) form one unified dark zone at the top. Body
+        // below stays #141414 — deliberate accent so the nav reads as a
+        // header rather than floating.
         position: "sticky", top: 0, zIndex: 100,
-        background: "#141414",
+        background: "#000000",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
         padding: "0 1.5rem", height: 64,
         display: "flex", alignItems: "center", justifyContent: "center",

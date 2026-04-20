@@ -32,13 +32,12 @@ export default function MarketingNav() {
   return (
     <>
       <nav style={{
-        // Opaque #141414 to match body. Previously rgba(10,10,10,0.85) with
-        // blur, which compositing over the #141414 body produced a visibly
-        // darker band — on mobile Safari that read as a mismatched strip
-        // between the iOS chrome and the rest of the page. Matching body
-        // makes the top of the viewport uniform.
+        // Pure black — matches theme-color meta so Safari's status bar
+        // area above the nav is the same color, forming one unified
+        // black band across the top. Body stays #141414 so the rest of
+        // the page reads as its normal dark grey.
         position: "sticky", top: 0, zIndex: 100,
-        background: "#141414",
+        background: "#000000",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
         padding: "0 1.5rem",
         height: 64,
