@@ -260,17 +260,23 @@ export default function StartPage() {
             const visibleTask = category ? SAMPLE_TASKS[category] : SAMPLE_TASKS.other;
             return (
               <div style={{ position: "relative" }}>
+                {/* Day total time — shown ONCE above the task stack, not per task.
+                    Tasks themselves don't show individual minutes to reduce
+                    friction / cognitive load. */}
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  fontSize: "0.75rem", color: "rgba(255,255,255,0.55)",
+                  marginBottom: 8, padding: "0 4px",
+                }}>
+                  <span style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Day 1</span>
+                  <span>~15 min total</span>
+                </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                   {/* Task 1 — fully visible */}
                   <div className="card" style={{ padding: "1rem 1.25rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
                     <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35 }}>
-                        {visibleTask}
-                      </div>
-                      <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 3 }}>
-                        Day 1 · ~2 min
-                      </div>
+                    <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0 }}>
+                      {visibleTask}
                     </div>
                   </div>
 
@@ -279,13 +285,8 @@ export default function StartPage() {
                     {BLURRED_PLACEHOLDERS.map((placeholder, i) => (
                       <div key={i} className="card" style={{ padding: "1rem 1.25rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
                         <div style={{ width: 24, height: 24, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35 }}>
-                            {placeholder}
-                          </div>
-                          <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.5)", marginTop: 3 }}>
-                            Day 1 · ~2 min
-                          </div>
+                        <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0 }}>
+                          {placeholder}
                         </div>
                       </div>
                     ))}
