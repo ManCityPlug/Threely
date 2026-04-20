@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase";
+import { cancelAndTombstoneCustomer } from "@/lib/stripe";
 
 // Vercel cron — runs daily to delete unconverted anonymous users older than 7 days
 // Triggered via vercel.json cron schedule, protected by CRON_SECRET
@@ -19,12 +20,19 @@ export async function GET(request: NextRequest) {
         email: { endsWith: "@anon.threely.local" },
         createdAt: { lt: sevenDaysAgo },
       },
-      select: { id: true },
+      select: { id: true, stripeCustomerId: true },
     });
 
     let deleted = 0;
     for (const u of anonUsers) {
       try {
+        // Stripe cleanup first (cancel subs + tombstone). Anon users
+        // sometimes get a Stripe customer created during checkout before
+        // they finish signup; this catches those.
+        await cancelAndTombstoneCustomer({
+          stripeCustomerId: u.stripeCustomerId,
+          threelyUserId: u.id,
+        });
         // Delete from Supabase auth (cascades to RLS-protected tables)
         await supabaseAdmin.auth.admin.deleteUser(u.id);
         // Delete from Prisma (goals/tasks/profile cascade via FK)

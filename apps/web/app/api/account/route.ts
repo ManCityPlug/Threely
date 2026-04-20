@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { prisma } from "@/lib/prisma";
 import { getUserFromRequest, supabaseAdmin } from "@/lib/supabase";
+import { cancelAndTombstoneCustomer } from "@/lib/stripe";
 
 // DELETE /api/account — permanently delete the current user's account and all data
 export async function DELETE(request: NextRequest) {
@@ -41,6 +42,19 @@ export async function DELETE(request: NextRequest) {
   await verifyClient.auth.signOut();
 
   try {
+    // 0. Stripe cleanup first — cancel any active subs + tombstone the
+    //    customer record. Keep the Stripe customer around for dispute /
+    //    refund history (Option B). Never blocks the delete — Stripe
+    //    errors are logged and swallowed inside cancelAndTombstoneCustomer.
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id },
+      select: { stripeCustomerId: true },
+    });
+    await cancelAndTombstoneCustomer({
+      stripeCustomerId: dbUser?.stripeCustomerId ?? null,
+      threelyUserId: user.id,
+    });
+
     // Explicitly delete all user data in dependency order to guarantee cleanup.
     // Even though schema has onDelete: Cascade, we do explicit deletes as a safety net.
 

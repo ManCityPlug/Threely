@@ -19,7 +19,7 @@ import type { TaskItem } from "@/lib/api-client";
 type PlanId = "monthly" | "yearly";
 
 const PLAN_INFO: Record<PlanId, { label: string; priceDisplay: string; subLine: string; badge?: string; priceYearly?: string }> = {
-  yearly:  { label: "Yearly",  priceDisplay: "$8.33/mo",  subLine: "Billed annually at $99.99", badge: "40% OFF", priceYearly: "$99.99/yr" },
+  yearly:  { label: "Yearly",  priceDisplay: "$8.33/mo",  subLine: "Billed annually", badge: "40% OFF", priceYearly: "$99.99/yr" },
   monthly: { label: "Monthly", priceDisplay: "$12.99/mo", subLine: "Billed monthly" },
 };
 
@@ -173,12 +173,13 @@ function PlanSelector({ plan, onChange }: { plan: PlanId; onChange: (p: PlanId) 
 interface InlinePaymentProps {
   plan: PlanId;
   onPlanChange: (p: PlanId) => void;
+  preloadedClientSecret?: string | null;
   onSuccess: (payerEmail: string | null) => void;
 }
-function InlinePayment({ plan, onPlanChange, onSuccess }: InlinePaymentProps) {
+function InlinePayment({ plan, onPlanChange, preloadedClientSecret, onSuccess }: InlinePaymentProps) {
   const stripe = useStripe();
   const elements = useElements();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [clientSecret, setClientSecret] = useState<string | null>(preloadedClientSecret ?? null);
   const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
   const [cardOpen, setCardOpen] = useState(false);
   const [fullName, setFullName] = useState("");
@@ -191,11 +192,14 @@ function InlinePayment({ plan, onPlanChange, onSuccess }: InlinePaymentProps) {
 
   const cardReady = fullName.trim().length > 0 && cardNumberComplete && cardExpiryComplete && cardCvcComplete;
 
-  // Fetch SetupIntent once (plan changes don't re-issue the SetupIntent — it's
-  // card-only; the actual subscription price is chosen at /confirm time).
+  // Fetch SetupIntent once. If /start pre-fetched it during the hype screen,
+  // clientSecret is already populated on first render and this effect no-ops —
+  // Apple Pay's canMakePayment() fires immediately on mount instead of after
+  // a round-trip to /api/subscription/checkout.
   useEffect(() => {
     if (initRan.current) return;
     initRan.current = true;
+    if (clientSecret) return; // already pre-loaded
     (async () => {
       try {
         const supabase = getSupabase();
@@ -516,6 +520,36 @@ export default function StartPage() {
   const [planReady, setPlanReady] = useState(false);
   const [generatedGoalTitle, setGeneratedGoalTitle] = useState("");
 
+  // ── Pre-fetch for fast Apple Pay ──────────────────────────────────────────
+  // Stripe.js is ~100KB and canMakePayment() is async. If we only start
+  // loading them when the plan-ready screen renders, users see a "Pay" button
+  // pop in late. Fix: kick off Stripe.js as soon as /start mounts, and
+  // pre-fetch the SetupIntent the moment the funnel is done (during the hype
+  // screen). By the time user clicks "Show me my plan", Apple Pay is already
+  // primed and renders instantly.
+  const [preloadedClientSecret, setPreloadedClientSecret] = useState<string | null>(null);
+  useEffect(() => { getStripePromise(); }, []);
+  useEffect(() => {
+    if (!showHype || preloadedClientSecret) return;
+    (async () => {
+      try {
+        const supabase = getSupabase();
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const res = await fetch("/api/subscription/checkout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ plan: "yearly" }),
+        });
+        const data = await safeJson(res);
+        if (res.ok && data.clientSecret) setPreloadedClientSecret(data.clientSecret);
+      } catch { /* swallow — InlinePayment will fetch on its own if prefetch fails */ }
+    })();
+  }, [showHype, preloadedClientSecret]);
+
   // ── Helpers ──
   function animateStep(newStep: number) {
     setFadeKey((k) => k + 1);
@@ -626,7 +660,11 @@ export default function StartPage() {
   if (planReady) {
     return (
       <Elements stripe={getStripePromise()}>
-        <PlanReadyScreen category={category} generatedGoalTitle={generatedGoalTitle} />
+        <PlanReadyScreen
+          category={category}
+          generatedGoalTitle={generatedGoalTitle}
+          preloadedClientSecret={preloadedClientSecret}
+        />
       </Elements>
     );
   }
@@ -843,7 +881,7 @@ export default function StartPage() {
 // ─── Plan Ready screen (wrapped in Elements by parent) ───────────────────────
 // Shows: goal card → blurred preview → plan selector → Apple/Google Pay +
 // card fallback → on success, swaps to AccountFinalize for email/password.
-function PlanReadyScreen({ category, generatedGoalTitle }: { category: Category | null; generatedGoalTitle: string }) {
+function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret }: { category: Category | null; generatedGoalTitle: string; preloadedClientSecret: string | null }) {
   const [plan, setPlan] = useState<PlanId>("yearly");
   const [paymentDone, setPaymentDone] = useState(false);
   const [payerEmail, setPayerEmail] = useState<string | null>(null);
@@ -928,6 +966,7 @@ function PlanReadyScreen({ category, generatedGoalTitle }: { category: Category 
         <InlinePayment
           plan={plan}
           onPlanChange={setPlan}
+          preloadedClientSecret={preloadedClientSecret}
           onSuccess={(email) => { setPayerEmail(email); setPaymentDone(true); }}
         />
 
