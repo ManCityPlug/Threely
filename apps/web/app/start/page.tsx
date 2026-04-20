@@ -69,6 +69,88 @@ const EFFORT_TO_INTENSITY: Record<string, number> = {
   heavy: 3,
 };
 
+// ─── Plan CTA — Apple Pay (if available) + card fallback ─────────────────────
+// Detects Apple Pay support via ApplePaySession and shows a branded Apple Pay
+// primary button on Safari (iPhone / iPad / Mac). Below: "Enter card manually"
+// opens a secondary continue button. Both route to /checkout where the actual
+// Stripe confirmation happens. Once Stripe's apple-pay-domain-association is
+// set up, we can move the PaymentRequestButton inline here.
+function PlanCta() {
+  const router = useRouter();
+  const [hasApplePay, setHasApplePay] = useState(false);
+  const [cardOpen, setCardOpen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const w = window as unknown as { ApplePaySession?: { canMakePayments: () => boolean } };
+      if (w.ApplePaySession?.canMakePayments?.()) setHasApplePay(true);
+    } catch { /* ignore */ }
+  }, []);
+
+  const goCheckout = (method: "apple" | "card") =>
+    router.push(`/checkout?plan=monthly&from=start&method=${method}`);
+
+  const applePayButton = (
+    <button
+      onClick={() => goCheckout("apple")}
+      aria-label="Pay with Apple Pay"
+      style={{
+        height: 56, width: "100%",
+        background: "#000", color: "#fff",
+        borderRadius: 14, border: "1px solid rgba(255,255,255,0.15)",
+        cursor: "pointer",
+        display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+        fontSize: "1.05rem", fontWeight: 500, letterSpacing: "-0.01em",
+      }}
+    >
+      <span style={{ fontSize: "1.25rem" }}></span>
+      <span>Pay</span>
+    </button>
+  );
+
+  const cardButton = (
+    <button
+      onClick={() => goCheckout("card")}
+      style={{
+        height: 56, width: "100%", fontSize: "1rem", fontWeight: 700,
+        background: "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)",
+        color: "#000", borderRadius: 14, border: "none", cursor: "pointer",
+      }}
+    >
+      Start For $1 →
+    </button>
+  );
+
+  // Non-Apple devices: single card button (same as before).
+  if (!hasApplePay) return <div style={{ marginTop: 8 }}>{cardButton}</div>;
+
+  // Apple devices: Apple Pay primary, "Enter card manually" expander below.
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 8 }}>
+      {applePayButton}
+      <button
+        onClick={() => setCardOpen((o) => !o)}
+        style={{
+          background: "none", border: "none", cursor: "pointer",
+          color: "rgba(255,255,255,0.7)", fontSize: "0.9rem", fontWeight: 600,
+          padding: "8px 0",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+        }}
+      >
+        Enter card manually
+        <span style={{
+          display: "inline-block",
+          transition: "transform 0.2s",
+          transform: cardOpen ? "rotate(180deg)" : "rotate(0deg)",
+        }}>▾</span>
+      </button>
+      {cardOpen && cardButton}
+    </div>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function StartPage() {
@@ -311,21 +393,10 @@ export default function StartPage() {
             );
           })()}
 
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 8 }}>
-            <button
-              onClick={() => router.push("/checkout?plan=monthly&from=start")}
-              style={{
-                height: 56, fontSize: "1rem", fontWeight: 700,
-                background: "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)",
-                color: "#000", borderRadius: 14, border: "none", cursor: "pointer",
-              }}
-            >
-              Start For $1 →
-            </button>
-            <p style={{ textAlign: "center", fontSize: "0.8rem", color: "rgba(255,255,255,0.85)" }}>
-              Cancel anytime.
-            </p>
-          </div>
+          <PlanCta />
+          <p style={{ textAlign: "center", fontSize: "0.8rem", color: "rgba(255,255,255,0.85)", marginTop: 10 }}>
+            Cancel anytime.
+          </p>
 
           <div style={{ textAlign: "center", marginTop: 8 }}>
             <Link href="/login" style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.85)" }}>
