@@ -28,7 +28,7 @@ export default function LandingPage() {
   }, []);
 
   const ctaHref = loggedIn ? "/dashboard" : "/start";
-  const ctaLabel = loggedIn ? "Go to Dashboard" : "Start Today →";
+  const ctaLabel = loggedIn ? "Go to Dashboard" : "Start for $1 →";
 
   // Scroll reveal — fade in on enter, fade out on leave
   useEffect(() => {
@@ -237,7 +237,7 @@ export default function LandingPage() {
         </Link>
 
         <p style={{ marginTop: 16, fontSize: "0.8rem", color: "rgba(255,255,255,0.3)" }}>
-          $1 to start · Cancel anytime
+          Cancel anytime
         </p>
       </section>
 
@@ -270,7 +270,7 @@ export default function LandingPage() {
               color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 12,
               textDecoration: "none", minHeight: 48,
             }}>
-              Start Today →
+              Start for $1 →
             </Link>
           </div>
         </div>
