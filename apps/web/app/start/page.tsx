@@ -251,7 +251,7 @@ export default function StartPage() {
               business:   "Write down your business idea in one sentence",
               daytrading: "Open a free paper trading account (Webull or Thinkorswim)",
               health:     "Take a Day 1 photo and save it on your phone",
-              other:      "Write what your life looks like when you've achieved your goal",
+              other:      "Google one person who's done what you want and save their name",
             };
             const visibleTask = category ? SAMPLE_TASKS[category] : SAMPLE_TASKS.other;
             return (
