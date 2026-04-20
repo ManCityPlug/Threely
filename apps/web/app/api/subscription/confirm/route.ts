@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     default_payment_method: defaultPaymentMethod,
   };
 
-  // Only grant 7-day trial if they've never had one before
+  // Only grant the free trial (TRIAL_DAYS) if they've never had one before
   if (trialEligible) {
     subscriptionParams.trial_period_days = TRIAL_DAYS;
   }

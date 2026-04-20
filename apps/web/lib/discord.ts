@@ -57,7 +57,7 @@ export function notifyTrialStarted(email: string, plan: string) {
   return send("startedFreeTrial", {
     title: "🎉 Started Free Trial",
     color: 0xFFA726, // orange
-    description: "A user entered their card and started a 7-day free trial.",
+    description: "A user entered their card and started a 3-day free trial.",
     fields: [
       { name: "Email", value: email, inline: true },
       { name: "Plan", value: plan, inline: true },

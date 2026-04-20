@@ -22,4 +22,4 @@ export const stripe = new Proxy({} as Stripe, {
 
 export const PRICE_MONTHLY   = "price_1TKTNOLR2WAEIJdD5saTp8zD"; // $12.99/4 weeks
 export const PRICE_YEARLY    = "price_1T6buHLR2WAEIJdDhlQaqxMe"; // $99.99/year ($8.33/mo)
-export const TRIAL_DAYS      = 7;
+export const TRIAL_DAYS      = 3;

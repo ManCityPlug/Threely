@@ -191,7 +191,7 @@ export default function Paywall({ visible, onDismiss }: PaywallProps) {
         {trialEligible ? (
           <>
             <Text style={styles.trialNote}>
-              No charge for 7 days. Cancel anytime in Settings.
+              No charge for 3 days. Cancel anytime in Settings.
             </Text>
             <Text style={styles.ctaSub}>
               Then {priceString}/month

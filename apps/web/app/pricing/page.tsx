@@ -7,11 +7,11 @@ import CheckoutButton from "@/components/CheckoutButton";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Start free for 7 days. Threely Pro: $12.99/month or $99.99/year. AI-generated daily tasks, personalized coaching insights, progress tracking, and mobile apps included.",
+    "Start free for 3 days. Threely Pro: $12.99/month or $99.99/year. AI-generated daily tasks, personalized coaching insights, progress tracking, and mobile apps included.",
   alternates: { canonical: "/pricing" },
   openGraph: {
-    title: "Threely Pricing — Free 7-Day Trial",
-    description: "Start free for 7 days. Threely Pro: $12.99/month or $99.99/year with AI coaching, daily tasks, and progress tracking.",
+    title: "Threely Pricing — Free 3-Day Trial",
+    description: "Start free for 3 days. Threely Pro: $12.99/month or $99.99/year with AI coaching, daily tasks, and progress tracking.",
   },
 };
 
@@ -43,7 +43,7 @@ export default function PricingPage() {
             Pricing
           </h1>
           <p style={{ fontSize: "1.05rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.7 }}>
-            Get Pro free for 7 days. Cancel anytime.
+            Get Pro free for 3 days. Cancel anytime.
           </p>
         </div>
       </section>
@@ -73,7 +73,7 @@ export default function PricingPage() {
               <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)" }}>/month</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.85)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              Monthly access.<br />7 days free included.
+              Monthly access.<br />3 days free included.
             </p>
             <CheckoutButton plan="monthly" style={{
               display: "block",
@@ -117,7 +117,7 @@ export default function PricingPage() {
               <span style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)" }}>/month</span>
             </div>
             <p style={{ fontSize: "0.875rem", color: "rgba(255,255,255,0.85)", marginBottom: "1.5rem", lineHeight: 1.5 }}>
-              Billed annually at $99.99.<br />7 days free included.
+              Billed annually at $99.99.<br />3 days free included.
             </p>
             <CheckoutButton plan="yearly" style={{
               display: "block",

@@ -36,7 +36,7 @@ function getStripePromise() {
 
 function getTrialEndDate(): string {
   const d = new Date();
-  d.setDate(d.getDate() + 7);
+  d.setDate(d.getDate() + 3);
   return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 }
 
@@ -379,7 +379,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
             color: "var(--subtext)",
             lineHeight: 1.4,
           }}>
-            7-day free trial + 14-day money-back guarantee
+            3-day free trial + 14-day money-back guarantee
           </span>
         </div>
 
@@ -395,7 +395,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
             boxShadow: "0 4px 14px rgba(184,134,45,0.2)",
           }}>
             <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "#ffffff", marginBottom: 4 }}>
-              7 days free
+              3 days free
             </div>
             <div style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.92)", lineHeight: 1.5 }}>
               Your trial starts today. You won&apos;t be charged until <strong style={{ color: "#ffffff" }}>{getTrialEndDate()}</strong>.
@@ -582,7 +582,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
             {/* Sub text */}
             <p style={{ fontSize: "0.75rem", color: "var(--muted)", textAlign: "center", lineHeight: 1.5 }}>
               {trialEligible
-                ? <>Your card will not be charged today. After your 7-day trial, you&apos;ll be billed {info.price}/{info.period}.</>
+                ? <>Your card will not be charged today. After your 3-day trial, you&apos;ll be billed {info.price}/{info.period}.</>
                 : <>{info.price}/{info.period} &middot; cancel anytime</>
               }
             </p>

@@ -11,7 +11,7 @@ const TESTIMONIALS: { quote: string; author: string; label: string; image?: stri
 ];
 
 const FAQ = [
-  { q: "Is it free?", a: "7-day free trial with full access." },
+  { q: "Is it free?", a: "3-day free trial with full access." },
   { q: "How long before I see results?", a: "Our users have quit their jobs and started making money their first week." },
   { q: "Can I cancel anytime?", a: "Yes. Cancel in your settings whenever you want. No contracts, no hidden fees, no questions asked." },
 ];
@@ -233,7 +233,7 @@ export default function LandingPage() {
         </Link>
 
         <p style={{ marginTop: 16, fontSize: "0.8rem", color: "rgba(255,255,255,0.3)" }}>
-          $0 due today · 7-day free trial · Cancel anytime
+          $0 due today · 3-day free trial · Cancel anytime
         </p>
       </section>
 

@@ -282,7 +282,7 @@ export default function StartPage() {
               Start Free Trial →
             </button>
             <p style={{ textAlign: "center", fontSize: "0.8rem", color: "rgba(255,255,255,0.85)" }}>
-              7-day free trial. Cancel anytime.
+              3-day free trial. Cancel anytime.
             </p>
           </div>
 
