@@ -232,12 +232,9 @@ export default function StartPage() {
         <div style={{ width: "100%", maxWidth: 640, display: "flex", flexDirection: "column", gap: "1.5rem" }}>
           <div style={{ textAlign: "center" }}>
             <img src="/favicon.png" alt="Threely" width={56} height={56} style={{ borderRadius: 14, marginBottom: 16 }} />
-            <h1 style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
+            <h1 style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 0 }}>
               Your plan is ready
             </h1>
-            <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.85)", maxWidth: 480, margin: "0 auto" }}>
-              Here are your first 3 tasks for today.
-            </p>
           </div>
 
           <div className="card" style={{ padding: "1.25rem 1.5rem", borderRadius: 16, border: "1px solid var(--border)" }}>
