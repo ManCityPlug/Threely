@@ -147,13 +147,8 @@ export function TaskCard({ task, onToggle, onRefine, onAsk, readonly = false, pa
               >
                 {taskTitle}
               </Text>
-              {task.estimated_minutes ? (
-                <View style={[styles.timeBadge, task.isCompleted && styles.timeBadgeDone]}>
-                  <Text style={[styles.timeBadgeText, task.isCompleted && styles.timeBadgeTextDone]}>
-                    ~{task.estimated_minutes}m
-                  </Text>
-                </View>
-              ) : null}
+              {/* Per-task minutes badge removed — day total shown once in
+                  the tasks-view heading. */}
               {task.isCarriedOver && (
                 <View style={styles.overduePill}>
                   <Text style={styles.overduePillText}>Overdue</Text>
@@ -320,12 +315,7 @@ function TaskDetailContent({
             bounces={true}
             style={{ flexShrink: 1 }}
           >
-            {/* Time badge */}
-            {task.estimated_minutes ? (
-              <View style={styles.modalTimeBadge}>
-                <Text style={styles.modalTimeBadgeText}>~{task.estimated_minutes} min</Text>
-              </View>
-            ) : null}
+            {/* Time badge removed — day total shown in the tasks-view heading. */}
 
             {/* Title */}
             <Text style={[styles.modalTitle, task.isCompleted && styles.modalTitleDone]}>

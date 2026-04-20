@@ -2412,9 +2412,21 @@ export default function DashboardScreen() {
                   <Text style={styles.backButtonText}>{"←"} Back to path</Text>
                 </TouchableOpacity>
 
-                {/* Day heading */}
+                {/* Day heading + day-total time (not per-task). */}
                 <View style={styles.dayLabelContainer}>
                   <Text style={styles.dayLabel}>Day {activeDayNumber}</Text>
+                  {(() => {
+                    const totalMin = activeTasks.reduce((sum, dt) => {
+                      const items = Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]).slice(-3) : [];
+                      return sum + items.reduce((s, t) => s + (t.estimated_minutes || 0), 0);
+                    }, 0);
+                    if (!totalMin) return null;
+                    return (
+                      <Text style={{ fontSize: typography.xs, fontWeight: "600", color: colors.textSecondary, marginTop: 3 }}>
+                        ~{totalMin} min total
+                      </Text>
+                    );
+                  })()}
                   {inWorkAhead && (
                     <Text style={{
                       fontSize: typography.xs,

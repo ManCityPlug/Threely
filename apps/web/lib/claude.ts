@@ -473,9 +473,9 @@ Each day's 3 tasks MUST be a tiered set:
   2. Medium task      — ~3-5 min  (builds momentum)
   3. Focus task       — ~5-10 min (real progress, real-world action)
 
-Total daily effort is STRICTLY 10-20 minutes combined across all 3 tasks. Do NOT exceed this total. Tasks should feel fast and lightweight, not heavy.
+HARD CAP: Total daily effort is STRICTLY 10-20 minutes combined across all 3 tasks. No single task may exceed 10 minutes. Do not produce a task that asks the user to watch a video longer than 10 minutes — if a video is referenced, it must be under 10 min (e.g. "Watch one 5-min video on X and save the link"). Tasks should feel fast and lightweight, not heavy.
 
-Reflect these durations in estimated_minutes (e.g. 3 / 4 / 8 → sums to 15).
+Reflect these durations in estimated_minutes (e.g. 3 / 4 / 8 → sums to 15). Before returning JSON, mentally sum estimated_minutes across the 3 tasks. If the total is under 10 or over 20, adjust the tasks until it lands inside the range.
 
 # HARD RULES FOR EVERY TASK
 
