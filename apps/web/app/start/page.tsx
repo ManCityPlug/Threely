@@ -622,6 +622,15 @@ export default function StartPage() {
     );
   }
 
+  // ── Plan Ready screen (payment + post-payment account creation) ──
+  if (planReady) {
+    return (
+      <Elements stripe={getStripePromise()}>
+        <PlanReadyScreen category={category} generatedGoalTitle={generatedGoalTitle} />
+      </Elements>
+    );
+  }
+
   // ── Hype screen ──
   if (showHype) {
     return (
