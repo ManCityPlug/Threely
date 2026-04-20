@@ -248,7 +248,7 @@ export default function StartPage() {
               so it reads as "the real thing" for their goal. */}
           {(() => {
             const SAMPLE_TASKS: Record<Category, string> = {
-              business:   "Write down your business idea in one sentence",
+              business:   "Write down 3 things you're already good at",
               daytrading: "Open a free paper trading account (Webull or Thinkorswim)",
               health:     "Take a Day 1 photo and save it on your phone",
               other:      "Google one person who's done what you want and save their name",
