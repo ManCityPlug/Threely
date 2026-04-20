@@ -172,11 +172,10 @@ function PlanSelector({ plan, onChange }: { plan: PlanId; onChange: (p: PlanId) 
 // neither, only the "Enter card manually" form is offered.
 interface InlinePaymentProps {
   plan: PlanId;
-  onPlanChange: (p: PlanId) => void;
   preloadedClientSecret?: string | null;
   onSuccess: (payerEmail: string | null) => void;
 }
-function InlinePayment({ plan, onPlanChange, preloadedClientSecret, onSuccess }: InlinePaymentProps) {
+function InlinePayment({ plan, preloadedClientSecret, onSuccess }: InlinePaymentProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [clientSecret, setClientSecret] = useState<string | null>(preloadedClientSecret ?? null);
@@ -306,44 +305,54 @@ function InlinePayment({ plan, onPlanChange, preloadedClientSecret, onSuccess }:
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-      <PlanSelector plan={plan} onChange={onPlanChange} />
-
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       {error && (
         <div style={{ padding: "0.6rem 0.8rem", borderRadius: 10, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", fontSize: "0.82rem", color: "#fca5a5" }}>
           {error}
         </div>
       )}
 
-      {/* Apple Pay / Google Pay (Stripe auto-detects the brand) */}
+      {/* Apple Pay / Google Pay — primary CTA. Stripe auto-detects brand.
+          Height 56px to match the typography hierarchy (headline/CTA). */}
       {paymentRequest && (
-        <div>
+        <div className="pr-button-wrap">
           <PaymentRequestButtonElement
             options={{
               paymentRequest,
-              style: { paymentRequestButton: { theme: "dark", height: "52px", type: "default" } },
+              style: { paymentRequestButton: { theme: "dark", height: "56px", type: "default" } },
             }}
           />
         </div>
       )}
 
-      {/* Enter card manually — collapsible */}
+      {/* Card — secondary option */}
       <button
         type="button"
         onClick={() => setCardOpen((o) => !o)}
+        className="press-scale"
         style={{
-          background: "none", border: "none", cursor: "pointer",
-          color: "rgba(255,255,255,0.75)", fontSize: "0.9rem", fontWeight: 600,
-          padding: "6px 0",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+          height: 52,
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 14,
+          cursor: "pointer",
+          color: "var(--text)",
+          fontSize: "0.95rem",
+          fontWeight: 600,
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          transition: "background 0.15s",
         }}
       >
-        Enter card manually
-        <span style={{ transition: "transform 0.2s", transform: cardOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▾</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.7 }}>
+          <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
+          <line x1="2" y1="10" x2="22" y2="10" />
+        </svg>
+        Pay $1 with card
+        <span style={{ transition: "transform 0.2s", transform: cardOpen ? "rotate(180deg)" : "rotate(0deg)", opacity: 0.6, marginLeft: 2 }}>▾</span>
       </button>
 
       {cardOpen && (
-        <form onSubmit={handleCardSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <form onSubmit={handleCardSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }} className="fade-in-fast">
           <input
             type="text" value={fullName} onChange={(e) => setFullName(e.target.value)}
             placeholder="Name on card" autoComplete="cc-name" style={inputStyle}
@@ -365,6 +374,7 @@ function InlinePayment({ plan, onPlanChange, preloadedClientSecret, onSuccess }:
           <button
             type="submit"
             disabled={!cardReady || submitting || !clientSecret}
+            className="press-scale"
             style={{
               height: 54, fontSize: "1rem", fontWeight: 700,
               background: cardReady && !submitting
@@ -373,6 +383,7 @@ function InlinePayment({ plan, onPlanChange, preloadedClientSecret, onSuccess }:
               color: cardReady && !submitting ? "#000" : "rgba(255,255,255,0.5)",
               borderRadius: 14, border: "none",
               cursor: cardReady && !submitting ? "pointer" : "default",
+              transition: "all 0.15s",
             }}
           >
             {submitting ? "Processing…" : "Start For $1 →"}
@@ -879,8 +890,14 @@ export default function StartPage() {
 }
 
 // ─── Plan Ready screen (wrapped in Elements by parent) ───────────────────────
-// Shows: goal card → blurred preview → plan selector → Apple/Google Pay +
-// card fallback → on success, swaps to AccountFinalize for email/password.
+// High-conversion paywall hierarchy:
+//   1. Headline "Your plan is ready — start for $1" + 15-min subtext + urgency
+//   2. Task preview (1 visible + 2 blurred with shimmer)
+//   3. CTA button (Apple/Google Pay primary, card secondary)
+//   4. Terms block ("$1 today • 3-day trial • then $12.99/mo • cancel anytime")
+//   5. Plan selector (Monthly / Yearly) — secondary, below terms, muted
+// Premium feel via soft shadows, subtle shimmer on blurred tasks, press-scale
+// on buttons, and a fade-in on mount.
 function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret }: { category: Category | null; generatedGoalTitle: string; preloadedClientSecret: string | null }) {
   const [plan, setPlan] = useState<PlanId>("yearly");
   const [paymentDone, setPaymentDone] = useState(false);
@@ -898,6 +915,8 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret }
   ];
   const visibleTask = category ? SAMPLE_TASKS[category] : SAMPLE_TASKS.other;
 
+  const monthlyPrice = plan === "yearly" ? "$12.99/month" : "$12.99/month";
+
   if (paymentDone) {
     return (
       <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -908,40 +927,76 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret }
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div style={{ width: "100%", maxWidth: 480, display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-        <div style={{ textAlign: "center" }}>
-          <img src="/favicon.png" alt="Threely" width={56} height={56} style={{ borderRadius: 14, marginBottom: 16 }} />
-          <h1 style={{ fontSize: "clamp(1.4rem, 4vw, 1.85rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 0 }}>
-            Your plan is ready
+      <div className="paywall-root" style={{ width: "100%", maxWidth: 460, display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+        {/* 1. Headline — most prominent */}
+        <div style={{ textAlign: "center", paddingTop: 8 }}>
+          <img src="/favicon.png" alt="Threely" width={52} height={52} style={{ borderRadius: 13, marginBottom: 14, boxShadow: "0 6px 20px rgba(212,168,67,0.15)" }} />
+          <h1 style={{
+            fontSize: "clamp(1.5rem, 5vw, 2rem)",
+            fontWeight: 800,
+            letterSpacing: "-0.025em",
+            color: "var(--text)",
+            lineHeight: 1.15,
+            margin: 0,
+            marginBottom: 8,
+          }}>
+            Your plan is ready — start for $1
           </h1>
+          <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.75)", margin: 0, marginBottom: 6 }}>
+            Takes ~15 minutes a day
+          </p>
+          <p style={{ fontSize: "0.78rem", color: "rgba(212,168,67,0.75)", fontWeight: 600, margin: 0, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+            Next step unlocks soon
+          </p>
         </div>
 
-        <div className="card" style={{ padding: "1.1rem 1.25rem", borderRadius: 16, border: "1px solid var(--border)" }}>
-          <div style={{ fontSize: "0.7rem", fontWeight: 700, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4 }}>Your Goal</div>
-          <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)" }}>{generatedGoalTitle}</div>
+        {/* Goal card — compact, secondary */}
+        <div className="card" style={{ padding: "0.9rem 1.1rem", borderRadius: 14, border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.02)" }}>
+          <div style={{ fontSize: "0.65rem", fontWeight: 700, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>Your Goal</div>
+          <div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)" }}>{generatedGoalTitle}</div>
         </div>
 
-        {/* Plan preview — 1 task visible + 2 blurred */}
+        {/* 2. Task preview — 1 visible + 2 blurred with shimmer */}
         <div style={{ position: "relative" }}>
           <div style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
-            fontSize: "0.72rem", color: "rgba(255,255,255,0.55)",
+            fontSize: "0.7rem", color: "rgba(255,255,255,0.55)",
             marginBottom: 8, padding: "0 4px",
           }}>
-            <span style={{ fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.05em" }}>Day 1</span>
+            <span style={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Day 1</span>
             <span>~15 min total</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            <div className="card" style={{ padding: "0.9rem 1.1rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
+            {/* Visible — premium feel */}
+            <div style={{
+              padding: "0.9rem 1.1rem",
+              borderRadius: 14,
+              border: "1px solid rgba(212,168,67,0.25)",
+              background: "rgba(255,255,255,0.03)",
+              boxShadow: "0 4px 20px rgba(0,0,0,0.2), 0 0 0 1px rgba(212,168,67,0.08)",
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+            }}>
+              <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.6)", flexShrink: 0 }} />
               <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0 }}>
                 {visibleTask}
               </div>
             </div>
-            <div style={{ filter: "blur(6px)", pointerEvents: "none", userSelect: "none", display: "flex", flexDirection: "column", gap: 10 }}>
+            {/* Blurred with shimmer */}
+            <div className="locked-stack" style={{ pointerEvents: "none", userSelect: "none", display: "flex", flexDirection: "column", gap: 10 }}>
               {BLURRED_PLACEHOLDERS.map((placeholder, i) => (
-                <div key={i} className="card" style={{ padding: "0.9rem 1.1rem", borderRadius: 14, border: "1px solid var(--border)", display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.5)", flexShrink: 0 }} />
+                <div key={i} className="locked-task" style={{
+                  padding: "0.9rem 1.1rem",
+                  borderRadius: 14,
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  background: "rgba(255,255,255,0.02)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  filter: "blur(5px)",
+                }}>
+                  <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.15)", flexShrink: 0 }} />
                   <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0 }}>
                     {placeholder}
                   </div>
@@ -949,35 +1004,100 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret }
               ))}
             </div>
           </div>
+          {/* Gradient fade + unlock caption */}
           <div style={{
             position: "absolute", left: 0, right: 0, bottom: 0,
-            height: "65%",
-            background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.6) 55%, rgba(10,10,10,0.95) 100%)",
+            height: "62%",
+            background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.55) 55%, rgba(10,10,10,0.95) 100%)",
             display: "flex", alignItems: "flex-end", justifyContent: "center",
-            paddingBottom: 12, borderRadius: 14, pointerEvents: "none",
+            paddingBottom: 10, borderRadius: 14, pointerEvents: "none",
           }}>
-            <p style={{ fontSize: "0.85rem", fontWeight: 600, color: "rgba(255,255,255,0.95)", margin: 0 }}>
-              Start for $1 to unlock your plan
+            <p style={{ fontSize: "0.82rem", fontWeight: 600, color: "rgba(255,255,255,0.95)", margin: 0, letterSpacing: "-0.01em" }}>
+              Unlock when you start
             </p>
           </div>
         </div>
 
-        {/* Inline payment — plan selector + Apple/Google Pay + card fallback */}
+        {/* 3. CTA — Apple Pay / Google Pay primary + card secondary */}
         <InlinePayment
           plan={plan}
-          onPlanChange={setPlan}
           preloadedClientSecret={preloadedClientSecret}
           onSuccess={(email) => { setPayerEmail(email); setPaymentDone(true); }}
         />
 
-        <p style={{ textAlign: "center", fontSize: "0.78rem", color: "rgba(255,255,255,0.75)" }}>
-          Cancel anytime.
+        {/* 4. Terms block — Bloomberg-style: clean, small, single line */}
+        <p style={{
+          textAlign: "center",
+          fontSize: "0.75rem",
+          color: "rgba(255,255,255,0.5)",
+          margin: 0,
+          letterSpacing: "-0.005em",
+          lineHeight: 1.5,
+        }}>
+          $1 today · 3-day trial · then {monthlyPrice} · cancel anytime
         </p>
-        <div style={{ textAlign: "center" }}>
-          <Link href="/login" style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.85)" }}>
+
+        {/* 5. Plan selector — secondary, muted, below everything */}
+        <div style={{ marginTop: 4 }}>
+          <div style={{
+            textAlign: "center",
+            fontSize: "0.68rem",
+            color: "rgba(255,255,255,0.4)",
+            textTransform: "uppercase",
+            letterSpacing: "0.08em",
+            fontWeight: 600,
+            marginBottom: 8,
+          }}>
+            After trial
+          </div>
+          <PlanSelector plan={plan} onChange={setPlan} />
+        </div>
+
+        <div style={{ textAlign: "center", marginTop: 4 }}>
+          <Link href="/login" style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.55)" }}>
             Already have an account? <span style={{ color: "var(--text)", fontWeight: 600 }}>Sign in</span>
           </Link>
         </div>
+
+        {/* Global paywall styles — fade-in, shimmer on locked tasks, press scale */}
+        <style>{`
+          .paywall-root { animation: paywallFadeIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both; }
+          @keyframes paywallFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+          }
+          .fade-in-fast { animation: paywallFadeIn 0.25s ease both; }
+          .locked-stack { position: relative; overflow: hidden; border-radius: 14px; }
+          .locked-task {
+            position: relative;
+            overflow: hidden;
+          }
+          .locked-task::before {
+            content: "";
+            position: absolute; inset: 0;
+            background: linear-gradient(
+              105deg,
+              transparent 0%,
+              rgba(255,255,255,0) 35%,
+              rgba(212,168,67,0.08) 50%,
+              rgba(255,255,255,0) 65%,
+              transparent 100%
+            );
+            transform: translateX(-100%);
+            animation: lockedShimmer 3.2s ease-in-out infinite;
+            pointer-events: none;
+          }
+          @keyframes lockedShimmer {
+            0%   { transform: translateX(-100%); }
+            60%  { transform: translateX(100%); }
+            100% { transform: translateX(100%); }
+          }
+          .press-scale { transition: transform 0.12s ease-out, background 0.15s ease, box-shadow 0.15s ease; }
+          .press-scale:active { transform: scale(0.97); }
+          .press-scale:hover:not(:disabled) { filter: brightness(1.06); }
+          .pr-button-wrap { transition: transform 0.12s ease-out; }
+          .pr-button-wrap:active { transform: scale(0.985); }
+        `}</style>
       </div>
     </div>
   );
