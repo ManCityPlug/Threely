@@ -385,6 +385,18 @@ export default function OnboardingScreen() {
         <View style={styles.categoryList}>
           <TouchableOpacity
             style={styles.categoryBtn}
+            onPress={() => selectCategory("daytrading")}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.categoryEmoji}>📈</Text>
+            <View style={styles.categoryTextWrap}>
+              <Text style={styles.categoryLabel}>Day Trading</Text>
+              <Text style={styles.categoryDesc}>Grow a trading account</Text>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.categoryBtn}
             onPress={() => selectCategory("business")}
             activeOpacity={0.8}
           >
