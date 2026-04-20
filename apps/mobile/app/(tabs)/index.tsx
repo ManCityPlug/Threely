@@ -1729,14 +1729,38 @@ export default function DashboardScreen() {
   const streak = getStreakFromGoals(effectiveGoals);
   const goalDayNumber = currentGoalObj ? getGoalDayNumber(currentGoalObj) : 1;
 
-  // Path day number — always the raw calendar day since goal.createdAt,
-  // matching web (apps/web/app/(app)/dashboard/page.tsx → getGoalDayNumber).
-  // Previous "effectiveDayNumber" capped this down to the loaded task's day
-  // which caused mobile to show "Day 6" while web (same account) showed
-  // "Day 7" right after midnight. Parity > the cap's stale-task guard; when
-  // tasks for today haven't loaded yet, loadData()'s next 60s tick or
-  // app-focus refetch resolves it.
-  const effectiveDayNumber = goalDayNumber;
+  // Effective path day number — calendar day, capped down to the oldest
+  // DailyTask (for this goal) whose tasks aren't all completed. Keeps the
+  // user on Day N visually + functionally until Day N's 3 tasks are done,
+  // even after midnight rolls the calendar to Day N+1. Web has the same
+  // guard at its pathDayNumber. Work-ahead keys still use the raw
+  // goalDayNumber so they reset daily by calendar.
+  const effectiveDayNumber = (() => {
+    if (!currentGoalObj) return goalDayNumber;
+    const today = new Date();
+    const todayLocalMs = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    const createdLocalMs = new Date(
+      new Date(currentGoalObj.createdAt).getFullYear(),
+      new Date(currentGoalObj.createdAt).getMonth(),
+      new Date(currentGoalObj.createdAt).getDate()
+    ).getTime();
+    const candidates = effectiveDailyTasks
+      .filter((d) => d.goalId === effectiveSelectedGoal && d.date)
+      .map((d) => {
+        const x = new Date(d.date);
+        const localMs = new Date(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()).getTime();
+        return { dt: d, localMs };
+      })
+      .filter((x) => x.localMs <= todayLocalMs)
+      .sort((a, b) => a.localMs - b.localMs);
+    const firstIncomplete = candidates.find(({ dt }) => {
+      const items = Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]).slice(-3) : [];
+      return items.length > 0 && !items.every((t) => t.isCompleted || t.isSkipped);
+    });
+    if (!firstIncomplete) return goalDayNumber;
+    const diffDays = Math.floor((firstIncomplete.localMs - createdLocalMs) / 86400000) + 1;
+    return Math.min(goalDayNumber, Math.max(1, diffDays));
+  })();
 
   // Task progress for progress ring (0-1)
   const taskProgress = newTaskItems.length > 0

@@ -903,13 +903,46 @@ function DashboardPageInner() {
     setWorkAheadDone(!!localStorage.getItem(aheadDoneKey));
   }, [aheadUsedKey, aheadDoneKey]);
 
+  // Effective day = calendar day, capped down to the oldest DailyTask (for
+  // this goal) whose tasks aren't all done. So if midnight rolls from Day N
+  // to Day N+1 but Day N's 3 tasks weren't finished, the path + tasks view
+  // stay on Day N until the user completes it. Mobile has the same guard.
+  // Work-ahead localStorage keys keep using the raw goalDayNumber so they
+  // reset daily by calendar.
+  const effectivePathDayNumber = (() => {
+    if (!selectedGoal) return goalDayNumber;
+    const today = new Date();
+    const todayLocalMs = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+    const createdLocalMs = new Date(
+      new Date(selectedGoal.createdAt).getFullYear(),
+      new Date(selectedGoal.createdAt).getMonth(),
+      new Date(selectedGoal.createdAt).getDate()
+    ).getTime();
+    const candidates = effectiveDailyTasks
+      .filter((d) => d.goalId === effectiveSelectedGoalId && d.date)
+      .map((d) => {
+        const x = new Date(d.date);
+        const localMs = new Date(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()).getTime();
+        return { dt: d, localMs };
+      })
+      .filter((x) => x.localMs <= todayLocalMs)
+      .sort((a, b) => a.localMs - b.localMs);
+    const firstIncomplete = candidates.find(({ dt }) => {
+      const items = dt.tasks.slice(-3);
+      return items.length > 0 && !items.every((t) => t.isCompleted || t.isSkipped);
+    });
+    if (!firstIncomplete) return goalDayNumber;
+    const diffDays = Math.floor((firstIncomplete.localMs - createdLocalMs) / 86400000) + 1;
+    return Math.min(goalDayNumber, Math.max(1, diffDays));
+  })();
+
   // Path state: compute which day is active and how many are completed
-  // - Before today done: active = goalDayNumber, completed = goalDayNumber - 1
-  // - Today done, no work ahead: active = goalDayNumber (shows COMPLETE!), next available
-  // - Work ahead started: active = goalDayNumber + 1 (Day 2 is active)
-  // - Work ahead completed: active = goalDayNumber + 1 (Day 2 shows COMPLETE!), Day 3 locked
-  const pathDayNumber = workAheadUsed ? goalDayNumber + 1 : goalDayNumber;
-  const pathCompletedDays = workAheadUsed ? goalDayNumber : goalDayNumber - 1;
+  // - Before today done: active = effectivePathDayNumber, completed = effectivePathDayNumber - 1
+  // - Today done, no work ahead: active = effectivePathDayNumber (shows COMPLETE!), next available
+  // - Work ahead started: active = effectivePathDayNumber + 1
+  // - Work ahead completed: active = effectivePathDayNumber + 1 (COMPLETE!), next locked
+  const pathDayNumber = workAheadUsed ? effectivePathDayNumber + 1 : effectivePathDayNumber;
+  const pathCompletedDays = workAheadUsed ? effectivePathDayNumber : effectivePathDayNumber - 1;
   const pathAllDone = workAheadUsed ? (todayAllDone && workAheadDone) : todayAllDone;
 
   const userToggledRef = useRef(false);
