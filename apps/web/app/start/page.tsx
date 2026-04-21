@@ -1271,8 +1271,9 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "clamp(2rem, 6vh, 4rem) clamp(1rem, 4vw, 2rem) clamp(1rem, 4vw, 2rem)", display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
       <div className="paywall-root" style={{ width: "100%", maxWidth: 460, display: "flex", flexDirection: "column", gap: "1.1rem" }}>
-        {/* 1. Headline — most prominent (logo removed to push content higher) */}
+        {/* 1. Logo + headline */}
         <div style={{ textAlign: "center", paddingTop: 0 }}>
+          <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 12, boxShadow: "0 6px 18px rgba(212,168,67,0.15)" }} />
           <h1 style={{
             fontSize: "clamp(1.5rem, 5vw, 2rem)",
             fontWeight: 800,
