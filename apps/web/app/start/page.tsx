@@ -1193,9 +1193,8 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "clamp(0.5rem, 2vh, 1.5rem) clamp(1rem, 4vw, 2rem)", display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
       <div className="paywall-root" style={{ width: "100%", maxWidth: 460, display: "flex", flexDirection: "column", gap: "1.1rem" }}>
-        {/* 1. Headline — most prominent */}
+        {/* 1. Headline — most prominent (logo removed to push content higher) */}
         <div style={{ textAlign: "center", paddingTop: 0 }}>
-          <img src="/favicon.png" alt="Threely" width={52} height={52} style={{ borderRadius: 13, marginBottom: 14, boxShadow: "0 6px 20px rgba(212,168,67,0.15)" }} />
           <h1 style={{
             fontSize: "clamp(1.5rem, 5vw, 2rem)",
             fontWeight: 800,
@@ -1203,7 +1202,6 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             color: "var(--text)",
             lineHeight: 1.15,
             margin: 0,
-            marginBottom: 8,
           }}>
             One Step Away From Your Goal
           </h1>
@@ -1217,13 +1215,6 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
 
         {/* 2. Task preview — 1 visible + 2 blurred with shimmer */}
         <div style={{ position: "relative" }}>
-          <div style={{
-            fontSize: "0.7rem", color: "rgba(255,255,255,0.55)",
-            marginBottom: 8, padding: "0 4px",
-            fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
-          }}>
-            Day 1
-          </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {/* Visible — premium feel */}
             <div style={{
