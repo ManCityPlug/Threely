@@ -78,14 +78,14 @@ const STEPS: Record<Category, StepConfig[]> = {
       ],
     },
     {
-      question: "How much do you want to make?",
+      question: "How much do you want to make a month?",
       buttons: [
         { label: "$500", path: "" },
         { label: "$1K-$5K", path: "" },
         { label: "$10K+", path: "" },
       ],
     },
-    { question: "How hard?", buttons: [
+    { question: "How hard do you want to work?", buttons: [
       { label: "Easy", path: "" },
       { label: "Medium", path: "" },
       { label: "Hard", path: "" },
@@ -93,21 +93,21 @@ const STEPS: Record<Category, StepConfig[]> = {
   ],
   daytrading: [
     {
-      question: "Where are you at?",
+      question: "Have you traded before?",
       buttons: [
         { label: "Never traded", path: "daytrading_beginner" },
         { label: "I've traded before", path: "daytrading_experienced" },
       ],
     },
     {
-      question: "How much do you want to make?",
+      question: "How much do you want to make a month?",
       buttons: [
         { label: "$500", path: "" },
         { label: "$1K-$5K", path: "" },
         { label: "$10K+", path: "" },
       ],
     },
-    { question: "How hard?", buttons: [
+    { question: "How hard do you want to work?", buttons: [
       { label: "Easy", path: "" },
       { label: "Medium", path: "" },
       { label: "Hard", path: "" },
@@ -115,7 +115,7 @@ const STEPS: Record<Category, StepConfig[]> = {
   ],
   health: [
     {
-      question: "What's your goal?",
+      question: "Which one?",
       buttons: [
         { label: "Lose weight", path: "health_weight_loss" },
         { label: "Glow up", path: "health_general" },
@@ -123,7 +123,7 @@ const STEPS: Record<Category, StepConfig[]> = {
       ],
     },
     // step 2 intentionally unused for health — we skip from path → effort
-    { question: "How hard?", buttons: [
+    { question: "How hard do you want to work?", buttons: [
       { label: "Easy", path: "" },
       { label: "Medium", path: "" },
       { label: "Hard", path: "" },
@@ -137,7 +137,7 @@ const STEPS: Record<Category, StepConfig[]> = {
 // goal for context only — does not influence path routing or task content.
 const HEALTH_OUTCOME: Record<string, { question: string; options: string[] }> = {
   health_weight_loss: {
-    question: "What does reaching this goal look like?",
+    question: "What do you want most?",
     options: [
       "Love the mirror again",
       "Feel good in photos",
@@ -146,7 +146,7 @@ const HEALTH_OUTCOME: Record<string, { question: string; options: string[] }> = 
     ],
   },
   health_general: {
-    question: "What does reaching this goal look like?",
+    question: "What do you want most?",
     options: [
       "Get noticed",
       "Feel wanted",
@@ -155,7 +155,7 @@ const HEALTH_OUTCOME: Record<string, { question: string; options: string[] }> = 
     ],
   },
   health_muscle: {
-    question: "What does reaching this goal look like?",
+    question: "What do you want most?",
     options: [
       "Feel powerful",
       "Earn respect",

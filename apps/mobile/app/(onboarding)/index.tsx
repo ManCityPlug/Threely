@@ -430,10 +430,10 @@ export default function OnboardingScreen() {
     if (!category) return null;
     const options = PATH_OPTIONS[category];
     const title = category === "daytrading"
-      ? "Where are you starting?"
+      ? "Have you traded before?"
       : category === "business"
-        ? "What are you building?"
-        : "What's your goal?";
+        ? "What do you want to build?"
+        : "Which one?";
     const totalSteps = category === "health" ? 2 : 3;
     return (
       <View style={styles.stepContainer}>
@@ -464,7 +464,7 @@ export default function OnboardingScreen() {
     return (
       <View style={styles.stepContainer}>
         <ProgressDots current={2} total={3} />
-        <Text style={styles.stepTitle}>How much do you want to make?</Text>
+        <Text style={styles.stepTitle}>How much do you want to make a month?</Text>
         <View style={styles.optionList}>
           {["$500", "$1K-$5K", "$10K+"].map((opt) => (
             <TouchableOpacity
@@ -489,7 +489,7 @@ export default function OnboardingScreen() {
     return (
       <View style={styles.stepContainer}>
         <ProgressDots current={current} total={totalSteps} />
-        <Text style={styles.stepTitle}>How hard?</Text>
+        <Text style={styles.stepTitle}>How hard do you want to work?</Text>
         <View style={styles.optionList}>
           {(["Easy", "Medium", "Hard"] as EffortLevel[]).map((opt) => (
             <TouchableOpacity
