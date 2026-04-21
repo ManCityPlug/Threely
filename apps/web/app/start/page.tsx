@@ -68,15 +68,11 @@ interface StepConfig {
 //   step 1 = path pick (sub-question)
 //   step 2 = income target (business/daytrading only — skipped for health)
 //   step 3 = effort level
+// New order everywhere: goal/target first, effort second, path last.
+// Business/daytrading: income → effort → path-pick
+// Health:              path-pick → effort → outcome-multi-select
 const STEPS: Record<Category, StepConfig[]> = {
   business: [
-    {
-      question: "What do you want to build?",
-      buttons: [
-        { label: "Ecommerce", path: "business_ecommerce", description: "Sell stuff online" },
-        { label: "Personal brand", path: "business_content", description: "Grow a following" },
-      ],
-    },
     {
       question: "How much do you want to make a month?",
       buttons: [
@@ -85,13 +81,41 @@ const STEPS: Record<Category, StepConfig[]> = {
         { label: "$10K+", path: "" },
       ],
     },
-    { question: "How hard do you want to work?", buttons: [
-      { label: "Easy", path: "" },
-      { label: "Medium", path: "" },
-      { label: "Hard", path: "" },
-    ] },
+    {
+      question: "How hard do you want to work?",
+      buttons: [
+        { label: "Easy", path: "" },
+        { label: "Medium", path: "" },
+        { label: "Hard", path: "" },
+      ],
+    },
+    {
+      question: "What do you want to build?",
+      buttons: [
+        { label: "Passive income", path: "business_passive" },
+        { label: "Ecommerce", path: "business_ecommerce" },
+        { label: "Personal brand", path: "business_content" },
+        { label: "SaaS", path: "business_saas" },
+      ],
+    },
   ],
   daytrading: [
+    {
+      question: "How much do you want to make a month?",
+      buttons: [
+        { label: "$500", path: "" },
+        { label: "$1K-$5K", path: "" },
+        { label: "$10K+", path: "" },
+      ],
+    },
+    {
+      question: "How hard do you want to work?",
+      buttons: [
+        { label: "Easy", path: "" },
+        { label: "Medium", path: "" },
+        { label: "Hard", path: "" },
+      ],
+    },
     {
       question: "Have you traded before?",
       buttons: [
@@ -99,19 +123,6 @@ const STEPS: Record<Category, StepConfig[]> = {
         { label: "I've traded before", path: "daytrading_experienced" },
       ],
     },
-    {
-      question: "How much do you want to make a month?",
-      buttons: [
-        { label: "$500", path: "" },
-        { label: "$1K-$5K", path: "" },
-        { label: "$10K+", path: "" },
-      ],
-    },
-    { question: "How hard do you want to work?", buttons: [
-      { label: "Easy", path: "" },
-      { label: "Medium", path: "" },
-      { label: "Hard", path: "" },
-    ] },
   ],
   health: [
     {
@@ -122,12 +133,15 @@ const STEPS: Record<Category, StepConfig[]> = {
         { label: "Build muscle", path: "health_muscle" },
       ],
     },
-    // step 2 intentionally unused for health — we skip from path → effort
-    { question: "How hard do you want to work?", buttons: [
-      { label: "Easy", path: "" },
-      { label: "Medium", path: "" },
-      { label: "Hard", path: "" },
-    ] },
+    {
+      question: "How hard do you want to work?",
+      buttons: [
+        { label: "Easy", path: "" },
+        { label: "Medium", path: "" },
+        { label: "Hard", path: "" },
+      ],
+    },
+    // step 3 is multi-select — rendered from HEALTH_OUTCOME, not STEPS
   ],
 };
 
@@ -139,37 +153,54 @@ const HEALTH_OUTCOME: Record<string, { question: string; options: string[] }> = 
   health_weight_loss: {
     question: "What do you want most?",
     options: [
-      "Love the mirror again",
-      "Feel good in photos",
-      "Feel wanted",
-      "Finally follow through",
+      "Look my best",
+      "Get my dream body",
+      "More confidence",
+      "Have more energy",
     ],
   },
   health_general: {
     question: "What do you want most?",
     options: [
-      "Get noticed",
-      "Feel wanted",
-      "Stop being invisible",
-      "Be my best self",
+      "Reach my max potential",
+      "Get more compliments",
+      "Upgrade my style",
+      "Be more attractive",
     ],
   },
   health_muscle: {
     question: "What do you want most?",
     options: [
-      "Feel powerful",
-      "Earn respect",
-      "Look strong",
-      "Stop feeling small",
+      "Build my dream body",
+      "Look jacked",
+      "Be more athletic",
+      "Get noticeably bigger",
     ],
   },
+};
+
+// Sample task shown on the paywall preview — picked by the user's selected
+// path (not just category) so it feels personal. Matches the "day trading
+// paper account" energy: concrete, real, immediately actionable.
+const PATH_SAMPLE_TASK: Record<string, string> = {
+  daytrading_beginner:      "Open a free paper trading account (Webull or Thinkorswim)",
+  daytrading_experienced:   "Open your brokerage and screenshot your last trade",
+  business_passive:         "Write down 3 things people would pay to learn from you",
+  business_ecommerce:       "Write down 3 things you'd personally buy online",
+  business_content:         "Pick one platform — TikTok, IG, or YouTube",
+  business_saas:            "Write down 3 annoying problems you have every week",
+  health_weight_loss:       "Download MyFitnessPal and log your breakfast",
+  health_general:           "Screenshot 3 looks you want to copy",
+  health_muscle:            "Download Hevy or Strong to track your workouts",
 };
 
 function buildGoalTitle(category: Category, path: string, incomeOrAnswer: string): string {
   switch (category) {
     case "business":
+      if (path === "business_passive") return incomeOrAnswer ? `Build Passive Income → ${incomeOrAnswer}/Month` : "Build Passive Income";
       if (path === "business_ecommerce") return incomeOrAnswer ? `Make ${incomeOrAnswer}/Month (Ecommerce)` : "Start an Ecommerce Brand";
       if (path === "business_content") return incomeOrAnswer ? `Build My Brand → ${incomeOrAnswer}/Month` : "Build a Personal Brand";
+      if (path === "business_saas") return incomeOrAnswer ? `Launch a SaaS → ${incomeOrAnswer}/Month` : "Launch a SaaS";
       return incomeOrAnswer ? `Make ${incomeOrAnswer}/Month` : "Start a Business";
     case "daytrading":
       if (path === "daytrading_beginner") return incomeOrAnswer ? `Learn Day Trading → ${incomeOrAnswer}/Month` : "Learn to Day Trade";
@@ -823,9 +854,12 @@ export default function StartPage() {
     animateStep(1);
   }
 
-  // Step 1 captures the path. Then:
-  //   - business/daytrading: step 2 = income, step 3 = effort
-  //   - health:              step 2 = outcome multi-select, step 3 = effort
+  // Universal flow (all categories land here after 3 answers):
+  //   - business/daytrading: step 1 = income, step 2 = effort, step 3 = path
+  //   - health:              step 1 = path,   step 2 = effort, step 3 = multi
+  // For biz/dt the path is captured on step 3 here. For health the path is
+  // captured on step 1 (selectedPath set early), and the terminal action is
+  // handleHealthOutcomeContinue below.
   function handleButtonAnswer(answer: string, path?: string) {
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
@@ -841,10 +875,10 @@ export default function StartPage() {
 
   function handleHealthOutcomeContinue() {
     if (healthOutcome.length === 0) return;
-    // Count the multi-select as one "answer slot" so totalSteps math lines up
+    // Health multi-select is the final step — go straight to build
     const newAnswers = [...answers, healthOutcome.join(", ")];
     setAnswers(newAnswers);
-    animateStep(funnelStep + 1);
+    startBuild(category!, newAnswers, selectedPath);
   }
 
   function toggleHealthOutcome(opt: string) {
@@ -868,9 +902,10 @@ export default function StartPage() {
 
   // ── Show hype + blurred preview (NO plan building yet) ──
   function startBuild(cat: Category, allAnswers: string[], path: string) {
-    // For business/daytrading: answers[0]=path-label, answers[1]=income, answers[2]=effort
-    // For health: answers[0]=path-label, answers[1]=effort (income skipped)
-    const income = cat === "health" ? "" : (allAnswers[1] ?? "");
+    // New order:
+    //   business/daytrading: answers[0]=income, answers[1]=effort, answers[2]=path-label
+    //   health:              answers[0]=path-label, answers[1]=effort, answers[2]=outcomes
+    const income = cat === "health" ? "" : (allAnswers[0] ?? "");
     const title = buildGoalTitle(cat, path, income);
 
     try {
@@ -920,6 +955,7 @@ export default function StartPage() {
           generatedGoalTitle={generatedGoalTitle}
           preloadedClientSecret={preloadedClientSecret}
           primedPaymentRequest={primedPaymentRequest}
+          selectedPath={selectedPath}
         />
       </Elements>
     );
@@ -965,21 +1001,21 @@ export default function StartPage() {
   }
 
   // ── Get current step config ──
-  // Health inserts a multi-select step at position 2 that isn't in the STEPS
-  // array — it's rendered from HEALTH_OUTCOME keyed on selectedPath. Effort
-  // for health lives at STEPS.health[1] but is reached at funnelStep=3.
+  // Universal order: step 1 = first question, step 2 = second, step 3 = last.
+  // For health, STEPS.health has only 2 entries (path + effort); the last
+  // step (funnelStep=3) is the outcome multi-select rendered from HEALTH_OUTCOME.
   const currentStepConfig = (() => {
     if (!category || funnelStep < 1 || funnelStep > 3) return null;
     if (category === "health") {
-      if (funnelStep === 1) return STEPS.health[0];
-      if (funnelStep === 2) return null; // custom multi-select render
-      if (funnelStep === 3) return STEPS.health[1]; // effort
+      if (funnelStep === 1) return STEPS.health[0]; // path
+      if (funnelStep === 2) return STEPS.health[1]; // effort
+      if (funnelStep === 3) return null;            // custom multi-select render
       return null;
     }
     return STEPS[category][funnelStep - 1];
   })();
   const healthOutcomeConfig =
-    category === "health" && funnelStep === 2 && selectedPath
+    category === "health" && funnelStep === 3 && selectedPath
       ? HEALTH_OUTCOME[selectedPath]
       : null;
 
@@ -1209,22 +1245,27 @@ function SaleCountdown() {
 //   5. Plan selector (Monthly / Yearly) — secondary, below terms, muted
 // Premium feel via soft shadows, subtle shimmer on blurred tasks, press-scale
 // on buttons, and a fade-in on mount.
-function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, primedPaymentRequest }: { category: Category | null; generatedGoalTitle: string; preloadedClientSecret: string | null; primedPaymentRequest: PaymentRequest | null }) {
+function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, primedPaymentRequest, selectedPath }: { category: Category | null; generatedGoalTitle: string; preloadedClientSecret: string | null; primedPaymentRequest: PaymentRequest | null; selectedPath: string }) {
   const [plan, setPlan] = useState<PlanId>("yearly");
   const [paymentDone, setPaymentDone] = useState(false);
   const [payerEmail, setPayerEmail] = useState<string | null>(null);
   const renewPrice = plan === "yearly" ? "$99.99/year" : "$12.99/month";
 
-  const SAMPLE_TASKS: Record<Category, string> = {
-    business:   "Write down 3 things you're already good at",
-    daytrading: "Open a free paper trading account (Webull or Thinkorswim)",
-    health:     "Take a Day 1 photo and save it on your phone",
-  };
   const BLURRED_PLACEHOLDERS = [
     "Your next personalized step, made for your goal",
     "A simple action to build momentum today",
   ];
-  const visibleTask = category ? SAMPLE_TASKS[category] : SAMPLE_TASKS.business;
+  // Prefer the path-specific sample task (e.g. daytrading_beginner → paper
+  // account), fall back to a category-level default.
+  const CATEGORY_FALLBACK: Record<Category, string> = {
+    business:   "Write down 3 things people would pay to learn from you",
+    daytrading: "Open a free paper trading account (Webull or Thinkorswim)",
+    health:     "Drink a full glass of water right now",
+  };
+  const visibleTask =
+    (selectedPath && PATH_SAMPLE_TASK[selectedPath]) ||
+    (category && CATEGORY_FALLBACK[category]) ||
+    CATEGORY_FALLBACK.business;
 
 
   if (paymentDone) {
