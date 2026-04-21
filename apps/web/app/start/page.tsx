@@ -733,6 +733,45 @@ export default function StartPage() {
       }));
     } catch { /* ignore */ }
   }, [category, funnelStep, answers, selectedPath, healthOutcome, showHype, planReady, generatedGoalTitle]);
+
+  // Browser back-navigation:
+  //   - From plan-ready / hype  → reset to category picker (step 0)
+  //   - From mid-funnel (1-3)   → go back one step
+  //   - From category picker    → default (home /)
+  // Refresh preserves state (via localStorage above); only an explicit back
+  // gesture resets. We intercept popstate and push a replacement entry so
+  // the user stays on /start unless they're at step 0.
+  useEffect(() => {
+    // Seed the history stack with a dummy entry so the first back gesture
+    // lands in our popstate handler instead of leaving the page.
+    if (typeof window !== "undefined") {
+      window.history.pushState({ threely: "start" }, "", window.location.pathname);
+    }
+    const onPop = () => {
+      if (planReady || showHype) {
+        setPlanReady(false);
+        setShowHype(false);
+        setCategory(null);
+        setFunnelStep(0);
+        setAnswers([]);
+        setSelectedPath("");
+        setHealthOutcome([]);
+        setGeneratedGoalTitle("");
+        window.history.pushState({ threely: "start" }, "", window.location.pathname);
+        return;
+      }
+      if (funnelStep > 0) {
+        setAnswers((prev) => prev.slice(0, -1));
+        setFunnelStep((prev) => Math.max(0, prev - 1));
+        window.history.pushState({ threely: "start" }, "", window.location.pathname);
+        return;
+      }
+      // At step 0 — allow the natural back to /
+      window.location.href = "/";
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, [planReady, showHype, funnelStep]);
   useEffect(() => {
     if (!showHype || preloadedClientSecret) return;
     (async () => {
