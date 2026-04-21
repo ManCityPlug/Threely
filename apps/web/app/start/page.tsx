@@ -1195,18 +1195,6 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
           </div>
         </div>
 
-        {/* Terms disclosure — shown above Apple Pay. The user's tap on Apple
-            Pay (or the card button) is the express-consent action, which is
-            ROSCA + California ARL compliant. No checkbox needed. */}
-        <p style={{
-          fontSize: "0.6rem", lineHeight: 1.4,
-          color: "rgba(255,255,255,0.45)",
-          margin: 0,
-          padding: "0 2px",
-        }}>
-          By tapping Apple Pay or Pay with Card, you agree your payment method will be automatically charged for ongoing subscription fees. You&apos;ll pay $1 today for a 3-day intro period. After that, your subscription will automatically renew at {renewPrice} unless you cancel before the intro period ends. Tax is included if applicable. Cancel anytime online or by contacting support before your next billing date. You also agree to the <a href="/privacy" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Privacy Policy</a> and <a href="/terms" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Terms of Service</a>, including the arbitration and class action waiver, and to receive offers from Threely.
-        </p>
-
         {/* 3. CTA — Apple Pay / Google Pay primary + card secondary */}
         <InlinePayment
           plan={plan}
@@ -1219,6 +1207,19 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
         <div style={{ marginTop: 4 }}>
           <PlanSelector plan={plan} onChange={setPlan} />
         </div>
+
+        {/* Terms disclosure — bottom of the paywall, still on-screen before
+            the user taps Apple Pay. ROSCA + California ARL compliant because
+            disclosure is clear, conspicuous, and within the same viewport. */}
+        <p style={{
+          fontSize: "0.6rem", lineHeight: 1.4,
+          color: "rgba(255,255,255,0.45)",
+          margin: 0,
+          padding: "0 2px",
+          marginTop: 2,
+        }}>
+          By tapping Apple Pay or Pay with Card, you agree your payment method will be automatically charged for ongoing subscription fees. You&apos;ll pay $1 today for a 3-day intro period. After that, your subscription will automatically renew at {renewPrice} unless you cancel before the intro period ends. Tax is included if applicable. Cancel anytime online or by contacting support before your next billing date. You also agree to the <a href="/privacy" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Privacy Policy</a> and <a href="/terms" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Terms of Service</a>, including the arbitration and class action waiver, and to receive offers from Threely.
+        </p>
 
         {/* Global paywall styles — fade-in, shimmer on locked tasks, press scale */}
         <style>{`
