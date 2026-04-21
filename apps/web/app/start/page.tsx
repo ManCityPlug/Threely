@@ -684,14 +684,30 @@ export default function StartPage() {
   const [primedPaymentRequest, setPrimedPaymentRequest] = useState<PaymentRequest | null>(null);
   useEffect(() => { getStripePromise(); }, []);
 
-  // Hide Crisp live chat while the user is in the /start flow — keeps the
-  // paywall terms fully unobstructed (compliance) and removes a conversion-
-  // killing distraction during checkout. Crisp.push() queues the command if
-  // the SDK hasn't finished loading yet, so this is safe on first mount.
+  // Hide Crisp live chat while the user is in the /start flow. Previously we
+  // only called $crisp.push(['do', 'chat:hide']) which raced with the Crisp
+  // SDK load on refresh — the widget would pop in briefly before we told it
+  // to hide. Now we inject a <style> element that force-hides Crisp's DOM
+  // regardless of when it loads. Belt-and-suspenders: also push the API
+  // command for good measure.
   useEffect(() => {
+    const style = document.createElement("style");
+    style.id = "threely-hide-crisp";
+    style.textContent = `
+      #crisp-chatbox,
+      .crisp-client,
+      [data-crisp-chatbox] {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+      }
+    `;
+    document.head.appendChild(style);
     const w = window as unknown as { $crisp?: unknown[] };
     if (w.$crisp) w.$crisp.push(["do", "chat:hide"]);
     return () => {
+      document.getElementById("threely-hide-crisp")?.remove();
       const w2 = window as unknown as { $crisp?: unknown[] };
       if (w2.$crisp) w2.$crisp.push(["do", "chat:show"]);
     };
