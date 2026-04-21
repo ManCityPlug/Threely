@@ -462,7 +462,7 @@ function InlinePayment({ plan, preloadedClientSecret, primedPaymentRequest, onSu
           <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
           <line x1="2" y1="10" x2="22" y2="10" />
         </svg>
-        Pay with Credit Card
+        Continue with card
         <span style={{ transition: "transform 0.2s", transform: cardOpen ? "rotate(180deg)" : "rotate(0deg)", opacity: 0.6, marginLeft: 2 }}>▾</span>
       </button>
 
@@ -1190,8 +1190,8 @@ function SaleCountdown() {
         animation: "saleCountdownPulse 2.4s ease-in-out infinite",
       }}
     >
-      <span style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(232,197,71,0.9)" }}>
-        Sale Ends:
+      <span style={{ fontSize: "0.78rem", fontWeight: 600, letterSpacing: "0.02em", color: "rgba(232,197,71,0.95)" }}>
+        <strong style={{ fontWeight: 900, color: "#E8C547" }}>$1</strong> offer ends in
       </span>
       <span style={{ fontSize: "1.05rem", fontWeight: 800, letterSpacing: "-0.01em", color: "#E8C547", fontVariantNumeric: "tabular-nums" }}>
         {pad(h)}:{pad(m)}:{pad(s)}
@@ -1261,7 +1261,7 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
         {/* 2. Task preview — 1 visible + 2 blurred with shimmer */}
         <div style={{ position: "relative" }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {/* Visible — premium feel */}
+            {/* Visible — numbered (1), premium feel */}
             <div style={{
               padding: "0.9rem 1.1rem",
               borderRadius: 14,
@@ -1272,12 +1272,19 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
               alignItems: "center",
               gap: 12,
             }}>
-              <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(212,168,67,0.6)", flexShrink: 0 }} />
+              <div style={{
+                width: 26, height: 26, borderRadius: "50%",
+                border: "2px solid rgba(212,168,67,0.8)",
+                background: "rgba(212,168,67,0.1)",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                flexShrink: 0,
+                fontSize: "0.78rem", fontWeight: 800, color: "#E8C547",
+              }}>1</div>
               <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0 }}>
                 {visibleTask}
               </div>
             </div>
-            {/* Blurred with shimmer */}
+            {/* Blurred with shimmer + numbered (2, 3) + shaking lock */}
             <div className="locked-stack" style={{ pointerEvents: "none", userSelect: "none", display: "flex", flexDirection: "column", gap: 10 }}>
               {BLURRED_PLACEHOLDERS.map((placeholder, i) => (
                 <div key={i} className="locked-task" style={{
@@ -1288,25 +1295,39 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
-                  filter: "blur(5px)",
                 }}>
-                  <div style={{ width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.15)", flexShrink: 0 }} />
-                  <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    width: 26, height: 26, borderRadius: "50%",
+                    border: "2px solid rgba(255,255,255,0.18)",
+                    background: "rgba(255,255,255,0.03)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0,
+                    fontSize: "0.78rem", fontWeight: 800, color: "rgba(255,255,255,0.35)",
+                  }}>{i + 2}</div>
+                  <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0, filter: "blur(5px)" }}>
                     {placeholder}
                   </div>
+                  <div className="shake-lock" style={{
+                    fontSize: "1.15rem",
+                    flexShrink: 0,
+                    filter: "drop-shadow(0 0 6px rgba(212,168,67,0.6))",
+                  }}>🔒</div>
                 </div>
               ))}
             </div>
           </div>
-          {/* Gradient fade + unlock caption */}
+          {/* Gradient fade + unlock CTA */}
           <div style={{
             position: "absolute", left: 0, right: 0, bottom: 0,
             height: "62%",
             background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.55) 55%, rgba(10,10,10,0.95) 100%)",
-            display: "flex", alignItems: "flex-end", justifyContent: "center",
-            paddingBottom: 10, borderRadius: 14, pointerEvents: "none",
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end",
+            paddingBottom: 12, borderRadius: 14, pointerEvents: "none", gap: 2,
           }}>
-            <p style={{ fontSize: "1.05rem", fontWeight: 700, color: "rgba(255,255,255,0.95)", margin: 0, letterSpacing: "-0.015em" }}>
+            <p style={{ fontSize: "1.15rem", fontWeight: 800, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>
+              Unlock the rest
+            </p>
+            <p style={{ fontSize: "0.88rem", fontWeight: 600, color: "rgba(255,255,255,0.72)", margin: 0, letterSpacing: "-0.01em" }}>
               Start your goal for only $1
             </p>
           </div>
@@ -1360,23 +1381,36 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             background: linear-gradient(
               105deg,
               transparent 0%,
-              rgba(255,255,255,0) 35%,
-              rgba(212,168,67,0.08) 50%,
-              rgba(255,255,255,0) 65%,
+              rgba(212,168,67,0) 30%,
+              rgba(232,197,71,0.32) 45%,
+              rgba(255,215,100,0.55) 50%,
+              rgba(232,197,71,0.32) 55%,
+              rgba(212,168,67,0) 70%,
               transparent 100%
             );
             transform: translateX(-100%);
-            animation: lockedShimmer 3.2s ease-in-out infinite;
+            animation: lockedShimmer 1.8s ease-in-out infinite;
             pointer-events: none;
+            z-index: 2;
           }
           @keyframes lockedShimmer {
             0%   { transform: translateX(-100%); }
-            60%  { transform: translateX(100%); }
+            50%  { transform: translateX(100%); }
             100% { transform: translateX(100%); }
           }
           @keyframes saleCountdownPulse {
             0%, 100% { transform: scale(1); box-shadow: 0 4px 16px rgba(212,168,67,0.15), inset 0 1px 0 rgba(255,255,255,0.05); }
             50%      { transform: scale(1.025); box-shadow: 0 6px 22px rgba(212,168,67,0.28), inset 0 1px 0 rgba(255,255,255,0.08); }
+          }
+          @keyframes lockShake {
+            0%, 100%     { transform: rotate(0deg); }
+            15%, 45%, 75% { transform: rotate(-14deg); }
+            30%, 60%, 90% { transform: rotate(14deg); }
+          }
+          .shake-lock {
+            display: inline-block;
+            animation: lockShake 1.1s cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+            transform-origin: center;
           }
           .press-scale { transition: transform 0.12s ease-out, background 0.15s ease, box-shadow 0.15s ease; }
           .press-scale:active { transform: scale(0.97); }
