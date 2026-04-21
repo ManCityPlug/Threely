@@ -7,7 +7,6 @@ import {
   RefreshControl,
   Alert,
   TouchableOpacity,
-  TextInput,
   Animated,
   Platform,
   KeyboardAvoidingView,
