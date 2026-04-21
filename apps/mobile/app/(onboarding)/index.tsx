@@ -4,11 +4,9 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   Animated,
   ActivityIndicator,
   Platform,
-  KeyboardAvoidingView,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -24,7 +22,7 @@ import { useTheme } from "@/lib/theme";
 
 const GOLD = "#D4A843";
 
-type Category = "business" | "daytrading" | "health" | "other";
+type Category = "business" | "daytrading" | "health";
 type EffortLevel = "Mild" | "Moderate" | "Heavy";
 
 const EFFORT_MAP: Record<EffortLevel, { dailyTimeMinutes: number; intensityLevel: number }> = {
@@ -32,6 +30,50 @@ const EFFORT_MAP: Record<EffortLevel, { dailyTimeMinutes: number; intensityLevel
   Moderate: { dailyTimeMinutes: 60, intensityLevel: 2 },
   Heavy: { dailyTimeMinutes: 120, intensityLevel: 3 },
 };
+
+// Path options per category. The `path` string is the library path id stored
+// on Goal.category — the runtime loader pulls tasks from the matching JSON.
+interface PathOption { label: string; path: string; description?: string }
+
+const PATH_OPTIONS: Record<Category, PathOption[]> = {
+  daytrading: [
+    { label: "Never traded", path: "daytrading_beginner", description: "Learn from scratch with paper trading" },
+    { label: "I have experience", path: "daytrading_experienced", description: "Build discipline and consistency" },
+  ],
+  business: [
+    { label: "Ecommerce — starting fresh", path: "business_ecommerce", description: "Physical product, Shopify, dropshipping" },
+    { label: "Ecommerce — already have a store", path: "business_ecommerce_existing", description: "Grow traffic and revenue" },
+    { label: "Service / freelancing", path: "business_service", description: "Trade skills for money" },
+    { label: "Content / audience", path: "business_content", description: "TikTok, YouTube, IG, X" },
+    { label: "Software / SaaS", path: "business_saas", description: "Digital product or SaaS" },
+  ],
+  health: [
+    { label: "Lose weight", path: "health_weight_loss", description: "Calorie deficit + movement" },
+    { label: "Build muscle", path: "health_muscle", description: "Progressive overload + protein" },
+    { label: "Get fit / feel better", path: "health_general", description: "Daily habits and movement" },
+  ],
+};
+
+function buildGoalTitleFromPath(category: Category, path: string, income: string): string {
+  switch (category) {
+    case "business":
+      if (path === "business_ecommerce") return income ? `Make ${income}/Month (Ecommerce)` : "Start an Ecommerce Brand";
+      if (path === "business_ecommerce_existing") return income ? `Grow My Store to ${income}/Month` : "Grow My Ecommerce Store";
+      if (path === "business_service") return income ? `Make ${income}/Month (Service)` : "Start a Service Business";
+      if (path === "business_content") return income ? `Build an Audience + ${income}/Month` : "Build a Content Brand";
+      if (path === "business_saas") return income ? `Launch a SaaS + ${income}/Month` : "Launch a SaaS";
+      return income ? `Make ${income}/Month` : "Start a Business";
+    case "daytrading":
+      if (path === "daytrading_beginner") return income ? `Learn Day Trading → ${income}/Month` : "Learn to Day Trade";
+      if (path === "daytrading_experienced") return income ? `Day Trading → ${income}/Month` : "Day Trade With Discipline";
+      return "Day Trading";
+    case "health":
+      if (path === "health_weight_loss") return "Lose Weight";
+      if (path === "health_muscle") return "Build Muscle";
+      if (path === "health_general") return "Get Fit + Feel Better";
+      return "Health Goal";
+  }
+}
 
 const BUILDING_STEPS = [
   "Understanding your situation…",
@@ -155,30 +197,6 @@ function BuildingProgressMobile({ styles, colors }: { styles: any; colors: Color
   );
 }
 
-// ─── Goal text builder ───────────────────────────────────────────────────────
-
-function buildGoalText(
-  category: Category,
-  answers: { q1: string; effort: EffortLevel; q3: string },
-): string {
-  const effortLower = answers.effort.toLowerCase();
-  if (category === "business") {
-    const idea = answers.q3.trim() || "no specific idea yet";
-    return `I want to make ${answers.q1} per month. I can put in ${effortLower} work. My business idea: ${idea}`;
-  }
-  if (category === "daytrading") {
-    const exp = answers.q3.trim() || "complete beginner with no day trading experience";
-    return `I want to day trade to make ${answers.q1} per month. I can put in ${effortLower} work. Previous experience: ${exp}`;
-  }
-  if (category === "health") {
-    const target = answers.q3.trim() || "no specific target";
-    return `I want to ${answers.q1.toLowerCase()}. I can put in ${effortLower} work. My target: ${target}`;
-  }
-  // other
-  const details = answers.q3.trim() || "no specific details";
-  return `My goal: ${answers.q1}. I can put in ${effortLower} work. Details: ${details}`;
-}
-
 // ─── Main component ──────────────────────────────────────────────────────────
 
 export default function OnboardingScreen() {
@@ -186,15 +204,16 @@ export default function OnboardingScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
-  // Funnel state
+  // Funnel state — all MC, no free text
+  //   step 0 = category pick
+  //   step 1 = path pick (sub-question)
+  //   step 2 = income target (business/daytrading only, skipped for health)
+  //   step 3 = effort level
   const [category, setCategory] = useState<Category | null>(null);
-  const [funnelStep, setFunnelStep] = useState(0); // 0 = category, 1-3 = questions
-  const [q1Answer, setQ1Answer] = useState("");
+  const [funnelStep, setFunnelStep] = useState(0);
+  const [selectedPath, setSelectedPath] = useState<string>("");
+  const [incomeTarget, setIncomeTarget] = useState("");
   const [effortLevel, setEffortLevel] = useState<EffortLevel | null>(null);
-  const [q3Input, setQ3Input] = useState("");
-
-  // For "Other" category, step 1 uses a text input
-  const [otherGoalInput, setOtherGoalInput] = useState("");
 
   // Hype / building state
   const [showHype, setShowHype] = useState(false);
@@ -244,13 +263,11 @@ export default function OnboardingScreen() {
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     animateTransition(() => {
       if (funnelStep === 1) {
-        // Go back to category picker
         setCategory(null);
         setFunnelStep(0);
-        setQ1Answer("");
+        setSelectedPath("");
+        setIncomeTarget("");
         setEffortLevel(null);
-        setQ3Input("");
-        setOtherGoalInput("");
       } else {
         setFunnelStep((s) => s - 1);
       }
@@ -265,24 +282,35 @@ export default function OnboardingScreen() {
     });
   }
 
-  function selectQ1(answer: string) {
-    setQ1Answer(answer);
+  function selectPath(path: string) {
+    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedPath(path);
+    // Health skips the income step (no $ target — the goal IS the path)
+    if (category === "health") {
+      animateTransition(() => setFunnelStep(3));
+    } else {
+      goNext();
+    }
+  }
+
+  function selectIncome(amount: string) {
+    setIncomeTarget(amount);
     goNext();
   }
 
   function selectEffort(level: EffortLevel) {
     setEffortLevel(level);
-    goNext();
+    // Kick off build once all answers are in
+    handleFinishHype(level);
   }
 
   // ─── Build plan ────────────────────────────────────────────────────────────
 
-  async function startBuild() {
-    if (!category || !effortLevel) return;
+  async function startBuild(effort: EffortLevel) {
+    if (!category || !selectedPath) return;
 
-    const q1 = category === "other" ? otherGoalInput.trim() : q1Answer;
-    const goalText = buildGoalText(category, { q1, effort: effortLevel, q3: q3Input });
-    const { dailyTimeMinutes, intensityLevel } = EFFORT_MAP[effortLevel];
+    const goalTitle = buildGoalTitleFromPath(category, selectedPath, incomeTarget);
+    const { dailyTimeMinutes, intensityLevel } = EFFORT_MAP[effort];
 
     setBuildDone(false);
     setBuildError("");
@@ -304,29 +332,21 @@ export default function OnboardingScreen() {
     }
 
     try {
-      // 1. Parse goal
-      const parsed = await withRetry(() => goalsApi.parse(goalText));
-
-      // 2. Save profile
       await withRetry(() => profileApi.save({ dailyTimeMinutes, intensityLevel }));
 
-      // 3. Create goal
-      const goalTitle = parsed.short_title ?? cleanFallbackTitle(goalText);
+      // Goal.category stores the library path id — runtime loader uses it to pull tasks
       const goalResult = await withRetry(() => goalsApi.create(goalTitle, {
-        rawInput: goalText,
-        structuredSummary: parsed.structured_summary ?? undefined,
-        category: parsed.category ?? category,
-        deadline: parsed.deadline_detected ?? undefined,
+        rawInput: goalTitle,
+        structuredSummary: goalTitle,
+        category: selectedPath,
         dailyTimeMinutes,
         intensityLevel,
-        workDays: parsed.work_days_detected ?? [1, 2, 3, 4, 5, 6, 7],
+        workDays: [1, 2, 3, 4, 5, 6, 7],
         onboarding: true,
       }));
 
-      // 4. Generate tasks
       await withRetry(() => tasksApi.generate(goalResult.goal.id, { onboarding: true }));
 
-      // 5. Mark onboarded
       const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
       if (uid) {
         await AsyncStorage.setItem(`@threely_onboarding_done_${uid}`, "true");
@@ -338,37 +358,24 @@ export default function OnboardingScreen() {
     }
   }
 
-  function handleFinishHype() {
-    if (!category || !effortLevel) return;
-
+  function handleFinishHype(effort: EffortLevel) {
+    if (!category || !selectedPath) return;
     setShowHype(true);
-    // Start building in the background
-    buildPromiseRef.current = startBuild();
+    buildPromiseRef.current = startBuild(effort);
   }
 
   // After step 3, go to hype screen
-  function handleStep3Continue() {
-    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    animateTransition(() => handleFinishHype());
-  }
-
-  function handleStep3Skip() {
-    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setQ3Input("");
-    animateTransition(() => handleFinishHype());
-  }
-
   // ─── Progress dots ─────────────────────────────────────────────────────────
 
-  function ProgressDots({ current }: { current: number }) {
+  function ProgressDots({ current, total }: { current: number; total: number }) {
     return (
       <View style={styles.progressDots}>
-        {[1, 2, 3].map((i) => (
+        {Array.from({ length: total }).map((_, i) => (
           <View
             key={i}
             style={[
               styles.dot,
-              i === current ? styles.dotActive : styles.dotInactive,
+              i + 1 === current ? styles.dotActive : styles.dotInactive,
             ]}
           />
         ))}
@@ -400,7 +407,7 @@ export default function OnboardingScreen() {
             onPress={() => selectCategory("business")}
             activeOpacity={0.8}
           >
-            <Text style={styles.categoryEmoji}>🤑</Text>
+            <Text style={styles.categoryEmoji}>💼</Text>
             <View style={styles.categoryTextWrap}>
               <Text style={styles.categoryLabel}>Business</Text>
               <Text style={styles.categoryDesc}>Start or grow a business</Text>
@@ -418,116 +425,76 @@ export default function OnboardingScreen() {
               <Text style={styles.categoryDesc}>Transform your body</Text>
             </View>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.categoryBtn}
-            onPress={() => selectCategory("other")}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.categoryEmoji}>✨</Text>
-            <View style={styles.categoryTextWrap}>
-              <Text style={styles.categoryLabel}>Other</Text>
-              <Text style={styles.categoryDesc}>Set any goal</Text>
-            </View>
-          </TouchableOpacity>
         </View>
       </View>
     );
   }
 
-  // ─── Render: Step 1 ────────────────────────────────────────────────────────
+  // ─── Render: Step 1 (path MC, category-specific) ──────────────────────────
 
   function renderStep1() {
-    if (category === "business" || category === "daytrading") {
-      return (
-        <View style={styles.stepContainer}>
-          <ProgressDots current={1} />
-          <Text style={styles.stepTitle}>How much do you want to make per month?</Text>
-          <View style={styles.optionList}>
-            {["$500", "$1K-$5K", "$10K+"].map((opt) => (
-              <TouchableOpacity
-                key={opt}
-                style={styles.optionBtn}
-                onPress={() => selectQ1(opt)}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.optionBtnText}>{opt}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      );
-    }
-
-    if (category === "health") {
-      return (
-        <View style={styles.stepContainer}>
-          <ProgressDots current={1} />
-          <Text style={styles.stepTitle}>What do you want?</Text>
-          <View style={styles.optionList}>
-            {["Lose weight", "Glow up", "Gain more muscle"].map((opt) => (
-              <TouchableOpacity
-                key={opt}
-                style={styles.optionBtn}
-                onPress={() => selectQ1(opt)}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.optionBtnText}>{opt}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      );
-    }
-
-    // Other
+    if (!category) return null;
+    const options = PATH_OPTIONS[category];
+    const title = category === "daytrading"
+      ? "Where are you starting?"
+      : category === "business"
+        ? "What are you building?"
+        : "What's your goal?";
+    const totalSteps = category === "health" ? 2 : 3;
     return (
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-      >
-        <View style={styles.stepContainer}>
-          <ProgressDots current={1} />
-          <Text style={styles.stepTitle}>What's your goal?</Text>
-          <TextInput
-            style={styles.textInput}
-            placeholder="e.g. Learn to play guitar"
-            placeholderTextColor={colors.textTertiary}
-            value={otherGoalInput}
-            onChangeText={setOtherGoalInput}
-            autoFocus
-            returnKeyType="done"
-            multiline
-            textAlignVertical="top"
-          />
-          <View style={styles.footer}>
+      <View style={styles.stepContainer}>
+        <ProgressDots current={1} total={totalSteps} />
+        <Text style={styles.stepTitle}>{title}</Text>
+        <View style={styles.optionList}>
+          {options.map((opt) => (
             <TouchableOpacity
-              style={[styles.continueBtn, !otherGoalInput.trim() && styles.continueBtnDisabled]}
-              onPress={() => {
-                if (otherGoalInput.trim()) {
-                  setQ1Answer(otherGoalInput.trim());
-                  goNext();
-                }
-              }}
-              activeOpacity={otherGoalInput.trim() ? 0.85 : 1}
+              key={opt.path}
+              style={styles.optionBtn}
+              onPress={() => selectPath(opt.path)}
+              activeOpacity={0.8}
             >
-              <Text style={[styles.continueBtnText, !otherGoalInput.trim() && styles.continueBtnTextDisabled]}>
-                Continue
-              </Text>
+              <Text style={styles.optionBtnText}>{opt.label}</Text>
+              {opt.description && (
+                <Text style={styles.optionBtnSub}>{opt.description}</Text>
+              )}
             </TouchableOpacity>
-          </View>
+          ))}
         </View>
-      </KeyboardAvoidingView>
+      </View>
     );
   }
 
-  // ─── Render: Step 2 (effort level) ─────────────────────────────────────────
+  // ─── Render: Step 2 (income target — business/daytrading only) ────────────
 
   function renderStep2() {
     return (
       <View style={styles.stepContainer}>
-        <ProgressDots current={2} />
+        <ProgressDots current={2} total={3} />
+        <Text style={styles.stepTitle}>How much do you want to make per month?</Text>
+        <View style={styles.optionList}>
+          {["$500", "$1K-$5K", "$10K+"].map((opt) => (
+            <TouchableOpacity
+              key={opt}
+              style={styles.optionBtn}
+              onPress={() => selectIncome(opt)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.optionBtnText}>{opt}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    );
+  }
+
+  // ─── Render: Step 3 (effort level) ────────────────────────────────────────
+
+  function renderStep3() {
+    const totalSteps = category === "health" ? 2 : 3;
+    const current = category === "health" ? 2 : 3;
+    return (
+      <View style={styles.stepContainer}>
+        <ProgressDots current={current} total={totalSteps} />
         <Text style={styles.stepTitle}>Level of work?</Text>
         <View style={styles.optionList}>
           {(["Mild", "Moderate", "Heavy"] as EffortLevel[]).map((opt) => (
@@ -545,53 +512,6 @@ export default function OnboardingScreen() {
     );
   }
 
-  // ─── Render: Step 3 (text input) ───────────────────────────────────────────
-
-  function renderStep3() {
-    const prompt =
-      category === "business"
-        ? "Got a business idea?"
-        : category === "daytrading"
-          ? "Any previous experience?"
-          : category === "health"
-            ? "Do you have a specific target goal?"
-            : "Anything specific?";
-
-    return (
-      <KeyboardAvoidingView
-        style={{ flex: 1 }}
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 100 : 0}
-      >
-        <View style={styles.stepContainer}>
-          <ProgressDots current={3} />
-          <Text style={styles.stepTitle}>{prompt}</Text>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Type here (optional)"
-            placeholderTextColor={colors.textTertiary}
-            value={q3Input}
-            onChangeText={setQ3Input}
-            autoFocus
-            multiline
-            textAlignVertical="top"
-          />
-          <View style={styles.footer}>
-            <TouchableOpacity
-              style={styles.continueBtn}
-              onPress={q3Input.trim() ? handleStep3Continue : handleStep3Skip}
-              activeOpacity={0.85}
-            >
-              <Text style={styles.continueBtnText}>
-                {q3Input.trim() ? "Continue" : "Skip"}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </KeyboardAvoidingView>
-    );
-  }
-
   // ─── Render: Hype screen ───────────────────────────────────────────────────
 
   function renderHype() {
@@ -605,8 +525,9 @@ export default function OnboardingScreen() {
           <TouchableOpacity
             style={styles.retryBtn}
             onPress={() => {
+              if (!effortLevel) return;
               setBuildError("");
-              buildPromiseRef.current = startBuild();
+              buildPromiseRef.current = startBuild(effortLevel);
             }}
             activeOpacity={0.85}
           >

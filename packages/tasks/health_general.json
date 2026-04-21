@@ -1,0 +1,3252 @@
+{
+  "path": "health_general",
+  "category": "health",
+  "display_name": "Get Fit + Feel Better",
+  "goal_title_suggestions": [
+    "Build a Body and Life I'm Proud Of",
+    "Get Fit, Sleep Better, Feel Great",
+    "Make Health My Default Setting"
+  ],
+  "days": [
+    {
+      "day": 1,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Download Apple Health or Google Fit right now and confirm it is open on your phone.",
+            "Open the App Store, install Apple Health or Google Fit, and launch it before moving on.",
+            "Get Apple Health or Google Fit installed and open on your phone \u2014 do it now, takes 2 minutes."
+          ],
+          "why": "Your tracker is your scoreboard \u2014 no tracking means no feedback."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Write one sentence in your notes app capturing exactly how you feel right now \u2014 energy, mood, body \u2014 this is your Day 1 baseline.",
+            "Open your notes app and record your current energy level, mood, and how your body feels in one honest sentence \u2014 this is your starting point.",
+            "Take 4 minutes, open notes, and write one sentence describing your energy, mood, and physical state today \u2014 you need a Day 1 snapshot to measure progress against."
+          ],
+          "why": "You can't measure progress without a starting line."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Walk out your front door and walk for 15 minutes at a pace where you can talk but feel it \u2014 no headphones required, just move.",
+            "Put on your shoes and walk for 15 minutes \u2014 brisk enough that your breathing picks up slightly \u2014 start the clock now.",
+            "Step outside and complete a 15-minute walk at a steady pace; if you need to take it indoors on a treadmill, that counts too."
+          ],
+          "why": "Movement today sets the physical and psychological tone for everything ahead."
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Drink a full glass of water right now before doing anything else today.",
+            "Pour and finish 8 oz of water before you check your phone or eat anything \u2014 do it now.",
+            "Start your morning with water: fill a glass and drink it completely in the next 2 minutes."
+          ],
+          "why": "Morning hydration kickstarts metabolism and sets a daily habit anchor."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Set a consistent bedtime alarm in your phone for tonight \u2014 pick a time you can actually hit 7 out of 7 nights this week.",
+            "Open your phone and set a recurring bedtime alarm for tonight and every night this week \u2014 be realistic, not aspirational.",
+            "Lock in your bedtime right now: set a repeating alarm on your phone for a time you will genuinely be in bed \u2014 not in bed scrolling, in bed sleeping."
+          ],
+          "why": "Consistent sleep timing is the single highest-leverage health habit \u2014 start it tonight."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Go for your 15-minute walk and count how many minutes felt easy vs. hard \u2014 log that number when you get back.",
+            "Complete today's 15-minute walk and afterward write in your notes: easy / medium / hard \u2014 one word about how it felt.",
+            "Walk 15 minutes and rate the effort from 1-10 when you finish \u2014 record that number alongside today's date in your notes."
+          ],
+          "why": "Tracking effort data turns a simple walk into measurable progress."
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Fill a large water bottle (at least 24 oz) right now and put it somewhere you will see it all day \u2014 this is your hydration cue.",
+            "Grab the biggest water bottle you own, fill it to the top, and set it on your desk or counter as a visual reminder to drink today.",
+            "Fill a water bottle with at least 24 oz and place it front and center in your workspace \u2014 visible means drinkable."
+          ],
+          "why": "Making water visible is the easiest way to hit 8 cups without thinking."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write today's one-sentence mood and energy check in your notes \u2014 compare it honestly to what you wrote on Day 1.",
+            "Add today's mood and energy snapshot to your notes app in one sentence, then re-read your Day 1 entry and notice anything different.",
+            "Open your Day 1 baseline note, write today's energy and mood in one new sentence below it, and spot one change \u2014 even tiny."
+          ],
+          "why": "Three days of data is the beginning of a pattern \u2014 keep the streak intact."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 15-20 minutes today \u2014 aim for 17 minutes and push the pace slightly harder than yesterday.",
+            "Do your walk today and make it 17 minutes \u2014 deliberately one step faster than your Day 2 pace.",
+            "Complete a 17-minute walk, consciously moving a little faster than you did yesterday \u2014 that progressive push is the whole point."
+          ],
+          "why": "Tiny progression each walk builds aerobic capacity without overwhelm."
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Drink your first glass of water before your feet leave the bedroom \u2014 make it non-negotiable starting today.",
+            "Before you stand up from bed, reach for water and drink a full glass \u2014 anchor this to waking up.",
+            "Keep a glass of water next to your bed tonight so tomorrow you drink it before standing up \u2014 do the prep now."
+          ],
+          "why": "Habit anchoring to an existing behavior (waking up) is the fastest way to automate hydration."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write today's one-sentence energy and mood log \u2014 you are on Day 4 of 7 for your baseline tracking streak.",
+            "Log your Day 4 mood and energy in one sentence in your notes \u2014 you are more than halfway through your first week of baseline data.",
+            "Add today's energy and mood to your running notes log \u2014 Day 4 entry, one sentence, honest assessment."
+          ],
+          "why": "Seven days of baseline data will be your first concrete measure of whether these habits are working."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes today \u2014 you have been building to this, now hit it.",
+            "Today's walk is 20 minutes \u2014 no shortcuts, pace yourself so you finish strong.",
+            "Get outside (or on a treadmill) and complete a full 20-minute walk \u2014 this is your new daily target."
+          ],
+          "why": "20 minutes is the baseline that supports measurable cardiovascular improvement over time."
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Drink your morning water and then track your cups throughout the day \u2014 write a tally mark every time you finish 8 oz.",
+            "Start tallying your water today: make a note every time you finish a cup and aim to hit 8 marks before dinner.",
+            "Use your notes app as a water counter today \u2014 add a tally every 8 oz, goal is 8 tallies by end of day."
+          ],
+          "why": "Tracking water intake makes an invisible habit visible and drives accountability."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Log Day 5 mood and energy \u2014 one sentence in your notes, keep the streak alive.",
+            "Add your Day 5 baseline entry: energy level and mood in one honest sentence.",
+            "Write today's energy and mood in your notes \u2014 Day 5, same format, one sentence."
+          ],
+          "why": "Five straight days of data is already a meaningful pattern \u2014 don't break it now."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Do your 20-minute walk and pick a route that includes one hill or incline \u2014 any slope counts.",
+            "Walk 20 minutes today and deliberately choose a path with at least one uphill stretch to add intensity.",
+            "Complete your 20-minute walk but introduce one uphill section \u2014 stairs, a ramp, or a slight grade all count."
+          ],
+          "why": "Adding incline increases calorie burn and builds lower-body strength without extra time."
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Check last night's bedtime \u2014 did you hit the alarm you set on Day 2? Write yes or no in your notes.",
+            "Look at when you actually went to sleep last night versus your bedtime goal \u2014 note the gap in one word: hit, close, or missed.",
+            "Open your notes and record whether you made your bedtime last night \u2014 one-word answer: yes, near, or no."
+          ],
+          "why": "Accountability requires honest data \u2014 tracking your bedtime hit rate is step one."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write your Day 6 mood and energy log and compare your energy this week to Day 1 \u2014 has anything shifted?",
+            "Log today's energy and mood, then spend 2 minutes re-reading your entries from Days 1-5 and note one thing that has changed.",
+            "Add Day 6 to your baseline log and look back at the week \u2014 write one sentence about what your energy trend has looked like."
+          ],
+          "why": "Reviewing the week's data turns individual entries into a story you can act on."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes at a brisk pace \u2014 finish fast, the last 3 minutes should be your quickest.",
+            "Complete your 20-minute walk and spend the final 3 minutes walking as fast as you comfortably can \u2014 finish strong.",
+            "Do your daily 20-minute walk and make it progressive: easy first 7 minutes, medium next 10, fast final 3."
+          ],
+          "why": "Finishing strong builds the habit of giving full effort on every session."
+        }
+      ]
+    },
+    {
+      "day": 7,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Drink your morning water and write your Day 7 mood and energy entry \u2014 this is the last day of your first baseline week.",
+            "Complete your morning water and log today's energy and mood \u2014 Day 7 closes your first full week of tracking.",
+            "Start with water, then write Day 7 in your notes \u2014 one sentence on energy and mood, same as every day this week."
+          ],
+          "why": "Completing your first 7-day streak is the real win today."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Open your notes and read all 7 days of baseline entries \u2014 write 2 sentences summarizing what you noticed about your energy patterns this week.",
+            "Review your 7-day log from start to finish and write a 2-sentence summary: what trend did you see, and what surprised you?",
+            "Read back through all 7 mood and energy entries and write down the 2 most important things you noticed \u2014 patterns, surprises, anything real."
+          ],
+          "why": "Your first weekly review turns raw logs into actionable insight."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Do your 20-minute walk \u2014 today walk somewhere new, a different route or neighborhood you haven't used this week.",
+            "Walk 20 minutes but change your route completely today \u2014 new streets, a park, anywhere different from your usual path.",
+            "Complete your Day 7 walk (20 min) on a brand-new route \u2014 novelty keeps the habit from getting stale."
+          ],
+          "why": "A fresh route rewards consistency and signals that this habit has legs."
+        }
+      ]
+    },
+    {
+      "day": 8,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Drink your morning water and record how many cups of water you hit yesterday \u2014 be honest.",
+            "Start with water and log yesterday's total water intake in your notes \u2014 did you hit 8 cups?",
+            "Morning water first, then check: how many cups did you actually drink yesterday? Write the number in your notes."
+          ],
+          "why": "Tracking yesterday's hydration keeps you accountable without obsessing in real-time."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write today's mood and energy entry \u2014 keep the baseline log going into week two.",
+            "Log today's energy and mood in one sentence \u2014 same format as last week, same consistency.",
+            "Add your Day 8 entry to your notes: one sentence, energy level and mood, keep the chain unbroken."
+          ],
+          "why": "Week two data confirms whether week one's habits actually moved the needle."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes and count your steps when you finish \u2014 record the number in your notes next to today's entry.",
+            "Complete your 20-minute walk and check your step count in Apple Health or Google Fit \u2014 log the number.",
+            "Do your walk and pull up your step count in your health app when done \u2014 record it so you can beat it later."
+          ],
+          "why": "Knowing your step count gives you a concrete number to improve over time."
+        }
+      ]
+    },
+    {
+      "day": 9,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Set a water reminder alarm for 2 pm today \u2014 when it fires, drink a full glass before dismissing it.",
+            "Add a 2 pm recurring alarm labeled 'drink water' to your phone right now \u2014 it fires every day.",
+            "Create a 2 pm daily water alarm on your phone this second \u2014 this automates your afternoon hydration without thinking."
+          ],
+          "why": "Mid-day is when most people forget to drink \u2014 the alarm removes the need to remember."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write your Day 9 mood and energy note and add one sentence: what habit felt easiest this week so far?",
+            "Log today's energy and mood, then answer in one extra sentence: which habit has felt most automatic since Day 1?",
+            "Add your Day 9 entry and note which of your current habits \u2014 walking, water, bedtime \u2014 feels the stickiest so far."
+          ],
+          "why": "Identifying your strongest habit tells you where momentum lives."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes and try to beat your step count from Day 8 by at least 200 steps.",
+            "Complete your 20-minute walk with a goal of surpassing yesterday's step count \u2014 check the number when you finish.",
+            "Go for your walk today and push your pace enough to add 200 steps over your Day 8 count \u2014 log the result."
+          ],
+          "why": "Tiny competitive targets make the same walk more effective."
+        }
+      ]
+    },
+    {
+      "day": 10,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Fill your water bottle right now and place it next to your phone \u2014 every time you pick up your phone, take a sip.",
+            "Put your water bottle directly beside your phone charger and commit to one sip every time you reach for your phone today.",
+            "Pair water with phone use today: water bottle next to your phone, one sip every time you touch the screen."
+          ],
+          "why": "Habit stacking water onto an existing high-frequency behavior (phone use) makes 8 cups nearly effortless."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Log Day 10 mood and energy \u2014 you are 10 days in and the data is real now.",
+            "Write your Day 10 entry in your notes \u2014 one sentence, energy and mood, same discipline as day one.",
+            "Add today's mood and energy snapshot \u2014 Day 10 means you have two full weeks of data almost built."
+          ],
+          "why": "Ten days of consistent logging is a genuine achievement \u2014 the data will compound."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and this time invite someone \u2014 a friend, partner, neighbor \u2014 even if they say no, ask.",
+            "Today's walk: bring someone with you or text one person right now asking if they want to walk \u2014 send the message before you head out.",
+            "Before your walk, text one person and invite them to join you \u2014 walk solo if they can't, but send the text first."
+          ],
+          "why": "Social movement accountability doubles the likelihood you keep showing up."
+        }
+      ]
+    },
+    {
+      "day": 11,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Check your Apple Health or Google Fit app and look at your average daily steps for the past 10 days \u2014 write the number down.",
+            "Open your health app and pull your 10-day average step count \u2014 record it in your notes next to today's date.",
+            "Look at your step data in your health app for the last 10 days and note your average \u2014 this is your current baseline."
+          ],
+          "why": "Knowing your 10-day step average gives you a real target to beat in the weeks ahead."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write today's mood and energy log and compare it honestly to your Day 1 entry \u2014 write one sentence about the difference.",
+            "Add Day 11 to your log, then re-read Day 1 and write one sentence: what has genuinely changed in 11 days?",
+            "Log today's energy and mood, then measure the distance from Day 1 \u2014 write one honest sentence about what has shifted."
+          ],
+          "why": "Eleven days is enough time to see real change if you have been consistent."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes and make the entire walk phone-free \u2014 put it in your pocket, don't touch it.",
+            "Complete your 20-minute walk with your phone in airplane mode or face-down in your pocket the whole time.",
+            "Walk 20 minutes without looking at your phone once \u2014 use the time to notice your surroundings instead."
+          ],
+          "why": "Phone-free walks reduce cortisol and train you to be present \u2014 a key health skill."
+        }
+      ]
+    },
+    {
+      "day": 12,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Put a glass of water on your nightstand right now so it is ready for tomorrow morning.",
+            "Set up your bedside water tonight before you forget \u2014 glass or bottle, filled, next to the bed.",
+            "Place a full glass of water on your nightstand tonight \u2014 morning-you will thank you."
+          ],
+          "why": "Prepping your morning water the night before removes every possible friction from the first habit of the day."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write today's mood and energy entry and note which time of day your energy tends to be highest \u2014 morning, afternoon, or evening.",
+            "Log Day 12 mood and energy, then add one sentence: when during the day do you feel sharpest and most alive?",
+            "Add your Day 12 log entry and answer: what is your peak energy window each day? Write it in one sentence."
+          ],
+          "why": "Knowing your peak energy window lets you schedule your hardest tasks there \u2014 this is real performance optimization."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes and time yourself \u2014 note your start and finish time, not just the duration.",
+            "Complete your 20-minute walk and log the exact time of day you did it \u2014 this reveals whether morning or afternoon walks stick better for you.",
+            "Do your walk and record what time of day you went \u2014 this data will tell you when your walk habit is most consistent."
+          ],
+          "why": "Time-of-day data helps you find the slot that makes the habit easiest to sustain."
+        }
+      ]
+    },
+    {
+      "day": 13,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Drink morning water and write your Day 13 log \u2014 one more day until your two-week check-in.",
+            "Morning water, then log your energy and mood for Day 13 \u2014 tomorrow is your first major review.",
+            "Start with water, write your Day 13 entry \u2014 energy, mood, one sentence \u2014 review is tomorrow."
+          ],
+          "why": "Keeping the daily streak intact through day 13 makes tomorrow's review meaningful."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Look at your bedtime hit rate for the past week \u2014 how many nights did you actually make it? Write the number.",
+            "Count how many nights this past week you hit your bedtime goal \u2014 log the score in your notes.",
+            "Check your calendar or memory: out of the last 7 nights, how many did you hit your bedtime? Record the count."
+          ],
+          "why": "Your bedtime consistency score is a leading indicator of your overall sleep quality."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and make it your fastest walk yet \u2014 push the pace from minute one and hold it.",
+            "Complete your walk in 20 minutes at the fastest pace you have used since Day 1 \u2014 measure by how hard your breathing is.",
+            "Today's 20-minute walk should be your hardest yet \u2014 go fast enough that conversation would be difficult."
+          ],
+          "why": "A challenging walk before tomorrow's review proves the habit has built real fitness."
+        }
+      ]
+    },
+    {
+      "day": 14,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Drink your morning water and write your Day 14 log \u2014 this closes your two-week baseline tracking streak.",
+            "Start with water, then add Day 14 to your notes \u2014 the final entry in your first two-week baseline.",
+            "Morning water, Day 14 log entry: energy and mood in one sentence \u2014 you are closing out the first phase today."
+          ],
+          "why": "Fourteen consecutive days of tracking is the foundation everything else builds on."
+        },
+        {
+          "position": 2,
+          "minutes": 6,
+          "variants": [
+            "Read through all 14 days of your baseline log and write a 3-sentence summary: what improved, what stayed flat, and what needs attention.",
+            "Review every entry from Days 1-14 and write 3 sentences: one on energy trends, one on what habits stuck, one on what you'll fix next.",
+            "Go through your full two-week log now and write your honest 3-sentence assessment \u2014 what moved, what didn't, what is your weakest habit?"
+          ],
+          "why": "Your two-week review is the data that guides what to prioritize in phase two."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes to mark two weeks of daily movement \u2014 this is your 14th consecutive walk, acknowledge that.",
+            "Complete walk number 14 \u2014 go your usual 20 minutes and notice how different walking feels compared to Day 1.",
+            "Do your 20-minute walk and spend the last 5 minutes thinking about one specific thing that has changed since Day 1."
+          ],
+          "why": "Two weeks of daily movement is a real fitness milestone \u2014 your body has already adapted."
+        }
+      ]
+    },
+    {
+      "day": 15,
+      "minutes_total": 18,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Drink a full glass of water, do a 2-minute full-body stretch (reach overhead, touch your toes, open your hips), then write one small task you will complete today \u2014 this is your morning routine starting now.",
+            "Start today's morning routine: water first, then 2 minutes of stretching (arms, back, legs), then write down the one task you are doing today no matter what.",
+            "Build your morning routine right now: drink water, spend 2 minutes stretching your entire body slowly, then write one priority task in your notes."
+          ],
+          "why": "Your morning routine is the structure that turns individual habits into a system."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Do your first bodyweight workout: 10 pushups, 15 squats, 20-second plank \u2014 rest 30 seconds, repeat the circuit twice.",
+            "Complete this circuit twice with 30 seconds rest between rounds: 10 pushups, 15 squats, 20-second plank \u2014 go now.",
+            "Knock out 2 rounds of this circuit: 10 pushups, 15 squats, 20-second hold plank \u2014 30 seconds rest between rounds."
+          ],
+          "why": "Bodyweight training 2-3x per week starting this week builds real strength alongside your walking habit."
+        },
+        {
+          "position": 3,
+          "minutes": 10,
+          "variants": [
+            "Walk 20 minutes at a brisk pace \u2014 today the walk happens in addition to your bodyweight circuit, not instead of it.",
+            "After your morning routine and circuit, complete your 20-minute walk \u2014 movement stacks on movement starting today.",
+            "Get your 20-minute walk done today on top of the bodyweight circuit \u2014 two movement sessions is the new standard for workout days."
+          ],
+          "why": "Stacking walk plus circuit on the same day begins to build your total weekly movement volume."
+        }
+      ]
+    },
+    {
+      "day": 16,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Run your morning routine: water, 2-minute stretch, write one priority task \u2014 same as yesterday, same order.",
+            "Morning routine: glass of water, 2-minute stretch hitting your shoulders and hips, then one task written in your notes.",
+            "Do it again: water, 2-minute full-body stretch, write today's one priority task \u2014 make this automatic."
+          ],
+          "why": "Repeating the routine on day two is what turns a one-off into a habit."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Set a 'screens off' alarm for 30 minutes before your bedtime tonight \u2014 label it 'wind down' and make it recurring.",
+            "Add a recurring wind-down alarm to your phone: 30 minutes before your bedtime, labeled 'screens off', repeating nightly.",
+            "Create a nightly alarm for 30 minutes before your bedtime and call it 'phone down' \u2014 set it to repeat every night."
+          ],
+          "why": "Screen-free time before bed is the highest-impact sleep improvement you can make without medication."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes \u2014 today is a walk-only day, no circuit, full recovery between workout sessions.",
+            "Complete your 20-minute walk today \u2014 this is your active recovery day between bodyweight sessions.",
+            "Walk 20 minutes at an easy-to-moderate pace \u2014 designated recovery day, no circuit, just steady movement."
+          ],
+          "why": "Recovery days between bodyweight sessions are mandatory for adaptation \u2014 don't skip them."
+        }
+      ]
+    },
+    {
+      "day": 17,
+      "minutes_total": 18,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Run your morning routine without skipping a step: water, 2-minute stretch, one priority task written down.",
+            "Morning routine, Day 3: water, stretch for 2 minutes (hold each position for 15 seconds), write one task to complete today.",
+            "Execute the morning routine again: drink water, do your 2-minute stretch, write your one non-negotiable task for today."
+          ],
+          "why": "Three mornings in a row makes the routine feel like gravity \u2014 it just happens."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Do your second bodyweight circuit of the week: 12 pushups, 15 squats, 10 lunges (each leg), 25-second plank \u2014 2 rounds with 30 sec rest.",
+            "Complete 2 rounds of: 12 pushups, 15 squats, 10 lunges per leg, 25-second plank \u2014 30 seconds rest between rounds.",
+            "Second workout of the week: 12 pushups, 15 squats, 10 lunges each side, 25-second plank \u2014 go twice through with 30 seconds rest."
+          ],
+          "why": "Adding 2 reps and a new movement (lunges) is the progression that builds real lower-body strength."
+        },
+        {
+          "position": 3,
+          "minutes": 10,
+          "variants": [
+            "Walk 20 minutes after your circuit \u2014 combine the sessions into one workout block for efficiency.",
+            "Back-to-back today: circuit done, then straight into your 20-minute walk with no more than 5 minutes rest in between.",
+            "Chain your circuit into your walk: finish the bodyweight rounds and head out the door within 5 minutes for your 20-minute walk."
+          ],
+          "why": "Training blocks build the habit of treating your body as a priority, not a sidebar."
+        }
+      ]
+    },
+    {
+      "day": 18,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, write your one priority task \u2014 fourth day running this sequence.",
+            "Water, stretch 2 minutes, write one task \u2014 execute the routine, no modifications, no skipping.",
+            "Run the morning routine: drink water, stretch your body for 2 minutes, log one task you commit to today."
+          ],
+          "why": "Day 4 of the same routine means it is becoming automatic \u2014 protect that momentum."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Check how many nights this week you honored the 'screens off' alarm \u2014 write the count and what you were doing instead on the nights you missed.",
+            "Look at your wind-down consistency this week: how many nights did you actually put your phone down 30 minutes before bed? Record the number.",
+            "Review your bedtime screen routine this week \u2014 count the nights you hit it and write one sentence about what got in the way on the nights you didn't."
+          ],
+          "why": "Reviewing adherence to your evening routine reveals the exact friction points to fix."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes \u2014 rest day from bodyweight, just steady movement today.",
+            "Active recovery: 20-minute walk, easy pace, no circuit today.",
+            "Walk only today \u2014 20 minutes, moderate effort, let your muscles recover from the week's circuits."
+          ],
+          "why": "Two bodyweight sessions plus daily walking is the right load for week three \u2014 trust the structure."
+        }
+      ]
+    },
+    {
+      "day": 19,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, one task written \u2014 same sequence, fifth consecutive morning.",
+            "Water, stretch, write one task \u2014 Day 5 of your morning routine, do it without thinking.",
+            "Execute your morning routine: drink water, do your 2-minute stretch, write one priority task."
+          ],
+          "why": "Five days of the same sequence starts to feel identity-level \u2014 you are someone who has a morning routine."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Do your third bodyweight circuit of the week: 12 pushups, 15 squats, 12 lunges each leg, 30-second plank \u2014 2 rounds, 30 sec rest.",
+            "Third workout of the week: 12 pushups, 15 squats, 12 lunges per side, 30-second plank \u2014 twice through, 30 seconds rest between.",
+            "Complete 2 rounds: 12 pushups, 15 squats, 12 lunges each leg, 30-second plank \u2014 30-second rest between rounds."
+          ],
+          "why": "Three sessions in week three builds on the two from week two \u2014 the progression is working."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and try a new location \u2014 a park, trail, or neighborhood you haven't used yet.",
+            "Change your walk route completely today \u2014 somewhere new keeps the habit fresh and the mind engaged.",
+            "Walk 20 minutes somewhere you have not walked before \u2014 novel environment, same duration, same effort."
+          ],
+          "why": "Route novelty prevents boredom and keeps the daily walk from feeling like a chore."
+        }
+      ]
+    },
+    {
+      "day": 20,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, write one task \u2014 same sequence, no deviation.",
+            "Run your morning sequence: water, 2-minute stretch, one priority task in writing.",
+            "Water first, then 2-minute stretch, then write your one task for today \u2014 morning routine, Day 6."
+          ],
+          "why": "Consistency on day 20 is more valuable than intensity \u2014 the routine compounds."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Look up one free 5-10 minute yoga or mobility video on YouTube, watch it, and do every movement shown.",
+            "Find a free 5-minute stretching or yoga routine on YouTube right now and follow along \u2014 do not just watch, move.",
+            "Search 'morning mobility 5 minutes' on YouTube, pick the first relevant result, and follow the whole routine."
+          ],
+          "why": "Mobility work on rest days maintains flexibility and reduces soreness from your bodyweight circuits."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes \u2014 focus on your posture the whole time: shoulders back, chin level, core gently engaged.",
+            "Complete your 20-minute walk with intentional posture throughout \u2014 spine tall, shoulders down, eyes forward.",
+            "Walk 20 minutes and make posture the focus: pull your shoulders back, keep your head level, and breathe deeply."
+          ],
+          "why": "Posture-focused walking strengthens your core and upper back, turning a simple walk into full-body training."
+        }
+      ]
+    },
+    {
+      "day": 21,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, one priority task written \u2014 Day 7 of the routine streak.",
+            "Execute your morning sequence: water, stretch 2 minutes, write one task \u2014 three weeks in.",
+            "Water, stretch, write one task \u2014 morning routine on repeat, Day 7 of this week."
+          ],
+          "why": "Seven straight mornings of the same routine means it is close to automatic."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Review the past 3 weeks: open your notes and write 2 sentences on what is working and 1 sentence on what habit needs the most attention.",
+            "Three-week review: read your notes from Days 1-21 and write 3 sentences \u2014 one on energy progress, one on movement consistency, one on what to fix.",
+            "Open your notes and do your 3-week assessment: what habit has you most consistent, and which one is most fragile right now?"
+          ],
+          "why": "Week 3 is when most people either lock in or drift \u2014 your review determines which one it is for you."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Walk 20 minutes and take a photo of where you walk today \u2014 save it to your camera roll as a Week 3 marker.",
+            "Do your 20-minute walk and take one photo mid-walk \u2014 a marker you can look back at when you hit Day 90.",
+            "Complete your walk (20 min) and snap a photo of your route or surroundings \u2014 call it your Day 21 milestone."
+          ],
+          "why": "Visual milestones create emotional anchors that make long-term habits stick."
+        }
+      ]
+    },
+    {
+      "day": 22,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, one priority task \u2014 same sequence entering week four.",
+            "Water, 2-minute stretch, write one task \u2014 open week four with the routine locked in.",
+            "Start week four with your morning routine: water, stretch, one written task \u2014 no deviation."
+          ],
+          "why": "Week four is where habits become identity \u2014 the routine is who you are now, not something you do."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Do your first circuit of week 4: 15 pushups, 15 squats, 12 lunges each leg, 30-second plank \u2014 2 rounds.",
+            "Week 4 circuit, round 1: 15 pushups (up from 12), 15 squats, 12 lunges per leg, 30-second plank \u2014 twice through.",
+            "Complete 2 rounds of: 15 pushups, 15 squats, 12 lunges each side, 30-second plank \u2014 30 seconds rest between rounds."
+          ],
+          "why": "Adding 3 pushups is a small jump that makes the progression real without overwhelming you."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and recall the photo you took on Day 21 \u2014 notice how much more routine this feels.",
+            "Complete your 20-minute walk and compare how it feels to Day 1 \u2014 the effort required has changed.",
+            "Walk 20 minutes and spend the last 5 minutes noticing how different your breathing and pace are compared to three weeks ago."
+          ],
+          "why": "Reflection during movement reinforces the progress your body has already made."
+        }
+      ]
+    },
+    {
+      "day": 23,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, one priority task \u2014 execute without thinking.",
+            "Water, stretch, write one task \u2014 morning routine, same as always.",
+            "Run your sequence: water, 2-minute stretch, one task written."
+          ],
+          "why": "Automatic routines free up mental energy for harder things later in the day."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Check your bedtime consistency this week: how many nights did you hit your screen-off alarm? Write the number.",
+            "Count your screens-off wins this week so far \u2014 number of nights you put the phone down 30 minutes before bed.",
+            "Review your evening wind-down this week \u2014 how many nights have you honored the 30-minute screen cutoff? Log it."
+          ],
+          "why": "Sleep quality is the multiplier on every other habit \u2014 tracking it weekly keeps it honest."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes at a brisk pace \u2014 recovery day from the circuit, full effort on the walk.",
+            "Active recovery: 20-minute brisk walk, no bodyweight circuit today.",
+            "Walk 20 minutes today \u2014 no circuit, just sustained movement at a pace that slightly elevates your heart rate."
+          ],
+          "why": "Daily walking on rest days maintains momentum without adding recovery debt."
+        }
+      ]
+    },
+    {
+      "day": 24,
+      "minutes_total": 18,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, one task written \u2014 make it fast, under 3 minutes, and move on.",
+            "Execute your morning sequence in under 3 minutes: water, stretch, write one task \u2014 efficiency is the point now.",
+            "Water, 2-minute stretch, one written task \u2014 morning routine should take less than 3 minutes at this point."
+          ],
+          "why": "A sub-3-minute morning routine means the friction is gone \u2014 it now costs almost nothing to do."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Do circuit number 2 of week 4: 15 pushups, 15 squats, 12 lunges each leg, 35-second plank \u2014 2 rounds.",
+            "Week 4, second circuit: 15 pushups, 15 squats, 12 lunges per side, 35-second plank \u2014 twice through with 30 seconds rest.",
+            "Complete 2 rounds: 15 pushups, 15 squats, 12 lunges each leg, 35-second plank \u2014 30-second rest between rounds."
+          ],
+          "why": "Extending the plank by 5 seconds is a micro-progression that adds real core work over time."
+        },
+        {
+          "position": 3,
+          "minutes": 10,
+          "variants": [
+            "Walk 20 minutes and call or voice-note one person you have been meaning to check in with \u2014 do it during the walk.",
+            "Take your walk today (20 min) and make a phone call to someone you care about \u2014 combine social connection with movement.",
+            "During your 20-minute walk, call a friend or family member \u2014 walk-and-talk counts as full credit on both habits."
+          ],
+          "why": "Combining social connection with movement doubles the habit value without extra time."
+        }
+      ]
+    },
+    {
+      "day": 25,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, write one task \u2014 same as always.",
+            "Water, 2-minute stretch, write today's one priority task.",
+            "Run your morning sequence: water, stretch 2 minutes, one task in notes."
+          ],
+          "why": "Day 25 of consistent mornings means this is no longer a habit \u2014 it is your baseline."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Find one free 5-minute yoga or meditation video on YouTube today \u2014 watch and follow it completely.",
+            "Search 'yoga for beginners 5 minutes' on YouTube, pick a result, and follow the entire video \u2014 move, don't just watch.",
+            "Pull up a free 5-minute meditation or stretching routine on YouTube and do every step \u2014 no skipping."
+          ],
+          "why": "Adding a mindfulness or mobility practice this week builds toward the next phase of your plan."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and afterward drink a full glass of water immediately \u2014 close the hydration loop before sitting down.",
+            "Complete your 20-minute walk and drink 8 oz of water within 3 minutes of finishing \u2014 rehydrate before anything else.",
+            "Finish your walk (20 min) and make your first move afterward drinking a full glass of water \u2014 no phone, no food first."
+          ],
+          "why": "Post-exercise hydration is a habit that compounds your recovery and energy across the day."
+        }
+      ]
+    },
+    {
+      "day": 26,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, one task written \u2014 entering the final stretch of month one.",
+            "Water, stretch, one task \u2014 morning routine, same sequence, four days from your month-one checkpoint.",
+            "Execute your morning routine: water, 2-minute stretch, one priority task written."
+          ],
+          "why": "Four days from the month-one milestone \u2014 keep the routine locked so you arrive there strong."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Do your third circuit of week 4: 15 pushups, 15 squats, 12 lunges each leg, 35-second plank \u2014 2 rounds.",
+            "Third workout this week: 15 pushups, 15 squats, 12 lunges per side, 35-second plank \u2014 2 rounds, 30 seconds rest.",
+            "Complete 2 rounds of this week's circuit: 15 pushups, 15 squats, 12 lunges each leg, 35-second plank."
+          ],
+          "why": "Three bodyweight sessions in a week is the target \u2014 you are hitting it consistently now."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and make a count: how many days this week did you hit all three core habits (water, bedtime, walk)?",
+            "During or after your 20-minute walk, tally your consistency this week: water days, bedtime days, walk days \u2014 write the three numbers.",
+            "Walk 20 minutes and then score this week: days with 8 cups of water, days hitting bedtime, days walking \u2014 give yourself a score out of 21."
+          ],
+          "why": "A weekly triple-habit score gives you a concrete number to improve next week."
+        }
+      ]
+    },
+    {
+      "day": 27,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 keep it sharp, keep it consistent.",
+            "Water, 2-minute stretch, write one task \u2014 same sequence, Day 27.",
+            "Execute the morning routine fast: water, 2-minute stretch, one task written."
+          ],
+          "why": "Two more days until the month-one checkpoint \u2014 don't let up now."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write 3 things about your body or energy that are genuinely different compared to when you started 27 days ago.",
+            "In your notes, write 3 specific changes you have noticed in your body, energy, or mood since Day 1 \u2014 be concrete.",
+            "Open your notes and document 3 real physical or mental changes from the last 27 days \u2014 not goals, actual changes you can observe."
+          ],
+          "why": "Documenting real change before the month-one checkpoint reinforces that the work is producing results."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes \u2014 tomorrow is a review day, today's walk closes the active training week.",
+            "Complete today's 20-minute walk \u2014 one more day of movement before your week-four review.",
+            "Walk 20 minutes today \u2014 active habits stay on until the checkpoint, no early coasting."
+          ],
+          "why": "Finishing the week strong, not coasting before a review, is what separates consistent performers."
+        }
+      ]
+    },
+    {
+      "day": 28,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, one priority task \u2014 same sequence for the four-week review day.",
+            "Water, stretch, write one task \u2014 execute the routine and then do your four-week review.",
+            "Run your morning routine: water, 2-minute stretch, one task written \u2014 today is review day."
+          ],
+          "why": "Doing the routine before the review proves the routine is automatic, not effortful."
+        },
+        {
+          "position": 2,
+          "minutes": 7,
+          "variants": [
+            "Do your four-week review: read your notes from Days 14-28, then write your best habit, your worst habit, and one specific thing you will change in month two.",
+            "Four-week check-in: review your last two weeks of notes and write 3 sentences \u2014 what is strongest, what is weakest, and what changes next.",
+            "Spend 7 minutes reviewing Days 14-28 in your notes and write a clear answer to three questions: what is working, what is broken, and what is the one thing that would most improve week five?"
+          ],
+          "why": "Four weeks of data gives you enough signal to make a high-quality decision about what to focus on next."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes and spend the time thinking about the one habit you identified as weakest in your review \u2014 what would fix it?",
+            "Complete your 20-minute walk thinking about your biggest habit gap from the review \u2014 come back with one concrete solution.",
+            "Walk 20 minutes and use the time to problem-solve the weak habit from your review \u2014 what is the simplest fix?"
+          ],
+          "why": "Walking while problem-solving leverages your brain's creative mode \u2014 movement produces insight."
+        }
+      ]
+    },
+    {
+      "day": 29,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, one task written \u2014 second-to-last day of month one.",
+            "Water, stretch, write one task \u2014 Day 29, one day before your month-one milestone.",
+            "Execute your morning routine: water, 2-minute stretch, priority task written \u2014 the streak holds."
+          ],
+          "why": "Protecting the routine the day before a milestone is just as important as the milestone itself."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Identify the one new habit you want to add in month two \u2014 journaling 3 lines, a gratitude list, or something specific to you \u2014 write it in your notes.",
+            "Write your month-two intention in your notes: which new habit are you adding in days 31-60? Name it specifically.",
+            "Decide now and write it down: what is the one new habit you are adding starting Day 31? Journaling, gratitude, meditation \u2014 pick one and commit in writing."
+          ],
+          "why": "Deciding your next habit before you need it removes friction from the start of month two."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes \u2014 tomorrow is the Day 30 milestone, finish month one with a strong final movement session.",
+            "Take your 20-minute walk today \u2014 the last one before your month-one checkpoint tomorrow.",
+            "Complete your 20-minute walk and know that tomorrow you hit 30 consecutive days of daily movement."
+          ],
+          "why": "Showing up on day 29 is what makes day 30 matter."
+        }
+      ]
+    },
+    {
+      "day": 30,
+      "minutes_total": 18,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, one task written \u2014 Day 30, month one complete.",
+            "Water, stretch, write one task \u2014 execute the routine on your month-one milestone day.",
+            "Run your morning sequence: water, 2-minute stretch, one priority task \u2014 30 days in, same routine as Day 15."
+          ],
+          "why": "The routine on Day 30 is the same as Day 15, and that consistency is the entire point."
+        },
+        {
+          "position": 2,
+          "minutes": 6,
+          "variants": [
+            "Write your month-one checkpoint: 3 things you achieved, 1 thing you missed, and your single most important focus for month two.",
+            "Month-one milestone assessment: open your notes and write what you built in 30 days, what fell short, and what you are prioritizing in days 31-60.",
+            "Do your 30-day review right now: 3 wins, 1 honest shortfall, and one specific improvement you are committing to for month two \u2014 write it clearly."
+          ],
+          "why": "Month-one checkpoints create momentum and give month two a clear direction to build on."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Walk 20 minutes to celebrate Day 30 \u2014 this is your 30th consecutive day of movement, you have built a real habit.",
+            "Celebrate 30 days with a strong 20-minute walk \u2014 this marks one month of daily movement without exception.",
+            "Complete your Day 30 walk (20 min) and acknowledge that you just built one full month of daily movement \u2014 that is not nothing."
+          ],
+          "why": "Thirty days of daily movement is a genuine physiological and psychological milestone."
+        }
+      ]
+    },
+    {
+      "day": 31,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, write one priority task \u2014 month two starts now, same foundation.",
+            "Water, stretch 2 minutes, write one task \u2014 open month two with the same routine that carried you through month one.",
+            "Execute your morning sequence: water, 2-minute stretch, one task written \u2014 Day 31, month two, same standard."
+          ],
+          "why": "Month two builds on month one's foundation \u2014 the routine does not change, the layers on top do."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Start the mindfulness habit you chose on Day 29: open Headspace, Calm, or YouTube and do a 5-minute guided meditation right now.",
+            "Pull up your chosen mindfulness app or search '5-minute meditation for beginners' on YouTube and complete the full session.",
+            "Start your daily 5-minute mindfulness practice today \u2014 Headspace, Calm, or a free YouTube guide \u2014 do it now, first session of month two."
+          ],
+          "why": "Starting mindfulness on Day 31 gives it the full 30 days of month two to become automatic."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Do your bodyweight circuit for week five: 15 pushups, 20 squats, 12 lunges each leg, 35-second plank \u2014 2 rounds, 30 sec rest \u2014 then walk 10 minutes.",
+            "Week five workout: 15 pushups, 20 squats, 12 lunges per side, 35-second plank \u2014 twice, 30 sec rest \u2014 finish with a 10-minute walk.",
+            "Complete 2 rounds of: 15 pushups, 20 squats, 12 lunges each leg, 35-second plank \u2014 rest 30 seconds between \u2014 then walk for 10 minutes."
+          ],
+          "why": "Bumping squats to 20 adds meaningful leg volume as you enter the habit-deepening phase."
+        }
+      ]
+    },
+    {
+      "day": 32,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same as always, same discipline.",
+            "Water, 2-minute stretch, write one priority task \u2014 morning routine on autopilot.",
+            "Execute your morning sequence without hesitation: water, stretch, one task written."
+          ],
+          "why": "Autopilot morning routines are a fitness habit in their own right \u2014 they prime the nervous system for discipline."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Do your 5-minute mindfulness session today \u2014 same app or channel as yesterday, consistency over novelty.",
+            "Sit down and do your 5-minute meditation right now \u2014 use the same guide as Day 31 for the first week to build the pattern.",
+            "Open your mindfulness app or YouTube and run your 5-minute session \u2014 same source, same time as yesterday if possible."
+          ],
+          "why": "Using the same guide for the first week builds a repeatable cue-routine loop."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes \u2014 recovery day from circuit, all effort goes into the walk.",
+            "Active recovery: 20-minute walk at a brisk pace \u2014 no circuit today.",
+            "Walk 20 minutes at full effort today \u2014 bodyweight rest day, walk is the only movement."
+          ],
+          "why": "Rest days from circuits are not optional \u2014 they are when the adaptation happens."
+        }
+      ]
+    },
+    {
+      "day": 33,
+      "minutes_total": 18,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, 2-minute stretch, one task written \u2014 third day of month two.",
+            "Water, stretch, write one task \u2014 morning routine, Day 33.",
+            "Run your sequence: water, 2-minute stretch, one priority task in your notes."
+          ],
+          "why": "Every morning routine completed is a vote for who you are becoming."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Complete today's 5-minute mindfulness session and afterward write one word describing how you feel post-meditation.",
+            "Do your 5-minute meditation and when it ends, write a single word in your notes capturing your state \u2014 calm, focused, restless, whatever is true.",
+            "Run your 5-minute mindfulness session and immediately after write one honest word about how your mind feels \u2014 this is your mindfulness data."
+          ],
+          "why": "Tracking post-meditation state turns a soft practice into measurable data."
+        },
+        {
+          "position": 3,
+          "minutes": 10,
+          "variants": [
+            "Second bodyweight session of week five: 15 pushups, 20 squats, 12 lunges each leg, 35-second plank \u2014 3 rounds this time, 30 sec rest.",
+            "Week 5 workout 2: bump to 3 rounds today \u2014 15 pushups, 20 squats, 12 lunges per side, 35-second plank, 30 seconds rest between rounds.",
+            "Complete 3 rounds of: 15 pushups, 20 squats, 12 lunges each leg, 35-second plank \u2014 30 seconds rest between each round."
+          ],
+          "why": "Moving from 2 rounds to 3 is the biggest progression jump yet \u2014 this is where real strength builds."
+        }
+      ]
+    },
+    {
+      "day": 34,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 34, keep the streak intact.",
+            "Water, 2-minute stretch, write one task \u2014 same as yesterday, same as tomorrow.",
+            "Execute your morning sequence: water, stretch 2 minutes, one priority task written."
+          ],
+          "why": "Streaks derive their power from the commitment to not break them \u2014 protect this one."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Add the second new habit from month two: write 3 lines in a journal or notes app about today \u2014 anything on your mind, how you feel, what happened.",
+            "Start your 3-line journaling habit today: open notes and write 3 sentences \u2014 stream of consciousness, no rules, just write.",
+            "Write 3 lines in your journal or notes app right now \u2014 this is your new daily writing habit starting today."
+          ],
+          "why": "Three lines of daily journaling takes 3 minutes and is one of the most evidence-backed stress-reduction practices available."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and notice your resting breathing \u2014 is it easier to breathe at this pace than it was on Day 1?",
+            "Complete your 20-minute walk and pay attention to your breath \u2014 how does your cardio feel compared to week one?",
+            "Walk 20 minutes and check in with your body: is the effort of this pace lower than it was a month ago?"
+          ],
+          "why": "Noticing physical adaptation reinforces that the habits are working \u2014 it is motivation built on evidence."
+        }
+      ]
+    },
+    {
+      "day": 35,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 five-week review day, start it right.",
+            "Water, 2-minute stretch, write one task \u2014 same routine opening your week-five review.",
+            "Execute the morning sequence: water, stretch, one task written \u2014 then do your five-week check-in."
+          ],
+          "why": "The routine before the review confirms the routine is now automatic."
+        },
+        {
+          "position": 2,
+          "minutes": 6,
+          "variants": [
+            "Five-week review: open your notes, read from Day 28 to today, and write your 3 strongest habits, your weakest habit, and one adjustment for the next week.",
+            "Week five check-in: review your notes from the past week and write 3 sentences \u2014 what habits are on autopilot, which ones still need daily effort, and what needs to change.",
+            "Spend 6 minutes reviewing the past week in your notes and write: which habits are automatic, which are fragile, and what one change would make next week stronger."
+          ],
+          "why": "Weekly reviews are the mechanism that prevents month two from drifting \u2014 run them every time."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Do your third bodyweight session of week five: 15 pushups, 20 squats, 12 lunges each leg, 35-second plank \u2014 3 rounds.",
+            "Week 5 workout 3: 15 pushups, 20 squats, 12 lunges per side, 35-second plank \u2014 3 rounds, 30 seconds rest.",
+            "Complete 3 rounds of week five's circuit: 15 pushups, 20 squats, 12 lunges each leg, 35-second plank \u2014 rest 30 seconds between rounds."
+          ],
+          "why": "Three sessions in week five locks in the 3x/week training frequency as normal."
+        }
+      ]
+    },
+    {
+      "day": 36,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 open week six the same way you opened week one.",
+            "Water, 2-minute stretch, write one priority task \u2014 week six, same morning sequence.",
+            "Execute your morning routine: water, stretch 2 minutes, one task in notes \u2014 week six starts now."
+          ],
+          "why": "The sameness of the morning routine is a feature, not a bug \u2014 it means it is automatic."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Do your 5-minute meditation and your 3-line journal entry back-to-back \u2014 they stack perfectly.",
+            "Run your mindfulness session (5 min) and immediately after write your 3-line journal entry \u2014 combine both new habits into one block.",
+            "Stack your two new habits: 5-minute meditation followed directly by 3 lines of journaling \u2014 one sitting, 8 minutes total."
+          ],
+          "why": "Habit stacking two practices into one block reduces friction and builds a powerful ritual."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes \u2014 use this walk to reflect on what your week-five review told you about your weakest habit.",
+            "Complete your 20-minute walk and spend it problem-solving the habit gap you identified in yesterday's review.",
+            "Walk 20 minutes and use the time to think through one concrete change you can make to your weakest habit starting today."
+          ],
+          "why": "Walking while thinking about strategy is one of the most productive uses of a daily walk."
+        }
+      ]
+    },
+    {
+      "day": 37,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same opening, different day.",
+            "Water, 2-minute stretch, write one priority task \u2014 Day 37.",
+            "Run your morning sequence without variation: water, stretch, one task written."
+          ],
+          "why": "The variation is in the rest of your day \u2014 not in the routine that anchors it."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3-line journal \u2014 complete both before moving on with your day.",
+            "Stack your mindfulness session with your journal: 5 minutes of meditation, then 3 lines written \u2014 same order, same block.",
+            "Run the mindfulness-journal stack: 5-minute meditation, then 3 honest lines in your notes."
+          ],
+          "why": "Stacked habits done in sequence start to feel like a single unified behavior."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Week 6 circuit: 15 pushups, 20 squats, 15 lunges each leg, 40-second plank \u2014 3 rounds, 30 sec rest.",
+            "Upgrade the circuit for week six: 15 pushups, 20 squats, 15 lunges per side, 40-second plank \u2014 3 rounds with 30 seconds rest.",
+            "Complete 3 rounds of: 15 pushups, 20 squats, 15 lunges each leg, 40-second plank \u2014 30 seconds rest between rounds."
+          ],
+          "why": "Adding 3 lunges and 5 seconds to the plank keeps progressive overload on track."
+        }
+      ]
+    },
+    {
+      "day": 38,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same foundation, Day 38.",
+            "Water, 2-minute stretch, write one task \u2014 routine first, everything else second.",
+            "Execute your morning sequence: water, stretch 2 minutes, one task in notes."
+          ],
+          "why": "Every day the routine happens before anything else \u2014 that priority is the habit."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Stack your meditation and journal: 5 minutes of guided mindfulness, then 3 lines written \u2014 do both now.",
+            "Mindfulness session (5 min) followed by 3-line journal \u2014 complete the stack before checking your phone.",
+            "Run the meditation-journal block: 5 minutes of mindfulness, then write 3 lines \u2014 uninterrupted."
+          ],
+          "why": "Protecting the mindfulness-journal block from phone interruptions is what makes it effective."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes \u2014 active recovery between circuits, walk is the only movement today.",
+            "Complete your 20-minute walk at a brisk pace \u2014 circuit rest day.",
+            "Walk 20 minutes today, no bodyweight work \u2014 let the muscles recover while staying active."
+          ],
+          "why": "Strategic rest from circuits while maintaining daily walking is the formula for sustainable progress."
+        }
+      ]
+    },
+    {
+      "day": 39,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 identical to every other morning.",
+            "Water, stretch 2 minutes, write one priority task.",
+            "Run your morning sequence: water, stretch, one task written \u2014 Day 39."
+          ],
+          "why": "Routine consistency is the compound interest of fitness \u2014 it pays out slowly but enormously."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Meditation and journal stack: 5-minute session, then 3 lines \u2014 same as yesterday.",
+            "Run your morning mindfulness block: 5-minute meditation, 3 journal lines \u2014 complete both.",
+            "5-minute meditation followed immediately by 3 journal lines \u2014 stack them back to back."
+          ],
+          "why": "Six straight days of the mindfulness-journal stack is the threshold where it starts feeling habitual."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Second week-six circuit: 15 pushups, 20 squats, 15 lunges each leg, 40-second plank \u2014 3 rounds, 30 sec rest.",
+            "Week 6 workout 2: 15 pushups, 20 squats, 15 lunges per side, 40-second plank \u2014 3 rounds with 30-second rest.",
+            "Complete 3 rounds: 15 pushups, 20 squats, 15 lunges each leg, 40-second plank \u2014 30 seconds between rounds."
+          ],
+          "why": "Second circuit of the week locks in the training frequency."
+        }
+      ]
+    },
+    {
+      "day": 40,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 40 days in, same routine.",
+            "Water, 2-minute stretch, write one task \u2014 Day 40.",
+            "Execute your morning sequence: water, stretch, one priority task written."
+          ],
+          "why": "Day 40 is a quiet milestone \u2014 the routine is no longer something you do, it is something you are."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Check your step count from Day 8 in your notes and see if your current daily average has improved \u2014 write the comparison.",
+            "Pull up the step count you recorded on Day 8 and compare it to your current average in Apple Health or Google Fit \u2014 note the difference.",
+            "Find your Day 8 step data and your current 7-day step average \u2014 write both numbers and calculate the improvement."
+          ],
+          "why": "Comparing step data from Day 8 to now provides hard evidence that your fitness has improved."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes and run the last 2 minutes \u2014 just try it, jog or run at any pace.",
+            "Complete your walk (18 minutes) and spend the last 2 minutes jogging \u2014 even a slow shuffle counts.",
+            "Walk 18 minutes then break into a jog for the final 2 minutes \u2014 this is your first running introduction."
+          ],
+          "why": "Introducing 2 minutes of running primes you for the 5k challenge coming in month three."
+        }
+      ]
+    },
+    {
+      "day": 41,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same sequence.",
+            "Water, 2-minute stretch, one priority task written.",
+            "Execute the morning routine: water, stretch 2 minutes, write one task."
+          ],
+          "why": "The routine runs first, always \u2014 everything else fits around it."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Meditation and journal stack: 5-minute session, then write 3 lines \u2014 same block, same order.",
+            "5-minute mindfulness session followed by 3 journal lines \u2014 complete the stack before starting work.",
+            "Run your meditation-journal block: 5 minutes of guided practice, then 3 written lines."
+          ],
+          "why": "The mindfulness-journal stack is now a ritual \u2014 protect it from disruption."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Third week-six circuit: 15 pushups, 20 squats, 15 lunges each leg, 40-second plank \u2014 3 rounds, 30 sec rest.",
+            "Week 6 final workout: 15 pushups, 20 squats, 15 lunges per side, 40-second plank \u2014 3 rounds with 30-second rest.",
+            "Complete 3 rounds of week 6's circuit: 15 pushups, 20 squats, 15 lunges each leg, 40-second plank \u2014 30 seconds rest between."
+          ],
+          "why": "Three sessions in week six continues the 3x/week cadence that has been building since Day 22."
+        }
+      ]
+    },
+    {
+      "day": 42,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 six-week review day, open it right.",
+            "Water, 2-minute stretch, write one task \u2014 then run your week-six review.",
+            "Execute the morning sequence and then do your six-week check-in: water, stretch, one task, then review."
+          ],
+          "why": "The routine anchors the review \u2014 the review without the routine is just journaling."
+        },
+        {
+          "position": 2,
+          "minutes": 7,
+          "variants": [
+            "Six-week review: open your notes and write 3 sentences \u2014 which habits are fully automatic, which mindfulness practice is working, and what is your physical state compared to Day 1.",
+            "Week six check-in: review your past two weeks of notes and write an honest 3-sentence assessment of your habit stack, mindfulness consistency, and physical progress.",
+            "Spend 7 minutes reviewing your notes from Days 35-42 and write: what is automatic, what needs attention, and one change you are making in week seven."
+          ],
+          "why": "The six-week mark is when habits either solidify or break \u2014 your review determines which."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes and run for 3 minutes during the walk \u2014 pick any 3-minute stretch and jog.",
+            "Complete your walk (17 min walking, 3 min jogging) \u2014 scatter the jog wherever feels right.",
+            "Walk 20 minutes total: jog for any 3 consecutive minutes during the walk \u2014 push past walking pace for those 3 minutes."
+          ],
+          "why": "Three minutes of jogging embedded in your walk continues your running introduction from Day 40."
+        }
+      ]
+    },
+    {
+      "day": 43,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 week seven starts with the same foundation.",
+            "Water, 2-minute stretch, write one priority task \u2014 open week seven consistently.",
+            "Execute your morning sequence: water, stretch, write one task \u2014 Day 43, same as always."
+          ],
+          "why": "Week seven's strength comes from carrying week six's foundation forward intact."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 run both back to back, same stack as all week.",
+            "Complete your meditation-journal stack: 5-minute session, then 3 lines written.",
+            "Mindfulness and journaling: 5-minute guided practice, then 3 written lines \u2014 stack them."
+          ],
+          "why": "The meditation-journal stack is a habit now \u2014 it costs almost nothing to execute."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Week 7 circuit upgrade: 17 pushups, 20 squats, 15 lunges each leg, 45-second plank \u2014 3 rounds.",
+            "New week, new circuit: 17 pushups, 20 squats, 15 lunges per side, 45-second plank \u2014 3 rounds, 30 seconds rest.",
+            "Complete 3 rounds of: 17 pushups, 20 squats, 15 lunges each leg, 45-second plank \u2014 30-second rest between rounds."
+          ],
+          "why": "Adding 2 pushups and 5 seconds of plank keeps the progressive overload on a consistent trajectory."
+        }
+      ]
+    },
+    {
+      "day": 44,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 automatic by now.",
+            "Water, 2-minute stretch, write one task \u2014 same sequence, Day 44.",
+            "Run your morning routine: water, stretch 2 minutes, one priority task in notes."
+          ],
+          "why": "Day 44 of the same morning routine means the friction is gone \u2014 it is free habit energy."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "5-minute meditation followed by 3 journal lines \u2014 complete both.",
+            "Stack: 5-minute mindfulness, then 3 written lines \u2014 uninterrupted block.",
+            "Run the mindfulness-journal block: guided 5-minute session, then 3 lines."
+          ],
+          "why": "Protecting the mindfulness block from interruption is the discipline within the discipline."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes \u2014 circuit recovery day, use the walk to notice where your body feels strong.",
+            "Active recovery: 20-minute walk, no circuit \u2014 this is intentional rest.",
+            "Walk 20 minutes today as your recovery session between circuits \u2014 keep the pace moderate."
+          ],
+          "why": "Recovery is part of the training \u2014 not an absence of it."
+        }
+      ]
+    },
+    {
+      "day": 45,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 halfway through the 90 days.",
+            "Water, 2-minute stretch, write one task \u2014 Day 45 is the halfway mark.",
+            "Execute your morning sequence: water, stretch, one task written \u2014 45 days in."
+          ],
+          "why": "Halfway through the 90-day arc, the routine is stronger than ever \u2014 keep the same standard."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Today's mindfulness session: try a different style \u2014 body scan if you have been doing breath focus, breath focus if you have been doing body scan.",
+            "Switch up your 5-minute meditation today \u2014 if you have been doing guided, try silent; if silent, try guided \u2014 same 5 minutes, new approach.",
+            "Use a different 5-minute meditation style today: search for 'body scan 5 minutes' or 'box breathing 5 minutes' on YouTube and try it."
+          ],
+          "why": "Introducing variety at the halfway point keeps the mindfulness practice from going stale."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Second week-seven circuit: 17 pushups, 20 squats, 15 lunges each leg, 45-second plank \u2014 3 rounds, 30 sec rest.",
+            "Week 7 workout 2: 17 pushups, 20 squats, 15 lunges per side, 45-second plank \u2014 3 rounds with 30-second rest.",
+            "Complete 3 rounds: 17 pushups, 20 squats, 15 lunges each leg, 45-second plank \u2014 30 seconds between rounds."
+          ],
+          "why": "Maintaining 3 sessions per week through the halfway point is the proof the system is working."
+        }
+      ]
+    },
+    {
+      "day": 46,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same sequence.",
+            "Water, 2-minute stretch, write one task \u2014 Day 46.",
+            "Execute your morning routine: water, stretch, one priority task."
+          ],
+          "why": "The routine is the backbone \u2014 nothing fancy, just consistent."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Meditation and journal stack \u2014 5 minutes, then 3 lines \u2014 same as always.",
+            "5-minute meditation followed by 3 journal lines \u2014 complete the stack.",
+            "Run your mindfulness-journal block: 5-minute session, then write 3 lines."
+          ],
+          "why": "The stack is becoming reflexive \u2014 a sign of real habit formation."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and run 4 minutes during the walk \u2014 pick any stretch to jog and go.",
+            "20-minute walk with 4 minutes of jogging embedded \u2014 push into a run for 4 consecutive minutes at some point.",
+            "Walk and run today: 16 minutes walking, 4 minutes jogging \u2014 break into the jog whenever feels right."
+          ],
+          "why": "Extending jogging from 3 to 4 minutes continues the progressive running build."
+        }
+      ]
+    },
+    {
+      "day": 47,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 entering the second half of month two.",
+            "Water, 2-minute stretch, write one priority task \u2014 Day 47.",
+            "Execute your morning sequence: water, stretch, one task written."
+          ],
+          "why": "The second half of month two is where habits harden into identity \u2014 protect the routine."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 complete the stack before starting your day.",
+            "Run your meditation-journal stack: 5 minutes mindfulness, then 3 honest lines.",
+            "Mindfulness block: 5-minute guided or silent session, then 3 written journal lines."
+          ],
+          "why": "The mindfulness-journal stack at day 47 has been running for over two weeks \u2014 it is a real habit."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Third week-seven circuit: 17 pushups, 20 squats, 15 lunges each leg, 45-second plank \u2014 3 rounds.",
+            "Week 7 final workout: 17 pushups, 20 squats, 15 lunges per side, 45-second plank \u2014 3 rounds, 30 seconds rest.",
+            "Complete 3 rounds of the week-seven circuit: 17 pushups, 20 squats, 15 lunges each leg, 45-second plank."
+          ],
+          "why": "Finishing week seven's third session keeps the 3x/week frequency perfect."
+        }
+      ]
+    },
+    {
+      "day": 48,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 48.",
+            "Water, 2-minute stretch, write one priority task.",
+            "Run your morning sequence: water, stretch 2 minutes, one task in notes."
+          ],
+          "why": "Routine consistency through day 48 means the habit is deeply wired."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write a weekly progress reflection today \u2014 3 sentences on your energy, your body, and your mindset compared to Day 30.",
+            "Weekly reflection: in 3 sentences, describe your current energy level, physical state, and mental state \u2014 compare each to where you were at Day 30.",
+            "Write your weekly reflection: 3 sentences capturing what has changed in your energy, body, and focus since you hit the Day 30 milestone."
+          ],
+          "why": "Tracking progress at the midpoint of month two gives you clear data for month three planning."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and make it phone-free \u2014 same as Day 11, but notice how much clearer your mind is on these walks now.",
+            "Complete your walk (20 min) with no phone \u2014 recall the Day 11 phone-free walk and notice how different your mental state is now.",
+            "Walk 20 minutes, phone in pocket, no checking \u2014 same phone-free discipline as Day 11, but you are a very different person now."
+          ],
+          "why": "Revisiting the Day 11 phone-free walk shows how much your relationship with movement has changed."
+        }
+      ]
+    },
+    {
+      "day": 49,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 seven-week review day, same opening.",
+            "Water, 2-minute stretch, write one task \u2014 then run your week-seven review.",
+            "Execute the morning sequence and do your seven-week check-in: water, stretch, one task, then review."
+          ],
+          "why": "Seven weeks of reviewing means review itself is a habit now."
+        },
+        {
+          "position": 2,
+          "minutes": 7,
+          "variants": [
+            "Seven-week review: open your notes and write 3 sentences \u2014 what has become effortless, what is still requiring effort, and what one habit should be stronger by Day 60.",
+            "Week seven check-in: review the past two weeks and write your honest assessment of which habits are solid, which are fragile, and what you want to achieve by Day 60.",
+            "Spend 7 minutes reviewing your notes from Days 42-49 and write: what is automatic, what needs daily will power, and what is your priority for the final 11 days of month two."
+          ],
+          "why": "Your Day 60 milestone is two weeks away \u2014 this review sets the direction."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes and run 5 minutes during the walk \u2014 pick the 5 consecutive minutes and push through them.",
+            "20-minute walk with 5 minutes of jogging \u2014 embed the jog anywhere and hold the pace for the full 5 minutes.",
+            "Complete your walk (15 min walking, 5 min jogging) \u2014 5 consecutive minutes of running, no stopping."
+          ],
+          "why": "Five minutes of continuous jogging is a milestone \u2014 it signals real cardiovascular improvement."
+        }
+      ]
+    },
+    {
+      "day": 50,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 50, same standard.",
+            "Water, 2-minute stretch, write one task \u2014 50 days in.",
+            "Execute your morning sequence: water, stretch, one priority task."
+          ],
+          "why": "Day 50 is a marker \u2014 the routine feels like gravity, and that is exactly right."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 complete the stack.",
+            "Meditation-journal block: 5-minute session, then 3 lines written.",
+            "Run your mindfulness stack: 5 minutes guided or silent, then write 3 journal lines."
+          ],
+          "why": "The mindfulness-journal stack at day 50 requires almost no activation energy \u2014 that is the goal."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Week 8 circuit: 17 pushups, 25 squats, 15 lunges each leg, 45-second plank \u2014 3 rounds.",
+            "Upgrade squats to 25 this week: 17 pushups, 25 squats, 15 lunges per side, 45-second plank \u2014 3 rounds.",
+            "Complete 3 rounds: 17 pushups, 25 squats, 15 lunges each leg, 45-second plank \u2014 30 seconds rest."
+          ],
+          "why": "Bumping squats to 25 adds meaningful leg volume at the 50-day mark."
+        }
+      ]
+    },
+    {
+      "day": 51,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same as always.",
+            "Water, 2-minute stretch, write one task.",
+            "Run your morning sequence: water, stretch, one task written."
+          ],
+          "why": "The routine is the foundation \u2014 it holds everything else up."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Meditation and journal stack \u2014 5 minutes, then 3 lines.",
+            "5-minute mindfulness session followed by 3 journal lines.",
+            "Run the stack: 5-minute meditation, then write 3 lines."
+          ],
+          "why": "The stack takes less effort every day \u2014 that is the compound interest of habit building."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes \u2014 active recovery between circuit days.",
+            "Complete your 20-minute walk today \u2014 no circuit, just movement.",
+            "Walk 20 minutes at a moderate pace \u2014 circuit rest day."
+          ],
+          "why": "Rest days are sacred \u2014 they are when the adaptation from your circuits actually happens."
+        }
+      ]
+    },
+    {
+      "day": 52,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 52.",
+            "Water, 2-minute stretch, write one priority task.",
+            "Execute your morning routine: water, stretch 2 minutes, write one task."
+          ],
+          "why": "Over 50 consecutive mornings with this routine \u2014 it is deeply embedded."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 run the stack.",
+            "Meditation-journal block: 5 minutes, then 3 written lines.",
+            "Complete your mindfulness stack: 5-minute session followed by 3 journal lines."
+          ],
+          "why": "The daily mindfulness-journal stack is a practice with measurable mental health benefits \u2014 keep it."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Second week-eight circuit: 17 pushups, 25 squats, 15 lunges each leg, 45-second plank \u2014 3 rounds.",
+            "Week 8 workout 2: 17 pushups, 25 squats, 15 lunges per side, 45-second plank \u2014 3 rounds, 30 seconds rest.",
+            "Complete 3 rounds: 17 pushups, 25 squats, 15 lunges each leg, 45-second plank \u2014 30 seconds between rounds."
+          ],
+          "why": "Week eight's second session keeps the 3x/week volume consistent."
+        }
+      ]
+    },
+    {
+      "day": 53,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same standard.",
+            "Water, 2-minute stretch, write one task \u2014 Day 53.",
+            "Execute the morning sequence: water, stretch, one priority task written."
+          ],
+          "why": "Same routine, day 53 \u2014 the consistency itself is a form of strength."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Look at your gratitude or journal entries from the past week and pull out one thing that genuinely helped your mindset \u2014 write it.",
+            "Read back through your last 7 journal entries and identify one recurring theme \u2014 write what it reveals about your current headspace.",
+            "Review your journal from the past week and write one sentence identifying what has improved the most in your mental state since Day 31."
+          ],
+          "why": "Reviewing your journal entries turns 3-line snapshots into an ongoing self-awareness practice."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and run 5 minutes \u2014 you did this on Day 49, match or beat the pace.",
+            "20-minute walk with 5 minutes of jogging \u2014 try to hold a slightly faster jog than you did on Day 49.",
+            "Complete your walk (15 min) and jog (5 min) and push the jog harder than the Day 49 version."
+          ],
+          "why": "Returning to the 5-minute jog and pushing the pace shows how your cardiovascular capacity has grown."
+        }
+      ]
+    },
+    {
+      "day": 54,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same opening, Day 54.",
+            "Water, 2-minute stretch, write one priority task.",
+            "Run your morning sequence: water, stretch 2 minutes, one task written."
+          ],
+          "why": "Six days from Day 60 \u2014 the routine holds steady all the way to the milestone."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Meditation and journal stack: 5 minutes, then 3 lines \u2014 complete it.",
+            "5-minute mindfulness session followed by 3 journal lines \u2014 stack them.",
+            "Run the mindfulness-journal block: 5-minute session, then 3 written lines."
+          ],
+          "why": "The stack is automatic at this point \u2014 it just needs to happen every day."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Third week-eight circuit: 17 pushups, 25 squats, 15 lunges each leg, 45-second plank \u2014 3 rounds.",
+            "Week 8 final workout: 17 pushups, 25 squats, 15 lunges per side, 45-second plank \u2014 3 rounds.",
+            "Complete 3 rounds of week eight's circuit: 17 pushups, 25 squats, 15 lunges each leg, 45-second plank."
+          ],
+          "why": "Three sessions in week eight \u2014 the training frequency has held solid for six weeks."
+        }
+      ]
+    },
+    {
+      "day": 55,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 five days from the Day 60 checkpoint.",
+            "Water, 2-minute stretch, write one task \u2014 entering the final stretch of month two.",
+            "Execute your morning routine: water, stretch, one task \u2014 Day 55."
+          ],
+          "why": "Five days from the milestone \u2014 the routine stays rock solid."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write 3 things about your fitness that have genuinely improved since Day 1 \u2014 be specific: reps, pace, sleep quality, energy level.",
+            "In your notes, list 3 concrete fitness improvements from Days 1-55 \u2014 specific numbers or observations, not vague feelings.",
+            "Write 3 measurable improvements you have achieved since Day 1 \u2014 step count increase, more pushup reps, consistent bedtime, whatever is real and specific."
+          ],
+          "why": "Concrete evidence of progress is the most powerful motivator for the final stretch."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and plan your Day 60 milestone celebration walk or activity in your head \u2014 something slightly bigger than a normal walk.",
+            "Complete your 20-minute walk and decide what you want to do for your Day 60 movement celebration \u2014 a longer walk, a new trail, something special.",
+            "Walk 20 minutes and commit to what your Day 60 movement will be \u2014 write it in your notes when you get back."
+          ],
+          "why": "Pre-committing to a Day 60 celebration activity makes the milestone feel earned and tangible."
+        }
+      ]
+    },
+    {
+      "day": 56,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 eight-week review day.",
+            "Water, 2-minute stretch, write one task \u2014 then run your eight-week check-in.",
+            "Execute the morning sequence and do your week-eight review: water, stretch, one task, then review."
+          ],
+          "why": "Eight weeks of reviews means the review itself is one of your strongest habits."
+        },
+        {
+          "position": 2,
+          "minutes": 7,
+          "variants": [
+            "Eight-week review: read your notes from Days 49-56 and write 3 sentences \u2014 what habits are fully automatic, what is improving slowest, and what do you want to accomplish in Days 57-90.",
+            "Week eight check-in: review the past two weeks and write your assessment of habit solidity, physical progress, and your top priority for the final 34 days.",
+            "Spend 7 minutes reviewing your recent notes and write your Day 56 assessment: which habits cost zero effort, which still require willpower, and what is your one focus for month three."
+          ],
+          "why": "The week-eight review sets the direction for the final month \u2014 this one matters."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes \u2014 four days from Day 60, keep all habits running full strength.",
+            "Complete your 20-minute walk \u2014 no coasting before the milestone.",
+            "Walk 20 minutes today \u2014 full effort, full habits, four days from your 60-day checkpoint."
+          ],
+          "why": "Arriving at Day 60 with full momentum matters more than what you do on the day itself."
+        }
+      ]
+    },
+    {
+      "day": 57,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 57, same standard.",
+            "Water, 2-minute stretch, write one priority task.",
+            "Run the morning routine: water, stretch 2 minutes, one task written."
+          ],
+          "why": "Three days from Day 60 \u2014 the routine holds."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 run the stack.",
+            "Meditation-journal block: 5-minute session, then 3 lines.",
+            "Complete your mindfulness-journal stack: 5 minutes of guided practice, then 3 written lines."
+          ],
+          "why": "The stack runs every day \u2014 Day 57 is no exception."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Week-nine circuit: 20 pushups, 25 squats, 15 lunges each leg, 45-second plank \u2014 3 rounds.",
+            "Open month three's training with a push: 20 pushups, 25 squats, 15 lunges per side, 45-second plank \u2014 3 rounds.",
+            "Complete 3 rounds: 20 pushups, 25 squats, 15 lunges each leg, 45-second plank \u2014 30 seconds rest."
+          ],
+          "why": "Reaching 20 pushups is a genuine strength milestone \u2014 this is where month three begins."
+        }
+      ]
+    },
+    {
+      "day": 58,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 two days from Day 60.",
+            "Water, 2-minute stretch, write one task \u2014 Day 58.",
+            "Execute your morning sequence: water, stretch, one task."
+          ],
+          "why": "Two days from the milestone \u2014 no coasting, same standard."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 same stack as always.",
+            "Run your mindfulness-journal block: 5-minute session, 3 journal lines.",
+            "Meditation then journal: 5 minutes guided or silent, then 3 written lines."
+          ],
+          "why": "The stack costs almost nothing at this point \u2014 it just happens."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and run 6 minutes during the walk \u2014 push the jogging interval higher.",
+            "20-minute walk with 6 consecutive minutes of jogging \u2014 embed the run wherever feels strong.",
+            "Walk 14 minutes, run 6 minutes \u2014 hold the jog for 6 unbroken minutes."
+          ],
+          "why": "Six continuous minutes of running marks a real aerobic improvement and primes you for the Day 60 milestone."
+        }
+      ]
+    },
+    {
+      "day": 59,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 tomorrow is Day 60, arrive there prepared.",
+            "Water, 2-minute stretch, write one task \u2014 Day 59, one day before the milestone.",
+            "Execute your morning sequence: water, stretch, one priority task \u2014 final full day before Day 60."
+          ],
+          "why": "Day 59 is about maintaining every habit intact so you arrive at Day 60 at full strength."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Meditation and journal stack \u2014 5 minutes, then 3 lines.",
+            "5-minute mindfulness session followed by 3 journal lines.",
+            "Run the stack: 5-minute meditation, then 3 written journal lines."
+          ],
+          "why": "Consistent execution through the day before a milestone is the real proof of habit formation."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes at a moderate pace and think about what you want to accomplish in the final 31 days.",
+            "Complete your 20-minute walk and use the time to set your intention for Days 61-90.",
+            "Walk 20 minutes and decide your top priority for month three \u2014 come back with one clear goal written down."
+          ],
+          "why": "Arriving at Day 60 with a clear month-three intention gives the final stretch direction."
+        }
+      ]
+    },
+    {
+      "day": 60,
+      "minutes_total": 18,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 60 milestone, same opening as Day 1.",
+            "Water, 2-minute stretch, write one task \u2014 60 days in, same routine as Day 15.",
+            "Run your morning sequence: water, stretch, one task written \u2014 this routine has been your anchor for two months."
+          ],
+          "why": "The fact that Day 60 starts exactly like Day 1 is the point \u2014 the routine is who you are now."
+        },
+        {
+          "position": 2,
+          "minutes": 6,
+          "variants": [
+            "Write your Day 60 milestone review: 3 things you built, 1 honest weakness, and your single most important focus for the final 30 days.",
+            "60-day checkpoint: open your notes and write what you have built in two months, what fell short, and your top priority for Days 61-90.",
+            "Day 60 assessment: 3 real wins, 1 honest gap, and one specific commitment for month three \u2014 write it clearly in your notes."
+          ],
+          "why": "The Day 60 review is the launchpad for month three \u2014 make it honest and specific."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Do the special movement session you planned on Day 55 \u2014 a longer walk, a new trail, or something you chose to mark this milestone.",
+            "Complete the Day 60 milestone movement you committed to on Day 55 \u2014 whatever you chose, do it now.",
+            "Execute your Day 60 celebration movement \u2014 the one you decided on during your Day 55 walk \u2014 this is your 60-day reward."
+          ],
+          "why": "Marking Day 60 with intentional movement reinforces that health is how you celebrate, not how you recover."
+        }
+      ]
+    },
+    {
+      "day": 61,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 month three starts the same way month one did.",
+            "Water, 2-minute stretch, write one priority task \u2014 open month three with the same foundation.",
+            "Execute your morning sequence: water, stretch, write one task \u2014 Day 61, new phase, same standard."
+          ],
+          "why": "Month three is about system-building \u2014 and systems start with routines that already work."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Choose your month-three challenge right now: a 5k run, a long hike, a fitness class \u2014 write it in your notes and commit.",
+            "Pick your new challenge for Days 61-90 and write it down: 5k, hike, swim class, yoga series \u2014 name it specifically.",
+            "Open your notes and commit in writing to one new challenge for this month \u2014 a 5k, a hike, a new physical skill \u2014 pick it now."
+          ],
+          "why": "Committing to a specific challenge gives month three an endpoint that pulls you forward."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Week-nine circuit: 20 pushups, 25 squats, 15 lunges each leg, 50-second plank \u2014 3 rounds.",
+            "Month three opens with a plank upgrade: 20 pushups, 25 squats, 15 lunges per side, 50-second plank \u2014 3 rounds.",
+            "Complete 3 rounds: 20 pushups, 25 squats, 15 lunges each leg, 50-second plank \u2014 30 seconds rest between rounds."
+          ],
+          "why": "Extending the plank to 50 seconds is the month-three opening progression."
+        }
+      ]
+    },
+    {
+      "day": 62,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 62.",
+            "Water, 2-minute stretch, write one priority task.",
+            "Run the morning sequence: water, stretch, one task written."
+          ],
+          "why": "Month three's system is built on month two's routine \u2014 nothing changes at the base."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 stack them back to back.",
+            "Meditation-journal block: 5-minute session, then 3 journal lines.",
+            "Complete your mindfulness-journal stack: 5 minutes then 3 written lines."
+          ],
+          "why": "The mindfulness stack is now a deeply wired habit \u2014 it runs automatically."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and research what training you need to do for your month-three challenge \u2014 look it up and write one sentence about your plan.",
+            "Complete your 20-minute walk, then spend 2 minutes looking up a beginner plan for your chosen challenge (5k, hike, class) and write one sentence about what you need to do.",
+            "Walk 20 minutes and then pull up basic preparation info for your month-three challenge \u2014 write one sentence about your starting point."
+          ],
+          "why": "Planning the challenge after committing to it turns an intention into an action path."
+        }
+      ]
+    },
+    {
+      "day": 63,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 nine-week review day.",
+            "Water, 2-minute stretch, write one task \u2014 then run your nine-week check-in.",
+            "Execute the morning sequence and do your week-nine review: water, stretch, one task, then review."
+          ],
+          "why": "Nine weeks of reviews \u2014 this habit is now one of the most powerful tools you have."
+        },
+        {
+          "position": 2,
+          "minutes": 7,
+          "variants": [
+            "Nine-week review: read your notes from Days 56-63 and write 3 sentences \u2014 what is automatic, what changed at the Day 60 milestone, and what is your challenge training plan.",
+            "Week nine check-in: review the past week and write your honest assessment of habit stack strength and your specific progress plan for the month-three challenge.",
+            "Spend 7 minutes reviewing your notes and write: which habits require zero effort, what your month-three challenge is, and what training you are doing for it."
+          ],
+          "why": "The nine-week review aligns your daily habits with your month-three challenge goal."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes and run 7 minutes during the walk \u2014 you have been building to this, now hit it.",
+            "20-minute session: 13 minutes walking, 7 minutes jogging \u2014 hold the run for the full 7 minutes.",
+            "Walk and run today: 7 consecutive minutes of jogging embedded in a 20-minute session."
+          ],
+          "why": "Seven minutes of continuous running is a real endurance milestone \u2014 the 5k build is on track."
+        }
+      ]
+    },
+    {
+      "day": 64,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 64, no variation.",
+            "Water, 2-minute stretch, write one priority task.",
+            "Execute your morning sequence: water, stretch, one task written."
+          ],
+          "why": "The routine is the system \u2014 protect it even in month three."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 complete the stack.",
+            "Run your mindfulness-journal block: 5-minute session, then 3 lines written.",
+            "Meditation then journal: 5 minutes, then 3 honest written lines."
+          ],
+          "why": "Month three's mindfulness practice is now over a month old \u2014 it is deeply embedded."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Week 10 circuit: 20 pushups, 25 squats, 20 lunges each leg, 50-second plank \u2014 3 rounds.",
+            "Bump lunges to 20 this week: 20 pushups, 25 squats, 20 lunges per side, 50-second plank \u2014 3 rounds.",
+            "Complete 3 rounds: 20 pushups, 25 squats, 20 lunges each leg, 50-second plank \u2014 30 seconds rest."
+          ],
+          "why": "Adding 5 lunges per leg is a significant lower-body volume increase for week ten."
+        }
+      ]
+    },
+    {
+      "day": 65,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 65.",
+            "Water, 2-minute stretch, write one task.",
+            "Run your morning sequence: water, stretch, one priority task written."
+          ],
+          "why": "65 days of the same morning routine \u2014 this is what identity-level habits look like."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Meditation and journal stack \u2014 5 minutes, then 3 lines.",
+            "5-minute mindfulness session followed by 3 journal lines \u2014 stack them.",
+            "Complete the mindfulness-journal block: 5-minute session, then 3 written lines."
+          ],
+          "why": "The stack is a permanent fixture in your daily rhythm \u2014 maintain it."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes with a friend, partner, or family member \u2014 social movement is your Day 65 task.",
+            "Invite someone on today's 20-minute walk \u2014 send the text now and walk together.",
+            "Today's walk is social: bring one person with you for the 20 minutes \u2014 message them before you start."
+          ],
+          "why": "Social movement at the system-building phase reinforces that health is part of your relationships, not apart from them."
+        }
+      ]
+    },
+    {
+      "day": 66,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same opening, Day 66.",
+            "Water, 2-minute stretch, write one priority task.",
+            "Execute your morning sequence: water, stretch, one task written."
+          ],
+          "why": "The routine anchors month three just as it anchored months one and two."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 run the stack without hesitation.",
+            "Mindfulness-journal block: 5-minute session, then 3 lines.",
+            "Complete your stack: 5-minute meditation, then 3 journal lines."
+          ],
+          "why": "Sixty-plus days of the same mindfulness-journal stack is a genuine mental health intervention."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Second week-ten circuit: 20 pushups, 25 squats, 20 lunges each leg, 50-second plank \u2014 3 rounds.",
+            "Week 10 workout 2: 20 pushups, 25 squats, 20 lunges per side, 50-second plank \u2014 3 rounds with 30-second rest.",
+            "Complete 3 rounds of week ten's circuit: 20 pushups, 25 squats, 20 lunges each leg, 50-second plank."
+          ],
+          "why": "Maintaining 3x/week training through week ten is the consistency that produces visible results."
+        }
+      ]
+    },
+    {
+      "day": 67,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 67.",
+            "Water, 2-minute stretch, write one task.",
+            "Run your morning sequence: water, stretch, one task written."
+          ],
+          "why": "Every morning this routine happens \u2014 that is the commitment."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write 3 sentences about your current physical state: what has genuinely gotten easier, what still challenges you, and what surprised you about this process.",
+            "Reflection task: write 3 sentences about what you can do physically now that you could not do on Day 1, what still challenges you, and one thing about this journey that surprised you.",
+            "Open your notes and write 3 sentences: one on what your body does easily now that was hard on Day 1, one on what still challenges you, one on what you learned about yourself."
+          ],
+          "why": "Reflective writing at Day 67 captures growth that will anchor your commitment through Day 90."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes \u2014 circuit recovery day, use the walk to plan this week's challenge training session.",
+            "Complete your 20-minute walk and use the time to think through your next challenge training step.",
+            "Active recovery: 20-minute walk, no circuit \u2014 plan your challenge preparation during the walk."
+          ],
+          "why": "Using walk time to plan challenge training turns passive recovery into productive strategy."
+        }
+      ]
+    },
+    {
+      "day": 68,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 68.",
+            "Water, 2-minute stretch, write one priority task.",
+            "Execute your morning sequence: water, stretch, one task written."
+          ],
+          "why": "The routine is the container everything else fits inside."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 same stack.",
+            "Meditation-journal block: 5-minute session, then 3 written lines.",
+            "Run the mindfulness-journal stack: 5 minutes, then 3 lines."
+          ],
+          "why": "The stack is part of how you process your days now \u2014 a genuine mental health habit."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Third week-ten circuit: 20 pushups, 25 squats, 20 lunges each leg, 50-second plank \u2014 3 rounds \u2014 try to rest only 20 seconds between rounds.",
+            "Week 10 final workout: 20 pushups, 25 squats, 20 lunges per side, 50-second plank \u2014 3 rounds, cut rest to 20 seconds.",
+            "Complete 3 rounds of the week-ten circuit with shorter rest: 20 pushups, 25 squats, 20 lunges each leg, 50-second plank \u2014 20-second rest between rounds."
+          ],
+          "why": "Reducing rest time is the progression that turns the circuit into a cardiovascular workout."
+        }
+      ]
+    },
+    {
+      "day": 69,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same sequence, Day 69.",
+            "Water, 2-minute stretch, write one task.",
+            "Run your morning routine: water, stretch 2 minutes, one priority task in notes."
+          ],
+          "why": "Day 69 \u2014 the routine still runs first, every time."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Meditation and journal stack \u2014 5 minutes then 3 lines \u2014 complete it.",
+            "5-minute mindfulness then 3 journal lines \u2014 same stack, same order.",
+            "Run the mindfulness-journal block: 5-minute session, then 3 written lines."
+          ],
+          "why": "Nearly 40 consecutive days of the mindfulness-journal stack \u2014 this is a real practice."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and run 8 minutes \u2014 push the jogging interval further.",
+            "20-minute session: 12 minutes walking, 8 minutes of continuous jogging.",
+            "Walk and run: 8 unbroken minutes of jogging inside a 20-minute session."
+          ],
+          "why": "Eight continuous minutes of running is significant aerobic progress \u2014 the challenge is coming into view."
+        }
+      ]
+    },
+    {
+      "day": 70,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 ten-week review day.",
+            "Water, 2-minute stretch, write one task \u2014 then run your ten-week check-in.",
+            "Execute the morning sequence and do your week-ten review: water, stretch, one task, then review."
+          ],
+          "why": "Ten weeks of consistent weekly reviews \u2014 this discipline has shaped everything else."
+        },
+        {
+          "position": 2,
+          "minutes": 7,
+          "variants": [
+            "Ten-week review: open your notes and write 3 sentences \u2014 what habits are fully on autopilot, what progress have you made on your month-three challenge, and what needs to be stronger by Day 90.",
+            "Week ten check-in: review Days 63-70 and write your honest assessment of habit automation, challenge preparation, and your top priority for the final 20 days.",
+            "Spend 7 minutes reviewing your recent notes and write: what costs no effort, what your challenge progress looks like, and what one thing must improve before Day 90."
+          ],
+          "why": "Twenty days from Day 90 \u2014 this review sets the final plan."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Week 11 circuit: 22 pushups, 25 squats, 20 lunges each leg, 55-second plank \u2014 3 rounds, 20 seconds rest.",
+            "Upgrade pushups to 22 for week 11: 22 pushups, 25 squats, 20 lunges per side, 55-second plank \u2014 3 rounds.",
+            "Complete 3 rounds: 22 pushups, 25 squats, 20 lunges each leg, 55-second plank \u2014 20 seconds rest between rounds."
+          ],
+          "why": "Adding 2 pushups and 5 seconds to the plank continues the progression into the final phase."
+        }
+      ]
+    },
+    {
+      "day": 71,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 71.",
+            "Water, 2-minute stretch, write one priority task.",
+            "Run your morning sequence: water, stretch, one task written."
+          ],
+          "why": "19 days from Day 90 \u2014 the routine is fully automatic, protect it."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 complete the stack.",
+            "Run your mindfulness-journal block: 5-minute session, then 3 written lines.",
+            "Meditation then journal: 5 minutes, then 3 lines."
+          ],
+          "why": "The mindfulness-journal stack has been running for 40 days \u2014 it is one of your most reliable habits."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and invite someone on a social walk this week \u2014 send a message now confirming who and when.",
+            "Text one person right now to confirm a walk together this week \u2014 then take today's 20-minute solo walk.",
+            "Schedule a social walk for later this week by sending one message, then complete your 20-minute solo walk today."
+          ],
+          "why": "Locking in a social walk commitment ensures it happens \u2014 social accountability is the strongest kind."
+        }
+      ]
+    },
+    {
+      "day": 72,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same foundation.",
+            "Water, 2-minute stretch, write one priority task \u2014 Day 72.",
+            "Execute your morning sequence: water, stretch, one task written."
+          ],
+          "why": "Seventy-two mornings of the same routine \u2014 the system is complete."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 the stack runs automatically now.",
+            "Mindfulness-journal block: 5-minute session, then 3 journal lines.",
+            "Complete the stack: 5-minute meditation, then 3 written lines."
+          ],
+          "why": "Automatic habits cost zero willpower \u2014 that freed-up energy goes into everything else."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Second week-11 circuit: 22 pushups, 25 squats, 20 lunges each leg, 55-second plank \u2014 3 rounds, 20 seconds rest.",
+            "Week 11 workout 2: 22 pushups, 25 squats, 20 lunges per side, 55-second plank \u2014 3 rounds with 20-second rest.",
+            "Complete 3 rounds: 22 pushups, 25 squats, 20 lunges each leg, 55-second plank \u2014 20 seconds rest between rounds."
+          ],
+          "why": "Three rounds with 20-second rest is the toughest version of this circuit yet."
+        }
+      ]
+    },
+    {
+      "day": 73,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 73.",
+            "Water, 2-minute stretch, write one task.",
+            "Run your morning sequence: water, stretch, one task written."
+          ],
+          "why": "The routine starts the day \u2014 every day, without exception."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Meditation and journal stack \u2014 5 minutes then 3 lines.",
+            "5-minute mindfulness session followed by 3 journal lines \u2014 run it.",
+            "Complete the mindfulness-journal stack: 5-minute session, 3 lines written."
+          ],
+          "why": "Forty-plus days of the mindfulness-journal stack is a real wellness practice."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and run 9 minutes during the walk \u2014 your longest run interval yet.",
+            "20-minute session: 11 minutes walking, 9 consecutive minutes of jogging.",
+            "Embed 9 unbroken minutes of jogging into your 20-minute walk \u2014 hold the pace for the full 9."
+          ],
+          "why": "Nine minutes of continuous running means you can finish a 5k \u2014 the challenge is within reach."
+        }
+      ]
+    },
+    {
+      "day": 74,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 entering the final 17 days.",
+            "Water, 2-minute stretch, write one priority task \u2014 Day 74.",
+            "Execute your morning sequence: water, stretch, one task written."
+          ],
+          "why": "17 days from Day 90 \u2014 the routine is the foundation for a strong finish."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 same stack.",
+            "Meditation-journal block: 5-minute session, then 3 journal lines.",
+            "Run the mindfulness-journal stack: 5 minutes, then 3 written lines."
+          ],
+          "why": "The stack keeps the mental game strong in the final stretch."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Third week-11 circuit: 22 pushups, 25 squats, 20 lunges each leg, 55-second plank \u2014 3 rounds, 20 seconds rest.",
+            "Week 11 final workout: 22 pushups, 25 squats, 20 lunges per side, 55-second plank \u2014 3 rounds with 20-second rest.",
+            "Complete 3 rounds of the week-11 circuit: 22 pushups, 25 squats, 20 lunges each leg, 55-second plank \u2014 20 seconds rest."
+          ],
+          "why": "Three sessions in week 11 \u2014 3x/week bodyweight training is now a permanent fixture."
+        }
+      ]
+    },
+    {
+      "day": 75,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 75, same standard.",
+            "Water, 2-minute stretch, write one task.",
+            "Run your morning sequence: water, stretch, one priority task written."
+          ],
+          "why": "Day 75 \u2014 the system is running on autopilot."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write your sustainability reflection: which of your current habits will you still be doing in 6 months, and which ones need a permanent place in your life?",
+            "Sustainability check: look at your full habit stack (routine, water, walk, circuit, mindfulness, journal) and write which ones are built for life.",
+            "Open your notes and write 3 sentences: which habits are permanent, which need structural support to survive, and what is your maintenance plan after Day 90."
+          ],
+          "why": "Planning for sustainability at Day 75 prevents the Day 91 drop-off that ends most health journeys."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Go on your scheduled social walk today \u2014 this is the walk you committed to during Day 71.",
+            "Complete the social walk you planned on Day 71 \u2014 walk with the person you invited and make it a full 20 minutes.",
+            "Do the social walk you set up on Day 71 \u2014 walk with your person, 20 minutes minimum."
+          ],
+          "why": "Social movement accountability at Day 75 builds the social health habits that outlast 90-day programs."
+        }
+      ]
+    },
+    {
+      "day": 76,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same opening.",
+            "Water, 2-minute stretch, write one priority task \u2014 Day 76.",
+            "Execute your morning sequence: water, stretch, one task written."
+          ],
+          "why": "The routine costs nothing and produces everything \u2014 keep it."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 run the stack.",
+            "Meditation-journal block: 5-minute session, then 3 lines written.",
+            "Complete the stack: 5-minute mindfulness, then 3 journal lines."
+          ],
+          "why": "The mindfulness-journal stack is a permanent part of your day at this point."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Week 12 circuit: 22 pushups, 30 squats, 20 lunges each leg, 55-second plank \u2014 3 rounds, 20 seconds rest.",
+            "Final month circuit upgrade: bump squats to 30 \u2014 22 pushups, 30 squats, 20 lunges per side, 55-second plank, 3 rounds.",
+            "Complete 3 rounds: 22 pushups, 30 squats, 20 lunges each leg, 55-second plank \u2014 20 seconds rest between rounds."
+          ],
+          "why": "Reaching 30 squats is a real lower-body strength milestone \u2014 your final circuit progression."
+        }
+      ]
+    },
+    {
+      "day": 77,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 eleven-week review day.",
+            "Water, 2-minute stretch, write one task \u2014 then run your week-11 check-in.",
+            "Execute the morning sequence and do your eleven-week review: water, stretch, one task, then review."
+          ],
+          "why": "Eleven weeks of weekly reviews \u2014 you now review your life the way professionals run projects."
+        },
+        {
+          "position": 2,
+          "minutes": 7,
+          "variants": [
+            "Eleven-week review: write 3 sentences \u2014 what is completely automatic, how your challenge preparation is progressing, and what your sustainability plan is after Day 90.",
+            "Week 11 check-in: review Days 70-77 and write an honest assessment of habit automation, challenge readiness, and your plan for continuing after Day 90.",
+            "Spend 7 minutes reviewing your notes and write: what costs zero effort, where your month-three challenge stands, and what your life looks like on Day 91."
+          ],
+          "why": "Your Day 91 plan determines whether the 90 days were a sprint or a launchpad."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes and run 10 minutes during the walk \u2014 10 consecutive minutes of running is the benchmark.",
+            "20-minute session: 10 minutes walking, 10 consecutive minutes of jogging \u2014 hit the 10-minute mark.",
+            "Walk 10 minutes then run 10 minutes straight \u2014 this is your benchmark before the final challenge push."
+          ],
+          "why": "Ten consecutive minutes of running means you are ready for a 5k or equivalent challenge."
+        }
+      ]
+    },
+    {
+      "day": 78,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 12 days from the finish.",
+            "Water, 2-minute stretch, write one task \u2014 Day 78.",
+            "Run your morning sequence: water, stretch, one priority task."
+          ],
+          "why": "Twelve days from Day 90 \u2014 the routine runs uninterrupted to the end."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 stack them.",
+            "Mindfulness-journal block: 5-minute session, then 3 lines.",
+            "Complete the stack: 5-minute meditation, then 3 written journal lines."
+          ],
+          "why": "The mindfulness-journal stack finishes strong \u2014 no shortcuts in the final 12 days."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Second week-12 circuit: 22 pushups, 30 squats, 20 lunges each leg, 55-second plank \u2014 3 rounds, 20 seconds rest.",
+            "Week 12 workout 2: 22 pushups, 30 squats, 20 lunges per side, 55-second plank \u2014 3 rounds, 20 seconds rest.",
+            "Complete 3 rounds: 22 pushups, 30 squats, 20 lunges each leg, 55-second plank \u2014 20 seconds rest between."
+          ],
+          "why": "Week 12 second session \u2014 two more to go in the final training week."
+        }
+      ]
+    },
+    {
+      "day": 79,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 79.",
+            "Water, 2-minute stretch, write one task.",
+            "Execute the morning sequence: water, stretch, one task written."
+          ],
+          "why": "Day 79 \u2014 the routine is effortless, which means you have achieved something real."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Meditation and journal stack \u2014 5 minutes then 3 lines.",
+            "5-minute mindfulness then 3 journal lines \u2014 complete the stack.",
+            "Run the mindfulness-journal block: 5-minute session, then 3 written lines."
+          ],
+          "why": "50 days of the mindfulness-journal stack \u2014 this is a genuine mental training practice."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and prepare mentally for your challenge \u2014 run through the challenge in your head, step by step.",
+            "Complete your 20-minute walk and use the time to mentally rehearse your month-three challenge from start to finish.",
+            "Walk 20 minutes and spend the time on mental preparation for your upcoming challenge \u2014 visualize completing it successfully."
+          ],
+          "why": "Mental rehearsal before a physical challenge improves performance \u2014 it is a proven sports psychology technique."
+        }
+      ]
+    },
+    {
+      "day": 80,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 10 days from the finish.",
+            "Water, 2-minute stretch, write one priority task \u2014 Day 80.",
+            "Run your morning sequence: water, stretch, one task in notes."
+          ],
+          "why": "Ten days from Day 90 \u2014 the system is proven, the question is whether you can hold every piece through the end."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 run the stack, no shortcuts.",
+            "Meditation-journal block: 5-minute session, then 3 journal lines.",
+            "Complete the mindfulness-journal stack: 5 minutes, then 3 written lines."
+          ],
+          "why": "The mindfulness-journal stack does not coast in the final 10 days."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Third week-12 circuit: 22 pushups, 30 squats, 20 lunges each leg, 55-second plank \u2014 3 rounds, 20 seconds rest \u2014 last regular circuit of the program.",
+            "Final regular circuit: 22 pushups, 30 squats, 20 lunges per side, 55-second plank \u2014 3 rounds, 20 seconds rest.",
+            "Complete your last structured circuit of the program: 22 pushups, 30 squats, 20 lunges each leg, 55-second plank \u2014 3 rounds."
+          ],
+          "why": "This is the last regular circuit before the final 10 days \u2014 finish it strong."
+        }
+      ]
+    },
+    {
+      "day": 81,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 same standard, final 9 days.",
+            "Water, 2-minute stretch, write one priority task \u2014 Day 81.",
+            "Execute your morning sequence: water, stretch, one task written."
+          ],
+          "why": "Nine days from Day 90 \u2014 the routine holds."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 complete the stack.",
+            "Run the mindfulness-journal block: 5-minute session, then 3 lines.",
+            "Meditation then journal: 5 minutes then 3 written lines."
+          ],
+          "why": "The mindfulness-journal practice finishes at full strength."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and then do your challenge \u2014 or schedule it for this week if you haven't yet \u2014 write the date in your notes.",
+            "Complete your 20-minute walk, then either do your month-three challenge today or write a specific date this week when you will.",
+            "Walk 20 minutes and commit: write the exact day and time you are doing your month-three challenge if you haven't done it yet."
+          ],
+          "why": "If your challenge has not happened yet, it needs a committed date \u2014 not a vague intention."
+        }
+      ]
+    },
+    {
+      "day": 82,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 82.",
+            "Water, 2-minute stretch, write one task.",
+            "Run your morning sequence: water, stretch, one priority task."
+          ],
+          "why": "The routine runs all the way to Day 90 \u2014 no exceptions."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write your post-90 maintenance plan in your notes: which habits are permanent, which frequency will each run at, and who holds you accountable.",
+            "Plan your life after Day 90 in writing: name each habit that continues, how often it runs, and what your accountability looks like.",
+            "Open your notes and write your Day 91 plan \u2014 specific habits, specific frequencies, specific accountability \u2014 make it concrete."
+          ],
+          "why": "The maintenance plan is the most important document you write in this whole 90 days."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and run 10 minutes during the walk \u2014 one more 10-minute run before the final push.",
+            "20-minute session: 10 minutes walking, 10 minutes of continuous jogging.",
+            "Walk 10 minutes, run 10 minutes \u2014 match the Day 77 run and notice how it feels now."
+          ],
+          "why": "Running 10 minutes at Day 82 versus Day 77 shows how much easier aerobic work has become."
+        }
+      ]
+    },
+    {
+      "day": 83,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 7 days from Day 90.",
+            "Water, 2-minute stretch, write one priority task \u2014 Day 83.",
+            "Execute your morning sequence: water, stretch, one task written."
+          ],
+          "why": "Seven days left \u2014 the routine remains non-negotiable."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 same stack, same quality.",
+            "Meditation-journal block: 5-minute session, then 3 lines.",
+            "Run the mindfulness-journal stack: 5 minutes, then 3 written lines."
+          ],
+          "why": "The mindfulness-journal stack does not coast \u2014 same quality to the end."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and invite someone on a final social walk this week \u2014 this is your last social movement of the program.",
+            "Invite one person to walk with you this week by sending a message now, then complete your 20-minute solo walk.",
+            "Text someone to schedule a social walk for this week, then take your solo 20-minute walk today."
+          ],
+          "why": "Building social movement into your final week reinforces it as a permanent habit, not just a program feature."
+        }
+      ]
+    },
+    {
+      "day": 84,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 twelve-week review day, final weekly check-in.",
+            "Water, 2-minute stretch, write one task \u2014 then run your final weekly review.",
+            "Execute the morning sequence and do your final weekly review: water, stretch, one task, then review."
+          ],
+          "why": "Your final weekly review is the last structured reflection before the Day 90 milestone."
+        },
+        {
+          "position": 2,
+          "minutes": 7,
+          "variants": [
+            "Final weekly review: write 3 sentences \u2014 what habits are permanent, what your challenge accomplished, and what your Day 91 life looks like.",
+            "Week twelve check-in: review Days 77-84 and write your final assessment \u2014 habit automation level, challenge completion, and post-90 sustainability plan.",
+            "Spend 7 minutes reviewing your final week of notes and write: what is fully automatic, what the challenge taught you, and what changes on Day 91."
+          ],
+          "why": "The final weekly review converts the 90-day experience into a clear forward plan."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Walk 20 minutes and reflect on the single most important change you have made in 90 days \u2014 just one, the biggest one.",
+            "Complete your 20-minute walk and use the time to identify the one habit or change that has had the biggest impact on how you feel.",
+            "Walk 20 minutes and decide: of everything you have built, what one thing has changed your daily experience the most?"
+          ],
+          "why": "Identifying your highest-leverage habit ensures you protect it above all others after Day 90."
+        }
+      ]
+    },
+    {
+      "day": 85,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 5 days from Day 90.",
+            "Water, 2-minute stretch, write one priority task \u2014 Day 85.",
+            "Run your morning sequence: water, stretch, one task written."
+          ],
+          "why": "Five days from the finish \u2014 same standard as Day 1."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 last week of the stack, run it at full quality.",
+            "Meditation-journal block: 5-minute session, then 3 lines \u2014 final week, full quality.",
+            "Complete the mindfulness-journal stack: 5 minutes then 3 written lines \u2014 last 5 days, same standard."
+          ],
+          "why": "The final 5 days of the stack are no different from Day 31 \u2014 same quality, same commitment."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Complete your month-three challenge today if you haven't \u2014 this is the last viable day before the final countdown.",
+            "If your challenge is not done, do it today \u2014 5 days from Day 90, this is your last clear window.",
+            "Challenge day if it hasn't happened: execute your month-three challenge now \u2014 a 5k, hike, or class \u2014 or walk 20 minutes if it is complete."
+          ],
+          "why": "The challenge must happen before Day 90 so the milestone can celebrate completion, not intention."
+        }
+      ]
+    },
+    {
+      "day": 86,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 86.",
+            "Water, 2-minute stretch, write one task.",
+            "Execute your morning sequence: water, stretch, one priority task."
+          ],
+          "why": "Four days from the finish \u2014 the routine holds."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Meditation and journal stack \u2014 5 minutes then 3 lines.",
+            "5-minute mindfulness session followed by 3 journal lines.",
+            "Run the stack: 5-minute meditation, then 3 written lines."
+          ],
+          "why": "The mindfulness-journal stack runs through Day 90 without interruption."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and notice everything that is different about your breathing, pace, and mental state compared to your Day 1 walk.",
+            "Complete your 20-minute walk and consciously compare how you feel right now to how you felt on Day 1 \u2014 the difference is real.",
+            "Walk 20 minutes and spend the time noticing what has changed in your body and mind since the first walk 85 days ago."
+          ],
+          "why": "Noticing physical and mental change on Day 86 makes the Day 90 celebration meaningful."
+        }
+      ]
+    },
+    {
+      "day": 87,
+      "minutes_total": 16,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 3 days from Day 90.",
+            "Water, 2-minute stretch, write one priority task \u2014 Day 87.",
+            "Run your morning sequence: water, stretch, one task written."
+          ],
+          "why": "Three days from the milestone \u2014 same standard, no coasting."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 complete the stack.",
+            "Meditation-journal block: 5-minute session, then 3 journal lines.",
+            "Run the mindfulness-journal stack: 5 minutes, then 3 lines written."
+          ],
+          "why": "The stack runs at full quality through the final days."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes on your social walk with the person you invited during Day 83 \u2014 social movement to close the final week.",
+            "Complete the social walk you planned on Day 83 \u2014 20 minutes with your person, full effort.",
+            "Do your final social walk of the 90 days \u2014 the one you committed to on Day 83 \u2014 walk together for 20 minutes."
+          ],
+          "why": "Ending the program with a social walk makes the habit feel relational, not just personal \u2014 that is what makes it last."
+        }
+      ]
+    },
+    {
+      "day": 88,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 2 days from Day 90.",
+            "Water, 2-minute stretch, write one priority task \u2014 Day 88.",
+            "Execute the morning sequence: water, stretch, one task written."
+          ],
+          "why": "Two days out \u2014 the routine runs to the end."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Meditation and journal stack \u2014 5 minutes then 3 lines \u2014 two more after this.",
+            "5-minute mindfulness then 3 journal lines \u2014 two days of the stack remaining.",
+            "Run the stack: 5-minute session, then 3 written lines \u2014 second to last time."
+          ],
+          "why": "Second-to-last mindfulness-journal session \u2014 same commitment as day one."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and write in your notes when you finish: the single most important lesson from the last 88 days.",
+            "Complete your 20-minute walk and immediately write one sentence \u2014 the most important thing you learned about yourself in 90 days.",
+            "Walk 20 minutes and write your one-sentence takeaway when you finish \u2014 what do you know now that you didn't know on Day 1?"
+          ],
+          "why": "Extracting your key lesson two days before the finish ensures it informs your Day 91 forward plan."
+        }
+      ]
+    },
+    {
+      "day": 89,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 last day before the finish.",
+            "Water, 2-minute stretch, write one task \u2014 Day 89, one more day.",
+            "Run your morning sequence: water, stretch, one priority task \u2014 Day 89."
+          ],
+          "why": "Day 89 exists to protect the habit on the day most people let their guard down."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "5-minute meditation and 3 journal lines \u2014 final entry before tomorrow's milestone.",
+            "Meditation-journal stack: 5-minute session, then 3 lines \u2014 last run before Day 90.",
+            "Complete the stack: 5-minute meditation, then 3 journal lines \u2014 tomorrow is the final day."
+          ],
+          "why": "The last pre-milestone mindfulness session \u2014 do it with the same care as Day 31."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Walk 20 minutes and allow yourself to feel good about what you have built \u2014 this is earned.",
+            "Complete your second-to-last walk of the program \u2014 20 minutes, and let yourself acknowledge the work.",
+            "Walk 20 minutes on Day 89 and know that the person walking today is different from the person who walked on Day 1."
+          ],
+          "why": "Acknowledging real progress on Day 89 makes Day 90 a celebration, not just a finish line."
+        }
+      ]
+    },
+    {
+      "day": 90,
+      "minutes_total": 20,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Morning routine: water, stretch, one task \u2014 Day 90, same as Day 1, same as every day in between.",
+            "Water, 2-minute stretch, write one task \u2014 the final morning routine of the 90-day program.",
+            "Execute your morning sequence for the 90th time: water, stretch, one task \u2014 this is the proof that the habit is real."
+          ],
+          "why": "Day 90 starts exactly like Day 1 \u2014 that sameness is the whole achievement."
+        },
+        {
+          "position": 2,
+          "minutes": 7,
+          "variants": [
+            "Write your 90-day final milestone: 5 specific things you built, 2 habits you are taking into permanent life, and one sentence about who you are now that you weren't on Day 1.",
+            "90-day checkpoint: open your notes and write your complete final review \u2014 what you built, what changed, and what your health life looks like starting tomorrow.",
+            "Complete your Day 90 milestone review: read your Day 1 baseline and your current state \u2014 write 5 things that are measurably different, 2 habits you are keeping forever, and one sentence about what this 90 days proved."
+          ],
+          "why": "The 90-day review is the document you keep \u2014 it proves what is possible and guides what comes next."
+        },
+        {
+          "position": 3,
+          "minutes": 10,
+          "variants": [
+            "Take a 20-minute walk to close the 90 days \u2014 this is walk number 90, and every single one of them counted.",
+            "Complete your final walk of the program \u2014 20 minutes, same as Day 1, but a completely different body and mind doing it.",
+            "Walk 20 minutes on Day 90 and take one photo at the end \u2014 the same way you took a photo on Day 21 \u2014 and compare where you are now."
+          ],
+          "why": "Ninety consecutive days of daily movement is a genuine transformation \u2014 mark it with the walk that closes the loop."
+        }
+      ]
+    }
+  ]
+}

@@ -17,6 +17,7 @@
     "@stripe/stripe-js": "^8.8.0",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.47.10",
+    "@threely/tasks": "workspace:*",
     "@types/pdfkit": "^0.17.5",
     "bcryptjs": "^3.0.3",
     "next": "^15.1.3",

@@ -171,6 +171,9 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.47.10
         version: 2.97.0
+      '@threely/tasks':
+        specifier: workspace:*
+        version: link:../../packages/tasks
       '@types/pdfkit':
         specifier: ^0.17.5
         version: 0.17.5
@@ -236,6 +239,8 @@ importers:
       typescript:
         specifier: ^5.7.2
         version: 5.9.3
+
+  packages/tasks: {}
 
 packages:
 

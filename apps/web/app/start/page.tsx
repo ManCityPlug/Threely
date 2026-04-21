@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { loadStripe, type Stripe, type PaymentRequest } from "@stripe/stripe-js";
 import {
   Elements,
@@ -125,39 +124,34 @@ function PlanSelector({ plan, onChange }: { plan: PlanId; onChange: (p: PlanId) 
         onClick={() => onChange(id)}
         style={{
           flex: 1,
-          padding: "0.85rem 0.9rem",
-          borderRadius: 12,
+          padding: "0.5rem 0.7rem",
+          borderRadius: 10,
           border: `1.5px solid ${selected ? "#D4A843" : "rgba(255,255,255,0.1)"}`,
           background: selected ? "rgba(212,168,67,0.08)" : "rgba(255,255,255,0.02)",
           color: "var(--text)",
           cursor: "pointer",
-          textAlign: "left",
+          textAlign: "center",
           position: "relative",
           transition: "all 0.15s",
+          fontSize: "0.8rem",
+          fontWeight: 600,
+          letterSpacing: "0.02em",
         }}
       >
         {info.badge && (
           <span style={{
-            position: "absolute", top: -10, right: 10,
+            position: "absolute", top: -8, right: 8,
             background: "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)",
-            color: "#000", fontSize: "0.65rem", fontWeight: 800,
-            padding: "2px 8px", borderRadius: 10, letterSpacing: "0.04em",
+            color: "#000", fontSize: "0.58rem", fontWeight: 800,
+            padding: "1.5px 6px", borderRadius: 8, letterSpacing: "0.04em",
           }}>{info.badge}</span>
         )}
-        <div style={{ fontSize: "0.72rem", fontWeight: 700, color: "rgba(255,255,255,0.5)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 3 }}>
-          {info.label}
-        </div>
-        <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)" }}>
-          {info.priceDisplay}
-        </div>
-        <div style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.55)", marginTop: 2 }}>
-          {info.subLine}
-        </div>
+        {info.label}
       </button>
     );
   };
   return (
-    <div style={{ display: "flex", gap: 10 }}>
+    <div style={{ display: "flex", gap: 8 }}>
       {renderOption("yearly")}
       {renderOption("monthly")}
     </div>
@@ -404,6 +398,9 @@ function AccountFinalize({ preFilledEmail }: { preFilledEmail: string | null }) 
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // When the email is already registered, flip the form into sign-in mode
+  // instead of throwing. The just-paid $1 still attaches to their account.
+  const [signInMode, setSignInMode] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -413,10 +410,27 @@ function AccountFinalize({ preFilledEmail }: { preFilledEmail: string | null }) 
     setError(null);
     try {
       const supabase = getSupabase();
+      if (signInMode) {
+        const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInErr) throw new Error("Wrong password. Try again.");
+        router.replace("/dashboard?subscribed=1");
+        return;
+      }
       const { error: updErr } = await supabase.auth.updateUser({ email, password });
       if (updErr) {
         if (updErr.message?.toLowerCase().includes("already")) {
-          throw new Error("An account with this email already exists. Please sign in.");
+          // Try signing into the existing account with the password they just typed
+          const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
+          if (!signInErr) {
+            router.replace("/dashboard?subscribed=1");
+            return;
+          }
+          // Password didn't match — flip to sign-in mode and ask for existing password
+          setSignInMode(true);
+          setPassword("");
+          setError("This email already has an account. Enter your existing password to log in.");
+          setSubmitting(false);
+          return;
         }
         throw new Error(updErr.message ?? "Couldn't create account");
       }
@@ -438,10 +452,10 @@ function AccountFinalize({ preFilledEmail }: { preFilledEmail: string | null }) 
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 40, marginBottom: 12 }}>{"\u2728"}</div>
         <h1 style={{ fontSize: "clamp(1.4rem, 4vw, 1.75rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 6 }}>
-          {preFilledEmail ? "One last step" : "Create your account"}
+          {signInMode ? "Welcome back" : preFilledEmail ? "One last step" : "Create your account"}
         </h1>
         <p style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.7)" }}>
-          {preFilledEmail ? "Set a password so you can log back in." : "Save your plan with an email and password."}
+          {signInMode ? "Sign in to attach your new plan to your existing account." : preFilledEmail ? "Set a password so you can log back in." : "Save your plan with an email and password."}
         </p>
       </div>
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -458,7 +472,8 @@ function AccountFinalize({ preFilledEmail }: { preFilledEmail: string | null }) 
         )}
         <input
           type="password" value={password} onChange={(e) => setPassword(e.target.value)}
-          placeholder="Password (8+ characters)" autoComplete="new-password" required style={inputStyle}
+          placeholder={signInMode ? "Your existing password" : "Password (8+ characters)"}
+          autoComplete={signInMode ? "current-password" : "new-password"} required style={inputStyle}
         />
         {error && (
           <div style={{ padding: "0.6rem 0.8rem", borderRadius: 10, background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", fontSize: "0.82rem", color: "#fca5a5" }}>
@@ -474,7 +489,7 @@ function AccountFinalize({ preFilledEmail }: { preFilledEmail: string | null }) 
             borderRadius: 14, border: "none", cursor: submitting ? "default" : "pointer", marginTop: 4,
           }}
         >
-          {submitting ? "Creating account…" : "Finish →"}
+          {submitting ? (signInMode ? "Signing in…" : "Creating account…") : (signInMode ? "Sign in →" : "Finish →")}
         </button>
       </form>
     </div>
@@ -915,7 +930,6 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret }
   ];
   const visibleTask = category ? SAMPLE_TASKS[category] : SAMPLE_TASKS.other;
 
-  const monthlyPrice = plan === "yearly" ? "$12.99/month" : "$12.99/month";
 
   if (paymentDone) {
     return (
@@ -1025,38 +1039,9 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret }
           onSuccess={(email) => { setPayerEmail(email); setPaymentDone(true); }}
         />
 
-        {/* 4. Terms block — Bloomberg-style: clean, small, single line */}
-        <p style={{
-          textAlign: "center",
-          fontSize: "0.75rem",
-          color: "rgba(255,255,255,0.5)",
-          margin: 0,
-          letterSpacing: "-0.005em",
-          lineHeight: 1.5,
-        }}>
-          $1 today · 3-day trial · then {monthlyPrice} · cancel anytime
-        </p>
-
-        {/* 5. Plan selector — secondary, muted, below everything */}
+        {/* Plan selector — compact pills, yearly default */}
         <div style={{ marginTop: 4 }}>
-          <div style={{
-            textAlign: "center",
-            fontSize: "0.68rem",
-            color: "rgba(255,255,255,0.4)",
-            textTransform: "uppercase",
-            letterSpacing: "0.08em",
-            fontWeight: 600,
-            marginBottom: 8,
-          }}>
-            After trial
-          </div>
           <PlanSelector plan={plan} onChange={setPlan} />
-        </div>
-
-        <div style={{ textAlign: "center", marginTop: 4 }}>
-          <Link href="/login" style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.55)" }}>
-            Already have an account? <span style={{ color: "var(--text)", fontWeight: 600 }}>Sign in</span>
-          </Link>
         </div>
 
         {/* Global paywall styles — fade-in, shimmer on locked tasks, press scale */}

@@ -1,0 +1,3252 @@
+{
+  "path": "health_muscle",
+  "category": "health",
+  "display_name": "Build Muscle",
+  "goal_title_suggestions": [
+    "Build Serious Muscle in 90 Days",
+    "Get Stronger and Add Mass",
+    "Follow a Real Program and Grow"
+  ],
+  "days": [
+    {
+      "day": 1,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Download either Strong or Hevy right now and create your free account.",
+            "Open the App Store, install Strong or Hevy, and sign up in the next 2 minutes.",
+            "Pick one workout logging app \u2014 Strong or Hevy \u2014 and get it installed on your phone today."
+          ],
+          "why": "You need a log before you lift a single weight \u2014 no log means no progressive overload."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Open the r/Fitness wiki or search 'GZCLP' or 'StrongLifts 5x5' and decide which free program you'll run \u2014 write the name in your notes app.",
+            "Choose your program right now: GZCLP, StrongLifts 5x5, or r/Fitness PPL \u2014 read the overview of each and commit to one by writing its name down.",
+            "Spend 4 minutes scanning GZCLP, StrongLifts 5x5, and r/Fitness PPL, then pick one and save the program link to your notes."
+          ],
+          "why": "Program selection is the first decision \u2014 commit now so you stop browsing and start training."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Step on the scale right now, log your weight in your notes, then take 3 photos \u2014 front, side, and back \u2014 and save them to a private album labeled 'Day 1'.",
+            "Weigh yourself, write the number down, and shoot 3 starting photos (front, back, left side) \u2014 store them in a folder you'll actually keep.",
+            "Get your Day 1 baseline locked in: bodyweight on the scale, 3 photos from different angles, both saved somewhere you can compare in 90 days."
+          ],
+          "why": "Baseline data is the only way to see real progress \u2014 take it before the first workout."
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Calculate your protein target: take your bodyweight in pounds and multiply by 0.8 \u2014 write that number down as your daily gram goal.",
+            "Figure out your protein number right now: bodyweight (lbs) \u00d7 0.8 = daily grams \u2014 put it in your notes next to your Day 1 weight.",
+            "Get your protein target locked in today \u2014 bodyweight in pounds times 0.8, written somewhere you'll see it every morning."
+          ],
+          "why": "Protein is the single most important nutrition variable for muscle \u2014 know your number before you eat another meal."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Download MyFitnessPal, create your account, and log everything you've eaten today so far \u2014 even if it's just coffee.",
+            "Open MyFitnessPal, set up your profile, and enter at least one meal from today to get comfortable with the logging flow.",
+            "Install MyFitnessPal right now, create the account, and log your last full meal with actual gram amounts."
+          ],
+          "why": "Hitting protein daily requires tracking \u2014 get the tool set up before tomorrow's first full tracking day."
+        },
+        {
+          "position": 3,
+          "minutes": 7,
+          "variants": [
+            "Read your chosen program's full overview \u2014 every workout, every lift listed \u2014 then write out Week 1 Day 1's exact exercises, sets, and reps in Strong or Hevy.",
+            "Open your program (GZCLP, StrongLifts, or PPL) and manually enter your first workout session into Strong or Hevy so it's ready to go when you walk into the gym.",
+            "Map out your first training session in your workout app right now: name each exercise, set the number of sets and reps, and add the starting weights you'll use."
+          ],
+          "why": "Walking in with a plan loaded means zero wasted time \u2014 you lift instead of figuring out what to do."
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Set a repeating alarm for your workout days this week \u2014 label it with the session name (e.g., 'Push Day') so there's no deciding when you wake up.",
+            "Open your calendar and block your first 3 training sessions this week as non-negotiable appointments with the gym or home space noted.",
+            "Schedule your workouts for the next 7 days right now \u2014 specific days, specific times \u2014 and add them to your phone calendar."
+          ],
+          "why": "Scheduled workouts happen; unscheduled ones get skipped when life hits."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Estimate your TDEE using a free calculator like TDEE.cc \u2014 enter your stats and write down your maintenance calories and your +250 surplus target.",
+            "Go to TDEE.cc or a similar calculator, plug in your age, weight, height, and activity level, then note your TDEE and add 250 to get your daily calorie target.",
+            "Calculate your calorie surplus target now: use any free TDEE calculator, get your maintenance number, add 250, and save both numbers in your notes."
+          ],
+          "why": "Eating 200-300 over maintenance fuels muscle growth without unnecessary fat gain \u2014 you need the number to hit it."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Do your first real workout today using your logged program \u2014 execute every set, every rep, and log the actual weight used in Strong or Hevy before you leave.",
+            "Execute Session 1 of your chosen program right now \u2014 every exercise, every set \u2014 and log each lift's weight and reps in your tracking app as you go.",
+            "Get under the bar (or hit the floor) for your first programmed session \u2014 run it start to finish and record every set in Strong or Hevy before you're done."
+          ],
+          "why": "The first session is the hardest one to start \u2014 completing it proves the habit is real."
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log yesterday's full food intake in MyFitnessPal if you haven't already \u2014 check whether you hit your protein target.",
+            "Open MyFitnessPal and finish logging Day 3's meals \u2014 note if you hit your protein gram target or fell short.",
+            "Pull up MyFitnessPal right now and complete yesterday's food log \u2014 see how close you got to your protein number."
+          ],
+          "why": "Reviewing yesterday closes the feedback loop \u2014 you can't improve what you don't check."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Find one high-protein food you actually like that you're not eating regularly \u2014 add it to your next grocery list or order it today.",
+            "Identify one protein source you're underusing (chicken breast, Greek yogurt, cottage cheese, eggs) and add it to today's meal plan explicitly.",
+            "Pick one easy protein add-on \u2014 a shake, Greek yogurt, or extra eggs \u2014 and add it to your eating plan for today to close any protein gap."
+          ],
+          "why": "Hitting 0.8g/lb daily requires deliberate food choices, not luck."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Do your next programmed session today \u2014 hit every set, log every lift, and note if any exercise felt too light so you know to add weight next time.",
+            "Execute your second training session per your program's schedule \u2014 log it in Strong or Hevy and flag any sets where you had 3+ reps in reserve at the top.",
+            "Train today per your program \u2014 run each set, track each weight in your app, and mark any lift where the weight was clearly too easy for you."
+          ],
+          "why": "Consistency in week 1 sets the baseline for everything that follows."
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Weigh yourself this morning before eating and log the number \u2014 track it in the same notes file as Day 1.",
+            "Step on the scale first thing, no food or water yet, and write the number next to your Day 1 baseline.",
+            "Get a morning weigh-in right now and add it to your tracking notes \u2014 you're building a weekly data set, not a single number."
+          ],
+          "why": "Weekly weigh-ins reveal trends \u2014 daily fluctuations are noise, weekly averages are signal."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Log all your meals in MyFitnessPal today and make sure protein hits your target before dinner \u2014 if you're short, add a shake or high-protein snack.",
+            "Track every meal in MyFitnessPal today in real time, not at the end of the day \u2014 hit your protein number before 8pm.",
+            "Open MyFitnessPal after each meal today and log it immediately \u2014 check your running protein total at lunch and again at dinner."
+          ],
+          "why": "Same-day logging catches shortfalls while you can still fix them."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Watch one 5-min YouTube video on the primary compound lift you struggled with most in session 1, pause it, and immediately practice the cue mentioned in your next set.",
+            "Find a form tutorial under 6 minutes for your weakest lift this week, watch it fully, then write down 2 cues to apply next session.",
+            "Pick the exercise from your first two sessions that felt most awkward, find a technique video under 5 minutes for it, and write 2 specific things to fix next time."
+          ],
+          "why": "Form locked in early prevents injuries that kill programs before week 4."
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Plan your meals for tomorrow in MyFitnessPal tonight \u2014 pre-log breakfast, lunch, and dinner so hitting protein tomorrow requires no decisions.",
+            "Pre-log tomorrow's food in MyFitnessPal right now \u2014 full meals, estimated portions \u2014 so you wake up knowing exactly what to eat.",
+            "Open MyFitnessPal and build tomorrow's meal plan tonight \u2014 log everything in advance so your protein target is already guaranteed."
+          ],
+          "why": "Pre-logging eliminates the decision fatigue that causes protein shortfalls."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute your next training session today \u2014 follow the program exactly, use the weights you logged before, and record each set in Strong or Hevy.",
+            "Hit your scheduled workout today: run every set per the program, log every weight in your tracking app, and note your RPE after the hardest set.",
+            "Train today per your program \u2014 no substitutions, no skips \u2014 and update your workout log in Strong or Hevy immediately after each exercise."
+          ],
+          "why": "Three sessions in the first week locks in the habit before motivation fades."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Look up the progressive overload rule for your specific program \u2014 GZCLP, StrongLifts, or PPL \u2014 and write down exactly when and how much you add weight.",
+            "Find your program's progression rules right now (e.g., 'add 5 lbs to upper body lifts each session') and put them in your notes so you apply them automatically.",
+            "Read your program's weight progression instructions carefully and write a one-line rule for each main lift \u2014 you'll follow this rule every single session."
+          ],
+          "why": "Knowing your progression rule means you add weight confidently instead of guessing."
+        }
+      ]
+    },
+    {
+      "day": 7,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Review your workout log from the past 6 days \u2014 count how many sessions you completed vs. planned and write 'Hit X of Y sessions' in your notes.",
+            "Open Strong or Hevy and look at all sessions logged this week \u2014 note how many you completed and whether any lifts felt significantly easier than session 1.",
+            "Check your training log for the week: how many sessions done, which lifts went up, which felt hard \u2014 write a 3-line summary in your notes."
+          ],
+          "why": "Week 1 review is the first data point \u2014 track it so week 2 has something to beat."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Open MyFitnessPal and check your average daily protein for the past 5 logged days \u2014 if you're under target, identify which meal is the weakest link.",
+            "Pull your protein totals from MyFitnessPal for days 2-6, calculate the average, and write down one specific change to fix any shortfall starting tomorrow.",
+            "Review your nutrition log for this week: average protein per day, average total calories \u2014 note whether you're in the right range or need to adjust."
+          ],
+          "why": "Weekly nutrition review catches drift before it becomes a habit."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Take your week 1 progress photos \u2014 front, side, back \u2014 save them next to your Day 1 photos and note any visible difference, even if small.",
+            "Shoot your week 1 check-in photos right now (same 3 angles as Day 1), save them in your progress folder, and compare them side-by-side with Day 1.",
+            "Week 1 photo check: take 3 photos, same angles as Day 1, save them labeled 'Week 1', and write one sentence about what you see vs. the baseline."
+          ],
+          "why": "Photo comparisons are the most honest progress tracker \u2014 start the habit of weekly documentation now."
+        }
+      ]
+    },
+    {
+      "day": 8,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight this morning and check if it's within 1 lb of Day 1 \u2014 your surplus hasn't kicked in yet, that's normal.",
+            "Step on the scale, log the number, and compare to your Day 1 baseline \u2014 note the difference in your tracking file.",
+            "Morning weigh-in: record today's weight next to last week's number and calculate the difference."
+          ],
+          "why": "Week 2 weight data starts building the trend line you'll use to calibrate calories."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log your meals for today before eating anything \u2014 build the day in MyFitnessPal first, then eat what you planned.",
+            "Set up today's food log in MyFitnessPal right now, before breakfast \u2014 plan every meal to hit your protein and calorie targets.",
+            "Open MyFitnessPal and build today's eating plan from scratch before your first meal \u2014 make sure protein is distributed across at least 3 meals."
+          ],
+          "why": "Planning before eating is what separates consistent trackers from inconsistent ones."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's training session and apply your program's progression rule \u2014 if you completed all reps last session, add the prescribed weight today.",
+            "Train today per the program and move up in weight if your last session's log shows you hit all reps \u2014 progressive overload starts now.",
+            "Hit your workout today and check your log before loading the bar \u2014 if you completed all sets and reps last time, add weight per your program's rule."
+          ],
+          "why": "Week 2 is when progressive overload begins \u2014 the log tells you what to lift, not your gut."
+        }
+      ]
+    },
+    {
+      "day": 9,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log all of yesterday's food in MyFitnessPal if it's not complete \u2014 check total protein and note whether you hit your target.",
+            "Finish logging Day 8's meals in MyFitnessPal and see your protein total \u2014 mark it as 'hit' or 'missed' in your notes.",
+            "Open MyFitnessPal and complete yesterday's log \u2014 check where protein ended up and note any meal where you fell short."
+          ],
+          "why": "Closing out yesterday's log before starting today keeps your data accurate."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Identify the one meal where you consistently undershoot protein and plan a specific fix \u2014 add a Greek yogurt, extra eggs, or a protein shake to that slot today.",
+            "Look at your last 3 days of food logs and find the meal with the lowest protein \u2014 swap one food in that meal for a higher-protein option starting today.",
+            "Find your protein weak spot this week: which meal is consistently low \u2014 fix it today by adding one high-protein food to that specific meal."
+          ],
+          "why": "Fixing the one weak meal is faster than overhauling your whole diet."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Do your programmed session today \u2014 before each compound lift, do 2 warm-up sets at 50% and 70% of your working weight, then hit your logged sets.",
+            "Train today and add proper warm-up sets before your main lifts \u2014 2 sets at lighter weight to prime the movement before your working weight.",
+            "Run your workout today and include warm-up sets for every compound movement \u2014 2 sets at reduced weight before you go to your working weight from the log."
+          ],
+          "why": "Warm-up sets protect joints and improve performance on the sets that count."
+        }
+      ]
+    },
+    {
+      "day": 10,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your morning weight and note your running average for the week so far \u2014 two numbers is enough to start seeing direction.",
+            "Step on the scale, log the number, and see if your weekly average is trending up from Day 1.",
+            "Morning weigh-in: log it, add it to your notes alongside previous days, and calculate a simple 3-day average."
+          ],
+          "why": "Weight trends over days, not single readings \u2014 track it daily to see the real signal."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Log all meals in MyFitnessPal today and make sure your protein is fully distributed \u2014 at least 30g per meal, not all at dinner.",
+            "Plan today's eating so protein is spread out: 30g+ at breakfast, 30g+ at lunch, 40g+ at dinner \u2014 log it in MyFitnessPal now.",
+            "Set up today's food log with protein distributed across 3 meals \u2014 don't let dinner carry all the weight."
+          ],
+          "why": "Distributed protein intake maximizes muscle protein synthesis throughout the day."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: review your Strong or Hevy log and write down every lift where you added weight this week compared to the same lift last week.",
+            "Check your workout log today and make a list of every exercise where the weight or reps went up from Week 1 \u2014 this is your progress record.",
+            "Open your training app and compare this week's weights to last week's for each lift \u2014 write down every PR, even a 2.5 lb one."
+          ],
+          "why": "Documenting weekly PRs makes progress visible and fuels consistency."
+        }
+      ]
+    },
+    {
+      "day": 11,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal before 8am \u2014 build the full day's eating plan so protein is locked in.",
+            "Open MyFitnessPal first thing and plan all three meals for today \u2014 make sure protein hits your target before you commit to the plan.",
+            "Log your full day of eating in MyFitnessPal before you eat anything \u2014 plan first, eat second."
+          ],
+          "why": "Morning planning prevents protein shortfalls that happen when you improvise all day."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Do your workout today and focus specifically on bar path and tempo \u2014 slow the eccentric (lowering phase) to a 2-count on every rep of your main lifts.",
+            "Train today with one intentional tweak: on every compound lift, lower the weight in 2 seconds \u2014 don't drop it.",
+            "Execute today's session and add a 2-second lowering phase on bench, squat, and deadlift \u2014 control beats rushing."
+          ],
+          "why": "Controlled eccentrics build more muscle and reinforce proper movement patterns."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After your session, spend 5 minutes stretching the muscle groups you just worked \u2014 hold each stretch for 30 seconds, 2 rounds per muscle.",
+            "Post-workout: hit 4 stretches targeting today's trained muscles, 30 seconds each \u2014 do them before you leave the gym or training space.",
+            "Cool down properly after today's session: 5 minutes of targeted stretching, 30 seconds per stretch, for every major muscle you trained."
+          ],
+          "why": "Regular post-workout stretching reduces soreness and keeps training frequency high."
+        }
+      ]
+    },
+    {
+      "day": 12,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight this morning and add it to your weekly tracking \u2014 you should have at least 5-6 data points by now.",
+            "Step on the scale and log it \u2014 by end of this week you'll have enough data to calculate a true weekly average.",
+            "Morning weigh-in and log it \u2014 check if the trend is flat, up, or down compared to your Day 1 baseline."
+          ],
+          "why": "Consistent daily weighing gives you the data needed to calibrate your calorie surplus."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Identify one grocery item you need more of to hit protein daily \u2014 add it to your shopping list and buy it today or order it online.",
+            "Open your fridge, assess your protein sources, and restock whatever is running low \u2014 place the order or make the grocery run today.",
+            "Check your protein foods at home right now \u2014 if anything is low, add it to a shopping list and get it today before you're in a deficit tomorrow."
+          ],
+          "why": "Running out of protein foods is the #1 reason people miss their targets mid-week."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute your training session today, apply your progression rule for any lift you hit all reps on last time, and log everything in Strong or Hevy.",
+            "Train today per the program \u2014 check your last session's log before loading weights so you know exactly what to add \u2014 and record every set.",
+            "Hit your workout and use your log to determine every weight: if you completed all reps last session, move up per the program's rule."
+          ],
+          "why": "The log drives the program \u2014 check it before you lift, not after."
+        }
+      ]
+    },
+    {
+      "day": 13,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and close out yesterday's food log in MyFitnessPal \u2014 two 2-minute habits that keep your data clean.",
+            "Morning routine: step on scale, log it, then check if yesterday's food log is complete in MyFitnessPal.",
+            "Quick data check: log today's weight and finish any incomplete meals from yesterday in MyFitnessPal."
+          ],
+          "why": "Keeping data current takes 2 minutes and is what separates trackers from guessers."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Plan tomorrow's workout in Strong or Hevy right now \u2014 confirm the weights you'll use based on today's log and set your targets for each lift.",
+            "Open your training app and prepare tomorrow's session: check last time's weights, apply the progression rule where needed, and set the session up.",
+            "Set up tomorrow's workout in your logging app tonight \u2014 plug in the weights based on your last session so there's zero friction when you train."
+          ],
+          "why": "Prepared sessions remove the mental overhead that leads to sloppy training."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Take a rest-day walk for at least 10 minutes and use the time to listen to one podcast episode about training or nutrition \u2014 no screens, just audio.",
+            "Active recovery today: 10-minute walk while listening to one fitness or nutrition podcast \u2014 absorb one actionable idea.",
+            "Rest day movement: get outside for a 10-minute walk and put on a training or nutrition podcast \u2014 low effort, high return."
+          ],
+          "why": "Active recovery keeps blood flowing and keeps your mindset in the game on rest days."
+        }
+      ]
+    },
+    {
+      "day": 14,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Review your training log for the full past 2 weeks \u2014 list every lift and note the starting weight vs. current weight for each.",
+            "Open Strong or Hevy and compare Week 1 weights to Week 2 weights for every lift \u2014 write 'up', 'same', or 'down' next to each exercise.",
+            "Two-week training review: pull up your log, identify every lift where weight increased, and write the total added pounds for your top 3 lifts."
+          ],
+          "why": "Two weeks of data reveals which lifts are progressing and which need attention."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Check your 2-week average protein in MyFitnessPal \u2014 calculate the daily average, compare to your target, and write one specific adjustment for week 3.",
+            "Pull your nutrition data from the past 14 days in MyFitnessPal \u2014 what's your average daily protein? What's your average calorie total? Write both numbers down.",
+            "Two-week nutrition audit: look at every logged day in MyFitnessPal, find your average daily protein and calories, and rate yourself: on track, above, or below target."
+          ],
+          "why": "Two weeks is enough data to see if your nutrition plan is actually working."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Take your 2-week progress photos \u2014 front, side, back \u2014 compare them to Day 1 and Week 1, then weigh yourself and write whether your weight trend is pointing up.",
+            "Week 2 check-in: photos from all 3 angles, morning weigh-in, and a 3-sentence written summary of what's working and what needs to change in week 3.",
+            "Full 2-week assessment: take progress photos, log your weight, compare to your Day 1 baseline, and write one concrete adjustment you're making going into week 3."
+          ],
+          "why": "Every two weeks you stop and assess \u2014 this is how programs improve instead of stagnating."
+        }
+      ]
+    },
+    {
+      "day": 15,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and note whether your 2-week average trend is moving in the right direction \u2014 up slightly for muscle gain.",
+            "Step on the scale, record the number, and see if your running average is climbing at roughly 0.5 lb per week.",
+            "Morning weigh-in and log it \u2014 by now you should be seeing the start of an upward trend if your calories are dialed in."
+          ],
+          "why": "0.5-1 lb per week is the target gain rate \u2014 your scale data tells you if calories are right."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Adjust your calorie target if your 2-week trend shows less than 0.5 lb gained \u2014 add 100-150 calories per day and update your MyFitnessPal goal.",
+            "Based on your 2-week weigh-in data, decide if you need to eat more \u2014 if you've gained less than 0.5 lb, bump daily calories by 150 and log the new target.",
+            "Do a calorie check: if your weight hasn't moved up in 2 weeks, increase your daily food intake by 150 calories and update your MyFitnessPal settings now."
+          ],
+          "why": "Calories need active management \u2014 the scale tells you whether to eat more or hold."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's training session, apply progression on every lift where you hit all reps last time, and log every set immediately after completing it.",
+            "Train today and check your log before each exercise \u2014 anywhere you hit all reps last session, add the prescribed weight today.",
+            "Hit your session today, use your log as your guide for weights, and apply progression on any lift that qualifies per your program's rule."
+          ],
+          "why": "Week 3 is when progressive overload starts to feel real \u2014 your weights should be meaningfully higher than Day 1."
+        }
+      ]
+    },
+    {
+      "day": 16,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Pre-log today's full menu in MyFitnessPal before eating \u2014 make sure protein hits your target and calories are in surplus range.",
+            "Build today's meal plan in MyFitnessPal now, before breakfast \u2014 every meal, every gram \u2014 so hitting your numbers is automatic.",
+            "Open MyFitnessPal and pre-load today's eating plan with all three meals before you eat anything \u2014 lock in the protein target first."
+          ],
+          "why": "Pre-planning food is a skill \u2014 the faster you build it, the easier every day gets."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Do your workout today and time your rest periods \u2014 use a timer app to keep rests at 2-3 minutes between compound sets and 60-90 seconds between accessory sets.",
+            "Train today and enforce your rest periods with a phone timer \u2014 2-3 minutes after squats and deadlifts, 90 seconds after accessories.",
+            "Use a timer during today's session: 2 minutes rest after compound lifts, 90 seconds after isolation work \u2014 stick to it the whole session."
+          ],
+          "why": "Consistent rest periods control training density and keep volume manageable."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After your session, write a 3-sentence training note in your phone: what felt strong, what felt off, and one thing to focus on next session.",
+            "Post-workout log entry: open your notes app and write what went well today, what struggled, and your specific goal for next session.",
+            "Before you leave the gym, write a quick session debrief \u2014 3 sentences max: wins, struggles, and one cue to carry into the next workout."
+          ],
+          "why": "Session notes create a feedback loop that makes every workout smarter than the last."
+        }
+      ]
+    },
+    {
+      "day": 17,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and check if you're averaging 0.5-1 lb per week gain \u2014 if you gained more than 1 lb this week, consider holding calories steady.",
+            "Morning scale check and log \u2014 compare to your week 2 average and see if the trend is in the 0.5-1 lb per week range.",
+            "Step on scale, record it, and evaluate: too fast means too many calories, too slow means too few \u2014 what does your trend say?"
+          ],
+          "why": "Gaining faster than 1 lb/week adds unnecessary fat \u2014 the scale is your feedback system."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Identify the compound lift you're weakest on right now and watch one specific technique video for it \u2014 under 5 minutes, save one cue to your notes.",
+            "Find your weakest main lift from your log this week, search for a 3-5 minute form tutorial, and write one thing to change in your next session.",
+            "Pick the lift where you've progressed slowest, find a short technique video for it, and add one form cue to your session notes for next time."
+          ],
+          "why": "Technique is a hidden lever for progression \u2014 better form unlocks weight you couldn't lift before."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: meal prep one high-protein food for the next 3 days \u2014 cook a batch of chicken, hard-boil a dozen eggs, or prep Greek yogurt portions.",
+            "Active recovery and protein prep: cook or portion out one high-protein food source today that covers 3 days of meals.",
+            "Rest day food prep: spend 10 minutes batch cooking or portioning one protein source \u2014 eggs, chicken, tuna packets \u2014 so you're covered through Wednesday."
+          ],
+          "why": "Prepped protein means you hit your target even on the laziest days."
+        }
+      ]
+    },
+    {
+      "day": 18,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal and confirm your protein target is achievable before you eat \u2014 adjust if needed.",
+            "Open MyFitnessPal and plan today's food first \u2014 every meal pre-logged before you eat the first bite.",
+            "Build today's food plan in MyFitnessPal right now so your protein goal is locked in from the start."
+          ],
+          "why": "Day 18 pre-logging should feel automatic \u2014 if it doesn't, make it a non-negotiable morning task."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute today's training session with the technique cue you wrote down yesterday \u2014 apply it on every rep of the lift you targeted.",
+            "Train today and actively apply the form cue you identified for your weak lift \u2014 think about it on every single rep, not just the first.",
+            "Use today's session to implement the technique adjustment from your notes \u2014 apply the cue on every rep and note whether it changes how the lift feels."
+          ],
+          "why": "Deliberate practice of one cue at a time is how technique improves."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Log every set of today's workout in Strong or Hevy in real time \u2014 don't wait until after the session to enter weights.",
+            "Record each set immediately after completing it today \u2014 open the app between sets and log weight, reps, and notes before moving on.",
+            "Live-log your workout today: enter each set's weight and reps into Strong or Hevy the moment you finish the set, not at the end."
+          ],
+          "why": "Real-time logging is more accurate and keeps you accountable between sets."
+        }
+      ]
+    },
+    {
+      "day": 19,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and track your weekly average \u2014 are you hitting the 0.5-1 lb per week gain target?",
+            "Morning weigh-in: log the number and calculate your running weekly average for this week.",
+            "Step on scale, record it, and compare to yesterday \u2014 this week's average should tell you whether to eat more, less, or stay."
+          ],
+          "why": "Frequent weighing combined with weekly averaging gives you the most accurate trend signal."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Review the past 3 sessions in your training log \u2014 identify any lift that hasn't progressed in 2+ sessions and think about why.",
+            "Open Strong or Hevy and look at your last 3 workouts \u2014 flag any exercise where weight or reps have stalled for 2 sessions in a row.",
+            "Check your training log for stalls: find any lift that hasn't gone up in 2 sessions and write a one-line theory for why \u2014 sleep, calories, technique?"
+          ],
+          "why": "Catching stalls early lets you address them before they become frustrating plateaus."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Do your programmed session today and on the lift where you've stalled, attempt one more rep than last time before adding weight.",
+            "Train today and specifically push your stalled lift \u2014 try to beat your last reps by 1 before moving to heavier weight.",
+            "Execute today's workout and test your stalled lift: get one extra rep at your current weight before deciding whether to increase."
+          ],
+          "why": "Squeezing every rep before adding weight ensures you're truly ready for progression."
+        }
+      ]
+    },
+    {
+      "day": 20,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and do a quick gut check \u2014 how is sleep this week? Under 7 hours is the most common cause of stalled lifts.",
+            "Morning weigh-in: log it, then honestly rate your sleep quality this week from 1-5 in your notes.",
+            "Step on scale and log it \u2014 then write down how many hours you slept last night, because sleep drives 80% of muscle recovery."
+          ],
+          "why": "Sleep is a training variable \u2014 tracking it helps explain weight and strength fluctuations."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Set a consistent bedtime alarm for the next 7 days \u2014 pick a time that gives you 7.5-8 hours and stick to it without exceptions.",
+            "Establish a bedtime right now: pick a time, set a recurring alarm, and commit to it for the next week \u2014 sleep is recovery.",
+            "Add a 'time to sleep' alarm to your phone for the next 7 nights \u2014 7.5-8 hours before your wake time \u2014 and treat it like a training session."
+          ],
+          "why": "Consistent sleep timing improves recovery, strength output, and muscle growth."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: go for a 15-minute walk, drink an extra liter of water, and make sure dinner tonight hits at least 40g of protein.",
+            "Active recovery: 15-minute walk, full water intake for the day, and a high-protein dinner \u2014 check all 3 boxes before bed.",
+            "Rest day checklist: walk 15 minutes, hit your daily water target, and eat at least 40g of protein at dinner \u2014 log all three in your notes."
+          ],
+          "why": "Recovery days done right accelerate gains \u2014 they're not optional rest, they're active preparation."
+        }
+      ]
+    },
+    {
+      "day": 21,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Three-week review: open your training log and count how many total sessions you've completed \u2014 write 'X of Y planned sessions done' in your notes.",
+            "Log your morning weight, then do a 3-week audit: how many workouts completed, how many missed, and what's your excuse for any misses?",
+            "Pull up your workout app and count your sessions for weeks 1-3 \u2014 write the number and compare it to your planned schedule."
+          ],
+          "why": "Session completion rate is the most honest metric of consistency in the first month."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Take your 3-week progress photos \u2014 front, side, back \u2014 compare them to Day 1 and write 3 sentences about what you see changing.",
+            "Week 3 photo check: shoot all 3 angles, put them next to Day 1 photos, and write down any visible change in shape, fullness, or definition.",
+            "3-week check-in photos from the same 3 angles as Day 1, saved and labeled 'Week 3' \u2014 write one honest sentence about the visual progress."
+          ],
+          "why": "Three weeks is when the first subtle visual changes begin \u2014 document them before they grow and you forget the starting point."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Review your Day 1 starting weights in Strong or Hevy and compare them to today's \u2014 write down the total weight added across your top 4 lifts in 3 weeks.",
+            "Open your training log and pull your week 1 Day 1 weights for bench, squat, deadlift, and overhead press \u2014 how much have you added in 3 weeks? Write it out.",
+            "Strength progress check: find the starting weight for each of your main lifts and calculate how many pounds you've added in 21 days \u2014 list each lift."
+          ],
+          "why": "Tracking strength numbers is more motivating than scale weight \u2014 it shows the program is working."
+        }
+      ]
+    },
+    {
+      "day": 22,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and compare it to your Day 1 baseline \u2014 after 3 weeks, you should be up 1-3 lbs if your calories are right.",
+            "Morning weigh-in: log it and calculate the difference from your Day 1 weight recorded 3 weeks ago.",
+            "Step on scale and record it \u2014 compare to Day 1 and note whether you're in the 1-3 lb gain range after 3 weeks."
+          ],
+          "why": "Three weeks in, your weight trend should show a clear direction \u2014 up by 1-3 lbs is ideal progress."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal and specifically plan a pre-workout meal with 30-40g of protein 1-2 hours before training.",
+            "Build today's food plan and schedule a pre-workout meal: 30-40g protein, some carbs, 1.5 hours before your session \u2014 log it now.",
+            "Set up today's nutrition in MyFitnessPal and include a proper pre-workout meal \u2014 protein + carbs, logged 1-2 hours before you train."
+          ],
+          "why": "Pre-workout nutrition improves performance and reduces muscle breakdown during training."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's training session and try to beat your Day 10 rep count by at least 2 reps on your primary lift \u2014 check your log for that number.",
+            "Train today and specifically challenge yourself on the main lift \u2014 reference your Day 10 log and add 2 more reps or 5 more pounds compared to that session.",
+            "Hit your workout today with a specific target: beat your Day 10 performance on your strongest compound lift \u2014 more weight or more reps, not both."
+          ],
+          "why": "Callbacking to Day 10 gives you a concrete benchmark that reveals 12 days of real progress."
+        }
+      ]
+    },
+    {
+      "day": 23,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Meal prep today: cook a batch of protein for the next 2-3 days \u2014 chicken, ground turkey, or eggs \u2014 and portion it into containers.",
+            "Spend 10 minutes prepping a protein source you can grab over the next 3 days \u2014 batch cook now so hitting your target is effortless.",
+            "Batch prep one protein food right now \u2014 cook it, portion it, refrigerate it \u2014 so 3 days of protein isn't a daily decision."
+          ],
+          "why": "Prepped food removes the friction that causes people to miss their protein targets mid-week."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Today's session: after your final set of each compound lift, write your RPE (rate of perceived exertion, 1-10) in Strong or Hevy's notes field.",
+            "Train today and add an RPE note to every compound lift after its final set \u2014 this data helps you calibrate intensity going forward.",
+            "Execute your workout and log your effort level (RPE 1-10) for each main lift's final set \u2014 you'll use this data to know when to push harder."
+          ],
+          "why": "RPE data reveals when you're under-training (consistently RPE 6) or overreaching (consistently RPE 10)."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After training, log your full post-workout meal in MyFitnessPal \u2014 at least 30-40g protein within 30 minutes of finishing your session.",
+            "Post-workout nutrition: eat and log 30-40g protein within 30 minutes of finishing today's session \u2014 write it in MyFitnessPal immediately.",
+            "Close out today's training with a logged post-workout meal: 30g+ protein, logged in MyFitnessPal before you shower."
+          ],
+          "why": "Post-workout protein accelerates recovery \u2014 log it to make the habit stick."
+        }
+      ]
+    },
+    {
+      "day": 24,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and check your weekly average \u2014 if it's flat for 2 consecutive weeks, your calories need to go up by 150.",
+            "Morning scale check and log \u2014 has your weight trend stalled for more than 10 days? If so, increase daily calories starting today.",
+            "Weigh in and evaluate: two weeks with no upward movement on the scale means bump calories 150 per day \u2014 what does your trend show?"
+          ],
+          "why": "A flat scale trend means your body has adapted \u2014 more calories are required to drive growth."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Find a new high-protein recipe online \u2014 something that uses an ingredient you already have \u2014 and save it to cook this week.",
+            "Search 'high protein meal 40g+' and pick one recipe you can make with ingredients you already own \u2014 bookmark or screenshot it.",
+            "Expand your protein menu: find one new recipe with 40g+ protein per serving, save it, and plan to make it in the next 3 days."
+          ],
+          "why": "Food variety keeps tracking sustainable long-term \u2014 eating the same 3 meals causes compliance to break down."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: take a 15-minute walk and review your workout log \u2014 pick the one lift where your numbers have grown the most and screenshot it.",
+            "Active recovery: 15-minute walk plus 5 minutes reviewing your training log \u2014 identify your biggest strength gain so far and write the numbers down.",
+            "Rest day: do 15 minutes of light movement and spend 5 minutes in your training app looking at your best progression \u2014 screenshot the chart."
+          ],
+          "why": "Seeing your fastest-progressing lift keeps motivation high during recovery days."
+        }
+      ]
+    },
+    {
+      "day": 25,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Pre-log today's full meals in MyFitnessPal \u2014 include your pre-workout and post-workout nutrition in the plan.",
+            "Build today's eating schedule in MyFitnessPal: breakfast, pre-workout meal, post-workout protein, dinner \u2014 all logged before you start eating.",
+            "Set up today's food log now: pre-workout meal, post-workout protein, and two other meals \u2014 make sure protein is distributed across all of them."
+          ],
+          "why": "Day 25 nutrition planning should be a locked routine, not a daily negotiation."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute today's session and on your biggest compound lift, try to hit a weight you've never lifted before \u2014 even if it's 5 lbs more than last time.",
+            "Train today with one goal: set a personal record on your primary lift, even by a single rep or 2.5 lbs \u2014 log it in Strong or Hevy as a PR.",
+            "Hit your workout today and chase a small PR on your main compound movement \u2014 1 more rep or 5 more pounds than your previous best."
+          ],
+          "why": "Small PRs compound \u2014 setting one every week adds up to massive strength gains by day 90."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After today's session, look up 'compound lift accessory exercises' for your weakest muscle group and write down 2 accessory movements to add later.",
+            "Post-workout: identify your physically weakest muscle group from today's session and research 2 accessory exercises that target it \u2014 save them for week 5.",
+            "Train, then research: after your session, find 2 accessory exercises for the muscle that felt weakest today \u2014 write them in your notes for future use."
+          ],
+          "why": "Accessory work planned now is ready to add in week 5 when the program calls for it."
+        }
+      ]
+    },
+    {
+      "day": 26,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and note any soreness \u2014 excessive soreness means recovery isn't keeping up, which kills progressive overload.",
+            "Morning weigh-in: log the number and rate your soreness from yesterday's training on a 1-5 scale in your notes.",
+            "Step on scale, record it, and check in on how your body feels \u2014 write 'fresh', 'moderate', or 'wrecked' next to today's weight."
+          ],
+          "why": "Soreness tracking tells you if recovery (sleep, protein, calories) is adequate for the training volume."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log meals for today and bump protein by 5-10g above target \u2014 slightly higher protein on heavy training days accelerates recovery.",
+            "Add an extra 5-10g of protein to today's food plan in MyFitnessPal \u2014 a small upgrade on training days that adds up over the week.",
+            "Build today's meal plan with a slight protein bump \u2014 add one extra protein serving to your usual plan and log it in MyFitnessPal."
+          ],
+          "why": "Slightly higher protein on training days provides extra amino acids when muscles need them most."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Today's session: warmup properly, then focus on full range of motion on every rep \u2014 touch chest on bench, squat to parallel or below, full lockout on deadlift.",
+            "Train today with a full range of motion focus \u2014 partial reps don't build as much muscle, so commit to the full movement on every single rep.",
+            "Execute your workout and be strict about ROM: full depth on squats, chest touch on bench, lockout on press and deadlift \u2014 no shortcuts."
+          ],
+          "why": "Full range of motion builds more muscle than partial reps \u2014 it's free gains you're leaving on the table if you skip it."
+        }
+      ]
+    },
+    {
+      "day": 27,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and check this week's trend \u2014 if you've gained more than 1 lb this week alone, reduce calories by 100 tomorrow.",
+            "Morning weigh-in: log it and compare to your Monday weight \u2014 too fast a gain means cut back slightly, flat means add more.",
+            "Weigh in and evaluate the week's trend: 0.5-1 lb total gain for the week is the target \u2014 adjust calories if you're outside that range."
+          ],
+          "why": "Active calorie management keeps lean gains on track \u2014 don't set and forget your surplus."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Write down your 5 most-eaten high-protein foods this week in your notes \u2014 these are your protein staples and you should always have them stocked.",
+            "Make a list of the protein foods you've actually eaten in the past 7 days \u2014 identify your top 5 and make sure they're on your next grocery run.",
+            "Review your MyFitnessPal log for this week and find the 5 foods contributing most to your protein total \u2014 note them as your core protein sources."
+          ],
+          "why": "Knowing your protein staples makes meal prep automatic and shopping efficient."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: do 10 minutes of mobility work focused on your hips and shoulders \u2014 search 'hip flexor stretch' and 'shoulder mobility routine' and do both.",
+            "Active recovery: spend 10 minutes on mobility \u2014 hip flexors, thoracic spine, and shoulder capsule \u2014 using a short YouTube routine.",
+            "Mobility work today: 10 minutes targeting your tightest areas from training \u2014 hips if you squat, shoulders if you press \u2014 find a quick routine and do it."
+          ],
+          "why": "Mobility work on rest days prevents tightness that degrades technique on main lifts."
+        }
+      ]
+    },
+    {
+      "day": 28,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Four-week training review: open your log and list how many sessions you completed in each of the 4 weeks \u2014 note any week with fewer than planned.",
+            "Month 1 review: pull up Strong or Hevy, count sessions per week for all 4 weeks, and write your total sessions completed vs. planned.",
+            "End of week 4: count your completed training sessions across all 4 weeks and calculate your consistency percentage \u2014 sessions done divided by sessions planned."
+          ],
+          "why": "Month 1 consistency data is the clearest predictor of whether you'll still be training at day 90."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Take your 4-week progress photos \u2014 same 3 angles \u2014 and line them up next to Day 1, Week 1, and Week 2 photos to see the full progression.",
+            "Week 4 photo check: shoot all 3 angles, put them in your progress folder, and compare the full timeline from Day 1 \u2014 write one observation about each angle.",
+            "Shoot your 4-week progress photos from all 3 angles, compare them to your Day 1 baseline, and write a 3-sentence assessment of visible changes."
+          ],
+          "why": "Monthly photo comparisons reveal progress that daily mirrors completely miss."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Month 1 strength audit: look up your starting weights for bench, squat, deadlift, and overhead press from week 1 and list the current weights \u2014 calculate total added pounds.",
+            "Pull your Day 1 starting weights for every main lift from your log and compare them to your most recent session \u2014 write the progression for each exercise.",
+            "Strength progress report for month 1: find your first session's weights and today's weights for every main compound lift \u2014 calculate and record the gains."
+          ],
+          "why": "One month of strength data shows you whether the program is working and whether progressive overload has been real."
+        }
+      ]
+    },
+    {
+      "day": 29,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and compare to your 4-week average \u2014 you should be 2-4 lbs above Day 1 if calories and training have been consistent.",
+            "Morning weigh-in: log it and calculate your total weight gain since Day 1 \u2014 the target is 2-4 lbs in the first month.",
+            "Step on scale and record it \u2014 4 weeks in, your weight should be 2-4 lbs above your Day 1 number if the program is working."
+          ],
+          "why": "2-4 lbs in the first month is healthy lean mass gain \u2014 more than that is mostly fat, less means calories need adjusting."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Set your nutrition targets for month 2 in MyFitnessPal \u2014 adjust protein goal if your weight has changed by more than 3 lbs (recalculate from your current weight).",
+            "Update your protein target for month 2: recalculate bodyweight \u00d7 0.8 using your current weight and adjust your MyFitnessPal goal if it's changed.",
+            "Recalibrate your nutrition targets: step on scale, multiply current weight by 0.8 for protein grams, and update MyFitnessPal to reflect month 2 targets."
+          ],
+          "why": "As your bodyweight increases, your protein target should increase with it."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Do your last session of month 1 \u2014 make it count by attempting a PR on your best lift before you walk out.",
+            "Train today and chase a personal record on your top compound lift \u2014 set a meaningful number to beat heading into month 2.",
+            "Close out month 1 with a strong session and at least one attempted PR \u2014 log it in Strong or Hevy with a 'Month 1 Final' note."
+          ],
+          "why": "A strong final session of the month builds momentum and gives you a clear benchmark heading into month 2."
+        }
+      ]
+    },
+    {
+      "day": 30,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Month 1 milestone: log your weight, take your photos, and write your 3 most significant wins from the past 30 days in your notes.",
+            "Day 30 checkpoint: morning weigh-in, 3 progress photos from all angles, and a written list of your top 3 achievements this month.",
+            "30-day mark: document your current state \u2014 weight, photos, and a written record of the 3 things that went best \u2014 before starting month 2."
+          ],
+          "why": "Documenting month 1 achievements locks in the progress and sets the bar for month 2."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Write your month 2 intention in your notes: one specific strength goal, one specific nutrition goal, and one training habit to add or fix.",
+            "Set 3 month 2 targets right now \u2014 a specific lift to PR, a weekly protein hit rate goal, and one recovery habit to lock in \u2014 write them somewhere you'll see them.",
+            "Before month 2 begins, define your 3 targets: what weight you want to hit on your main lift by day 60, your average weekly protein target, and one habit to build."
+          ],
+          "why": "Written goals for month 2 replace vague motivation with concrete targets that drive decisions."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Calculate your consistency score for month 1: sessions completed \u00f7 sessions planned \u00d7 100 \u2014 and set a target of equal or higher for month 2, written in your notes.",
+            "Month 1 final review: consistency rate, weight trend, strength progress on your top 4 lifts \u2014 write a 5-sentence summary and set one specific improvement for month 2.",
+            "Day 30 full assessment: compile your session count, weight change, protein hit rate, and strength gains into one written summary \u2014 this is your month 1 report card."
+          ],
+          "why": "A full month 1 audit gives you the data to make month 2 more effective \u2014 the score improves every month you do this."
+        }
+      ]
+    },
+    {
+      "day": 31,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Month 2 starts today \u2014 log your weight, open your workout app, and confirm your program's next session is ready to go.",
+            "First day of month 2: morning weigh-in, log it, then open Strong or Hevy and verify your next session is set up with correct weights.",
+            "Kick off month 2 right: log your weight, pull up your training app, and confirm the weights in your next session reflect last month's progress."
+          ],
+          "why": "Month 2 is about progressive overload \u2014 every session's weights must be informed by the log."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Add one accessory exercise to today's session \u2014 choose from the 2 you wrote down on Day 25 \u2014 and do 3 sets of 10-12 reps after your main lifts.",
+            "Incorporate your first accessory movement today: pick one from your Day 25 notes, add 3 sets of 10-12 after your compound work, and log it.",
+            "Today's workout gets an upgrade: add one of the accessory exercises from your notes (from Day 25) after your main lifts \u2014 3 sets, 10-12 reps, logged."
+          ],
+          "why": "Month 2 adds accessory work to target weak points \u2014 start with one exercise before layering more."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute your full session with the new accessory included \u2014 log everything including the accessory sets and note how the new movement felt.",
+            "Run your complete workout today \u2014 main compounds plus the accessory you added \u2014 and record every set in Strong or Hevy including the new exercise.",
+            "Train today per the program plus your new accessory movement \u2014 log it all and write one sentence about how the accessory targeted your weak point."
+          ],
+          "why": "Adding accessory volume strategically is how month 2 builds on month 1's foundation."
+        }
+      ]
+    },
+    {
+      "day": 32,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and check this week's calorie average in MyFitnessPal \u2014 is it landing in your target surplus range?",
+            "Morning weigh-in and a quick check of this week's logged calories in MyFitnessPal \u2014 on target, high, or low?",
+            "Step on scale, record it, then open MyFitnessPal and verify your calorie average for the week so far."
+          ],
+          "why": "Calorie tracking drift happens slowly \u2014 weekly checks catch it before it derails progress."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Take your monthly measurements today: arms, chest, and waist \u2014 write the numbers in your notes next to your Day 1 measurements.",
+            "Pull out a tape measure and record your arm (flexed), chest, and waist circumferences \u2014 log them next to your month 1 baseline numbers.",
+            "Monthly body measurement check: arms flexed, chest at nipple line, waist at navel \u2014 write all three numbers and compare to your starting point."
+          ],
+          "why": "Tape measurements capture muscle growth that scale weight alone can't show."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: spend 6 minutes reading your chosen program's FAQ or troubleshooting section for tips on breaking plateaus \u2014 write one new strategy down.",
+            "Active recovery: review your program's documentation for plateau-busting techniques \u2014 note one method you haven't tried and save it for when you need it.",
+            "Rest day reading: find your program's advice on stalled lifts \u2014 read it, write down one technique to deploy if a lift stops progressing for 3 sessions."
+          ],
+          "why": "Knowing plateau strategies before you need them means faster fixes when stalls happen."
+        }
+      ]
+    },
+    {
+      "day": 33,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal and make sure protein is front-loaded \u2014 at least 30g at breakfast.",
+            "Log today's food plan before eating \u2014 specifically ensure breakfast has 30g+ protein so you start the day ahead.",
+            "Build today's meals in MyFitnessPal now and put 30g of protein in breakfast \u2014 front-loading protein is easier than chasing it at night."
+          ],
+          "why": "Front-loading protein makes hitting daily targets almost automatic."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute today's session and on every compound lift, add weight per your program's progression rule \u2014 no skipping the increase if you hit all reps.",
+            "Train today and be disciplined about adding weight where the program calls for it \u2014 check your log before each lift and apply the rule.",
+            "Hit your workout and use your log to drive every weight decision \u2014 if last session shows completed reps, today you add weight. No exceptions."
+          ],
+          "why": "Month 2 progressive overload is non-negotiable \u2014 the rule exists so you don't talk yourself out of adding weight."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After training, write a quick progress note comparing today's weights to your Day 1 starting weights for those same lifts \u2014 calculate total pounds added.",
+            "Post-session: open your notes and calculate how much total weight you've added across your main lifts since Day 1 \u2014 write it out lift by lift.",
+            "After your session, do a quick audit: your day 1 weight vs. today's weight on bench, squat, deadlift, press \u2014 list the gains for each."
+          ],
+          "why": "Tracking cumulative strength gains makes the work feel worthwhile and drives continued effort."
+        }
+      ]
+    },
+    {
+      "day": 34,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log your weight and check your weekly average \u2014 if flat for the past 2 weeks, bump daily calories by 150 starting today.",
+            "Morning weigh-in: compare your weekly average to the previous week \u2014 no movement means add 150 calories to your daily target.",
+            "Weigh in, log it, and evaluate the trend: two flat weeks means your body has adapted and needs more fuel \u2014 adjust calories upward if that's the case."
+          ],
+          "why": "Flat weight for 2 weeks means your metabolism has caught up \u2014 add calories to restart progress."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Film a 10-second video of your squat from the side \u2014 watch it and note one thing that looks different from proper form you've seen in tutorials.",
+            "Record a short clip of yourself doing 3 squats from a side angle \u2014 watch it back and write down one form issue to fix next session.",
+            "Set up your phone to record your squat from the side, do 3 reps, then watch it and identify one technical issue to address."
+          ],
+          "why": "Form video check in month 2 catches habits that feel right but look wrong \u2014 fix them before they become ingrained."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Run your full training session today and apply the form correction you identified from the video \u2014 focus on that cue on every rep of every squat set.",
+            "Train today with your squat form fix as the priority \u2014 apply the correction from your video review on every single rep and note whether it changes how it feels.",
+            "Execute today's workout with your video-identified form cue as the main focus \u2014 apply it deliberately on every squat rep and log your observation after."
+          ],
+          "why": "Deliberate technique work during the session locks in corrections faster than passive awareness."
+        }
+      ]
+    },
+    {
+      "day": 35,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Week 5 review: open your training log and count this week's sessions \u2014 also list the 3 lifts where weight went up this week.",
+            "Five-week mark: review your workout log and note which compound lifts progressed this week and which stayed flat.",
+            "Weekly training review: pull up Strong or Hevy and identify every lift where you added weight or reps this week vs. last week."
+          ],
+          "why": "Weekly lift-by-lift review catches stalls while you can still address them before they compound."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Take your 5-week progress photos \u2014 3 angles \u2014 and line them up with Week 4 and Day 1 to see the full progression arc.",
+            "Week 5 photo check: shoot front, side, and back, save them, and compare the full sequence from Day 1 through today.",
+            "Shoot your 5-week photos from all 3 angles and write one sentence per angle about visible change compared to your Day 1 baseline."
+          ],
+          "why": "Photo comparisons at 5 weeks reveal the real changes that mirrors and scale alone can't show."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Review this week's nutrition data in MyFitnessPal: average protein, average calories, and days you hit or missed protein target \u2014 write a 3-line summary.",
+            "Pull your week 5 nutrition data from MyFitnessPal \u2014 daily protein averages, calorie averages \u2014 and rate this week compared to week 4.",
+            "Nutrition audit for week 5: check every logged day, calculate average protein and calories, and identify the one day or meal where you consistently fall short."
+          ],
+          "why": "Five weeks of data reveals patterns \u2014 both good habits to reinforce and bad ones to fix."
+        }
+      ]
+    },
+    {
+      "day": 36,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and compare to last week's average \u2014 you should be up 0.5-1 lb per week for clean lean gains.",
+            "Morning weigh-in: is the weekly trend still in the 0.5-1 lb range? Log it and assess.",
+            "Step on scale, log it, and check the trend \u2014 0.5-1 lb per week is the target, more means cut back calories slightly."
+          ],
+          "why": "Maintaining the right gain rate prevents excessive fat accumulation while building muscle."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Film a 10-second video of your bench press from the side \u2014 watch it and note whether your bar path is straight, your arch is consistent, and your elbows are at the right angle.",
+            "Record 3 reps of your bench from a side angle \u2014 watch the clip and identify one technical issue compared to your understanding of proper form.",
+            "Set up your phone to record your bench press, shoot 3 reps, watch the video, and write one specific form cue to apply next session."
+          ],
+          "why": "Bench form video in week 5 catches bar path and elbow angle issues before they limit your max."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's full training session and add your second accessory exercise \u2014 choose from your Day 25 notes and add 3 sets of 10-12 after your compounds.",
+            "Train today and introduce the second accessory exercise from your list \u2014 3 sets of 10-12 reps, logged in Strong or Hevy after the main work.",
+            "Add your second accessory movement to today's session \u2014 pick it from your notes, do 3 sets of 10-12 after compounds, and log it."
+          ],
+          "why": "Progressive volume increase through accessories builds the detail and weak-point strength that compounds alone can't reach."
+        }
+      ]
+    },
+    {
+      "day": 37,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and note your sleep hours last night \u2014 if under 7 hours, prioritize an earlier bedtime tonight.",
+            "Morning weigh-in: log the number and check last night's sleep \u2014 was it 7+ hours? Note it in your tracking log.",
+            "Step on scale, record it, and honestly note how many hours you slept \u2014 sleep debt shows up as flat strength and slow recovery."
+          ],
+          "why": "Sleep is the most underrated muscle-building variable \u2014 tracking it reveals its impact on training quality."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal, including a pre-workout and post-workout meal, and confirm protein hits your target.",
+            "Plan today's eating in MyFitnessPal with specific attention to the meals around your training window \u2014 pre and post-workout logged.",
+            "Build today's full food plan in MyFitnessPal before eating \u2014 make sure you have a planned pre-workout and post-workout protein source."
+          ],
+          "why": "Peri-workout nutrition planning in month 2 should be standard \u2014 it directly impacts training performance."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: take a 15-minute walk and spend the last 5 minutes doing breathing exercises \u2014 4-count inhale, 4-count hold, 4-count exhale \u2014 for recovery and stress management.",
+            "Active recovery: 15-minute walk plus 5 minutes of slow diaphragmatic breathing \u2014 this directly improves recovery quality and sleep.",
+            "Rest day routine: walk for 15 minutes, then do 5 rounds of box breathing (4-4-4-4 count) \u2014 both support recovery and next session's performance."
+          ],
+          "why": "Parasympathetic activation through breathing and walking accelerates muscle recovery between sessions."
+        }
+      ]
+    },
+    {
+      "day": 38,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log your weight, then open your training app and verify your next session's weights are correctly updated from your last session.",
+            "Morning weigh-in and session prep: log your weight, then pull up Strong or Hevy and confirm today's workout has current, not outdated, weights.",
+            "Step on scale, log it, then check your training app \u2014 make sure today's session weights reflect your most recent progress, not last month's."
+          ],
+          "why": "Checking the app before training prevents the common mistake of lifting last week's weight instead of progressing."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute your training session and on the lift you filmed on Day 34, apply the correction \u2014 notice if the technique change affects how the weight moves.",
+            "Train today with your Day 34 squat cue actively in mind \u2014 apply it on every rep and see if it changes your depth or bar path.",
+            "Use today's session to apply your video-identified form correction from earlier this week \u2014 be deliberate on every rep and log how it felt."
+          ],
+          "why": "Technique corrections need 2-3 sessions of deliberate practice before they become automatic."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After your session, plan next week's training schedule in your calendar \u2014 block every session with specific days and times.",
+            "Post-workout: open your calendar and schedule next week's training sessions with exact days, times, and which session type for each slot.",
+            "Before you leave training today, block next week's workouts in your calendar \u2014 day, time, and session name for each one."
+          ],
+          "why": "Scheduling ahead is what makes 5x/week training possible without constant willpower decisions."
+        }
+      ]
+    },
+    {
+      "day": 39,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and compare your current 7-day average to your week 4 average \u2014 the trend should show gradual upward movement.",
+            "Morning weigh-in: calculate a 7-day average and compare it to last week's 7-day average \u2014 is the line going up?",
+            "Step on scale, log it, and pull your 7-day average \u2014 compare to the previous week's average and note the direction."
+          ],
+          "why": "Seven-day averages eliminate daily noise and give you the clearest signal of whether your surplus is working."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Log today's meals in MyFitnessPal and specifically track creatine intake if you're using it \u2014 5g daily, any time, with food.",
+            "Pre-log today's food and if you've been considering creatine, add it to your supplement plan \u2014 5g monohydrate daily, no loading phase required.",
+            "Plan today's meals in MyFitnessPal \u2014 and if creatine is in your stack, log it as a daily habit (5g/day, every day)."
+          ],
+          "why": "Creatine is the most research-backed supplement for strength and muscle gain \u2014 5g daily is the dose."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Run today's session and hit a rep PR on at least one lift \u2014 more reps at the same weight counts as progress if you can't add plates yet.",
+            "Execute your workout today and specifically aim for 1-2 extra reps on your second-strongest lift \u2014 rep PRs count as real progressive overload.",
+            "Train today and set a rep personal record on at least one lift \u2014 if the weight hasn't gone up, the reps must."
+          ],
+          "why": "Rep PRs are valid progressive overload \u2014 they build the capacity needed to eventually add more weight."
+        }
+      ]
+    },
+    {
+      "day": 40,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and note whether your energy levels before and during training have been high, moderate, or low this week.",
+            "Morning weigh-in: log the number and rate your training energy this week from 1-5 \u2014 it's a direct indicator of whether calories and sleep are right.",
+            "Weigh in, record it, and honestly grade your energy in the gym this week \u2014 low energy means something in your recovery protocol needs fixing."
+          ],
+          "why": "Energy levels in training are a direct readout of sleep, calories, and stress \u2014 track them to diagnose problems early."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Write down your current working weight for your top 3 compound lifts and set a specific target weight for each by Day 60 \u2014 write both numbers in your notes.",
+            "Set Day 60 strength targets right now: look up today's weights for bench, squat, and deadlift and write a realistic but challenging number to hit by day 60.",
+            "In your notes, list today's weights for your 3 main lifts and set a Day 60 goal for each \u2014 ambitious but achievable based on your current progression rate."
+          ],
+          "why": "Day 60 targets give the next 20 sessions a specific direction \u2014 training without targets is aimless."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: take measurements \u2014 arms, chest, waist \u2014 and compare to your Day 32 measurements to see month 2's body composition changes.",
+            "Monthly measurement check: arms, chest, and waist with a tape measure \u2014 compare to your Week 5 measurements and note the differences.",
+            "Measurement day on your rest day: tape measure all 3 sites, record the numbers, and compare to last month's measurements \u2014 calculate each change."
+          ],
+          "why": "Measurement comparisons in month 2 are when you start seeing real body composition changes."
+        }
+      ]
+    },
+    {
+      "day": 41,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal before 8am and ensure carbs are scheduled around your training window for maximum energy.",
+            "Build today's food plan and place your biggest carb servings pre- and post-workout \u2014 log it in MyFitnessPal before you eat anything.",
+            "Set up today's nutrition in MyFitnessPal and front-load carbs around training \u2014 breakfast or pre-workout and post-workout should have the most."
+          ],
+          "why": "Carb timing around training fuels performance and speeds glycogen replenishment."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute today's session and specifically work toward your Day 60 strength targets \u2014 check if you're on track based on your current progression rate.",
+            "Train today and after the session, calculate whether your current weekly weight increases will get you to your Day 60 target \u2014 are you on pace?",
+            "Hit your workout today with your Day 60 strength goal in the back of your mind \u2014 log your weights and verify you're progressing fast enough to hit it."
+          ],
+          "why": "Reverse-engineering your Day 60 target from today's weight keeps progression intentional."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After training, film a 10-second video of your deadlift from the side \u2014 check bar path, back angle, and lockout \u2014 write one correction to apply.",
+            "Record 3 deadlift reps from the side angle, watch the video, and identify one technique issue to fix in the next session.",
+            "Set up your phone to film your deadlift today \u2014 shoot 3 reps, review the video, and note the most important form issue you see."
+          ],
+          "why": "Deadlift form check in month 2 catches rounding or bar drift before weights get heavy enough to cause injury."
+        }
+      ]
+    },
+    {
+      "day": 42,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Week 6 review: list every lift where you progressed this week \u2014 by weight or reps \u2014 and flag any that have stalled for more than 2 sessions.",
+            "Six-week training review: open your log and do a lift-by-lift scan \u2014 weight up, same, or down vs. last week for every exercise.",
+            "Weekly audit: pull up Strong or Hevy and find every exercise that progressed vs. every one that stalled \u2014 write both lists."
+          ],
+          "why": "Tracking progress vs. stalls weekly keeps the program responsive instead of mechanical."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Take week 6 progress photos from all 3 angles, compare them to Day 1 and week 4, and write 2 sentences about visible muscle development.",
+            "Week 6 photo check \u2014 3 angles, saved and labeled \u2014 then compare to your day 1 baseline and write one sentence about the biggest change you see.",
+            "Shoot your 6-week progress photos, line them up with your Day 1 photos, and write a 3-sentence honest assessment of your visual progress so far."
+          ],
+          "why": "Six weeks is when visible muscle changes become undeniable \u2014 documenting now captures the inflection point."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Nutrition review for week 6: pull your MyFitnessPal data, calculate your 7-day average protein and calories, and compare them to your targets \u2014 adjust if needed.",
+            "Week 6 nutrition audit: open MyFitnessPal, review every logged day this week, and calculate your average daily protein \u2014 write whether it's at, above, or below target.",
+            "Full nutrition check for week 6: average daily protein, average daily calories, and the number of days you hit your protein target \u2014 write all three numbers."
+          ],
+          "why": "Six weeks of nutrition data gives you the most accurate picture of whether your diet is supporting your training."
+        }
+      ]
+    },
+    {
+      "day": 43,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and apply your deadlift form correction from Day 41's video in today's mental preparation \u2014 write the cue in your notes before training.",
+            "Morning weigh-in: log it, then write down the deadlift technique cue from your Day 41 video review \u2014 you'll use it in every pull today.",
+            "Step on scale, log it, then pull up your Day 41 notes and find the deadlift correction \u2014 remind yourself of it before today's session."
+          ],
+          "why": "Technique corrections need intentional recall before each session to stick."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals and add a new high-protein food you haven't eaten this week \u2014 variety prevents diet fatigue in month 2.",
+            "Set up today's food plan in MyFitnessPal and include at least one protein source you haven't eaten in the past 3 days.",
+            "Build today's meals in MyFitnessPal and deliberately rotate in a different protein source \u2014 eat what you haven't had in a few days."
+          ],
+          "why": "Protein variety prevents dietary monotony which is what causes tracking compliance to drop."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's training session and apply your deadlift technique correction on every rep \u2014 after your final set, note whether it changed the lift.",
+            "Train today and use the deadlift form cue from your video review on every single pull \u2014 log the session and add a note about how the technique felt.",
+            "Run your full workout today with deliberate deadlift technique focus \u2014 apply your correction and write one post-session note about the improvement."
+          ],
+          "why": "Three weeks of technique work before weights get truly heavy builds the movement pattern that keeps you safe."
+        }
+      ]
+    },
+    {
+      "day": 44,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log your weight and verify your weekly average is still trending upward \u2014 if flat, add 100 calories per day and update MyFitnessPal.",
+            "Morning weigh-in: is the trend still moving? Compare to 2 weeks ago \u2014 flat trend means add calories, rising trend means hold steady.",
+            "Step on scale and log it \u2014 compare today's weekly average to 2 weeks ago; if growth has stalled, bump calories by 100 per day."
+          ],
+          "why": "Calorie adjustments every 2 weeks keep lean gains on track as your metabolism adapts."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Film your overhead press today from the front \u2014 check that your bar path is vertical, your elbows are under the bar, and you're not overarching your lower back.",
+            "Record 3 overhead press reps from the front angle, watch the video, and identify one issue to correct in the next session.",
+            "Set up your phone to film your overhead press from the front \u2014 shoot 3 working reps, watch the clip, and write one technique note."
+          ],
+          "why": "Overhead press is the most technically demanding pressing movement \u2014 catching issues early prevents shoulder problems."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's full session including all accessories \u2014 log every set, note any PR, and apply your overhead press correction from the video.",
+            "Run your complete workout today, apply your overhead press technique correction on every rep, and log every set in Strong or Hevy.",
+            "Train today per the program, apply the press form cue from your video check, and record all sets \u2014 note whether the correction changes how the lift feels."
+          ],
+          "why": "Consistent technique improvement across all four main lifts is the defining work of month 2."
+        }
+      ]
+    },
+    {
+      "day": 45,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and calculate your midpoint progress: you're halfway through the 90 days \u2014 how many pounds have you gained since Day 1?",
+            "Morning weigh-in at the midpoint: log it and calculate the total weight change from Day 1 \u2014 you're halfway there.",
+            "Step on scale, record it, and do the math: current weight minus Day 1 weight equals your 45-day progress number."
+          ],
+          "why": "Day 45 is the program midpoint \u2014 knowing your progress number tells you exactly how the second half should be calibrated."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Write a midpoint self-assessment in your notes: what's working in training, what's working in nutrition, and one thing you'll fix for the second half.",
+            "Midpoint review: write 3 sentences \u2014 one about training consistency, one about nutrition compliance, one about what you're changing for days 46-90.",
+            "Day 45 audit: rate yourself on training (1-10), nutrition (1-10), and sleep (1-10), then identify the one lowest-scored area to prioritize."
+          ],
+          "why": "Midpoint self-assessment with honest ratings guides where to focus energy for the second half."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: walk 15 minutes and update your Day 60 strength targets based on your current progression rate \u2014 are the targets still realistic?",
+            "Active recovery and goal calibration: 15-minute walk, then revisit your Day 60 strength targets \u2014 are you on track, ahead, or behind? Adjust if needed.",
+            "Rest day: 15-minute walk plus a 5-minute check on your Day 60 targets \u2014 look at your current progression rate and confirm you'll hit them."
+          ],
+          "why": "Midpoint target calibration ensures your goals are driving the right training decisions."
+        }
+      ]
+    },
+    {
+      "day": 46,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Pre-log today's meals and check that your protein is distributed across at least 4 servings \u2014 spreading it out maximizes muscle protein synthesis.",
+            "Build today's food plan in MyFitnessPal with protein spread across 4+ eating occasions \u2014 never let one meal carry more than 40% of the daily total.",
+            "Set up today's nutrition in MyFitnessPal and distribute protein across breakfast, lunch, an afternoon snack, and dinner \u2014 log it before eating."
+          ],
+          "why": "Four protein feedings per day maximizes muscle protein synthesis compared to front- or back-loading."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute today's session and time your rest periods strictly \u2014 2.5 minutes between compound sets with a phone timer, no longer, no shorter.",
+            "Train today with exact rest intervals \u2014 set a 2.5-minute timer after every compound set and 90-second timer after accessories \u2014 stick to it.",
+            "Use a timer for every rest period today: 2.5 minutes between main lift sets, 90 seconds between accessory sets \u2014 enforce the structure."
+          ],
+          "why": "Timed rest periods drive training density, which is a key variable for hypertrophy in month 2."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After your session, log every set in Strong or Hevy and write a 2-sentence session note: one thing that improved today, one thing to fix next time.",
+            "Post-workout logging: enter all sets and add a 2-line session note to your training app \u2014 a win and a priority for next session.",
+            "Close out today's log in Strong or Hevy with every set recorded and a quick note \u2014 what improved, what's the focus for next time."
+          ],
+          "why": "Session notes turn training into a learning loop \u2014 every workout should inform the next one."
+        }
+      ]
+    },
+    {
+      "day": 47,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and note any joint soreness \u2014 if knees, elbows, or shoulders are consistently nagging, that's a signal to deload next week.",
+            "Morning weigh-in: log the number, then do a 30-second body scan \u2014 are any joints sore in a way that's different from muscle fatigue?",
+            "Weigh in and record it, then check in with your joints \u2014 persistent joint soreness (not muscle soreness) is a warning sign to address before it becomes injury."
+          ],
+          "why": "Catching joint issues at 7 weeks prevents the forced deload that happens when they become injuries at week 10."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log your meals today and add a dedicated recovery meal at night \u2014 high protein, complex carbs \u2014 to fuel overnight muscle repair.",
+            "Build today's food plan in MyFitnessPal and include a solid pre-sleep meal: 30g+ protein, some carbs \u2014 casein protein, cottage cheese, or Greek yogurt works.",
+            "Set up today's nutrition with a planned evening meal that has 30g+ protein \u2014 your muscles repair overnight and they need the amino acids."
+          ],
+          "why": "Pre-sleep protein reduces muscle protein breakdown during the overnight fast."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's session \u2014 on any lift where you've been stuck for 3+ sessions at the same weight, try adding just 2.5 lbs instead of 5 to break through.",
+            "Train today and on any stalled lift, attempt a microload \u2014 add 2.5 lbs instead of 5 \u2014 to find the progression step that keeps you moving forward.",
+            "Hit your workout and use microloading on any lift that hasn't progressed in 3 sessions \u2014 2.5 lb jumps are valid and often unlock a stall."
+          ],
+          "why": "Microloading is the solution to lifts that stall between standard increment jumps."
+        }
+      ]
+    },
+    {
+      "day": 48,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log your weight and look up what a deload week is for your program \u2014 if you've trained 7-8 weeks straight, a deload next week may be appropriate.",
+            "Morning weigh-in and program check: search how your specific program handles deloads \u2014 read it and decide if week 9 should be lighter.",
+            "Weigh in, log it, and read your program's deload guidance \u2014 7-8 weeks of progressive overload typically calls for a strategic lighter week."
+          ],
+          "why": "Planned deloads prevent accumulated fatigue from masking strength gains and causing overuse injuries."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal and specifically confirm you're eating enough carbs on training days \u2014 carbs under 150g on a training day is too low.",
+            "Set up today's food plan and check your carbohydrate total \u2014 a training day should have 150g+ carbs to fuel performance and glycogen replenishment.",
+            "Build today's meal plan with adequate carbs for training \u2014 log it in MyFitnessPal and verify carbs are above 150g for a full training day."
+          ],
+          "why": "Carbohydrates are the primary fuel source for high-intensity lifting \u2014 inadequate carbs tank training performance."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute your full session today including all accessories \u2014 log it all, note your PRs, and after training write your best lift performance from Day 10 vs. today.",
+            "Train today and after the session, look up your Day 10 log in Strong or Hevy \u2014 compare weights for your main lifts then vs. now and write the differences.",
+            "Run your complete workout, then pull up your Day 10 session in your training app \u2014 compare then vs. now on 3 lifts and write down the progress."
+          ],
+          "why": "Comparing to Day 10 shows 38 days of accumulated strength gains in concrete numbers."
+        }
+      ]
+    },
+    {
+      "day": 49,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Week 7 review: how many sessions this week, did every compound lift progress, and are you on pace for your Day 60 targets?",
+            "Seven-week training review: count sessions completed, list lifts that progressed, and check whether your current rate of gain will hit your Day 60 strength goals.",
+            "Weekly audit: sessions done vs. planned, lift-by-lift progress check, and a quick calculation of whether you'll hit your Day 60 targets at this pace."
+          ],
+          "why": "Seven-week review with an eye toward Day 60 targets ensures the second half is planned, not improvised."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Take your week 7 progress photos, compare them to Day 1 and Day 30, and write a 3-sentence assessment of how your physique has changed since the midpoint.",
+            "Week 7 photo check: 3 angles, saved next to your archive \u2014 compare to Day 30 specifically and describe the change in one sentence per angle.",
+            "Shoot your 7-week photos from all 3 angles and line them up with your Day 30 photos \u2014 you're in the second half now, what has changed?"
+          ],
+          "why": "Comparing week 7 to day 30 shows only the second-half progress, which is motivating and informative."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Nutrition review for week 7: average protein, average calories, number of days you hit your protein target \u2014 compare it to your week 4 numbers.",
+            "Pull week 7 nutrition data from MyFitnessPal: daily protein average, calorie average, and days hitting target \u2014 is it better or worse than week 4?",
+            "Week 7 nutrition audit: calculate your 7-day average protein and calories, count your protein hit days, and compare the numbers to your month 1 data."
+          ],
+          "why": "Tracking nutrition compliance across months reveals whether your habits are improving or drifting."
+        }
+      ]
+    },
+    {
+      "day": 50,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and calculate the average for the past 7 days \u2014 compare this week's 7-day average to your week 5 average to see the clean trend.",
+            "Morning weigh-in: log it and do a 7-day average comparison between this week and 2 weeks ago \u2014 this is the real progress signal.",
+            "Step on scale, record it, and pull your 7-day average \u2014 compare it to your 7-day average from week 5 to measure the actual weight trend."
+          ],
+          "why": "Comparing 7-day averages two weeks apart cuts through all daily noise and gives you the real trend."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Look up how to incorporate a deload week into your program and plan it for next week if you've been training 7+ weeks without a break.",
+            "Research your program's deload protocol and if week 8 is coming up with no scheduled break, plan a lighter training week now \u2014 reduce weights by 40-50%.",
+            "Decide on a deload week: if you've completed 7 straight weeks of progressive overload, plan next week as a deload \u2014 40-50% weight, same movements."
+          ],
+          "why": "A planned deload at week 8 is where you recover accumulated fatigue and come back stronger for the final phase."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Train today per the program and go for a PR on your primary lift \u2014 you're 50 days in, the numbers should be significantly above where you started.",
+            "Execute today's session and specifically attempt a 50-day PR on your strongest compound lift \u2014 what's the most weight you've moved in this program?",
+            "Hit your workout and mark the 50-day point with a PR attempt on your main lift \u2014 log it and celebrate it regardless of the outcome."
+          ],
+          "why": "Day 50 is a milestone \u2014 setting a PR here documents real, measurable progress."
+        }
+      ]
+    },
+    {
+      "day": 51,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and verify your calorie target is still appropriate \u2014 after 50 days your bodyweight may have increased enough to recalculate protein and TDEE.",
+            "Morning weigh-in: if your bodyweight has changed by more than 5 lbs from Day 1, recalculate your TDEE and protein target today.",
+            "Step on scale, log it, and check: has your weight increased 5+ lbs from Day 1? If so, your protein and calorie targets need to be recalculated."
+          ],
+          "why": "As bodyweight increases, maintenance calories and protein targets increase with it \u2014 recalculate at major milestones."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Recalculate your protein target using your current bodyweight: current weight \u00d7 0.8 = new daily gram target \u2014 update MyFitnessPal if the number changed.",
+            "Update your nutrition targets for the final phase: calculate protein at 0.8g per lb of your current weight and update your MyFitnessPal daily goal.",
+            "Current weight \u00d7 0.8 = your updated protein target \u2014 log it, compare to your current MyFitnessPal setting, and adjust if needed."
+          ],
+          "why": "Protein needs scale with bodyweight \u2014 recalculating ensures you're not undereating protein as you add mass."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: spend 6 minutes reviewing your training log for the past 3 weeks and count how many individual exercise PRs you've set \u2014 write the total.",
+            "Active recovery: review Strong or Hevy for the past 3 weeks and log every PR you set \u2014 weight PRs and rep PRs both count.",
+            "Rest day progress check: open your training app and count every PR from the past 3 weeks \u2014 list the lift and the PR number."
+          ],
+          "why": "Counting PRs over a 3-week window quantifies progress and motivates continued effort."
+        }
+      ]
+    },
+    {
+      "day": 52,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "If this is your deload week, today's session should be at 50% of your usual working weight \u2014 same exercises, same sets and reps, much lighter.",
+            "Deload session today: run your normal workout but with 40-50% of your regular weights \u2014 focus on perfect technique, not effort.",
+            "Deload day: train all your normal movements but cut weight in half \u2014 this is active recovery, not an easy workout."
+          ],
+          "why": "A deload at 50% weight maintains movement patterns while clearing accumulated fatigue from the nervous system."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Use the lighter deload session to fix technique: on every set, focus entirely on form, not effort \u2014 note any movement that feels different at a lighter weight.",
+            "Deload training tip: at lighter weights today, slow every rep down to 3 seconds on the lowering phase \u2014 it's a technique session, not a muscle session.",
+            "During your deload session, use the lighter loads to practice perfect form on every rep \u2014 write one technique observation per lift after the session."
+          ],
+          "why": "Deload sessions are the perfect time to ingrain technique improvements that get sloppy under heavy loads."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Post-deload session: plan month 3's training approach \u2014 will you continue your current program, switch to a new split, or change rep ranges? Write your plan.",
+            "After today's easy session, spend 8 minutes planning the final phase (days 61-90): same program, modified program, or new split \u2014 write down your decision.",
+            "Use your deload session's extra energy to plan month 3: look at your options (continue current program, switch to higher rep work, change the split) and commit to one."
+          ],
+          "why": "Planning month 3 during the deload means you walk into day 61 with a clear direction."
+        }
+      ]
+    },
+    {
+      "day": 53,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and note that deload week often shows a slight weight dip \u2014 this is normal water and glycogen fluctuation, not muscle loss.",
+            "Morning weigh-in during deload: log the number and remember that any weight dip is glycogen, not muscle \u2014 it comes back in week 9.",
+            "Step on scale, log it, and don't be alarmed by a slight dip this week \u2014 deloads temporarily reduce glycogen stores which affects scale weight."
+          ],
+          "why": "Understanding weight fluctuations during deload prevents misinterpreting data as muscle loss."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal \u2014 during deload week you can slightly reduce calories by 100-150 since training volume is lower.",
+            "Build today's food plan and reduce calories slightly for the deload week \u2014 100 fewer calories is fine since you're not training as hard.",
+            "Set up today's nutrition in MyFitnessPal and reduce daily calories by 100-150 this week \u2014 less training volume means slightly less fuel needed."
+          ],
+          "why": "Minor calorie reduction during a deload week prevents unnecessary fat gain while training volume is down."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Research the program you'll run in month 3 \u2014 look at the specific split, rep ranges, and weekly structure and write out week 1's template.",
+            "If you're switching programs for month 3, spend 8 minutes reading the full program overview and write your first week's session structure.",
+            "Plan month 3's Week 1 template: what sessions, what lifts, what rep ranges \u2014 write it out so day 61 has a complete plan ready to execute."
+          ],
+          "why": "Having month 3 planned before the deload ends means zero friction in the return to full training."
+        }
+      ]
+    },
+    {
+      "day": 54,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and note that coming out of deload, your performance next week will likely exceed anything you've done before.",
+            "Morning weigh-in: log it and mentally prepare for week 9 \u2014 deloads prime your body to set PRs in the sessions that follow.",
+            "Step on scale, record it, and get ready \u2014 week 9 after the deload typically produces your best strength performances yet."
+          ],
+          "why": "Post-deload sessions are often the strongest of any training block \u2014 anticipating this fuels the return."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Deload session today: run your full workout at reduced weight, focus on controlled eccentric movements, and note how much easier the movement feels.",
+            "Train today at deload weight and use the lightness to feel the full range of motion on every rep \u2014 slow and controlled throughout.",
+            "Deload workout: move at 50% weight, 3-second eccentrics on every rep, and pay attention to technique details you normally can't notice under load."
+          ],
+          "why": "The deload session that focuses on technique turns lighter training into a setup for stronger performance next week."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest: review your planned month 3 program and finalize the starting weights you'll use for each lift \u2014 write them into your training app.",
+            "Enter next week's session into Strong or Hevy with the weights you plan to open month 3 with \u2014 use your best recent weights as the starting point.",
+            "Prepare month 3's first session in your training app: exercises, starting weights, sets and reps \u2014 have it ready to go when week 9 starts."
+          ],
+          "why": "Entering week 9's session now means you walk in knowing exactly what to lift."
+        }
+      ]
+    },
+    {
+      "day": 55,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Pre-log today's full meals in MyFitnessPal and build back to your normal calorie surplus \u2014 the deload is almost done, increase calories to target today.",
+            "Resume your full calorie surplus today: build your meal plan in MyFitnessPal back to the 200-300 over maintenance level.",
+            "Set up today's nutrition at your full target calories \u2014 deload reduced it slightly, but today you return to your normal surplus in MyFitnessPal."
+          ],
+          "why": "Restoring full calorie intake before the deload ends primes glycogen and is ready for week 9's hard training."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Final deload session: run the workout at 50% weight, and after each exercise write one technique note you noticed that you'll carry into month 3.",
+            "Last deload training day: move all your normal lifts at reduced weight and collect one technical cue per lift to apply in the fresh month 3 sessions.",
+            "Complete your final deload session today \u2014 at 50% weight, focused entirely on form \u2014 and write 3 technique takeaways to carry into the next training block."
+          ],
+          "why": "The final deload session is the last chance to ingrain technique before weights go back up."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Take your 8-week progress photos \u2014 3 angles \u2014 and compare them to Day 1, Day 30, and Day 45 for the full timeline of change.",
+            "Week 8 photo check: front, side, back \u2014 saved and labeled \u2014 compare to your Day 1 and Day 30 photos and note the clearest change.",
+            "Shoot your 8-week progress photos and line them up with your full archive: Day 1, Week 4, Week 6 \u2014 write a sentence about the change you see at each comparison."
+          ],
+          "why": "Eight-week photos are the most striking comparison because they span nearly the full program."
+        }
+      ]
+    },
+    {
+      "day": 56,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Week 8 review: list every lift from the deload week, note which ones felt notably lighter, and set the weights for your post-deload sessions.",
+            "End of deload week review: look at your logged sessions, confirm the weights, and prepare your mind for week 9's full-effort return.",
+            "Eight-week training summary: how many total sessions have you completed across all 8 weeks? Write the number and calculate your consistency rate."
+          ],
+          "why": "Deload week review captures technique improvements made under lighter loads before returning to heavy work."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Full 8-week nutrition review: average daily protein across the entire 8 weeks \u2014 how many of those days did you hit your target?",
+            "Calculate your overall protein compliance rate for the first 8 weeks: days you hit your protein target \u00f7 56 \u00d7 100 = your rate. Write it down.",
+            "Eight-week nutrition audit: total days logged in MyFitnessPal, days hitting protein target, and your overall average daily protein \u2014 write all three numbers."
+          ],
+          "why": "An 8-week nutrition compliance rate tells you exactly how much of your progress was supported by diet."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Take your 8-week body measurements \u2014 arms, chest, waist \u2014 compare to your Day 1, Day 32, and Day 40 measurements and calculate the changes.",
+            "Full measurement audit at 8 weeks: arms, chest, and waist \u2014 compare to your earliest measurement and write the gains or changes for each site.",
+            "Week 8 measurement day: tape measure all 3 sites, record them, and compare to your Day 1 baseline \u2014 list the change in inches or centimeters for each."
+          ],
+          "why": "Eight weeks of measurement data shows body composition changes that the scale alone never captures."
+        }
+      ]
+    },
+    {
+      "day": 57,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Post-deload first day back: log your weight and get ready \u2014 today's session will feel easier than it should, which is the point of deloads.",
+            "Morning weigh-in back from deload week: log the number and mentally prepare for your return to full training today.",
+            "Step on scale, log it, and get fired up \u2014 this is the first full-effort session after deload, and it should feel like a reset."
+          ],
+          "why": "The post-deload session is typically your strongest \u2014 capitalizing on it sets the tone for month 3."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's full meals in MyFitnessPal at your normal surplus target \u2014 training resumes at full intensity today.",
+            "Build today's complete meal plan in MyFitnessPal: full protein target, full surplus calories \u2014 you're back in full training mode.",
+            "Set up today's nutrition at your normal targets in MyFitnessPal \u2014 deload is over, the full surplus and protein target are back on."
+          ],
+          "why": "Returning to full nutrition on the first day back from deload maximizes the post-deload performance spike."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute your first post-deload session at full intensity \u2014 expect to feel strong, and capitalize on it by attempting a PR on your main lift.",
+            "Train at 100% today \u2014 the deload should make you feel fresher than week 8's last session \u2014 attempt a PR on your primary compound lift.",
+            "First full-intensity session back: run the workout hard, chase a PR on your top lift, and log everything in Strong or Hevy \u2014 this is what deloads are for."
+          ],
+          "why": "Post-deload sessions are the strongest of any training block \u2014 you've earned this performance by resting smart."
+        }
+      ]
+    },
+    {
+      "day": 58,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log your weight post-deload \u2014 it may be slightly up from water and glycogen returning, which is a good sign that recovery worked.",
+            "Morning weigh-in: log it and expect a slight uptick from deload \u2014 glycogen restoration adds 1-2 lbs of water weight, which is normal and good.",
+            "Step on scale and log it \u2014 any post-deload weight spike is glycogen, not fat \u2014 it means your muscles are fully fueled for month 3."
+          ],
+          "why": "Post-deload weight uptick is a sign of successful glycogen restoration, not fat gain."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal and ensure carbs are substantial today \u2014 post-deload training requires maximum glycogen.",
+            "Build today's meal plan with carbs prioritized \u2014 180g+ on a full training day \u2014 and log it in MyFitnessPal before eating.",
+            "Set up today's nutrition with high carbs for training: 180g+ carbs logged in MyFitnessPal, with the biggest servings around your workout window."
+          ],
+          "why": "Post-deload training days need maximum carb support to capitalize on the strength boost."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's session and if you set a PR yesterday, aim to equal or exceed it today on a different lift.",
+            "Train today and carry the post-deload momentum \u2014 attempt a PR on a second lift, different from yesterday's \u2014 log it all.",
+            "Hit your second post-deload session and continue the PR chase on a different compound lift \u2014 this week should be your strongest of the program so far."
+          ],
+          "why": "The post-deload window lasts 3-5 sessions \u2014 maximize it by attempting PRs on multiple lifts."
+        }
+      ]
+    },
+    {
+      "day": 59,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and review the PRs you set this week post-deload \u2014 write the new numbers in your notes as your updated benchmarks.",
+            "Morning weigh-in: log it, then open your training log and document every PR you set this week \u2014 weight PRs and rep PRs both count.",
+            "Step on scale, record it, and list this week's PRs in your notes \u2014 every new personal record is the new starting point for the next block."
+          ],
+          "why": "Documenting post-deload PRs establishes the new baseline for month 3's progression."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals and verify your updated protein target from Day 51 is still set in MyFitnessPal \u2014 confirm the numbers are current.",
+            "Build today's food plan and double-check that your MyFitnessPal protein goal reflects your current bodyweight, not your Day 1 weight.",
+            "Set up today's nutrition in MyFitnessPal and confirm your protein target is updated \u2014 current weight \u00d7 0.8, not Day 1 weight \u00d7 0.8."
+          ],
+          "why": "Nutrition targets must stay current with your body \u2014 stale numbers lead to underfeeding muscle growth."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: take your 9-week progress photos \u2014 3 angles \u2014 and note this is the last photo set before the Day 60 milestone check.",
+            "Active recovery plus photos: take your pre-Day 60 progress photos (front, side, back), compare to your most recent set, and write one observation.",
+            "Rest day photo session: 3 angles, saved and labeled 'Day 59', compared to Day 30 \u2014 one more day until the Day 60 milestone check."
+          ],
+          "why": "Pre-milestone photos let you see progress clearly before the Day 60 formal assessment."
+        }
+      ]
+    },
+    {
+      "day": 60,
+      "minutes_total": 20,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 4,
+          "variants": [
+            "Day 60 milestone: weigh yourself, take your 3 progress photos, and calculate the total weight added since Day 1 \u2014 this is your 2-month progress report.",
+            "Two-month checkpoint: morning weigh-in, full set of progress photos from all 3 angles, and a written record of your weight change from Day 1.",
+            "Day 60 formal assessment: log your weight, take photos from front, side, and back, and calculate the difference from your Day 1 weight \u2014 write it down."
+          ],
+          "why": "Day 60 is the second major milestone \u2014 documenting it completely gives you the data to make month 3 exceptional."
+        },
+        {
+          "position": 2,
+          "minutes": 6,
+          "variants": [
+            "Review your Day 40 strength targets: did you hit them? Write your actual weights vs. your targets for bench, squat, deadlift, and overhead press.",
+            "Compare today's weights against the Day 60 targets you set on Day 40 \u2014 write 'hit', 'missed', or 'exceeded' for each lift and calculate by how much.",
+            "Pull up the Day 60 strength goals you set on Day 40 and compare them to today's actual weights \u2014 write the target, the actual, and the gap or surplus."
+          ],
+          "why": "Day 60 target review shows exactly how accurate your goal-setting was and calibrates Day 90 targets."
+        },
+        {
+          "position": 3,
+          "minutes": 10,
+          "variants": [
+            "Write your full 2-month report: strength gains on every main lift (with numbers), body measurements change, weight gained, and the 3 biggest lessons learned \u2014 then set your Day 90 targets.",
+            "Month 2 complete: write your progress summary (lifts, measurements, weight trend, compliance rate) and define 3 specific targets for the final 30 days.",
+            "Day 60 full assessment and Day 90 planning: document everything you've achieved in 60 days and write your final 3 goals \u2014 a strength target, a physique goal, and a habit to lock in."
+          ],
+          "why": "The 60-day report and 90-day target setting transforms the final month from training into a mission."
+        }
+      ]
+    },
+    {
+      "day": 61,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Month 3 starts today \u2014 open your training app and confirm your month 3 program is loaded with the correct starting weights from your Day 60 PRs.",
+            "First session of month 3: pull up Strong or Hevy and verify the weights for today's session reflect your post-deload PRs, not older numbers.",
+            "Month 3 launch: log your weight, open your workout app, and check that today's weights are loaded at your best recent levels."
+          ],
+          "why": "Month 3 builds on month 2's peak performance \u2014 starting weights must reflect your current strength, not where you were 4 weeks ago."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute month 3's first session and apply all the technique cues you've collected over 60 days \u2014 this is refined training now, not beginner lifting.",
+            "Train today at your full capability, using every technique refinement from your 60 days of form work \u2014 execute with precision, not just effort.",
+            "Hit your first month 3 session with all the technical knowledge from the past 60 days \u2014 form is an asset now, not an afterthought."
+          ],
+          "why": "Month 3 is execution at a higher level \u2014 technique, progressive overload, and nutrition all refined."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After today's session, write your Day 90 strength targets based on your current weights \u2014 add a realistic but aggressive number to each main lift.",
+            "Post-session: set your Day 90 targets for bench, squat, deadlift, and overhead press \u2014 current weight plus 30 days of progression at your recent rate.",
+            "Write your 4 Day 90 strength goals right now after training: pick a weight for each main compound lift that would require consistent effort to reach."
+          ],
+          "why": "Day 90 targets give the final month a direction \u2014 every session should feel like it's building toward those numbers."
+        }
+      ]
+    },
+    {
+      "day": 62,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and confirm your calorie surplus is back to your normal target after the deload week adjustment.",
+            "Morning weigh-in: log the number and double-check your MyFitnessPal calorie target is at your standard surplus, not the reduced deload level.",
+            "Step on scale, record it, and verify your nutrition targets are set correctly in MyFitnessPal \u2014 full surplus, not deload reduction."
+          ],
+          "why": "Confirming full nutrition targets on day 2 of month 3 ensures you don't accidentally undereat coming out of the deload."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Take your monthly measurements for month 3 baseline \u2014 arms, chest, waist \u2014 and compare them to your Day 60 measurements.",
+            "Pull out the tape measure: arms, chest, and waist \u2014 log the numbers and compare to your Day 56 measurements to start month 3 with a clear baseline.",
+            "Month 3 starting measurements: arms, chest, waist \u2014 record them and line them up with your previous measurement check from Day 40."
+          ],
+          "why": "Month 3 measurement baseline lets you track the final phase's body composition changes precisely."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's training session \u2014 if you switched programs for month 3, follow the new split exactly; if continuing, apply your normal progression rule.",
+            "Train today per your month 3 plan and add weight per your progression rule on every eligible lift \u2014 month 3 is not a maintenance phase.",
+            "Run your full session today, applying your progression rule on every lift where you completed all reps last time \u2014 log everything in Strong or Hevy."
+          ],
+          "why": "Month 3 training carries the same progressive overload discipline as months 1 and 2 \u2014 the rule doesn't change, the weights do."
+        }
+      ]
+    },
+    {
+      "day": 63,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Week 9 review: list every session completed, every lift that progressed, and whether you set any PRs coming out of the deload.",
+            "Nine-week review: how many sessions this week, which lifts went up, and are your weights now higher than any point before the deload?",
+            "Weekly audit: sessions completed, lift progression, and a comparison of this week's weights to your highest pre-deload numbers."
+          ],
+          "why": "Week 9 review confirms the deload worked \u2014 weights should be at or above pre-deload bests."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Take your week 9 progress photos \u2014 3 angles \u2014 and compare them to your Day 60 photos specifically to see what month 3 is starting with.",
+            "Week 9 photo check: front, side, back \u2014 saved next to your Day 60 set \u2014 write one sentence about what you see entering the final phase.",
+            "Shoot your 9-week photos from all 3 angles and do a side-by-side with your Day 60 baseline \u2014 note any change in muscle fullness or definition."
+          ],
+          "why": "Comparing week 9 to Day 60 isolates the changes made in just the past 9 days."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Nutrition review for week 9: average protein, days hitting target, and whether your calorie average is back to full surplus after the deload week.",
+            "Pull week 9 nutrition data from MyFitnessPal: daily protein average, calorie average, and count of protein-hit days \u2014 compare to week 8 numbers.",
+            "Week 9 nutrition audit: check every logged day, calculate 7-day average protein and calories, and confirm you're back on full targets."
+          ],
+          "why": "Week 9 nutrition review confirms your fueling is back to full power after the deload week's reduction."
+        }
+      ]
+    },
+    {
+      "day": 64,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and check if you're on track to hit your Day 90 targets \u2014 calculate how much weight you need to add to your main lifts each week.",
+            "Morning weigh-in: log it, then check your Day 90 strength targets \u2014 at your current weekly progression rate, will you hit them?",
+            "Step on scale, record it, then calculate: how many weeks until Day 90? How much do your lifts need to increase per week to hit your targets?"
+          ],
+          "why": "Reverse-engineering Day 90 targets from your current weights and weekly progression keeps training purposeful."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Film a form check video for your most improved lift from the past 60 days \u2014 verify the technique has improved as much as the weight has.",
+            "Record 3 reps of the lift you're most proud of improving over 60 days \u2014 watch it and compare to how you imagine your form looked on Day 1.",
+            "Shoot a short form video of your strongest lift right now \u2014 watch it critically and note one remaining technique issue to continue working on."
+          ],
+          "why": "Form check on your strongest lift ensures strength gains weren't built on flawed movement patterns."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's full session and log it \u2014 after the workout, compare today's weights to your Day 14 weights on the same lifts.",
+            "Train today and post-session: pull up your Day 14 log in Strong or Hevy and compare those weights to today's \u2014 calculate the total added across all lifts.",
+            "Hit your workout, then after the session look up Day 14's session weights and write the difference for each lift \u2014 50 days of progressive overload in numbers."
+          ],
+          "why": "Comparing to Day 14 gives you a 50-day view of strength progress \u2014 the numbers at this stage are motivating."
+        }
+      ]
+    },
+    {
+      "day": 65,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and assess sleep quality this week \u2014 month 3 training should be your hardest yet, which means recovery must be your best yet.",
+            "Morning weigh-in: log the number, then rate your sleep for the past 4 nights \u2014 in month 3, sleep is your highest-leverage recovery tool.",
+            "Step on scale, record it, and evaluate sleep: how many 7.5+ hour nights this week? In the final phase, sleep is non-negotiable."
+          ],
+          "why": "Month 3 training is the most demanding \u2014 recovery quality in the final phase determines how much progress you lock in."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals and include a deliberate pre-sleep protein source \u2014 cottage cheese, Greek yogurt, or a casein shake \u2014 to support overnight recovery.",
+            "Build today's food plan in MyFitnessPal with a planned pre-sleep protein source: 25-30g protein 30 minutes before bed, logged now.",
+            "Set up today's nutrition and schedule a nighttime protein meal \u2014 25g+ casein or slow-digesting protein before sleep \u2014 to maximize overnight muscle repair."
+          ],
+          "why": "Pre-sleep protein is especially valuable in month 3 when training stress and recovery demands are highest."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: 15-minute walk and a full review of this week's training \u2014 are you on track for your Day 90 strength targets based on this week's numbers?",
+            "Active recovery: 15-minute walk plus 5 minutes checking your Day 90 strength progress \u2014 how many pounds away are you from each target?",
+            "Rest day check-in: walk 15 minutes, then calculate the gap between today's lifts and your Day 90 targets \u2014 how many weeks of normal progression will close it?"
+          ],
+          "why": "Regular target gap analysis keeps the final month driven by numbers, not just effort."
+        }
+      ]
+    },
+    {
+      "day": 66,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Pre-log today's full meals in MyFitnessPal and verify your protein and calorie totals are both on target for a hard training day.",
+            "Build today's complete food plan in MyFitnessPal: protein at or above target, calories in surplus \u2014 check both numbers before eating.",
+            "Set up today's nutrition with full attention: protein at your updated target, calories in your normal surplus, logged in MyFitnessPal before the first meal."
+          ],
+          "why": "Month 3 nutrition must match month 3 training demands \u2014 no shortcuts on fueling in the final phase."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute today's training session and push the pace \u2014 in month 3, you should be training at higher intensity than any previous month.",
+            "Train today at full intensity and challenge yourself to hit a session PR \u2014 more weight, more reps, or denser rest periods than your personal best.",
+            "Hit your workout today and make it the hardest session you've had in the program \u2014 intensity in month 3 should exceed anything from months 1 or 2."
+          ],
+          "why": "Month 3 is the final push \u2014 training intensity should reflect the accumulated fitness from 9 weeks of progressive overload."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After today's session, take a 5-minute mobility cooldown and write your session debrief: best lift, hardest set, one thing to improve next session.",
+            "Post-workout routine: 5-minute stretch, then a 3-sentence session note in your phone \u2014 win, challenge, focus for next time.",
+            "Cooldown and log: spend 5 minutes stretching the muscles you trained, then write your session debrief in your notes \u2014 wins, struggles, next priority."
+          ],
+          "why": "Session debriefs in month 3 turn every workout into specific data for the next one."
+        }
+      ]
+    },
+    {
+      "day": 67,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and check the weekly trend \u2014 at 67 days in, your trend should show a consistent gradual increase since Day 1.",
+            "Morning weigh-in: log the number and trace back your weight trend \u2014 Day 1, Day 30, Day 60, today \u2014 is the progression consistent?",
+            "Step on scale, record it, and do a milestone check: your 4-point weight trend (Day 1, 30, 60, today) should show gradual, controlled gain."
+          ],
+          "why": "A clean weight trend across 67 days confirms your surplus strategy has been right all along."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal and specifically plan a solid post-workout meal \u2014 40g protein plus carbs within 30 minutes of finishing.",
+            "Set up today's food plan with a dedicated post-workout slot in MyFitnessPal \u2014 40g protein and some carbs, scheduled for immediately after training.",
+            "Build today's nutrition plan around your training window: pre-workout carbs, post-workout protein + carbs \u2014 log both in MyFitnessPal before you eat."
+          ],
+          "why": "Post-workout nutrition in month 3 directly impacts recovery speed between sessions \u2014 don't skip it."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's session and specifically aim to beat your Day 21 weights on every lift \u2014 you've had 46 days of progressive overload since then.",
+            "Train today and after each set, check your Day 21 log in Strong or Hevy \u2014 your current weights should be significantly higher than 46 days ago.",
+            "Hit your workout today with a specific benchmark: beat every Day 21 weight by at least 10% \u2014 log today's numbers next to that reference."
+          ],
+          "why": "Day 21 comparison shows 46 days of accumulated strength gain in exact numbers \u2014 this is what the work has produced."
+        }
+      ]
+    },
+    {
+      "day": 68,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log your weight and add one more high-protein meal option to your rotation \u2014 month 3 is when dietary monotony hits hardest.",
+            "Morning weigh-in: log it, then find one new high-protein recipe or food to add to your regular rotation this week.",
+            "Step on scale, record it, then spend 3 minutes finding one new protein-dense meal you haven't tried yet \u2014 add it to this week's plan."
+          ],
+          "why": "Dietary variety at week 10 prevents the compliance breakdown that happens when eating the same foods daily for 2.5 months."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute today's session and film a quick form check on your most recently improved lift \u2014 verify the technique is holding under heavier month 3 weights.",
+            "Train today and shoot a quick form video of your secondary compound lift \u2014 check that technique hasn't regressed now that weights are heavier.",
+            "Hit your workout and take a form check video of your second compound lift \u2014 month 3 weights are heavy enough to expose cracks in technique."
+          ],
+          "why": "Form checks under heavy loads in month 3 catch regression before it leads to injury or stalled progress."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After your session, review the form video from today and write one correction to apply starting next session \u2014 technical detail matters more now that weights are high.",
+            "Watch your form video from today's session and identify one issue to fix \u2014 write it as a specific cue you'll apply on every rep next session.",
+            "Review today's technique video and write the single most important correction \u2014 one cue, clearly worded, saved in your notes for next session."
+          ],
+          "why": "A single, well-identified technique fix applied consistently is more valuable than 5 vague corrections."
+        }
+      ]
+    },
+    {
+      "day": 69,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and check whether your calorie surplus is still appropriate \u2014 at 69 days, your TDEE may have increased with your added muscle mass.",
+            "Morning weigh-in: log it and consider whether your maintenance calories have shifted \u2014 more muscle mass means a higher TDEE.",
+            "Step on scale, record it, and think: have your maintenance calories increased with the muscle you've built? If so, your surplus needs to account for it."
+          ],
+          "why": "Increased muscle mass raises your TDEE \u2014 the surplus that worked at Day 1 may be smaller than intended now."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals and bump your protein slightly above target \u2014 10-15g extra on hard training days in month 3 supports the higher volume.",
+            "Build today's food plan in MyFitnessPal with a slight protein boost \u2014 add 10-15g above your standard target for today's heavy session.",
+            "Set up today's meals with elevated protein: your normal target plus 15g \u2014 on month 3 training days, higher protein supports harder sessions."
+          ],
+          "why": "Slightly higher protein on the heaviest training days of month 3 accelerates recovery."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: 15-minute walk and a full audit of your accessory exercises \u2014 are they still targeting your weakest areas, or do you need to swap one?",
+            "Active recovery and accessory review: 15-minute walk, then look at your accessory movements \u2014 after 5+ weeks, do they still target your weakest muscle groups?",
+            "Rest day: walk 15 minutes, then review your current accessory exercises \u2014 have they improved your weak points, or is it time to swap for a more targeted movement?"
+          ],
+          "why": "Accessory exercises should evolve when weak points improve \u2014 stale accessories stop being productive."
+        }
+      ]
+    },
+    {
+      "day": 70,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Week 10 review: sessions completed, lifts that progressed, and how many total days you've trained since Day 1 \u2014 calculate your overall consistency percentage.",
+            "Ten-week training review: count this week's sessions, list progression across your main lifts, and calculate your overall training consistency across 70 days.",
+            "Weekly audit at 10 weeks: list every lift that progressed this week, flag any that stalled, and calculate your total session count since Day 1."
+          ],
+          "why": "Ten-week consistency data shows whether you've built a training habit or just a training streak."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Take your week 10 progress photos \u2014 3 angles \u2014 and compare them to Day 1, Day 30, and Day 60 for the full timeline.",
+            "Week 10 photo check: 3 angles, saved and labeled \u2014 line them up with your full archive from Day 1 through Day 60 and write 2 observations.",
+            "Shoot your 10-week photos from all 3 angles and compare the full sequence: Day 1, Day 30, Day 60, today \u2014 write one sentence about the overall arc."
+          ],
+          "why": "Ten-week photos reveal the cumulative change across the entire program \u2014 the arc of progress is clearest here."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Full review: take your month 3 measurements (arms, chest, waist), compare to Day 1, Day 32, and Day 62, and calculate the total changes in each measurement.",
+            "Ten-week measurement check: tape measure all 3 sites, record the numbers, and compare to your full measurement history \u2014 calculate total inches gained or changed.",
+            "Week 10 measurement review: arms, chest, waist \u2014 logged next to your previous measurements \u2014 write the total change from Day 1 for each site."
+          ],
+          "why": "Ten-week measurements plus photos give the clearest picture of body composition change in the entire program."
+        }
+      ]
+    },
+    {
+      "day": 71,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and set up this week's training sessions in your calendar \u2014 with 19 days left, every session matters more than ever.",
+            "Morning weigh-in: log the number, then block your final 3 weeks of training in your calendar so nothing gets rescheduled.",
+            "Step on scale, record it, and schedule the remaining training sessions in your calendar \u2014 the last 19 days don't get skipped."
+          ],
+          "why": "Scheduling the final 19 sessions with the same rigor as the first ones protects the progress made."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals and check that your protein is on target \u2014 in the final phase, every day of hitting protein contributes to the physique you're building.",
+            "Build today's complete food plan in MyFitnessPal and commit to hitting protein exactly \u2014 not approximately, exactly \u2014 today.",
+            "Set up today's nutrition in MyFitnessPal with full precision: every gram of protein counted, full surplus calories logged, no estimating."
+          ],
+          "why": "Precise nutrition in the final phase compounds the results from 70 days of effort."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's training session and apply the form correction you identified on Day 68 \u2014 deliberate technique carries through to the end of the program.",
+            "Train today with your Day 68 form cue as the active focus \u2014 apply it on every rep of the relevant lift and note whether it's becoming automatic.",
+            "Hit your workout today and deliberately use the technique correction from your Day 68 video review \u2014 it should be starting to feel natural by now."
+          ],
+          "why": "Technique corrections need 3-4 weeks to become automatic \u2014 applying them consistently through the end seals the improvement."
+        }
+      ]
+    },
+    {
+      "day": 72,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log your weight and write down how many pounds you've gained since Day 1 \u2014 if it's less than 4 lbs, bump calories by 150 for the final phase.",
+            "Morning weigh-in at day 72: log it, calculate total gain from Day 1, and decide if the final phase needs a calorie adjustment to maximize the result.",
+            "Step on scale, record it, and assess your total gain: less than 5 lbs in 72 days means your surplus wasn't aggressive enough \u2014 add 150 calories now."
+          ],
+          "why": "Final phase calorie adjustment ensures the last 18 days are maximally productive."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute today's session and on your primary compound lift, attempt the highest weight you've ever lifted for at least 1 solid rep.",
+            "Train today and go for a lifetime PR on your main lift \u2014 load the bar heavier than you've ever touched, warm up properly, and attempt the lift.",
+            "Hit a new lifetime PR today on your strongest compound lift \u2014 make sure you're warm, have a spotter if needed, and go for it."
+          ],
+          "why": "Pushing a true max lift in the final phase shows the full range of strength built across 72 days."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After your session, plan next week's training in detail \u2014 write out every session, every exercise, and the weight you intend to use based on your current log.",
+            "Post-workout: plan the next 5 training sessions in Strong or Hevy right now \u2014 exercise, sets, reps, and target weights \u2014 so the final phase runs automatically.",
+            "Before you close the gym, enter next week's sessions into your training app \u2014 exercise list, target weights, and set/rep structure \u2014 so there's zero planning mid-week."
+          ],
+          "why": "Detailed planning for the final 2 weeks removes all friction and keeps training focused on execution."
+        }
+      ]
+    },
+    {
+      "day": 73,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and note any fatigue \u2014 if you feel beat up at 73 days, consider reducing accessories slightly rather than main lifts.",
+            "Morning weigh-in: log the number, then assess your recovery \u2014 accumulated fatigue at this stage is real, address it through sleep and nutrition before considering training cuts.",
+            "Step on scale, record it, and do an honest fatigue assessment \u2014 73 days in, some fatigue is normal, but persistent soreness means recovery needs attention."
+          ],
+          "why": "Managing fatigue intelligently in the final phase ensures you don't grind down before Day 90."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals with a focus on anti-inflammatory foods \u2014 blueberries, salmon, olive oil \u2014 alongside your protein targets.",
+            "Build today's food plan in MyFitnessPal and include at least one anti-inflammatory food alongside your standard protein sources.",
+            "Set up today's nutrition and add one recovery-supporting food: fatty fish, berries, or extra vegetables \u2014 log it all in MyFitnessPal."
+          ],
+          "why": "Anti-inflammatory foods support recovery at high training volumes \u2014 small diet choices compound over the final weeks."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: 15-minute walk, 10 minutes of foam rolling or stretching, and confirm your planned meals for tomorrow are logged in MyFitnessPal.",
+            "Active recovery day: walk 15 minutes, do 10 minutes of foam rolling on your tightest muscle groups, and pre-log tomorrow's food.",
+            "Rest day recovery protocol: 15-minute walk, 10-minute foam roll session targeting legs and back, and tomorrow's meals pre-logged \u2014 check all three."
+          ],
+          "why": "Rest day recovery work in the final weeks accelerates the compounding gains from the last training sessions."
+        }
+      ]
+    },
+    {
+      "day": 74,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal and confirm this week's average protein will hit or exceed target \u2014 no slipping in the final stretch.",
+            "Build today's food plan and check your protein average for the week so far \u2014 make sure today's plan will keep the weekly average at target.",
+            "Set up today's full nutrition in MyFitnessPal before eating and verify your week's protein average is on track \u2014 the final days count most."
+          ],
+          "why": "Final-phase nutrition consistency is what separates a good 90-day result from an exceptional one."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Execute today's training session and specifically focus on the lift you improved most since Day 1 \u2014 push it further than last week.",
+            "Train today and on your most-improved lift, go heavier or do more reps than your last session \u2014 build on your greatest strength.",
+            "Hit your workout and push your peak lift \u2014 the one that's improved the most across 74 days \u2014 to a new high this week."
+          ],
+          "why": "Focusing extra effort on your best lift in the final weeks builds momentum and locks in the habit of pushing."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "After today's session, plan the next 2 weeks' meal prep schedule \u2014 what you'll cook, when you'll cook it, and which protein sources you'll use.",
+            "Post-workout: write a 2-week meal prep plan covering days 75-90 \u2014 specific protein sources, rough quantities, and when you'll prep them.",
+            "After training, build a final 2-week meal prep plan: which protein sources, which days you cook, and how you'll stay consistent through Day 90."
+          ],
+          "why": "A pre-planned meal prep schedule for the final 2 weeks ensures nutrition doesn't become an afterthought."
+        }
+      ]
+    },
+    {
+      "day": 75,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight \u2014 you're 15 days from the end \u2014 and compare today's number to Day 60 to see the month 3 weight gain so far.",
+            "Morning weigh-in at the 75-day mark: log it and calculate how much you've gained since Day 60 \u2014 that's month 3's contribution.",
+            "Step on scale, record it, and subtract your Day 60 weight \u2014 the difference is what month 3 has added so far."
+          ],
+          "why": "Month 3 weight gain isolated shows whether the final phase is contributing its share to the program's results."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals and do a full nutrition check \u2014 are your protein and calorie targets still current, or did you adjust them last week?",
+            "Build today's food plan and verify your MyFitnessPal goals reflect your most recent weight \u2014 protein target should be based on current bodyweight.",
+            "Set up today's nutrition and confirm your protein target is still current: current bodyweight \u00d7 0.8 \u2014 update MyFitnessPal if your weight has shifted."
+          ],
+          "why": "Protein targets should track bodyweight \u2014 verifying them at 75 days ensures the final phase is properly fueled."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute your full training session today and compare every compound lift to your Day 30 weights \u2014 you're now seeing 45 days of growth since the month 1 checkpoint.",
+            "Train today and after the session, look up your Day 30 weights in Strong or Hevy \u2014 compare them to today and write the progression for each lift.",
+            "Hit your workout and post-session, reference your Day 30 training log \u2014 list what you lifted then vs. what you lift now for each compound movement."
+          ],
+          "why": "Day 30 comparison at Day 75 shows 45 days of compounding progressive overload in a single set of numbers."
+        }
+      ]
+    },
+    {
+      "day": 76,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and ensure you're sleeping 7.5+ hours \u2014 in the final 2 weeks, sleep is the highest-impact recovery variable.",
+            "Morning weigh-in: log the number and commit to 7.5+ hours tonight \u2014 the final 2 weeks demand maximum recovery.",
+            "Step on scale, record it, and set a bedtime alarm for tonight that gives you 7.5 hours before your wake time \u2014 non-negotiable in the final stretch."
+          ],
+          "why": "Sleep in the last 2 weeks directly impacts how well you perform and how much muscle is preserved and built."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals with particular attention to post-workout nutrition \u2014 40g protein within 30 minutes of finishing training today.",
+            "Build today's food plan and specifically ensure your post-workout meal is logged and ready \u2014 40g protein, some carbs, right after training.",
+            "Set up today's nutrition in MyFitnessPal with a planned post-workout meal: 40g+ protein, carbs, to be eaten within 30 minutes of finishing today's session."
+          ],
+          "why": "Post-workout nutrition in the final 2 weeks compounds every session's muscle-building signal."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: 15-minute walk and write down the 3 training habits you've built in 76 days that you plan to keep after Day 90.",
+            "Active recovery: walk 15 minutes, then write the 3 things you're keeping after this program ends \u2014 what has become a real habit vs. a temporary behavior?",
+            "Rest day reflection: 15-minute walk and a 5-minute notes session \u2014 write the 3 gym and nutrition habits that feel permanent and non-negotiable now."
+          ],
+          "why": "Identifying your lasting habits before the program ends helps you transition to long-term training without a gap."
+        }
+      ]
+    },
+    {
+      "day": 77,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Week 11 review: sessions completed this week, every lift that progressed, and a check of how close you are to your Day 90 strength targets.",
+            "Eleven-week training review: count sessions, list lift progressions, and calculate the gap between today's weights and your Day 90 targets.",
+            "Weekly audit at 11 weeks: sessions done, progression on each compound lift, and an honest assessment of whether your Day 90 targets are reachable."
+          ],
+          "why": "Eleven-week review with Day 90 target tracking makes the final 2 weeks intentional and specific."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Take your week 11 progress photos \u2014 3 angles \u2014 and compare them to your full archive from Day 1 through Day 60 for the complete transformation view.",
+            "Week 11 photo check: front, side, back \u2014 saved and labeled \u2014 compare the full series from Day 1 to today and write your most honest assessment of the change.",
+            "Shoot your 11-week photos from all 3 angles and lay them out next to your full archive \u2014 this is the most comprehensive view of 77 days of work."
+          ],
+          "why": "Week 11 photos plus the full archive give you the complete visual story of what 77 days of consistent training produces."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Full nutrition review for weeks 9-11: pull your MyFitnessPal data for the past 3 weeks and calculate your protein compliance rate \u2014 days hit \u00f7 21 \u00d7 100.",
+            "Three-week final phase nutrition audit: average daily protein, average daily calories, and protein compliance rate for weeks 9 through 11 \u2014 write all three.",
+            "Pull your MyFitnessPal data for the past 21 days: average daily protein, days at or above target, and average calorie total \u2014 write the numbers and assess."
+          ],
+          "why": "Final phase nutrition review shows whether the last 3 weeks have been as disciplined as the first few."
+        }
+      ]
+    },
+    {
+      "day": 78,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and note that you're 12 days from the end \u2014 set a single priority for these last 12 days and write it in your notes.",
+            "Morning weigh-in at 12 days out: log it, then write the one thing you won't compromise on for the final 12 days \u2014 a lift goal, a nutrition target, or a sleep standard.",
+            "Step on scale, record it, and choose your final 12-day priority: one concrete thing to execute with no exceptions \u2014 strength, nutrition, or sleep."
+          ],
+          "why": "Narrowing focus to one priority in the final stretch makes the result better than trying to improve everything at once."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's full meals before eating and confirm you'll hit both protein and calorie targets \u2014 12 days left, make every one count.",
+            "Build today's complete food plan in MyFitnessPal and commit to hitting it exactly \u2014 12 days left and nutrition consistency is what locks in your gains.",
+            "Set up today's nutrition with precision: protein at target, calories in surplus, logged before eating \u2014 the final 12 days demand the same discipline as day 1."
+          ],
+          "why": "Nutrition precision in the last 12 days is what separates a good result from an exceptional one."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's session and push harder than last week on every set \u2014 in the final 12 days, mediocre training effort is unacceptable.",
+            "Train today with maximum effort \u2014 heavier or more reps than last week on every compound lift \u2014 and log everything in Strong or Hevy.",
+            "Hit your workout today and raise the intensity: heavier weight on your primary lift, extra reps on your accessory work \u2014 make today harder than last week."
+          ],
+          "why": "The final sessions are when accumulated fitness peaks \u2014 pushing hard now produces the most return on 78 days of work."
+        }
+      ]
+    },
+    {
+      "day": 79,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log your weight and review your Day 90 strength targets \u2014 calculate exactly how much you need to add to each lift in the remaining sessions.",
+            "Morning weigh-in: log the number, then open your notes and find your Day 90 strength targets \u2014 are they still reachable in the remaining sessions?",
+            "Step on scale, record it, and calculate: how many lifting sessions are left before Day 90, and how much progression is needed per session to hit your targets?"
+          ],
+          "why": "Reverse-engineering targets from the remaining sessions drives specific effort in the final days."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal and bump protein by 10g today \u2014 slightly higher protein in the final days helps lock in the muscle you've built.",
+            "Build today's food plan with 10g extra protein above your standard target \u2014 a small bump in the final 11 days provides extra amino acids for muscle retention.",
+            "Set up today's nutrition with slightly elevated protein: 10g above your normal target, logged in MyFitnessPal before eating today."
+          ],
+          "why": "A minor protein boost in the final days provides optimal amino acid availability during the program's hardest training sessions."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's session and after each compound lift, confirm the weight in your log \u2014 every number in the final 11 days matters for your Day 90 assessment.",
+            "Train today and log every set in real time in Strong or Hevy \u2014 Day 90 is 11 days out and your final training log needs to be complete and accurate.",
+            "Hit your full workout today and be meticulous with your logging \u2014 every weight, every rep, every set \u2014 your final session data is the record of what you built."
+          ],
+          "why": "Complete and accurate logs in the final days create the data for the Day 90 review."
+        }
+      ]
+    },
+    {
+      "day": 80,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and look up your Day 1 weight \u2014 calculate the total change and write it in bold in your notes: 'I gained X lbs in 80 days.'",
+            "Morning weigh-in: log the number and calculate the total from Day 1 \u2014 write that number down, it's the result of 80 days of work.",
+            "Step on scale, record it, then subtract Day 1 \u2014 the difference is the body composition change you've driven through 80 days of progressive overload and nutrition."
+          ],
+          "why": "Day 80 weight comparison to Day 1 gives you a concrete before-and-after number with 10 days still left to add."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals and ensure you're in a clean calorie surplus with protein at or above target \u2014 10 days left means 10 more chances to do it perfectly.",
+            "Build today's food plan: protein above target, calories in surplus, everything logged in MyFitnessPal \u2014 treat every one of the final 10 days as a mandatory win.",
+            "Set up today's nutrition perfectly in MyFitnessPal \u2014 no estimating, no skipping entries \u2014 10 days left and every day of perfect nutrition counts."
+          ],
+          "why": "Perfect nutrition execution in the final 10 days maximizes the return on everything done before."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: review your full training log from the beginning \u2014 scroll through all 80 days and count the total number of logged sessions.",
+            "Active recovery: 15-minute walk and a full training log review \u2014 scroll from Day 1 to today in Strong or Hevy and count every session completed.",
+            "Rest day and progress reflection: walk 15 minutes, then open your training app and scroll your complete log from Day 1 \u2014 count the sessions, see the work."
+          ],
+          "why": "Reviewing the complete log on day 80 shows the full body of work that has been done \u2014 it's motivating in a way that day-to-day tracking isn't."
+        }
+      ]
+    },
+    {
+      "day": 81,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log your weight and set a specific stretch goal for Day 90 on your primary lift \u2014 a number that would require your best performance to hit.",
+            "Morning weigh-in: log it and write your most ambitious realistic Day 90 lift goal \u2014 the number that would make you genuinely proud.",
+            "Step on scale, record it, and commit to a Day 90 lift target that's at the edge of what you think is possible \u2014 write it down and make it real."
+          ],
+          "why": "A stretch goal for Day 90 gives the final sessions something specific to chase."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's complete meals in MyFitnessPal \u2014 full protein, full surplus, distributed across 4 eating occasions.",
+            "Build today's food plan with protein spread across 4 meals and confirm both protein and calories are at target before eating anything.",
+            "Set up today's meals in MyFitnessPal: 4 protein-containing meals, full surplus calories, logged before the first meal of the day."
+          ],
+          "why": "Four protein meals per day in the final weeks maximizes the muscle protein synthesis signal."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's full session with everything you have \u2014 form, intensity, weight \u2014 log every set and note whether you're on pace to hit your Day 90 stretch goal.",
+            "Train today at peak effort and after the session, calculate whether your stretch goal for Day 90 is reachable based on today's numbers.",
+            "Hit your workout today and push every set \u2014 after the session, open your notes and see how close to your Day 90 stretch goal you're getting."
+          ],
+          "why": "Training with a specific Day 90 target in mind makes the final sessions harder and more productive."
+        }
+      ]
+    },
+    {
+      "day": 82,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and verify your recovery is optimal \u2014 sleep, protein, and hydration at max for the final 8 days.",
+            "Morning weigh-in: log the number and run a quick recovery check \u2014 7.5+ hours last night, protein hit yesterday, hydration on target?",
+            "Step on scale, record it, and audit your recovery checklist: sleep hours, yesterday's protein total, and water intake \u2014 all need to be dialed in for the final 8."
+          ],
+          "why": "Full recovery optimization in the last 8 days ensures your final sessions produce your best numbers."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's complete meals before eating and bring your A-game to nutrition execution \u2014 8 days left, every gram matters.",
+            "Build today's food plan in MyFitnessPal and commit to executing it exactly as planned \u2014 not approximately, exactly \u2014 for the final 8 days.",
+            "Set up today's nutrition with precision and discipline: every meal planned and logged before eating, protein above target, full calorie surplus."
+          ],
+          "why": "Precision nutrition in the final 8 days is where the last gains are made or left on the table."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's session and on your main lift, go heavier than last session \u2014 there are only a few sessions left to hit your Day 90 stretch goal.",
+            "Train today with urgency \u2014 Day 90 is 8 days out \u2014 and push your primary lift to a number higher than last session.",
+            "Hit your full workout and make today the heaviest session you've had on your main lift \u2014 8 days left to hit that Day 90 stretch goal."
+          ],
+          "why": "With 8 days left, the urgency of Day 90 should make every set count more than any day before it."
+        }
+      ]
+    },
+    {
+      "day": 83,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and write your body's current stats in full: weight, any measurements you've taken, and your top 4 lift weights.",
+            "Morning weigh-in: log it, then write your complete current stats \u2014 weight, arms, chest, waist, and current working weights for each main lift.",
+            "Step on scale, record it, and create a full stats snapshot: bodyweight, key measurements, and today's working weights for all four compound lifts."
+          ],
+          "why": "A complete stats snapshot 7 days before the end gives you one more comparison point for the Day 90 final report."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal and confirm your food supply is stocked for the final week \u2014 buy any protein sources you need today.",
+            "Build today's food plan and check your kitchen: do you have enough protein food for the next 7 days? Buy anything you're short on today.",
+            "Set up today's nutrition and do a quick inventory check \u2014 enough protein sources in the fridge for 7 more days? If not, order or shop today."
+          ],
+          "why": "Running out of protein food in the final week is the most preventable way to undermine the last 7 days."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: 15-minute walk, foam roll your tightest areas, and write down what you plan to do after Day 90 \u2014 what's the next training block?",
+            "Active recovery: walk 15 minutes, do some light stretching, and draft your post-Day 90 training plan \u2014 what program, what goals, what changes?",
+            "Rest day: 15 minutes of movement, some foam rolling, and 5 minutes writing your next training block \u2014 program, goals, and start date after Day 90."
+          ],
+          "why": "Planning what comes after Day 90 prevents the gap between programs that kills momentum."
+        }
+      ]
+    },
+    {
+      "day": 84,
+      "minutes_total": 17,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Final full week review: list every session completed this week, every lift that hit a new high, and calculate how close you are to each Day 90 target.",
+            "Week 12 review: sessions completed, PRs set, and the gap between today's lift weights and your Day 90 stretch goals \u2014 write it all out.",
+            "Last weekly review of the program: how many sessions this week, which lifts progressed, and what's the final gap to your Day 90 targets?"
+          ],
+          "why": "Final weekly review with Day 90 target tracking makes the last 6 sessions specific and intentional."
+        },
+        {
+          "position": 2,
+          "minutes": 5,
+          "variants": [
+            "Take your penultimate progress photos \u2014 3 angles \u2014 and compare them to Day 60 and Day 77 to see the final phase's changes clearly.",
+            "Week 12 photo check: front, side, back \u2014 saved and labeled 'Day 84' \u2014 compare to Day 60 and Day 77 and write one sentence about the change.",
+            "Shoot your Day 84 photos from all 3 angles and line them up with Day 60 \u2014 the last 24 days of change is visible here."
+          ],
+          "why": "Day 84 photos versus Day 60 isolates the final phase's visual impact \u2014 6 more days will add to this."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Final 12-week nutrition review: calculate your overall protein compliance rate for all 84 days \u2014 days hitting target \u00f7 84 \u00d7 100. Write the percentage.",
+            "Full program nutrition audit at 84 days: average daily protein, average daily calories, and overall protein compliance rate \u2014 write all three numbers.",
+            "12-week nutrition report: pull your MyFitnessPal data, calculate average protein across all logged days, your calorie average, and your protein hit rate \u2014 record them."
+          ],
+          "why": "Full nutrition compliance rate at 84 days tells you how much of your progress was supported by deliberate eating."
+        }
+      ]
+    },
+    {
+      "day": 85,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log your weight and prepare mentally \u2014 5 sessions remain and each one is a PR opportunity before the Day 90 final assessment.",
+            "Morning weigh-in: log the number and write down your game plan for the final 5 training sessions \u2014 which lifts, which targets.",
+            "Step on scale, record it, and map the final 5 sessions: exercises, target weights, and the Day 90 goal for each main lift."
+          ],
+          "why": "Planning the final 5 sessions turns the last training days into a structured finish rather than an open-ended grind."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals and hit every nutrition target perfectly \u2014 5 days of full nutrition execution compounds into a measurable physique difference.",
+            "Build today's complete food plan in MyFitnessPal: full protein at target, full surplus, distributed meals \u2014 execute it without exception.",
+            "Set up today's nutrition with maximum precision \u2014 protein at or above target, full surplus calories, pre-logged before eating \u2014 5 days of this matters."
+          ],
+          "why": "Five consecutive days of perfect nutrition at the end of a 90-day program produces a meaningfully better result."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's session and on your primary lift, go for a new all-time PR \u2014 load the bar heavier than you ever have and take the attempt.",
+            "Train today and open the session with a true max attempt on your strongest lift \u2014 all-time PR attempt with proper warmup and full focus.",
+            "Hit your workout and go for the all-time PR on your main lift today \u2014 you have the fitness, the strength, and the technique from 85 days of work \u2014 take it."
+          ],
+          "why": "An all-time PR 5 days from the end confirms the program worked and produces a number to benchmark future training."
+        }
+      ]
+    },
+    {
+      "day": 86,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and recover from yesterday's PR attempt \u2014 note how your body feels and plan your nutrition to support recovery.",
+            "Morning weigh-in: log the number, then assess recovery \u2014 after a PR attempt, today's recovery is as important as tomorrow's session.",
+            "Step on scale, record it, and do a recovery check \u2014 note soreness, energy, and sleep quality after yesterday's hard training."
+          ],
+          "why": "Recovery after a PR attempt ensures the following sessions can also produce high performance."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals with slightly higher carbs to replenish glycogen after yesterday's heavy session \u2014 20-30g extra carbs today.",
+            "Build today's food plan with a carb boost: 20g extra carbs above your normal plan to refuel glycogen after yesterday's PR session.",
+            "Set up today's nutrition with elevated carbs in MyFitnessPal \u2014 after a heavy PR day, your glycogen needs restoring: add 20-30g carbs to your normal plan."
+          ],
+          "why": "Glycogen replenishment after max effort sessions accelerates recovery and keeps performance high in the final sessions."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's training session and on your secondary lift, attempt a PR as well \u2014 4 days out, every lift deserves one final push.",
+            "Train today and chase a PR on your second compound lift \u2014 you did your primary yesterday, push your secondary one today.",
+            "Hit your workout and make today's main goal a PR on a different lift than yesterday \u2014 4 days left to add to your final totals."
+          ],
+          "why": "Setting PRs across multiple lifts in the final week gives the Day 90 report a complete picture of strength built."
+        }
+      ]
+    },
+    {
+      "day": 87,
+      "minutes_total": 12,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight and write down your current all-time PRs for each compound lift \u2014 this is the record before the Day 90 final assessment.",
+            "Morning weigh-in: log the number, then list your all-time best weights for bench, squat, deadlift, and overhead press \u2014 these are your 87-day marks.",
+            "Step on scale, record it, and write your current personal records for every compound lift \u2014 this is the pre-final-assessment snapshot."
+          ],
+          "why": "Documenting current PRs 3 days before the end creates a clear benchmark for the Day 90 final report."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals in MyFitnessPal \u2014 3 days left, perfect nutrition execution every single day until Day 90.",
+            "Build today's complete food plan: protein at target, calories in surplus, fully logged before eating \u2014 3 days of this closes out the program right.",
+            "Set up today's nutrition with precision and commitment \u2014 the last 3 days of nutrition are the final 3% of a 90-day effort."
+          ],
+          "why": "Three consecutive days of perfect nutrition to close the program is a clean way to finish what you started on Day 1."
+        },
+        {
+          "position": 3,
+          "minutes": 6,
+          "variants": [
+            "Rest day: 15-minute walk and 10 minutes writing what the next training program will be \u2014 name it, describe the split, and set a Day 1 date for it.",
+            "Active recovery: walk 15 minutes, then write your next block's plan \u2014 what program, what split, what goals \u2014 and set a start date.",
+            "Rest day and next block planning: walk for 15 minutes, then commit your next training block to writing \u2014 program name, start date, and 3 goals."
+          ],
+          "why": "Planning your next program before Day 90 ends eliminates the gap between programs that leads to detraining."
+        }
+      ]
+    },
+    {
+      "day": 88,
+      "minutes_total": 15,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Log your weight and take your final pre-Day-90 measurements \u2014 arms, chest, waist \u2014 to have a comparison point for the Day 90 report.",
+            "Morning weigh-in and final measurements: tape measure arms, chest, and waist \u2014 log these for the Day 90 report so you have the most accurate final numbers.",
+            "Step on scale, log it, then take your Day 88 body measurements \u2014 arms, chest, waist \u2014 these will feed into your Day 90 final assessment."
+          ],
+          "why": "Pre-Day-90 measurements captured 2 days early give you final numbers before the celebration disrupts the data."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's complete meals in MyFitnessPal \u2014 2 days left, execute with the same discipline as Day 1.",
+            "Build today's food plan: every meal logged, protein at target, calories in surplus \u2014 2 days from the end is not the time to let nutrition slip.",
+            "Set up today's nutrition in MyFitnessPal with full attention \u2014 2 more days of perfect fueling closes out the program exactly as it started."
+          ],
+          "why": "Two days of perfect nutrition before the Day 90 assessment maximizes how you look and feel at the finish line."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Execute today's penultimate training session \u2014 make it the best session of the program, leave nothing in reserve.",
+            "Train today as if it's your last session of the program \u2014 full effort, every set, every rep \u2014 because Day 90 is the celebration, today is the performance.",
+            "Hit your second-to-last session of the program at maximum effort \u2014 full intensity, full focus, every set logged \u2014 Day 90 is tomorrow."
+          ],
+          "why": "The second-to-last session is often the best one \u2014 urgency and accumulated fitness combine."
+        }
+      ]
+    },
+    {
+      "day": 89,
+      "minutes_total": 14,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Log your weight one final time before Day 90 \u2014 tomorrow is the official weigh-in and photo day, today is preparation.",
+            "Morning weigh-in on the day before the finish: log the number and note that tomorrow is the Day 90 final assessment.",
+            "Step on scale, record it \u2014 tomorrow is Day 90, the final weigh-in, final photos, and final strength test."
+          ],
+          "why": "Day 89 weigh-in gives you a preview of tomorrow's final number."
+        },
+        {
+          "position": 2,
+          "minutes": 4,
+          "variants": [
+            "Pre-log today's meals \u2014 your last full nutrition day before Day 90 \u2014 and execute it perfectly.",
+            "Build today's complete food plan in MyFitnessPal: last full nutrition day, every gram counted, protein above target.",
+            "Set up today's nutrition with everything you have \u2014 final full nutrition day, logged in advance, protein and calories both on target."
+          ],
+          "why": "The last full nutrition day before the Day 90 assessment sets up optimal muscle fullness for the final photos and weigh-in."
+        },
+        {
+          "position": 3,
+          "minutes": 8,
+          "variants": [
+            "Final training session of the program \u2014 run it completely, set whatever PRs you have left in you, and log every last set in Strong or Hevy.",
+            "Last session: hit everything on the program, attempt a PR on any lift you haven't maxed yet this week, and log the final sets of the program.",
+            "Close out your training log with your final session \u2014 every exercise, every set, every weight \u2014 and attempt at least one PR in this last workout."
+          ],
+          "why": "The final training session of the 90 days deserves maximum effort \u2014 it's the last line of your progress story."
+        }
+      ]
+    },
+    {
+      "day": 90,
+      "minutes_total": 20,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 4,
+          "variants": [
+            "Day 90 final assessment: weigh yourself, take your 3 progress photos, and line them up next to your Day 1 baseline \u2014 write the total weight change.",
+            "90-day milestone: morning weigh-in, progress photos from all 3 angles, and a full comparison to Day 1 \u2014 document everything before you celebrate.",
+            "Final day: step on scale, take your Day 90 photos (front, side, back), calculate the total weight change from Day 1, and save everything in one place."
+          ],
+          "why": "Day 90 documentation is the capstone \u2014 the complete record of what 90 days of consistent training and nutrition produces."
+        },
+        {
+          "position": 2,
+          "minutes": 7,
+          "variants": [
+            "Write your 90-day strength report: Day 1 weights vs. Day 90 weights for bench, squat, deadlift, and overhead press \u2014 calculate the total pounds added per lift.",
+            "Final strength audit: find your first session's weights and today's weights for every compound lift \u2014 write the progression and calculate total strength gained.",
+            "90-day strength summary: list every main lift with your Day 1 starting weight and your current best \u2014 calculate the total weight added across all four lifts."
+          ],
+          "why": "The strength report is the objective proof of what progressive overload produces over 90 days."
+        },
+        {
+          "position": 3,
+          "minutes": 9,
+          "variants": [
+            "Write your complete 90-day program report: weight gained, muscle measurements change, total sessions completed, protein compliance rate, and 3 things that made the difference \u2014 then write your next block's start date.",
+            "Final report: body weight change, measurements change, strength gains on every lift, consistency rate, top 3 lessons learned, and the date your next training block begins.",
+            "Day 90 full assessment: compile your complete results \u2014 weight, measurements, lifts, compliance \u2014 into a written summary and commit to a next block start date in writing today."
+          ],
+          "why": "A complete written report on Day 90 closes the loop on 90 days of effort and sets the foundation for the next block \u2014 the work doesn't stop here."
+        }
+      ]
+    }
+  ]
+}

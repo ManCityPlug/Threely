@@ -173,9 +173,9 @@ function AddGoalFlow({ onDone, onClose, onProRequired }: AddGoalFlowProps) {
   const insets = useSafeAreaInsets();
 
   const [category, setCategory] = useState<FunnelCategory | null>(null);
-  const [funnelStep, setFunnelStep] = useState(0); // 0 = category, 1-3 = questions
+  const [funnelStep, setFunnelStep] = useState(0); // 0 = category, 1-n = questions
   const [answers, setAnswers] = useState<string[]>([]);
-  const [textValue, setTextValue] = useState("");
+  const [selectedPath, setSelectedPath] = useState<string>("");
   const [building, setBuilding] = useState(false);
   const [buildError, setBuildError] = useState("");
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -192,37 +192,28 @@ function AddGoalFlow({ onDone, onClose, onProRequired }: AddGoalFlowProps) {
     animateTransition(() => {
       setCategory(cat);
       setAnswers([]);
-      setTextValue("");
+      setSelectedPath("");
       setFunnelStep(1);
     });
   }
 
-  function handleButtonAnswer(answer: string) {
+  function handleButtonAnswer(answer: string, path?: string) {
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
-    setTextValue("");
-    if (newAnswers.length >= 3) {
-      startBuild(category!, newAnswers);
+    // Step 1 is always the path selector — capture path and move forward
+    const nextPath = path || selectedPath;
+    if (path) setSelectedPath(path);
+    // Health skips the income question (step 2)
+    const totalSteps = category === "health" ? 2 : 3;
+    if (newAnswers.length >= totalSteps) {
+      startBuild(category!, newAnswers, nextPath);
+    } else if (category === "health" && funnelStep === 1) {
+      // Skip from path → effort (step 3 equivalent)
+      animateTransition(() => setFunnelStep(3));
     } else {
       animateTransition(() => setFunnelStep(funnelStep + 1));
     }
-  }
-
-  function handleTextSubmit(value: string) {
-    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    const newAnswers = [...answers, value];
-    setAnswers(newAnswers);
-    setTextValue("");
-    if (newAnswers.length >= 3) {
-      startBuild(category!, newAnswers);
-    } else {
-      animateTransition(() => setFunnelStep(funnelStep + 1));
-    }
-  }
-
-  function handleSkip() {
-    handleTextSubmit("");
   }
 
   function handleBack() {
@@ -231,24 +222,25 @@ function AddGoalFlow({ onDone, onClose, onProRequired }: AddGoalFlowProps) {
       animateTransition(() => {
         setCategory(null);
         setAnswers([]);
-        setTextValue("");
+        setSelectedPath("");
         setFunnelStep(0);
       });
     } else if (funnelStep > 1) {
       animateTransition(() => {
         setAnswers((prev) => prev.slice(0, -1));
-        setTextValue("");
-        setFunnelStep(funnelStep - 1);
+        const prevStep = category === "health" && funnelStep === 3 ? 1 : funnelStep - 1;
+        setFunnelStep(prevStep);
       });
     }
   }
 
-  async function startBuild(cat: FunnelCategory, allAnswers: string[]) {
+  async function startBuild(cat: FunnelCategory, allAnswers: string[], path: string) {
     setBuilding(true);
     setBuildError("");
 
-    const goalText = buildGoalText(cat, allAnswers);
-    const effortKey = (allAnswers[1] ?? "moderate").toLowerCase();
+    const goalText = buildGoalText(cat, allAnswers, path);
+    const effortAnswer = cat === "health" ? allAnswers[1] : allAnswers[2];
+    const effortKey = (effortAnswer ?? "moderate").toLowerCase();
     const dailyMinutes = EFFORT_TO_MINUTES[effortKey] ?? 60;
     const intensity = EFFORT_TO_INTENSITY[effortKey] ?? 2;
 
@@ -259,20 +251,11 @@ function AddGoalFlow({ onDone, onClose, onProRequired }: AddGoalFlowProps) {
       // 2. Save profile preferences
       await profileApi.save({ dailyTimeMinutes: dailyMinutes, intensityLevel: intensity });
 
-      // 3. Create the goal
-      const title =
-        cat === "business"
-          ? `Make ${allAnswers[0]} per month`
-          : cat === "daytrading"
-            ? `Day trade to ${allAnswers[0]}/mo`
-            : cat === "health"
-              ? allAnswers[0]
-              : (allAnswers[0]?.slice(0, 40) || "My Goal");
-
-      const { goal } = await goalsApi.create(title, {
+      // 3. Create the goal — category field stores the library path id
+      const { goal } = await goalsApi.create(goalText, {
         rawInput: goalText,
         structuredSummary: parsed.structured_summary ?? undefined,
-        category: parsed.category ?? cat,
+        category: path,
         deadline: parsed.deadline_detected ?? undefined,
         dailyTimeMinutes: dailyMinutes,
         intensityLevel: intensity,
@@ -314,7 +297,7 @@ function AddGoalFlow({ onDone, onClose, onProRequired }: AddGoalFlowProps) {
               <TouchableOpacity
                 style={styles.continueBtn}
                 onPress={() => {
-                  if (category) startBuild(category, answers);
+                  if (category) startBuild(category, answers, selectedPath);
                 }}
                 activeOpacity={0.85}
               >
@@ -373,81 +356,25 @@ function AddGoalFlow({ onDone, onClose, onProRequired }: AddGoalFlowProps) {
                 ))}
               </View>
 
-              {/* Button-style answers */}
+              {/* Button-style answers (MC only — no free text) */}
               {currentStepConfig.buttons && (
                 <View style={styles.optionList}>
                   {currentStepConfig.buttons.map((btn) => (
                     <TouchableOpacity
-                      key={btn}
+                      key={btn.label}
                       style={styles.optionBtn}
-                      onPress={() => handleButtonAnswer(btn)}
+                      onPress={() => handleButtonAnswer(btn.label, btn.path || undefined)}
                       activeOpacity={0.8}
                     >
-                      <Text style={styles.optionBtnText}>{btn}</Text>
+                      <Text style={styles.optionBtnText}>{btn.label}</Text>
+                      {btn.description && (
+                        <Text style={styles.optionBtnSub}>{btn.description}</Text>
+                      )}
                     </TouchableOpacity>
                   ))}
                 </View>
               )}
 
-              {/* Text input answer */}
-              {currentStepConfig.isTextInput && (
-                <View style={{ gap: spacing.md }}>
-                  <TextInput
-                    style={styles.textInput}
-                    placeholder={currentStepConfig.placeholder}
-                    placeholderTextColor={colors.textTertiary}
-                    value={textValue}
-                    onChangeText={setTextValue}
-                    autoFocus
-                    multiline
-                    textAlignVertical="top"
-                    returnKeyType="done"
-                    onSubmitEditing={() => {
-                      if (textValue.trim()) handleTextSubmit(textValue.trim());
-                    }}
-                  />
-
-                  {currentStepConfig.continueButton && (
-                    <TouchableOpacity
-                      style={[
-                        styles.continueBtn,
-                        !textValue.trim() && styles.continueBtnDisabled,
-                      ]}
-                      onPress={() => textValue.trim() && handleTextSubmit(textValue.trim())}
-                      activeOpacity={textValue.trim() ? 0.85 : 1}
-                      disabled={!textValue.trim()}
-                    >
-                      <Text
-                        style={[
-                          styles.continueBtnText,
-                          !textValue.trim() && styles.continueBtnTextDisabled,
-                        ]}
-                      >
-                        {currentStepConfig.continueButton}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-
-                  {currentStepConfig.skippable && (
-                    <TouchableOpacity
-                      style={[
-                        styles.continueBtn,
-                        !textValue.trim() && { backgroundColor: colors.primary },
-                      ]}
-                      onPress={() =>
-                        textValue.trim()
-                          ? handleTextSubmit(textValue.trim())
-                          : handleSkip()
-                      }
-                      activeOpacity={0.85}
-                    >
-                      <Text style={styles.continueBtnText}>
-                        {textValue.trim() ? "Continue" : "Skip"}
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
-              )}
             </ScrollView>
           </KeyboardAvoidingView>
         </Animated.View>
@@ -827,6 +754,12 @@ function createStyles(c: Colors) {
       fontSize: typography.lg,
       fontWeight: typography.bold,
       color: c.text,
+    },
+    optionBtnSub: {
+      fontSize: typography.sm,
+      color: c.textSecondary,
+      marginTop: 2,
+      textAlign: "center",
     },
 
     textInput: {
