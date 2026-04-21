@@ -886,7 +886,7 @@ export default function StartPage() {
             <div style={{ textAlign: "center" }}>
               <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 16 }} />
               <h1 style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
-                What do you want?
+                What is your goal?
               </h1>
               <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.85)" }}>
                 Pick one to start
@@ -1110,10 +1110,10 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "clamp(0.5rem, 2vh, 1.5rem) clamp(1rem, 4vw, 2rem)", display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
       <div className="paywall-root" style={{ width: "100%", maxWidth: 460, display: "flex", flexDirection: "column", gap: "1.1rem" }}>
         {/* 1. Headline — most prominent */}
-        <div style={{ textAlign: "center", paddingTop: 8 }}>
+        <div style={{ textAlign: "center", paddingTop: 0 }}>
           <img src="/favicon.png" alt="Threely" width={52} height={52} style={{ borderRadius: 13, marginBottom: 14, boxShadow: "0 6px 20px rgba(212,168,67,0.15)" }} />
           <h1 style={{
             fontSize: "clamp(1.5rem, 5vw, 2rem)",

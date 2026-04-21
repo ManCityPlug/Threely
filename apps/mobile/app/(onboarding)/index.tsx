@@ -382,7 +382,7 @@ export default function OnboardingScreen() {
   function renderCategoryPicker() {
     return (
       <View style={styles.centerContent}>
-        <Text style={styles.stepTitle}>What do you want?</Text>
+        <Text style={styles.stepTitle}>What is your goal?</Text>
         <View style={styles.categoryList}>
           <TouchableOpacity
             style={styles.categoryBtn}
