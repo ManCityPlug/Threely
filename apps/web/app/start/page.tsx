@@ -1324,18 +1324,25 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             ))}
           </div>
           {/* Big lock — sits clearly ABOVE the CTA text and slightly below
-              the top border of the blurred block, horizontally centered. */}
-          <div className="shake-lock" style={{
+              the top border of the blurred block. The shake animation's
+              transform was overriding translateX(-50%), pulling the lock
+              off-center. Outer wrapper handles positioning, inner element
+              does the shake. */}
+          <div style={{
             position: "absolute",
             left: "50%",
-            top: 18,
+            top: 12,
             transform: "translateX(-50%)",
-            fontSize: "2.4rem",
-            lineHeight: 1,
-            filter: "drop-shadow(0 0 16px rgba(212,168,67,0.65))",
             pointerEvents: "none",
             zIndex: 4,
-          }}>🔒</div>
+          }}>
+            <div className="shake-lock" style={{
+              fontSize: "2.4rem",
+              lineHeight: 1,
+              filter: "drop-shadow(0 0 16px rgba(212,168,67,0.65))",
+              display: "inline-block",
+            }}>🔒</div>
+          </div>
           {/* Gradient fade + CTA text */}
           <div style={{
             position: "absolute", left: 0, right: 0, bottom: 0,
