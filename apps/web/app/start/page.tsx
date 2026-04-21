@@ -1123,7 +1123,7 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             margin: 0,
             marginBottom: 8,
           }}>
-            One Step Away
+            One Step Away From Your Goal
           </h1>
         </div>
 
