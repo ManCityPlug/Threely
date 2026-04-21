@@ -11,7 +11,7 @@ import { MOCK_TUTORIAL_GOAL } from "@/lib/mock-tutorial-data";
 
 // ─── 3-Step Funnel for "Add Goal" (same as /start) ───────────────────────────
 
-type FunnelCategory = "business" | "daytrading" | "health" | "other";
+type FunnelCategory = "business" | "daytrading" | "health";
 
 interface StepConfig {
   question: string;
@@ -38,11 +38,6 @@ const FUNNEL_STEPS: Record<FunnelCategory, StepConfig[]> = {
     { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
     { question: "Do you have a specific target goal?", isTextInput: true, placeholder: "Enter my goal...", skippable: true },
   ],
-  other: [
-    { question: "What's your goal?", isTextInput: true, placeholder: "Describe your goal...", continueButton: "Continue" },
-    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
-    { question: "Anything specific?", isTextInput: true, placeholder: "Enter details...", skippable: true },
-  ],
 };
 
 function buildGoalText(category: FunnelCategory, answers: string[]): string {
@@ -53,8 +48,6 @@ function buildGoalText(category: FunnelCategory, answers: string[]): string {
       return `I want to day trade to make ${answers[0]} per month. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `Previous experience: ${answers[2]}` : "I'm a complete beginner with no day trading experience."}`;
     case "health":
       return `I want to ${answers[0].toLowerCase()}. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `My target: ${answers[2]}` : ""}`.trim();
-    case "other":
-      return `My goal: ${answers[0]}. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `Details: ${answers[2]}` : ""}`.trim();
   }
 }
 
@@ -133,7 +126,7 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
     setBuildError("");
     const goalText = buildGoalText(cat, allAnswers);
     // Determine effort from the "Level of work?" answer (always index 1 for business/health, index 1 for other)
-    const effortAnswer = cat === "other" ? allAnswers[1] : allAnswers[1];
+    const effortAnswer = allAnswers[1];
     const effortKey = effortAnswer.toLowerCase();
     const dailyMinutes = EFFORT_TO_MINUTES[effortKey] ?? 60;
     const intensity = EFFORT_TO_INTENSITY[effortKey] ?? 2;
@@ -244,7 +237,6 @@ function AddGoalFlow({ onDone, onClose }: { onDone: (goal: Goal) => void; onClos
                 { id: "daytrading" as FunnelCategory, label: "\uD83D\uDCC8 Day Trading", subtitle: "Grow a trading account" },
                 { id: "business" as FunnelCategory, label: "\uD83E\uDD11 Business", subtitle: "Start or grow a business" },
                 { id: "health" as FunnelCategory, label: "\uD83D\uDCAA Health", subtitle: "Transform your body" },
-                { id: "other" as FunnelCategory, label: "Other", subtitle: "Set any goal" },
               ]).map((cat) => (
                 <button
                   key={cat.id}

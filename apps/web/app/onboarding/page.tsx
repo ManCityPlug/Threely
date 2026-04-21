@@ -10,7 +10,7 @@ import { formatDisplayName } from "@/lib/format-name";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Category = "business" | "health" | "other";
+type Category = "business" | "health";
 
 interface ChatEntry {
   role: "user" | "assistant";
@@ -60,11 +60,6 @@ const STEPS: Record<Category, StepConfig[]> = {
     { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
     { question: "Do you have a specific target goal?", isTextInput: true, placeholder: "Enter my goal...", skippable: true },
   ],
-  other: [
-    { question: "What's your goal?", isTextInput: true, placeholder: "Describe your goal...", continueButton: "Continue" },
-    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
-    { question: "Anything specific?", isTextInput: true, placeholder: "Enter details...", skippable: true },
-  ],
 };
 
 function buildInitialMessage(category: Category, answers: string[]): string {
@@ -73,8 +68,6 @@ function buildInitialMessage(category: Category, answers: string[]): string {
       return `I want to make ${answers[0]} per month. I can put in ${answers[1].toLowerCase()} work. My business idea: ${answers[2] || "no specific idea yet"}`;
     case "health":
       return `I want to ${answers[0].toLowerCase()}. I can put in ${answers[1].toLowerCase()} work. My target: ${answers[2] || "no specific target"}`;
-    case "other":
-      return `My goal: ${answers[0]}. I can put in ${answers[1].toLowerCase()} work. Details: ${answers[2] || "no specific details"}`;
   }
 }
 
@@ -326,9 +319,8 @@ export default function OnboardingPage() {
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
               {([
-                { id: "business" as Category, label: "🤑 Business", subtitle: "Start or grow a business" },
+                { id: "business" as Category, label: "💼 Business", subtitle: "Start or grow a business" },
                 { id: "health" as Category, label: "💪 Health", subtitle: "Transform your body" },
-                { id: "other" as Category, label: "Other", subtitle: "Set any goal" },
               ]).map((cat) => (
                 <button
                   key={cat.id}

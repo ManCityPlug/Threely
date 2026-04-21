@@ -18,7 +18,7 @@ interface GoalTemplatesProps {
   onClose: () => void;
 }
 
-// Category picker for the Add Goal funnel: 3 stacked cards (Business / Health / Other).
+// Category picker for the Add Goal funnel: stacked cards from FUNNEL_CATEGORIES.
 export function GoalTemplates({ onSelect, onClose }: GoalTemplatesProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
