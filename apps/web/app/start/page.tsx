@@ -462,7 +462,7 @@ function InlinePayment({ plan, preloadedClientSecret, primedPaymentRequest, onSu
           <rect x="2" y="5" width="20" height="14" rx="2" ry="2" />
           <line x1="2" y1="10" x2="22" y2="10" />
         </svg>
-        Pay $1 with card
+        Pay with Credit Card
         <span style={{ transition: "transform 0.2s", transform: cardOpen ? "rotate(180deg)" : "rotate(0deg)", opacity: 0.6, marginLeft: 2 }}>▾</span>
       </button>
 
