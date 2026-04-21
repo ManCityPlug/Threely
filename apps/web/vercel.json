@@ -1,5 +1,7 @@
 {
   "alias": ["threely-app.vercel.app"],
+  "installCommand": "cd ../.. && pnpm install --frozen-lockfile",
+  "buildCommand": "cd ../.. && pnpm --filter @threely/web build",
   "crons": [
     {
       "path": "/api/cron/cleanup-anon",
