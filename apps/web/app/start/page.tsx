@@ -51,52 +51,107 @@ function getElementStyle(): Record<string, unknown> {
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Category = "business" | "daytrading" | "health" | "other";
+type Category = "business" | "daytrading" | "health";
+
+interface PathOption {
+  label: string;
+  path: string;
+  description?: string;
+}
 
 interface StepConfig {
   question: string;
-  buttons?: string[];
-  isTextInput?: boolean;
-  placeholder?: string;
-  skippable?: boolean;
-  continueButton?: string;
+  buttons: PathOption[];
 }
 
-// ─── Step configurations per category ─────────────────────────────────────────
-
+// Step order per category (all MC, no free text):
+//   step 1 = path pick (sub-question)
+//   step 2 = income target (business/daytrading only — skipped for health)
+//   step 3 = effort level
 const STEPS: Record<Category, StepConfig[]> = {
   business: [
-    { question: "How much do you want to make per month?", buttons: ["$500", "$1K-$5K", "$10K+"] },
-    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
-    { question: "Got a business idea?", isTextInput: true, placeholder: "Enter your idea...", skippable: true },
+    {
+      question: "What are you building?",
+      buttons: [
+        { label: "Ecommerce — starting fresh", path: "business_ecommerce", description: "Physical product, Shopify, dropshipping" },
+        { label: "Ecommerce — already have a store", path: "business_ecommerce_existing", description: "Grow traffic and revenue" },
+        { label: "Service / freelancing", path: "business_service", description: "Trade skills for money" },
+        { label: "Content / audience", path: "business_content", description: "TikTok, YouTube, IG, X" },
+        { label: "Software / SaaS", path: "business_saas", description: "Digital product or SaaS" },
+      ],
+    },
+    {
+      question: "How much do you want to make per month?",
+      buttons: [
+        { label: "$500", path: "" },
+        { label: "$1K-$5K", path: "" },
+        { label: "$10K+", path: "" },
+      ],
+    },
+    { question: "Level of work?", buttons: [
+      { label: "Mild", path: "" },
+      { label: "Moderate", path: "" },
+      { label: "Heavy", path: "" },
+    ] },
   ],
   daytrading: [
-    { question: "How much do you want to make per month?", buttons: ["$500", "$1K-$5K", "$10K+"] },
-    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
-    { question: "Any previous experience?", isTextInput: true, placeholder: "", skippable: true },
+    {
+      question: "Where are you starting?",
+      buttons: [
+        { label: "Never traded", path: "daytrading_beginner", description: "Learn from scratch with paper trading" },
+        { label: "I have experience", path: "daytrading_experienced", description: "Build discipline and consistency" },
+      ],
+    },
+    {
+      question: "How much do you want to make per month?",
+      buttons: [
+        { label: "$500", path: "" },
+        { label: "$1K-$5K", path: "" },
+        { label: "$10K+", path: "" },
+      ],
+    },
+    { question: "Level of work?", buttons: [
+      { label: "Mild", path: "" },
+      { label: "Moderate", path: "" },
+      { label: "Heavy", path: "" },
+    ] },
   ],
   health: [
-    { question: "What do you want?", buttons: ["Lose weight", "Glow up", "Gain more muscle"] },
-    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
-    { question: "Do you have a specific target goal?", isTextInput: true, placeholder: "Enter my goal...", skippable: true },
-  ],
-  other: [
-    { question: "What's your goal?", isTextInput: true, placeholder: "Describe your goal...", continueButton: "Continue" },
-    { question: "Level of work?", buttons: ["Mild", "Moderate", "Heavy"] },
-    { question: "Anything specific?", isTextInput: true, placeholder: "Enter details...", skippable: true },
+    {
+      question: "What's your goal?",
+      buttons: [
+        { label: "Lose weight", path: "health_weight_loss", description: "Calorie deficit + movement" },
+        { label: "Build muscle", path: "health_muscle", description: "Progressive overload + protein" },
+        { label: "Get fit / feel better", path: "health_general", description: "Daily habits and movement" },
+      ],
+    },
+    // step 2 intentionally unused for health — we skip from path → effort
+    { question: "Level of work?", buttons: [
+      { label: "Mild", path: "" },
+      { label: "Moderate", path: "" },
+      { label: "Heavy", path: "" },
+    ] },
   ],
 };
 
-function buildGoalText(category: Category, answers: string[]): string {
+function buildGoalTitle(category: Category, path: string, incomeOrAnswer: string): string {
   switch (category) {
     case "business":
-      return `I want to make ${answers[0]} per month. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `My business idea: ${answers[2]}` : "I need help finding a business idea."}`;
+      if (path === "business_ecommerce") return incomeOrAnswer ? `Make ${incomeOrAnswer}/Month (Ecommerce)` : "Start an Ecommerce Brand";
+      if (path === "business_ecommerce_existing") return incomeOrAnswer ? `Grow My Store to ${incomeOrAnswer}/Month` : "Grow My Ecommerce Store";
+      if (path === "business_service") return incomeOrAnswer ? `Make ${incomeOrAnswer}/Month (Service)` : "Start a Service Business";
+      if (path === "business_content") return incomeOrAnswer ? `Build an Audience + ${incomeOrAnswer}/Month` : "Build a Content Brand";
+      if (path === "business_saas") return incomeOrAnswer ? `Launch a SaaS + ${incomeOrAnswer}/Month` : "Launch a SaaS";
+      return incomeOrAnswer ? `Make ${incomeOrAnswer}/Month` : "Start a Business";
     case "daytrading":
-      return `I want to day trade to make ${answers[0]} per month. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `Previous experience: ${answers[2]}` : "I'm a complete beginner with no day trading experience."}`;
+      if (path === "daytrading_beginner") return incomeOrAnswer ? `Learn Day Trading → ${incomeOrAnswer}/Month` : "Learn to Day Trade";
+      if (path === "daytrading_experienced") return incomeOrAnswer ? `Day Trading → ${incomeOrAnswer}/Month` : "Day Trade With Discipline";
+      return "Day Trading";
     case "health":
-      return `I want to ${answers[0].toLowerCase()}. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `My target: ${answers[2]}` : ""}`.trim();
-    case "other":
-      return `My goal: ${answers[0]}. I can put in ${answers[1].toLowerCase()} work. ${answers[2] ? `Details: ${answers[2]}` : ""}`.trim();
+      if (path === "health_weight_loss") return "Lose Weight";
+      if (path === "health_muscle") return "Build Muscle";
+      if (path === "health_general") return "Get Fit + Feel Better";
+      return "Health Goal";
   }
 }
 
@@ -538,7 +593,7 @@ export default function StartPage() {
   const [category, setCategory] = useState<Category | null>(null);
   const [funnelStep, setFunnelStep] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
-  const [textValue, setTextValue] = useState("");
+  const [selectedPath, setSelectedPath] = useState<string>("");
   const [fadeKey, setFadeKey] = useState(0);
 
   // ── Hype + preview state ──
@@ -585,70 +640,55 @@ export default function StartPage() {
   function handleCategorySelect(cat: Category) {
     setCategory(cat);
     setAnswers([]);
-    setTextValue("");
+    setSelectedPath("");
     animateStep(1);
   }
 
-  function handleButtonAnswer(answer: string) {
+  // Step 1 captures the path; step 2 (business/daytrading) captures income;
+  // step 3 captures effort. Health skips step 2.
+  function handleButtonAnswer(answer: string, path?: string) {
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
-    setTextValue("");
+    const nextPath = path || selectedPath;
+    if (path) setSelectedPath(path);
 
-    if (newAnswers.length >= 3) {
-      startBuild(category!, newAnswers);
+    const totalSteps = category === "health" ? 2 : 3;
+    if (newAnswers.length >= totalSteps) {
+      startBuild(category!, newAnswers, nextPath);
+    } else if (category === "health" && funnelStep === 1) {
+      // Skip income step for health — jump directly to effort (step 3)
+      animateStep(3);
     } else {
       animateStep(funnelStep + 1);
     }
-  }
-
-  function handleTextSubmit(value: string) {
-    const newAnswers = [...answers, value];
-    setAnswers(newAnswers);
-    setTextValue("");
-
-    if (newAnswers.length >= 3) {
-      startBuild(category!, newAnswers);
-    } else {
-      animateStep(funnelStep + 1);
-    }
-  }
-
-  function handleSkip() {
-    handleTextSubmit("");
   }
 
   function handleBack() {
     if (funnelStep === 1) {
       setCategory(null);
       setAnswers([]);
+      setSelectedPath("");
       animateStep(0);
     } else if (funnelStep > 1) {
       setAnswers((prev) => prev.slice(0, -1));
-      animateStep(funnelStep - 1);
+      // Health goes back from effort (step 3) directly to path (step 1)
+      const prev = category === "health" && funnelStep === 3 ? 1 : funnelStep - 1;
+      animateStep(prev);
     }
   }
 
   // ── Show hype + blurred preview (NO plan building yet) ──
-  function startBuild(cat: Category, allAnswers: string[]) {
-    const goalText = buildGoalText(cat, allAnswers);
-    // Store goal info for later (after checkout + signup)
-    // Create an aspirational display title
-    const title = cat === "business"
-      ? `Making ${allAnswers[0] === "$500" ? "$500" : allAnswers[0] === "$1K-$5K" ? "$5,000" : "$10,000"}/Month`
-      : cat === "daytrading"
-        ? `Day Trading to ${allAnswers[0] === "$500" ? "$500" : allAnswers[0] === "$1K-$5K" ? "$5,000" : "$10,000"}/Month`
-        : cat === "health"
-          ? allAnswers[0] === "Lose weight" ? "Losing Weight"
-            : allAnswers[0] === "Glow up" ? "Glow Up"
-            : allAnswers[0] === "Gain more muscle" ? "Building Muscle"
-            : allAnswers[0]
-          : allAnswers[0]?.slice(0, 40) || "Your Goal";
+  function startBuild(cat: Category, allAnswers: string[], path: string) {
+    // For business/daytrading: answers[0]=path-label, answers[1]=income, answers[2]=effort
+    // For health: answers[0]=path-label, answers[1]=effort (income skipped)
+    const income = cat === "health" ? "" : (allAnswers[1] ?? "");
+    const title = buildGoalTitle(cat, path, income);
 
     try {
       localStorage.setItem("threely_pending_goal", JSON.stringify({
-        category: cat,
+        category: path, // store the library path id
         answers: allAnswers,
-        goalText,
+        goalText: title,
         displayTitle: title,
       }));
     } catch { /* ignore */ }
@@ -748,9 +788,8 @@ export default function StartPage() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
               {([
                 { id: "daytrading" as Category, label: "📈 Day Trading", subtitle: "Grow a trading account" },
-                { id: "business" as Category, label: "🤑 Business", subtitle: "Start or grow a business" },
+                { id: "business" as Category, label: "💼 Business", subtitle: "Start or grow a business" },
                 { id: "health" as Category, label: "💪 Health", subtitle: "Transform your body" },
-                { id: "other" as Category, label: "Other", subtitle: "Set any goal" },
               ]).map((cat) => (
                 <button
                   key={cat.id}
@@ -813,80 +852,30 @@ export default function StartPage() {
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {currentStepConfig.buttons.map((btn) => (
                   <button
-                    key={btn}
-                    onClick={() => handleButtonAnswer(btn)}
+                    key={btn.label}
+                    onClick={() => handleButtonAnswer(btn.label, btn.path || undefined)}
                     style={{
                       padding: "1rem 1.25rem", borderRadius: 14,
                       border: "1.5px solid var(--border)", background: "var(--card)",
                       color: "var(--text)", fontSize: "1rem", fontWeight: 600,
-                      cursor: "pointer", transition: "all 0.15s", minHeight: 56, textAlign: "center",
+                      cursor: "pointer", transition: "all 0.15s", minHeight: 56,
+                      textAlign: btn.description ? "left" : "center",
+                      display: "flex", flexDirection: "column", alignItems: btn.description ? "flex-start" : "center", justifyContent: "center", gap: 2,
                     }}
                     onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#D4A843"; e.currentTarget.style.color = "#D4A843"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text)"; }}
                   >
-                    {btn}
+                    <span>{btn.label}</span>
+                    {btn.description && (
+                      <span style={{ fontSize: "0.8rem", fontWeight: 500, color: "rgba(255,255,255,0.6)" }}>
+                        {btn.description}
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
             )}
 
-            {currentStepConfig.isTextInput && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <input
-                  className="field-input"
-                  placeholder={currentStepConfig.placeholder}
-                  value={textValue}
-                  onChange={(e) => setTextValue(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter" && textValue.trim()) handleTextSubmit(textValue.trim()); }}
-                  // No autoFocus — user should see Skip before being forced
-                  // into the keyboard. Safari autofill / password-manager
-                  // hints (^v✓) happen when autoComplete is unset; we
-                  // explicitly opt out of all of them so the box just holds
-                  // the user's typed text.
-                  autoComplete="off"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  data-1p-ignore
-                  data-lpignore="true"
-                  name="goalText"
-                  style={{
-                    fontSize: "1rem", padding: "1rem 1.25rem", borderRadius: 14, minHeight: 56,
-                    background: "var(--card)", border: "1.5px solid var(--border)", color: "var(--text)",
-                  }}
-                />
-                {currentStepConfig.continueButton && (
-                  <button
-                    onClick={() => textValue.trim() && handleTextSubmit(textValue.trim())}
-                    disabled={!textValue.trim()}
-                    style={{
-                      padding: "1rem 1.25rem", borderRadius: 14, border: "none",
-                      background: textValue.trim()
-                        ? "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)"
-                        : "var(--border)",
-                      color: textValue.trim() ? "#000" : "rgba(255,255,255,0.5)",
-                      fontSize: "1rem", fontWeight: 700,
-                      cursor: textValue.trim() ? "pointer" : "default",
-                      minHeight: 56, transition: "all 0.15s",
-                    }}
-                  >
-                    {currentStepConfig.continueButton}
-                  </button>
-                )}
-                {currentStepConfig.skippable && (
-                  <button
-                    onClick={handleSkip}
-                    style={{
-                      background: "none", border: "none", color: "rgba(255,255,255,0.85)",
-                      cursor: "pointer", fontSize: "0.95rem", fontWeight: 600,
-                      padding: "0.75rem", minHeight: 48,
-                      textDecoration: "underline", textUnderlineOffset: 3,
-                    }}
-                  >
-                    Skip
-                  </button>
-                )}
-              </div>
-            )}
           </div>
         )}
       </div>
@@ -922,13 +911,12 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret }
     business:   "Write down 3 things you're already good at",
     daytrading: "Open a free paper trading account (Webull or Thinkorswim)",
     health:     "Take a Day 1 photo and save it on your phone",
-    other:      "Google one person who's done what you want and save their name",
   };
   const BLURRED_PLACEHOLDERS = [
     "Your next personalized step, made for your goal",
     "A simple action to build momentum today",
   ];
-  const visibleTask = category ? SAMPLE_TASKS[category] : SAMPLE_TASKS.other;
+  const visibleTask = category ? SAMPLE_TASKS[category] : SAMPLE_TASKS.business;
 
 
   if (paymentDone) {
