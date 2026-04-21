@@ -241,22 +241,50 @@ function PlanSelector({ plan, onChange }: { plan: PlanId; onChange: (p: PlanId) 
   );
 }
 
+// ─── PaymentRequestPrimer ────────────────────────────────────────────────────
+// Mounts during the hype screen. Creates the Stripe paymentRequest, runs
+// canMakePayment(), and hands the ready PR up to StartPage. By the time the
+// user clicks "Show me my plan", InlinePayment just receives the already-
+// primed object and attaches its paymentmethod handler — no 1s delay while
+// Stripe.js loads + canMakePayment() resolves.
+function PaymentRequestPrimer({ clientSecret, onReady }: { clientSecret: string; onReady: (pr: PaymentRequest) => void }) {
+  const stripe = useStripe();
+  const ran = useRef(false);
+  useEffect(() => {
+    if (ran.current) return;
+    if (!stripe || !clientSecret) return;
+    ran.current = true;
+    const pr = stripe.paymentRequest({
+      country: "US",
+      currency: "usd",
+      total: { label: "Threely Trial", amount: 100 },
+      requestPayerEmail: true,
+      requestPayerName: true,
+    });
+    pr.canMakePayment().then((result) => {
+      if (result) onReady(pr);
+    });
+  }, [stripe, clientSecret, onReady]);
+  return null;
+}
+
 // ─── Inline payment (Apple Pay / Google Pay + card fallback) ─────────────────
-// Mounts inside Stripe <Elements>. On mount, creates a SetupIntent via the
-// existing /api/subscription/checkout endpoint (anon user already set up by
-// outer /start flow). PaymentRequestButton handles Apple Pay + Google Pay
-// detection — Stripe shows the right brand automatically. If device supports
-// neither, only the "Enter card manually" form is offered.
+// Mounts inside Stripe <Elements>. Optionally receives a primedPaymentRequest
+// created during the hype screen — when present, Apple Pay renders instantly
+// instead of waiting for Stripe.js + canMakePayment() to finish.
 interface InlinePaymentProps {
   plan: PlanId;
   preloadedClientSecret?: string | null;
+  primedPaymentRequest?: PaymentRequest | null;
   onSuccess: (payerEmail: string | null) => void;
 }
-function InlinePayment({ plan, preloadedClientSecret, onSuccess }: InlinePaymentProps) {
+function InlinePayment({ plan, preloadedClientSecret, primedPaymentRequest, onSuccess }: InlinePaymentProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [clientSecret, setClientSecret] = useState<string | null>(preloadedClientSecret ?? null);
-  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(null);
+  // Seed with the primed PR so the Apple Pay button renders on first paint
+  const [paymentRequest, setPaymentRequest] = useState<PaymentRequest | null>(primedPaymentRequest ?? null);
+  const handlerAttached = useRef(false);
   const [cardOpen, setCardOpen] = useState(false);
   const [fullName, setFullName] = useState("");
   const [cardNumberComplete, setCardNumberComplete] = useState(false);
@@ -298,19 +326,29 @@ function InlinePayment({ plan, preloadedClientSecret, onSuccess }: InlinePayment
     })();
   }, [plan]);
 
-  // Wire PaymentRequest (Apple Pay / Google Pay) once both stripe + secret are ready.
+  // Wire PaymentRequest (Apple Pay / Google Pay). If StartPage primed it
+  // during the hype screen, we just attach the paymentmethod handler.
+  // Otherwise we create the PR here as a fallback.
   useEffect(() => {
     if (!stripe || !clientSecret) return;
-    const pr = stripe.paymentRequest({
+    if (handlerAttached.current) return;
+
+    const pr = paymentRequest ?? stripe.paymentRequest({
       country: "US",
       currency: "usd",
       total: { label: "Threely Trial", amount: 100 },
       requestPayerEmail: true,
       requestPayerName: true,
     });
-    pr.canMakePayment().then((result) => {
-      if (result) setPaymentRequest(pr);
-    });
+
+    // If we created a fresh PR (no primed one), we still need the canMakePayment check
+    if (!paymentRequest) {
+      pr.canMakePayment().then((result) => {
+        if (result) setPaymentRequest(pr);
+      });
+    }
+
+    handlerAttached.current = true;
     pr.on("paymentmethod", async (ev) => {
       if (!stripe || !clientSecret) { ev.complete("fail"); return; }
       setSubmitting(true);
@@ -335,7 +373,7 @@ function InlinePayment({ plan, preloadedClientSecret, onSuccess }: InlinePayment
         setSubmitting(false);
       }
     });
-  }, [stripe, clientSecret, plan, onSuccess]);
+  }, [stripe, clientSecret, plan, onSuccess, paymentRequest]);
 
   async function confirmSubscription(planId: PlanId) {
     const supabase = getSupabase();
@@ -640,6 +678,8 @@ export default function StartPage() {
   // screen). By the time user clicks "Show me my plan", Apple Pay is already
   // primed and renders instantly.
   const [preloadedClientSecret, setPreloadedClientSecret] = useState<string | null>(null);
+  // Primed during the hype screen so Apple Pay renders instantly on plan-ready
+  const [primedPaymentRequest, setPrimedPaymentRequest] = useState<PaymentRequest | null>(null);
   useEffect(() => { getStripePromise(); }, []);
   useEffect(() => {
     if (!showHype || preloadedClientSecret) return;
@@ -772,36 +812,48 @@ export default function StartPage() {
           category={category}
           generatedGoalTitle={generatedGoalTitle}
           preloadedClientSecret={preloadedClientSecret}
+          primedPaymentRequest={primedPaymentRequest}
         />
       </Elements>
     );
   }
 
   // ── Hype screen ──
+  // Wrapped in <Elements> so PaymentRequestPrimer can create the Stripe
+  // paymentRequest NOW and run canMakePayment() in the background. By the
+  // time the user taps "Show me my plan", Apple Pay is already primed.
   if (showHype) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)" }}>
-        <div className="fade-in" style={{ width: "100%", maxWidth: 480, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
-          <div style={{ fontSize: 64, lineHeight: 1 }}>🔥</div>
-          <h1 style={{ fontSize: "clamp(1.75rem, 5vw, 2.5rem)", fontWeight: 800, letterSpacing: "-0.03em", color: "#fff", lineHeight: 1.15 }}>
-            You're the perfect fit.
-          </h1>
-          <p style={{ fontSize: "1.05rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.6, maxWidth: 400 }}>
-            Threely is building your personalized plan right now. This is going to change everything.
-          </p>
-          <button
-            onClick={handleHypeContinue}
-            style={{
-              height: 56, fontSize: "1rem", fontWeight: 700, width: "100%", maxWidth: 320,
-              background: "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)",
-              color: "#000", borderRadius: 14, border: "none", cursor: "pointer",
-              marginTop: 8,
-            }}
-          >
-            Show me my plan →
-          </button>
+      <Elements stripe={getStripePromise()}>
+        {preloadedClientSecret && !primedPaymentRequest && (
+          <PaymentRequestPrimer
+            clientSecret={preloadedClientSecret}
+            onReady={setPrimedPaymentRequest}
+          />
+        )}
+        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)" }}>
+          <div className="fade-in" style={{ width: "100%", maxWidth: 480, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
+            <div style={{ fontSize: 64, lineHeight: 1 }}>🔥</div>
+            <h1 style={{ fontSize: "clamp(1.75rem, 5vw, 2.5rem)", fontWeight: 800, letterSpacing: "-0.03em", color: "#fff", lineHeight: 1.15 }}>
+              You're the perfect fit.
+            </h1>
+            <p style={{ fontSize: "1.05rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.6, maxWidth: 400 }}>
+              Threely is building your personalized plan right now. This is going to change everything.
+            </p>
+            <button
+              onClick={handleHypeContinue}
+              style={{
+                height: 56, fontSize: "1rem", fontWeight: 700, width: "100%", maxWidth: 320,
+                background: "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)",
+                color: "#000", borderRadius: 14, border: "none", cursor: "pointer",
+                marginTop: 8,
+              }}
+            >
+              Show me my plan →
+            </button>
+          </div>
         </div>
-      </div>
+      </Elements>
     );
   }
 
@@ -1031,7 +1083,7 @@ export default function StartPage() {
 //   5. Plan selector (Monthly / Yearly) — secondary, below terms, muted
 // Premium feel via soft shadows, subtle shimmer on blurred tasks, press-scale
 // on buttons, and a fade-in on mount.
-function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret }: { category: Category | null; generatedGoalTitle: string; preloadedClientSecret: string | null }) {
+function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, primedPaymentRequest }: { category: Category | null; generatedGoalTitle: string; preloadedClientSecret: string | null; primedPaymentRequest: PaymentRequest | null }) {
   const [plan, setPlan] = useState<PlanId>("yearly");
   const [paymentDone, setPaymentDone] = useState(false);
   const [payerEmail, setPayerEmail] = useState<string | null>(null);
@@ -1153,6 +1205,7 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret }
         <InlinePayment
           plan={plan}
           preloadedClientSecret={preloadedClientSecret}
+          primedPaymentRequest={primedPaymentRequest}
           onSuccess={(email) => { setPayerEmail(email); setPaymentDone(true); }}
         />
 
