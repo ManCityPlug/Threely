@@ -681,6 +681,19 @@ export default function StartPage() {
   // Primed during the hype screen so Apple Pay renders instantly on plan-ready
   const [primedPaymentRequest, setPrimedPaymentRequest] = useState<PaymentRequest | null>(null);
   useEffect(() => { getStripePromise(); }, []);
+
+  // Hide Crisp live chat while the user is in the /start flow — keeps the
+  // paywall terms fully unobstructed (compliance) and removes a conversion-
+  // killing distraction during checkout. Crisp.push() queues the command if
+  // the SDK hasn't finished loading yet, so this is safe on first mount.
+  useEffect(() => {
+    const w = window as unknown as { $crisp?: unknown[] };
+    if (w.$crisp) w.$crisp.push(["do", "chat:hide"]);
+    return () => {
+      const w2 = window as unknown as { $crisp?: unknown[] };
+      if (w2.$crisp) w2.$crisp.push(["do", "chat:show"]);
+    };
+  }, []);
   useEffect(() => {
     if (!showHype || preloadedClientSecret) return;
     (async () => {
