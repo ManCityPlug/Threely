@@ -1291,7 +1291,8 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
           <div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)" }}>{generatedGoalTitle}</div>
         </div>
 
-        {/* 2. Task preview — 2 blurred numbered cards, no leak */}
+        {/* 2. Task preview — 2 blurred numbered cards + 1 big shaking lock
+             centered above them. No per-card locks, no visible starter. */}
         <div style={{ position: "relative" }}>
           <div className="locked-stack" style={{ pointerEvents: "none", userSelect: "none", display: "flex", flexDirection: "column", gap: 10 }}>
             {BLURRED_PLACEHOLDERS.map((placeholder, i) => (
@@ -1315,16 +1316,21 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
                 <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0, filter: "blur(5px)" }}>
                   {placeholder}
                 </div>
-                <div className="shake-lock" style={{
-                  fontSize: "1.15rem",
-                  flexShrink: 0,
-                  filter: "drop-shadow(0 0 6px rgba(212,168,67,0.7))",
-                  position: "relative",
-                  zIndex: 3,
-                }}>🔒</div>
               </div>
             ))}
           </div>
+          {/* One large shaking lock centered above both tasks */}
+          <div className="shake-lock" style={{
+            position: "absolute",
+            left: "50%",
+            top: "50%",
+            transform: "translate(-50%, -50%)",
+            fontSize: "3.2rem",
+            lineHeight: 1,
+            filter: "drop-shadow(0 0 18px rgba(212,168,67,0.65))",
+            zIndex: 4,
+            pointerEvents: "none",
+          }}>🔒</div>
           {/* Gradient fade + unlock CTA */}
           <div style={{
             position: "absolute", left: 0, right: 0, bottom: 0,
