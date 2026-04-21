@@ -534,6 +534,7 @@ function AccountFinalize({ preFilledEmail }: { preFilledEmail: string | null }) 
       if (signInMode) {
         const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
         if (signInErr) throw new Error("Wrong password. Try again.");
+        try { localStorage.removeItem("threely_start_state"); } catch { /* ignore */ }
         router.replace("/dashboard?subscribed=1");
         return;
       }
@@ -543,7 +544,8 @@ function AccountFinalize({ preFilledEmail }: { preFilledEmail: string | null }) 
           // Try signing into the existing account with the password they just typed
           const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password });
           if (!signInErr) {
-            router.replace("/dashboard?subscribed=1");
+            try { localStorage.removeItem("threely_start_state"); } catch { /* ignore */ }
+        router.replace("/dashboard?subscribed=1");
             return;
           }
           // Password didn't match — flip to sign-in mode and ask for existing password
@@ -694,6 +696,44 @@ export default function StartPage() {
       if (w2.$crisp) w2.$crisp.push(["do", "chat:show"]);
     };
   }, []);
+
+  // Refresh persistence: write funnel state to localStorage on change, read
+  // on mount. Lets a user reload /start and land exactly where they left off
+  // instead of restarting the flow. Expires after 24h.
+  const STATE_KEY = "threely_start_state";
+  const restoredRef = useRef(false);
+  useEffect(() => {
+    if (restoredRef.current) return;
+    restoredRef.current = true;
+    try {
+      const raw = localStorage.getItem(STATE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (!saved || Date.now() - (saved.savedAt ?? 0) > 24 * 60 * 60 * 1000) {
+        localStorage.removeItem(STATE_KEY);
+        return;
+      }
+      if (saved.category) setCategory(saved.category);
+      if (typeof saved.funnelStep === "number") setFunnelStep(saved.funnelStep);
+      if (Array.isArray(saved.answers)) setAnswers(saved.answers);
+      if (saved.selectedPath) setSelectedPath(saved.selectedPath);
+      if (typeof saved.incomeTarget === "string") setIncomeTarget(saved.incomeTarget);
+      if (Array.isArray(saved.healthOutcome)) setHealthOutcome(saved.healthOutcome);
+      if (saved.showHype) setShowHype(true);
+      if (saved.planReady) setPlanReady(true);
+      if (saved.generatedGoalTitle) setGeneratedGoalTitle(saved.generatedGoalTitle);
+    } catch { /* ignore — bad JSON means start fresh */ }
+  }, []);
+  useEffect(() => {
+    if (!restoredRef.current) return;
+    try {
+      localStorage.setItem(STATE_KEY, JSON.stringify({
+        category, funnelStep, answers, selectedPath, incomeTarget,
+        healthOutcome, showHype, planReady, generatedGoalTitle,
+        savedAt: Date.now(),
+      }));
+    } catch { /* ignore */ }
+  }, [category, funnelStep, answers, selectedPath, incomeTarget, healthOutcome, showHype, planReady, generatedGoalTitle]);
   useEffect(() => {
     if (!showHype || preloadedClientSecret) return;
     (async () => {
