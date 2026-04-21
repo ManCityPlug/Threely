@@ -1319,26 +1319,21 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
               </div>
             ))}
           </div>
-          {/* One large shaking lock centered above both tasks */}
-          <div className="shake-lock" style={{
-            position: "absolute",
-            left: "50%",
-            top: "50%",
-            transform: "translate(-50%, -50%)",
-            fontSize: "3.2rem",
-            lineHeight: 1,
-            filter: "drop-shadow(0 0 18px rgba(212,168,67,0.65))",
-            zIndex: 4,
-            pointerEvents: "none",
-          }}>🔒</div>
-          {/* Gradient fade + unlock CTA */}
+          {/* Gradient fade + big lock + CTA text, all stacked bottom-up
+              so nothing overlaps. Lock sits above the text, centered. */}
           <div style={{
             position: "absolute", left: 0, right: 0, bottom: 0,
-            height: "62%",
-            background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.55) 55%, rgba(10,10,10,0.95) 100%)",
+            height: "72%",
+            background: "linear-gradient(180deg, transparent 0%, rgba(10,10,10,0.55) 45%, rgba(10,10,10,0.95) 100%)",
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end",
-            paddingBottom: 12, borderRadius: 14, pointerEvents: "none", gap: 2,
+            paddingBottom: 12, borderRadius: 14, pointerEvents: "none", gap: 6,
           }}>
+            <div className="shake-lock" style={{
+              fontSize: "2.6rem",
+              lineHeight: 1,
+              filter: "drop-shadow(0 0 16px rgba(212,168,67,0.65))",
+              marginBottom: 2,
+            }}>🔒</div>
             <p style={{ fontSize: "1.15rem", fontWeight: 800, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>
               Finish what you started
             </p>
