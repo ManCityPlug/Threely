@@ -877,7 +877,7 @@ export default function StartPage() {
       : null;
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)" }}>
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "flex-start", justifyContent: "center", background: "var(--bg)", padding: "clamp(2.5rem, 8vh, 5rem) clamp(1rem, 4vw, 2rem) clamp(1rem, 4vw, 2rem)" }}>
       <div style={{ width: "100%", maxWidth: 560 }}>
 
         {/* ── Step 0: Category Picker ── */}
@@ -926,19 +926,6 @@ export default function StartPage() {
         {/* ── Health multi-select (step 2) ── */}
         {healthOutcomeConfig && (
           <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-            <button
-              onClick={handleBack}
-              style={{
-                background: "none", border: "none", color: "rgba(255,255,255,0.85)",
-                cursor: "pointer", fontSize: "1rem", padding: "4px 0",
-                alignSelf: "flex-start", display: "flex", alignItems: "center", gap: 6, minHeight: 48,
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              Back
-            </button>
             <div style={{ textAlign: "center" }}>
               <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 16 }} />
               <h2 style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
@@ -999,19 +986,6 @@ export default function StartPage() {
         {/* ── Steps 1-3: Funnel questions ── */}
         {funnelStep >= 1 && funnelStep <= 3 && currentStepConfig && (
           <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-            <button
-              onClick={handleBack}
-              style={{
-                background: "none", border: "none", color: "rgba(255,255,255,0.85)",
-                cursor: "pointer", fontSize: "1rem", padding: "4px 0",
-                alignSelf: "flex-start", display: "flex", alignItems: "center", gap: 6, minHeight: 48,
-              }}
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              Back
-            </button>
 
             <div style={{ textAlign: "center" }}>
               <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 16 }} />
