@@ -105,6 +105,12 @@ export async function POST(request: NextRequest) {
           health: "health_general",
           fitness: "health_general",
           wealth: "business_ecommerce",
+          // "Most money" option routes to ecommerce library
+          business_money: "business_ecommerce",
+          // Earlier options that don't have their own JSON files (yet)
+          // fall back to closest match so tasks still load
+          business_passive: "business_ecommerce",
+          business_saas: "business_ecommerce",
         };
         let pathId = goal.category as PathId | null;
         if (pathId && !(pathId in LIBRARIES) && LEGACY_CATEGORY_FALLBACK[pathId]) {

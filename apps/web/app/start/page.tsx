@@ -90,12 +90,12 @@ const STEPS: Record<Category, StepConfig[]> = {
       ],
     },
     {
-      question: "What do you want to build?",
+      question: "What kind of business?",
       buttons: [
         { label: "Passive income", path: "business_passive" },
         { label: "Ecommerce", path: "business_ecommerce" },
         { label: "Personal brand", path: "business_content" },
-        { label: "SaaS", path: "business_saas" },
+        { label: "Most money", path: "business_money" },
       ],
     },
   ],
@@ -188,7 +188,7 @@ const PATH_SAMPLE_TASK: Record<string, string> = {
   business_passive:         "Write down 3 things people would pay to learn from you",
   business_ecommerce:       "Write down 3 things you'd personally buy online",
   business_content:         "Pick one platform — TikTok, IG, or YouTube",
-  business_saas:            "Write down 3 annoying problems you have every week",
+  business_money:           "Write down 3 things you'd personally buy online",
   health_weight_loss:       "Download MyFitnessPal and log your breakfast",
   health_general:           "Screenshot 3 looks you want to copy",
   health_muscle:            "Download Hevy or Strong to track your workouts",
@@ -200,7 +200,7 @@ function buildGoalTitle(category: Category, path: string, incomeOrAnswer: string
       if (path === "business_passive") return incomeOrAnswer ? `Build Passive Income → ${incomeOrAnswer}/Month` : "Build Passive Income";
       if (path === "business_ecommerce") return incomeOrAnswer ? `Make ${incomeOrAnswer}/Month (Ecommerce)` : "Start an Ecommerce Brand";
       if (path === "business_content") return incomeOrAnswer ? `Build My Brand → ${incomeOrAnswer}/Month` : "Build a Personal Brand";
-      if (path === "business_saas") return incomeOrAnswer ? `Launch a SaaS → ${incomeOrAnswer}/Month` : "Launch a SaaS";
+      if (path === "business_money") return incomeOrAnswer ? `Make ${incomeOrAnswer}/Month` : "Make Money";
       return incomeOrAnswer ? `Make ${incomeOrAnswer}/Month` : "Start a Business";
     case "daytrading":
       if (path === "daytrading_beginner") return incomeOrAnswer ? `Learn Day Trading → ${incomeOrAnswer}/Month` : "Learn to Day Trade";
