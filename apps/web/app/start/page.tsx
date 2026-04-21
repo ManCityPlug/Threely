@@ -1323,15 +1323,14 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
               </div>
             ))}
           </div>
-          {/* Big lock — absolutely positioned so the gap from the top of
-              the blurred block to the lock equals the gap from the lock
-              down to the CTA text. */}
+          {/* Big lock — sits clearly ABOVE the CTA text and slightly below
+              the top border of the blurred block, horizontally centered. */}
           <div className="shake-lock" style={{
             position: "absolute",
             left: "50%",
-            top: "38%",
-            transform: "translate(-50%, -50%)",
-            fontSize: "2.6rem",
+            top: 18,
+            transform: "translateX(-50%)",
+            fontSize: "2.4rem",
             lineHeight: 1,
             filter: "drop-shadow(0 0 16px rgba(212,168,67,0.65))",
             pointerEvents: "none",
