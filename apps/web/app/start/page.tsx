@@ -1270,8 +1270,8 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             display: "flex", alignItems: "flex-end", justifyContent: "center",
             paddingBottom: 10, borderRadius: 14, pointerEvents: "none",
           }}>
-            <p style={{ fontSize: "0.82rem", fontWeight: 600, color: "rgba(255,255,255,0.95)", margin: 0, letterSpacing: "-0.01em" }}>
-              Unlock when you start
+            <p style={{ fontSize: "1.05rem", fontWeight: 700, color: "rgba(255,255,255,0.95)", margin: 0, letterSpacing: "-0.015em" }}>
+              Unlock the full plan
             </p>
           </div>
         </div>
