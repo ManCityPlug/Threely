@@ -460,19 +460,21 @@ export default function PathView({
           transform: scale(0.95);
         }
 
-        /* Responsive vertical spacing */
+        /* Responsive vertical spacing — generous enough that "Day N / TODAY"
+           label + START badge can't collide with the previous day's label
+           even at week boundaries. */
         .path-field {
-          --node-spacing: 130px;
+          --node-spacing: 155px;
           --max-path-width: 500px;
         }
         @media (min-width: 900px) {
           .path-field {
-            --node-spacing: 140px;
+            --node-spacing: 170px;
           }
         }
         @media (max-width: 499px) {
           .path-field {
-            --node-spacing: 90px;
+            --node-spacing: 135px;
           }
         }
       `}</style>
@@ -502,7 +504,7 @@ export default function PathView({
             margin: "0 auto",
             // +40px accounts for the future-day bump applied below so the
             // last node stays inside the container.
-            height: `calc(${days.length} * var(--node-spacing, 100px) + 120px)`,
+            height: `calc(${days.length} * var(--node-spacing, 155px) + 160px)`,
           }}
         >
           {days.map((day, i) => {
@@ -535,7 +537,7 @@ export default function PathView({
                   <div
                     style={{
                       position: "absolute",
-                      top: `calc(40px + ${i} * var(--node-spacing, 100px) - 20px)`,
+                      top: `calc(40px + ${i} * var(--node-spacing, 155px) - 20px)`,
                       left: "10%",
                       right: "10%",
                       display: "flex",
@@ -562,12 +564,12 @@ export default function PathView({
                 ref={isToday ? todayRef : undefined}
                 style={{
                   position: "absolute",
-                  // Future days (day > dayNumber) get an extra +40px so
+                  // Future days (day > dayNumber) get an extra +60px so
                   // today's START badge + "Day N / TODAY" label doesn't
                   // overlap the previous day's node or label — especially
                   // noticeable at milestone boundaries where the previous
                   // label reads "1 Week!" and stacks above the badge.
-                  top: `calc(40px + ${i} * var(--node-spacing, 100px) + ${day > dayNumber ? 40 : 0}px)`,
+                  top: `calc(40px + ${i} * var(--node-spacing, 155px) + ${day > dayNumber ? 60 : 0}px)`,
                   left: `${xOffset}%`,
                   transform: "translateX(-50%)",
                   display: "flex",
