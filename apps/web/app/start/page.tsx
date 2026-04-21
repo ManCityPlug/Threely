@@ -717,7 +717,6 @@ export default function StartPage() {
       if (typeof saved.funnelStep === "number") setFunnelStep(saved.funnelStep);
       if (Array.isArray(saved.answers)) setAnswers(saved.answers);
       if (saved.selectedPath) setSelectedPath(saved.selectedPath);
-      if (typeof saved.incomeTarget === "string") setIncomeTarget(saved.incomeTarget);
       if (Array.isArray(saved.healthOutcome)) setHealthOutcome(saved.healthOutcome);
       if (saved.showHype) setShowHype(true);
       if (saved.planReady) setPlanReady(true);
@@ -728,12 +727,12 @@ export default function StartPage() {
     if (!restoredRef.current) return;
     try {
       localStorage.setItem(STATE_KEY, JSON.stringify({
-        category, funnelStep, answers, selectedPath, incomeTarget,
+        category, funnelStep, answers, selectedPath,
         healthOutcome, showHype, planReady, generatedGoalTitle,
         savedAt: Date.now(),
       }));
     } catch { /* ignore */ }
-  }, [category, funnelStep, answers, selectedPath, incomeTarget, healthOutcome, showHype, planReady, generatedGoalTitle]);
+  }, [category, funnelStep, answers, selectedPath, healthOutcome, showHype, planReady, generatedGoalTitle]);
   useEffect(() => {
     if (!showHype || preloadedClientSecret) return;
     (async () => {
@@ -978,7 +977,7 @@ export default function StartPage() {
 
         {/* ── Health multi-select (step 2) ── */}
         {healthOutcomeConfig && (
-          <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", paddingTop: "clamp(1rem, 4vh, 2.5rem)" }}>
             <div style={{ textAlign: "center" }}>
               <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 16 }} />
               <h2 style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
@@ -1038,7 +1037,7 @@ export default function StartPage() {
 
         {/* ── Steps 1-3: Funnel questions ── */}
         {funnelStep >= 1 && funnelStep <= 3 && currentStepConfig && (
-          <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem", paddingTop: "clamp(1rem, 4vh, 2.5rem)" }}>
 
             <div style={{ textAlign: "center" }}>
               <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 16 }} />
