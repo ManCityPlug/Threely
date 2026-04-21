@@ -1331,7 +1331,7 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
           <div style={{
             position: "absolute",
             left: "50%",
-            top: 12,
+            top: 4,
             transform: "translateX(-50%)",
             pointerEvents: "none",
             zIndex: 4,
