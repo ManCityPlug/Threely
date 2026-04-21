@@ -1351,7 +1351,9 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
                   <div className="shake-lock" style={{
                     fontSize: "1.15rem",
                     flexShrink: 0,
-                    filter: "drop-shadow(0 0 6px rgba(212,168,67,0.6))",
+                    filter: "drop-shadow(0 0 6px rgba(212,168,67,0.7))",
+                    position: "relative",
+                    zIndex: 3,
                   }}>🔒</div>
                 </div>
               ))}
