@@ -1190,8 +1190,8 @@ function SaleCountdown() {
         animation: "saleCountdownPulse 2.4s ease-in-out infinite",
       }}
     >
-      <span style={{ fontSize: "0.78rem", fontWeight: 600, letterSpacing: "0.02em", color: "rgba(232,197,71,0.95)" }}>
-        <strong style={{ fontWeight: 900, color: "#E8C547" }}>$1</strong> offer ends in
+      <span style={{ fontSize: "1.05rem", fontWeight: 700, letterSpacing: "-0.005em", color: "rgba(232,197,71,0.95)" }}>
+        <strong style={{ fontWeight: 900, color: "#FFD766", textShadow: "0 0 12px rgba(255,215,100,0.45)" }}>$1</strong> offer ends in
       </span>
       <span style={{ fontSize: "1.05rem", fontWeight: 800, letterSpacing: "-0.01em", color: "#E8C547", fontVariantNumeric: "tabular-nums" }}>
         {pad(h)}:{pad(m)}:{pad(s)}
