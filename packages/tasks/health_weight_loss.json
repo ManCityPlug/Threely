@@ -16,31 +16,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Download MyFitnessPal and create your free account.",
-            "Install MyFitnessPal from the App Store and sign up.",
-            "Get MyFitnessPal on your phone and make an account."
+            "Set up MyFitnessPal. Download the app and create your free account now.",
+            "Get MyFitnessPal ready. Install it and sign up in 2 minutes.",
+            "Start tracking food. Get MyFitnessPal on your phone and make an account."
           ],
-          "why": "This app will help you track what you eat."
+          "why": "This app will be your daily food log for the next 90 days."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Step on a scale and write down your weight.",
-            "Weigh yourself and note the number somewhere.",
-            "Check your weight on a scale and write it down."
+            "Check your weight. Step on the scale and write down today's number.",
+            "Log your start weight. Weigh yourself and note the number in your phone.",
+            "Find your baseline. Step on the scale and save your weight somewhere."
           ],
-          "why": "You need a starting number so you can see progress later."
+          "why": "You need a starting number so you can see real progress later."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Take a quick photo of yourself in the mirror.",
-            "Snap a front-facing photo of yourself today.",
-            "Take a photo of yourself right now."
+            "Take a progress photo. Snap a mirror selfie and save it.",
+            "Start your photo record. Take a front-facing photo of yourself right now.",
+            "Capture day one. Take a quick mirror photo and keep it safe."
           ],
-          "why": "A starting photo helps you see how far you've come."
+          "why": "A before photo is proof of how far you'll come."
         }
       ]
     },
@@ -52,31 +52,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log what you ate for breakfast in MyFitnessPal.",
-            "Open MyFitnessPal and add your breakfast.",
-            "Type your breakfast into MyFitnessPal."
+            "Track your food. Log breakfast in MyFitnessPal right after you eat.",
+            "Log your breakfast. Open MyFitnessPal and add everything you had.",
+            "Record your morning meal. Type your breakfast into MyFitnessPal now."
           ],
-          "why": "Logging one meal a day builds the habit."
+          "why": "Logging one meal a day is how the habit starts."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink one full glass of water right now.",
-            "Fill a glass with water and drink it.",
-            "Pour yourself a glass of water and drink it."
+            "Drink more water. Finish 1 full glass of water right now.",
+            "Hydrate today. Pour a glass of water and drink it before you move on.",
+            "Hit your water. Drink one glass of water right now."
           ],
-          "why": "Staying hydrated helps your body work better."
+          "why": "Staying hydrated helps your body function and feel full."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Go for a 5-minute walk outside.",
-            "Walk outside for 5 minutes.",
-            "Step outside and walk for 5 minutes."
+            "Move your body. Walk outside for 5 minutes right now.",
+            "Take a short walk. Step outside and walk for 5 minutes.",
+            "Get moving. Go for a quick 5-minute walk today."
           ],
-          "why": "A short walk is the easiest way to start moving more."
+          "why": "A 5-minute walk is enough to start building the movement habit."
         }
       ]
     },
@@ -88,31 +88,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log what you ate for lunch today.",
-            "Add your lunch to MyFitnessPal.",
-            "Open MyFitnessPal and log today's lunch."
+            "Track your lunch. Log what you ate in MyFitnessPal after your midday meal.",
+            "Log lunch today. Open MyFitnessPal and add everything you had at lunch.",
+            "Record your noon meal. Type today's lunch into MyFitnessPal."
           ],
-          "why": "Tracking lunch helps you see your full day of eating."
+          "why": "Tracking lunch gives you a fuller picture of your day."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink two glasses of water before dinner.",
-            "Drink a glass of water now and one more before dinner.",
-            "Have two glasses of water before your evening meal."
+            "Drink more water. Have 2 glasses of water before dinner tonight.",
+            "Pre-dinner hydration. Drink a glass of water now and one more before dinner.",
+            "Up your water. Have two glasses of water before your evening meal."
           ],
-          "why": "Drinking water before meals helps you eat less."
+          "why": "Drinking water before meals naturally helps you eat less."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 5 minutes after dinner.",
-            "Take a quick 5-minute walk after you eat tonight.",
-            "Go for a short walk once dinner is done."
+            "Move your body. Walk for 5 minutes after dinner tonight.",
+            "Post-dinner walk. Take a quick 5-minute walk after you eat.",
+            "Walk it off. Go for a short walk right after dinner."
           ],
-          "why": "Walking after eating helps your body digest food."
+          "why": "Walking after eating helps digestion and burns a few extra calories."
         }
       ]
     },
@@ -124,31 +124,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log everything you ate for breakfast and lunch.",
-            "Add your breakfast and lunch to MyFitnessPal today.",
-            "Open MyFitnessPal and log both breakfast and lunch."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double your logging. Add both breakfast and lunch to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Tracking two meals helps you see your habits."
+          "why": "Tracking two meals shows you where most of your food comes from."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Pick a healthy snack for today — like an apple or a handful of nuts.",
-            "Choose one healthy snack to eat today instead of chips or candy.",
-            "Swap one snack today for a piece of fruit or some nuts."
+            "Swap a snack. Eat an apple or a handful of nuts instead of chips today.",
+            "Pick a better snack. Choose fruit or nuts over candy or chips right now.",
+            "Make a small swap. Trade one snack today for a piece of fruit."
           ],
-          "why": "One small swap adds up over time."
+          "why": "One swap at a time is how eating habits change."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 5 minutes today.",
-            "Go for a 5-minute walk at any point today.",
-            "Take a short 5-minute walk sometime today."
+            "Move your body. Take a 5-minute walk at any point today.",
+            "Short walk today. Go for 5 minutes outside whenever you can.",
+            "Get outside. Walk for 5 minutes sometime today."
           ],
-          "why": "Moving a little every day matters."
+          "why": "Small daily movement adds up over weeks and months."
         }
       ]
     },
@@ -160,31 +160,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log what you ate for dinner last night.",
-            "Add last night's dinner to MyFitnessPal.",
-            "Open MyFitnessPal and log yesterday's dinner."
+            "Track your dinner. Log your evening meal in MyFitnessPal tonight.",
+            "Log dinner tonight. Open MyFitnessPal and add everything you ate.",
+            "Record your dinner. Type tonight's meal into MyFitnessPal."
           ],
-          "why": "Logging dinner completes your full day of tracking."
+          "why": "Dinner is often where people underestimate how much they eat."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink a glass of water when you wake up tomorrow morning.",
-            "Put a glass of water by your bed so you drink it first thing tomorrow.",
-            "Set a reminder to drink water first thing in the morning."
+            "Drink more water. Fill a large bottle and finish it before bed tonight.",
+            "Hit your water goal. Drink 3 glasses of water spread through today.",
+            "Stay hydrated. Drink a glass of water now and two more today."
           ],
-          "why": "Starting the day with water is a simple healthy habit."
+          "why": "Most people are mildly dehydrated and don't know it."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 5 minutes today.",
-            "Step outside for a 5-minute walk.",
-            "Take 5 minutes to walk around the block."
+            "Move your body. Walk for 5 minutes before you sit down for the evening.",
+            "End-of-day walk. Take a quick 5-minute walk before winding down.",
+            "Evening stroll. Go outside for a 5-minute walk tonight."
           ],
-          "why": "Daily walks are the easiest exercise to stick with."
+          "why": "Moving in the evening helps your body recover and sleep better."
         }
       ]
     },
@@ -196,31 +196,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals in MyFitnessPal today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today in MyFitnessPal."
+            "Track all three meals. Log breakfast, lunch, and dinner in MyFitnessPal today.",
+            "Full day log. Add every meal to MyFitnessPal before you sleep tonight.",
+            "Log the whole day. Open MyFitnessPal and enter all three meals."
           ],
-          "why": "Tracking all your meals gives you the full picture."
+          "why": "Seeing a full day helps you spot where extra calories come from."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink one glass of water with each meal today.",
-            "Have a glass of water at breakfast, lunch, and dinner.",
-            "Drink water alongside every meal today."
+            "Swap a drink. Have water instead of soda or juice at one meal today.",
+            "Skip the sugary drink. Choose water over soda or juice right now.",
+            "Cut a liquid calorie. Drink water instead of juice or soda at lunch."
           ],
-          "why": "Pairing water with meals is an easy habit to build."
+          "why": "Liquid calories are an easy place to cut without feeling hungry."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 5 minutes today.",
-            "Go for a quick 5-minute walk.",
-            "Step out for 5 minutes of walking."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk today. Get outside for a quick 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes anytime today."
           ],
-          "why": "Consistency matters more than intensity right now."
+          "why": "Consistency with short walks builds a lasting movement habit."
         }
       ]
     },
@@ -232,31 +232,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself this morning and write down the number.",
-            "Step on the scale and note your weight.",
-            "Check your weight and record it."
+            "Review your week. Count how many meals you logged in MyFitnessPal this week.",
+            "Weekly food check. Open MyFitnessPal and look at what you logged this week.",
+            "Check your log. Scroll through MyFitnessPal and see your meals from the past 7 days."
           ],
-          "why": "Weighing in once a week shows you if things are working."
+          "why": "Reviewing the week shows your progress and where to improve."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log what you ate yesterday in MyFitnessPal.",
-            "Add yesterday's meals to MyFitnessPal.",
-            "Track yesterday's food in MyFitnessPal today."
+            "Check your weight. Step on the scale and write down today's number.",
+            "Weekly weigh-in. Weigh yourself this morning and log the number.",
+            "Log your weight. Step on the scale and note the number in your phone."
           ],
-          "why": "Tracking what you ate keeps you honest."
+          "why": "Weighing in weekly tracks your real progress over time."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Go for a 5-minute walk.",
-            "Walk for 5 minutes today.",
-            "Take a quick 5-minute walk outside."
+            "Take a progress photo. Snap a mirror selfie and save it next to day 1.",
+            "Week-one photo. Take a front-facing photo and compare it to your start.",
+            "Capture week one. Take a quick mirror photo today."
           ],
-          "why": "You've walked every day this week — keep the streak going."
+          "why": "Photos show changes the scale doesn't always capture."
         }
       ]
     },
@@ -268,31 +268,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast this morning.",
-            "Add breakfast to MyFitnessPal right now.",
-            "Track your morning meal in MyFitnessPal."
+            "Track your breakfast. Log your morning meal in MyFitnessPal right after eating.",
+            "Log breakfast now. Open MyFitnessPal and add what you had this morning.",
+            "Start your food log. Add today's breakfast to MyFitnessPal."
           ],
-          "why": "Starting the day with logging keeps you on track."
+          "why": "Logging breakfast sets up a full day of tracking."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink a glass of water before your first meal.",
-            "Have a full glass of water before breakfast.",
-            "Drink water before you eat breakfast today."
+            "Drink more water. Drink a glass of water before every meal today.",
+            "Pre-meal water habit. Have a glass of water before breakfast, lunch, and dinner.",
+            "Water before meals. Drink one glass of water before each meal today."
           ],
-          "why": "Drinking water before eating helps you feel full faster."
+          "why": "Drinking water before eating helps you feel full sooner."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 8 minutes today.",
-            "Go for an 8-minute walk.",
-            "Walk a little longer today — aim for 8 minutes."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk today. Step outside for a 5-minute walk at any point.",
+            "Take a walk. Go outside and walk for 5 minutes."
           ],
-          "why": "Slowly walking more is how you build the habit."
+          "why": "Daily walks are one of the most effective habits for weight loss."
         }
       ]
     },
@@ -304,31 +304,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your lunch today in MyFitnessPal.",
-            "Add what you ate for lunch to MyFitnessPal.",
-            "Open MyFitnessPal after lunch and log your meal."
+            "Track your lunch. Log your midday meal in MyFitnessPal today.",
+            "Log lunch now. Open MyFitnessPal and enter what you ate for lunch.",
+            "Add lunch to your log. Type today's lunch into MyFitnessPal."
           ],
-          "why": "Logging midday keeps you aware of how much you've eaten."
+          "why": "Consistent logging is the single best thing you can do today."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Swap your afternoon snack for a piece of fruit today.",
-            "Eat a piece of fruit instead of your usual afternoon snack.",
-            "Choose fruit as your snack this afternoon."
+            "Swap a snack. Replace chips or cookies with fruit or nuts right now.",
+            "Pick a better snack. Grab an apple or nuts instead of something processed.",
+            "Make a smart swap. Trade your usual snack for fruit or a handful of nuts."
           ],
-          "why": "Fruit fills you up and has fewer calories than most snacks."
+          "why": "Small snack swaps reduce hundreds of calories without much effort."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 8 minutes.",
-            "Take an 8-minute walk today.",
-            "Get outside for 8 minutes of walking."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk today. Take a 5-minute walk at any point.",
+            "Get outside. Walk for 5 minutes sometime today."
           ],
-          "why": "Small increases in activity add up."
+          "why": "Short daily walks add up to meaningful movement over time."
         }
       ]
     },
@@ -340,31 +340,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log everything you ate yesterday.",
-            "Catch up on yesterday's food in MyFitnessPal.",
-            "Add any meals you missed logging yesterday."
+            "Track your dinner. Log your evening meal in MyFitnessPal tonight.",
+            "Log dinner tonight. Open MyFitnessPal and add everything you ate.",
+            "Add dinner to your log. Enter tonight's meal into MyFitnessPal."
           ],
-          "why": "Catching up keeps your record accurate."
+          "why": "Dinner is often the biggest meal — logging it keeps you honest."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink three glasses of water today.",
-            "Have at least three glasses of water before dinner.",
-            "Make sure you drink three full glasses of water today."
+            "Drink more water. Finish 3 glasses of water throughout today.",
+            "Hit your water. Drink one glass now and two more before bed.",
+            "Stay hydrated. Have a glass of water right now and two more today."
           ],
-          "why": "Drinking more water throughout the day helps with weight loss."
+          "why": "Consistent hydration helps control hunger and supports fat loss."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 8 minutes.",
-            "Go for an 8-minute walk today.",
-            "Take a short 8-minute walk."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Evening walk. Take a quick 5-minute walk before you settle in.",
+            "Take a short walk. Go outside for 5 minutes today."
           ],
-          "why": "Keeping the walking habit is more important than how fast you go."
+          "why": "A quick walk is one of the easiest habits to maintain every day."
         }
       ]
     },
@@ -376,31 +376,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Track both breakfast and lunch in MyFitnessPal.",
-            "Add morning and midday meals to MyFitnessPal."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal today."
           ],
-          "why": "Tracking two meals is becoming a habit."
+          "why": "A full day of logging gives you the clearest picture of your eating."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat one extra vegetable today — like carrots, broccoli, or a salad.",
-            "Add one vegetable to one of your meals today.",
-            "Include one vegetable with lunch or dinner today."
+            "Swap a drink. Have water instead of juice or soda at one meal today.",
+            "Cut a liquid calorie. Drink water instead of a sugary drink right now.",
+            "Skip the soda. Choose water over any sugary drink at your next meal."
           ],
-          "why": "Vegetables fill you up without many calories."
+          "why": "Cutting sugary drinks is one of the fastest ways to drop calories."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 8 minutes.",
-            "Take an 8-minute walk today.",
-            "Go for a short walk — aim for 8 minutes."
+            "Move your body. Walk for 5 minutes today.",
+            "Short walk. Get outside for a quick 5-minute walk.",
+            "Take a walk. Go outside and move for 5 minutes."
           ],
-          "why": "You're building a walking habit — keep it going."
+          "why": "Every walk counts toward your weekly movement total."
         }
       ]
     },
@@ -412,31 +412,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and enter what you ate this morning.",
+            "Start your log. Add today's breakfast to MyFitnessPal right now."
           ],
-          "why": "Full-day logging gives you the clearest picture."
+          "why": "Logging first thing helps you stay consistent all day."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink a glass of water before bed tonight.",
-            "Have one more glass of water before you sleep.",
-            "End the day with a glass of water."
+            "Drink more water. Have a glass of water now and one more after lunch.",
+            "Hit your water. Drink two glasses of water today before 3pm.",
+            "Stay hydrated. Finish a glass of water right now."
           ],
-          "why": "Staying hydrated helps your body recover overnight."
+          "why": "Hydration supports your metabolism and keeps hunger in check."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 10 minutes today.",
-            "Go for a 10-minute walk.",
-            "Take a 10-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Step outside and walk for 5 minutes.",
+            "Take a walk. Go outside for a quick 5 minutes."
           ],
-          "why": "You're ready to walk a little longer now."
+          "why": "Short daily walks are more effective than occasional long ones."
         }
       ]
     },
@@ -448,31 +448,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log what you ate for breakfast and dinner today.",
-            "Add breakfast and dinner to MyFitnessPal.",
-            "Track your morning and evening meals today."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Log two today. Add this morning's and midday meals to MyFitnessPal.",
+            "Double log. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Bookending your day with logging keeps you aware."
+          "why": "Two meals tracked is better than zero — keep the streak alive."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat one piece of fruit today.",
-            "Have an apple, banana, or orange as a snack.",
-            "Grab a piece of fruit for a snack today."
+            "Swap a snack. Trade chips or sweets for fruit or nuts right now.",
+            "Pick a better snack. Grab an apple or nuts instead of something packaged.",
+            "Make a small swap. Replace your usual snack with a piece of fruit today."
           ],
-          "why": "Fruit is a simple, filling swap for sugary snacks."
+          "why": "Better snack choices save calories without feeling deprived."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 10 minutes.",
-            "Take a 10-minute walk today.",
-            "Step outside for 10 minutes of walking."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk at any point today.",
+            "Get moving. Go outside and walk for 5 minutes."
           ],
-          "why": "Ten minutes a day adds up to real results."
+          "why": "Staying consistent this week builds strong habits for the long haul."
         }
       ]
     },
@@ -484,31 +484,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself and write down the number.",
-            "Step on the scale and note your weight.",
-            "Check your weight this morning and record it."
+            "Review your week. Count your logged meals in MyFitnessPal from the past 7 days.",
+            "Two-week check. Open MyFitnessPal and scroll through your entries this week.",
+            "Food log review. Look at what you tracked in MyFitnessPal over the last 7 days."
           ],
-          "why": "You've been at this for two weeks — let's see where you are."
+          "why": "Two weeks of data shows patterns you wouldn't notice day by day."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Take a new photo of yourself in the mirror.",
-            "Snap a photo of yourself today.",
-            "Take a quick selfie and compare it to day 1."
+            "Check your weight. Step on the scale and write down today's number.",
+            "Weekly weigh-in. Weigh yourself this morning and log the number.",
+            "Log your weight. Step on the scale and note the number right now."
           ],
-          "why": "Photos show changes your scale might not capture yet."
+          "why": "Tracking your weight weekly is the clearest signal of progress."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 10 minutes today.",
-            "Go for a 10-minute walk.",
-            "Take a 10-minute walk to celebrate two weeks in."
+            "Take a progress photo. Snap a mirror selfie and save it.",
+            "Two-week photo. Take a front-facing photo and compare it to day one.",
+            "Capture week two. Take a quick mirror photo and save it."
           ],
-          "why": "Two weeks of daily action is a real achievement."
+          "why": "Two weeks of changes are often visible in photos before the scale moves."
         }
       ]
     },
@@ -520,31 +520,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log what you ate for breakfast.",
-            "Add breakfast to MyFitnessPal this morning.",
-            "Track your morning meal right after you eat."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast now. Add what you had this morning to MyFitnessPal.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Logging first thing makes it easier to track all day."
+          "why": "Daily logging is the foundation of every successful weight loss plan."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink a glass of water before each meal today.",
-            "Have water before breakfast, lunch, and dinner.",
-            "Drink one glass of water before every meal today."
+            "Drink more water. Have a glass of water right now and two more today.",
+            "Hit your water. Drink 3 glasses of water spread across today.",
+            "Stay hydrated. Finish a glass of water before your next meal."
           ],
-          "why": "Water before meals helps you eat less without trying."
+          "why": "Drinking enough water each day helps control hunger and energy."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 10 minutes.",
-            "Take a 10-minute walk today.",
-            "Get outside for 10 minutes of walking."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Step outside and walk for 5 minutes.",
+            "Take a walk. Go outside for a quick 5-minute walk."
           ],
-          "why": "You're in week 3 — keep the momentum going."
+          "why": "Daily movement is one of the simplest levers for weight loss."
         }
       ]
     },
@@ -556,31 +556,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your lunch today.",
-            "Add what you ate for lunch to MyFitnessPal.",
-            "Track your midday meal in MyFitnessPal."
+            "Track your lunch. Log your midday meal in MyFitnessPal today.",
+            "Log lunch. Open MyFitnessPal and add what you had for lunch.",
+            "Add lunch to your log. Enter today's lunch into MyFitnessPal."
           ],
-          "why": "Logging lunch keeps you aware of your afternoon choices."
+          "why": "Logging consistently every day is what gets you results."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Add one vegetable to dinner tonight.",
-            "Have a vegetable with your evening meal.",
-            "Include some broccoli, carrots, or salad at dinner."
+            "Swap a drink. Have water instead of soda or juice at lunch today.",
+            "Skip the sugary drink. Choose water over juice or soda right now.",
+            "Cut a liquid calorie. Drink water instead of something sweet at your next meal."
           ],
-          "why": "Vegetables take up space on your plate without many calories."
+          "why": "Liquid calories are easy to cut and you won't feel hungry afterward."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 10 minutes.",
-            "Go for a 10-minute walk today.",
-            "Take a short 10-minute walk."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Go outside and walk for 5 minutes.",
+            "Take a walk. Step outside and move for 5 minutes."
           ],
-          "why": "Walking every day is the foundation of this plan."
+          "why": "Consistent short walks burn more fat than occasional long ones."
         }
       ]
     },
@@ -592,31 +592,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today in MyFitnessPal."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Enter breakfast, lunch, and dinner into MyFitnessPal.",
+            "Log the whole day. Add all three meals to MyFitnessPal today."
           ],
-          "why": "Full-day tracking helps you spot patterns."
+          "why": "Full-day tracking gives you the complete picture of what you ate."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink four glasses of water today.",
-            "Make sure you drink at least four glasses of water.",
-            "Get four glasses of water in before bed."
+            "Drink more water. Finish 3 glasses of water throughout today.",
+            "Hit your water. Have a glass now and two more before dinner.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "More water keeps you full and helps your body burn fat."
+          "why": "Staying hydrated keeps energy up and hunger down."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 10 minutes.",
-            "Take a 10-minute walk today.",
-            "Step outside for a 10-minute walk."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk anytime today.",
+            "Get outside. Walk for 5 minutes today."
           ],
-          "why": "Ten minutes of walking is always worth it."
+          "why": "Walking daily keeps your metabolism active."
         }
       ]
     },
@@ -628,31 +628,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast this morning.",
-            "Open MyFitnessPal and add breakfast.",
-            "Track what you ate for breakfast."
+            "Track your breakfast. Log your morning meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate this morning.",
+            "Start your log. Enter today's breakfast into MyFitnessPal now."
           ],
-          "why": "Starting the day with logging sets the tone."
+          "why": "Logging breakfast first thing makes the rest of the day easier."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Skip one sugary drink today and have water instead.",
-            "Replace one soda or juice today with a glass of water.",
-            "Choose water instead of a sugary drink at one meal today."
+            "Swap a snack. Replace chips or sweets with fruit or a handful of nuts today.",
+            "Make a better snack choice. Grab an apple or nuts instead of something packaged.",
+            "Pick a smarter snack. Trade your usual snack for fruit or nuts right now."
           ],
-          "why": "Cutting sugary drinks is one of the fastest ways to eat less."
+          "why": "Consistent snack swaps make a real difference over months."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 10 minutes.",
-            "Go for a 10-minute walk.",
-            "Take a short walk — at least 10 minutes."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Go outside and walk for 5 minutes."
           ],
-          "why": "Every walk counts toward your goal."
+          "why": "You're building a movement habit that will last past 90 days."
         }
       ]
     },
@@ -664,67 +664,67 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log what you ate for lunch and dinner today.",
-            "Add lunch and dinner to MyFitnessPal.",
-            "Track your afternoon and evening meals."
+            "Track your dinner. Log tonight's meal in MyFitnessPal.",
+            "Log dinner. Open MyFitnessPal and add everything you ate tonight.",
+            "Add dinner to your log. Enter tonight's meal into MyFitnessPal."
           ],
-          "why": "Logging later meals helps you finish the day strong."
+          "why": "Dinner tracking keeps your full-day log complete."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat a piece of fruit as a snack today.",
-            "Have an apple, banana, or another fruit this afternoon.",
-            "Swap your afternoon snack for a piece of fruit."
+            "Drink more water. Have a glass of water now and two more before bed.",
+            "Hit your water. Finish 3 glasses of water today.",
+            "Stay hydrated. Drink a glass of water right now."
           ],
-          "why": "Fruit is filling and a better choice than most packaged snacks."
+          "why": "Good hydration overnight helps your body recover while you sleep."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 10 minutes.",
-            "Take a 10-minute walk today.",
-            "Get outside for a 10-minute walk."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk before winding down.",
+            "Evening stroll. Go outside for a quick 5-minute walk."
           ],
-          "why": "You're building a real habit — don't break the streak."
+          "why": "Even a short walk after dinner burns extra calories."
         }
       ]
     },
     {
       "day": 20,
-      "minutes_total": 4,
+      "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add both morning and midday meals to MyFitnessPal.",
-            "Track breakfast and lunch in MyFitnessPal."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Two meals tracked is better than none."
+          "why": "Logging every day, even imperfectly, builds the habit."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Drink a glass of water right now.",
-            "Pour yourself a glass of water and drink it.",
-            "Have a glass of water before your next meal."
+            "Swap a drink. Drink water instead of soda or juice at one meal today.",
+            "Cut a liquid calorie. Choose water over a sweet drink right now.",
+            "Skip the soda. Have water instead of any sugary drink today."
           ],
-          "why": "Staying hydrated is simple and effective."
+          "why": "Cutting a drink a day is one of the easiest calorie reductions you can make."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 10 minutes.",
-            "Go for a 10-minute walk today.",
-            "Take a short walk outside for 10 minutes."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Go for a 5-minute walk at any point today.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Walking is your most reliable daily habit right now."
+          "why": "Three weeks of daily walks means you're already building a lasting habit."
         }
       ]
     },
@@ -736,31 +736,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself this morning and write it down.",
-            "Step on the scale and note your weight.",
-            "Check your weight and record it today."
+            "Review your week. Count your logged meals in MyFitnessPal from the past 7 days.",
+            "Three-week check. Open MyFitnessPal and scroll through this week's entries.",
+            "Food log review. Look at what you tracked in MyFitnessPal over the last 7 days."
           ],
-          "why": "Week 3 check-in — see how your body is responding."
+          "why": "Reviewing your log every week keeps you accountable and motivated."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Check your weight. Step on the scale and log today's number.",
+            "Weekly weigh-in. Weigh yourself this morning and note the number.",
+            "Log your weight. Step on the scale and write down the number."
           ],
-          "why": "Full-day tracking is a cornerstone of this plan."
+          "why": "Week-3 weight is often the first time people see clear progress."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 12 minutes today.",
-            "Go for a 12-minute walk.",
-            "Take a 12-minute walk — you're ready to go a bit longer."
+            "Take a progress photo. Snap a mirror selfie and save it.",
+            "Three-week photo. Take a front-facing photo and compare it to week one.",
+            "Capture week three. Take a quick mirror photo today."
           ],
-          "why": "Slightly longer walks burn more calories over time."
+          "why": "Three weeks of photos tell a story the scale alone can't."
         }
       ]
     },
@@ -772,31 +772,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log what you ate for breakfast today.",
-            "Add breakfast to MyFitnessPal this morning.",
-            "Open MyFitnessPal and log your morning meal."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Add what you ate this morning to MyFitnessPal.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Morning logging is the easiest way to start the habit."
+          "why": "Keeping the logging streak alive is the job today."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Add a vegetable to one meal today.",
-            "Eat one vegetable with lunch or dinner.",
-            "Include some greens or another veggie in a meal today."
+            "Drink more water. Finish 3 glasses of water throughout today.",
+            "Hit your water. Drink one glass now and two more before dinner.",
+            "Stay hydrated. Have a glass of water right now."
           ],
-          "why": "Vegetables help you feel full for fewer calories."
+          "why": "Daily hydration supports every system in your body."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 12 minutes.",
-            "Take a 12-minute walk today.",
-            "Get outside for a 12-minute walk."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Go outside for a 5-minute walk.",
+            "Take a walk. Step outside and move for 5 minutes."
           ],
-          "why": "Small steps forward compound into big results."
+          "why": "Three weeks of daily movement is a real achievement — keep it going."
         }
       ]
     },
@@ -808,31 +808,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your lunch and dinner today.",
-            "Track your afternoon and evening meals.",
-            "Add lunch and dinner to MyFitnessPal."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Tracking later meals is where most people slip up."
+          "why": "Tracking two meals a day keeps your eating in focus."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Swap a sweet snack for nuts or fruit today.",
-            "Choose nuts or a piece of fruit instead of candy or chips.",
-            "Have a handful of nuts or a fruit instead of your usual snack."
+            "Swap a snack. Have fruit or nuts instead of chips or candy today.",
+            "Pick a better snack. Grab an apple or nuts instead of packaged food.",
+            "Make a small swap. Trade your usual snack for something healthier."
           ],
-          "why": "Better snacks lead to better results without much effort."
+          "why": "Every good swap compounds over the weeks ahead."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 12 minutes.",
-            "Go for a 12-minute walk today.",
-            "Take a 12-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Take a 5-minute walk at any point today.",
+            "Get outside. Walk for 5 minutes sometime today."
           ],
-          "why": "Every walk you take is a vote for the person you're becoming."
+          "why": "Your walks are getting easier because your body is adapting."
         }
       ]
     },
@@ -844,31 +844,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal today.",
-            "Log breakfast, lunch, and dinner in MyFitnessPal."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Enter breakfast, lunch, and dinner into MyFitnessPal.",
+            "Log the whole day. Add all three meals to MyFitnessPal today."
           ],
-          "why": "Full tracking days help you understand your eating patterns."
+          "why": "Full logging days are where the real progress happens."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink water with every meal today.",
-            "Have a glass of water alongside each meal.",
-            "Drink one glass of water at breakfast, lunch, and dinner."
+            "Drink more water. Finish 3 glasses of water throughout today.",
+            "Hit your water. Drink a glass now and two more before bed.",
+            "Stay hydrated. Have three glasses of water today."
           ],
-          "why": "Water with meals helps you eat slower and feel full sooner."
+          "why": "Good hydration is a consistent habit now — keep it up."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 12 minutes.",
-            "Take a 12-minute walk today.",
-            "Step out for 12 minutes of walking."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Go for a 5-minute walk today.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "You're almost at week 4 — don't stop now."
+          "why": "Daily movement is one of your best tools for the rest of this journey."
         }
       ]
     },
@@ -880,31 +880,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log what you had for breakfast and lunch.",
-            "Add breakfast and lunch to MyFitnessPal.",
-            "Track your morning and afternoon meals today."
+            "Track your breakfast. Log your morning meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate this morning.",
+            "Start your log. Enter today's breakfast into MyFitnessPal now."
           ],
-          "why": "Tracking keeps you aware of what you're putting in your body."
+          "why": "Logging breakfast is the most reliable trigger for a full tracking day."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat a vegetable at dinner tonight.",
-            "Add one vegetable to your evening meal.",
-            "Include a side of veggies at dinner today."
+            "Swap a drink. Have water instead of soda or juice at one meal today.",
+            "Cut a liquid calorie. Choose water over a sweet drink right now.",
+            "Skip the soda. Drink water instead of anything sugary today."
           ],
-          "why": "Vegetables at dinner help you eat less of higher-calorie foods."
+          "why": "Liquid calories are silent. Cutting them is a real win every time."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 12 minutes.",
-            "Go for a 12-minute walk today.",
-            "Take a short 12-minute walk."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a quick 5-minute walk.",
+            "Take a walk. Go outside and walk for 5 minutes."
           ],
-          "why": "Consistency beats perfection every time."
+          "why": "25 days of walking means you're halfway through your foundational habit."
         }
       ]
     },
@@ -916,31 +916,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal today.",
-            "Log breakfast, lunch, and dinner."
+            "Track your lunch. Log your midday meal in MyFitnessPal today.",
+            "Log lunch. Open MyFitnessPal and enter what you had for lunch.",
+            "Add lunch to your log. Type today's lunch into MyFitnessPal."
           ],
-          "why": "You're building a real logging habit — keep it up."
+          "why": "Mid-day logging keeps you aware and in control for the rest of the day."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Skip one snack today that you don't really need.",
-            "Skip the snack you'd usually grab out of boredom today.",
-            "Pass on one snack today that you normally eat out of habit."
+            "Drink more water. Have a glass of water now and two more today.",
+            "Hit your water. Finish 3 glasses of water today.",
+            "Stay hydrated. Drink a glass of water right now."
           ],
-          "why": "Skipping mindless snacks is one of the easiest ways to eat less."
+          "why": "Consistent water intake is one of the most underrated weight loss tools."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 12 minutes.",
-            "Take a 12-minute walk.",
-            "Get outside for 12 minutes today."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk anytime today.",
+            "Get outside. Walk for 5 minutes today."
           ],
-          "why": "Walking every day this week — that's the goal."
+          "why": "Your daily walk habit is strong — protect it."
         }
       ]
     },
@@ -952,31 +952,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log what you ate yesterday if you missed it.",
-            "Catch up on any logging you missed yesterday.",
-            "Add any meals from yesterday you forgot to log."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Catching up is better than skipping — keep your record going."
+          "why": "A full logging day gives you a clear picture of your eating patterns."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink four glasses of water today.",
-            "Have at least four glasses of water before bed.",
-            "Get four glasses of water in throughout the day."
+            "Swap a snack. Trade chips or sweets for fruit or nuts today.",
+            "Make a smart swap. Grab fruit or nuts instead of processed snacks.",
+            "Pick a better snack. Have an apple or handful of nuts instead of something packaged."
           ],
-          "why": "Hydration supports fat loss and energy levels."
+          "why": "Snack swaps are small but they compound over months."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 12 minutes.",
-            "Go for a 12-minute walk today.",
-            "Take a 12-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Go for a 5-minute walk today.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Keep your walking streak alive."
+          "why": "You're in the middle stretch — consistency now sets you up for the final push."
         }
       ]
     },
@@ -988,31 +988,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself and write down your weight.",
-            "Step on the scale this morning and note the number.",
-            "Check your weight and record it."
+            "Review your week. Count your logged meals in MyFitnessPal from the past 7 days.",
+            "Four-week check. Open MyFitnessPal and scroll through this week's entries.",
+            "Food log review. Look at what you tracked in MyFitnessPal over the last 7 days."
           ],
-          "why": "Weekly weigh-ins show your progress over time."
+          "why": "Four weeks of data gives you real insight into your eating habits."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Take a new photo of yourself.",
-            "Snap a quick mirror selfie today.",
-            "Take a photo of yourself to compare to your week 2 photo."
+            "Check your weight. Step on the scale and log today's number.",
+            "Weekly weigh-in. Weigh yourself this morning and write down the number.",
+            "Log your weight. Step on the scale and note the number now."
           ],
-          "why": "Monthly photos show changes the scale might miss."
+          "why": "Four weeks in, the scale should be showing a clear downward trend."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes today.",
-            "Go for a 15-minute walk.",
-            "Take a 15-minute walk to mark four weeks of progress."
+            "Take a progress photo. Snap a mirror selfie and save it.",
+            "Four-week photo. Take a front-facing photo and compare it to day one.",
+            "Capture week four. Take a quick mirror photo today."
           ],
-          "why": "Four weeks in — you've built real momentum."
+          "why": "A month of photos is a powerful reminder of how far you've come."
         }
       ]
     },
@@ -1024,31 +1024,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add both meals to MyFitnessPal this morning and afternoon.",
-            "Track breakfast and lunch in MyFitnessPal today."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Add what you ate this morning to MyFitnessPal.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Starting month two with strong logging is a great sign."
+          "why": "A new week starts with the same proven habit: log breakfast first."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink water instead of juice or soda at one meal today.",
-            "Replace one drink today with plain water.",
-            "Choose water over a sugary drink at lunch or dinner."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Drink a glass now and two more before dinner.",
+            "Stay hydrated. Have three glasses of water spread across today."
           ],
-          "why": "Liquid calories add up fast — water is the better swap."
+          "why": "Water is still one of your best tools — don't let the habit slip."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Longer walks are your new normal — you can handle it."
+          "why": "Month two starts now — keep the streak alive."
         }
       ]
     },
@@ -1060,31 +1060,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal today.",
-            "Log breakfast, lunch, and dinner in MyFitnessPal."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal today."
           ],
-          "why": "One month in — full-day logging is a strong habit now."
+          "why": "Thirty days of logging is a real achievement. Finish the month strong."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Add a vegetable to two meals today.",
-            "Eat a vegetable at both lunch and dinner.",
-            "Include veggies in two of your meals today."
+            "Swap a drink. Drink water instead of soda or juice at one meal today.",
+            "Cut a liquid calorie. Choose water over something sweet right now.",
+            "Skip the sugary drink. Have water instead of juice or soda today."
           ],
-          "why": "More vegetables mean more fullness with fewer calories."
+          "why": "You've made this swap many times now. It's becoming automatic."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk — celebrate 30 days of effort."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Go for a 5-minute walk today.",
+            "Take a walk. Step outside and move for 5 minutes."
           ],
-          "why": "Thirty days in — you've already changed your life."
+          "why": "Day 30. Thirty walks done. Keep it going."
         }
       ]
     },
@@ -1096,31 +1096,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast this morning.",
-            "Add breakfast to MyFitnessPal right after you eat.",
-            "Track your morning meal in MyFitnessPal."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and enter what you ate.",
+            "Start your log. Add today's breakfast to MyFitnessPal now."
           ],
-          "why": "Morning logging is the easiest time to track."
+          "why": "Month two. Same habits, stronger results."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink a glass of water when you wake up.",
-            "Have a full glass of water first thing in the morning.",
-            "Start today by drinking a glass of water."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before dinner.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Starting the day hydrated helps your body and your hunger."
+          "why": "Consistent hydration keeps your metabolism running well."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes today.",
-            "Take a 15-minute walk.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a quick 5-minute walk.",
+            "Take a walk. Go outside and walk for 5 minutes."
           ],
-          "why": "You're a month in — this walk should feel normal now."
+          "why": "You're past the hardest part. Now it's about building on what works."
         }
       ]
     },
@@ -1132,31 +1132,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your lunch today.",
-            "Add what you ate for lunch to MyFitnessPal.",
-            "Track your midday meal in MyFitnessPal."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Lunch logging keeps you on track for the rest of the day."
+          "why": "Two meals tracked is a solid day — keep it consistent."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat slowly at dinner tonight — put down your fork between bites.",
-            "Try eating dinner more slowly than usual tonight.",
-            "At dinner, slow down and chew each bite before reaching for more."
+            "Swap a snack. Have fruit or nuts instead of chips or candy today.",
+            "Pick a better snack. Grab an apple or nuts instead of packaged food.",
+            "Make a smart swap. Replace your usual snack with something healthier."
           ],
-          "why": "Eating slowly helps you notice when you're full."
+          "why": "Better snack choices are now part of who you are."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a short 15-minute walk."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes."
           ],
-          "why": "Walking is your most reliable fat-burning tool right now."
+          "why": "Month two is where the physical changes start to really show."
         }
       ]
     },
@@ -1168,31 +1168,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Full tracking days give you the most useful data."
+          "why": "Full-day logging gives you complete information about your eating."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink water with every meal today.",
-            "Have a glass of water alongside each meal.",
-            "Drink one glass of water at each of your meals."
+            "Drink more water. Have a glass of water before each meal today.",
+            "Pre-meal water. Drink one glass of water before breakfast, lunch, and dinner.",
+            "Water before meals. Have a glass of water before each of your meals today."
           ],
-          "why": "Water at meals is a simple habit with real benefits."
+          "why": "Drinking water before meals is one of the most proven hunger-reduction tricks."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Step outside for 15 minutes of walking."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Go for a 5-minute walk today.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Keep the walking habit strong — it's working."
+          "why": "33 days of movement. Your body is adapting in ways you can't see yet."
         }
       ]
     },
@@ -1204,31 +1204,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add morning and midday meals to MyFitnessPal.",
-            "Track breakfast and lunch in MyFitnessPal."
+            "Track your dinner. Log tonight's meal in MyFitnessPal.",
+            "Log dinner. Open MyFitnessPal and add everything you ate tonight.",
+            "Add dinner to your log. Enter tonight's meal into MyFitnessPal."
           ],
-          "why": "Tracking two meals is your minimum — three is your goal."
+          "why": "Dinner logging is often the one people skip — don't skip it."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Add a protein to your lunch today — like eggs, chicken, or beans.",
-            "Include some protein at lunch: eggs, tuna, chicken, or beans.",
-            "Make sure lunch has a good source of protein today."
+            "Swap a drink. Drink water instead of soda or juice at dinner tonight.",
+            "Cut a liquid calorie. Choose water over anything sweet at your evening meal.",
+            "Skip the soda. Have water with dinner tonight instead of a sweet drink."
           ],
-          "why": "Protein keeps you fuller for longer after meals."
+          "why": "Drinks with dinner are easy calories to cut."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk."
+            "Move your body. Walk for 5 minutes after dinner tonight.",
+            "Post-dinner walk. Take a short 5-minute walk after you eat.",
+            "Walk it off. Go outside for 5 minutes after dinner."
           ],
-          "why": "Every walk is progress — don't skip today."
+          "why": "After-dinner walks help digestion and burn extra calories."
         }
       ]
     },
@@ -1240,31 +1240,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself this morning and write the number down.",
-            "Step on the scale and note your weight today.",
-            "Check your weight and record it this week."
+            "Review your week. Count your logged meals in MyFitnessPal from the last 7 days.",
+            "Five-week check. Open MyFitnessPal and look at this week's food entries.",
+            "Food log review. Scroll through MyFitnessPal and see your meals from the last 7 days."
           ],
-          "why": "Weekly weigh-ins track your trend over time."
+          "why": "Five weeks of data reveals real patterns in what you eat."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal today.",
-            "Log breakfast, lunch, and dinner."
+            "Check your weight. Step on the scale and log today's number.",
+            "Weekly weigh-in. Weigh yourself this morning and note the number.",
+            "Log your weight. Step on the scale and write down the number."
           ],
-          "why": "Tracking on weigh-in day shows how food and weight connect."
+          "why": "Consistent weekly weigh-ins are your most reliable progress signal."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Take a progress photo. Snap a mirror selfie and save it.",
+            "Five-week photo. Take a front-facing photo and compare it to day one.",
+            "Capture week five. Take a quick mirror photo today."
           ],
-          "why": "Five weeks of walking — that's impressive."
+          "why": "Five weeks of photos — you should see a real difference from day one."
         }
       ]
     },
@@ -1276,31 +1276,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast this morning.",
-            "Add breakfast to MyFitnessPal right after eating.",
-            "Track what you had for breakfast today."
+            "Track your breakfast. Log your morning meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate this morning.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Morning habits set the tone for the whole day."
+          "why": "Keep the breakfast logging habit locked in."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Skip one sugary drink today and drink water instead.",
-            "Choose water over soda or juice at one meal.",
-            "Replace one sweet drink today with plain water."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before dinner.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Sugary drinks are an easy source of extra calories to cut."
+          "why": "Water intake is a habit you've built — protect it."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Get outside for 15 minutes of walking."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Walking is still your best daily habit."
+          "why": "Your daily walks are automatic now. That's a real win."
         }
       ]
     },
@@ -1312,31 +1312,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner.",
-            "Log every meal you eat in MyFitnessPal."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Enter breakfast and lunch into MyFitnessPal."
           ],
-          "why": "Tracking consistently is the biggest predictor of success."
+          "why": "Two meals logged is a productive tracking day."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat a vegetable at both lunch and dinner.",
-            "Add a veggie to your lunch and your dinner today.",
-            "Include a vegetable in two of your meals today."
+            "Swap a snack. Trade chips or sweets for fruit or nuts today.",
+            "Make a better snack choice. Grab something healthy instead of processed food.",
+            "Pick a smarter snack. Have fruit or nuts right now instead of junk food."
           ],
-          "why": "Two servings of vegetables a day is a good goal."
+          "why": "Snack choices at week five are habits, not just one-time swaps."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk.",
-            "Take a 15-minute walk outside today."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk anytime today.",
+            "Get outside. Walk for 5 minutes."
           ],
-          "why": "Fifteen minutes is your baseline — you've earned it."
+          "why": "Short walks every day keep your body burning more even at rest."
         }
       ]
     },
@@ -1348,31 +1348,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your lunch and dinner today.",
-            "Add afternoon and evening meals to MyFitnessPal.",
-            "Track your lunch and dinner in MyFitnessPal."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Afternoon and evening are when most people overeat."
+          "why": "Full-day logging days are where real awareness happens."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink four glasses of water today.",
-            "Have at least four glasses of water before bed.",
-            "Get four glasses of water in throughout the day."
+            "Drink more water. Finish 3 glasses of water throughout today.",
+            "Hit your water. Drink a glass now and two more before bed.",
+            "Stay hydrated. Have three glasses of water today."
           ],
-          "why": "Four glasses is a realistic daily water goal."
+          "why": "Staying hydrated is one of the simplest things you can do for your body."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Step outside for 15 minutes."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "You've built a real habit — keep protecting it."
+          "why": "More than a month of daily walking. You're proving you can do this."
         }
       ]
     },
@@ -1384,31 +1384,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal.",
-            "Log breakfast, lunch, and dinner today."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast now. Open MyFitnessPal and add what you ate.",
+            "Start your log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Full tracking is your most important daily action."
+          "why": "Breakfast logging is your daily anchor. Don't let it slip."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat your dinner on a smaller plate tonight.",
-            "Use a smaller dish than usual for dinner.",
-            "Try using a smaller plate at dinner to eat a bit less."
+            "Swap a drink. Have water instead of soda or juice at one meal today.",
+            "Cut a liquid calorie. Choose water over a sweet drink right now.",
+            "Skip the soda. Drink water instead of anything sugary today."
           ],
-          "why": "Smaller plates make smaller portions feel the same."
+          "why": "Cutting liquid calories is a habit now — lean into it."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Go for a 5-minute walk today.",
+            "Take a walk. Step outside and move for 5 minutes."
           ],
-          "why": "Almost at six weeks — you're doing this."
+          "why": "Consistency is the whole game at this stage."
         }
       ]
     },
@@ -1420,31 +1420,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add breakfast and lunch to MyFitnessPal.",
-            "Track both morning and midday meals."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Tracking two meals is the floor — three is the goal."
+          "why": "Forty days of daily habits. You're well past the hard part."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink a glass of water before breakfast.",
-            "Have water first thing in the morning before you eat.",
-            "Start the day by drinking a full glass of water."
+            "Drink more water. Finish 3 glasses of water throughout today.",
+            "Hit your water. Drink one glass now and two more before dinner.",
+            "Stay hydrated. Have three glasses of water today."
           ],
-          "why": "Morning water kickstarts your body and reduces morning hunger."
+          "why": "Hydration at 40 days is a real habit. Keep it strong."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk.",
-            "Go for a 15-minute walk today."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "You've walked for over a month — it's part of who you are now."
+          "why": "Day 40. You've done this 40 times. That's real."
         }
       ]
     },
@@ -1456,31 +1456,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Track your lunch. Log today's midday meal in MyFitnessPal.",
+            "Log lunch. Open MyFitnessPal and enter what you had for lunch.",
+            "Add lunch to your log. Type today's lunch into MyFitnessPal."
           ],
-          "why": "Full tracking on a regular day keeps the habit solid."
+          "why": "Lunch tracking keeps your full-day picture accurate."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Add protein to your breakfast today — like eggs or Greek yogurt.",
-            "Have an egg, some Greek yogurt, or another protein at breakfast.",
-            "Include a protein-rich food at breakfast today."
+            "Swap a snack. Have fruit or nuts instead of chips or sweets today.",
+            "Make a better snack choice. Grab an apple or nuts instead of packaged food.",
+            "Pick a smarter snack. Trade your usual snack for something healthier right now."
           ],
-          "why": "Protein at breakfast keeps you full through the morning."
+          "why": "Snack swaps at six weeks are deeply ingrained. Keep them going."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Stick with 15 minutes — it's your daily foundation."
+          "why": "You're in the strongest phase of habit formation right now."
         }
       ]
     },
@@ -1492,31 +1492,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself this morning and write it down.",
-            "Step on the scale and note your weight.",
-            "Check your weight and record the number."
+            "Review your week. Count your logged meals in MyFitnessPal from the last 7 days.",
+            "Six-week check. Open MyFitnessPal and look at this week's food entries.",
+            "Food log review. Scroll through MyFitnessPal and see your meals from the past 7 days."
           ],
-          "why": "Six weeks in — let's see your progress."
+          "why": "Six weeks of consistent logging is a real accomplishment."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal.",
-            "Log breakfast, lunch, and dinner."
+            "Check your weight. Step on the scale and log today's number.",
+            "Weekly weigh-in. Weigh yourself this morning and write down the number.",
+            "Log your weight. Step on the scale and note the number right now."
           ],
-          "why": "Tracking consistently is what makes this work."
+          "why": "Six weeks in, you should see clear progress in your weight."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk."
+            "Take a progress photo. Snap a mirror selfie and save it.",
+            "Six-week photo. Take a front-facing photo and compare it to day one.",
+            "Capture week six. Take a quick mirror photo today."
           ],
-          "why": "Six weeks of walking — that's a real achievement."
+          "why": "Six weeks of photos shows a transformation in progress."
         }
       ]
     },
@@ -1528,31 +1528,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast today.",
-            "Add breakfast to MyFitnessPal this morning.",
-            "Track your morning meal in MyFitnessPal."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Add what you ate this morning to MyFitnessPal.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Logging breakfast is your anchor habit."
+          "why": "New week, same strong habits."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 5 squats right now.",
-            "Stand up and do 5 squats.",
-            "Try 5 bodyweight squats today."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before dinner.",
+            "Stay hydrated. Drink three glasses of water throughout today."
           ],
-          "why": "Simple strength moves help your body burn more over time."
+          "why": "Hydration is a locked-in habit. Let it run on autopilot."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Keep walking — it's your most consistent habit."
+          "why": "Daily movement is your single most reliable habit. Keep it."
         }
       ]
     },
@@ -1564,31 +1564,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your lunch and dinner today.",
-            "Track your afternoon and evening meals.",
-            "Add lunch and dinner to MyFitnessPal."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Evenings are when most people underestimate what they eat."
+          "why": "Full-day logging keeps your awareness sharp."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 5 push-ups today.",
-            "Try 5 push-ups — full or from your knees.",
-            "Do 5 push-ups right now, any style."
+            "Swap a drink. Have water instead of soda or juice at one meal today.",
+            "Cut a liquid calorie. Choose water over a sweet drink right now.",
+            "Skip the sugary drink. Drink water instead of anything sweet today."
           ],
-          "why": "A little strength work each day adds up over weeks."
+          "why": "Drink swaps are automatic for you now. That's a real habit win."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk.",
-            "Get outside for a 15-minute walk."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes."
           ],
-          "why": "Walking plus mini-workouts is a powerful combo."
+          "why": "Every walk keeps your metabolism elevated throughout the day."
         }
       ]
     },
@@ -1600,31 +1600,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner.",
-            "Log every meal you eat in MyFitnessPal today."
+            "Track your breakfast. Log your morning meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate this morning.",
+            "Start your log. Enter today's breakfast into MyFitnessPal now."
           ],
-          "why": "Halfway through — strong tracking keeps your results coming."
+          "why": "Halfway through the 90 days. You're doing it."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink four glasses of water today.",
-            "Get at least four glasses of water in today.",
-            "Have four glasses of water spread throughout the day."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Drink a glass now and two more before bed.",
+            "Stay hydrated. Have three glasses of water today."
           ],
-          "why": "Staying hydrated helps your workouts and hunger."
+          "why": "Day 45. Every habit you have right now is stronger than day one."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk — halfway done!"
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and move for 5 minutes."
           ],
-          "why": "Day 45 — you're halfway to 90. Keep going."
+          "why": "Day 45 walk. You're halfway there."
         }
       ]
     },
@@ -1636,31 +1636,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself this morning and write it down.",
-            "Step on the scale and note your weight.",
-            "Check your weight and record the number."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Weekly weigh-ins keep you honest and motivated."
+          "why": "Phase three starts now. Logging and movement stay daily."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Try 10 squats. Stand up and do 10 slow squats right now.",
+            "Do a quick workout. Stand and do 10 squats at home — takes 1 minute.",
+            "Add some strength. Do 10 squats wherever you are right now."
           ],
-          "why": "Full tracking is the habit that drives your results."
+          "why": "Adding simple at-home moves builds muscle and burns more calories."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Do 10 squats today.",
-            "Stand up and do 10 squats right now.",
-            "Try 10 bodyweight squats today."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Your legs are strong enough for 10 squats now."
+          "why": "Walking plus a few strength moves is a complete daily routine."
         }
       ]
     },
@@ -1672,31 +1672,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add morning and midday meals to MyFitnessPal.",
-            "Track breakfast and lunch today."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Tracking two meals keeps your streak going even on busy days."
+          "why": "Full logging days give you the best data on your eating."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat a vegetable with every meal today.",
-            "Include a vegetable at breakfast, lunch, and dinner.",
-            "Have some veggies at all three meals today."
+            "Do 10 push-ups. Drop and do 10 push-ups right now — knees are fine.",
+            "Try a home workout. Do 10 push-ups wherever you are — knees on floor is ok.",
+            "Add some strength. Do 10 push-ups right now."
           ],
-          "why": "Vegetables at every meal is a simple rule that helps."
+          "why": "Push-ups build upper body strength and burn calories at home."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "Walking is your foundation — keep it solid."
+          "why": "Walking + strength moves is the combination that speeds up fat loss."
         }
       ]
     },
@@ -1708,31 +1708,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal today.",
-            "Log breakfast, lunch, and dinner."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Tracking daily is your most important habit right now."
+          "why": "Breakfast logging anchors the rest of your day."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 5 push-ups and 10 squats today.",
-            "Try 5 push-ups and 10 bodyweight squats.",
-            "Knock out 5 push-ups and 10 squats today."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before dinner.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Combining two moves is your first mini-workout."
+          "why": "Hydration supports muscle recovery from your new home workouts."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk.",
-            "Get outside for 15 minutes of walking."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Walking plus home exercises — you're building real fitness."
+          "why": "Your daily walk is the habit that holds everything else together."
         }
       ]
     },
@@ -1744,31 +1744,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast this morning.",
-            "Add breakfast to MyFitnessPal after you eat.",
-            "Track your morning meal in MyFitnessPal."
+            "Review your week. Count your logged meals in MyFitnessPal from the past 7 days.",
+            "Seven-week check. Open MyFitnessPal and look at this week's food entries.",
+            "Food log review. Scroll through MyFitnessPal and see your meals from the last 7 days."
           ],
-          "why": "Logging breakfast is one of your strongest habits now."
+          "why": "Seven weeks of logs show how your eating has shifted over time."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink a glass of water before each meal today.",
-            "Have water before breakfast, lunch, and dinner.",
-            "Drink one glass of water ahead of every meal."
+            "Check your weight. Step on the scale and log today's number.",
+            "Weekly weigh-in. Weigh yourself this morning and write down the number.",
+            "Log your weight. Step on the scale and note the number now."
           ],
-          "why": "Water before meals helps you feel full with less food."
+          "why": "Seven weeks of weigh-ins gives you the clearest trend line."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk outside."
+            "Take a progress photo. Snap a mirror selfie and save it.",
+            "Seven-week photo. Take a front-facing photo and compare it to day one.",
+            "Capture week seven. Take a quick mirror photo today."
           ],
-          "why": "Seven weeks in — this walk is part of your routine."
+          "why": "Seven weeks of photos. The difference from day one should be striking."
         }
       ]
     },
@@ -1780,31 +1780,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Day 50 — your tracking habit is strong."
+          "why": "Day 50. You've logged your way to this point. Keep going."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 10 squats and 5 push-ups today.",
-            "Knock out 10 squats and 5 push-ups.",
-            "Try 10 squats followed by 5 push-ups."
+            "Do 10 squats. Stand and do 10 squats right now.",
+            "Try 10 squats. Do 10 slow squats wherever you are right now.",
+            "Add some strength. Do 10 squats at home — takes about 1 minute."
           ],
-          "why": "Small workouts done daily are better than big ones done rarely."
+          "why": "Squats are the most effective home exercise for your legs and core."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Fifty days of showing up — keep going."
+          "why": "Day 50 walk. You've done this 50 times. That's impressive."
         }
       ]
     },
@@ -1816,31 +1816,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your lunch and dinner today.",
-            "Add afternoon and evening meals to MyFitnessPal.",
-            "Track your midday and evening meals."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Add what you ate this morning to MyFitnessPal.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Logging afternoon and evening meals catches the most calories."
+          "why": "Logging breakfast is the cornerstone of your food awareness."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Add protein to your lunch today — chicken, eggs, tuna, or beans.",
-            "Make sure lunch has a protein source today.",
-            "Include chicken, tuna, eggs, or beans at lunch."
+            "Swap a drink. Have water instead of juice or soda at one meal today.",
+            "Cut a liquid calorie. Choose water over a sweet drink right now.",
+            "Skip the soda. Drink water instead of anything sugary at your next meal."
           ],
-          "why": "Protein at lunch helps you avoid afternoon snacking."
+          "why": "Drink swaps are second nature at this point. Keep them locked in."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk.",
-            "Step outside for 15 minutes."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk anytime today.",
+            "Get outside. Walk for 5 minutes."
           ],
-          "why": "Keep walking — it's your most consistent habit."
+          "why": "Daily walks plus small home workouts is a winning formula."
         }
       ]
     },
@@ -1852,31 +1852,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal.",
-            "Log breakfast, lunch, and dinner."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Every logged day is a data point for your progress."
+          "why": "Two meals a day is the minimum to keep your tracking habit alive."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink four glasses of water today.",
-            "Have at least four glasses of water before bed.",
-            "Get four glasses of water in today."
+            "Do 10 push-ups. Drop and do 10 push-ups right now.",
+            "Try a quick workout. Do 10 push-ups wherever you are — knees are fine.",
+            "Add some strength. Do 10 push-ups at home right now."
           ],
-          "why": "Hydration supports energy and fat burning."
+          "why": "Weekly push-up practice builds real upper body strength over time."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Do 10 squats and 5 push-ups.",
-            "Try 10 squats followed by 5 push-ups.",
-            "Knock out 10 squats and 5 push-ups today."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a quick 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Your mini-workout is becoming a habit."
+          "why": "Walking and strength together are more effective than either alone."
         }
       ]
     },
@@ -1888,31 +1888,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add breakfast and lunch to MyFitnessPal.",
-            "Track both morning and midday meals."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Tracking two meals is your minimum every day."
+          "why": "Full-day logging keeps your eating honest and your progress real."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Skip your afternoon snack today and drink water instead.",
-            "Replace your afternoon snack with a glass of water.",
-            "When you feel like snacking this afternoon, drink water first."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Drink one glass now and two more today.",
+            "Stay hydrated. Have three glasses of water throughout today."
           ],
-          "why": "Sometimes thirst feels like hunger — water helps."
+          "why": "Water is still one of your most powerful weight loss tools."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "Walking every day is your most reliable tool."
+          "why": "You're in the final stretch of month two. Stay consistent."
         }
       ]
     },
@@ -1924,31 +1924,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat in MyFitnessPal."
+            "Track your dinner. Log tonight's meal in MyFitnessPal.",
+            "Log dinner. Open MyFitnessPal and add everything you ate tonight.",
+            "Add dinner to your log. Enter tonight's meal into MyFitnessPal."
           ],
-          "why": "Full tracking keeps you on course."
+          "why": "Dinner tracking closes out your day and keeps you accountable."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 10 squats and 8 push-ups today.",
-            "Try 10 squats and 8 push-ups.",
-            "Knock out 10 squats followed by 8 push-ups."
+            "Swap a snack. Have fruit or nuts instead of chips or candy today.",
+            "Make a better snack choice. Grab an apple or nuts instead of packaged food.",
+            "Pick a smarter snack. Trade your usual snack for something healthier now."
           ],
-          "why": "Slowly adding more reps builds real strength."
+          "why": "Healthy snack choices at two months are deeply ingrained now."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Step outside for 15 minutes of walking."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Walking plus your mini-workout is a solid daily routine."
+          "why": "Walking every day has changed how your body burns energy at rest."
         }
       ]
     },
@@ -1960,31 +1960,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself and write down your number.",
-            "Step on the scale and note your weight this morning.",
-            "Check your weight and record it."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Consistent weekly weigh-ins reveal your true trend."
+          "why": "Consistent logging for over 50 days is a genuine achievement."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal today.",
-            "Log breakfast, lunch, and dinner."
+            "Do 10 squats and 10 push-ups. Do both at home right now — takes 2 minutes.",
+            "Quick home workout. Do 10 squats then 10 push-ups wherever you are.",
+            "Combine your moves. Do 10 squats and 10 push-ups back to back right now."
           ],
-          "why": "Tracking on weigh-in day helps you connect habits and results."
+          "why": "Combining squats and push-ups gives you a full-body workout in 2 minutes."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Take a 5-minute walk at any point today.",
+            "Get outside. Walk for 5 minutes."
           ],
-          "why": "Eight weeks of walking — keep the streak alive."
+          "why": "Home strength plus walking is the most time-efficient fat-loss combo."
         }
       ]
     },
@@ -1996,31 +1996,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Take a new photo of yourself in the mirror.",
-            "Snap a quick mirror selfie today.",
-            "Take a photo of yourself today — compare it to day 28."
+            "Review your week. Count your logged meals in MyFitnessPal from the past 7 days.",
+            "Eight-week check. Open MyFitnessPal and look at this week's food entries.",
+            "Food log review. Scroll through MyFitnessPal and see your meals from the last 7 days."
           ],
-          "why": "Bi-monthly photos show body changes before the scale catches up."
+          "why": "Eight weeks of logs — two full months of data on your habits."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add breakfast and lunch to MyFitnessPal.",
-            "Track both morning and midday meals."
+            "Check your weight. Step on the scale and log today's number.",
+            "Weekly weigh-in. Weigh yourself this morning and note the number.",
+            "Log your weight. Step on the scale and write down the number."
           ],
-          "why": "Tracking keeps your results predictable."
+          "why": "Eight weekly weigh-ins give you the clearest picture of your trend."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Get outside for 15 minutes."
+            "Take a progress photo. Snap a mirror selfie and save it.",
+            "Eight-week photo. Take a front-facing photo and compare it to day one.",
+            "Capture week eight. Take a quick mirror photo today."
           ],
-          "why": "You're in the home stretch — two-thirds done."
+          "why": "Two months of photos is a powerful record of your transformation."
         }
       ]
     },
@@ -2032,31 +2032,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal today."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Full tracking is your most powerful daily action."
+          "why": "Full logging is your default now. Let it run on autopilot."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat one vegetable at lunch and one at dinner.",
-            "Have a veggie side with both lunch and dinner today.",
-            "Include a vegetable at your lunch and dinner today."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before bed.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Two servings of veggies a day is a strong goal."
+          "why": "Hydration is non-negotiable for fat loss and energy."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Do 10 squats and 8 push-ups.",
-            "Knock out 10 squats and 8 push-ups today.",
-            "Try 10 squats and 8 push-ups right now."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Your body is getting stronger — keep it going."
+          "why": "Nearly 60 days of daily movement. You're building a life-long habit."
         }
       ]
     },
@@ -2068,31 +2068,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add breakfast and lunch to MyFitnessPal.",
-            "Track your morning and midday meals."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Tracking two meals is always better than zero."
+          "why": "Breakfast logging is locked in. It's what you do now."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink four glasses of water today.",
-            "Have at least four glasses of water before bed.",
-            "Get four glasses of water in today."
+            "Do 10 squats and 10 push-ups. Do both right now at home.",
+            "Quick home workout. Stand up and do 10 squats then 10 push-ups.",
+            "Combine your strength moves. Do 10 squats and 10 push-ups back to back."
           ],
-          "why": "Hydration supports your energy and your results."
+          "why": "Two minutes of strength work twice a week is enough to build real muscle."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "Walking every single day — that's discipline."
+          "why": "Walking and strength together accelerate your progress in the final month."
         }
       ]
     },
@@ -2104,31 +2104,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Full tracking is the backbone of this plan."
+          "why": "Two meals is the minimum to maintain your tracking habit."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat dinner on a smaller plate tonight.",
-            "Use a slightly smaller dish for dinner today.",
-            "Try a smaller plate at dinner and see how it feels."
+            "Swap a drink. Have water instead of soda or juice at one meal today.",
+            "Cut a liquid calorie. Choose water over a sweet drink right now.",
+            "Skip the sugary drink. Drink water instead of anything sweet today."
           ],
-          "why": "Smaller plates trick your brain into feeling satisfied with less."
+          "why": "Drink swaps are a permanent part of how you eat now."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk.",
-            "Step outside for 15 minutes today."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Almost at 60 days — you're almost there."
+          "why": "Two more days until the end of month two. Finish strong."
         }
       ]
     },
@@ -2140,31 +2140,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself and write down your weight.",
-            "Step on the scale and note your number.",
-            "Check your weight — it's been two months."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Day 60 weigh-in — two months of work shows up on the scale."
+          "why": "Sixty days of logging. Two months down, one to go."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal.",
-            "Log breakfast, lunch, and dinner today."
+            "Check your weight. Step on the scale and log today's number.",
+            "Mid-journey weigh-in. Weigh yourself today and note the number.",
+            "Log your weight. Step on the scale and write down the number now."
           ],
-          "why": "Two months of tracking — you've built a real habit."
+          "why": "Day 60 is a milestone. Your weight today is proof of your work."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes — then smile.",
-            "Take a 15-minute walk to celebrate 60 days.",
-            "Go for a 15-minute walk — you've earned it."
+            "Take a progress photo. Snap a mirror selfie and save it.",
+            "Day 60 photo. Take a front-facing photo and compare it to day one.",
+            "Capture day sixty. Take a quick mirror photo right now."
           ],
-          "why": "Sixty days of consistent action is something to be proud of."
+          "why": "Day 60 photo. You're two-thirds of the way to your goal."
         }
       ]
     },
@@ -2176,31 +2176,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add morning and midday meals to MyFitnessPal.",
-            "Track breakfast and lunch in MyFitnessPal."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Keep logging — it's working."
+          "why": "Final month. Same habits that got you here will finish the job."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 12 squats and 8 push-ups today.",
-            "Try 12 squats and 8 push-ups.",
-            "Knock out 12 squats and 8 push-ups."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before dinner.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Small strength increases week over week add up."
+          "why": "Hydration in the final stretch supports your body at its best."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Month three starts now — keep the momentum."
+          "why": "Thirty days left. Protect the habits you've built."
         }
       ]
     },
@@ -2212,31 +2212,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal today."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Consistent logging is your most important daily habit."
+          "why": "Consistent two-meal tracking keeps your eating in focus."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink a glass of water before breakfast and before lunch.",
-            "Have water before both breakfast and lunch today.",
-            "Drink one glass of water before two of your meals today."
+            "Do 10 squats and 10 push-ups. Do both at home right now.",
+            "Quick home workout. Stand up and do 10 squats then 10 push-ups.",
+            "Combine your strength moves. Do 10 squats and 10 push-ups back to back."
           ],
-          "why": "Water before meals reduces how much you eat."
+          "why": "Home strength workouts are paying off — your body is stronger now."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "Walking is your daily anchor — protect it."
+          "why": "Every daily walk in the final month cements your long-term habits."
         }
       ]
     },
@@ -2248,31 +2248,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and dinner today.",
-            "Add breakfast and dinner to MyFitnessPal.",
-            "Track your morning and evening meals."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Bookending your day with logging catches the most."
+          "why": "Full logging days are the most powerful days in your journey."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat a vegetable with lunch and dinner today.",
-            "Have veggies alongside both lunch and dinner.",
-            "Include a vegetable in two meals today."
+            "Swap a snack. Have fruit or nuts instead of chips or sweets today.",
+            "Make a better snack choice. Grab an apple or nuts instead of packaged food.",
+            "Pick a smarter snack. Trade your usual snack for something healthier now."
           ],
-          "why": "Vegetables at two meals a day is your new standard."
+          "why": "Better snacks have been your default for months. Keep it that way."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Do 12 squats and 8 push-ups.",
-            "Knock out 12 squats and 8 push-ups today.",
-            "Try 12 squats and 8 push-ups right now."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Your mini-workout is getting stronger."
+          "why": "Nine weeks of daily walks. This is who you are now."
         }
       ]
     },
@@ -2284,31 +2284,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal today.",
-            "Log breakfast, lunch, and dinner."
+            "Track your dinner. Log tonight's meal in MyFitnessPal.",
+            "Log dinner. Open MyFitnessPal and add everything you ate tonight.",
+            "Add dinner to your log. Enter tonight's meal into MyFitnessPal."
           ],
-          "why": "Nine weeks of tracking — you're a different person now."
+          "why": "Dinner logging closes the loop on your full day."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink four glasses of water today.",
-            "Have at least four glasses of water before bed.",
-            "Get four glasses of water in throughout the day."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before bed.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Hydration is an easy win every single day."
+          "why": "Water supports fat burning and keeps energy levels steady."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes after dinner tonight.",
+            "Post-dinner walk. Go for a quick 5-minute walk after you eat.",
+            "Walk it off. Take a short walk right after dinner."
           ],
-          "why": "Walking every day — you've made it a lifestyle."
+          "why": "After-dinner walks are one of the best ways to end a day."
         }
       ]
     },
@@ -2320,31 +2320,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself this morning and write it down.",
-            "Step on the scale and note your weight.",
-            "Check your weight and record the number."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Add what you ate this morning to MyFitnessPal.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Weekly weigh-in — stay curious, not anxious."
+          "why": "Final month breakfast logging. Make it count."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add breakfast and lunch to MyFitnessPal.",
-            "Track both morning and midday meals today."
+            "Do 10 squats and 10 push-ups. Do both at home right now.",
+            "Quick home workout. Do 10 squats then 10 push-ups wherever you are.",
+            "Combine your moves. Do 10 squats and 10 push-ups back to back."
           ],
-          "why": "Tracking two meals is your daily minimum."
+          "why": "Your body is strong enough now to feel these moves working."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Do 12 squats and 10 push-ups.",
-            "Try 12 squats and 10 push-ups today.",
-            "Knock out 12 squats and 10 push-ups."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Ten push-ups — look how far you've come."
+          "why": "Strength plus walking is your daily power combination."
         }
       ]
     },
@@ -2356,31 +2356,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Full tracking is what separates consistent results from guessing."
+          "why": "Every full logging day in the final month moves you closer to your goal."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Skip one snack today and drink water instead.",
-            "Replace one snack with a glass of water today.",
-            "Next time you feel like snacking, try water first."
+            "Swap a drink. Have water instead of soda or juice at one meal today.",
+            "Cut a liquid calorie. Choose water over a sweet drink right now.",
+            "Skip the sugary drink. Drink water instead of anything sweet today."
           ],
-          "why": "Skipping mindless snacks reduces calories effortlessly."
+          "why": "Drink swaps are as natural as breathing now."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk anytime today.",
+            "Get outside. Walk for 5 minutes."
           ],
-          "why": "Walking is your foundation — it still works."
+          "why": "You've built something real. Don't let it slip in the final weeks."
         }
       ]
     },
@@ -2392,31 +2392,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and dinner today.",
-            "Add breakfast and dinner to MyFitnessPal.",
-            "Track morning and evening meals in MyFitnessPal."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Logging breakfast and dinner captures your biggest meals."
+          "why": "Two meals tracked is a solid, consistent day."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat protein with every meal today.",
-            "Include a protein source at breakfast, lunch, and dinner.",
-            "Have chicken, eggs, beans, or fish at every meal today."
+            "Drink more water. Finish 3 glasses of water throughout today.",
+            "Hit your water. Have a glass now and two more before dinner.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Protein at every meal keeps hunger in check all day."
+          "why": "Hydration is one of the habits you'll keep for life after this."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Get outside for 15 minutes of walking."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "You've walked for over two months — this is who you are."
+          "why": "Daily movement is the cornerstone of long-term weight management."
         }
       ]
     },
@@ -2428,31 +2428,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track every meal in MyFitnessPal.",
-            "Log breakfast, lunch, and dinner today."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Tracking every day keeps the results coming."
+          "why": "Full logging in the final stretch keeps your results on track."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 15 squats and 10 push-ups today.",
-            "Try 15 squats and 10 push-ups.",
-            "Knock out 15 squats and 10 push-ups."
+            "Do 10 squats and 10 push-ups. Do both at home right now.",
+            "Quick home workout. Do 10 squats then 10 push-ups right now.",
+            "Combine your strength moves. Do 10 squats and 10 push-ups back to back."
           ],
-          "why": "You're getting stronger — 15 squats is your new floor."
+          "why": "Every strength session in the final month keeps your metabolism high."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "Walking plus strength moves — you're doing real fitness."
+          "why": "Your walk habit is strong enough now to last a lifetime."
         }
       ]
     },
@@ -2464,31 +2464,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add morning and midday meals to MyFitnessPal.",
-            "Track breakfast and lunch in MyFitnessPal."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Logging two meals keeps your habit intact on any day."
+          "why": "Nearly 70 days of breakfast logging. That's a real habit."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink four glasses of water today.",
-            "Get four glasses of water in before bed.",
-            "Have at least four glasses of water today."
+            "Swap a snack. Have fruit or nuts instead of chips or candy today.",
+            "Make a better snack choice. Grab an apple or nuts instead of packaged food.",
+            "Pick a smarter snack. Trade your usual snack for something healthier now."
           ],
-          "why": "Water is your simplest health tool."
+          "why": "Snack choices in the final month are second nature. Keep it up."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Step outside for 15 minutes of walking."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Three weeks left — don't stop now."
+          "why": "Three weeks left. Protect your streak."
         }
       ]
     },
@@ -2500,31 +2500,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself and write down your number.",
-            "Step on the scale and note your weight this morning.",
-            "Check your weight and record it — 70 days in."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Ten weeks of action — the scale should reflect your effort."
+          "why": "Day 70. You've logged your eating 70 times. That's remarkable."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal today."
+            "Check your weight. Step on the scale and log today's number.",
+            "Weekly weigh-in. Weigh yourself and write down the number.",
+            "Log your weight. Step on the scale and note the number now."
           ],
-          "why": "Tracking at the 70-day mark is a real commitment."
+          "why": "Day 70 weight check. The scale should reflect 70 days of effort."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk to mark 70 days."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a quick 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Seventy days — you've changed your life."
+          "why": "70 walks done. 20 more and you've changed your life."
         }
       ]
     },
@@ -2536,31 +2536,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add breakfast and lunch to MyFitnessPal.",
-            "Track both morning and midday meals."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Add what you ate this morning to MyFitnessPal.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Tracking two meals minimum keeps the habit strong."
+          "why": "The habits are yours now. This is just maintenance."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat a vegetable at every meal today.",
-            "Include veggies at breakfast, lunch, and dinner.",
-            "Have a vegetable with every meal today."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before bed.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Vegetables at every meal is an elite-level habit."
+          "why": "You'll carry this water habit past day 90. It's part of who you are."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Do 15 squats and 10 push-ups.",
-            "Try 15 squats and 10 push-ups today.",
-            "Knock out 15 squats and 10 push-ups right now."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes."
           ],
-          "why": "This mini-workout is your new normal."
+          "why": "Walking is how you move through the world now."
         }
       ]
     },
@@ -2572,31 +2572,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Full tracking is the engine of your results."
+          "why": "Two meals a day is a sustainable habit you can keep forever."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink water with every meal today.",
-            "Have a glass of water alongside each meal.",
-            "Drink one glass of water at every meal today."
+            "Do 10 squats and 10 push-ups. Do both at home right now.",
+            "Quick home workout. Do 10 squats then 10 push-ups wherever you are.",
+            "Combine your moves. Do 10 squats and 10 push-ups back to back."
           ],
-          "why": "Water with meals is a habit that pays off every day."
+          "why": "Two minutes of strength work keeps your metabolism high in the final push."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Walking every day — you've mastered this."
+          "why": "Walking plus strength is the best 3-minute routine you can do."
         }
       ]
     },
@@ -2608,31 +2608,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and dinner today.",
-            "Track morning and evening meals in MyFitnessPal.",
-            "Add breakfast and dinner to MyFitnessPal."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Tracking your bookend meals captures the most."
+          "why": "Full logging in the final two weeks brings it all home."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Skip one sweet or salty snack today.",
-            "Pass on one packaged snack today and have water instead.",
-            "Skip the snack you'd normally have this afternoon."
+            "Swap a drink. Have water instead of soda or juice at one meal today.",
+            "Cut a liquid calorie. Choose water over a sweet drink right now.",
+            "Skip the sugary drink. Drink water instead of anything sweet today."
           ],
-          "why": "Cutting one unnecessary snack is a small win that adds up."
+          "why": "Drink swaps are a permanent change you've made to your lifestyle."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "Keep showing up — the last stretch is where it counts."
+          "why": "Seventeen days left. You're in the home stretch."
         }
       ]
     },
@@ -2644,31 +2644,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal today."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "You're almost there — keep tracking."
+          "why": "Every logging day in the final stretch matters."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 15 squats and 12 push-ups today.",
-            "Try 15 squats and 12 push-ups.",
-            "Knock out 15 squats and 12 push-ups."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before dinner.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Twelve push-ups — your strength has grown."
+          "why": "Hydration keeps your energy high in the final weeks."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a quick 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Less than three weeks left — finish strong."
+          "why": "16 days left. Every single walk counts."
         }
       ]
     },
@@ -2680,31 +2680,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself and write down your number.",
-            "Step on the scale this morning and note your weight.",
-            "Check your weight and record it."
+            "Review your week. Count your logged meals in MyFitnessPal from the past 7 days.",
+            "Ten-week check. Open MyFitnessPal and look at this week's food entries.",
+            "Food log review. Scroll through MyFitnessPal and see your meals from the last 7 days."
           ],
-          "why": "75-day check-in — see what 10+ weeks of work looks like."
+          "why": "75 days of data. You can see your transformation in the numbers."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner.",
-            "Log every meal you eat in MyFitnessPal today."
+            "Check your weight. Step on the scale and log today's number.",
+            "Weekly weigh-in. Weigh yourself this morning and write down the number.",
+            "Log your weight. Step on the scale and note the number."
           ],
-          "why": "Tracking to the end is what separates results from wishes."
+          "why": "Day 75 weigh-in. Two weeks left to finish strong."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Take a new photo of yourself today.",
-            "Snap a mirror selfie to compare to your earlier photos.",
-            "Take a quick photo of yourself — compare to day 56."
+            "Take a progress photo. Snap a mirror selfie and save it.",
+            "75-day photo. Take a front-facing photo and compare it to day one.",
+            "Capture day 75. Take a quick mirror photo today."
           ],
-          "why": "You've changed — look at the evidence."
+          "why": "Day 75 photo. 15 days from the final reveal."
         }
       ]
     },
@@ -2716,31 +2716,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add breakfast and lunch to MyFitnessPal.",
-            "Track morning and midday meals in MyFitnessPal."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Final two weeks — don't take your foot off the gas."
+          "why": "Final two weeks. Full logging every day."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink four glasses of water today.",
-            "Get at least four glasses of water in today.",
-            "Have four glasses of water before bed tonight."
+            "Do 10 squats and 10 push-ups. Do both at home right now.",
+            "Quick home workout. Do 10 squats then 10 push-ups wherever you are.",
+            "Combine your strength moves. Do 10 squats and 10 push-ups back to back."
           ],
-          "why": "Hydration is your easiest daily win — still true."
+          "why": "Strength in the final weeks means you'll finish looking and feeling different."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Walking every day for 76 days — that's incredible."
+          "why": "14 days left. Keep every habit intact."
         }
       ]
     },
@@ -2752,31 +2752,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Full tracking in the final stretch keeps your results coming."
+          "why": "Thirteen days left. Don't break the streak now."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat a vegetable at lunch and dinner today.",
-            "Have veggies with both lunch and dinner.",
-            "Include a vegetable in two meals today."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before bed.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Two servings of vegetables a day is your standard now."
+          "why": "Hydration in the final stretch keeps your body performing at its best."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Do 15 squats and 12 push-ups.",
-            "Try 15 squats and 12 push-ups today.",
-            "Knock out 15 squats and 12 push-ups."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "Your body is stronger than when you started."
+          "why": "13 more walks to finish the 90 days strong."
         }
       ]
     },
@@ -2788,31 +2788,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and dinner today.",
-            "Add breakfast and dinner to MyFitnessPal.",
-            "Track morning and evening meals."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Logging the first and last meal of the day is your anchor."
+          "why": "Two meals tracked is a strong day in the final stretch."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink water with every meal today.",
-            "Have a glass of water at breakfast, lunch, and dinner.",
-            "Drink one glass of water alongside every meal."
+            "Swap a snack. Have fruit or nuts instead of chips or sweets today.",
+            "Make a better snack choice. Grab an apple or nuts instead of packaged food.",
+            "Pick a smarter snack. Trade your usual snack for something healthier now."
           ],
-          "why": "Water with meals — still one of your best habits."
+          "why": "Snack habits in the final two weeks set your pattern for after day 90."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Get outside for a 15-minute walk."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Twelve more days — don't look back."
+          "why": "12 days to go. Protect your streak."
         }
       ]
     },
@@ -2824,31 +2824,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Full-day logging in the final stretch matters."
+          "why": "Full logging in the final 11 days finishes the job properly."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Skip one snack today that you don't truly need.",
-            "Skip an unnecessary snack today and have water instead.",
-            "Pass on one mindless snack today."
+            "Swap a drink. Have water instead of soda or juice at one meal today.",
+            "Cut a liquid calorie. Choose water over a sweet drink right now.",
+            "Skip the sugary drink. Drink water instead of anything sweet today."
           ],
-          "why": "Small choices in the final days lock in your results."
+          "why": "Drink swaps are a part of your life now, not just this challenge."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes."
           ],
-          "why": "Eleven days left — finish what you started."
+          "why": "11 days left. Every walk from here is a finishing sprint."
         }
       ]
     },
@@ -2860,31 +2860,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself this morning and write it down.",
-            "Step on the scale and note your weight.",
-            "Check your weight and record it — 80 days in."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "80-day check-in — your number tells a story."
+          "why": "Day 80. Ten days left. Finish what you started."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner.",
-            "Log every meal you eat in MyFitnessPal."
+            "Do 10 squats and 10 push-ups. Do both at home right now.",
+            "Quick home workout. Do 10 squats then 10 push-ups wherever you are.",
+            "Combine your moves. Do 10 squats and 10 push-ups back to back."
           ],
-          "why": "Logging is your most consistent habit — don't stop now."
+          "why": "Final 10 days of strength work. Finish feeling strong."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Do 15 squats and 12 push-ups.",
-            "Knock out 15 squats and 12 push-ups today.",
-            "Try 15 squats and 12 push-ups."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Ten days left — go out strong."
+          "why": "10 days left. You've done 80. Do the last 10."
         }
       ]
     },
@@ -2896,31 +2896,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add breakfast and lunch to MyFitnessPal.",
-            "Track morning and midday meals."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Keep tracking — the finish line is close."
+          "why": "Nine days left. Full logging every day until day 90."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat a vegetable with every meal today.",
-            "Include veggies at breakfast, lunch, and dinner.",
-            "Have a vegetable alongside all three meals today."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before bed.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Vegetables at every meal is a habit worth keeping forever."
+          "why": "Water habit in the final nine days locks it in for life."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "Nine days left — you're almost a finisher."
+          "why": "9 days left. Don't stop now."
         }
       ]
     },
@@ -2932,31 +2932,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal today."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Full tracking until the last day — that's the standard."
+          "why": "Eight days left. Every logged meal counts toward your final result."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink four glasses of water today.",
-            "Get four glasses of water in before bed.",
-            "Have at least four glasses of water today."
+            "Swap a snack. Have fruit or nuts instead of chips or sweets today.",
+            "Make a better snack choice. Grab an apple or nuts instead of packaged food.",
+            "Pick a smarter snack. Trade your usual snack for something healthier right now."
           ],
-          "why": "Hydration is a habit you'll carry past day 90."
+          "why": "Snack habits in the final 8 days set your pattern for after day 90."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Go for a 15-minute walk today.",
-            "Take a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Eight days left — keep showing up."
+          "why": "8 days left. You're almost there."
         }
       ]
     },
@@ -2968,31 +2968,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and dinner today.",
-            "Add breakfast and dinner to MyFitnessPal.",
-            "Track morning and evening meals."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Logging two meals is always enough to keep you accountable."
+          "why": "Seven days left. Keep logging every single day."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat slowly at every meal today.",
-            "Try putting your fork down between every few bites today.",
-            "Slow down at every meal today and enjoy your food."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before dinner.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Eating slowly is one of the easiest ways to eat less."
+          "why": "One week left. Hydration gets you to the finish line feeling great."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Do 15 squats and 12 push-ups.",
-            "Try 15 squats and 12 push-ups today.",
-            "Knock out 15 squats and 12 push-ups."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "Seven days left — let's go."
+          "why": "7 days left. You've earned every step."
         }
       ]
     },
@@ -3004,31 +3004,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Review your week. Count your logged meals in MyFitnessPal from the past 7 days.",
+            "Final week check. Open MyFitnessPal and look at this week's food entries.",
+            "Food log review. Scroll through MyFitnessPal and see your meals from the last 7 days."
           ],
-          "why": "One week left — full tracking, full effort."
+          "why": "One week left. Your log tells the story of your transformation."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink water with every meal today.",
-            "Have a glass of water at every meal.",
-            "Drink one glass of water alongside each meal today."
+            "Check your weight. Step on the scale and log today's number.",
+            "Weekly weigh-in. Weigh yourself this morning and write down the number.",
+            "Log your weight. Step on the scale and note the number right now."
           ],
-          "why": "Six more days of this habit — then it's yours forever."
+          "why": "Six days from the finish. Your weight today reflects 84 days of work."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Take a progress photo. Snap a mirror selfie and save it.",
+            "Day 84 photo. Take a front-facing photo to use in your final comparison.",
+            "Almost there photo. Take a quick mirror photo and save it."
           ],
-          "why": "One week left — walk like you mean it."
+          "why": "One week from your final photo. Save this one for comparison."
         }
       ]
     },
@@ -3040,31 +3040,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself and write down your weight.",
-            "Step on the scale this morning and note the number.",
-            "Check your weight — five days to go."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Weekly weigh-in — the last one before the final check."
+          "why": "Five days left. Full logging every day until the finish."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner.",
-            "Log every meal you eat today."
+            "Do 10 squats and 10 push-ups. Do both at home right now.",
+            "Quick home workout. Do 10 squats then 10 push-ups wherever you are.",
+            "Combine your moves. Do 10 squats and 10 push-ups back to back."
           ],
-          "why": "Five days of tracking left — finish the way you started."
+          "why": "Final days of strength work. Finish feeling your strongest."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Five days left — you've come too far to slow down."
+          "why": "5 days left. Walk every single one."
         }
       ]
     },
@@ -3076,31 +3076,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and lunch today.",
-            "Add breakfast and lunch to MyFitnessPal.",
-            "Track morning and midday meals."
+            "Track your breakfast. Log this morning's meal in MyFitnessPal.",
+            "Log breakfast. Open MyFitnessPal and add what you ate.",
+            "Start your food log. Enter today's breakfast into MyFitnessPal."
           ],
-          "why": "Four days left — keep logging."
+          "why": "Four days left. Don't break the streak this close to the end."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat a vegetable at lunch and dinner today.",
-            "Have veggies with both lunch and dinner.",
-            "Include a vegetable in two meals today."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before bed.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Vegetables are a habit you'll keep long after day 90."
+          "why": "Hydration in the final four days keeps you sharp and energized."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Do 15 squats and 12 push-ups.",
-            "Knock out 15 squats and 12 push-ups today.",
-            "Try 15 squats and 12 push-ups."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "Four days left — give it everything."
+          "why": "4 days left. Walk every one of them."
         }
       ]
     },
@@ -3112,31 +3112,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal you eat today."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "Three days left — full effort until the end."
+          "why": "Three days left. Full logging until you cross the finish line."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink four glasses of water today.",
-            "Get four glasses of water in today.",
-            "Have at least four glasses of water before bed."
+            "Swap a drink. Have water instead of soda or juice at one meal today.",
+            "Cut a liquid calorie. Choose water over a sweet drink right now.",
+            "Skip the sugary drink. Drink water instead of anything sweet today."
           ],
-          "why": "Three days of hydration — let's go."
+          "why": "Three days of drink swaps left. Then it's just your life."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "Three days left — don't stop now."
+          "why": "3 days left. Walk every one."
         }
       ]
     },
@@ -3148,31 +3148,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log your breakfast and dinner today.",
-            "Add breakfast and dinner to MyFitnessPal.",
-            "Track morning and evening meals."
+            "Track two meals. Log breakfast and lunch in MyFitnessPal today.",
+            "Double log. Add this morning's and midday meals to MyFitnessPal.",
+            "Log two today. Open MyFitnessPal and enter breakfast and lunch."
           ],
-          "why": "Two days left — keep logging."
+          "why": "Two days left after today. Keep the streak alive."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Eat protein with every meal today.",
-            "Include a protein source at breakfast, lunch, and dinner.",
-            "Have eggs, chicken, beans, or fish at every meal today."
+            "Drink more water. Finish 3 glasses of water today.",
+            "Hit your water. Have a glass now and two more before bed.",
+            "Stay hydrated. Drink three glasses of water today."
           ],
-          "why": "Strong protein habits will carry you past 90 days."
+          "why": "Almost there. Hydrate your way to the finish."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Walk for 15 minutes.",
-            "Take a 15-minute walk today.",
-            "Go for a 15-minute walk outside."
+            "Move your body. Walk for 5 minutes outside today.",
+            "Short walk. Take a 5-minute walk today.",
+            "Get outside. Walk for 5 minutes right now."
           ],
-          "why": "Two more walks and you're done — make them count."
+          "why": "Two walks left after today. Make this one count."
         }
       ]
     },
@@ -3184,31 +3184,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Log all three meals today.",
-            "Track breakfast, lunch, and dinner in MyFitnessPal.",
-            "Log every meal today — last full day."
+            "Track all three meals. Log every meal in MyFitnessPal today.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal.",
+            "Log the whole day. Enter all three meals into MyFitnessPal."
           ],
-          "why": "One day left — log everything, no excuses."
+          "why": "One day left after today. Finish with a full log."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Drink water with every meal today.",
-            "Have a glass of water at each meal today.",
-            "Drink one glass of water alongside every meal today."
+            "Do 10 squats and 10 push-ups. Do both at home right now.",
+            "Quick home workout. Do 10 squats then 10 push-ups wherever you are.",
+            "Combine your moves. Do 10 squats and 10 push-ups back to back."
           ],
-          "why": "Tomorrow is day 90 — make today count."
+          "why": "Last strength session before the finish. Give it everything."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Do 15 squats and 12 push-ups.",
-            "Try 15 squats and 12 push-ups today.",
-            "Knock out 15 squats and 12 push-ups — second to last day."
+            "Move your body. Walk outside for 5 minutes today.",
+            "Short walk. Get outside for a 5-minute walk.",
+            "Take a walk. Step outside and walk for 5 minutes."
           ],
-          "why": "One more workout before the finish line."
+          "why": "One walk left after today. Make this one count."
         }
       ]
     },
@@ -3220,33 +3220,35 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself and write down your final number.",
-            "Step on the scale — this is your day 90 weight.",
-            "Record your weight today and compare it to day 1."
+            "Track all three meals. Log every meal in MyFitnessPal today — your final day.",
+            "Full day log. Add breakfast, lunch, and dinner to MyFitnessPal on day 90.",
+            "Log the whole day. Enter all three meals into MyFitnessPal for the last time."
           ],
-          "why": "Day 90 — see what 90 days of consistency looks like."
+          "why": "90 days of logging. You built one of the most powerful health habits there is."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Take a final photo of yourself and compare it to day 1.",
-            "Snap a mirror selfie and put it next to your day 1 photo.",
-            "Take a photo today — hold it next to your starting photo."
+            "Check your final weight. Step on the scale and log your day-90 number.",
+            "Final weigh-in. Weigh yourself today and write down the number next to day 1.",
+            "Log your finish weight. Step on the scale and note the number — then compare it to day one."
           ],
-          "why": "You've changed — look at the proof."
+          "why": "Your day-90 weight tells the full story of what you accomplished."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Go for a 15-minute walk to celebrate finishing 90 days.",
-            "Walk for 15 minutes — your final walk of the program.",
-            "Take a 15-minute walk today and be proud of yourself."
+            "Take your final photo. Snap a mirror selfie and put it next to your day-1 photo.",
+            "Final progress photo. Take a front-facing photo and compare it to day one.",
+            "Capture day 90. Take a mirror photo and place it beside your starting photo."
           ],
-          "why": "You did it. Ninety days of showing up every single day."
+          "why": "This is your before and after. You did this."
         }
       ]
     }
   ]
 }
+
+

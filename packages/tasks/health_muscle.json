@@ -16,19 +16,19 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Download Hevy or Strong on your phone.",
-            "Open the App Store and install Hevy or Strong.",
-            "Pick one workout app — Hevy or Strong — and download it now."
+            "Track your workouts. Download Hevy or Strong.",
+            "Start logging. Install Hevy or Strong from the App Store.",
+            "Get the app. Pick Hevy or Strong and download it now."
           ],
-          "why": "You need a place to track your workouts before you start."
+          "why": "You need a place to log before you can build anything."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Step on the scale and write down your weight.",
-            "Weigh yourself and note the number in your phone.",
-            "Check your weight today and save it somewhere you can find it."
+            "Log your weight. Step on the scale and save the number.",
+            "Find your baseline. Weigh yourself and write it down.",
+            "Start the record. Step on the scale and note the number."
           ],
           "why": "Your starting weight is the only way to measure real progress."
         },
@@ -36,11 +36,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Take a front photo of yourself and save it.",
-            "Snap a quick photo of yourself today — front view — and keep it.",
-            "Take a starting photo right now and put it in a private album."
+            "Take a progress photo. Front-facing. Save it in Photos.",
+            "Snap your before shot. Stand straight, front view, save it.",
+            "Get the baseline photo. Take one now and keep it private."
           ],
-          "why": "A before photo is the best way to see how far you've come."
+          "why": "A before photo is the best proof of how far you'll come."
         }
       ]
     },
@@ -52,9 +52,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Create your free account in Hevy or Strong.",
-            "Open your new workout app and sign up.",
-            "Finish setting up your profile in your workout app."
+            "Set up your app. Create a free account in Hevy or Strong.",
+            "Finish the setup. Open your workout app and sign up.",
+            "Build your profile. Complete the setup in your workout app."
           ],
           "why": "A quick setup today means you're ready to log your first workout."
         },
@@ -62,9 +62,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Pick 3 days this week to work out and write them down.",
-            "Choose your 3 workout days — like Mon, Wed, Fri — and note them.",
-            "Decide which 3 days you'll work out this week."
+            "Plan your week. Pick 3 days to work out and write them down.",
+            "Choose your days. Mon, Wed, Fri works — just pick 3 and note them.",
+            "Lock in 3 days. Write down which days you'll work out this week."
           ],
           "why": "Picking your days now means you won't skip when life gets busy."
         },
@@ -72,9 +72,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Set a reminder on your phone for your first workout day.",
-            "Add a phone alarm for your first workout this week.",
-            "Put a calendar alert on your first planned workout day."
+            "Set a reminder. Add a phone alarm for your first workout day.",
+            "Block the time. Put a calendar alert on your first workout.",
+            "Make it stick. Set an alarm for your first workout this week."
           ],
           "why": "A reminder makes it harder to forget."
         }
@@ -86,21 +86,21 @@
       "tasks": [
         {
           "position": 1,
-          "minutes": 3,
+          "minutes": 2,
           "variants": [
-            "Do 10 pushups right now.",
-            "Get on the floor and do as many pushups as you can.",
-            "Do 10 pushups — drop to your knees if you need to."
+            "Start the day. Do 10 pushups on your floor.",
+            "First workout. Get down and do 10 pushups right now.",
+            "Try it now. Do 10 pushups — drop to your knees if needed."
           ],
           "why": "Your first workout starts with one simple move."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Do 10 squats — no weight needed.",
-            "Stand up and do 10 bodyweight squats.",
-            "Do 10 squats right where you are."
+            "Build your legs. Do 20 bodyweight squats.",
+            "Work the legs. Stand up and do 20 squats right now.",
+            "Leg day basics. Do 20 squats — no weight needed."
           ],
           "why": "Squats work your whole lower body with zero equipment."
         },
@@ -108,9 +108,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log what you just did in your workout app.",
-            "Open Hevy or Strong and add today's pushups and squats.",
-            "Write down your reps in your workout app — even if it's just a few."
+            "Log it now. Open your app and record today's pushups and squats.",
+            "Save the work. Type your reps into Hevy or Strong.",
+            "Track the session. Log what you just did in your workout app."
           ],
           "why": "Logging your first session builds the habit of tracking."
         }
@@ -124,31 +124,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Eat one extra chicken breast today.",
-            "Add a hard-boiled egg or Greek yogurt to your next meal.",
-            "Have a protein shake or some cottage cheese with your next meal."
+            "Eat more protein. Have a second chicken breast today.",
+            "Boost protein. Add eggs or Greek yogurt to your next meal.",
+            "Protein basics. Have a shake or some cottage cheese today."
           ],
-          "why": "More protein gives your muscles what they need to grow."
+          "why": "More protein means your muscles can actually grow."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Drink a full glass of water right now.",
-            "Fill a water bottle and drink it before your next meal.",
-            "Drink 2 glasses of water today — muscles need water to work."
+            "Hold a plank. Get on the floor and hold it for 30 seconds.",
+            "Core today. Drop to a plank and hold for 30 seconds.",
+            "Build your core. Hold a plank position for 30 seconds."
           ],
-          "why": "Staying hydrated helps you feel better during workouts."
+          "why": "A strong core makes every other exercise easier."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write down one food high in protein that you like.",
-            "Think of 2 protein foods you already eat and note them.",
-            "List 3 protein foods you enjoy — eggs, chicken, beans, etc."
+            "Rest smart. Drink a full glass of water before bed tonight.",
+            "Recover well. Have a big glass of water before you sleep.",
+            "Hydrate now. Drink a full glass of water in the next 5 minutes."
           ],
-          "why": "Knowing your go-to protein foods makes eating better easy."
+          "why": "Water helps your muscles recover while you sleep."
         }
       ]
     },
@@ -158,357 +158,357 @@
       "tasks": [
         {
           "position": 1,
-          "minutes": 3,
+          "minutes": 2,
           "variants": [
-            "Do 3 sets of 10 pushups with a 30-second rest between each.",
-            "Do 10 pushups, rest, do 10 more, rest, do 10 more.",
-            "Complete 3 rounds of pushups — 10 reps each, rest between rounds."
+            "Push again. Do 12 pushups — 2 more than day 3.",
+            "Beat last time. Do 12 pushups right now.",
+            "More reps today. Get on the floor and do 12 pushups."
           ],
-          "why": "Doing multiple sets instead of one is how you build muscle faster."
+          "why": "Adding 2 reps each session is how you get stronger."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Do 3 sets of 10 squats.",
-            "Complete 3 rounds of 10 squats with a short rest.",
-            "Do 30 total squats in 3 sets of 10."
+            "Work your arms. Do 10 tricep dips off a chair or step.",
+            "Try dips. Use a chair and do 10 tricep dips.",
+            "Build your arms. Do 10 dips off the edge of your couch or chair."
           ],
-          "why": "More sets means more work for your legs today."
+          "why": "Dips work your arms and chest at the same time."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log today's sets and reps in your workout app.",
-            "Open your app and write down 3x10 pushups and 3x10 squats.",
-            "Add your workout to your log right after you finish."
+            "Log it now. Save your reps in Hevy or Strong.",
+            "Track it fast. Open your app and log today's session.",
+            "Record the work. Add today's dips and pushups to your app."
           ],
-          "why": "Tracking your sets shows you how much work you're really doing."
+          "why": "Logging keeps you honest and shows you how far you've come."
         }
       ]
     },
     {
       "day": 6,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Take a rest day — just go for a 5-minute walk.",
-            "Rest today, but get outside for a short walk.",
-            "Skip the workout today. Walk around the block once."
+            "Review your week. Count how many workouts you finished.",
+            "Check your streak. Look at how many sessions you logged.",
+            "Week one check. Open your app and count your completed workouts."
           ],
-          "why": "Your muscles grow while you rest, not just while you lift."
+          "why": "Reviewing what you did keeps you motivated to keep going."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Eat something with protein today — eggs, chicken, or beans.",
-            "Make sure you have protein in your next meal.",
-            "Add a protein food to your lunch or dinner today."
+            "Stretch it out. Hold each leg in a standing hamstring stretch for 20 seconds.",
+            "Loosen up. Do a simple hamstring stretch on each side for 20 seconds.",
+            "Rest day stretch. Stretch your legs and hold each side for 20 seconds."
           ],
-          "why": "Rest days are when your body repairs — protein helps that happen."
+          "why": "Stretching on rest days keeps you loose and ready for next session."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Look at your workout log and see what you did this week.",
-            "Open your app and review the workouts you logged.",
-            "Check how many days you worked out this week."
+            "Eat more protein. Add eggs or chicken to today's biggest meal.",
+            "Protein reminder. Have Greek yogurt or a shake with your next meal.",
+            "Keep it up. Pick one high-protein food and add it to lunch or dinner."
           ],
-          "why": "Seeing your progress keeps you motivated to keep going."
+          "why": "Your muscles need protein every day, not just on workout days."
         }
       ]
     },
     {
       "day": 7,
-      "minutes_total": 5,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
-          "minutes": 3,
+          "minutes": 1,
           "variants": [
-            "Do 3 sets of 12 pushups today — 2 more reps than before.",
-            "Try 12 pushups per set instead of 10.",
-            "Bump up to 12 reps this set if you can."
+            "Log your weight. Step on the scale and write it down.",
+            "Weekly weigh-in. Step on the scale and save the number.",
+            "Track the number. Weigh yourself and record it today."
           ],
-          "why": "Adding even 2 reps is how you get stronger over time."
+          "why": "Checking once a week shows real trends without daily noise."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do 3 sets of 12 squats.",
-            "Add 2 more reps to your squat sets today.",
-            "Go for 12 squats per set this time."
+            "Plan next week. Write down your 3 workout days.",
+            "Schedule it. Pick 3 days next week and block them off.",
+            "Set it up. Choose which 3 days you'll work out next week."
           ],
-          "why": "Small increases in reps add up to big gains over 90 days."
+          "why": "Planning ahead makes showing up feel automatic."
         },
         {
           "position": 3,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Log your workout and compare to your first session.",
-            "Open your app and see how your numbers changed since day 3.",
-            "Check your log — are you doing more reps than day 1?"
+            "Rest and walk. Go outside for a 10-minute walk.",
+            "Active rest. Take a short walk around the block today.",
+            "Move easy. Walk for 10 minutes — no rush."
           ],
-          "why": "Seeing your improvement keeps you coming back."
+          "why": "Light movement on rest days helps your body recover faster."
         }
       ]
     },
     {
       "day": 8,
-      "minutes_total": 4,
+      "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look up 'how to do a good pushup' and watch a 1-min video.",
-            "Check your pushup form — search for a quick form tip online.",
-            "Watch a 60-second pushup form video on YouTube."
+            "Push it. Do 3 sets of 10 pushups with a 30-second rest between.",
+            "Level up. Do 10 pushups, rest 30 seconds, repeat 3 times.",
+            "Build endurance. Do 3 rounds of 10 pushups today."
           ],
-          "why": "Good form means you build muscle faster and avoid getting hurt."
+          "why": "Three sets builds more strength than one set at a time."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Do 10 slow pushups focusing on your chest squeezing at the top.",
-            "Try 10 pushups, pausing for 1 second at the bottom.",
-            "Do 10 pushups as slowly and controlled as you can."
+            "Squat more. Do 3 sets of 15 bodyweight squats.",
+            "Leg session. Do 15 squats, rest 30 seconds, repeat 3 times.",
+            "Work the legs. Do 3 rounds of 15 squats today."
           ],
-          "why": "Slowing down makes the exercise harder and more effective."
+          "why": "More sets mean more work for your legs to grow."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your form-focused pushups in your app.",
-            "Add today's 10 slow pushups to your workout log.",
-            "Write down what you focused on today in your log."
+            "Log everything. Save all 3 sets in your app right now.",
+            "Track it all. Open Hevy or Strong and log each set.",
+            "Record the work. Add your sets and reps to your workout app."
           ],
-          "why": "Tracking everything — even small sessions — builds the habit."
+          "why": "Tracking sets helps you see if you're actually getting stronger."
         }
       ]
     },
     {
       "day": 9,
-      "minutes_total": 5,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Add a new move to your workout: do 10 lunges (5 each leg).",
-            "Try lunges today — 5 steps forward on each leg.",
-            "Do 10 lunges to work your legs in a new way."
+            "Eat more protein. Have two eggs or a scoop of protein today.",
+            "Protein today. Add a hard-boiled egg to your snack.",
+            "Hit your protein. Have chicken, eggs, or Greek yogurt at your next meal."
           ],
-          "why": "Adding a new exercise keeps your body guessing and growing."
+          "why": "Eating protein on rest days helps your muscles repair overnight."
         },
         {
           "position": 2,
-          "minutes": 2,
+          "minutes": 1,
           "variants": [
-            "Do your usual pushups and squats after the lunges.",
-            "Finish with 3x10 pushups and 3x10 squats.",
-            "After lunges, do 2 sets of 10 pushups and 10 squats."
+            "Hold a plank. Get on the floor and hold for 40 seconds.",
+            "Core work. Do a plank and hold for 40 seconds.",
+            "Plank today. Hold a plank for 40 seconds — 10 more than last time."
           ],
-          "why": "Finishing your regular moves keeps your routine solid."
+          "why": "Adding 10 seconds each time is how your core gets stronger."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log all 3 exercises in your app today.",
-            "Write down lunges, pushups, and squats in your workout log.",
-            "Add the full workout to your tracker."
+            "Sleep better. Put your phone down 20 minutes before bed.",
+            "Rest well. Set a phone-down alarm 20 minutes before sleep.",
+            "Recover tonight. Avoid screens for 20 minutes before bed."
           ],
-          "why": "Tracking your full session shows your workout getting bigger."
+          "why": "Better sleep means faster muscle recovery."
         }
       ]
     },
     {
       "day": 10,
-      "minutes_total": 4,
+      "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Eat an extra serving of protein at breakfast — eggs, yogurt, or a shake.",
-            "Add protein to your morning meal today.",
-            "Have a protein-heavy breakfast — 2 eggs or a cup of Greek yogurt."
+            "Push harder. Do 3 sets of 12 pushups today.",
+            "More reps. Do 12 pushups per set, 3 sets total.",
+            "Step it up. Do 3 rounds of 12 pushups with a 30-second rest."
           ],
-          "why": "Eating protein in the morning helps your body recover from yesterday."
+          "why": "Two more reps per set is steady, real progress."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Do 20 pushups right after breakfast.",
-            "Drop and do pushups first thing in the morning.",
-            "Start your day with 20 pushups before checking your phone."
+            "Work your back. Do 10 Superman holds on the floor.",
+            "Back exercise. Lie face down and lift your arms and legs 10 times.",
+            "Back basics. Do 10 Superman lifts — lie down and raise arms and legs."
           ],
-          "why": "Morning movement gives you energy and gets the workout done early."
+          "why": "A strong back prevents injury and helps every other lift."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log today's pushups in your app.",
-            "Add your morning pushups to your workout tracker.",
-            "Record your reps before you forget."
+            "Log it. Open your app and save today's pushups and Supermans.",
+            "Track the session. Record your sets in Hevy or Strong.",
+            "Save your work. Log reps and sets in your workout app now."
           ],
-          "why": "Logging right after keeps your numbers accurate."
+          "why": "Tracking gives you proof that you showed up."
         }
       ]
     },
     {
       "day": 11,
-      "minutes_total": 5,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
-          "minutes": 3,
+          "minutes": 1,
           "variants": [
-            "Do 3 sets of 10 pushups, 10 squats, and 10 lunges — rest 30 sec between.",
-            "Run through pushups, squats, and lunges — 3 rounds of 10 each.",
-            "Complete your 3-exercise circuit: 3 rounds of 10 pushups, 10 squats, 10 lunges."
+            "Check your food. Look at what you ate yesterday and find the protein.",
+            "Food audit. Pick one meal from yesterday — did it have protein in it?",
+            "Protein check. Think through yesterday's meals and count the protein sources."
           ],
-          "why": "Doing your moves back-to-back saves time and burns more energy."
+          "why": "Noticing your habits is the first step to changing them."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Do a 30-second plank after the circuit.",
-            "Hold a plank for as long as you can — aim for 30 seconds.",
-            "Add a plank at the end — just get in position and hold it."
+            "Stretch your chest. Hold a doorframe stretch for 30 seconds each side.",
+            "Open your chest. Stand in a doorway and gently stretch for 30 seconds.",
+            "Chest stretch. Use a doorframe — push your arm back and hold for 30 seconds."
           ],
-          "why": "A strong core makes every other exercise easier."
+          "why": "Stretching your chest keeps your shoulders healthy as you push more."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the full circuit — all 4 moves — in your app.",
-            "Write down every exercise you did today in your tracker.",
-            "Record your full workout before you sit down."
+            "Drink more water. Fill a large bottle and drink it today.",
+            "Hydrate today. Have 3 full glasses of water before dinner.",
+            "Water goal. Drink one full water bottle today."
           ],
-          "why": "A full log today shows you how much your routine has grown."
+          "why": "Staying hydrated helps every part of recovery."
         }
       ]
     },
     {
       "day": 12,
-      "minutes_total": 3,
+      "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Rest day. Do a 5-minute stretch.",
-            "Take today off from working out and stretch your legs.",
-            "Rest today — sit on the floor and stretch for 5 minutes."
+            "Full session. Do 3 sets of 12 pushups and 3 sets of 15 squats.",
+            "Push and squat. Do 12 pushups then 15 squats — repeat 3 times.",
+            "Workout combo. 3 sets each: 12 pushups, 15 squats."
           ],
-          "why": "Stretching on rest days helps your muscles recover faster."
+          "why": "Combining moves saves time and works more muscles."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Drink 6 glasses of water today.",
-            "Fill your water bottle twice today.",
-            "Track how much water you drink today — aim for 6 glasses."
+            "Add lunges. Do 10 walking lunges on each leg.",
+            "Lunge it out. Step forward into 10 lunges on each side.",
+            "Try lunges. Do 10 lunges per leg — slow and steady."
           ],
-          "why": "Staying hydrated helps sore muscles feel better."
+          "why": "Lunges work each leg separately and fix imbalances."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Plan your next 3 workout days on your calendar.",
-            "Pick your workout days for next week right now.",
-            "Set 3 workout reminders for next week."
+            "Log the full session. Save all sets and exercises in your app.",
+            "Track everything. Open Hevy or Strong and record today's full workout.",
+            "Record it all. Log pushups, squats, and lunges in your workout app."
           ],
-          "why": "Planning ahead makes it much easier to follow through."
+          "why": "A full log lets you look back and see real improvement."
         }
       ]
     },
     {
       "day": 13,
-      "minutes_total": 5,
-      "tasks": [
-        {
-          "position": 1,
-          "minutes": 3,
-          "variants": [
-            "Try to do 1 more rep than last time on every exercise.",
-            "Push for 13 pushups per set instead of 12.",
-            "Beat your last count by at least 1 rep on each move."
-          ],
-          "why": "Doing 1 more rep than last time is exactly how muscles grow."
-        },
-        {
-          "position": 2,
-          "minutes": 1,
-          "variants": [
-            "Hold a plank for 10 seconds longer than yesterday.",
-            "Try to hold your plank for 40 seconds today.",
-            "Beat your plank time from last session by a few seconds."
-          ],
-          "why": "Small improvements add up to a much stronger core."
-        },
-        {
-          "position": 3,
-          "minutes": 1,
-          "variants": [
-            "Log your new personal records in the app.",
-            "Write down your best reps for each exercise today.",
-            "Add your improved numbers to your tracker."
-          ],
-          "why": "Personal records are proof you're getting stronger."
-        }
-      ]
-    },
-    {
-      "day": 14,
       "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself and compare to your day 1 number.",
-            "Step on the scale and check where you are vs. day 1.",
-            "Get your two-week weight check-in and note the number."
+            "Rest well. Do a 5-minute full-body stretch on the floor.",
+            "Recovery day. Spend 5 minutes stretching your legs, back, and arms.",
+            "Stretch it out. Lie on the floor and stretch each muscle group for a minute."
           ],
-          "why": "Checking in every 2 weeks shows if your plan is working."
+          "why": "Rest and stretching are when your muscles actually grow."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Take a front photo and compare it to your day 1 photo.",
-            "Snap a photo and put it side by side with your starting pic.",
-            "Take a 2-week progress photo from the same angle as day 1."
+            "Eat more protein. Have chicken or eggs with your biggest meal today.",
+            "Protein focus. Add Greek yogurt or a shake to your day.",
+            "Fuel recovery. Pick one meal today and double the protein in it."
           ],
-          "why": "Photos often show changes the scale doesn't."
+          "why": "Your muscles are repairing right now — feed them protein."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write one thing that got easier this week.",
-            "Think of one exercise that feels less hard than day 1.",
-            "Note one way your body already feels different."
+            "Review your week. Count workouts done vs. planned.",
+            "Check your progress. Look at how many sessions you logged this week.",
+            "Week review. Open your app and see how many workouts you completed."
           ],
-          "why": "Noticing progress — even small — keeps you going."
+          "why": "Seeing what you did keeps you motivated to keep the streak alive."
+        }
+      ]
+    },
+    {
+      "day": 14,
+      "minutes_total": 5,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 1,
+          "variants": [
+            "Two-week check-in. Log your weight and write it next to day 1.",
+            "Weigh in. Step on the scale and compare it to your week-one number.",
+            "Track progress. Weigh yourself and save the number."
+          ],
+          "why": "Two weeks of data shows if your effort is paying off."
+        },
+        {
+          "position": 2,
+          "minutes": 1,
+          "variants": [
+            "Take a progress photo. Front-facing. Compare it to day 1.",
+            "Photo check. Take a front photo today and put it next to your day-1 shot.",
+            "Progress snapshot. Take a photo now and save it in the same album."
+          ],
+          "why": "Photos catch changes that the scale misses."
+        },
+        {
+          "position": 3,
+          "minutes": 3,
+          "variants": [
+            "Celebrate week two. Do your best full workout — pushups, squats, lunges.",
+            "Finish strong. Do 3 sets of pushups, squats, and lunges today.",
+            "Mark the moment. Do a full session: pushups, squats, dips, lunges."
+          ],
+          "why": "Two weeks in is worth celebrating with a strong session."
         }
       ]
     },
@@ -520,31 +520,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Do 3 sets of pushups, squats, lunges, and a plank.",
-            "Run your full circuit: 3 rounds of all 4 moves.",
-            "Complete 3 sets of each exercise in your routine."
+            "Upper body day. Do 3 sets of 12 pushups and 10 dips off a chair.",
+            "Push session. 3 rounds: 12 pushups, 10 dips. Rest 30 seconds between.",
+            "Arms and chest. Do 12 pushups and 10 chair dips — 3 sets each."
           ],
-          "why": "Week 3 starts — keep the habit going strong."
+          "why": "A focused upper body session builds strength faster than random moves."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Add a 5-min walk after your workout.",
-            "Walk around the block after your session.",
-            "Get outside for 5 minutes after you finish your workout."
+            "Eat more protein. Have eggs, chicken, or Greek yogurt today.",
+            "Protein reminder. Add a protein source to your next meal right now.",
+            "Fuel your muscles. Have a scoop of protein or a chicken breast today."
           ],
-          "why": "Walking after a workout helps your body cool down and recover."
+          "why": "Protein eaten after a workout helps your muscles recover and grow."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the full workout.",
-            "Record every set in your tracker.",
-            "Add today's session to your workout app."
+            "Log the session. Save your sets in Hevy or Strong.",
+            "Track it. Open your app and log your pushups and dips.",
+            "Record it. Add today's sets and reps to your workout app."
           ],
-          "why": "Consistent logging shows your streak building."
+          "why": "Logging shows you exactly what to beat next session."
         }
       ]
     },
@@ -556,31 +556,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Add one new protein food to your meals today.",
-            "Try a food you haven't eaten much — tuna, cottage cheese, or lentils.",
-            "Pick a new high-protein food and eat it today."
+            "Rest and recover. Walk outside for 10 minutes.",
+            "Active rest. Take a 10-minute walk today.",
+            "Move easy. Go outside and walk for 10 minutes."
           ],
-          "why": "Mixing up protein sources keeps eating healthy from getting boring."
+          "why": "Light movement on rest days speeds up muscle recovery."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Eat protein with every meal today.",
-            "Make sure each meal today has a protein food in it.",
-            "Add eggs, chicken, beans, or yogurt to every meal today."
+            "Drink water. Have a full glass of water with every meal today.",
+            "Hydrate. Drink 3 large glasses of water today.",
+            "Water check. Fill a bottle and drink it before lunch."
           ],
-          "why": "Spreading protein across meals helps your muscles recover all day."
+          "why": "Hydration is recovery — most people don't drink enough."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write down what you ate for protein today.",
-            "List the protein foods you had today.",
-            "Note your 3 protein meals in your phone."
+            "Eat more protein. Have chicken or eggs with dinner tonight.",
+            "Protein goal. Add one protein-rich food to your biggest meal today.",
+            "Keep feeding muscle. Have Greek yogurt or a shake as a snack."
           ],
-          "why": "Tracking what you eat makes it easier to hit your goals."
+          "why": "Rest days are when your muscles actually grow — they need protein to do it."
         }
       ]
     },
@@ -592,67 +592,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Do 3 rounds of pushups, squats, and lunges — try to add 1 rep to each.",
-            "Workout day: all 3 moves, 3 sets, try 1 extra rep per set.",
-            "Hit your circuit and push for slightly more reps than last time."
+            "Leg day. Do 3 sets of 20 squats and 10 lunges each leg.",
+            "Lower body session. 3 rounds: 20 squats, 10 lunges per side.",
+            "Work your legs. Do 20 squats and 10 lunges per leg — 3 sets total."
           ],
-          "why": "Adding 1 rep at a time is the whole game of getting stronger."
+          "why": "Your legs are your biggest muscles — training them burns the most."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Hold your plank for 45 seconds.",
-            "See if you can hit 45 seconds on your plank today.",
-            "Plank for 40-50 seconds — as long as you can with good form."
+            "Hold a plank. Get on the floor and hold for 45 seconds.",
+            "Core time. Do a plank hold for 45 seconds.",
+            "Plank it out. Hold a plank for 45 seconds — add 5 more seconds each session."
           ],
-          "why": "Your plank time is a good sign of how much stronger you're getting."
+          "why": "Your core ties your upper and lower body together."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your workout.",
-            "Record today's reps and sets in your app.",
-            "Add the session to your tracker before you sit down."
+            "Log your leg day. Save squats and lunges in your app.",
+            "Track the session. Open Hevy or Strong and record your sets.",
+            "Record it. Add today's squats, lunges, and plank to your workout log."
           ],
-          "why": "Your log is proof you showed up today."
+          "why": "Tracking leg day shows you how fast your endurance is growing."
         }
       ]
     },
     {
       "day": 18,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Rest day. Stretch your chest and legs for 5 minutes.",
-            "Take today off from lifting and do a light stretch.",
-            "Rest today — spend a few minutes stretching your sore muscles."
+            "Sleep check. Did you get 7+ hours last night? Note yes or no.",
+            "Recovery audit. Think about last night's sleep — was it 7 hours or more?",
+            "Track your sleep. Write down how many hours you slept last night."
           ],
-          "why": "Recovery days are built into any good routine."
+          "why": "Sleep is the single biggest factor in how fast you build muscle."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Drink plenty of water today.",
-            "Aim for 6 glasses of water on your rest day.",
-            "Stay hydrated today even though you're not working out."
+            "Stretch your legs. Sit on the floor and hold a toe touch for 30 seconds.",
+            "Hamstring stretch. Sit down, reach for your toes, and hold for 30 seconds.",
+            "Lower body stretch. Do a seated forward bend and hold for 30 seconds."
           ],
-          "why": "Water helps your muscles repair on rest days."
+          "why": "Stretching your legs after leg day prevents soreness."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Read 1 tip about building muscle — something simple.",
-            "Search 'muscle building tip' and read one short article.",
-            "Watch a 60-second tip about working out — YouTube or Google."
+            "Protein today. Have a chicken breast or two eggs with your next meal.",
+            "Keep eating protein. Add a protein source to your lunch or dinner.",
+            "Fuel recovery. Have a scoop of protein or some Greek yogurt today."
           ],
-          "why": "Learning one new thing each week helps you improve faster."
+          "why": "Protein on rest days fuels the muscle repair happening right now."
         }
       ]
     },
@@ -664,31 +664,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Do 4 rounds of your circuit today instead of 3.",
-            "Add one extra round to your workout today.",
-            "Go through pushups, squats, and lunges 4 times instead of 3."
+            "Full body day. Do pushups, squats, dips, and lunges — 3 sets each.",
+            "Big session. 3 rounds: 12 pushups, 20 squats, 10 dips, 10 lunges per leg.",
+            "Mix it all. Do 3 sets of pushups, squats, chair dips, and walking lunges."
           ],
-          "why": "More rounds is a simple way to make your workout harder."
+          "why": "Full-body sessions work more muscles and burn more in less time."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Rest only 20 seconds between sets.",
-            "Cut your rest time by 10 seconds today.",
-            "Try to keep moving with shorter breaks between sets."
+            "Try a wall sit. Slide your back down a wall and hold for 30 seconds.",
+            "Wall sit hold. Back against the wall, thighs parallel — hold 30 seconds.",
+            "Hold the wall sit. Sit against the wall at 90 degrees and hold for 30 seconds."
           ],
-          "why": "Less rest makes your heart work harder and burns more."
+          "why": "Wall sits build leg endurance without any equipment."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your 4-round workout.",
-            "Record that you completed 4 sets today in your app.",
-            "Write down your extra round in the tracker."
+            "Log the full session. Record all exercises and sets in your app.",
+            "Track everything. Open Hevy or Strong and save today's full workout.",
+            "Record it all. Log every set from today's session in your app."
           ],
-          "why": "Logging the upgrade shows you pushed yourself."
+          "why": "A complete log lets you track everything in one place."
         }
       ]
     },
@@ -698,33 +698,33 @@
       "tasks": [
         {
           "position": 1,
-          "minutes": 2,
+          "minutes": 1,
           "variants": [
-            "Cook a simple high-protein meal — eggs with anything, or chicken and rice.",
-            "Make a quick protein-heavy meal today — 2 eggs, some chicken, or tuna.",
-            "Prep a simple meal with protein as the main part."
+            "Review your week. Count workouts done and protein days.",
+            "Check in. How many sessions and protein meals did you hit this week?",
+            "Week review. Look at your workout app — how many sessions logged?"
           ],
-          "why": "Cooking your own meals makes it easy to control what you eat."
+          "why": "Three weeks in, your habits are starting to form."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Do 20 pushups as a midday break.",
-            "Get up and do 20 pushups in the middle of your day.",
-            "Take a pushup break — 20 reps before your next meal."
+            "Rest day walk. Go outside for 10 minutes.",
+            "Active recovery. Walk for 10 minutes at an easy pace.",
+            "Move gently. Take a 10-minute walk today."
           ],
-          "why": "Quick movement during the day adds up and keeps your body active."
+          "why": "Walking on rest days keeps blood moving to sore muscles."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your pushups from today.",
-            "Record your midday pushups in your app.",
-            "Add the 20 reps to your daily log."
+            "Drink water. Fill a bottle and finish it today.",
+            "Hydrate well. Have 3 big glasses of water today.",
+            "Water goal. Drink a full water bottle before dinner tonight."
           ],
-          "why": "Every set counts — even the ones between tasks."
+          "why": "Water helps carry nutrients to your recovering muscles."
         }
       ]
     },
@@ -734,69 +734,69 @@
       "tasks": [
         {
           "position": 1,
-          "minutes": 3,
+          "minutes": 1,
           "variants": [
-            "Do your full workout — circuit, plank, all of it.",
-            "Run the full circuit 3 times with your best effort.",
-            "Hit your workout today — same moves, push for your best."
+            "Three-week weigh-in. Step on the scale and log the number.",
+            "Weekly weight. Weigh yourself and save it next to week 1 and 2.",
+            "Track progress. Step on the scale and record today's weight."
           ],
-          "why": "Three weeks in — this is where habits start to stick for good."
+          "why": "Three data points start to show a real trend."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 3,
           "variants": [
-            "After your workout, eat something with protein within 30 minutes.",
-            "Have a protein snack right after your session.",
-            "Drink a shake or eat some chicken within 30 min of finishing."
+            "Upper body workout. 3 sets: 15 pushups, 12 dips, 10 Superman holds.",
+            "Push day. Do 15 pushups, 12 dips, 10 Supermans — 3 rounds.",
+            "Chest and back. 3 rounds of 15 pushups, 10 chair dips, 10 Supermans."
           ],
-          "why": "Eating protein after a workout helps your muscles repair."
+          "why": "Working chest and back together builds balanced strength."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the workout and your post-workout meal.",
-            "Record your session and what you ate after.",
-            "Add today's full workout and food to your tracker."
+            "Log and reflect. Save your session and note how it felt.",
+            "Track it. Log your sets in Hevy or Strong and add a short note.",
+            "Record and rate. Log the workout and write one word about how it felt."
           ],
-          "why": "Tracking both food and workouts is the full picture."
+          "why": "Notes help you remember what worked and what to change."
         }
       ]
     },
     {
       "day": 22,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Rest today. Go for a 10-minute walk.",
-            "Take today easy — just walk around the block twice.",
-            "Active rest day: a slow 10-minute walk is perfect."
+            "Try pike pushups. Do 8 pike pushups — hands on floor, hips high.",
+            "New move. Get into a pike position and do 8 slow pushups.",
+            "Pike pushups today. Hips up, hands on floor, lower your head down — 8 reps."
           ],
-          "why": "Walking on rest days keeps blood flowing to your muscles."
+          "why": "Pike pushups work your shoulders with no equipment."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Look at your workout log for the past 3 weeks.",
-            "Open your app and count how many workouts you've logged.",
-            "Review your last 21 days of sessions in your tracker."
+            "Eat more protein. Add eggs or chicken to your biggest meal today.",
+            "Protein check. Have a scoop of protein or Greek yogurt today.",
+            "Fuel up. Pick a meal today and add a protein source to it."
           ],
-          "why": "Seeing 3 weeks of work is motivating — you earned this."
+          "why": "Protein after every workout helps your muscles repair faster."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write down your 3-week win — one thing you're proud of.",
-            "Note one thing that's improved since day 1.",
-            "Write a quick sentence about how your body feels vs. 3 weeks ago."
+            "Log pike pushups. Save your reps in Hevy or Strong.",
+            "Track the new move. Open your app and record today's pike pushups.",
+            "Record it. Add pike pushups and your rep count to your workout app."
           ],
-          "why": "Celebrating small wins helps you stay motivated."
+          "why": "Logging new moves creates a record of your expanding skill set."
         }
       ]
     },
@@ -808,31 +808,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Try a new move: do 10 tricep dips using a chair.",
-            "Find a sturdy chair and do 10 dips — hands behind you, lower your body.",
-            "Add chair dips to your workout today — 10 reps."
+            "Leg day. 3 sets: 20 squats, 12 lunges each leg, 30-second wall sit.",
+            "Lower body push. Do 20 squats, 12 lunges per side, wall sit — 3 rounds.",
+            "Legs and hold. 3 sets of 20 squats, 12 lunges, then wall sit for 30 seconds."
           ],
-          "why": "Tricep dips add a new challenge that pushups don't hit."
+          "why": "Adding a wall sit to your leg day builds endurance alongside strength."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Finish with your pushups and squats as usual.",
-            "After dips, do 2 sets of 10 pushups and 10 squats.",
-            "Complete your regular moves after the new exercise."
+            "Hold a plank. Do a 50-second plank hold.",
+            "Core today. Get on the floor and plank for 50 seconds.",
+            "Plank hold. Hold the plank position for 50 seconds."
           ],
-          "why": "Mixing new moves with your regular ones builds a fuller routine."
+          "why": "Five seconds more each session adds up to real core strength."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the new exercise in your app.",
-            "Add chair dips to your tracker as a new exercise.",
-            "Record your first set of dips in your workout log."
+            "Log everything. Record squats, lunges, wall sit, and plank in your app.",
+            "Track it all. Open Hevy or Strong and save today's full session.",
+            "Save the work. Log every exercise from today in your workout app."
           ],
-          "why": "Logging a new move is the start of tracking a new strength."
+          "why": "Detailed logs make it easy to plan your next session."
         }
       ]
     },
@@ -844,31 +844,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Try a new protein snack today — cottage cheese, edamame, or jerky.",
-            "Pick up or make one new high-protein snack today.",
-            "Eat a protein snack you don't usually have — try something new."
+            "Rest and stretch. Do a 5-minute body stretch on the floor.",
+            "Recovery stretch. Spend 5 minutes stretching chest, legs, and back.",
+            "Floor stretch. Lie down and stretch each major muscle for 1 minute."
           ],
-          "why": "Finding protein snacks you like makes it easy to eat enough."
+          "why": "Stretching on rest days is just as important as the workouts."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do 15 pushups in one set without stopping.",
-            "Try 15 pushups straight through, no breaks.",
-            "See if you can do 15 pushups without resting."
+            "Protein today. Have chicken or eggs with your lunch.",
+            "Keep up protein. Add a protein-rich food to your next meal.",
+            "Fuel the repair. Have Greek yogurt or a scoop of protein today."
           ],
-          "why": "Pushing to 15 in one go shows real progress."
+          "why": "Muscle repair happens on rest days — protein is the raw material."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log it.",
-            "Add your 15 pushups to your tracker.",
-            "Record your pushup set in the app."
+            "Sleep tonight. Get to bed 30 minutes earlier than usual.",
+            "Rest better. Set an alarm to be in bed 30 minutes early tonight.",
+            "Prioritize sleep. Aim for 8 hours tonight — set a bedtime alarm."
           ],
-          "why": "A 15-rep set is worth recording."
+          "why": "Growth hormone releases during deep sleep — more sleep means more gains."
         }
       ]
     },
@@ -880,67 +880,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Do your full circuit: pushups, squats, lunges, dips, plank.",
-            "Run all 5 exercises today — 3 rounds of each.",
-            "Full workout day: 3 sets of all your moves."
+            "Full body push. 3 sets: 15 pushups, 20 squats, 10 dips, 10 Supermans.",
+            "Big workout. 3 rounds: 15 pushups, 20 squats, 10 chair dips, 10 Supermans.",
+            "Hit everything. 3 sets each: pushups, squats, dips, and Superman holds."
           ],
-          "why": "Your routine is growing — this is a real workout now."
+          "why": "A full-body session this week shows how much stronger you've gotten."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Time your full workout — how long did it take?",
-            "Start a timer when you begin and stop it when you finish.",
-            "Check how many minutes your full session takes."
+            "Add a wall sit. Hold for 40 seconds at the end of your session.",
+            "Finish with a wall sit. Back against the wall — hold for 40 seconds.",
+            "Wall sit finisher. Slide down the wall and hold for 40 seconds."
           ],
-          "why": "Knowing your workout time helps you plan your day."
+          "why": "A finisher at the end of your workout builds mental toughness."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the workout and your total time.",
-            "Record all exercises and how long you worked out.",
-            "Write down your session with the total minutes in your tracker."
+            "Log and reflect. Save your full session and note what felt hard.",
+            "Track it. Log your workout in Hevy or Strong and add a quick note.",
+            "Record the session. Add all exercises to your app and write what was hardest."
           ],
-          "why": "Tracking time shows how efficient your workouts are getting."
+          "why": "Noting what's hard tells you where to focus next."
         }
       ]
     },
     {
       "day": 26,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Rest. Stretch your shoulders and back for 5 minutes.",
-            "Spend 5 minutes stretching your upper body — no workout today.",
-            "Rest day — sit on the floor and stretch your arms and back."
+            "Weigh in. Step on the scale and log the number.",
+            "Track your weight. Weigh yourself today and save it.",
+            "Weekly weight check. Step on the scale and write it down."
           ],
-          "why": "Shoulder and back stretches reduce soreness from pushups."
+          "why": "Consistent weekly weigh-ins reveal real trends over time."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Drink plenty of water and eat a protein-focused lunch.",
-            "Have a simple high-protein lunch — eggs, chicken, or tuna.",
-            "Make sure your lunch today has a good protein source."
+            "Walk outside. Get 10 minutes of easy movement today.",
+            "Rest day walk. Go for a 10-minute easy walk.",
+            "Active recovery. Walk for 10 minutes at a relaxed pace."
           ],
-          "why": "Food and water on rest days fuel tomorrow's workout."
+          "why": "Easy movement is the best way to recover without overdoing it."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Set your workout schedule for the next 7 days.",
-            "Plan your workout days for next week right now.",
-            "Pick 3 days next week and put them in your calendar."
+            "Eat protein. Have eggs, chicken, or cottage cheese today.",
+            "Protein focus. Pick one protein-heavy food and eat it today.",
+            "Fuel recovery. Add Greek yogurt or a shake to your day."
           ],
-          "why": "Having a plan for next week means you won't skip days."
+          "why": "Protein every day keeps your muscles in repair mode."
         }
       ]
     },
@@ -952,31 +952,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Do your circuit and try to beat your reps from last session.",
-            "Push for 1 more rep on at least 2 exercises today.",
-            "Full workout — see if any numbers go up vs. last time."
+            "Upper body day. 3 sets: 15 pushups, 12 pike pushups, 12 chair dips.",
+            "Push workout. 3 rounds: 15 pushups, 10 pike pushups, 12 dips.",
+            "Chest and shoulders. 3 sets each: pushups, pike pushups, and dips."
           ],
-          "why": "Every workout you should try to do slightly more than last time."
+          "why": "Hitting different push angles builds more complete upper-body strength."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Hold your plank for 1 minute if you can.",
-            "Go for 60 seconds on your plank today.",
-            "Try for a full 1-minute plank hold."
+            "Hold a plank. Get on the floor and hold for 55 seconds.",
+            "Core session. Plank hold for 55 seconds today.",
+            "Plank today. Hold the plank position for 55 seconds."
           ],
-          "why": "A 1-minute plank is a real milestone — go for it."
+          "why": "Adding 5 seconds each time quietly builds a strong core."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your workout and note your plank time.",
-            "Record your session and write down your plank seconds.",
-            "Add everything to your tracker — especially if you hit 60 seconds."
+            "Log the full session. Save every set in your app.",
+            "Track it all. Open Hevy or Strong and log today's full workout.",
+            "Record everything. Add pushups, pike pushups, dips, and plank to your log."
           ],
-          "why": "A 1-minute plank in your log is worth remembering."
+          "why": "Tracking different exercises shows your variety is growing."
         }
       ]
     },
@@ -988,31 +988,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Weigh yourself and compare to day 14.",
-            "Step on the scale for your 4-week check-in.",
-            "Get your 28-day weight and write it next to your last numbers."
+            "Four-week check-in. Compare your weight to day 1 and day 14.",
+            "Monthly check. Look at your logged weights and see the trend.",
+            "Progress review. Open your notes and compare week 1, 2, 3, and 4 weights."
           ],
-          "why": "4 weeks in is a great time to see how your body is changing."
+          "why": "Four weeks of data is enough to see a real pattern."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Take a progress photo from the same angle as your first two.",
-            "Snap a photo today and line it up with day 1 and day 14.",
-            "Take a 4-week photo from the same spot as your other check-ins."
+            "Take a progress photo. Front-facing. Save it next to week 2.",
+            "Month-one photo. Take a front photo and compare it to day 1.",
+            "Snapshot check. Take a photo today and put it next to your day-14 shot."
           ],
-          "why": "Photos every 2 weeks give you a clear picture of your progress."
+          "why": "Four weeks of training often shows visible change in photos."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write your 4-week summary — what's better, what's harder.",
-            "Note 2 things that improved and 1 thing still challenging.",
-            "Quick review: what's easier now vs. day 1?"
+            "Plan next week. Write your 3 workout days and set phone reminders.",
+            "Schedule week 5. Pick your 3 workout days and add them to your calendar.",
+            "Set up next week. Write your workout days and set 3 phone alarms."
           ],
-          "why": "A short review helps you know what to focus on next."
+          "why": "Planning ahead turns good intentions into actual workouts."
         }
       ]
     },
@@ -1024,67 +1024,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full workout today — all your moves, 3 sets each.",
-            "Do your complete circuit with full effort.",
-            "Hit every exercise in your routine for 3 sets."
+            "Leg day. 3 sets: 25 squats, 15 lunges each leg, 40-second wall sit.",
+            "Push the legs. 3 rounds: 25 squats, 15 lunges per side, 40-second wall sit.",
+            "Lower body burn. 3 sets of 25 squats, 15 lunges per leg, and a wall sit."
           ],
-          "why": "Month 1 is almost done — finish strong."
+          "why": "More reps each week keeps your legs growing."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "After your workout, eat a protein-rich meal within 30 minutes.",
-            "Have a protein snack as soon as you finish your session.",
-            "Immediately after working out, eat something with protein."
+            "Hold a plank. Get on the floor and hold for 60 seconds.",
+            "One-minute plank. Hold a plank for a full 60 seconds.",
+            "Minute plank. Hold the plank position for 60 seconds today."
           ],
-          "why": "Your muscles need protein right after a workout to rebuild."
+          "why": "A 60-second plank is a real milestone — hit it today."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log today's workout.",
-            "Add your session to your tracker.",
-            "Record all your sets and reps in the app."
+            "Log the session. Record all sets and exercises in your app.",
+            "Track it. Save your squats, lunges, wall sit, and plank in Hevy or Strong.",
+            "Record it all. Log every set from today's leg day in your workout app."
           ],
-          "why": "One more session in the books."
+          "why": "Logging your milestone plank is worth saving."
         }
       ]
     },
     {
       "day": 30,
-      "minutes_total": 4,
+      "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
-          "minutes": 2,
+          "minutes": 1,
           "variants": [
-            "Do max pushups in one set — go until you can't anymore.",
-            "See how many pushups you can do without stopping.",
-            "Push out your max pushup reps — go to failure."
+            "Review month one. Count total workouts you logged in 30 days.",
+            "Month-one audit. Open your app and count every session you completed.",
+            "30-day check. Look at your workout log and count your total sessions."
           ],
-          "why": "Your max reps after 30 days shows exactly how much stronger you are."
+          "why": "Counting real sessions shows you the discipline you've built."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 3,
           "variants": [
-            "Write down your max number and compare to day 1.",
-            "Note your pushup max and think about how many you could do on day 1.",
-            "Record your 30-day max pushups — compare to your starting number."
+            "Celebrate with a workout. Do your best full-body session today.",
+            "Mark day 30. Do 3 sets of pushups, squats, dips, and lunges.",
+            "Best session yet. Hit all your exercises — 3 sets of everything."
           ],
-          "why": "A bigger number than day 1 is real, measurable proof of progress."
+          "why": "Month one deserves a strong finish."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Celebrate making it 30 days — that's the hardest part.",
-            "Take a moment to appreciate 30 days of showing up.",
-            "You made it one month — write down one thing you're proud of."
+            "Log and celebrate. Save the session and write one thing you're proud of.",
+            "Record day 30. Log the full workout and add a quick win note.",
+            "Save the milestone. Log today's session and note one improvement since day 1."
           ],
-          "why": "30 days of consistency is something worth celebrating."
+          "why": "Celebrating progress keeps you going into month two."
         }
       ]
     },
@@ -1096,31 +1096,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Month 2 starts. Do your full circuit — aim to beat your day 30 numbers.",
-            "Start month 2 strong — run your full circuit with fresh effort.",
-            "New month, same routine — go for 1 more rep on everything."
+            "Upper body day. 3 sets: 15 pushups, 12 pike pushups, 12 dips.",
+            "Push session. 3 rounds: 15 pushups, 10 pike pushups, 12 chair dips.",
+            "Chest and shoulders. 3 sets each: pushups, pike pushups, and dips."
           ],
-          "why": "Month 2 is where real results start to show."
+          "why": "Month two starts with what you've built — now push a bit harder."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Add a 2nd plank today — try 2 sets of planks.",
-            "Do your plank twice today for more core work.",
-            "Hold 2 planks — rest between — to build more core strength."
+            "Hold a plank. Get on the floor and hold for 60 seconds.",
+            "One-minute plank. Hold a full 60-second plank.",
+            "Plank hold. Hold the position for 60 seconds today."
           ],
-          "why": "Doubling up on planks is a simple way to make your core work harder."
+          "why": "Holding last week's milestone keeps your core sharp."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your month 2 kickoff workout.",
-            "Record your day 31 session in your app.",
-            "Add today's sets to your tracker to start month 2 right."
+            "Log it. Record all sets in your workout app.",
+            "Track it. Open Hevy or Strong and save today's session.",
+            "Save the work. Log your pushups, pike pushups, dips, and plank."
           ],
-          "why": "Day 31 logged means month 2 has officially started."
+          "why": "Month two logs show you the progress curve clearly."
         }
       ]
     },
@@ -1132,31 +1132,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look up 1 simple home workout move you haven't tried yet.",
-            "Search 'beginner home exercise' and find one new move.",
-            "Pick one new bodyweight exercise to add to your routine."
+            "Walk and recover. Go outside for a 10-minute easy walk.",
+            "Active rest. Take a 10-minute walk today.",
+            "Move gently. Get outside for 10 minutes of easy movement."
           ],
-          "why": "Adding variety keeps your body and mind engaged."
+          "why": "Active rest keeps blood flowing without adding fatigue."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Try the new move — do 10 reps.",
-            "Practice the new exercise you found — 10 reps to start.",
-            "Do the new move 10 times to see how it feels."
+            "Protein today. Have chicken, eggs, or Greek yogurt.",
+            "Eat protein. Add a protein source to your lunch or dinner.",
+            "Fuel your muscles. Have a scoop of protein or some cottage cheese."
           ],
-          "why": "Trying it once is how you find out if you like it."
+          "why": "Rest-day protein is when your muscles actually do the rebuilding."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the new exercise.",
-            "Add your new move to your workout tracker.",
-            "Record your first reps of the new exercise."
+            "Check your app. Look at your last 5 sessions and spot a pattern.",
+            "Review your log. Open Hevy or Strong and see which exercise improved most.",
+            "Look back. Scroll your workout history and find your biggest improvement."
           ],
-          "why": "Tracking a new move means you can build on it next time."
+          "why": "Reviewing your log turns data into motivation."
         }
       ]
     },
@@ -1168,67 +1168,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Do your full circuit — pushups, squats, lunges, dips, and your new move.",
-            "Run your whole routine including the new exercise you added.",
-            "Full workout today with all your exercises — 3 sets each."
+            "Leg day. 3 sets: 25 squats, 15 lunges each leg, 45-second wall sit.",
+            "Lower body push. 3 rounds: 25 squats, 15 lunges per leg, 45-second wall sit.",
+            "Legs and hold. 25 squats, 15 lunges per side, wall sit — 3 sets."
           ],
-          "why": "Expanding your routine gives more muscles a reason to grow."
+          "why": "Legs respond fast when you keep adding a little more each week."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Eat a protein-heavy meal today — more than usual.",
-            "Make protein the main event at every meal today.",
-            "Have eggs for breakfast and chicken or fish for lunch today."
+            "Try a glute bridge. Lie on your back and push your hips up 15 times.",
+            "Glute bridge. Back on the floor, knees bent — push hips up 15 reps.",
+            "Add glute bridges. Do 15 hip thrusts lying on your back."
           ],
-          "why": "More muscle work means your body needs more protein to recover."
+          "why": "Glute bridges work your glutes and lower back without any weight."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the full session.",
-            "Record every exercise in your tracker today.",
-            "Add all your sets and the new exercise to your app."
+            "Log the session. Save all sets and exercises in your app.",
+            "Track it. Open your app and record today's leg day.",
+            "Record it all. Log squats, lunges, wall sit, and bridges."
           ],
-          "why": "A complete log today shows how full your routine has become."
+          "why": "Adding new exercises to your log shows you're constantly learning."
         }
       ]
     },
     {
       "day": 34,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Rest today. Do a light stretch for 5 minutes.",
-            "Take the day off — just stretch your legs and back.",
-            "Rest day — spend a few minutes loosening up your body."
+            "Weigh in. Step on the scale and log the number.",
+            "Weekly weight. Weigh yourself and save it next to past weeks.",
+            "Track progress. Step on the scale and record today's weight."
           ],
-          "why": "Regular rest is what lets muscles actually grow."
+          "why": "Five weeks of weigh-ins gives you a real trend line."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Eat your regular protein today even on a rest day.",
-            "Keep up protein intake today — eggs, chicken, or a shake.",
-            "Don't skip protein just because it's a rest day."
+            "Rest and stretch. Do 5 minutes of floor stretching.",
+            "Stretch it out. Spend 5 minutes stretching legs, back, and chest.",
+            "Recovery stretch. Lie on the floor and hold each stretch for a minute."
           ],
-          "why": "Your muscles still need fuel on rest days to repair."
+          "why": "Consistent stretching prevents the tightness that leads to injury."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Look at your workout log and count your total sessions this month.",
-            "Count how many times you've worked out in the last 2 weeks.",
-            "Review your log and see your session count for month 2 so far."
+            "Protein goal. Have two protein sources at dinner tonight.",
+            "Double the protein. Add eggs and chicken — or chicken and yogurt — to dinner.",
+            "Eat protein. Pick your biggest meal today and add two protein foods to it."
           ],
-          "why": "Seeing your session count is motivating — every one counts."
+          "why": "More protein sources means more amino acids for muscle repair."
         }
       ]
     },
@@ -1240,31 +1240,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Do your workout with a focus on slow, controlled reps.",
-            "Slow each rep down — 2 seconds up, 2 seconds down.",
-            "Use slow reps today — no rushing, full control on every move."
+            "Full body session. 3 sets: 15 pushups, 25 squats, 12 dips, 15 lunges each leg.",
+            "Big workout. 3 rounds: 15 pushups, 25 squats, 12 chair dips, 15 lunges per side.",
+            "Hit everything. 3 sets each: pushups, squats, dips, and lunges."
           ],
-          "why": "Slowing down makes the same exercises harder and more effective."
+          "why": "Full-body sessions are the most efficient use of your training time."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Hold the bottom of your squat for 2 seconds before coming up.",
-            "Pause at the lowest point of your squat — count to 2.",
-            "Add a 2-second pause at the bottom of each squat."
+            "Hold a plank. Get on the floor and hold for 65 seconds.",
+            "Plank challenge. Hold for 65 seconds — just 5 more than last time.",
+            "Core time. Do a 65-second plank hold today."
           ],
-          "why": "Pausing at the bottom makes squats much tougher without any extra weight."
+          "why": "Tiny increases in plank time build real endurance."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your slow-rep workout.",
-            "Record your session noting you used slow reps.",
-            "Add today's controlled session to your tracker."
+            "Log the full session. Record every set in your app.",
+            "Track it all. Save today's complete workout in Hevy or Strong.",
+            "Record everything. Log all exercises and sets in your workout app."
           ],
-          "why": "Noting your form changes helps you know what worked."
+          "why": "A full log of a full session is satisfying and motivating."
         }
       ]
     },
@@ -1276,31 +1276,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Try a new protein food this week — Greek yogurt, edamame, or tempeh.",
-            "Add one protein food you've never eaten much of.",
-            "Eat something new today that's high in protein."
+            "Rest day walk. Go for 10 minutes outside.",
+            "Active recovery. Take an easy 10-minute walk today.",
+            "Move easy. Get outside for 10 minutes."
           ],
-          "why": "Variety in protein keeps eating healthy from getting old."
+          "why": "Easy movement on rest days beats sitting still for recovery."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do 25 pushups straight through in one set.",
-            "See if you can hit 25 pushups without stopping.",
-            "Push for 25 reps in one unbroken set of pushups."
+            "Drink water. Finish a full bottle before lunch.",
+            "Hydrate well. Have 3 big glasses of water today.",
+            "Water check. Fill a bottle now and drink it in the next 2 hours."
           ],
-          "why": "25 reps in one go is a strong milestone."
+          "why": "Hydration is one of the simplest recovery tools available."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your 25-rep set.",
-            "Record your 25 pushups in your tracker.",
-            "Add your max-rep set to your workout log."
+            "Sleep tonight. Aim for 8 hours — set an alarm to go to bed.",
+            "Prioritize rest. Set a bedtime reminder for tonight.",
+            "Recover well. Get to bed 30 minutes earlier than usual tonight."
           ],
-          "why": "25 in one set is worth tracking."
+          "why": "Sleep is free recovery — take advantage of it."
         }
       ]
     },
@@ -1312,67 +1312,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full workout — all your moves, 3 sets, best effort.",
-            "Do your complete routine today.",
-            "Run every exercise in your plan — no skipping today."
+            "Upper body push. 3 sets: 18 pushups, 12 pike pushups, 12 dips.",
+            "Push session. 3 rounds: 18 pushups, 12 pike pushups, 12 chair dips.",
+            "More reps today. Do 18 pushups per set — 3 more than usual."
           ],
-          "why": "Consistency is the most important thing in month 2."
+          "why": "Adding 3 more reps per set is a real strength gain."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Try to reduce your rest time between sets to 20 seconds.",
-            "Rest only 20 seconds between each set today.",
-            "Short rest workout — only 20 seconds between sets."
+            "Add Superman holds. Do 12 slow Superman lifts.",
+            "Back work. Lie face down and do 12 Superman holds.",
+            "Superman today. Do 12 raises — arms and legs off the floor."
           ],
-          "why": "Less rest increases intensity without adding more exercises."
+          "why": "Your back needs as much attention as your chest."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the workout.",
-            "Record your session in the app.",
-            "Add today's sets and reps to your tracker."
+            "Log it. Record your session in Hevy or Strong.",
+            "Track the workout. Open your app and save all sets.",
+            "Save the work. Log pushups, pike pushups, dips, and Supermans."
           ],
-          "why": "Your log is your proof of consistency."
+          "why": "Logging the new rep count proves you're getting stronger."
         }
       ]
     },
     {
       "day": 38,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Rest. Get 8 hours of sleep tonight.",
-            "Take today off and prioritize sleep tonight.",
-            "Rest day — aim for 8 hours of sleep to help your muscles grow."
+            "Protein check. Did you eat protein with every meal today?",
+            "Food audit. Think through today's meals — did each one have protein?",
+            "Track protein. Count how many meals today had chicken, eggs, or dairy."
           ],
-          "why": "Most of your muscle growth actually happens while you sleep."
+          "why": "Noticing patterns is the first step to changing them."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Drink 8 glasses of water today.",
-            "Stay extra hydrated today — 8 full glasses.",
-            "Focus on water today — aim for 8 glasses."
+            "Stretch your back. Lie on the floor and hug your knees for 30 seconds.",
+            "Back stretch. Pull your knees to your chest and hold for 30 seconds.",
+            "Floor stretch. Lie on your back, hug knees to chest, hold 30 seconds."
           ],
-          "why": "Hydration on rest days speeds up recovery."
+          "why": "Releasing your lower back prevents the aches that come with heavier training."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Plan your workouts for the rest of the week.",
-            "Set 3 workout reminders for the next 5 days.",
-            "Pick your next 3 workout days and add them to your calendar."
+            "Eat more protein. Have a chicken breast or two eggs with your next meal.",
+            "Fuel recovery. Add protein to your next snack or meal.",
+            "Protein now. Have Greek yogurt or a scoop of protein today."
           ],
-          "why": "Planning now removes the decision later."
+          "why": "Rest-day protein keeps muscle repair running around the clock."
         }
       ]
     },
@@ -1384,31 +1384,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Do your full circuit — try for max reps on the last set of each exercise.",
-            "Last set of every exercise — push to your limit.",
-            "Full workout, and on your final set of each move, go until you can't."
+            "Leg day. 3 sets: 30 squats, 15 lunges per leg, 50-second wall sit.",
+            "Lower body push. 3 rounds: 30 squats, 15 lunges, 50-second wall sit.",
+            "Legs and hold. 3 sets of 30 squats, 15 lunges each side, and a long wall sit."
           ],
-          "why": "Going to your limit on the last set is how you keep making gains."
+          "why": "30 squats per set is a strong milestone — push for it."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do a 90-second plank if you can.",
-            "Try for 90 seconds on your plank hold today.",
-            "Push your plank to 90 seconds — break it into 2 holds if needed."
+            "Add glute bridges. Do 3 sets of 15 glute bridges.",
+            "Glute bridges. Do 15 reps per set, 3 sets total.",
+            "Bridges today. Lie on your back and do 3 sets of 15 hip thrusts."
           ],
-          "why": "A 90-second plank is a strong core milestone."
+          "why": "Your glutes are your biggest muscle — training them pays off fast."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your max-effort sets.",
-            "Record your max reps for each exercise today.",
-            "Write down your hardest effort sets in your tracker."
+            "Log everything. Record all sets in your workout app.",
+            "Track the session. Open Hevy or Strong and save today's leg day.",
+            "Save it. Log squats, lunges, wall sit, and glute bridges."
           ],
-          "why": "Tracking max efforts shows your ceiling going up."
+          "why": "A logged leg day you're proud of is worth keeping."
         }
       ]
     },
@@ -1418,33 +1418,33 @@
       "tasks": [
         {
           "position": 1,
-          "minutes": 2,
+          "minutes": 1,
           "variants": [
-            "Weigh yourself for a mid-month check-in.",
-            "Step on the scale today and note the number.",
-            "Get your day 40 weight and compare it to your earlier numbers."
+            "Weigh in. Step on the scale and compare to day 1.",
+            "Six-week weight. Log today's weight next to your earlier numbers.",
+            "Track progress. Step on the scale and record the number."
           ],
-          "why": "Regular check-ins keep you honest about your progress."
+          "why": "Six weeks is enough time for real, measurable changes."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Take a progress photo.",
-            "Snap a side photo today and compare it to earlier ones.",
-            "Take a quick photo to track your month 2 progress."
+            "Walk outside. Take a 10-minute easy walk.",
+            "Rest day move. Go outside for 10 minutes.",
+            "Active recovery. Walk for 10 minutes at a relaxed pace."
           ],
-          "why": "A photo every few weeks shows changes you might not notice daily."
+          "why": "Walking clears your head and helps your body recover."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write one thing you want to improve in the next 2 weeks.",
-            "Set one small goal for the next 14 days.",
-            "Pick one thing to focus on between now and day 56."
+            "Plan next week. Write your 3 workout days and set reminders.",
+            "Schedule it. Pick your workout days and add them to your calendar.",
+            "Set up week 7. Choose 3 workout days and set phone alarms."
           ],
-          "why": "Having a small focus goal keeps your training sharp."
+          "why": "A written plan is more likely to happen than a mental note."
         }
       ]
     },
@@ -1456,67 +1456,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Do 4 sets of your circuit today — one more than usual.",
-            "Add an extra round to your workout today.",
-            "Go through all your exercises 4 times today."
+            "Full body day. 3 sets: 18 pushups, 30 squats, 12 dips, 15 lunges per leg.",
+            "Big session. 3 rounds: 18 pushups, 30 squats, 12 chair dips, 15 lunges.",
+            "Hit it all. 3 sets each: pushups, squats, dips, lunges — more reps than before."
           ],
-          "why": "More sets is one of the best ways to build more muscle."
+          "why": "Hitting more reps in every exercise proves month two is working."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Eat protein at breakfast, lunch, and dinner today.",
-            "Make sure all 3 meals today have a protein source.",
-            "Add eggs, chicken, beans, or yogurt to every meal today."
+            "Hold a plank. Do a 70-second plank hold.",
+            "Plank push. Hold for 70 seconds — your new record.",
+            "Core time. Get on the floor and hold the plank for 70 seconds."
           ],
-          "why": "Spreading protein across all your meals helps your body use it better."
+          "why": "A new plank record at 6 weeks means your core is genuinely stronger."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your 4-set workout.",
-            "Record that you did 4 rounds in your tracker.",
-            "Add your extra-round session to the app."
+            "Log and celebrate. Save the session and note your new records.",
+            "Track the wins. Log everything and mark any personal bests.",
+            "Record it all. Open your app and save the full session with notes."
           ],
-          "why": "A 4-set day in your log shows you're leveling up."
+          "why": "Noting personal bests keeps you excited to keep going."
         }
       ]
     },
     {
       "day": 42,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Rest. Do a quick full-body stretch.",
-            "Take today off and spend 5 minutes stretching.",
-            "Rest day — loosen up your whole body with a light stretch."
+            "Six-week check. Count total sessions in your workout log.",
+            "Review the log. Open your app and count every workout you've done.",
+            "Audit your work. Look at your workout history and count total sessions."
           ],
-          "why": "Stretching after hard workout days speeds up how fast you recover."
+          "why": "Counting your real sessions shows how much discipline you've built."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Review what you've done in the past 6 weeks.",
-            "Open your log and count all your sessions since day 1.",
-            "Look at 6 weeks of logged workouts and see how far you've come."
+            "Take a progress photo. Front-facing. Compare to day 1 and day 14.",
+            "Six-week photo. Take a front photo and line it up with your earlier shots.",
+            "Snapshot time. Take a photo now and save it next to your other check-ins."
           ],
-          "why": "Seeing 6 weeks of work is a big motivator to keep going."
+          "why": "Six weeks often shows the most visible progress of the whole 90 days."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write down what you want month 2 to finish with.",
-            "Set a goal for the end of month 2 — specific reps or a new move.",
-            "Write one thing you want to achieve by day 60."
+            "Eat more protein. Have chicken or eggs at your biggest meal today.",
+            "Protein focus. Add a protein source to every meal today.",
+            "Fuel the next phase. Have a shake, eggs, or Greek yogurt today."
           ],
-          "why": "A clear target for the next 2 weeks keeps your training focused."
+          "why": "You're almost halfway — keep the nutrition consistent."
         }
       ]
     },
@@ -1528,31 +1528,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full workout — focus on your weakest exercise and give it extra effort.",
-            "Pick the hardest exercise in your routine and do 1 extra set of it.",
-            "Do your whole circuit, then add an extra set of the move you find hardest."
+            "Upper body day. 3 sets: 20 pushups, 12 pike pushups, 15 dips.",
+            "Push session. 3 rounds: 20 pushups, 12 pike pushups, 15 chair dips.",
+            "More reps. Do 20 pushups per set this time — 3 sets total."
           ],
-          "why": "Your weakest move is the best one to focus on — that's where growth hides."
+          "why": "20 pushups per set is a real milestone — chase it today."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do your plank and try to beat your best time.",
-            "Hold your plank and go until you can't — beat your last record.",
-            "Push your plank time as long as you can today."
+            "Superman holds. Do 3 sets of 15 slow Superman raises.",
+            "Back work. 15 Superman holds per set, 3 sets.",
+            "Back session. Lie face down and do 3 sets of 15 raises."
           ],
-          "why": "Your personal best is always worth chasing."
+          "why": "Your back muscles need direct work to keep up with your chest."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your workout with special note on your weak-point exercise.",
-            "Record all sets and note which exercise you focused on.",
-            "Add today's session and mark the extra set."
+            "Log it. Record all sets and reps in your app.",
+            "Track the session. Open Hevy or Strong and save today's push day.",
+            "Save the workout. Log pushups, pike pushups, dips, and Supermans."
           ],
-          "why": "Noting your focus areas helps you track what you improved."
+          "why": "Tracking 20-rep sets is worth recording."
         }
       ]
     },
@@ -1564,31 +1564,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Try one new food this week that has lots of protein.",
-            "Pick a protein food you've never cooked — lentils, tempeh, or edamame.",
-            "Cook or eat something new that's high in protein today."
+            "Rest and stretch. Do a 5-minute full-body stretch on the floor.",
+            "Recovery stretch. Spend 5 minutes on chest, legs, and back.",
+            "Floor stretch. Hold each major muscle stretch for about a minute."
           ],
-          "why": "Variety keeps your diet sustainable for the long run."
+          "why": "Stretching after a hard session reduces the soreness you'll feel tomorrow."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do 30 pushups in one set.",
-            "See if you can hit 30 pushups without stopping.",
-            "Go for 30 unbroken pushups — push to 30."
+            "Drink water. Finish a full water bottle today.",
+            "Hydrate well. Have 3 big glasses of water today.",
+            "Water goal. Drink a full bottle before lunch."
           ],
-          "why": "30 pushups in one go is a real strength milestone."
+          "why": "Water keeps everything working — muscles, joints, energy."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your 30-rep pushup set.",
-            "Record hitting 30 pushups in your tracker.",
-            "Add this milestone set to your workout log."
+            "Protein today. Have chicken or eggs with your biggest meal.",
+            "Keep eating protein. Add a protein source to lunch and dinner.",
+            "Fuel recovery. Have a shake or some cottage cheese today."
           ],
-          "why": "30 reps in one set is worth celebrating and tracking."
+          "why": "Consistent protein keeps your progress steady."
         }
       ]
     },
@@ -1600,31 +1600,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Halfway point workout — do your full circuit with your best effort.",
-            "Day 45 is the halfway mark. Hit your whole routine hard today.",
-            "Full workout today — treat it like a test of your progress so far."
+            "Leg day. 3 sets: 30 squats, 20 lunges per leg, 55-second wall sit.",
+            "Lower body push. 3 rounds: 30 squats, 20 lunges each side, 55-second wall sit.",
+            "Legs today. 3 sets of 30 squats, 20 lunges per leg, long wall sit."
           ],
-          "why": "Halfway through — your best effort today shows how far you've come."
+          "why": "Halfway through — your legs should feel noticeably stronger by now."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do max pushups — count every rep.",
-            "Go for max reps on pushups — write down the number.",
-            "Find your current pushup max and compare to day 30."
+            "Add glute bridges. Do 3 sets of 20 glute bridges.",
+            "Bridges today. 20 reps per set, 3 sets — lie on your back.",
+            "Glute bridges. Do 20 hip thrusts lying on your back — 3 sets."
           ],
-          "why": "A max test at day 45 shows exactly how much stronger you are."
+          "why": "20 glute bridges per set puts real work into your biggest muscle."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your max reps and compare to day 30.",
-            "Write down today's pushup max next to your day 30 number.",
-            "Record your day 45 max — is it higher than day 30?"
+            "Log the session. Record all sets in your workout app.",
+            "Track it. Save your full leg day in Hevy or Strong.",
+            "Record it. Log squats, lunges, wall sit, and bridges."
           ],
-          "why": "Your day 45 max is proof of 45 days of work paying off."
+          "why": "Halfway-point logs are worth keeping for comparison later."
         }
       ]
     },
@@ -1634,33 +1634,33 @@
       "tasks": [
         {
           "position": 1,
-          "minutes": 3,
+          "minutes": 1,
           "variants": [
-            "Do your full workout and try to beat last session's numbers.",
-            "Full circuit — push for 1 more rep on every exercise.",
-            "Run your complete routine and aim to improve at least one number."
+            "Weigh in. Step on the scale and log the number.",
+            "Halfway weigh-in. Weigh yourself and compare to week 1.",
+            "Track it. Step on the scale and record today's weight."
           ],
-          "why": "Every workout is a chance to make a tiny improvement."
+          "why": "Halfway through the 90 days — your numbers tell the real story."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 3,
           "variants": [
-            "Add a short jog or brisk walk after your workout — 5 minutes.",
-            "Finish your session with a 5-minute walk or light jog.",
-            "After your workout, go outside for a 5-minute brisk walk."
+            "Consistency push. Do your full session — all exercises, all sets.",
+            "No skipping. Hit all 3 sets of pushups, squats, dips, and lunges.",
+            "Full effort. Do everything: pushups, squats, dips, lunges — 3 sets each."
           ],
-          "why": "A little cardio after lifting helps your heart and recovery."
+          "why": "Days 46-75 are where consistency separates those who finish from those who don't."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your workout.",
-            "Record your session in the app.",
-            "Add today's sets and reps to your tracker."
+            "Log everything. Save all sets in your app after the session.",
+            "Track it all. Open Hevy or Strong and record your full workout.",
+            "Record it. Log every exercise and set in your workout app today."
           ],
-          "why": "Consistent logging keeps your progress visible."
+          "why": "Every session logged keeps you accountable through the second half."
         }
       ]
     },
@@ -1672,31 +1672,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Prep a high-protein meal for tomorrow so it's ready.",
-            "Cook something simple tonight for tomorrow — chicken, eggs, or beans.",
-            "Make one meal ahead tonight so you have protein ready tomorrow."
+            "Walk and recover. Get outside for 10 minutes.",
+            "Active rest. Take a 10-minute easy walk today.",
+            "Move easy. Walk outside for 10 minutes — no rush."
           ],
-          "why": "Having food ready makes it easy to eat well even on busy days."
+          "why": "Easy movement keeps the habit alive on rest days."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do 15 pushups as a quick midday session.",
-            "Take a break and do 15 pushups right now.",
-            "Do 15 quick pushups before your next meal."
+            "Protein check. Did every meal today have a protein source?",
+            "Food audit. Think through today's meals and count the protein sources.",
+            "Track protein. Note how many of today's meals included protein."
           ],
-          "why": "Short bursts of movement during the day add up."
+          "why": "Consistent daily protein is the biggest nutrition habit to lock in."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your pushups.",
-            "Record your 15 pushups in the tracker.",
-            "Add the quick set to your daily log."
+            "Eat more protein. Have a chicken breast or two eggs with dinner.",
+            "Protein tonight. Add eggs, chicken, or cottage cheese to your dinner.",
+            "Fuel tomorrow. Have a protein-rich dinner to prep for your next session."
           ],
-          "why": "Even small sessions deserve to be tracked."
+          "why": "Protein at dinner fuels overnight muscle repair."
         }
       ]
     },
@@ -1708,67 +1708,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full workout — try 4 sets of everything today.",
-            "Do 4 rounds of your full circuit today.",
-            "Add an extra set to every exercise in your routine."
+            "Upper body push. 3 sets: 20 pushups, 15 pike pushups, 15 dips.",
+            "Push session. 3 rounds: 20 pushups, 15 pike pushups, 15 chair dips.",
+            "Chest and shoulders. 3 sets each: 20 pushups, 15 pike pushups, 15 dips."
           ],
-          "why": "4 sets is a proven way to build more muscle than 3."
+          "why": "15 pike pushups per set means your shoulders are genuinely stronger."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Plank for as long as you can — go past your record.",
-            "Hold your plank and try to beat your best time.",
-            "Push your plank hold until you physically can't hold it anymore."
+            "Hold a plank. Hold for 75 seconds today.",
+            "Plank record. Get on the floor and hold for 75 seconds.",
+            "Core time. Do a 75-second plank hold — a new milestone."
           ],
-          "why": "Breaking your plank record means your core is stronger."
+          "why": "75 seconds is a strong plank — it's a real achievement."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the 4-set session and your plank time.",
-            "Record your 4 rounds and how long you held the plank.",
-            "Add all sets and your plank record to your tracker."
+            "Log it. Record all sets in Hevy or Strong.",
+            "Track the session. Save your pushups, pike pushups, dips, and plank.",
+            "Record everything. Log all sets and note any personal bests."
           ],
-          "why": "A 4-set day plus a plank record is a great session to log."
+          "why": "Tracking your new plank record is worth saving."
         }
       ]
     },
     {
       "day": 49,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Rest day. Stretch your hips and legs for 5 minutes.",
-            "Take today off — focus on stretching your lower body.",
-            "Rest and stretch your quads and hamstrings today."
+            "Rest and stretch. Do 5 minutes of full-body stretching.",
+            "Stretch it out. Spend 5 minutes on your legs, chest, and back.",
+            "Recovery day. Lie on the floor and stretch for 5 minutes."
           ],
-          "why": "Lower body stretching on rest days keeps your legs ready to go."
+          "why": "Seven weeks in, stretching keeps you injury-free through the final stretch."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Eat well today — protein at every meal.",
-            "Stay on your protein routine even on your rest day.",
-            "Don't let rest day become a bad food day — keep up protein."
+            "Log your weight. Step on the scale and save the number.",
+            "Weekly weigh-in. Weigh yourself and record it.",
+            "Track it. Step on the scale and note the number today."
           ],
-          "why": "What you eat on rest days affects how you recover."
+          "why": "Weekly tracking stays consistent even on rest days."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Plan next week's workouts and set reminders.",
-            "Schedule your 3 workout days for next week.",
-            "Set calendar alerts for your next 3 sessions."
+            "Protein today. Have two protein-rich foods in your meals.",
+            "Double protein. Add eggs and chicken — or chicken and yogurt — today.",
+            "Fuel the repair. Have at least two sources of protein today."
           ],
-          "why": "Planned workouts are far more likely to happen."
+          "why": "Two protein sources means more amino acids working on your muscles."
         }
       ]
     },
@@ -1780,31 +1780,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Do your full workout — focus on feeling each muscle work.",
-            "Full circuit — slow down and feel your muscles on every rep.",
-            "Run your full routine and concentrate on the muscle doing the work."
+            "Leg day. 3 sets: 30 squats, 20 lunges per leg, 60-second wall sit.",
+            "Lower body push. 3 rounds: 30 squats, 20 lunges each side, 60-second wall sit.",
+            "Legs today. 30 squats, 20 lunges per leg, 1-minute wall sit — 3 sets."
           ],
-          "why": "Feeling the muscle you're working makes exercises more effective."
+          "why": "A 60-second wall sit is a strong leg-day finisher."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "After your last set, do a 30-second cool-down stretch.",
-            "Spend 30 seconds stretching right after your workout ends.",
-            "Cool down with a quick stretch before you sit down."
+            "Glute bridges. Do 3 sets of 20 with a 2-second hold at the top.",
+            "Slow bridges. 20 reps per set — hold the top for 2 seconds each rep.",
+            "Add a pause. Do 20 glute bridges per set and squeeze at the top for 2 seconds."
           ],
-          "why": "Stretching after a workout helps your muscles recover faster."
+          "why": "Pausing at the top doubles the work your glutes do."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log today's workout.",
-            "Add your session to the tracker.",
-            "Record all your sets in the app."
+            "Log the session. Record all sets in your workout app.",
+            "Track it. Save today's leg day in Hevy or Strong.",
+            "Record it. Log squats, lunges, wall sit, and glute bridges."
           ],
-          "why": "50 days logged — you're more than halfway there."
+          "why": "A good leg day log is proof of how far your endurance has come."
         }
       ]
     },
@@ -1816,31 +1816,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Think about whether you want to add any weights — even light ones.",
-            "Look up a simple set of dumbbells (5-10 lbs) you could use at home.",
-            "Consider grabbing light dumbbells or resistance bands to level up."
+            "Walk outside. Get 10 minutes of easy movement.",
+            "Active rest. Take a 10-minute walk at a calm pace.",
+            "Move today. Go outside for 10 minutes."
           ],
-          "why": "Adding even light resistance takes your workouts to the next level."
+          "why": "Walking on rest days is an easy win that adds up."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "If you have any weights, try 10 curls with each arm.",
-            "Use whatever you have — a water bottle, backpack — and do 10 curls.",
-            "Do 10 bicep curls with something heavy enough to feel it."
+            "Drink water. Finish a full water bottle before dinner.",
+            "Hydrate. Have 3 big glasses of water today.",
+            "Water check. Fill a bottle and drink it before your next meal."
           ],
-          "why": "Curls target your arms in a way pushups don't."
+          "why": "You're more than halfway — don't let hydration slip."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your curls.",
-            "Record your 10 curls in your workout tracker.",
-            "Add your arm work to today's log."
+            "Review your log. Look at your last 7 sessions in your app.",
+            "Check your progress. Open Hevy or Strong and scan your recent workouts.",
+            "Spot the trend. Look at your workout history — is it consistent?"
           ],
-          "why": "New exercises deserve a spot in your log."
+          "why": "A consistent log through day 50 means your habit is real."
         }
       ]
     },
@@ -1852,67 +1852,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full circuit workout — all your moves, 3-4 sets.",
-            "Do your whole routine with full effort today.",
-            "Hit every exercise in your plan for 3 or 4 sets."
+            "Full body session. 3 sets: 20 pushups, 30 squats, 15 dips, 20 lunges each leg.",
+            "Big workout. 3 rounds: 20 pushups, 30 squats, 15 dips, 20 lunges per side.",
+            "Hit everything. 3 sets each: 20 pushups, 30 squats, 15 dips, 20 lunges."
           ],
-          "why": "Consistency through week 8 is what separates results from not."
+          "why": "Full-body sessions build the total strength that shows up in photos."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Include curls or arm work if you have any resistance.",
-            "Add 10 curls with whatever weight you have after your circuit.",
-            "Finish with 10 arm curls — use weights, a bag, or water bottles."
+            "Hold a plank. Get on the floor and hold for 80 seconds.",
+            "Plank today. Hold for 80 seconds — 5 more than last time.",
+            "Core challenge. Do an 80-second plank hold."
           ],
-          "why": "Adding arm work rounds out your routine."
+          "why": "A steady 5-second increase each week turns into real core strength."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the full workout including arm work.",
-            "Record all exercises including your curls.",
-            "Add every exercise to your tracker today."
+            "Log the full session. Save every set and note any records.",
+            "Track it all. Open Hevy or Strong and record today's complete workout.",
+            "Record everything. Log all exercises, sets, and personal bests."
           ],
-          "why": "A complete log shows your full routine in action."
+          "why": "A full log at this stage shows how much your capacity has grown."
         }
       ]
     },
     {
       "day": 53,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Rest day. Stretch and relax.",
-            "Take today off — rest and do a light stretch.",
-            "Rest. Just focus on stretching if your muscles are sore."
+            "Rest and stretch. Do 5 minutes of floor stretching.",
+            "Recovery stretch. Stretch your chest, legs, and back for 5 minutes.",
+            "Stretch it out. Spend 5 minutes on the floor stretching everything."
           ],
-          "why": "Rest and stretching keep your body ready for the next session."
+          "why": "Consistent recovery is what separates people who finish from those who quit."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Drink extra water today — your muscles need it.",
-            "Focus on hydration — 8 glasses today.",
-            "Drink a big glass of water right now and keep it up all day."
+            "Protein today. Have chicken, eggs, or Greek yogurt.",
+            "Keep up protein. Add a protein source to your next meal.",
+            "Fuel recovery. Have a scoop of protein or some cottage cheese."
           ],
-          "why": "Hydration directly affects how well you recover."
+          "why": "Rest-day protein is non-negotiable in the final stretch."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Open your log and count your workouts from the last 7 days.",
-            "How many times did you work out this week? Check your log.",
-            "Count your sessions this week and see if you hit 3."
+            "Sleep tonight. Get to bed 30 minutes earlier than usual.",
+            "Rest well. Set a bedtime alarm for 30 minutes earlier tonight.",
+            "Prioritize sleep. Aim for 8 hours — set a bedtime reminder."
           ],
-          "why": "Tracking your weekly session count builds accountability."
+          "why": "Better sleep means better performance in every session this week."
         }
       ]
     },
@@ -1924,31 +1924,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Do your full circuit — pushups, squats, lunges, dips, planks.",
-            "Run every exercise in your routine for 3 sets.",
-            "Full workout today — the whole circuit."
+            "Upper body push. 3 sets: 22 pushups, 15 pike pushups, 15 dips.",
+            "Push session. 3 rounds: 22 pushups, 15 pike pushups, 15 chair dips.",
+            "More reps. 22 pushups per set this time — 3 sets total."
           ],
-          "why": "Sticking to your full routine is what builds lasting results."
+          "why": "22 pushups per set is serious strength — go for it."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Try to do 1 more rep than last session on at least one exercise.",
-            "Push for an extra rep somewhere in your workout today.",
-            "Beat your last number by 1 rep on any exercise."
+            "Superman holds. Do 3 sets of 20 slow Superman raises.",
+            "Back work. 20 Superman holds per set, 3 sets.",
+            "Back session. Lie face down and do 3 sets of 20 raises."
           ],
-          "why": "One extra rep is how steady progress happens."
+          "why": "Strong back muscles protect your spine and improve every exercise."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your workout.",
-            "Record your session in the app.",
-            "Add today's sets to your tracker."
+            "Log the session. Record all sets in your workout app.",
+            "Track it. Save pushups, pike pushups, dips, and Supermans in Hevy.",
+            "Record it. Log all your sets and note the new rep count."
           ],
-          "why": "Every session logged is progress documented."
+          "why": "Logging 22 pushups per set is a record worth keeping."
         }
       ]
     },
@@ -1958,213 +1958,213 @@
       "tasks": [
         {
           "position": 1,
-          "minutes": 2,
+          "minutes": 1,
           "variants": [
-            "Weigh yourself and record your day 55 number.",
-            "Step on the scale for a check-in.",
-            "Get your day 55 weight and write it down."
+            "Weigh in. Step on the scale and log the number.",
+            "Weekly weight. Record your weight and compare to earlier weeks.",
+            "Track progress. Weigh yourself and note the number today."
           ],
-          "why": "Regular weigh-ins show trends that single readings miss."
+          "why": "Eight weeks of data shows exactly what the training is doing."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Do your pushup max and count every rep.",
-            "Max out on pushups and compare to day 45.",
-            "See how many pushups you can do without stopping today."
+            "Walk outside. Take a 10-minute easy walk.",
+            "Active rest. Get outside for 10 minutes.",
+            "Move gently. Walk for 10 minutes at an easy pace."
           ],
-          "why": "Your pushup max every 2 weeks shows real strength progress."
+          "why": "Gentle movement keeps your momentum alive on rest days."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Record your max and compare to previous check-ins.",
-            "Write down your pushup max and check it against day 45.",
-            "Log your count and note how much it's improved."
+            "Protein goal. Have protein with every meal today.",
+            "Track protein. Add a protein source to breakfast, lunch, and dinner.",
+            "Eat protein. Make sure every meal today has chicken, eggs, or dairy."
           ],
-          "why": "Tracking your max over time is the best measure of progress."
+          "why": "Three protein meals a day is the gold standard for muscle building."
         }
       ]
     },
     {
       "day": 56,
-      "minutes_total": 4,
+      "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
-          "minutes": 2,
+          "minutes": 3,
           "variants": [
-            "Take a progress photo.",
-            "Snap a photo today and compare it to your earlier ones.",
-            "Take a day 56 photo from the same angle as your others."
+            "Leg day. 3 sets: 35 squats, 20 lunges per leg, 60-second wall sit.",
+            "Lower body push. 3 rounds: 35 squats, 20 lunges each side, 60-second wall sit.",
+            "Legs today. 35 squats, 20 lunges per leg, 1-minute wall sit — 3 sets."
           ],
-          "why": "Photos every 2 weeks capture changes that are easy to miss."
+          "why": "35 squats per set takes real leg strength — you've built it."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Write down what's improved most since day 1.",
-            "Think about your biggest improvement and note it.",
-            "What's easiest now that was hardest at the start? Write it down."
+            "Glute bridges with pause. Do 3 sets of 20 — hold 2 seconds at the top.",
+            "Slow bridges. 20 reps per set, hold the top each time — 3 sets.",
+            "Bridges today. 3 sets of 20 glute bridges — squeeze and hold at the top."
           ],
-          "why": "Recognizing improvement fuels motivation to keep going."
+          "why": "The pause makes every rep harder and the gains faster."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Set one goal for the final month.",
-            "Write what you want to be able to do by day 90.",
-            "Pick one specific goal for the next 34 days."
+            "Log everything. Record all sets in your workout app.",
+            "Track the session. Save today's full leg day in Hevy or Strong.",
+            "Record it all. Log squats, lunges, wall sit, and glute bridges."
           ],
-          "why": "A clear target for the final month gives your training direction."
+          "why": "Week-8 logs are worth saving to compare against the end."
         }
       ]
     },
     {
       "day": 57,
-      "minutes_total": 5,
-      "tasks": [
-        {
-          "position": 1,
-          "minutes": 3,
-          "variants": [
-            "Full workout with 4 sets of every exercise.",
-            "Do 4 rounds of your complete circuit today.",
-            "Go through your whole routine 4 times — no skipping."
-          ],
-          "why": "The final month starts with a strong 4-set day."
-        },
-        {
-          "position": 2,
-          "minutes": 1,
-          "variants": [
-            "Eat a full protein-rich meal within an hour of your workout.",
-            "Have a real protein meal right after your session — not just a snack.",
-            "Finish your workout and eat chicken, eggs, or fish within an hour."
-          ],
-          "why": "Real food after lifting gives your muscles more to work with."
-        },
-        {
-          "position": 3,
-          "minutes": 1,
-          "variants": [
-            "Log your 4-set session.",
-            "Record the full workout — 4 rounds — in your app.",
-            "Add today's big session to your tracker."
-          ],
-          "why": "Day 57 kicks off the final push — worth logging well."
-        }
-      ]
-    },
-    {
-      "day": 58,
-      "minutes_total": 3,
-      "tasks": [
-        {
-          "position": 1,
-          "minutes": 1,
-          "variants": [
-            "Rest. Stretch every major muscle group for 5 minutes.",
-            "Take today off and do a full-body stretch.",
-            "Rest day — sit on the floor and stretch from head to toe."
-          ],
-          "why": "A full-body stretch at this stage helps prevent soreness and injury."
-        },
-        {
-          "position": 2,
-          "minutes": 1,
-          "variants": [
-            "Drink plenty of water today.",
-            "Stay hydrated — make water your main drink today.",
-            "Drink 8 glasses of water on your rest day."
-          ],
-          "why": "Hydration on rest days speeds up recovery for the next session."
-        },
-        {
-          "position": 3,
-          "minutes": 1,
-          "variants": [
-            "Plan your workout days for the rest of the week.",
-            "Schedule your 3 workouts for the coming week.",
-            "Set your workout reminders for the next 7 days."
-          ],
-          "why": "Planning now means you won't have to decide later."
-        }
-      ]
-    },
-    {
-      "day": 59,
-      "minutes_total": 5,
-      "tasks": [
-        {
-          "position": 1,
-          "minutes": 3,
-          "variants": [
-            "Full circuit — give every set your full effort.",
-            "Do your complete routine with maximum focus.",
-            "Run all your exercises — make every rep count."
-          ],
-          "why": "Month 3 is where the biggest visible changes happen — stay sharp."
-        },
-        {
-          "position": 2,
-          "minutes": 1,
-          "variants": [
-            "Add slow reps on your last set of pushups.",
-            "Do your last pushup set very slowly — 3 seconds down, 3 up.",
-            "Slow motion on your final set — make it burn."
-          ],
-          "why": "Slow reps on your last set squeeze out extra muscle work."
-        },
-        {
-          "position": 3,
-          "minutes": 1,
-          "variants": [
-            "Log your workout.",
-            "Record your session in the app.",
-            "Add all your sets to your tracker."
-          ],
-          "why": "Keep your logging streak going."
-        }
-      ]
-    },
-    {
-      "day": 60,
       "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Do your max pushups — go all out.",
-            "Find your 60-day pushup max — push until failure.",
-            "Max reps on pushups — count carefully."
+            "Rest and stretch. Do 5 minutes of full-body stretching on the floor.",
+            "Recovery stretch. Spend 5 minutes on legs, chest, and back.",
+            "Stretch day. Lie on the floor and work through each muscle group."
           ],
-          "why": "A max test at 60 days shows real progress."
+          "why": "At 8 weeks, consistent stretching is what keeps you injury-free."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Compare your number to day 1, day 30, and day 45.",
-            "Line up your max reps from each check-in.",
-            "Write your 60-day max next to your earlier numbers."
+            "Drink water. Finish a full water bottle before dinner.",
+            "Hydrate today. Have 3 large glasses of water.",
+            "Water check. Fill a bottle and drink it in the next 2 hours."
           ],
-          "why": "Seeing growth across 3 milestones is very motivating."
+          "why": "Hydration is simple — don't let it slip this late in the game."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Celebrate being 2/3 of the way to your goal.",
-            "You're 60 days in — write one thing you're proud of.",
-            "Take a moment to appreciate 60 days of consistent effort."
+            "Protein today. Have a chicken breast or eggs with your biggest meal.",
+            "Eat protein. Add a protein source to lunch and dinner today.",
+            "Fuel recovery. Have Greek yogurt or a shake today."
           ],
-          "why": "60 days of showing up is a real achievement."
+          "why": "Protein every day keeps your body in muscle-building mode."
+        }
+      ]
+    },
+    {
+      "day": 58,
+      "minutes_total": 5,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 3,
+          "variants": [
+            "Full body session. 3 sets: 22 pushups, 35 squats, 15 dips, 20 lunges per leg.",
+            "Big workout. 3 rounds: 22 pushups, 35 squats, 15 dips, 20 lunges each side.",
+            "Hit everything. 3 sets each: pushups, squats, dips, lunges — most reps yet."
+          ],
+          "why": "The numbers you're hitting now would have been impossible on day 1."
+        },
+        {
+          "position": 2,
+          "minutes": 1,
+          "variants": [
+            "Hold a plank. Do an 85-second plank hold.",
+            "Plank today. Hold for 85 seconds — 5 more than last time.",
+            "Core push. Get on the floor and hold the plank for 85 seconds."
+          ],
+          "why": "Each new plank record proves your core is getting stronger."
+        },
+        {
+          "position": 3,
+          "minutes": 1,
+          "variants": [
+            "Log and reflect. Save the session and note what surprised you.",
+            "Track the wins. Log everything and mark any personal bests.",
+            "Record it all. Log today's full session and add a short note."
+          ],
+          "why": "Noting progress at week 8 keeps you motivated through week 13."
+        }
+      ]
+    },
+    {
+      "day": 59,
+      "minutes_total": 4,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 1,
+          "variants": [
+            "Check your streak. How many weeks in a row did you hit 3 workouts?",
+            "Streak count. Open your app and count how many consecutive workout weeks you've done.",
+            "Consistency check. Look at your log and count your unbroken weeks."
+          ],
+          "why": "A streak is your most powerful motivator — protect it."
+        },
+        {
+          "position": 2,
+          "minutes": 2,
+          "variants": [
+            "Walk outside. Get 10 minutes of easy movement.",
+            "Active rest. Take a calm 10-minute walk today.",
+            "Move easy. Go for a 10-minute walk at a relaxed pace."
+          ],
+          "why": "Light movement on rest days is a habit that keeps you consistent."
+        },
+        {
+          "position": 3,
+          "minutes": 1,
+          "variants": [
+            "Plan next week. Write your 3 workout days and set alarms.",
+            "Schedule it. Pick your 3 workout days and put them in your calendar.",
+            "Set up the week. Choose your workout days and add phone reminders."
+          ],
+          "why": "Planning every week keeps the habit from breaking."
+        }
+      ]
+    },
+    {
+      "day": 60,
+      "minutes_total": 5,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 1,
+          "variants": [
+            "Two-thirds check. Weigh yourself and compare to day 1, 14, and 42.",
+            "60-day weight. Step on the scale and log the number.",
+            "Track progress. Weigh yourself and save it next to your earlier check-ins."
+          ],
+          "why": "60 days of data shows a clear, undeniable trend."
+        },
+        {
+          "position": 2,
+          "minutes": 1,
+          "variants": [
+            "Take a progress photo. Front-facing. Compare to day 1, 14, and 42.",
+            "60-day photo. Snap a front photo and line it up with earlier shots.",
+            "Snapshot check. Take a photo now and save it next to your other check-ins."
+          ],
+          "why": "Two months of training almost always shows visible change."
+        },
+        {
+          "position": 3,
+          "minutes": 3,
+          "variants": [
+            "Celebrate day 60. Do your best full-body session yet.",
+            "Mark the milestone. Hit all your exercises with max effort today.",
+            "Day 60 session. Do everything — pushups, squats, dips, lunges — 3 strong sets."
+          ],
+          "why": "60 days is worth celebrating with a session that shows what you're made of."
         }
       ]
     },
@@ -2176,31 +2176,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full circuit — all moves, 4 sets, best effort.",
-            "Run your whole routine 4 times today.",
-            "Do every exercise in your plan for 4 sets."
+            "Upper body push. 3 sets: 22 pushups, 15 pike pushups, 18 dips.",
+            "Push session. 3 rounds: 22 pushups, 15 pike pushups, 18 chair dips.",
+            "Chest and shoulders. 3 sets each: pushups, pike pushups, and dips — more dips."
           ],
-          "why": "The final 30 days start now — make them count."
+          "why": "The final 30 days start with more reps — push your previous best."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Eat 3 protein-rich meals today.",
-            "Make protein a part of every meal today.",
-            "Have eggs, chicken, or beans at breakfast, lunch, and dinner."
+            "Hold a plank. Get on the floor and hold for 90 seconds.",
+            "90-second plank. Hold the plank position for a full 90 seconds.",
+            "Core milestone. Do a 90-second plank hold today."
           ],
-          "why": "Consistent protein over the final month is what builds muscle you can see."
+          "why": "90 seconds is a real core strength milestone."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log today's workout.",
-            "Record your day 61 session.",
-            "Add your sets to the tracker."
+            "Log it. Save all sets in your workout app.",
+            "Track the session. Record today's pushups, pike pushups, dips, and plank.",
+            "Record it. Open Hevy or Strong and log your full workout."
           ],
-          "why": "Day 61 is the start of your strongest month."
+          "why": "The final phase logs are the most satisfying to look back on."
         }
       ]
     },
@@ -2212,31 +2212,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Think about adding a new challenge — can you do a pullup?",
-            "Try hanging from a bar or doorframe pullup bar today.",
-            "If you have a pullup bar, try 1 pullup or just hang for 10 seconds."
+            "Walk outside. Take an easy 10-minute walk.",
+            "Active rest. Go for a calm 10-minute walk today.",
+            "Move gently. Get outside for 10 minutes."
           ],
-          "why": "Pullups are one of the best upper-body moves — even attempting one builds strength."
+          "why": "Walking on rest days is a habit that sticks through to the finish."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do 30 pushups and 30 squats today.",
-            "Hit 30 reps of pushups and 30 reps of squats.",
-            "Go for 30 of each — pushups and squats."
+            "Protein today. Have chicken, eggs, or Greek yogurt.",
+            "Keep eating protein. Add a protein source to every meal today.",
+            "Fuel the muscles. Have a shake, eggs, or cottage cheese today."
           ],
-          "why": "30 reps of each is a solid checkpoint for where you are now."
+          "why": "Consistent protein every day is what separates month 3 from month 1."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your 30-rep sets and your pullup attempt.",
-            "Record your 30s and note your pullup try.",
-            "Add your session to the tracker."
+            "Check your app. Look at your last 10 sessions and notice your progress.",
+            "Review the log. Open Hevy or Strong and scan the past 10 workouts.",
+            "Spot the gains. Scroll your workout history and find the exercises that grew most."
           ],
-          "why": "Logging your first pullup attempt is the beginning of a new milestone."
+          "why": "Seeing 10 sessions of growth makes the last 30 days feel exciting."
         }
       ]
     },
@@ -2248,67 +2248,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full workout — push for your best reps on every exercise.",
-            "Do your complete circuit — aim to beat your last session.",
-            "Go for your best numbers today on all exercises."
+            "Leg day. 3 sets: 35 squats, 20 lunges per leg, 65-second wall sit.",
+            "Lower body push. 3 rounds: 35 squats, 20 lunges each side, 65-second wall sit.",
+            "Legs today. 35 squats, 20 lunges per leg, wall sit — 3 sets."
           ],
-          "why": "The last month is when you push harder to finish strong."
+          "why": "Strong legs are the foundation of everything else — keep building them."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Hold a 2-minute plank — break it into 2 holds of 60 sec if needed.",
-            "Try for 2 total minutes of plank — split it if needed.",
-            "Two minutes of plank today — you can split it into two 1-minute holds."
+            "Glute bridges with pause. Do 3 sets of 25 — hold 2 seconds at the top.",
+            "Slow bridges. 25 reps per set — squeeze at the top each time.",
+            "Bridges today. 3 sets of 25 glute bridges with a 2-second hold."
           ],
-          "why": "2 total minutes of plank is an advanced core target."
+          "why": "25 paused reps puts serious work into your glutes."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your full workout and your plank time.",
-            "Record your session and note your plank total.",
-            "Add all sets and plank seconds to your tracker."
+            "Log the session. Record all sets in your workout app.",
+            "Track it. Save today's full leg day in Hevy or Strong.",
+            "Record it all. Log squats, lunges, wall sit, and glute bridges."
           ],
-          "why": "A detailed log today captures your strength at week 9."
+          "why": "Logging week 9 leg day keeps your progress line moving up."
         }
       ]
     },
     {
       "day": 64,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Rest. Light stretch — focus on shoulders.",
-            "Take today off and stretch your shoulders and arms.",
-            "Rest day — spend a few minutes on shoulder and chest stretches."
+            "Weigh in. Step on the scale and log the number.",
+            "Weekly weight. Weigh yourself and compare to earlier weeks.",
+            "Track it. Step on the scale and save today's number."
           ],
-          "why": "Shoulder stretches prevent tightness from lots of pushups."
+          "why": "Week 9 weight shows you how your body is changing in the final phase."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Eat well today — protein with every meal.",
-            "Keep up your protein intake on rest day.",
-            "Have a protein-focused meal today — don't take the day off from eating well."
+            "Rest and stretch. Do 5 minutes of full-body stretching.",
+            "Recovery stretch. Spend 5 minutes on your legs, back, and chest.",
+            "Floor stretch. Stretch each muscle group for about a minute."
           ],
-          "why": "Consistent nutrition even on rest days drives results."
+          "why": "Nine weeks of training means your muscles need consistent care."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Plan your workouts for the week.",
-            "Set 3 workout reminders for next week.",
-            "Choose your workout days for the next 7 days."
+            "Drink water. Finish a full bottle before dinner.",
+            "Hydrate well. Have 3 big glasses of water today.",
+            "Water goal. Fill a bottle now and finish it in the next 2 hours."
           ],
-          "why": "Planning your week keeps your routine on track."
+          "why": "Hydration is easy to forget and hard to recover without."
         }
       ]
     },
@@ -2320,31 +2320,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full circuit — 4 sets, best effort, go hard.",
-            "Do your whole routine — 4 rounds — with everything you've got.",
-            "4 sets of all exercises today — treat it like your best workout."
+            "Full body session. 3 sets: 25 pushups, 35 squats, 18 dips, 20 lunges per leg.",
+            "Big workout. 3 rounds: 25 pushups, 35 squats, 18 dips, 20 lunges each side.",
+            "Hit everything. 3 sets each: 25 pushups, 35 squats, 18 dips, 20 lunges."
           ],
-          "why": "25 days left — this is the time to push."
+          "why": "25 pushups per set is a milestone — you've earned it."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do your slowest, most controlled set of pushups at the end.",
-            "Finish with one very slow, controlled set of pushups.",
-            "Last set: slow pushups — 3 seconds down, hold, 3 seconds up."
+            "Hold a plank. Get on the floor and hold for 90 seconds.",
+            "Plank hold. Hold for 90 seconds — match your personal best.",
+            "Core time. Do a 90-second plank hold today."
           ],
-          "why": "A slow finisher set targets muscle in a way fast reps don't."
+          "why": "Holding your best plank time builds the habit of hitting your ceiling."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the full workout.",
-            "Record all 4 sets in your tracker.",
-            "Add your day 65 session to the app."
+            "Log it all. Record every set and note any personal bests.",
+            "Track the session. Save the full workout in Hevy or Strong.",
+            "Record everything. Log all sets and mark any new records."
           ],
-          "why": "Every session logged this late in the game matters."
+          "why": "A 25-pushup session logged is a record to be proud of."
         }
       ]
     },
@@ -2356,31 +2356,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Cook a protein-heavy meal tonight for tomorrow.",
-            "Prep chicken, eggs, or beans for tomorrow's meals.",
-            "Make a quick high-protein dinner you can use for lunch tomorrow too."
+            "Walk and recover. Go outside for 10 minutes.",
+            "Active rest. Take a calm 10-minute walk.",
+            "Move easy. Get outside for 10 minutes of easy movement."
           ],
-          "why": "Meal prep makes eating well automatic."
+          "why": "Rest days matter more than ever in the final phase."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do a quick 15-pushup break today.",
-            "Take a midday break — 15 pushups.",
-            "Do 15 pushups right now before you forget."
+            "Eat more protein. Have chicken, eggs, or Greek yogurt today.",
+            "Protein focus. Make sure every meal today has a protein source.",
+            "Fuel the finish. Have a shake or cottage cheese as a snack."
           ],
-          "why": "Extra reps between workouts add up over a week."
+          "why": "Final-phase nutrition is what determines how you look and feel at day 90."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your pushups.",
-            "Add today's quick set to your tracker.",
-            "Record your 15 pushups in the app."
+            "Sleep tonight. Get to bed 30 minutes early.",
+            "Prioritize rest. Set a bedtime alarm 30 minutes before usual.",
+            "Recover well. Aim for 8 hours tonight — set a reminder."
           ],
-          "why": "Every set is worth tracking."
+          "why": "The last push takes more from your body — protect your sleep."
         }
       ]
     },
@@ -2392,67 +2392,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full workout — focus on your best form, not just more reps.",
-            "Do your full circuit with perfect form on every rep.",
-            "Quality over quantity today — every rep done cleanly."
+            "Upper body push. 3 sets: 25 pushups, 18 pike pushups, 18 dips.",
+            "Push session. 3 rounds: 25 pushups, 18 pike pushups, 18 chair dips.",
+            "Chest and shoulders. 3 sets each: 25 pushups, 18 pike pushups, 18 dips."
           ],
-          "why": "Good form at this stage locks in gains that last."
+          "why": "18 pike pushups per set means your shoulders are significantly stronger."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Try 2 pullups or more if you can.",
-            "Attempt 2-3 pullups today — or hang for 20 seconds.",
-            "See if you can do more pullups than your first attempt."
+            "Superman holds. Do 3 sets of 20 — hold each one for 2 seconds.",
+            "Back work with pause. 20 Superman raises per set, hold each at the top.",
+            "Slow Supermans. 3 sets of 20 — raise arms and legs and hold for 2 seconds."
           ],
-          "why": "Your pullup strength should be building — test it."
+          "why": "Holding each rep builds more back strength than quick reps."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your session and your pullup count.",
-            "Record your workout and your pullup reps.",
-            "Add your full session plus pullup attempt to the tracker."
+            "Log the session. Record all sets in your app.",
+            "Track it. Save pushups, pike pushups, dips, and Supermans in Hevy.",
+            "Record it. Log all sets and note your new pike pushup count."
           ],
-          "why": "Tracking pullup progress shows one of the hardest milestones building."
+          "why": "Tracking 18 pike pushups per set shows a real shoulder milestone."
         }
       ]
     },
     {
       "day": 68,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Rest. Do a 5-min stretch.",
-            "Take today off and do a light stretch.",
-            "Rest day — loosen up with a few gentle stretches."
+            "Rest and stretch. Do 5 minutes of full-body floor stretching.",
+            "Stretch day. Spend 5 minutes on legs, back, and chest.",
+            "Recovery stretch. Lie on the floor and work through each muscle group."
           ],
-          "why": "Rest days are part of the program — not optional."
+          "why": "Stretching this late in the program keeps injury off the table."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Drink plenty of water today.",
-            "Focus on hydration — aim for 8 glasses.",
-            "Drink a full glass of water right now."
+            "Log your weight. Step on the scale and record it.",
+            "Weekly weigh-in. Weigh yourself and compare to earlier weeks.",
+            "Track the number. Step on the scale and save today's weight."
           ],
-          "why": "Staying hydrated helps your muscles keep growing."
+          "why": "Tracking weekly keeps the trend visible."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Look at your log — how many sessions have you done?",
-            "Count your total workouts logged since day 1.",
-            "Open your app and look at the full history of sessions."
+            "Drink water. Finish a full water bottle today.",
+            "Hydrate. Have 3 big glasses of water before dinner.",
+            "Water check. Fill a bottle now and drink it before your next meal."
           ],
-          "why": "Seeing your total session count is powerful motivation."
+          "why": "Simple habits done daily are what make the difference at day 90."
         }
       ]
     },
@@ -2464,67 +2464,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full workout — 4 sets, maximum reps on the last set of each exercise.",
-            "Do your circuit and push to failure on the last set.",
-            "4 rounds — and the last set of every exercise, go all out."
+            "Leg day. 3 sets: 40 squats, 20 lunges per leg, 70-second wall sit.",
+            "Lower body push. 3 rounds: 40 squats, 20 lunges each side, 70-second wall sit.",
+            "Legs today. 40 squats, 20 lunges per leg, wall sit — 3 sets."
           ],
-          "why": "Max effort on the final set is how you break through plateaus."
+          "why": "40 squats per set is a genuine test of leg endurance."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Hold your longest plank yet — go past your record.",
-            "Try to beat your plank record today.",
-            "Plank until you can't — aim past your personal best."
+            "Glute bridges. Do 3 sets of 25 with a 3-second hold at the top.",
+            "Slow bridges. 25 reps per set — hold 3 seconds each rep.",
+            "Bridges with long pause. 3 sets of 25 — squeeze and hold for 3 seconds."
           ],
-          "why": "Your plank personal best is always worth chasing."
+          "why": "A 3-second hold means your glutes work harder on every single rep."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log everything — sets, reps, and plank time.",
-            "Record your max-effort session in full.",
-            "Add all your numbers to the tracker today."
+            "Log the session. Record all sets in your workout app.",
+            "Track it. Save today's full leg day in Hevy or Strong.",
+            "Record it. Log squats, lunges, wall sit, and glute bridges."
           ],
-          "why": "Max effort days deserve the most detailed logs."
+          "why": "The best leg day logs come in the final weeks."
         }
       ]
     },
     {
       "day": 70,
-      "minutes_total": 4,
+      "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
-          "minutes": 2,
+          "minutes": 1,
           "variants": [
-            "Weigh yourself for your day 70 check-in.",
-            "Step on the scale today.",
-            "Get your weight today and compare to your other numbers."
+            "10-week check. Count total workouts completed since day 1.",
+            "Audit your work. Open your app and count every session you've logged.",
+            "Total sessions. Look at your workout history and count from day 1."
           ],
-          "why": "Regular check-ins in the final stretch show your trend."
+          "why": "70 days in, your total session count is proof of real commitment."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Take a progress photo from your usual angle.",
-            "Snap a photo today — same angle as your others.",
-            "Get a day 70 photo to compare to day 56."
+            "Take a progress photo. Front-facing. Save it next to all your check-ins.",
+            "70-day photo. Take a front photo and compare to day 1, 42, and 60.",
+            "Photo check. Snap a front photo and put it next to your earlier shots."
           ],
-          "why": "Photos every 2 weeks show changes that are hard to feel."
+          "why": "Ten weeks of training always shows visible, measurable change."
         },
         {
           "position": 3,
-          "minutes": 1,
+          "minutes": 3,
           "variants": [
-            "Write down one thing that's noticeably better now vs. day 1.",
-            "Note the biggest physical change you've seen.",
-            "What can you do now that you couldn't do on day 1? Write it down."
+            "Celebrate day 70. Do a strong full-body session today.",
+            "Mark the milestone. Hit all your exercises with solid effort.",
+            "Day 70 workout. Do 3 sets each of pushups, squats, dips, and lunges."
           ],
-          "why": "Noting real changes keeps you pushing through the final weeks."
+          "why": "20 days from the finish — celebrate by training hard."
         }
       ]
     },
@@ -2536,67 +2536,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full workout — all exercises, 4 sets, strong effort.",
-            "Hit every move in your routine for 4 sets.",
-            "Do your complete circuit with 4 rounds today."
+            "Upper body push. 3 sets: 25 pushups, 20 pike pushups, 20 dips.",
+            "Push session. 3 rounds: 25 pushups, 20 pike pushups, 20 chair dips.",
+            "Chest and shoulders. 3 sets each: 25 pushups, 20 pike pushups, 20 dips."
           ],
-          "why": "20 days left — every workout counts more now."
+          "why": "20 pike pushups per set is a significant shoulder strength milestone."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do a 30-second stretch right after finishing.",
-            "Cool down immediately after your last set with a stretch.",
-            "Spend 30 seconds stretching before you sit down."
+            "Hold a plank. Do a 95-second plank hold.",
+            "Plank today. Hold for 95 seconds — 5 more than your record.",
+            "Core push. Get on the floor and hold the plank for 95 seconds."
           ],
-          "why": "Cooling down after intense sessions helps your muscles recover faster."
+          "why": "Inching toward 2 minutes means your core is strong."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your workout.",
-            "Record today's full session.",
-            "Add your 4 sets to the tracker."
+            "Log the session. Record all sets in your workout app.",
+            "Track it. Save pushups, pike pushups, dips, and plank in Hevy.",
+            "Record it. Log all sets and note your new plank time."
           ],
-          "why": "20 days to go — keep your log going strong."
+          "why": "Logging 20 pike pushups and a 95-second plank is worth saving."
         }
       ]
     },
     {
       "day": 72,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Rest day. Stretch and rest — no workout needed.",
-            "Take today completely off.",
-            "Rest — your body is doing the real work today while you recover."
+            "Walk outside. Take an easy 10-minute walk.",
+            "Active rest. Go for a 10-minute easy walk today.",
+            "Move gently. Get outside for 10 minutes."
           ],
-          "why": "This close to the end, rest days are critical for max results."
+          "why": "Easy movement every rest day keeps recovery quality high."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Eat plenty of protein today — this is when your muscles rebuild.",
-            "Fuel your rest day with good protein — eggs, chicken, or fish.",
-            "Don't skip nutrition on rest day — your muscles are growing now."
+            "Protein today. Have chicken, eggs, or Greek yogurt.",
+            "Keep eating protein. Add protein to every meal today.",
+            "Fuel the finish. Have a shake, eggs, or cottage cheese today."
           ],
-          "why": "Muscles grow on rest days, but only if you feed them."
+          "why": "Three weeks to go — nutrition still matters as much as training."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Think about your day 90 goals — are you on track?",
-            "Review where you are vs. your day 56 goal.",
-            "Check in with yourself: will you hit your day 90 target?"
+            "Review your log. Look at your last 5 sessions and find what got better.",
+            "Check your progress. Open Hevy or Strong and scan your recent workouts.",
+            "Spot the gains. Scroll your history and note one thing that improved."
           ],
-          "why": "Checking in with your goal keeps you accountable."
+          "why": "Seeing recent progress in week 10 keeps you strong through week 13."
         }
       ]
     },
@@ -2608,31 +2608,31 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full circuit — try to hit new personal records on any exercise.",
-            "Today's goal: beat your best reps on at least one exercise.",
-            "Full workout — can you set any personal records today?"
+            "Leg day. 3 sets: 40 squats, 25 lunges per leg, 70-second wall sit.",
+            "Lower body push. 3 rounds: 40 squats, 25 lunges each side, 70-second wall sit.",
+            "Legs today. 40 squats, 25 lunges per leg, wall sit — 3 sets."
           ],
-          "why": "Personal records in the final stretch prove your program worked."
+          "why": "25 lunges per leg builds real single-leg strength."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Attempt your max pushups and compare to all previous tests.",
-            "Max pushup test — go all out.",
-            "Do as many pushups as you can and write the number down."
+            "Glute bridges. 3 sets of 25 — hold 3 seconds at the top.",
+            "Slow bridges. 25 reps per set with a 3-second squeeze at the top.",
+            "Bridges today. 3 sets of 25 glute bridges — hold each rep at the top."
           ],
-          "why": "A max test this close to day 90 shows exactly where you stand."
+          "why": "Your glutes are one of your strongest muscles now — keep building."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your max and compare to day 60.",
-            "Record your pushup max and check it vs. your 60-day number.",
-            "Write your 73-day max next to your other milestones."
+            "Log everything. Record all sets in your workout app.",
+            "Track the session. Save today's leg day in Hevy or Strong.",
+            "Record it all. Log squats, lunges, wall sit, and bridges."
           ],
-          "why": "More reps than day 60 means you're still improving in the home stretch."
+          "why": "Week 11 leg day logs show how much your endurance has grown."
         }
       ]
     },
@@ -2642,33 +2642,33 @@
       "tasks": [
         {
           "position": 1,
-          "minutes": 2,
+          "minutes": 1,
           "variants": [
-            "Cook a simple high-protein meal — something that fuels your last workouts.",
-            "Make a solid protein meal to fuel the last stretch.",
-            "Prep something high in protein for today and tomorrow."
+            "Weigh in. Step on the scale and log the number.",
+            "Weekly weight. Weigh yourself and compare to earlier weeks.",
+            "Track it. Step on the scale and save today's weight."
           ],
-          "why": "Good food in the final 2 weeks maximizes what you've built."
+          "why": "Week 11 weight is where the most visible changes show up."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Do 20 pushups and 20 squats as a midday mini-workout.",
-            "Quick midday session — 20 pushups and 20 squats.",
-            "Take a break and do 20 of each — pushups and squats."
+            "Rest and stretch. Do 5 minutes of full-body stretching.",
+            "Stretch day. Spend 5 minutes on legs, chest, and back.",
+            "Floor stretch. Lie down and stretch each muscle group for a minute."
           ],
-          "why": "Bonus reps between workouts add up by day 90."
+          "why": "Stretching every rest day keeps you ready and injury-free."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your mini-workout.",
-            "Add your midday pushups and squats to your tracker.",
-            "Record the 20+20 in your app."
+            "Protein today. Have protein with every meal.",
+            "Track protein. Make sure breakfast, lunch, and dinner have protein.",
+            "Eat protein. Add chicken, eggs, or dairy to every meal today."
           ],
-          "why": "Every set counts — even the quick ones."
+          "why": "Consistent protein this close to the finish line still makes a difference."
         }
       ]
     },
@@ -2680,355 +2680,355 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full circuit — best effort on every single set.",
-            "Go all out today — maximum reps on every exercise.",
-            "Your best workout yet: full circuit, max effort."
+            "Full body session. 3 sets: 25 pushups, 40 squats, 20 dips, 25 lunges per leg.",
+            "Big workout. 3 rounds: 25 pushups, 40 squats, 20 dips, 25 lunges each side.",
+            "Hit everything. 3 sets each: 25 pushups, 40 squats, 20 dips, 25 lunges."
           ],
-          "why": "Day 75 is the launch into your final 2 weeks — make it your best."
+          "why": "Three-quarters done — this session shows how far you've come."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Hold your longest plank ever.",
-            "Push your plank past your current record — go as long as you can.",
-            "Try for a plank record today — beat your personal best."
+            "Hold a plank. Do a 100-second plank hold.",
+            "100-second plank. Get on the floor and hold for a full 100 seconds.",
+            "Core milestone. Hold a plank for 100 seconds today."
           ],
-          "why": "A new plank record at day 75 shows your core has transformed."
+          "why": "100 seconds is a serious core achievement — earn it."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the full session with all your best numbers.",
-            "Record your day 75 workout in detail — reps, sets, plank time.",
-            "Add your best performance to your tracker."
+            "Log and celebrate. Record the full session and note the plank milestone.",
+            "Track the win. Save today's workout and mark the 100-second plank.",
+            "Record it all. Log every set and write that you hit 100 seconds."
           ],
-          "why": "Day 75 is worth a complete, detailed log."
+          "why": "A 100-second plank log is worth saving forever."
         }
       ]
     },
     {
       "day": 76,
-      "minutes_total": 3,
+      "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Rest day. Walk 10 minutes.",
-            "Take today off — just get outside for a quick walk.",
-            "Active rest: a calm 10-minute walk is perfect."
+            "Take a progress photo. Front-facing. Compare to day 1, 42, and 70.",
+            "Final-phase photo. Snap a front photo and line it up with earlier shots.",
+            "Photo check. Take a photo now and save it next to your day-1 shot."
           ],
-          "why": "A light walk keeps blood moving and muscles recovering."
+          "why": "The last 15 days of photos will show your biggest visible changes."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 3,
           "variants": [
-            "Eat 3 protein-rich meals today.",
-            "Protein at every meal — even on rest days.",
-            "Have protein at breakfast, lunch, and dinner today."
+            "Upper body push. 3 sets: 28 pushups, 20 pike pushups, 20 dips.",
+            "Push session. 3 rounds: 28 pushups, 20 pike pushups, 20 chair dips.",
+            "Chest and shoulders. 3 sets each: 28 pushups, 20 pike pushups, 20 dips."
           ],
-          "why": "These final rest days matter — feed your muscles well."
+          "why": "28 pushups per set is elite — push for it in the final phase."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write down what you want to achieve in the final 14 days.",
-            "Set your last 2-week goal — specific and measurable.",
-            "What do you want to accomplish between now and day 90?"
+            "Log it. Record all sets and note how it felt.",
+            "Track the session. Save your full workout in Hevy or Strong.",
+            "Record it. Log today's pushups, pike pushups, and dips."
           ],
-          "why": "A specific goal for the final stretch keeps you focused."
+          "why": "The final-phase logs are the ones you'll look back on most."
         }
       ]
     },
     {
       "day": 77,
-      "minutes_total": 5,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
-          "minutes": 3,
+          "minutes": 2,
           "variants": [
-            "Full circuit — 4 sets, strong effort.",
-            "Do your whole routine 4 times today.",
-            "Every exercise, 4 sets — no shortcuts in the final stretch."
+            "Walk outside. Take a 10-minute easy walk.",
+            "Active rest. Go for a calm 10-minute walk today.",
+            "Move easy. Get outside for 10 minutes."
           ],
-          "why": "Final 2 weeks: full effort on every session."
+          "why": "Easy movement in week 12 helps your body peak for the final push."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Try your pullup max — how many can you do now?",
-            "Test your pullups today — see how many you can get.",
-            "Max pullup attempt — go for it."
+            "Protein today. Have chicken, eggs, or Greek yogurt.",
+            "Keep eating protein. Add protein to every meal today.",
+            "Fuel the finish. Have a shake, eggs, or cottage cheese."
           ],
-          "why": "Pullup progress in the final stretch shows how your whole upper body improved."
+          "why": "13 days from the end — nutrition is your final lever."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your workout and pullup count.",
-            "Record your session and your pullup reps.",
-            "Add your full session to the tracker."
+            "Sleep tonight. Get 8 hours — set a bedtime alarm.",
+            "Prioritize rest. Go to bed 30 minutes earlier than usual.",
+            "Recover tonight. Set a reminder to be in bed by a set time."
           ],
-          "why": "Logging your pullup progress this late is meaningful."
+          "why": "Sleep quality in the final weeks determines how you feel at day 90."
         }
       ]
     },
     {
       "day": 78,
-      "minutes_total": 4,
+      "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
-          "minutes": 2,
+          "minutes": 3,
           "variants": [
-            "Take a progress photo — one of your last few before day 90.",
-            "Snap a day 78 photo from your usual angle.",
-            "Get a photo now, 12 days before the end."
+            "Leg day. 3 sets: 40 squats, 25 lunges per leg, 75-second wall sit.",
+            "Lower body push. 3 rounds: 40 squats, 25 lunges each side, 75-second wall sit.",
+            "Legs today. 40 squats, 25 lunges per leg, long wall sit — 3 sets."
           ],
-          "why": "Photos every week in the final stretch capture the full transformation."
+          "why": "A 75-second wall sit is a genuine test of leg strength."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Compare your day 78 photo to your day 1 photo.",
-            "Put your starting photo and today's photo side by side.",
-            "Look at day 1 and day 78 — the change is real."
+            "Glute bridges. 3 sets of 30 — hold 2 seconds at the top.",
+            "More bridges. 30 reps per set — squeeze at the top each time.",
+            "Bridges today. 3 sets of 30 glute bridges with a 2-second hold."
           ],
-          "why": "Seeing the real change keeps your energy high for the final days."
+          "why": "30 glute bridges per set is a strong finish for your lower body."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write down what you see that's different.",
-            "Note 2 physical changes you can see in your photos.",
-            "Describe in one sentence what's visibly different."
+            "Log the session. Record all sets in your workout app.",
+            "Track it. Save today's leg day in Hevy or Strong.",
+            "Record everything. Log squats, lunges, wall sit, and bridges."
           ],
-          "why": "Putting it in words makes the progress feel real."
+          "why": "Week 12 leg day is one of the strongest you've ever done."
         }
       ]
     },
     {
       "day": 79,
-      "minutes_total": 5,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
-          "minutes": 3,
+          "minutes": 1,
           "variants": [
-            "Full workout — all exercises, 4 sets, push hard.",
-            "Complete your full routine with 4 sets.",
-            "Do every exercise 4 times — this is a final-stretch workout."
+            "Weigh in. Step on the scale and log the number.",
+            "Final-phase weight. Weigh yourself and save it.",
+            "Track it. Step on the scale and record today's number."
           ],
-          "why": "10 days left — every session builds on what you've earned."
+          "why": "Week 12 weight shows the full trend from day 1."
         },
         {
           "position": 2,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Do a max set of squats at the end.",
-            "Go for max reps on squats — all out.",
-            "Max out on squats as your finisher today."
+            "Rest and stretch. Do 5 minutes of full-body stretching.",
+            "Stretch day. Spend 5 minutes on legs, chest, and back.",
+            "Floor stretch. Lie on the floor and stretch each muscle group."
           ],
-          "why": "A squat max test shows your lower body strength gain."
+          "why": "Stretching at week 12 keeps you fresh for the final sessions."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your full workout and your squat max.",
-            "Record all your sets and your max squat reps.",
-            "Add your day 79 session to the tracker."
+            "Drink water. Finish a full bottle today.",
+            "Hydrate well. Have 3 big glasses of water.",
+            "Water check. Fill a bottle and drink it before lunch."
           ],
-          "why": "Detailed logs in the final days are the record of your transformation."
+          "why": "Simple habits done daily are what define this final phase."
         }
       ]
     },
     {
       "day": 80,
-      "minutes_total": 3,
-      "tasks": [
-        {
-          "position": 1,
-          "minutes": 1,
-          "variants": [
-            "Rest. Stretch well today.",
-            "Take today off — full rest and a good stretch.",
-            "Rest day — prioritize sleep tonight too."
-          ],
-          "why": "Rest now so you can finish the final 10 days strong."
-        },
-        {
-          "position": 2,
-          "minutes": 1,
-          "variants": [
-            "Eat a big protein-rich meal today.",
-            "Have your best protein meal of the week today.",
-            "Make today's nutrition excellent — protein with every meal."
-          ],
-          "why": "Great nutrition on rest days powers your last workouts."
-        },
-        {
-          "position": 3,
-          "minutes": 1,
-          "variants": [
-            "Plan your last 10 workout days.",
-            "Schedule your final 3 workouts and set reminders.",
-            "Map out your last 10 days — every workout day on the calendar."
-          ],
-          "why": "A plan for the home stretch means you finish what you started."
-        }
-      ]
-    },
-    {
-      "day": 81,
       "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full circuit — 4 sets, every exercise, strong effort.",
-            "All exercises, 4 rounds — bring your best.",
-            "Go hard today: full circuit, 4 sets, max effort."
+            "Full body session. 3 sets: 28 pushups, 40 squats, 20 dips, 25 lunges per leg.",
+            "Big workout. 3 rounds: 28 pushups, 40 squats, 20 dips, 25 lunges each side.",
+            "Hit everything. 3 sets each: 28 pushups, 40 squats, 20 dips, 25 lunges."
           ],
-          "why": "9 days left — your best work is happening right now."
+          "why": "10 days from the finish — leave it all in the session."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Hold your longest plank of the journey.",
-            "Go for a new plank record today.",
-            "Push your plank to the absolute max — this close to the end."
+            "Hold a plank. Do a 100-second plank hold.",
+            "Plank hold. Get on the floor and hold for 100 seconds.",
+            "Core session. Hold a 100-second plank today."
           ],
-          "why": "A new plank record with 9 days left proves everything worked."
+          "why": "Holding your record plank in the final weeks cements the strength."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your full workout and plank time.",
-            "Record your session and your plank best.",
-            "Add every detail to your tracker today."
+            "Log it all. Record every set and note how you feel.",
+            "Track the session. Save the full workout in Hevy or Strong.",
+            "Record everything. Log all sets and add a short note."
           ],
-          "why": "These are your final strong sessions — document them well."
+          "why": "The final-10-days logs are the most satisfying of the whole program."
         }
       ]
     },
     {
-      "day": 82,
+      "day": 81,
       "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Eat extra protein today — one more meal than usual.",
-            "Add an extra protein snack today on top of your regular meals.",
-            "Have a 4th protein portion today — shake, eggs, or cottage cheese."
+            "Walk outside. Take a 10-minute easy walk.",
+            "Active rest. Go for a calm 10-minute walk.",
+            "Move easy. Get outside for 10 minutes."
           ],
-          "why": "Extra protein in the final stretch maximizes what you've built."
+          "why": "Nine days from the finish — rest days are still part of the plan."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do a quick 20-pushup break.",
-            "20 pushups right now — midday boost.",
-            "Take a break and crank out 20 pushups."
+            "Protein today. Have chicken, eggs, or Greek yogurt.",
+            "Keep eating protein. Add protein to every meal today.",
+            "Fuel the final stretch. Have a shake or cottage cheese today."
           ],
-          "why": "Bonus reps stack up to real gains by day 90."
+          "why": "Protein every day through to day 90 locks in your results."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log the pushups.",
-            "Add your 20 pushups to your tracker.",
-            "Record your midday set in the app."
+            "Take a progress photo. Front-facing. Compare to earlier check-ins.",
+            "Photo check. Snap a front photo and save it next to your other shots.",
+            "Final-phase snapshot. Take a photo now and compare to day 1."
           ],
-          "why": "Every set in the final days is worth recording."
+          "why": "Photos in the final 10 days capture the peak of your progress."
         }
       ]
     },
     {
-      "day": 83,
+      "day": 82,
       "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full workout — all exercises, 4 sets, go for personal records.",
-            "Try to set new records on every exercise today.",
-            "Full circuit — push every set past your previous best."
+            "Upper body push. 3 sets: 30 pushups, 20 pike pushups, 22 dips.",
+            "Push session. 3 rounds: 30 pushups, 20 pike pushups, 22 chair dips.",
+            "Chest and shoulders. 3 sets each: 30 pushups, 20 pike pushups, 22 dips."
           ],
-          "why": "With 1 week left, it's time to find out what you've built."
+          "why": "30 pushups per set is the final target — reach for it today."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Max pullups — how many now?",
-            "Try pullups again — give it everything.",
-            "Full pullup attempt — all reps you can manage."
+            "Superman holds. 3 sets of 20 — hold each for 3 seconds.",
+            "Back work. 20 slow Supermans per set, hold 3 seconds at the top.",
+            "Slow Supermans. 3 sets of 20 — raise, hold 3 seconds, lower."
           ],
-          "why": "Your pullup max near day 90 is a real strength statement."
+          "why": "Controlled reps with holds build the strongest back muscles."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log everything — especially your personal records.",
-            "Record your best reps for every exercise today.",
-            "Document your records in the app."
+            "Log it. Record all sets and note any 30-pushup sets.",
+            "Track the session. Save pushups, pike pushups, dips, and Supermans.",
+            "Record it. Log today's full upper body session in your app."
           ],
-          "why": "Personal records near day 90 deserve to be in your log."
+          "why": "A 30-pushup set is a milestone to record and remember."
+        }
+      ]
+    },
+    {
+      "day": 83,
+      "minutes_total": 4,
+      "tasks": [
+        {
+          "position": 1,
+          "minutes": 2,
+          "variants": [
+            "Rest and stretch. Do 5 minutes of full-body stretching.",
+            "Stretch day. Spend 5 minutes on legs, back, and chest.",
+            "Floor stretch. Work through each major muscle group for a minute."
+          ],
+          "why": "Seven days from the end — stay healthy to finish strong."
+        },
+        {
+          "position": 2,
+          "minutes": 1,
+          "variants": [
+            "Log your weight. Step on the scale and record it.",
+            "Final-phase weigh-in. Weigh yourself and compare to day 1.",
+            "Track it. Step on the scale and save the number."
+          ],
+          "why": "One more weight check before the final week."
+        },
+        {
+          "position": 3,
+          "minutes": 1,
+          "variants": [
+            "Eat more protein. Have chicken or eggs with your biggest meal.",
+            "Protein focus. Have protein at every meal today.",
+            "Fuel the finish. Have a shake, eggs, or cottage cheese today."
+          ],
+          "why": "Protein in the final week helps your muscles show their best."
         }
       ]
     },
     {
       "day": 84,
-      "minutes_total": 3,
+      "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
-          "minutes": 1,
+          "minutes": 3,
           "variants": [
-            "Rest day. Stretch and relax.",
-            "Take today off — light stretch only.",
-            "Rest. Sleep well tonight."
+            "Leg day. 3 sets: 40 squats, 25 lunges per leg, 80-second wall sit.",
+            "Lower body push. 3 rounds: 40 squats, 25 lunges each side, 80-second wall sit.",
+            "Legs today. 40 squats, 25 lunges per leg, long wall sit — 3 sets."
           ],
-          "why": "Rest now so you finish the last 6 days at full strength."
+          "why": "An 80-second wall sit is one of the hardest things you can do with no equipment."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Drink plenty of water today.",
-            "Hydrate well on your rest day.",
-            "8 glasses of water today — keep it up."
+            "Glute bridges. 3 sets of 30 — hold 3 seconds at the top.",
+            "Final bridges. 30 reps with a 3-second squeeze — 3 sets.",
+            "Bridges today. 3 sets of 30 glute bridges — hold each at the top."
           ],
-          "why": "Hydration keeps recovery running smoothly in the home stretch."
+          "why": "30 paused bridges in week 12 shows how strong your glutes have become."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write down what you want to achieve in your final 6 workouts.",
-            "Set your last 6-day goal — be specific.",
-            "What do you want to accomplish before day 90?"
+            "Log the session. Record all sets in your workout app.",
+            "Track it. Save today's full leg day in Hevy or Strong.",
+            "Record it. Log squats, lunges, wall sit, and bridges."
           ],
-          "why": "A final-week target keeps your energy sharp."
+          "why": "Second-to-last week leg day — save this one."
         }
       ]
     },
@@ -3038,33 +3038,33 @@
       "tasks": [
         {
           "position": 1,
-          "minutes": 3,
+          "minutes": 1,
           "variants": [
-            "Full circuit — 4 sets, push hard, this is your second-to-last week.",
-            "All exercises, 4 rounds — strong effort in the home stretch.",
-            "Final 5 days of hard work: full circuit, 4 sets."
+            "Final-week prep. Write down your top 3 improvements since day 1.",
+            "Count your wins. Think of 3 things that are easier now than on day 1.",
+            "Reflect. Write down 3 things you can do now that you couldn't on day 1."
           ],
-          "why": "5 days left — give every session your best."
+          "why": "Going into the final week knowing your wins keeps your motivation sharp."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Hold your plank for 2 full minutes.",
-            "Try for 2 minutes on your plank — break it up if needed.",
-            "Two-minute plank goal: hold as long as you can."
+            "Take a progress photo. Front-facing. Compare to day 1.",
+            "Final-week photo. Snap a front photo and save it next to your day-1 shot.",
+            "Before-and-after. Take a front photo and line it up with day 1."
           ],
-          "why": "A 2-minute plank at day 85 shows what 85 days built."
+          "why": "One more photo this close to the end is worth taking."
         },
         {
           "position": 3,
-          "minutes": 1,
+          "minutes": 3,
           "variants": [
-            "Log your workout.",
-            "Record your session in the tracker.",
-            "Add your day 85 sets to the app."
+            "Full body session. 3 sets: 30 pushups, 40 squats, 22 dips, 25 lunges per leg.",
+            "Big workout. 3 rounds: 30 pushups, 40 squats, 22 dips, 25 lunges each side.",
+            "Final-week push. 3 sets each: pushups, squats, dips, lunges — your best numbers."
           ],
-          "why": "Day 85 logged — almost there."
+          "why": "Day 85 is the last full session before the final stretch — make it count."
         }
       ]
     },
@@ -3076,31 +3076,31 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Take a progress photo — 4 days before the end.",
-            "Snap a photo today so you have a near-final comparison.",
-            "Get a day 86 photo to use in your final comparison."
+            "Walk outside. Take an easy 10-minute walk.",
+            "Active rest. Go for a calm 10-minute walk.",
+            "Move easy. Get outside for 10 minutes."
           ],
-          "why": "A photo this close to day 90 sets up your final before-and-after."
+          "why": "Four days from the finish — rest as hard as you train."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Eat an extra protein meal today.",
-            "Add one more protein serving today.",
-            "Have a bonus protein meal — shake, eggs, or chicken."
+            "Protein today. Have chicken, eggs, or Greek yogurt.",
+            "Keep eating protein. Add protein to every meal.",
+            "Fuel the final days. Have a shake or cottage cheese today."
           ],
-          "why": "Extra nutrition in the final days helps you finish strong."
+          "why": "Protein every day through to day 90 is the final non-negotiable."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write one thing you'll keep doing after day 90.",
-            "What habit from this journey will you keep?",
-            "Pick one thing to continue after this program ends."
+            "Drink water. Finish a full bottle today.",
+            "Hydrate well. Have 3 big glasses of water.",
+            "Water goal. Fill a bottle and drink it today."
           ],
-          "why": "The best programs create habits that last past day 90."
+          "why": "Four days from the end — stay sharp with simple habits."
         }
       ]
     },
@@ -3112,67 +3112,67 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full workout — all exercises, 4 sets, your best effort of the whole program.",
-            "Make this one of your best workouts — all moves, all sets, everything.",
-            "Full circuit, 4 rounds, max effort — treat it like your final test."
+            "Upper body push. 3 sets: 30 pushups, 22 pike pushups, 22 dips.",
+            "Push session. 3 rounds: 30 pushups, 22 pike pushups, 22 chair dips.",
+            "Chest and shoulders. 3 sets each: 30 pushups, 22 pike pushups, 22 dips."
           ],
-          "why": "3 days from the end — make this one count."
+          "why": "Your second-to-last push session — hit your best numbers."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Do a pushup max set — your best total of the program.",
-            "Go for your all-time pushup max right now.",
-            "Max pushups — everything you've got."
+            "Hold a plank. Do a 105-second plank hold.",
+            "Plank near-final. Hold for 105 seconds — a new record.",
+            "Core push. Get on the floor and hold the plank for 105 seconds."
           ],
-          "why": "Your 87-day pushup max shows 87 days of building strength."
+          "why": "105 seconds shows how far your core has come from day 1."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log everything — this is a milestone workout.",
-            "Record your full day 87 session in detail.",
-            "Add your best numbers from today to the tracker."
+            "Log it. Record all sets in your workout app.",
+            "Track the session. Save pushups, pike pushups, dips, and plank.",
+            "Record it. Log today's full upper body session and note the plank."
           ],
-          "why": "Day 87 is a milestone — log it like one."
+          "why": "Three days from the finish — log it and feel proud."
         }
       ]
     },
     {
       "day": 88,
-      "minutes_total": 3,
+      "minutes_total": 4,
       "tasks": [
         {
           "position": 1,
-          "minutes": 1,
+          "minutes": 2,
           "variants": [
-            "Rest. Stretch your whole body for 10 minutes.",
-            "Take today off — a proper full-body stretch.",
-            "Rest day — be generous with your stretching today."
+            "Rest and stretch. Do a final 5-minute full-body stretch.",
+            "Final stretch day. Spend 5 minutes on chest, legs, and back.",
+            "Stretch it out. Lie on the floor and stretch everything for 5 minutes."
           ],
-          "why": "Rest before your final 2 workouts lets you finish at 100%."
+          "why": "Two days from the finish — arrive at day 90 feeling loose and ready."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Eat a big protein meal to fuel your last 2 workouts.",
-            "Fuel up today — protein-heavy meal for the final push.",
-            "Have your best protein meal of the week — 2 days left."
+            "Weigh in. Step on the scale and save the number.",
+            "Final weigh-in before the end. Record your weight today.",
+            "Track your weight. Step on the scale and log it."
           ],
-          "why": "Great fuel on rest day means great performance on workout day."
+          "why": "Your day-88 weight next to day-1 weight tells the whole story."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write down what day 90 will feel like when you finish.",
-            "Picture finishing day 90 — what does it mean to you?",
-            "Write a sentence about why you're proud of what you've done."
+            "Protein today. Have chicken, eggs, or Greek yogurt.",
+            "Eat protein. Have a protein source at every meal today.",
+            "Fuel the final push. Have a shake or cottage cheese today."
           ],
-          "why": "Visualizing the finish line makes you more likely to cross it."
+          "why": "Two more days of good nutrition locks in everything you've built."
         }
       ]
     },
@@ -3184,69 +3184,71 @@
           "position": 1,
           "minutes": 3,
           "variants": [
-            "Full circuit — all exercises, all sets, every rep counts.",
-            "Second-to-last workout: full routine, full effort.",
-            "Do your whole circuit today — no skipping, nothing held back."
+            "Leg day. 3 sets: 40 squats, 25 lunges per leg, 80-second wall sit.",
+            "Final leg session. 3 rounds: 40 squats, 25 lunges each side, 80-second wall sit.",
+            "Last leg day. 40 squats, 25 lunges per leg, long wall sit — 3 strong sets."
           ],
-          "why": "Day 89 is your last real training day — give it everything."
+          "why": "Your last leg day — finish strong."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Max pushups — final big test before day 90.",
-            "Go for your all-time pushup max one more time.",
-            "Final max pushup set before tomorrow."
+            "Glute bridges. 3 sets of 30 — hold 3 seconds at the top.",
+            "Final bridges. 30 reps with a 3-second squeeze — your best effort.",
+            "Last bridge set. 3 sets of 30 glute bridges — hold each at the top."
           ],
-          "why": "Your pushup max today is your true measure of the last 89 days."
+          "why": "The final glute bridge session shows how strong you've become."
         },
         {
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Log your full workout and your pushup max.",
-            "Record every detail of your day 89 session.",
-            "Add your final big training day to the tracker."
+            "Log the session. Record all sets and write one thing you're proud of.",
+            "Track it. Save today's leg day and add a note about how far you've come.",
+            "Record day 89. Log the full session and write one win from the 90 days."
           ],
-          "why": "Day 89 deserves a complete, detailed log."
+          "why": "One more log — tomorrow is the finish line."
         }
       ]
     },
     {
       "day": 90,
-      "minutes_total": 4,
+      "minutes_total": 5,
       "tasks": [
         {
           "position": 1,
-          "minutes": 2,
+          "minutes": 1,
           "variants": [
-            "Take your final progress photo and compare it to day 1.",
-            "Snap your day 90 photo and put it next to your very first one.",
-            "Final photo — same angle as day 1. Look at what you built."
+            "Final weigh-in. Step on the scale and compare to day 1.",
+            "Day 90 weight. Weigh yourself and put it next to your day-1 number.",
+            "Finish the record. Step on the scale and log your final weight."
           ],
-          "why": "Your day 1 and day 90 photos are the proof of 90 days of work."
+          "why": "90 days of data. Compare it to day 1 and see the full journey."
         },
         {
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Weigh yourself and write your final number next to day 1.",
-            "Step on the scale for the last time and record your weight.",
-            "Get your final weight and compare the full journey."
+            "Take your final photo. Front-facing. Compare to day 1.",
+            "Day 90 photo. Snap a front photo and put it next to your day-1 shot.",
+            "The final before-and-after. Take a photo now and compare to where you started."
           ],
-          "why": "Your final weight next to your starting weight tells the whole story."
+          "why": "90 days of training almost always produces a visible, meaningful change."
         },
         {
           "position": 3,
-          "minutes": 1,
+          "minutes": 3,
           "variants": [
-            "Write down what you accomplished in 90 days.",
-            "List 3 things you can do now that you couldn't do on day 1.",
-            "Celebrate finishing — write one sentence about what this meant to you."
+            "Celebrate day 90. Do your best full-body session — all exercises, best reps.",
+            "Finish strong. Hit 3 sets of everything: pushups, squats, dips, lunges.",
+            "Day 90 session. Do your absolute best workout to close out the 90 days."
           ],
-          "why": "You showed up for 90 days. That deserves to be recognized."
+          "why": "You showed up 90 days in a row. Celebrate by finishing with everything you've got."
         }
       ]
     }
   ]
 }
+
+

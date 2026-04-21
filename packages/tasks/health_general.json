@@ -16,9 +16,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water right now.",
-            "Fill a glass with water and finish it.",
-            "Grab some water and drink it."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Grab a glass of water and drink the whole thing.",
+            "Water first. Pour a full glass and drink it before anything else."
           ],
           "why": "Hydration is the easiest win you can start with today."
         },
@@ -26,9 +26,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Take a selfie. Save it.",
-            "Snap a photo of yourself. Keep it.",
-            "Take a photo of your face right now. Save it."
+            "Take a before selfie. Snap a photo of your face and save it.",
+            "Start your glow-up log. Take a photo of yourself right now and keep it.",
+            "Capture Day 1. Take a selfie in good lighting and save it."
           ],
           "why": "You'll want a before photo when you see how far you come."
         },
@@ -36,9 +36,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Pull your covers up and straighten your bed.",
-            "Tidy your bed before you leave the room."
+            "Make your bed. Pull up the sheets and fluff the pillows.",
+            "Tidy your bed. Straighten the covers and fix the pillows.",
+            "Fix your bed. Pull the blankets flat and set the pillows in place."
           ],
           "why": "A made bed starts your day with one win already done."
         }
@@ -52,9 +52,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Wash your face with water.",
-            "Splash cold water on your face and dry off.",
-            "Go wash your face right now."
+            "Wash your face. Use cleanser or water and dry off with a clean towel.",
+            "Do your skincare step one. Splash water on your face, scrub gently, rinse.",
+            "Clean your face. Wet it, rub with cleanser or soap, rinse clean."
           ],
           "why": "Clean skin is the start of looking better every day."
         },
@@ -62,9 +62,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Go outside for 2 minutes.",
-            "Step outside and breathe for 2 minutes.",
-            "Walk out your front door and stand outside for 2 minutes."
+            "Get fresh air. Step outside and stand or walk for 2 minutes.",
+            "Go outside. Walk out your front door and breathe for 2 minutes.",
+            "Take an air break. Step outside and move around for 2 minutes."
           ],
           "why": "Fresh air and a little movement clears your head fast."
         },
@@ -72,9 +72,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Floss once today.",
-            "Take 60 seconds to floss."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Pull out the floss and go between each tooth.",
+            "Floss now. Take 60 seconds and run floss between all your teeth."
           ],
           "why": "Flossing is a small habit that makes a big difference fast."
         }
@@ -88,9 +88,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water right now.",
-            "Grab some water and drink it."
+            "Drink water. Pour a full glass and finish it.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass right now and drink the whole thing."
           ],
           "why": "Staying hydrated keeps your skin clear and energy up."
         },
@@ -98,9 +98,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Clean your desk or bedside table for 2 minutes.",
-            "Pick up clutter in one spot in your room for 2 minutes.",
-            "Tidy one surface in your space right now."
+            "Tidy one surface. Clear your desk or nightstand completely in 2 minutes.",
+            "Clean one spot. Pick up clutter from one flat surface in your room.",
+            "Declutter fast. Spend 2 minutes clearing one area — desk, counter, or table."
           ],
           "why": "A cleaner space puts you in a better headspace."
         },
@@ -108,9 +108,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall for 60 seconds in front of a mirror.",
-            "Look in the mirror and stand up straight for 1 minute.",
-            "Check your posture in a mirror right now."
+            "Fix your posture. Stand with your back against a wall for 30 seconds.",
+            "Check your posture. Stand tall in front of a mirror — shoulders back, chin up.",
+            "Posture reset. Press your shoulders back and hold your spine straight for 30 seconds."
           ],
           "why": "Good posture makes you look and feel more confident instantly."
         }
@@ -124,9 +124,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Write down what time you went to bed last night.",
-            "Note the time you fell asleep last night.",
-            "Write down last night's bedtime."
+            "Track your sleep. Write down what time you went to bed last night.",
+            "Log your bedtime. Note the time you fell asleep and woke up today.",
+            "Sleep check. Write down last night's bedtime and this morning's wake time."
           ],
           "why": "Tracking sleep is the first step to fixing it."
         },
@@ -134,9 +134,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Splash water on your face and clean it.",
-            "Take a minute to wash your face."
+            "Wash your face. Splash water on it, scrub gently, and rinse clean.",
+            "Do your skincare. Wet your face, use soap or cleanser, and rinse.",
+            "Clean your skin. Wash your face with water and a cleanser or bar soap."
           ],
           "why": "A clean face is one of the quickest glow-up wins."
         },
@@ -144,9 +144,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Straighten your bed out.",
-            "Pull your sheets and blankets into place."
+            "Make your bed. Pull the sheets up and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set your pillows in place.",
+            "Fix your bed. Pull up the sheets and fluff the pillows."
           ],
           "why": "Starting the day tidy builds momentum for everything else."
         }
@@ -160,9 +160,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water right now.",
-            "Drink some water before anything else."
+            "Drink water. Fill a glass and finish it before eating anything.",
+            "Hydrate first. Pour a glass of water and drink it all.",
+            "Water habit. Grab a glass and drink it down right now."
           ],
           "why": "Drinking water first thing is a simple habit that adds up."
         },
@@ -170,9 +170,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Go for a 2-minute walk outside.",
-            "Step outside and walk for 2 minutes.",
-            "Take a short walk outside right now."
+            "Walk outside. Step out and walk at a normal pace for 2 minutes.",
+            "Get moving. Go outside and walk around the block or down the street.",
+            "Take a short walk. Step outside and keep moving for 2 minutes."
           ],
           "why": "Moving your body, even briefly, boosts your mood."
         },
@@ -180,9 +180,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Pick out your outfit for tomorrow.",
-            "Lay out what you'll wear tomorrow.",
-            "Choose tomorrow's clothes tonight."
+            "Plan your outfit. Lay out what you'll wear tomorrow before bed.",
+            "Pick tomorrow's look. Choose your outfit tonight and hang it ready.",
+            "Set out your clothes. Decide what you're wearing tomorrow and put it aside."
           ],
           "why": "Planning your look the night before makes mornings easier."
         }
@@ -196,19 +196,19 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Message 1 person you care about.",
-            "Text or message a friend or family member.",
-            "Reach out to 1 person today."
+            "Moisturize your face. Apply lotion or moisturizer and rub it in.",
+            "Do your skincare. Squeeze some face moisturizer and spread it evenly.",
+            "Hydrate your skin. Apply face moisturizer and let it absorb."
           ],
-          "why": "Staying connected feels good and is part of a healthy life."
+          "why": "Moisturizing keeps your skin looking healthy and fresh."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Tidy one area of your room for 2 minutes.",
-            "Put away anything out of place in your bedroom.",
-            "Spend 2 minutes cleaning up one spot."
+            "Tidy your room. Put away anything out of place for 2 minutes.",
+            "Clean one spot. Spend 2 minutes picking up clutter in your bedroom.",
+            "Quick room reset. Put away 5 items that are out of place right now."
           ],
           "why": "A clean space reflects how you feel — and how you want to feel."
         },
@@ -216,9 +216,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Take 1 minute to floss today.",
-            "Floss once before bed."
+            "Floss your teeth. Run floss between every tooth before bed.",
+            "Do your flossing. Floss all the way around — top and bottom.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Dental hygiene is a quick habit that shows in your smile."
         }
@@ -232,9 +232,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Take a selfie. Compare it to Day 1.",
-            "Snap a photo of yourself and look at it next to your first photo.",
-            "Take a photo today and put it next to your Day 1 selfie."
+            "Take a progress selfie. Snap a photo and compare it to Day 1.",
+            "Week 1 check-in. Take a photo of your face and put it next to Day 1.",
+            "Glow-up log update. Take a selfie today and compare it to your first photo."
           ],
           "why": "Seeing even small changes early keeps you going."
         },
@@ -242,9 +242,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water right now.",
-            "Grab water and drink it."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration is the habit that pays off every single day."
         },
@@ -252,9 +252,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Pull your blankets up and tidy your bed.",
-            "Straighten your bed out today."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and fluff the pillows.",
+            "Fix your bed. Straighten the sheets and set the pillows in place."
           ],
           "why": "One small win first thing keeps the momentum going."
         }
@@ -268,9 +268,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face with water.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, rinse clean.",
+            "Do your skincare. Wet your face, lather with cleanser, and rinse.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Washing your face consistently is step one of any skincare routine."
         },
@@ -278,9 +278,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 10 push-ups or try your best.",
-            "Drop and do 10 push-ups right now.",
-            "Try 10 push-ups — go at your own pace."
+            "Do 10 push-ups. Get on the floor and do 10 reps — go at your own pace.",
+            "Drop and push. Do 10 push-ups right now, even if you need to go slow.",
+            "Push-up set. Lower yourself to the floor and do 10 push-ups."
           ],
           "why": "A tiny dose of exercise builds a habit faster than you think."
         },
@@ -288,9 +288,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Write down what time you want to wake up tomorrow.",
-            "Set a wake-up goal for tomorrow and write it down.",
-            "Decide what time you'll wake up tomorrow and note it."
+            "Set a wake-up goal. Write down what time you want to get up tomorrow.",
+            "Plan your morning. Decide your wake time tonight and write it down.",
+            "Commit to a wake time. Choose when you'll get up tomorrow and note it."
           ],
           "why": "Choosing your wake time tonight makes it easier to stick to."
         }
@@ -304,9 +304,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Drink a full glass of water."
+            "Drink water. Pour a full glass and drink it all right now.",
+            "Hydrate. Fill a glass with water and finish it.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Water is the cheapest and easiest thing you can do for your skin and energy."
         },
@@ -314,9 +314,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Go outside for 2 minutes.",
-            "Step outside and stand in the fresh air for 2 minutes.",
-            "Take a short walk outside right now."
+            "Get outside. Step out and walk around for 2 minutes.",
+            "Fresh air break. Go outside and move around for 2 minutes.",
+            "Walk it out. Step outside and keep walking for a full 2 minutes."
           ],
           "why": "Getting outside even briefly resets your mood."
         },
@@ -324,9 +324,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall for 1 minute in front of a mirror.",
-            "Check your posture in a mirror.",
-            "Look in a mirror and straighten up for 60 seconds."
+            "Fix your posture. Stand tall in front of a mirror for 60 seconds.",
+            "Posture check. Look in a mirror and hold your shoulders back for 1 minute.",
+            "Stand tall. Press your back straight and hold it in front of a mirror."
           ],
           "why": "Posture practice rewires how you carry yourself over time."
         }
@@ -340,9 +340,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Clean one surface in your space — desk, nightstand, or counter.",
-            "Tidy one flat surface in your room right now.",
-            "Pick up the clutter from one area in your space."
+            "Clear a surface. Wipe down your desk, nightstand, or counter completely.",
+            "Tidy one flat surface. Pick up everything off it and put it where it belongs.",
+            "Declutter fast. Clear one surface in your room — takes 2 minutes."
           ],
           "why": "Your environment affects your energy and confidence more than you think."
         },
@@ -350,9 +350,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Floss once today.",
-            "Take 1 minute and floss."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss all the way around top and bottom.",
+            "Floss now. Pull out the floss and clean between every tooth."
           ],
           "why": "Showing up for small dental habits adds up to a better smile."
         },
@@ -360,9 +360,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face right now."
+            "Wash your face. Use soap or cleanser, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, work in cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and cleanser right now."
           ],
           "why": "Consistent face washing keeps your skin clearer over time."
         }
@@ -376,9 +376,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed before you leave the room.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull the sheets up and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set your pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Starting tidy creates a small sense of order you'll feel all day."
         },
@@ -386,9 +386,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 10 squats.",
-            "Try 10 bodyweight squats right now.",
-            "Do 10 squats — take your time."
+            "Do 10 squats. Stand up, lower down slowly, and repeat 10 times.",
+            "Squat set. Stand with feet shoulder-width apart and do 10 bodyweight squats.",
+            "Try 10 squats. Lower yourself down and push back up — 10 times."
           ],
           "why": "Lower body movement keeps your energy and blood flow up."
         },
@@ -396,9 +396,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Drink a glass of water before your next meal."
+            "Drink water. Pour a full glass and finish it before your next meal.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass right now and drink the whole thing."
           ],
           "why": "A daily water habit is one of the simplest ways to feel better."
         }
@@ -412,19 +412,19 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Message 1 friend or family member.",
-            "Reach out to someone you care about today.",
-            "Send a quick text to 1 person you like."
+            "Brush your teeth properly. Set a timer and brush for a full 2 minutes.",
+            "Two-minute brush. Time yourself brushing — 30 seconds per section.",
+            "Brush well. Spend 2 full minutes brushing every surface of your teeth."
           ],
-          "why": "Human connection is part of glowing up — not just looks."
+          "why": "A clean smile is one of the first things people notice."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Walk outside for 2 minutes.",
-            "Step out for a 2-minute walk.",
-            "Go outside and walk for 2 minutes."
+            "Walk outside. Step out and keep walking at a steady pace for 2 minutes.",
+            "Short walk. Go outside and walk — keep moving for the full 2 minutes.",
+            "Get moving. Step out your door and walk around for 2 minutes."
           ],
           "why": "Short walks add up and help your mood every time."
         },
@@ -432,9 +432,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face right now."
+            "Wash your face. Use cleanser or soap, scrub gently, rinse off.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Washing your face daily is the foundation of clear skin."
         }
@@ -448,9 +448,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Grab some water and drink it."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration keeps your skin, energy, and focus sharp."
         },
@@ -458,9 +458,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Tidy your room for 2 minutes.",
-            "Pick up anything out of place in your space.",
-            "Clean up one area of your room for 2 minutes."
+            "Tidy your room. Pick up anything out of place and put it away.",
+            "Quick room clean. Spend 2 minutes clearing clutter from your bedroom.",
+            "Room reset. Put away 5 things that are out of place right now."
           ],
           "why": "A clean space keeps your mindset clear."
         },
@@ -468,9 +468,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Pick out your outfit for tomorrow.",
-            "Choose what you'll wear tomorrow tonight.",
-            "Lay out tomorrow's clothes right now."
+            "Plan your outfit. Choose what you'll wear tomorrow and set it out.",
+            "Pick tomorrow's look. Lay out your outfit tonight so it's ready.",
+            "Set out your clothes. Decide on tomorrow's outfit and hang it up."
           ],
           "why": "Planning your look ahead makes you feel more put-together."
         }
@@ -484,9 +484,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Take a selfie. Save it.",
-            "Snap a photo of yourself today.",
-            "Take a photo of your face and keep it."
+            "Take a progress selfie. Snap a photo and put it next to Day 1.",
+            "Two-week check-in. Take a photo of your face today and compare it to Day 1.",
+            "Glow-up log update. Take a selfie and save it next to your first photo."
           ],
           "why": "Two weeks in — your before photo is already starting to look different."
         },
@@ -494,9 +494,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 10 push-ups or your best attempt.",
-            "Drop and do 10 push-ups now.",
-            "Try 10 push-ups at your own pace."
+            "Do 10 push-ups. Get on the floor and do 10 reps at your own pace.",
+            "Push-up set. Lower yourself down and push up 10 times.",
+            "Drop and push. Do 10 push-ups right now — go slow if you need to."
           ],
           "why": "Doing this twice this week means it's becoming a habit."
         },
@@ -504,9 +504,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed before you leave the room.",
-            "Pull your covers up and straighten out your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Two weeks of small wins — keep the streak alive."
         }
@@ -520,9 +520,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look at your hair and decide if it needs a trim. If yes, book a haircut today.",
-            "Check your hair in the mirror. If it's overdue, text or call a barber or salon now.",
-            "Look at your hair. Does it need a cut? If so, schedule one today."
+            "Check your hair. Look in the mirror — if it needs a trim, book a cut today.",
+            "Hair check. Look at your hair closely. If it's overdue, schedule a barber or salon now.",
+            "Assess your hair. Look in the mirror — if it needs a cut, book one right now."
           ],
           "why": "A fresh haircut is one of the fastest ways to look noticeably better."
         },
@@ -530,9 +530,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, work in cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and cleanser right now."
           ],
           "why": "Skincare basics start with just keeping your face clean."
         },
@@ -540,9 +540,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water right now.",
-            "Drink some water."
+            "Drink water. Fill a glass and drink it all right now.",
+            "Hydrate. Pour a full glass and finish it.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration shows in your skin — keep it going."
         }
@@ -556,9 +556,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look in the mirror and check your posture. Hold it tall for 1 minute.",
-            "Stand in front of a mirror. Straighten up and hold good posture for 1 minute.",
-            "Check your posture in a mirror and hold it for 60 seconds."
+            "Fix your posture. Stand against a wall — heels, back, and head touching it — for 1 minute.",
+            "Posture hold. Stand tall in the mirror with shoulders back and chin up for 60 seconds.",
+            "Posture practice. Press your spine straight and hold it in front of a mirror for 1 minute."
           ],
           "why": "Posture is confidence you can practice any time."
         },
@@ -566,9 +566,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed before anything else today.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set your pillows in place.",
+            "Fix your bed. Pull the sheets flat and fluff the pillows."
           ],
           "why": "One small win every morning keeps you consistent."
         },
@@ -576,9 +576,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Take 1 minute to floss.",
-            "Floss once today."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Consistent dental care is part of your overall glow up."
         }
@@ -592,9 +592,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Drink some water before your next meal."
+            "Drink water. Fill a glass and finish it before your next meal.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing right now."
           ],
           "why": "Water is still the simplest habit you can stack every day."
         },
@@ -602,9 +602,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Go for a 2-minute walk outside.",
-            "Step outside and walk for 2 minutes.",
-            "Walk outside for just 2 minutes right now."
+            "Walk outside. Step out and keep walking at a steady pace for 2 minutes.",
+            "Fresh air. Go outside and walk around for 2 full minutes.",
+            "Get moving. Step out your door and walk for 2 minutes."
           ],
           "why": "Fresh air and movement boost your mood and energy."
         },
@@ -612,9 +612,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face right now."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse clean.",
+            "Do your skincare. Wet your face, lather cleanser, rinse off.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Clean skin is the base of every grooming upgrade."
         }
@@ -628,9 +628,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look at your fingernails. Trim or clean them if needed.",
-            "Check your nails — trim them or clean under them.",
-            "Take 2 minutes to tidy your nails."
+            "Do your nails. Clip them shorter and clean under each one.",
+            "Nail check. Trim your fingernails and brush or clean underneath them.",
+            "Tidy your nails. Cut them if they're too long and wipe them clean."
           ],
           "why": "Clean, trimmed nails are a small detail that says a lot."
         },
@@ -638,9 +638,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed today.",
-            "Straighten out your bed right now."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and fluff the pillows.",
+            "Fix your bed. Straighten the sheets and set the pillows in place."
           ],
           "why": "A tidy space keeps your head in a better place."
         },
@@ -648,11 +648,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 person you care about.",
-            "Reach out to someone you like today.",
-            "Text or message 1 friend today."
+            "Smile in the mirror. Hold a genuine smile for 30 seconds and notice it.",
+            "Practice your smile. Look in the mirror and hold a real smile for 30 seconds.",
+            "Mirror smile. Stand in front of a mirror and hold your best smile for 30 seconds."
           ],
-          "why": "Glowing up includes how you show up for people."
+          "why": "A confident smile is one of the most powerful parts of your look."
         }
       ]
     },
@@ -664,9 +664,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Grab some water and drink it."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration every day is one habit that never stops paying off."
         },
@@ -674,9 +674,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 10 push-ups or your best attempt.",
-            "Drop and do 10 push-ups.",
-            "Try 10 push-ups right now."
+            "Do 10 push-ups. Get on the floor and do 10 reps at your own pace.",
+            "Push-up set. Lower down and push up 10 times — go slow if needed.",
+            "Drop and push. Do 10 push-ups right now."
           ],
           "why": "Consistent reps over time are what build real change."
         },
@@ -684,9 +684,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face right now.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and cleanser right now."
           ],
           "why": "Keep the skincare basics going — it adds up."
         }
@@ -700,9 +700,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look at your clothes and pull out anything worn out or doesn't fit. Set aside 1 item to donate.",
-            "Check your closet for 1 item you no longer wear and put it in a donate pile.",
-            "Find 1 piece of clothing you don't wear anymore and set it aside to go."
+            "Edit your wardrobe. Pull out 1 item you don't wear and set it aside to donate.",
+            "Closet audit. Find 1 piece of clothing that doesn't fit or suit you and remove it.",
+            "Clear out 1 item. Look through your clothes and pull out 1 thing to donate or toss."
           ],
           "why": "Clearing out what doesn't fit you anymore makes room for a better version of you."
         },
@@ -710,9 +710,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed right now.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Starting every day with one win is a habit worth keeping."
         },
@@ -720,9 +720,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Floss once today.",
-            "Take 1 minute to floss."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss all the way around — top and bottom.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Dental hygiene is an easy habit that's easy to skip — don't skip it."
         }
@@ -736,9 +736,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Take a selfie. Save it.",
-            "Snap a photo of yourself today and keep it.",
-            "Take a photo of your face right now and save it."
+            "Take a progress selfie. Snap a photo and compare it to Day 1 and Day 7.",
+            "Three-week check-in. Take a photo of your face and put it next to Day 1.",
+            "Glow-up log update. Take a selfie today and save it next to your earlier photos."
           ],
           "why": "Three weeks in — check the progress you might not notice daily."
         },
@@ -746,9 +746,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Stand tall in the mirror for 1 minute. No slouching.",
-            "Check your posture in the mirror and hold it tall for 60 seconds.",
-            "Look in a mirror, straighten up, and hold good posture for 1 minute."
+            "Fix your posture. Stand tall in the mirror — no slouching — for 1 minute.",
+            "Posture hold. Shoulders back, chin up, spine straight — hold it for 60 seconds.",
+            "Stand tall. Press your back straight and hold good posture in the mirror for 1 minute."
           ],
           "why": "How you carry yourself is how people see you."
         },
@@ -756,9 +756,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water now.",
-            "Drink a glass of water."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Week 3 — this one's non-negotiable."
         }
@@ -772,9 +772,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Go outside for a 2-minute walk.",
-            "Walk outside for 2 minutes.",
-            "Step out and walk for 2 minutes."
+            "Walk outside. Step out and keep walking for 2 minutes at a steady pace.",
+            "Fresh air walk. Go outside and walk around for the full 2 minutes.",
+            "Get moving. Step out your door and walk for 2 minutes."
           ],
           "why": "Consistent short movement beats occasional long workouts."
         },
@@ -782,9 +782,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Washing your face is the one skincare step that matters most."
         },
@@ -792,9 +792,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Small tidy habits build into a cleaner, calmer life."
         }
@@ -808,9 +808,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Grab some water and drink it."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Your body needs water every day — same as yesterday, same as tomorrow."
         },
@@ -818,9 +818,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Check your hair — does it need a trim? If yes, book one this week.",
-            "Look at your hair in the mirror. If it's getting long, schedule a cut.",
-            "Look at your hair. Does it need attention? Book a cut if so."
+            "Check your hair. Look closely in the mirror — book a cut this week if it's due.",
+            "Hair check. Look at your hair — if it's getting long or uneven, schedule a cut.",
+            "Assess your hair. Look in the mirror — if it needs attention, book an appointment now."
           ],
           "why": "Your hair is one of the biggest parts of how you present yourself."
         },
@@ -828,9 +828,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Floss once today.",
-            "Take 60 seconds to floss."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Flossing is a small habit that shows over time."
         }
@@ -844,9 +844,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Tidy your bathroom counter. Put away what's out.",
-            "Clean up your bathroom or sink area for 2 minutes.",
-            "Pick up anything cluttering your bathroom for 2 minutes."
+            "Clean your bathroom counter. Put away what's out and wipe it down.",
+            "Tidy your sink area. Clear the counter and put everything in its place.",
+            "Bathroom reset. Pick up anything cluttering your counter and wipe it clean."
           ],
           "why": "Your bathroom is where you start every day — keep it clean."
         },
@@ -854,9 +854,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face right now."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and cleanser right now."
           ],
           "why": "Consistent face washing over weeks changes your skin."
         },
@@ -864,11 +864,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 friend or family member.",
-            "Reach out to someone you care about today.",
-            "Send a quick message to 1 person you like."
+            "Clean your phone screen. Wipe it down with a cloth or tissue right now.",
+            "Wipe your screen. Give your phone a proper wipe — it takes 30 seconds.",
+            "Phone screen clean. Grab a cloth and wipe your screen clean right now."
           ],
-          "why": "Staying connected boosts your mood and theirs."
+          "why": "A clean screen is a small detail that keeps your life looking sharp."
         }
       ]
     },
@@ -880,9 +880,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water right now.",
-            "Drink some water."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration keeps your skin, eyes, and energy in good shape."
         },
@@ -890,9 +890,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 10 squats.",
-            "Do 10 bodyweight squats right now.",
-            "Try 10 squats — go at your own pace."
+            "Do 10 squats. Stand, lower slowly, push back up — 10 reps.",
+            "Squat set. Feet shoulder-width apart, lower down, push up — 10 times.",
+            "Try 10 squats. Lower yourself down and push back up, 10 times."
           ],
           "why": "A few squats each day builds a habit faster than you think."
         },
@@ -900,9 +900,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall in the mirror for 60 seconds.",
-            "Check your posture in a mirror and hold it for 1 minute.",
-            "Look in a mirror and stand up straight for 60 seconds."
+            "Fix your posture. Stand tall in the mirror — shoulders back — for 60 seconds.",
+            "Posture hold. Press your spine straight and hold it in front of a mirror.",
+            "Stand tall. Look in the mirror and hold good posture for 1 minute."
           ],
           "why": "Posture practice is confidence practice."
         }
@@ -916,9 +916,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look at your shoes. Wipe off any dirt or scuffs right now.",
-            "Clean your shoes — a quick wipe-down takes 2 minutes.",
-            "Grab a cloth and clean your shoes today."
+            "Clean your shoes. Wipe off any dirt or scuffs with a damp cloth.",
+            "Shoe wipe-down. Grab a cloth and clean both shoes — dirt, scuffs, soles.",
+            "Polish your kicks. Take 2 minutes to wipe your shoes clean."
           ],
           "why": "Clean shoes make your whole look sharper with almost no effort."
         },
@@ -926,9 +926,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "The bed habit keeps your day starting with intention."
         },
@@ -936,9 +936,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face right now.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Face washing every day is the simplest skincare habit that works."
         }
@@ -952,9 +952,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water now.",
-            "Drink a glass of water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Three weeks of daily water — it's a real habit now."
         },
@@ -962,9 +962,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Go outside for 2 minutes.",
-            "Step outside and walk around for 2 minutes.",
-            "Take a 2-minute walk outside."
+            "Walk outside. Step out and keep walking for 2 minutes.",
+            "Fresh air break. Go outside and walk around for the full 2 minutes.",
+            "Get moving. Step out your door and walk for 2 minutes."
           ],
           "why": "Short outdoor time is great for your mood and focus."
         },
@@ -972,9 +972,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Pick out your outfit for tomorrow.",
-            "Lay out what you'll wear tomorrow.",
-            "Choose tomorrow's clothes tonight."
+            "Plan your outfit. Choose what you'll wear tomorrow and set it out.",
+            "Pick tomorrow's look. Lay out your outfit tonight so it's ready.",
+            "Set out your clothes. Decide on tomorrow's outfit and hang it up."
           ],
           "why": "Thinking about how you look tomorrow starts tonight."
         }
@@ -988,9 +988,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Check your nails — trim or clean them if needed.",
-            "Take 2 minutes to trim or tidy your nails.",
-            "Look at your fingernails. Clean or cut them."
+            "Do your nails. Trim them shorter and clean underneath each one.",
+            "Nail check. Clip your fingernails and brush or wipe them clean.",
+            "Tidy your nails. Cut them if they're too long and clean underneath."
           ],
           "why": "Clean, tidy nails are a small detail that makes a real difference."
         },
@@ -998,9 +998,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Floss once today.",
-            "Take 1 minute to floss."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Dental care is part of the glow up too."
         },
@@ -1008,9 +1008,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Straighten your bed out.",
-            "Tidy your bed before you leave the room."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "One month almost done — keep the streak."
         }
@@ -1024,9 +1024,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Grab water and drink it."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration is a habit worth keeping for life."
         },
@@ -1034,9 +1034,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 10 push-ups or your best attempt.",
-            "Drop and do 10 push-ups now.",
-            "Try 10 push-ups at your own pace."
+            "Do 10 push-ups. Get on the floor and do 10 reps at your own pace.",
+            "Push-up set. Lower down and push up 10 times — go slow if needed.",
+            "Drop and push. Do 10 push-ups right now."
           ],
           "why": "This is the third time this week — it's becoming automatic."
         },
@@ -1044,9 +1044,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Almost a full month of face washing — your skin notices."
         }
@@ -1060,9 +1060,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Take a selfie. Save it.",
-            "Snap a photo of yourself today.",
-            "Take a photo of your face right now and keep it."
+            "Take a progress selfie. Snap a photo and put it next to Day 1.",
+            "One-month check-in. Take a photo of your face and compare it to the start.",
+            "Glow-up log update. Take a selfie today — look at how far you've come."
           ],
           "why": "One month — look at how far you've come since Day 1."
         },
@@ -1070,9 +1070,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Stand tall in the mirror. Hold it for 1 full minute.",
-            "Check your posture in a mirror and hold it tall for 60 seconds.",
-            "Look in a mirror and straighten up for 1 minute."
+            "Fix your posture. Stand tall in the mirror — shoulders back — for 1 full minute.",
+            "Posture hold. Spine straight, chin up, no slouching — hold it for 60 seconds.",
+            "Stand tall. Press your back straight in front of a mirror and hold for 1 minute."
           ],
           "why": "Thirty days of posture practice is starting to stick."
         },
@@ -1080,11 +1080,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 person you care about.",
-            "Reach out to someone today.",
-            "Text or message 1 friend or family member."
+            "Phone down before bed. Set your phone face-down 5 minutes before you sleep.",
+            "Screen curfew. Put your phone away 5 minutes before bed tonight.",
+            "Wind down right. Step away from your screen 5 minutes before bed."
           ],
-          "why": "Month 1 done — celebrate it by connecting with someone."
+          "why": "Better sleep means better skin, better energy, better everything."
         }
       ]
     },
@@ -1096,9 +1096,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look at your closet and pick 1 outfit you feel good in. Hang it ready for tomorrow.",
-            "Find 1 outfit in your closet that you actually like wearing. Set it out for tomorrow.",
-            "Pull out 1 outfit you feel confident in and set it aside for tomorrow."
+            "Pick a confidence outfit. Find 1 outfit you feel good in and hang it ready for tomorrow.",
+            "Wardrobe win. Pull out 1 outfit you actually like wearing and set it out for tomorrow.",
+            "Dress with intention. Choose 1 outfit you feel confident in and lay it out tonight."
           ],
           "why": "Dressing well starts with knowing what you already have."
         },
@@ -1106,9 +1106,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face right now.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Clean skin is the base for everything in the grooming phase."
         },
@@ -1116,9 +1116,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Drink a glass of water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration every day — still the easiest win."
         }
@@ -1132,9 +1132,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Walk outside for 2 minutes.",
-            "Step outside and walk around for 2 minutes.",
-            "Go for a 2-minute walk outside right now."
+            "Walk outside. Step out and keep walking at a steady pace for 2 minutes.",
+            "Fresh air walk. Go outside and walk around for the full 2 minutes.",
+            "Get moving. Step out your door and walk for 2 minutes."
           ],
           "why": "Fresh air and movement are part of looking and feeling better."
         },
@@ -1142,9 +1142,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Starting tidy keeps the momentum going into month 2."
         },
@@ -1152,9 +1152,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Floss once today.",
-            "Take 60 seconds to floss."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Dental care is part of the full glow up — keep it consistent."
         }
@@ -1168,9 +1168,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Grab water and drink it."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration is still your easiest daily win."
         },
@@ -1178,9 +1178,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 10 push-ups or your best attempt.",
-            "Drop and do 10 push-ups.",
-            "Try 10 push-ups right now."
+            "Do 10 push-ups. Get on the floor and do 10 reps at your own pace.",
+            "Push-up set. Lower down and push up 10 times — go slow if needed.",
+            "Drop and push. Do 10 push-ups right now."
           ],
           "why": "The reps are getting easier — that's the point."
         },
@@ -1188,9 +1188,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall in the mirror for 60 seconds.",
-            "Check your posture in a mirror and hold it for 1 minute.",
-            "Look in a mirror, straighten up, and hold it for 60 seconds."
+            "Fix your posture. Stand tall in the mirror for 60 seconds — shoulders back.",
+            "Posture hold. Press your spine straight and hold it in front of a mirror.",
+            "Stand tall. Look in the mirror and hold good posture for 1 minute."
           ],
           "why": "Posture is confidence — keep practicing it."
         }
@@ -1204,9 +1204,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look at your hair in the mirror. Does it need a style update? Note one thing to change.",
-            "Check your hair today. Is the style still working for you? Think of one adjustment.",
-            "Look at your hair. Write down one thing you'd like to do differently with it."
+            "Style your hair. Look in the mirror and actually do something with it today.",
+            "Hair check. Comb or style your hair neatly — spend 2 minutes on it.",
+            "Fix your hair. Look in the mirror and style it before leaving the room."
           ],
           "why": "Your hair frames your face — small changes go a long way."
         },
@@ -1214,9 +1214,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Keep the skincare habit going — it's working."
         },
@@ -1224,11 +1224,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 friend or family member.",
-            "Reach out to someone today.",
-            "Send a quick message to 1 person you care about."
+            "Do 20 squats. Stand, lower slowly, push back up — 20 reps.",
+            "Squat set. Feet shoulder-width apart, lower and push up — 20 times.",
+            "Try 20 squats. Lower yourself down and push back up, 20 times."
           ],
-          "why": "Confidence also comes from staying connected."
+          "why": "A quick burst of movement keeps your body and energy on track."
         }
       ]
     },
@@ -1240,9 +1240,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Drink some water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Keep the hydration habit — your body thanks you every day."
         },
@@ -1250,9 +1250,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Tidy one area of your room or space for 2 minutes.",
-            "Pick up anything out of place in your space.",
-            "Spend 2 minutes cleaning up one spot."
+            "Tidy your room. Pick up anything out of place and put it away.",
+            "Quick room reset. Spend 2 minutes clearing clutter from your bedroom.",
+            "Room clean. Put away 5 things that are out of place right now."
           ],
           "why": "Your space reflects how you feel — keep it clean."
         },
@@ -1260,9 +1260,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed before leaving your room.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "One win first thing keeps your day on track."
         }
@@ -1276,9 +1276,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Clean your shoes — wipe off any dirt or scuffs.",
-            "Take 2 minutes to wipe down your shoes.",
-            "Grab a cloth and clean your shoes."
+            "Clean your shoes. Wipe off any dirt or scuffs with a damp cloth right now.",
+            "Shoe wipe-down. Grab a cloth and clean both shoes — scuffs, dirt, soles.",
+            "Polish your shoes. Take 2 minutes to wipe them clean and make them sharp."
           ],
           "why": "Shoes are the first thing people notice — keep them clean."
         },
@@ -1286,9 +1286,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face right now."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Over a month of face washing — your skin is cleaner than ever."
         },
@@ -1296,9 +1296,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water right now.",
-            "Drink some water."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydrate — still the easiest thing you can do today."
         }
@@ -1312,9 +1312,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Do 10 squats and 10 push-ups back to back.",
-            "Drop and do 10 push-ups, then 10 squats.",
-            "Try 10 squats and 10 push-ups right now."
+            "Do 10 push-ups then 10 squats. No rest between — go right from one to the other.",
+            "Push-up to squat combo. Drop for 10 push-ups, stand and do 10 squats.",
+            "Mini circuit. Do 10 push-ups back to back with 10 squats right now."
           ],
           "why": "Combining moves in a row is a small step up — you're ready for it."
         },
@@ -1322,9 +1322,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Floss once today.",
-            "Take 1 minute to floss."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Dental care is easy to forget — that's why you keep showing up."
         },
@@ -1332,9 +1332,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Straighten out your bed today.",
-            "Tidy your bed before you leave the room."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "The bed habit is automatic now — keep it."
         }
@@ -1348,9 +1348,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water now.",
-            "Grab water and drink it."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Daily hydration — still your simplest glow-up move."
         },
@@ -1358,9 +1358,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Walk outside for 2 minutes.",
-            "Step out for a 2-minute walk.",
-            "Go for a quick walk outside."
+            "Walk outside. Step out and keep walking for 2 minutes at a steady pace.",
+            "Fresh air break. Go outside and walk around for the full 2 minutes.",
+            "Get moving. Step out your door and walk for 2 minutes."
           ],
           "why": "Short outdoor movement keeps your energy and mood up."
         },
@@ -1368,9 +1368,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall in the mirror for 60 seconds.",
-            "Check your posture in a mirror and hold it for 1 minute.",
-            "Look in a mirror, straighten up, and hold it for 60 seconds."
+            "Fix your posture. Stand tall in the mirror for 60 seconds — no slouching.",
+            "Posture hold. Shoulders back, spine straight — hold it in front of a mirror.",
+            "Stand tall. Press your back straight and hold good posture for 1 minute."
           ],
           "why": "Posture practice — keep doing this until it's just how you stand."
         }
@@ -1384,9 +1384,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look at your skin in the mirror. Notice if it looks clearer than Day 1.",
-            "Check your skin in the mirror — is it better than a month ago?",
-            "Take a close look at your skin. See how it's changed."
+            "Skin check. Look at your face in the mirror — notice if it's clearer than Day 1.",
+            "Check your skin. Compare your complexion now to how it looked a month ago.",
+            "Progress check. Take a close look at your skin in good lighting and see the change."
           ],
           "why": "Noticing progress keeps you motivated to keep going."
         },
@@ -1394,9 +1394,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face right now.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Keep the face-washing habit — it's one of the best things you've done."
         },
@@ -1404,9 +1404,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Pick out your outfit for tomorrow.",
-            "Lay out what you'll wear tomorrow.",
-            "Choose tomorrow's clothes tonight."
+            "Plan your outfit. Choose what you'll wear tomorrow and set it out.",
+            "Pick tomorrow's look. Lay out your outfit tonight so it's ready.",
+            "Set out your clothes. Decide on tomorrow's outfit and hang it up."
           ],
           "why": "Planning your look ahead keeps you consistent."
         }
@@ -1420,9 +1420,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Drink some water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "40 days of water — this is just part of who you are now."
         },
@@ -1430,9 +1430,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Check your nails — trim or clean them if needed.",
-            "Take 2 minutes to tidy your nails.",
-            "Trim or clean your fingernails."
+            "Do your nails. Clip them shorter and clean underneath each one.",
+            "Nail check. Trim your fingernails and wipe or brush them clean.",
+            "Tidy your nails. Cut them if they're too long and clean underneath."
           ],
           "why": "Small grooming details add to the overall picture."
         },
@@ -1440,9 +1440,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed today.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "40 days strong — this habit is locked in."
         }
@@ -1456,9 +1456,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Take a selfie. Compare it to Day 1 and Day 21.",
-            "Snap a photo today and put it next to your Day 1 and Day 21 photos.",
-            "Take a photo of yourself right now. Look at the progress."
+            "Take a progress selfie. Compare it to Day 1, Day 14, and Day 30.",
+            "Six-week check-in. Snap a photo and stack it next to your Day 1 and Day 30 photos.",
+            "Glow-up log update. Take a photo right now and look at the full progression."
           ],
           "why": "Six weeks in — you can see the difference now."
         },
@@ -1466,9 +1466,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Skincare basics — still the most important habit you've built."
         },
@@ -1476,11 +1476,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 person you care about.",
-            "Reach out to someone you like today.",
-            "Text or message 1 friend or family member."
+            "Apply sunscreen. Squeeze a little onto your face and rub it in before heading out.",
+            "Put on SPF. Apply sunscreen to your face — takes 30 seconds.",
+            "Sunscreen habit. Grab your SPF and apply it to your face right now."
           ],
-          "why": "Glow up includes how you connect with the people around you."
+          "why": "Sunscreen is the single best thing you can do to keep your skin looking good long-term."
         }
       ]
     },
@@ -1492,9 +1492,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Grab water and drink it."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Six weeks of water — it's a real part of your routine now."
         },
@@ -1502,9 +1502,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 10 push-ups and 10 squats back to back.",
-            "Drop and do 10 push-ups, then stand and do 10 squats.",
-            "Try 10 push-ups followed by 10 squats right now."
+            "Do 10 push-ups then 10 squats. Go from one to the other with no rest.",
+            "Push-up to squat combo. 10 push-ups then stand and do 10 squats.",
+            "Mini circuit. 10 push-ups followed by 10 squats — right now."
           ],
           "why": "You're building a body that matches the confidence you're growing."
         },
@@ -1512,9 +1512,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Six weeks of this — it's just what you do now."
         }
@@ -1528,9 +1528,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look at your wardrobe. Find 1 item that needs replacing or updating.",
-            "Check your clothes. Is there 1 thing that's worn out or doesn't fit well?",
-            "Open your closet and find 1 item you'd like to upgrade eventually."
+            "Audit your wardrobe. Find 1 item that's worn out or doesn't fit and set it aside.",
+            "Closet check. Pull out 1 piece you don't wear anymore and put it in a donate pile.",
+            "Style upgrade scan. Open your closet and find 1 item you'd like to eventually replace."
           ],
           "why": "Knowing what to upgrade helps you make better choices when you shop."
         },
@@ -1538,9 +1538,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Take 1 minute to floss.",
-            "Floss once today."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Dental hygiene — still showing up for it matters."
         },
@@ -1548,9 +1548,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall in the mirror for 60 seconds.",
-            "Hold good posture in front of a mirror for 1 minute.",
-            "Check your posture and hold it tall for 60 seconds."
+            "Fix your posture. Stand tall in the mirror for 60 seconds — shoulders back.",
+            "Posture hold. Spine straight, chin up — hold it in front of a mirror.",
+            "Stand tall. Press your back straight and hold good posture for 1 minute."
           ],
           "why": "Posture becomes natural when you practice it consistently."
         }
@@ -1564,9 +1564,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Drink some water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration is a forever habit — keep going."
         },
@@ -1574,9 +1574,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Walk outside for 2 minutes.",
-            "Go outside and walk for 2 minutes.",
-            "Take a short walk outside right now."
+            "Walk outside. Step out and keep walking for 2 minutes at a steady pace.",
+            "Fresh air break. Go outside and walk around for the full 2 minutes.",
+            "Get moving. Step out your door and walk for 2 minutes."
           ],
           "why": "Fresh air and movement keep your energy up every day."
         },
@@ -1584,9 +1584,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face right now.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Keep the skincare habit going — this is the foundation."
         }
@@ -1600,9 +1600,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look in the mirror and pick 1 thing you like about how you look today.",
-            "Stand in the mirror and name 1 thing you like about your appearance.",
-            "Take a moment in front of the mirror. Find 1 thing you genuinely like."
+            "Find something you like. Look in the mirror and name 1 thing you genuinely like about how you look.",
+            "Confidence mirror. Stand in front of a mirror and pick out 1 thing you like about your appearance.",
+            "Self-check. Look in the mirror and find 1 thing about your look that you actually like."
           ],
           "why": "Noticing what's good builds the confidence you're working toward."
         },
@@ -1610,9 +1610,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Halfway through — the habit is yours now."
         },
@@ -1620,9 +1620,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water now.",
-            "Grab water and drink it."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Day 45 — halfway there and still hydrating."
         }
@@ -1636,9 +1636,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Pick 1 outfit for today that makes you feel good. Put it on.",
-            "Choose an outfit you feel confident in and wear it today.",
-            "Get dressed in 1 outfit you actually like how you look in."
+            "Wear a confidence outfit. Pick 1 outfit you feel great in and put it on today.",
+            "Dress with intention. Choose the outfit that makes you feel most confident right now.",
+            "Own your look. Get dressed in 1 outfit you genuinely like how you look in."
           ],
           "why": "What you wear changes how you feel and how you carry yourself."
         },
@@ -1646,9 +1646,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face right now."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Skincare habit — still going, still working."
         },
@@ -1656,9 +1656,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Drink some water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration is part of the daily routine now."
         }
@@ -1672,9 +1672,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Clean your shoes — wipe off any dirt or scuffs.",
-            "Take 2 minutes to clean your shoes.",
-            "Grab a cloth and give your shoes a quick wipe."
+            "Clean your shoes. Wipe off any dirt or scuffs with a damp cloth.",
+            "Shoe wipe-down. Grab a cloth and clean both shoes — scuffs, dirt, soles.",
+            "Polish your kicks. Take 2 minutes to wipe your shoes clean and sharp."
           ],
           "why": "Clean shoes finish an outfit — it's worth 2 minutes."
         },
@@ -1682,9 +1682,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "This habit is locked in — just keep going."
         },
@@ -1692,11 +1692,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 friend or family member.",
-            "Reach out to someone today.",
-            "Send a quick message to 1 person you care about."
+            "Stretch your neck and shoulders. Roll your neck slowly and pull each shoulder back for 30 seconds.",
+            "Quick stretch. Take 60 seconds to loosen your neck, shoulders, and upper back.",
+            "Body reset. Tilt your head side to side, then roll your shoulders back — 1 minute."
           ],
-          "why": "Confidence is also about how you show up for people."
+          "why": "Looser muscles mean better posture and less tension in your body."
         }
       ]
     },
@@ -1708,9 +1708,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Drink a glass of water."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Water every day — still your most consistent habit."
         },
@@ -1718,9 +1718,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 10 push-ups and 10 squats.",
-            "Try 10 push-ups followed by 10 squats.",
-            "Drop and do 10 push-ups, then 10 squats."
+            "Do 10 push-ups then 10 squats. No rest between — go from one to the other.",
+            "Push-up to squat combo. 10 push-ups then stand and do 10 squats.",
+            "Mini circuit. 10 push-ups followed by 10 squats — right now."
           ],
           "why": "Your body is responding — keep giving it something to work with."
         },
@@ -1728,9 +1728,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall in the mirror for 60 seconds.",
-            "Check your posture in a mirror and hold it for 1 minute.",
-            "Look in a mirror and straighten up for 60 seconds."
+            "Fix your posture. Stand tall in the mirror for 60 seconds — shoulders back.",
+            "Posture hold. Spine straight, no slouching — hold it in front of a mirror.",
+            "Stand tall. Press your back straight and hold good posture for 1 minute."
           ],
           "why": "Posture is becoming natural — a few more weeks and it'll stick for good."
         }
@@ -1744,9 +1744,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Go outside and walk for 5 minutes.",
-            "Take a 5-minute walk outside.",
-            "Step outside and walk for 5 minutes."
+            "Walk outside for 5 minutes. Step out and keep moving at a steady pace.",
+            "Longer walk. Go outside and walk for a full 5 minutes today.",
+            "Level up your walk. Step out and walk 5 minutes — longer than before."
           ],
           "why": "You've been doing 2 minutes — 5 is the next step up."
         },
@@ -1754,9 +1754,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Face washing is a habit that's working — keep it."
         },
@@ -1764,9 +1764,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Floss once today.",
-            "Take 1 minute to floss."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Flossing is a habit that shows in the long run."
         }
@@ -1780,9 +1780,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Take a selfie. Save it.",
-            "Snap a photo of yourself today and keep it.",
-            "Take a photo of your face right now."
+            "Take a progress selfie. Snap a photo and save it for your glow-up log.",
+            "Day 50 check-in. Take a photo of your face today and keep it.",
+            "Glow-up log update. Take a selfie right now — document where you are."
           ],
           "why": "Day 50 — document where you are."
         },
@@ -1790,9 +1790,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Look in the mirror and name 2 things you like about how you look.",
-            "Stand in the mirror and find 2 things you genuinely like about yourself.",
-            "Take 2 minutes in front of the mirror and notice 2 things you like."
+            "Find 2 things you like. Look in the mirror and name 2 things you genuinely like about how you look.",
+            "Confidence mirror. Stand in front of the mirror and pick out 2 things you like about yourself.",
+            "Self-check. Look in the mirror and find 2 things about your appearance you actually like."
           ],
           "why": "Building confidence means learning to see what's already good."
         },
@@ -1800,9 +1800,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Drink a glass of water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "50 days of water — this habit is part of you now."
         }
@@ -1816,9 +1816,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Pick out tomorrow's outfit right now. Make sure it's clean and ready.",
-            "Choose your outfit for tomorrow and hang it up or lay it out.",
-            "Decide what you'll wear tomorrow and get it ready tonight."
+            "Prep tomorrow's outfit. Pick it out, make sure it's clean, and hang it ready.",
+            "Outfit plan. Choose what you'll wear tomorrow and lay it out or hang it up.",
+            "Dress for tomorrow. Decide your outfit tonight and get it ready right now."
           ],
           "why": "Looking good tomorrow starts with planning tonight."
         },
@@ -1826,9 +1826,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "This habit is automatic now — keep the chain."
         },
@@ -1836,9 +1836,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "The skincare basics are still the most important part."
         }
@@ -1852,9 +1852,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Grab water and drink it."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration — keep the streak alive."
         },
@@ -1862,9 +1862,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Walk outside for 5 minutes.",
-            "Take a 5-minute walk outside.",
-            "Step outside and walk for 5 minutes."
+            "Walk outside for 5 minutes. Step out and keep moving at a steady pace.",
+            "5-minute walk. Go outside and walk for the full 5 minutes.",
+            "Get outside. Step out and walk for 5 minutes today."
           ],
           "why": "5-minute walks are easy and they add up fast."
         },
@@ -1872,9 +1872,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall in the mirror for 60 seconds.",
-            "Hold good posture in front of a mirror for 1 minute.",
-            "Check your posture in a mirror and hold it tall for 60 seconds."
+            "Fix your posture. Stand tall in the mirror for 60 seconds — shoulders back.",
+            "Posture hold. Spine straight, chin up — hold it in front of a mirror.",
+            "Stand tall. Press your back straight and hold good posture for 1 minute."
           ],
           "why": "Posture is almost automatic now — a few more weeks to fully lock it in."
         }
@@ -1888,9 +1888,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Check your nails — trim or clean them.",
-            "Take 2 minutes to tidy your fingernails.",
-            "Look at your nails and clean or trim them if needed."
+            "Do your nails. Clip them shorter and clean underneath each one.",
+            "Nail check. Trim your fingernails and brush or wipe them clean.",
+            "Tidy your nails. Cut them if they're too long and clean underneath."
           ],
           "why": "Grooming details matter — they say you care about yourself."
         },
@@ -1898,9 +1898,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face right now.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Over 50 days of face washing — you look better for it."
         },
@@ -1908,11 +1908,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 person you care about.",
-            "Reach out to 1 friend or family member today.",
-            "Text someone you like today."
+            "Fold or hang 3 clothes. Pick up 3 items lying around and fold or hang them.",
+            "Quick laundry sort. Take 1 minute to fold or hang 3 pieces of clothing.",
+            "Clothes reset. Grab 3 items off the floor or chair and put them away."
           ],
-          "why": "Social confidence grows when you stay connected."
+          "why": "A tidier wardrobe makes getting dressed easier and keeps your style sharp."
         }
       ]
     },
@@ -1924,9 +1924,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Drink some water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Water every day — still going."
         },
@@ -1934,9 +1934,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 15 push-ups or your best attempt.",
-            "Try 15 push-ups — you've built up to this.",
-            "Drop and do 15 push-ups right now."
+            "Do 15 push-ups. Get on the floor and do 15 reps — you've built up to this.",
+            "Push-up upgrade. Try 15 push-ups right now — more than before.",
+            "Level up your push-ups. Drop and do 15 reps at your own pace."
           ],
           "why": "You started at 10 — 15 is the next level."
         },
@@ -1944,9 +1944,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "One win first thing — still the best way to start the day."
         }
@@ -1960,9 +1960,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Go through your closet and find 1 item to donate or throw out.",
-            "Pull out 1 piece of clothing you don't wear anymore.",
-            "Find 1 item in your wardrobe that no longer fits your style."
+            "Edit your wardrobe. Go through your closet and pull out 1 item to donate or toss.",
+            "Closet clean. Find 1 piece you don't wear and put it in a donate pile.",
+            "Style audit. Open your wardrobe and remove 1 item that no longer fits your style."
           ],
           "why": "Making space in your wardrobe makes room for a better version of your style."
         },
@@ -1970,9 +1970,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Floss once today.",
-            "Take 1 minute to floss."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Flossing is a tiny habit with a real payoff."
         },
@@ -1980,9 +1980,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "The skincare habit is one of the best things you've done."
         }
@@ -1996,9 +1996,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Drink a glass of water."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Eight weeks of water — this is just you now."
         },
@@ -2006,9 +2006,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Walk outside for 5 minutes.",
-            "Step outside and walk for 5 minutes.",
-            "Take a 5-minute walk outside right now."
+            "Walk outside for 5 minutes. Step out and keep moving at a steady pace.",
+            "5-minute walk. Go outside and walk for the full 5 minutes.",
+            "Get outside. Step out and walk for 5 minutes today."
           ],
           "why": "Consistent movement keeps your energy and mood steady."
         },
@@ -2016,9 +2016,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall in the mirror for 60 seconds.",
-            "Check your posture in a mirror and hold it for 1 minute.",
-            "Hold good posture in front of a mirror for 60 seconds."
+            "Fix your posture. Stand tall in the mirror for 60 seconds — shoulders back.",
+            "Posture hold. Spine straight, no slouching — hold it in front of a mirror.",
+            "Stand tall. Press your back straight and hold good posture for 1 minute."
           ],
           "why": "Eight weeks of posture practice — it's becoming who you are."
         }
@@ -2032,9 +2032,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Clean your shoes today.",
-            "Wipe down your shoes — takes 2 minutes.",
-            "Give your shoes a quick clean right now."
+            "Clean your shoes. Wipe off any dirt or scuffs with a damp cloth right now.",
+            "Shoe wipe-down. Grab a cloth and clean both shoes — scuffs, dirt, soles.",
+            "Polish your kicks. Take 2 minutes to wipe your shoes completely clean."
           ],
           "why": "Clean shoes are the finishing touch on any outfit."
         },
@@ -2042,9 +2042,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed today.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "This habit is automatic — keep it going."
         },
@@ -2052,9 +2052,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face right now."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Face washing is the one skincare habit that matters most."
         }
@@ -2068,9 +2068,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water now.",
-            "Drink a glass of water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Still the easiest daily win you've got — keep it."
         },
@@ -2078,9 +2078,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 15 push-ups and 10 squats.",
-            "Try 15 push-ups followed by 10 squats.",
-            "Drop and do 15 push-ups, then 10 squats."
+            "Do 15 push-ups then 10 squats. Go from one to the other with no rest.",
+            "Push-up to squat combo. 15 push-ups then stand and do 10 squats.",
+            "Mini circuit. 15 push-ups followed by 10 squats — right now."
           ],
           "why": "Your strength is building — the numbers show it."
         },
@@ -2088,11 +2088,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 friend or family member.",
-            "Reach out to someone today.",
-            "Text or message 1 person you care about."
+            "Style your hair. Comb or brush it neatly before you leave the mirror.",
+            "Hair check. Look in the mirror and style your hair before heading out.",
+            "Fix your hair. Comb it into shape and make sure it looks intentional."
           ],
-          "why": "Confidence comes from both how you look and how you connect."
+          "why": "How your hair looks affects your whole appearance — take 1 minute."
         }
       ]
     },
@@ -2104,9 +2104,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look in the mirror. Name 3 things you like about how you look.",
-            "Stand in front of the mirror and find 3 things you genuinely like.",
-            "Take 2 minutes in the mirror and notice 3 things you like about yourself."
+            "Find 3 things you like. Look in the mirror and name 3 things you genuinely like about your look.",
+            "Confidence mirror. Stand in front of the mirror and find 3 things you like about yourself.",
+            "Self-check. Look in the mirror and pick out 3 things about your appearance you actually like."
           ],
           "why": "You're almost 2 months in — there's a lot to notice now."
         },
@@ -2114,9 +2114,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Take 1 minute to floss.",
-            "Floss once today."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Two months of dental care adds up."
         },
@@ -2124,9 +2124,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed today.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Almost 60 days — the habit is part of your morning now."
         }
@@ -2140,9 +2140,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Take a selfie. Compare it to Day 1, 21, and 50.",
-            "Snap a photo today and look at it next to your earlier ones.",
-            "Take a photo right now. You've got a real before-and-after now."
+            "Take a progress selfie. Compare it to Day 1, Day 30, and Day 50.",
+            "Two-month check-in. Snap a photo and stack it next to your earlier ones.",
+            "Glow-up log update. Take a photo right now — you've got a real before-and-after."
           ],
           "why": "Two months — the visual progress is real."
         },
@@ -2150,9 +2150,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Walk outside for 5 minutes.",
-            "Step outside and walk for 5 minutes.",
-            "Take a 5-minute walk outside."
+            "Walk outside for 5 minutes. Step out and keep moving at a steady pace.",
+            "5-minute walk. Go outside and walk for the full 5 minutes.",
+            "Get outside. Step out and walk for 5 minutes today."
           ],
           "why": "Two months of movement — your body is used to this now."
         },
@@ -2160,9 +2160,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Grab water and drink it."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "60 days in — you know the drill."
         }
@@ -2176,9 +2176,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Pick 1 outfit that makes you feel confident and wear it today.",
-            "Choose an outfit you feel great in and put it on.",
-            "Get dressed in 1 outfit you genuinely like how you look in."
+            "Wear a confidence outfit. Pick 1 outfit you feel great in and put it on today.",
+            "Dress with intention. Choose the outfit that makes you feel most confident right now.",
+            "Own your look. Get dressed in 1 outfit you genuinely like how you look in."
           ],
           "why": "How you dress affects how you feel all day — make it count."
         },
@@ -2186,9 +2186,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Two months of face washing — your skin is noticeably better."
         },
@@ -2196,9 +2196,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Drink some water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Water every day — still your most reliable habit."
         }
@@ -2212,9 +2212,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Stand in the mirror. Walk toward it like you mean it — head up, shoulders back.",
-            "Walk across your room with your head up and shoulders back. Try it 3 times.",
-            "Practice walking with good posture across your room right now."
+            "Practice confident walking. Walk across your room with head up and shoulders back — try it 3 times.",
+            "Walk tall. Step across the room with good posture — head up, chest out — repeat 3 times.",
+            "Body language drill. Walk across your space like you mean it — head up, back straight — 3 passes."
           ],
           "why": "Confident movement is something you can practice and improve."
         },
@@ -2222,9 +2222,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "The daily win — still setting the tone."
         },
@@ -2232,9 +2232,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Take 1 minute to floss today.",
-            "Floss once today."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Dental care — showing up for it is the only trick."
         }
@@ -2248,9 +2248,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Drink a glass of water."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Nine weeks in — hydration is just part of your life."
         },
@@ -2258,9 +2258,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Walk outside for 5 minutes.",
-            "Step outside and walk for 5 minutes.",
-            "Take a 5-minute walk outside today."
+            "Walk outside for 5 minutes. Step out and keep moving at a steady pace.",
+            "5-minute walk. Go outside and walk for the full 5 minutes.",
+            "Get outside. Step out and walk for 5 minutes today."
           ],
           "why": "Movement every day keeps your energy and mood steady."
         },
@@ -2268,11 +2268,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 person you haven't talked to in a while.",
-            "Reach out to someone you've been meaning to contact.",
-            "Text or message 1 person you care about today."
+            "Take a progress selfie. Snap a photo and save it for your glow-up log.",
+            "Glow-up log update. Take a photo of yourself today to track your progress.",
+            "Document the glow. Take a quick selfie right now and save it."
           ],
-          "why": "Confidence grows when you show up for relationships too."
+          "why": "Seeing your own progress over time keeps the motivation real."
         }
       ]
     },
@@ -2284,9 +2284,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look at your hair in the mirror. Is it styled or just there? Spend 2 minutes on it.",
-            "Give your hair 2 minutes of attention today — comb, style, or fix it.",
-            "Spend 2 minutes actually styling your hair today."
+            "Style your hair. Look in the mirror and spend 2 minutes actually doing something with it.",
+            "Hair focus. Comb, style, or fix your hair — give it 2 real minutes today.",
+            "Fix your hair. Look in the mirror and style it intentionally — not just combed flat."
           ],
           "why": "Your hair frames everything — 2 minutes of effort makes a real difference."
         },
@@ -2294,9 +2294,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face right now.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Skincare habit — still the best thing you do for your skin daily."
         },
@@ -2304,9 +2304,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed before you leave the room.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "9 weeks of this — it's automatic and that's the goal."
         }
@@ -2320,9 +2320,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Drink some water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration — your forever habit."
         },
@@ -2330,9 +2330,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 15 push-ups and 15 squats.",
-            "Try 15 push-ups followed by 15 squats.",
-            "Drop and do 15 push-ups, then 15 squats."
+            "Do 15 push-ups then 15 squats. No rest between — go from one to the other.",
+            "Push-up to squat combo. 15 push-ups then stand and do 15 squats.",
+            "Mini circuit. 15 push-ups followed by 15 squats — right now."
           ],
           "why": "You've leveled up the numbers — keep going."
         },
@@ -2340,9 +2340,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall in the mirror for 60 seconds.",
-            "Check your posture in a mirror and hold it for 1 minute.",
-            "Hold good posture in front of a mirror for 60 seconds."
+            "Fix your posture. Stand tall in the mirror for 60 seconds — shoulders back.",
+            "Posture hold. Spine straight, chin up — hold it in front of a mirror.",
+            "Stand tall. Press your back straight and hold good posture for 1 minute."
           ],
           "why": "Posture is almost fully natural now — just keep reinforcing it."
         }
@@ -2356,9 +2356,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Check your nails — trim or clean them.",
-            "Take 2 minutes to tidy your fingernails.",
-            "Look at your nails. Clean or trim them if needed."
+            "Do your nails. Clip them shorter and clean underneath each one.",
+            "Nail check. Trim your fingernails and wipe or brush them clean.",
+            "Tidy your nails. Cut them if they're too long and clean underneath."
           ],
           "why": "Grooming details say a lot about how much you care about yourself."
         },
@@ -2366,9 +2366,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Floss once today.",
-            "Take 1 minute to floss."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Still showing up for the dental habit — that's the whole game."
         },
@@ -2376,9 +2376,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Face washing every day is the best skincare routine you can do."
         }
@@ -2392,9 +2392,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water now.",
-            "Drink a glass of water."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Still the simplest habit — still working."
         },
@@ -2402,9 +2402,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Go for a 5-minute walk outside.",
-            "Step outside and walk for 5 minutes.",
-            "Take a 5-minute walk right now."
+            "Walk outside for 5 minutes. Step out and keep moving at a steady pace.",
+            "5-minute walk. Go outside and walk for the full 5 minutes.",
+            "Get outside. Step out and walk for 5 minutes today."
           ],
           "why": "Consistent outdoor movement is one of the best things for your mood."
         },
@@ -2412,9 +2412,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "The habit is fully yours now — keep the chain."
         }
@@ -2428,9 +2428,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Look in the mirror. How is your posture when you're not thinking about it?",
-            "Catch yourself in a mirror right now — are you slouching or standing tall?",
-            "Check your natural posture in a mirror today."
+            "Check your natural posture. Look in a mirror without thinking about it — are you standing tall?",
+            "Posture reality check. Catch yourself in a mirror right now — are you slouching or standing tall?",
+            "Posture audit. Check your natural posture in a mirror — fix anything that's still off."
           ],
           "why": "After 10 weeks, your posture should be improving on its own."
         },
@@ -2438,9 +2438,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face right now.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Skincare habit — still the cornerstone."
         },
@@ -2448,11 +2448,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 person you care about.",
-            "Reach out to someone today.",
-            "Text or message 1 friend or family member."
+            "Moisturize under your eyes. Dab a little cream or moisturizer under each eye and pat it in.",
+            "Eye area care. Apply eye cream or moisturizer under your eyes — takes 30 seconds.",
+            "Under-eye hydration. Pat a little moisturizer under your eyes and let it soak in."
           ],
-          "why": "Confidence comes from within — and from how you treat others."
+          "why": "The skin under your eyes is delicate — keeping it hydrated shows."
         }
       ]
     },
@@ -2464,9 +2464,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Grab water and drink it."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Ten weeks of hydration — it's part of who you are."
         },
@@ -2474,9 +2474,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Pick 1 outfit for tomorrow that you feel great in. Set it out.",
-            "Choose tomorrow's outfit tonight. Make it one you actually like.",
-            "Lay out an outfit for tomorrow that you feel confident in."
+            "Prep tomorrow's outfit. Choose something you feel confident in and lay it out.",
+            "Outfit plan. Pick your outfit for tomorrow tonight — make it one you actually like.",
+            "Dress for tomorrow. Lay out an outfit you feel great in so it's ready to go."
           ],
           "why": "When you plan your look ahead, you show up better."
         },
@@ -2484,9 +2484,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed today.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Keep the chain — you're almost at 70 days."
         }
@@ -2500,9 +2500,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Take a selfie. Save it.",
-            "Snap a photo of yourself today.",
-            "Take a photo of your face right now and keep it."
+            "Take a progress selfie. Snap a photo and put it next to your earlier ones.",
+            "70-day check-in. Take a photo of your face today and save it.",
+            "Glow-up log update. Take a selfie right now — look at the difference."
           ],
           "why": "70 days — look at the difference."
         },
@@ -2510,9 +2510,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 15 push-ups and 15 squats.",
-            "Try 15 push-ups and then 15 squats.",
-            "Drop and do 15 push-ups, then 15 squats."
+            "Do 15 push-ups then 15 squats. No rest between — go from one to the other.",
+            "Push-up to squat combo. 15 push-ups then stand and do 15 squats.",
+            "Mini circuit. 15 push-ups followed by 15 squats — right now."
           ],
           "why": "Ten weeks of movement — your body is stronger and it shows."
         },
@@ -2520,9 +2520,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "70 days of face washing — one of the best habits you've built."
         }
@@ -2536,9 +2536,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Clean your shoes today.",
-            "Wipe down your shoes — takes 2 minutes.",
-            "Give your shoes a quick clean."
+            "Clean your shoes. Wipe off any dirt or scuffs with a damp cloth right now.",
+            "Shoe wipe-down. Grab a cloth and clean both shoes — scuffs, dirt, soles.",
+            "Polish your kicks. Take 2 minutes to wipe your shoes completely clean."
           ],
           "why": "Clean shoes finish the look every time."
         },
@@ -2546,9 +2546,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water now.",
-            "Drink a glass of water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration — still going strong."
         },
@@ -2556,9 +2556,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Take 1 minute to floss today.",
-            "Floss once today."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Dental care — keep showing up."
         }
@@ -2572,9 +2572,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Go outside for a 5-minute walk.",
-            "Walk outside for 5 minutes.",
-            "Step outside and walk for 5 minutes."
+            "Walk outside for 5 minutes. Step out and keep moving at a steady pace.",
+            "5-minute walk. Go outside and walk for the full 5 minutes.",
+            "Get outside. Step out and walk for 5 minutes today."
           ],
           "why": "Outdoor movement is one of the best habits you can keep for life."
         },
@@ -2582,9 +2582,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "One win first thing — still the best way to start."
         },
@@ -2592,9 +2592,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "The skincare habit that changed your skin — keep going."
         }
@@ -2608,9 +2608,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Drink some water."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "73 days — this one's fully automatic and it should be."
         },
@@ -2618,9 +2618,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Look at your closet. Pick 1 outfit that represents the new you.",
-            "Find 1 outfit in your wardrobe that feels most like the version of you you're becoming.",
-            "Pick 1 outfit that makes you feel like the best version of yourself."
+            "Pick your best outfit. Look through your closet and choose the one that feels most like the new you.",
+            "Style moment. Find the outfit in your wardrobe that makes you feel like the best version of yourself.",
+            "Confidence fit. Pick 1 outfit that represents where you're headed — not just where you've been."
           ],
           "why": "Your style is evolving — recognize it."
         },
@@ -2628,9 +2628,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall in the mirror for 60 seconds.",
-            "Check your posture in a mirror and hold it for 1 minute.",
-            "Hold good posture in front of a mirror for 60 seconds."
+            "Fix your posture. Stand tall in the mirror for 60 seconds — shoulders back.",
+            "Posture hold. Spine straight, chin up — hold it in front of a mirror.",
+            "Stand tall. Press your back straight and hold good posture for 1 minute."
           ],
           "why": "10+ weeks of posture work — it's almost your default now."
         }
@@ -2644,9 +2644,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Check your nails — trim or clean them if needed.",
-            "Take 2 minutes to tidy your nails.",
-            "Trim or clean your fingernails today."
+            "Do your nails. Clip them shorter and clean underneath each one.",
+            "Nail check. Trim your fingernails and wipe or brush them clean.",
+            "Tidy your nails. Cut them if they're too long and clean underneath."
           ],
           "why": "Grooming details are a sign of self-respect — keep them up."
         },
@@ -2654,9 +2654,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Still the number one daily skincare habit."
         },
@@ -2664,11 +2664,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 person you care about.",
-            "Reach out to 1 friend or family member today.",
-            "Text or message someone you like today."
+            "Tidy one drawer. Open one clothes drawer and straighten it out right now.",
+            "Drawer reset. Take 1 minute to fold and sort one dresser drawer.",
+            "Organize one drawer. Pull it open and put everything neatly in its place."
           ],
-          "why": "How you show up for others reflects how you feel about yourself."
+          "why": "An organized wardrobe makes it easier to look put-together every day."
         }
       ]
     },
@@ -2680,19 +2680,19 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Grab water and drink it."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
-          "why": "75 days of water — this is one of the best things you've done for yourself."
+          "why": "75 days of water — one of the best things you've done for yourself."
         },
         {
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 20 push-ups or your best attempt.",
-            "Try 20 push-ups — you've built up to this.",
-            "Drop and do 20 push-ups right now."
+            "Do 20 push-ups. Get on the floor and do 20 reps — you've built up to this.",
+            "Push-up upgrade. Try 20 push-ups right now — more than you started with.",
+            "Level up your push-ups. Drop and do 20 reps at your own pace."
           ],
           "why": "75 days in — 20 push-ups is where you are now."
         },
@@ -2700,9 +2700,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "75 days of this habit — it's just who you are."
         }
@@ -2716,9 +2716,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Take a full-body selfie. Compare it to Day 1.",
-            "Take a photo of yourself — full body if you can. Compare it to the start.",
-            "Snap a full-body photo today and put it next to your Day 1 photo."
+            "Take a full-body progress photo. Stand in front of a mirror and snap it — compare to Day 1.",
+            "Full-body check-in. Take a photo of yourself — head to toe — and put it next to Day 1.",
+            "Final-stretch selfie. Take a full-body photo right now and compare it to your starting point."
           ],
           "why": "Final stretch — the visual progress from 76 days is real."
         },
@@ -2726,9 +2726,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "The skincare habit is carrying you into the final stretch."
         },
@@ -2736,9 +2736,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water now.",
-            "Drink a glass of water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Final 15 days — keep every habit strong."
         }
@@ -2752,9 +2752,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Walk outside for 5 minutes.",
-            "Go for a 5-minute walk outside.",
-            "Step outside and walk for 5 minutes."
+            "Walk outside for 5 minutes. Step out and keep moving at a steady pace.",
+            "5-minute walk. Go outside and walk for the full 5 minutes.",
+            "Get outside. Step out and walk for 5 minutes today."
           ],
           "why": "Outdoor movement is a habit worth keeping forever."
         },
@@ -2762,9 +2762,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "77 days — the chain is real."
         },
@@ -2772,9 +2772,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Take 1 minute to floss.",
-            "Floss once today."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Dental care — you've made this a habit. Don't break it now."
         }
@@ -2788,9 +2788,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water now.",
-            "Drink a glass of water."
+            "Drink water. Fill a glass and finish it right now.",
+            "Hydrate. Pour a full glass of water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Almost done — keep every habit strong."
         },
@@ -2798,9 +2798,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Look in the mirror. Name 3 things you like about yourself today.",
-            "Stand in the mirror and find 3 genuine things you like about your appearance.",
-            "Take 2 minutes in the mirror — find 3 things you genuinely like."
+            "Find 3 things you like. Look in the mirror and name 3 things you genuinely like about your look.",
+            "Confidence mirror. Stand in front of the mirror and find 3 things you like about yourself.",
+            "Self-check. Look in the mirror and pick out 3 things about your appearance you actually like."
           ],
           "why": "The confidence you've built over 78 days is real — notice it."
         },
@@ -2808,9 +2808,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face right now.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Skincare — still your best daily habit."
         }
@@ -2824,9 +2824,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Pick your best outfit and wear it today.",
-            "Get dressed in the outfit that makes you feel best.",
-            "Wear your most confident outfit today."
+            "Wear your best outfit. Get dressed in the one that makes you feel most confident today.",
+            "Dress your best. Put on the outfit you feel greatest in — wear it today.",
+            "Own your look. Choose your most confident outfit and put it on right now."
           ],
           "why": "Final stretch — show up looking and feeling your best."
         },
@@ -2834,9 +2834,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed today.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "79 days of this — it's a life habit now."
         },
@@ -2844,11 +2844,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 person you care about.",
-            "Reach out to someone today.",
-            "Text or message 1 friend or family member."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
-          "why": "Connection is part of confidence — keep reaching out."
+          "why": "Staying hydrated keeps your skin clear and your energy steady."
         }
       ]
     },
@@ -2860,9 +2860,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Drink some water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "80 days — this habit is just part of your life."
         },
@@ -2870,9 +2870,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Do 20 push-ups and 15 squats.",
-            "Try 20 push-ups and then 15 squats.",
-            "Drop and do 20 push-ups, then 15 squats."
+            "Do 20 push-ups then 15 squats. No rest between — go from one to the other.",
+            "Push-up to squat combo. 20 push-ups then stand and do 15 squats.",
+            "Mini circuit. 20 push-ups followed by 15 squats — right now."
           ],
           "why": "80 days of movement — your body is not what it was."
         },
@@ -2880,9 +2880,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Stand tall in the mirror for 60 seconds.",
-            "Check your posture in a mirror and hold it for 1 minute.",
-            "Hold good posture in front of a mirror for 60 seconds."
+            "Fix your posture. Stand tall in the mirror for 60 seconds — shoulders back.",
+            "Posture hold. Spine straight, chin up — hold it in front of a mirror.",
+            "Stand tall. Press your back straight and hold good posture for 1 minute."
           ],
           "why": "Final 10 days — posture is fully yours now."
         }
@@ -2896,9 +2896,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Clean your shoes today.",
-            "Give your shoes a quick wipe-down.",
-            "Wipe down your shoes — 2 minutes."
+            "Clean your shoes. Wipe off any dirt or scuffs with a damp cloth right now.",
+            "Shoe wipe-down. Grab a cloth and clean both shoes — scuffs, dirt, soles.",
+            "Polish your kicks. Take 2 minutes to wipe your shoes completely clean."
           ],
           "why": "Clean shoes in the final stretch — finish the way you started."
         },
@@ -2906,9 +2906,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Still the best daily skincare habit you've built."
         },
@@ -2916,9 +2916,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Almost at 90 — keep the streak."
         }
@@ -2932,9 +2932,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water now.",
-            "Drink a glass of water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "Hydration — still the habit that started it all."
         },
@@ -2942,9 +2942,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Walk outside for 5 minutes.",
-            "Step outside and walk for 5 minutes.",
-            "Go for a 5-minute walk outside right now."
+            "Walk outside for 5 minutes. Step out and keep moving at a steady pace.",
+            "5-minute walk. Go outside and walk for the full 5 minutes.",
+            "Get outside. Step out and walk for 5 minutes today."
           ],
           "why": "Movement in the final stretch — keep it going."
         },
@@ -2952,9 +2952,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Take 1 minute to floss.",
-            "Floss once today."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "82 days of dental care — the habit is yours to keep."
         }
@@ -2968,9 +2968,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Take a selfie. Compare it to Day 1, 30, and 60.",
-            "Snap a photo today and look at all your progress photos.",
-            "Take a photo right now and compare it to your earlier ones."
+            "Take a progress selfie. Compare it to Day 1, Day 30, and Day 60.",
+            "Final-stretch check-in. Snap a photo and look at all your progress photos together.",
+            "Glow-up log update. Take a photo right now and compare it to your earlier ones."
           ],
           "why": "Final week coming — the transformation is real."
         },
@@ -2978,9 +2978,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face right now.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "Still the best skincare habit — keep it for life."
         },
@@ -2988,9 +2988,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed today.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "83 days — one of the best habits you've ever built."
         }
@@ -3004,9 +3004,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have a glass of water now.",
-            "Drink some water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "84 days — this habit is permanent now."
         },
@@ -3014,9 +3014,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Look in the mirror. Name your 3 biggest glow-up wins.",
-            "Stand in the mirror and think about the 3 biggest changes you've made.",
-            "Take 2 minutes and reflect on the 3 things that changed most."
+            "Name your top 3 glow-up wins. Look in the mirror and say the 3 biggest things that changed.",
+            "Glow-up review. Stand in the mirror and think about the 3 biggest changes you've made.",
+            "Reflect on your wins. Take 2 minutes and name the 3 things that changed most."
           ],
           "why": "Naming your wins makes them real and helps them stick."
         },
@@ -3024,11 +3024,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 person you care about.",
-            "Reach out to someone today.",
-            "Text or message 1 friend or family member."
+            "Do 10 push-ups. Get on the floor and knock out 10 reps right now.",
+            "Quick push-up set. Drop and do 10 push-ups — go at your own pace.",
+            "Push-up check-in. Do 10 push-ups and notice how much easier it is than Day 1."
           ],
-          "why": "You've grown — share some of that energy with someone else."
+          "why": "Finishing strong means keeping every habit going all the way to Day 90."
         }
       ]
     },
@@ -3040,9 +3040,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Go for a 5-minute walk outside.",
-            "Step outside and walk for 5 minutes.",
-            "Take a 5-minute walk outside today."
+            "Walk outside for 5 minutes. Step out and keep moving at a steady pace.",
+            "5-minute walk. Go outside and walk for the full 5 minutes.",
+            "Get outside. Step out and walk for 5 minutes today."
           ],
           "why": "Five days left — keep every habit strong."
         },
@@ -3050,9 +3050,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "85 days of face washing — this is just how you live now."
         },
@@ -3060,9 +3060,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Five days from the finish — don't stop now."
         }
@@ -3076,9 +3076,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water right now.",
-            "Drink a glass of water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "86 days — almost there."
         },
@@ -3086,9 +3086,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Pick your best outfit and wear it today.",
-            "Get dressed in the outfit you feel most confident in.",
-            "Wear your best outfit today — finish strong."
+            "Wear your best outfit. Get dressed in the one that makes you feel most confident today.",
+            "Dress your best. Put on the outfit you feel greatest in — wear it today.",
+            "Own your look. Choose your most confident outfit and put it on right now."
           ],
           "why": "Final days — show up looking your best."
         },
@@ -3096,9 +3096,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Floss your teeth.",
-            "Take 1 minute to floss.",
-            "Floss once today."
+            "Floss your teeth. Run floss between every tooth — takes 60 seconds.",
+            "Do your flossing. Floss top and bottom all the way around.",
+            "Floss now. Take 60 seconds and clean between every tooth."
           ],
           "why": "Dental care to the finish — keep it going beyond Day 90."
         }
@@ -3112,9 +3112,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Do 20 push-ups and 20 squats.",
-            "Try 20 push-ups followed by 20 squats.",
-            "Drop and do 20 push-ups, then 20 squats."
+            "Do 20 push-ups then 20 squats. No rest between — go from one to the other.",
+            "Push-up to squat combo. 20 push-ups then stand and do 20 squats.",
+            "Mini circuit. 20 push-ups followed by 20 squats — right now."
           ],
           "why": "Final days — give it your best."
         },
@@ -3122,9 +3122,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Go wash your face.",
-            "Take 1 minute to wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "87 days — the skincare habit is one of your best."
         },
@@ -3132,9 +3132,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "Three days left — finish what you started."
         }
@@ -3148,9 +3148,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water.",
-            "Have some water now.",
-            "Drink a glass of water."
+            "Drink water. Pour a full glass and finish it right now.",
+            "Hydrate. Fill a glass with water and drink it all.",
+            "Water habit. Grab a glass and drink the whole thing."
           ],
           "why": "88 days of water — this habit is for life."
         },
@@ -3158,9 +3158,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Stand tall in the mirror for 2 minutes. Look at yourself.",
-            "Take 2 minutes in the mirror. Notice how you carry yourself now.",
-            "Look in the mirror for 2 full minutes. See who you've become."
+            "Look at yourself. Stand in the mirror for 2 minutes and notice how you carry yourself now.",
+            "Mirror moment. Take 2 minutes in the mirror — notice your posture, your look, how you've changed.",
+            "Full self-check. Look in the mirror for 2 full minutes and see who you've become."
           ],
           "why": "Two days left — take a real look at the person you've built."
         },
@@ -3168,11 +3168,11 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Message 1 person you care about.",
-            "Reach out to someone today.",
-            "Text or message 1 friend or family member."
+            "Tidy your eyebrows. Look in the mirror and pluck or trim any stray hairs.",
+            "Brow check. Look at your eyebrows — pluck or trim if they need it.",
+            "Clean up your brows. Take 1 minute to pluck or tidy your eyebrows right now."
           ],
-          "why": "The glow up is inside and out — stay connected."
+          "why": "Clean brows frame your face and make a big difference in how you look."
         }
       ]
     },
@@ -3184,9 +3184,9 @@
           "position": 1,
           "minutes": 2,
           "variants": [
-            "Take a full-body photo. Compare it to Day 1.",
-            "Snap a full-body selfie today. Put it next to your Day 1 photo.",
-            "Take a photo right now — full body if you can. Look at the difference."
+            "Take a full-body progress photo. Stand in front of a mirror and compare it to Day 1.",
+            "Day 89 full-body check-in. Snap a photo head to toe — put it next to your Day 1 photo.",
+            "Final-stretch selfie. Take a full-body photo right now and look at the difference."
           ],
           "why": "One day left — document where you are."
         },
@@ -3194,9 +3194,9 @@
           "position": 2,
           "minutes": 1,
           "variants": [
-            "Wash your face.",
-            "Take 1 minute to wash your face.",
-            "Go wash your face."
+            "Wash your face. Use cleanser or soap, scrub gently, and rinse.",
+            "Do your skincare. Wet your face, lather cleanser, rinse clean.",
+            "Clean your skin. Wash your face with water and soap right now."
           ],
           "why": "89 days of this — keep it going forever."
         },
@@ -3204,9 +3204,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Make your bed.",
-            "Tidy your bed this morning.",
-            "Pull your covers up and straighten your bed."
+            "Make your bed. Pull up the sheets and straighten the blanket.",
+            "Tidy your bed. Fix the covers and set the pillows in place.",
+            "Fix your bed. Straighten the sheets and fluff the pillows."
           ],
           "why": "One more — you've done it 89 times. Do it one more time."
         }
@@ -3220,9 +3220,9 @@
           "position": 1,
           "minutes": 1,
           "variants": [
-            "Take a selfie. You earned it.",
-            "Snap a photo of yourself today — the final one.",
-            "Take a photo right now. Day 90. Look at where you started."
+            "Take your final selfie. Snap a photo and put it next to Day 1.",
+            "Day 90 photo. Take a selfie right now — the final one. Look at where you started.",
+            "Glow-up complete. Take a photo of yourself today and compare it to your very first."
           ],
           "why": "90 days. You did it. This photo is the proof."
         },
@@ -3230,9 +3230,9 @@
           "position": 2,
           "minutes": 2,
           "variants": [
-            "Stand in the mirror. Name your top 3 glow-up wins.",
-            "Look in the mirror and say 3 things out loud that changed most.",
-            "Take 2 minutes and think about the 3 biggest things that changed."
+            "Name your top 3 wins. Stand in the mirror and say the 3 things that changed most.",
+            "Glow-up review. Look in the mirror and name 3 specific things you did — and notice.",
+            "Reflect on 90 days. Take 2 minutes and think about the 3 biggest things that changed."
           ],
           "why": "You set out to glow up — and you did. Know what you did."
         },
@@ -3240,9 +3240,9 @@
           "position": 3,
           "minutes": 1,
           "variants": [
-            "Drink 1 glass of water. Then decide which habits you're keeping forever.",
-            "Have a glass of water. Think about which habits stay with you after today.",
-            "Drink some water. You've built something real — decide which habits are yours to keep."
+            "Drink water. Pour a glass and drink it — then decide which habits you're keeping forever.",
+            "Final water. Fill a glass, drink it, and think about which habits stay with you after today.",
+            "Water and reflect. Drink a full glass of water and decide which habits are yours to keep."
           ],
           "why": "Day 90 is not the end. It's just who you are now."
         }
