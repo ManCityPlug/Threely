@@ -1087,6 +1087,9 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
   const [plan, setPlan] = useState<PlanId>("yearly");
   const [paymentDone, setPaymentDone] = useState(false);
   const [payerEmail, setPayerEmail] = useState<string | null>(null);
+  // Pre-checked on mount — purely informational disclosure, does not gate payment
+  const [termsAccepted, setTermsAccepted] = useState(true);
+  const renewPrice = plan === "yearly" ? "$99.99/year" : "$12.99/month";
 
   const SAMPLE_TASKS: Record<Category, string> = {
     business:   "Write down 3 things you're already good at",
@@ -1136,12 +1139,11 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
         {/* 2. Task preview — 1 visible + 2 blurred with shimmer */}
         <div style={{ position: "relative" }}>
           <div style={{
-            display: "flex", alignItems: "center", justifyContent: "space-between",
             fontSize: "0.7rem", color: "rgba(255,255,255,0.55)",
             marginBottom: 8, padding: "0 4px",
+            fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em",
           }}>
-            <span style={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em" }}>Day 1</span>
-            <span>~15 min total</span>
+            Day 1
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {/* Visible — premium feel */}
@@ -1194,6 +1196,26 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             </p>
           </div>
         </div>
+
+        {/* Terms disclosure — compact, pre-checked, fits above Apple Pay */}
+        <label style={{
+          display: "flex", alignItems: "flex-start", gap: 8,
+          fontSize: "0.6rem", lineHeight: 1.4,
+          color: "rgba(255,255,255,0.45)",
+          cursor: "pointer",
+          padding: "0 2px",
+          marginTop: -4,
+        }}>
+          <input
+            type="checkbox"
+            checked={termsAccepted}
+            onChange={(e) => setTermsAccepted(e.target.checked)}
+            style={{ marginTop: 2, accentColor: "#D4A843", flexShrink: 0, width: 13, height: 13, cursor: "pointer" }}
+          />
+          <span>
+            By continuing, you agree the payment method below will be automatically charged for ongoing subscription fees. You&apos;ll pay $1 today for a 3-day intro period. After that, your subscription will automatically renew at {renewPrice} unless you cancel before the intro period ends. Tax is included if applicable. Cancel anytime online or by contacting support before your next billing date. You also agree to the <a href="/privacy" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Privacy Policy</a> and <a href="/terms" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Terms of Service</a>, including the arbitration and class action waiver, and to receive offers from Threely.
+          </span>
+        </label>
 
         {/* 3. CTA — Apple Pay / Google Pay primary + card secondary */}
         <InlinePayment
