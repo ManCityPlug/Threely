@@ -1155,6 +1155,51 @@ export default function StartPage() {
   );
 }
 
+// ─── Sale countdown — resets at local midnight ────────────────────────────
+// Grey pill with gold accent that shows "Sale Ends: HH:MM:SS" counting down
+// to the user's local midnight. Placed directly above Apple Pay to add
+// urgency. Rerenders every second; recalculates on midnight cross.
+function SaleCountdown() {
+  const [tick, setTick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(id);
+  }, []);
+  const now = new Date();
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  let diff = Math.max(0, midnight.getTime() - now.getTime());
+  const h = Math.floor(diff / 3_600_000); diff -= h * 3_600_000;
+  const m = Math.floor(diff / 60_000); diff -= m * 60_000;
+  const s = Math.floor(diff / 1000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return (
+    <div
+      aria-hidden="true"
+      data-tick={tick}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 8,
+        padding: "0.7rem 1rem",
+        borderRadius: 14,
+        background: "linear-gradient(135deg, rgba(232,197,71,0.16) 0%, rgba(184,134,45,0.12) 100%)",
+        border: "1px solid rgba(212,168,67,0.45)",
+        boxShadow: "0 4px 16px rgba(212,168,67,0.15), inset 0 1px 0 rgba(255,255,255,0.05)",
+        animation: "saleCountdownPulse 2.4s ease-in-out infinite",
+      }}
+    >
+      <span style={{ fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: "rgba(232,197,71,0.9)" }}>
+        Sale Ends:
+      </span>
+      <span style={{ fontSize: "1.05rem", fontWeight: 800, letterSpacing: "-0.01em", color: "#E8C547", fontVariantNumeric: "tabular-nums" }}>
+        {pad(h)}:{pad(m)}:{pad(s)}
+      </span>
+    </div>
+  );
+}
+
 // ─── Plan Ready screen (wrapped in Elements by parent) ───────────────────────
 // High-conversion paywall hierarchy:
 //   1. Headline "Your plan is ready — start for $1" + 15-min subtext + urgency
@@ -1191,7 +1236,7 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "clamp(0.5rem, 2vh, 1.5rem) clamp(1rem, 4vw, 2rem)", display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
+    <div style={{ minHeight: "100vh", background: "var(--bg)", padding: "clamp(2rem, 6vh, 4rem) clamp(1rem, 4vw, 2rem) clamp(1rem, 4vw, 2rem)", display: "flex", alignItems: "flex-start", justifyContent: "center" }}>
       <div className="paywall-root" style={{ width: "100%", maxWidth: 460, display: "flex", flexDirection: "column", gap: "1.1rem" }}>
         {/* 1. Headline — most prominent (logo removed to push content higher) */}
         <div style={{ textAlign: "center", paddingTop: 0 }}>
@@ -1262,10 +1307,13 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             paddingBottom: 10, borderRadius: 14, pointerEvents: "none",
           }}>
             <p style={{ fontSize: "1.05rem", fontWeight: 700, color: "rgba(255,255,255,0.95)", margin: 0, letterSpacing: "-0.015em" }}>
-              Unlock the full plan
+              Start your goal for only $1
             </p>
           </div>
         </div>
+
+        {/* Countdown urgency — resets at local midnight */}
+        <SaleCountdown />
 
         {/* 3. CTA — Apple Pay / Google Pay primary + card secondary */}
         <InlinePayment
@@ -1325,6 +1373,10 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             0%   { transform: translateX(-100%); }
             60%  { transform: translateX(100%); }
             100% { transform: translateX(100%); }
+          }
+          @keyframes saleCountdownPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 16px rgba(212,168,67,0.15), inset 0 1px 0 rgba(255,255,255,0.05); }
+            50%      { transform: scale(1.025); box-shadow: 0 6px 22px rgba(212,168,67,0.28), inset 0 1px 0 rgba(255,255,255,0.08); }
           }
           .press-scale { transition: transform 0.12s ease-out, background 0.15s ease, box-shadow 0.15s ease; }
           .press-scale:active { transform: scale(0.97); }
