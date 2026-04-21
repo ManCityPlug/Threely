@@ -1123,14 +1123,8 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             margin: 0,
             marginBottom: 8,
           }}>
-            Your plan is ready — start for $1
+            One Step Away
           </h1>
-          <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.75)", margin: 0, marginBottom: 6 }}>
-            Takes ~15 minutes a day
-          </p>
-          <p style={{ fontSize: "0.78rem", color: "rgba(212,168,67,0.75)", fontWeight: 600, margin: 0, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-            Next step unlocks soon
-          </p>
         </div>
 
         {/* Goal card — compact, secondary */}
