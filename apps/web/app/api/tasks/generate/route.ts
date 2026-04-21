@@ -96,10 +96,22 @@ export async function POST(request: NextRequest) {
         // Already have today's task set — return it untouched
         if (existing) return { dailyTask: existing };
 
-        // goal.category stores the library path id (e.g. "daytrading_beginner")
-        const pathId = goal.category as PathId | null;
+        // goal.category stores the library path id (e.g. "daytrading_beginner").
+        // Legacy clients may still pass the short category name — fall back to a
+        // sensible default path per category so nothing breaks mid-rollout.
+        const LEGACY_CATEGORY_FALLBACK: Record<string, PathId> = {
+          daytrading: "daytrading_beginner",
+          business: "business_ecommerce",
+          health: "health_general",
+          fitness: "health_general",
+          wealth: "business_ecommerce",
+        };
+        let pathId = goal.category as PathId | null;
+        if (pathId && !(pathId in LIBRARIES) && LEGACY_CATEGORY_FALLBACK[pathId]) {
+          pathId = LEGACY_CATEGORY_FALLBACK[pathId];
+        }
         if (!pathId || !(pathId in LIBRARIES)) {
-          throw new Error(`Goal ${goal.id} has no valid library path (category="${pathId}")`);
+          throw new Error(`Goal ${goal.id} has no valid library path (category="${goal.category}")`);
         }
 
         // Day number = (fully-completed prior days) + 1 — completion-based progression
