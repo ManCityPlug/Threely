@@ -121,8 +121,8 @@ const STEPS: Record<Category, StepConfig[]> = {
       question: "What's your goal?",
       buttons: [
         { label: "Lose weight", path: "health_weight_loss", description: "Calorie deficit + movement" },
+        { label: "Glow up", path: "health_general", description: "Look, feel, and carry yourself better" },
         { label: "Build muscle", path: "health_muscle", description: "Progressive overload + protein" },
-        { label: "Get fit / feel better", path: "health_general", description: "Daily habits and movement" },
       ],
     },
     // step 2 intentionally unused for health — we skip from path → effort
@@ -132,6 +132,40 @@ const STEPS: Record<Category, StepConfig[]> = {
       { label: "Heavy", path: "" },
     ] },
   ],
+};
+
+// Multi-select "what does reaching this goal look like" shown only for health,
+// right after the path pick. 4 options per path, picked for psychological
+// weight — the real reasons people actually chase these goals. Stored on the
+// goal for context only — does not influence path routing or task content.
+const HEALTH_OUTCOME: Record<string, { question: string; options: string[] }> = {
+  health_weight_loss: {
+    question: "What does reaching this goal look like?",
+    options: [
+      "Love the mirror again",
+      "Feel good in photos",
+      "Feel wanted",
+      "Finally follow through",
+    ],
+  },
+  health_general: {
+    question: "What does reaching this goal look like?",
+    options: [
+      "Get noticed",
+      "Feel wanted",
+      "Stop being invisible",
+      "Be my best self",
+    ],
+  },
+  health_muscle: {
+    question: "What does reaching this goal look like?",
+    options: [
+      "Feel powerful",
+      "Earn respect",
+      "Look strong",
+      "Stop feeling small",
+    ],
+  },
 };
 
 function buildGoalTitle(category: Category, path: string, incomeOrAnswer: string): string {
@@ -150,7 +184,7 @@ function buildGoalTitle(category: Category, path: string, incomeOrAnswer: string
     case "health":
       if (path === "health_weight_loss") return "Lose Weight";
       if (path === "health_muscle") return "Build Muscle";
-      if (path === "health_general") return "Get Fit + Feel Better";
+      if (path === "health_general") return "Glow Up";
       return "Health Goal";
   }
 }
@@ -594,6 +628,9 @@ export default function StartPage() {
   const [funnelStep, setFunnelStep] = useState(0);
   const [answers, setAnswers] = useState<string[]>([]);
   const [selectedPath, setSelectedPath] = useState<string>("");
+  // Health-only multi-select: "what does reaching this goal look like?"
+  // Stored for context, does NOT affect path routing or task content.
+  const [healthOutcome, setHealthOutcome] = useState<string[]>([]);
   const [fadeKey, setFadeKey] = useState(0);
 
   // ── Hype + preview state ──
@@ -641,26 +678,38 @@ export default function StartPage() {
     setCategory(cat);
     setAnswers([]);
     setSelectedPath("");
+    setHealthOutcome([]);
     animateStep(1);
   }
 
-  // Step 1 captures the path; step 2 (business/daytrading) captures income;
-  // step 3 captures effort. Health skips step 2.
+  // Step 1 captures the path. Then:
+  //   - business/daytrading: step 2 = income, step 3 = effort
+  //   - health:              step 2 = outcome multi-select, step 3 = effort
   function handleButtonAnswer(answer: string, path?: string) {
     const newAnswers = [...answers, answer];
     setAnswers(newAnswers);
     const nextPath = path || selectedPath;
     if (path) setSelectedPath(path);
 
-    const totalSteps = category === "health" ? 2 : 3;
-    if (newAnswers.length >= totalSteps) {
+    if (newAnswers.length >= 3) {
       startBuild(category!, newAnswers, nextPath);
-    } else if (category === "health" && funnelStep === 1) {
-      // Skip income step for health — jump directly to effort (step 3)
-      animateStep(3);
     } else {
       animateStep(funnelStep + 1);
     }
+  }
+
+  function handleHealthOutcomeContinue() {
+    if (healthOutcome.length === 0) return;
+    // Count the multi-select as one "answer slot" so totalSteps math lines up
+    const newAnswers = [...answers, healthOutcome.join(", ")];
+    setAnswers(newAnswers);
+    animateStep(funnelStep + 1);
+  }
+
+  function toggleHealthOutcome(opt: string) {
+    setHealthOutcome((prev) =>
+      prev.includes(opt) ? prev.filter((o) => o !== opt) : [...prev, opt]
+    );
   }
 
   function handleBack() {
@@ -668,12 +717,11 @@ export default function StartPage() {
       setCategory(null);
       setAnswers([]);
       setSelectedPath("");
+      setHealthOutcome([]);
       animateStep(0);
     } else if (funnelStep > 1) {
       setAnswers((prev) => prev.slice(0, -1));
-      // Health goes back from effort (step 3) directly to path (step 1)
-      const prev = category === "health" && funnelStep === 3 ? 1 : funnelStep - 1;
-      animateStep(prev);
+      animateStep(funnelStep - 1);
     }
   }
 
@@ -764,9 +812,23 @@ export default function StartPage() {
   }
 
   // ── Get current step config ──
-  const currentStepConfig = category && funnelStep >= 1 && funnelStep <= 3
-    ? STEPS[category][funnelStep - 1]
-    : null;
+  // Health inserts a multi-select step at position 2 that isn't in the STEPS
+  // array — it's rendered from HEALTH_OUTCOME keyed on selectedPath. Effort
+  // for health lives at STEPS.health[1] but is reached at funnelStep=3.
+  const currentStepConfig = (() => {
+    if (!category || funnelStep < 1 || funnelStep > 3) return null;
+    if (category === "health") {
+      if (funnelStep === 1) return STEPS.health[0];
+      if (funnelStep === 2) return null; // custom multi-select render
+      if (funnelStep === 3) return STEPS.health[1]; // effort
+      return null;
+    }
+    return STEPS[category][funnelStep - 1];
+  })();
+  const healthOutcomeConfig =
+    category === "health" && funnelStep === 2 && selectedPath
+      ? HEALTH_OUTCOME[selectedPath]
+      : null;
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)" }}>
@@ -812,6 +874,79 @@ export default function StartPage() {
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* ── Health multi-select (step 2) ── */}
+        {healthOutcomeConfig && (
+          <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+            <button
+              onClick={handleBack}
+              style={{
+                background: "none", border: "none", color: "rgba(255,255,255,0.85)",
+                cursor: "pointer", fontSize: "1rem", padding: "4px 0",
+                alignSelf: "flex-start", display: "flex", alignItems: "center", gap: 6, minHeight: 48,
+              }}
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              Back
+            </button>
+            <div style={{ textAlign: "center" }}>
+              <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 16 }} />
+              <h2 style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
+                {healthOutcomeConfig.question}
+              </h2>
+              <p style={{ fontSize: "0.85rem", color: "rgba(255,255,255,0.55)", margin: 0 }}>Pick all that apply</p>
+              <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 12 }}>
+                {[1, 2, 3].map((dot) => (
+                  <div key={dot} style={{
+                    width: 8, height: 8, borderRadius: "50%",
+                    background: dot <= funnelStep ? "#D4A843" : "var(--border)",
+                    transition: "background 0.2s",
+                  }} />
+                ))}
+              </div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {healthOutcomeConfig.options.map((opt) => {
+                const selected = healthOutcome.includes(opt);
+                return (
+                  <button
+                    key={opt}
+                    onClick={() => toggleHealthOutcome(opt)}
+                    style={{
+                      padding: "1rem 1.25rem", borderRadius: 14,
+                      border: `1.5px solid ${selected ? "#D4A843" : "var(--border)"}`,
+                      background: selected ? "rgba(212,168,67,0.1)" : "var(--card)",
+                      color: selected ? "#D4A843" : "var(--text)",
+                      fontSize: "1rem", fontWeight: 600,
+                      cursor: "pointer", transition: "all 0.15s", minHeight: 56,
+                      textAlign: "center",
+                    }}
+                  >
+                    {opt}
+                  </button>
+                );
+              })}
+            </div>
+            <button
+              onClick={handleHealthOutcomeContinue}
+              disabled={healthOutcome.length === 0}
+              style={{
+                padding: "1rem 1.25rem", borderRadius: 14, border: "none",
+                background: healthOutcome.length > 0
+                  ? "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)"
+                  : "var(--border)",
+                color: healthOutcome.length > 0 ? "#000" : "rgba(255,255,255,0.5)",
+                fontSize: "1rem", fontWeight: 700,
+                cursor: healthOutcome.length > 0 ? "pointer" : "default",
+                minHeight: 56, transition: "all 0.15s",
+              }}
+            >
+              Continue
+            </button>
           </div>
         )}
 
