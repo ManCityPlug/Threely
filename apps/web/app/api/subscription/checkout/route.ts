@@ -21,26 +21,33 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid plan. Use 'monthly' or 'yearly'." }, { status: 400 });
     }
 
-    // Ensure user record exists (anon users may not have one yet).
-    // If the email is already claimed by a different row (stale anon record
-    // from a previous visit), return a clean "sign in" error instead of
-    // surfacing the raw Prisma P2002.
-    const userEmail = user.email ?? `anon-${user.id}@anon.threely.local`;
+    // Ensure user record exists (anon users may not have one yet). If the
+    // real email collides with an existing row (leftover from a prior flow),
+    // keep this row on the anon placeholder email — Apple Pay can still
+    // collect the card. The sign-in flow in AccountFinalize handles claiming
+    // the existing account after payment.
+    const anonFallbackEmail = `anon-${user.id}@anon.threely.local`;
+    const desiredEmail = user.email ?? anonFallbackEmail;
     try {
       await prisma.user.upsert({
         where: { id: user.id },
-        create: { id: user.id, email: userEmail },
+        create: { id: user.id, email: desiredEmail },
         update: user.email ? { email: user.email } : {},
       });
     } catch (upsertErr: unknown) {
       const msg = upsertErr instanceof Error ? upsertErr.message : "";
       if (msg.includes("Unique constraint") && msg.includes("email")) {
-        return NextResponse.json(
-          { error: "An account with this email already exists. Please sign in instead." },
-          { status: 409 }
-        );
+        // Email is taken by another row — fall back to an anon-suffixed
+        // email so the checkout row exists and Stripe SetupIntent can proceed.
+        // The real email gets re-attached later via the sign-in fallback.
+        await prisma.user.upsert({
+          where: { id: user.id },
+          create: { id: user.id, email: anonFallbackEmail },
+          update: { email: anonFallbackEmail },
+        });
+      } else {
+        throw upsertErr;
       }
-      throw upsertErr;
     }
     const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
 
