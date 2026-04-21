@@ -1366,7 +1366,7 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             paddingBottom: 12, borderRadius: 14, pointerEvents: "none", gap: 2,
           }}>
             <p style={{ fontSize: "1.15rem", fontWeight: 800, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>
-              Unlock the rest
+              Finish what you started
             </p>
             <p style={{ fontSize: "0.88rem", fontWeight: 600, color: "rgba(255,255,255,0.72)", margin: 0, letterSpacing: "-0.01em" }}>
               Start your goal for only $1
