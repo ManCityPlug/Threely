@@ -1292,14 +1292,16 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
         </div>
 
         {/* 2. Task preview — 2 blurred numbered cards + 1 big shaking lock
-             centered above them. No per-card locks, no visible starter. */}
+             centered above them. No per-card locks, no visible starter.
+             Tasks sit flush (no gap) so the overlay reads as a single unit. */}
         <div style={{ position: "relative" }}>
-          <div className="locked-stack" style={{ pointerEvents: "none", userSelect: "none", display: "flex", flexDirection: "column", gap: 10 }}>
+          <div className="locked-stack" style={{ pointerEvents: "none", userSelect: "none", display: "flex", flexDirection: "column", gap: 0, borderRadius: 14, overflow: "hidden" }}>
             {BLURRED_PLACEHOLDERS.map((placeholder, i) => (
               <div key={i} className="locked-task" style={{
                 padding: "0.9rem 1.1rem",
-                borderRadius: 14,
+                borderRadius: 0,
                 border: "1px solid rgba(255,255,255,0.08)",
+                borderTop: i === 0 ? "1px solid rgba(255,255,255,0.08)" : "none",
                 background: "rgba(255,255,255,0.02)",
                 display: "flex",
                 alignItems: "center",
@@ -1337,7 +1339,7 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             <p style={{ fontSize: "1.15rem", fontWeight: 800, color: "#fff", margin: 0, letterSpacing: "-0.02em" }}>
               Finish what you started
             </p>
-            <p style={{ fontSize: "0.88rem", fontWeight: 600, color: "rgba(255,255,255,0.72)", margin: 0, letterSpacing: "-0.01em" }}>
+            <p style={{ fontSize: "0.88rem", fontWeight: 600, color: "#fff", margin: 0, letterSpacing: "-0.01em" }}>
               Start your goal for only $1
             </p>
           </div>
