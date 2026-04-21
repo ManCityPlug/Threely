@@ -71,65 +71,62 @@ interface StepConfig {
 const STEPS: Record<Category, StepConfig[]> = {
   business: [
     {
-      question: "What are you building?",
+      question: "What do you want to build?",
       buttons: [
-        { label: "Ecommerce — starting fresh", path: "business_ecommerce", description: "Physical product, Shopify, dropshipping" },
-        { label: "Ecommerce — already have a store", path: "business_ecommerce_existing", description: "Grow traffic and revenue" },
-        { label: "Service / freelancing", path: "business_service", description: "Trade skills for money" },
-        { label: "Content / audience", path: "business_content", description: "TikTok, YouTube, IG, X" },
-        { label: "Software / SaaS", path: "business_saas", description: "Digital product or SaaS" },
+        { label: "Ecommerce", path: "business_ecommerce", description: "Sell stuff online" },
+        { label: "Personal brand", path: "business_content", description: "Grow a following" },
       ],
     },
     {
-      question: "How much do you want to make per month?",
+      question: "How much do you want to make?",
       buttons: [
         { label: "$500", path: "" },
         { label: "$1K-$5K", path: "" },
         { label: "$10K+", path: "" },
       ],
     },
-    { question: "Level of work?", buttons: [
-      { label: "Mild", path: "" },
-      { label: "Moderate", path: "" },
-      { label: "Heavy", path: "" },
+    { question: "How hard?", buttons: [
+      { label: "Easy", path: "" },
+      { label: "Medium", path: "" },
+      { label: "Hard", path: "" },
     ] },
   ],
   daytrading: [
     {
-      question: "Where are you starting?",
+      question: "Where are you at?",
       buttons: [
-        { label: "Never traded", path: "daytrading_beginner", description: "Learn from scratch with paper trading" },
-        { label: "I have experience", path: "daytrading_experienced", description: "Build discipline and consistency" },
+        { label: "Never traded", path: "daytrading_beginner" },
+        { label: "I've traded before", path: "daytrading_experienced" },
       ],
     },
     {
-      question: "How much do you want to make per month?",
+      question: "How much do you want to make?",
       buttons: [
         { label: "$500", path: "" },
         { label: "$1K-$5K", path: "" },
         { label: "$10K+", path: "" },
       ],
     },
-    { question: "Level of work?", buttons: [
-      { label: "Mild", path: "" },
-      { label: "Moderate", path: "" },
-      { label: "Heavy", path: "" },
+    { question: "How hard?", buttons: [
+      { label: "Easy", path: "" },
+      { label: "Medium", path: "" },
+      { label: "Hard", path: "" },
     ] },
   ],
   health: [
     {
       question: "What's your goal?",
       buttons: [
-        { label: "Lose weight", path: "health_weight_loss", description: "Calorie deficit + movement" },
-        { label: "Glow up", path: "health_general", description: "Look, feel, and carry yourself better" },
-        { label: "Build muscle", path: "health_muscle", description: "Progressive overload + protein" },
+        { label: "Lose weight", path: "health_weight_loss" },
+        { label: "Glow up", path: "health_general" },
+        { label: "Build muscle", path: "health_muscle" },
       ],
     },
     // step 2 intentionally unused for health — we skip from path → effort
-    { question: "Level of work?", buttons: [
-      { label: "Mild", path: "" },
-      { label: "Moderate", path: "" },
-      { label: "Heavy", path: "" },
+    { question: "How hard?", buttons: [
+      { label: "Easy", path: "" },
+      { label: "Medium", path: "" },
+      { label: "Hard", path: "" },
     ] },
   ],
 };
@@ -172,10 +169,7 @@ function buildGoalTitle(category: Category, path: string, incomeOrAnswer: string
   switch (category) {
     case "business":
       if (path === "business_ecommerce") return incomeOrAnswer ? `Make ${incomeOrAnswer}/Month (Ecommerce)` : "Start an Ecommerce Brand";
-      if (path === "business_ecommerce_existing") return incomeOrAnswer ? `Grow My Store to ${incomeOrAnswer}/Month` : "Grow My Ecommerce Store";
-      if (path === "business_service") return incomeOrAnswer ? `Make ${incomeOrAnswer}/Month (Service)` : "Start a Service Business";
-      if (path === "business_content") return incomeOrAnswer ? `Build an Audience + ${incomeOrAnswer}/Month` : "Build a Content Brand";
-      if (path === "business_saas") return incomeOrAnswer ? `Launch a SaaS + ${incomeOrAnswer}/Month` : "Launch a SaaS";
+      if (path === "business_content") return incomeOrAnswer ? `Build My Brand → ${incomeOrAnswer}/Month` : "Build a Personal Brand";
       return incomeOrAnswer ? `Make ${incomeOrAnswer}/Month` : "Start a Business";
     case "daytrading":
       if (path === "daytrading_beginner") return incomeOrAnswer ? `Learn Day Trading → ${incomeOrAnswer}/Month` : "Learn to Day Trade";
@@ -190,15 +184,15 @@ function buildGoalTitle(category: Category, path: string, incomeOrAnswer: string
 }
 
 const EFFORT_TO_MINUTES: Record<string, number> = {
-  mild: 30,
-  moderate: 60,
-  heavy: 120,
+  easy: 30,
+  medium: 60,
+  hard: 120,
 };
 
 const EFFORT_TO_INTENSITY: Record<string, number> = {
-  mild: 1,
-  moderate: 2,
-  heavy: 3,
+  easy: 1,
+  medium: 2,
+  hard: 3,
 };
 
 // ─── Plan Selector (Monthly | Yearly) ────────────────────────────────────────
@@ -840,18 +834,18 @@ export default function StartPage() {
             <div style={{ textAlign: "center" }}>
               <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 16 }} />
               <h1 style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
-                What do you want to achieve?
+                What do you want?
               </h1>
               <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.85)" }}>
-                Pick a category to get started
+                Pick one to start
               </p>
             </div>
 
             <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
               {([
-                { id: "daytrading" as Category, label: "📈 Day Trading", subtitle: "Grow a trading account" },
-                { id: "business" as Category, label: "💼 Business", subtitle: "Start or grow a business" },
-                { id: "health" as Category, label: "💪 Health", subtitle: "Transform your body" },
+                { id: "daytrading" as Category, label: "📈 Day Trading", subtitle: "Make money trading" },
+                { id: "business" as Category, label: "💼 Business", subtitle: "Make money online" },
+                { id: "health" as Category, label: "💪 Health", subtitle: "Get in shape" },
               ]).map((cat) => (
                 <button
                   key={cat.id}

@@ -23,12 +23,12 @@ import { useTheme } from "@/lib/theme";
 const GOLD = "#D4A843";
 
 type Category = "business" | "daytrading" | "health";
-type EffortLevel = "Mild" | "Moderate" | "Heavy";
+type EffortLevel = "Easy" | "Medium" | "Hard";
 
 const EFFORT_MAP: Record<EffortLevel, { dailyTimeMinutes: number; intensityLevel: number }> = {
-  Mild: { dailyTimeMinutes: 30, intensityLevel: 1 },
-  Moderate: { dailyTimeMinutes: 60, intensityLevel: 2 },
-  Heavy: { dailyTimeMinutes: 120, intensityLevel: 3 },
+  Easy:   { dailyTimeMinutes: 30, intensityLevel: 1 },
+  Medium: { dailyTimeMinutes: 60, intensityLevel: 2 },
+  Hard:   { dailyTimeMinutes: 120, intensityLevel: 3 },
 };
 
 // Path options per category. The `path` string is the library path id stored
@@ -37,20 +37,17 @@ interface PathOption { label: string; path: string; description?: string }
 
 const PATH_OPTIONS: Record<Category, PathOption[]> = {
   daytrading: [
-    { label: "Never traded", path: "daytrading_beginner", description: "Learn from scratch with paper trading" },
-    { label: "I have experience", path: "daytrading_experienced", description: "Build discipline and consistency" },
+    { label: "Never traded", path: "daytrading_beginner" },
+    { label: "I've traded before", path: "daytrading_experienced" },
   ],
   business: [
-    { label: "Ecommerce — starting fresh", path: "business_ecommerce", description: "Physical product, Shopify, dropshipping" },
-    { label: "Ecommerce — already have a store", path: "business_ecommerce_existing", description: "Grow traffic and revenue" },
-    { label: "Service / freelancing", path: "business_service", description: "Trade skills for money" },
-    { label: "Content / audience", path: "business_content", description: "TikTok, YouTube, IG, X" },
-    { label: "Software / SaaS", path: "business_saas", description: "Digital product or SaaS" },
+    { label: "Ecommerce", path: "business_ecommerce", description: "Sell stuff online" },
+    { label: "Personal brand", path: "business_content", description: "Grow a following" },
   ],
   health: [
-    { label: "Lose weight", path: "health_weight_loss", description: "Calorie deficit + movement" },
-    { label: "Build muscle", path: "health_muscle", description: "Progressive overload + protein" },
-    { label: "Get fit / feel better", path: "health_general", description: "Daily habits and movement" },
+    { label: "Lose weight", path: "health_weight_loss" },
+    { label: "Glow up", path: "health_general" },
+    { label: "Build muscle", path: "health_muscle" },
   ],
 };
 
@@ -58,10 +55,7 @@ function buildGoalTitleFromPath(category: Category, path: string, income: string
   switch (category) {
     case "business":
       if (path === "business_ecommerce") return income ? `Make ${income}/Month (Ecommerce)` : "Start an Ecommerce Brand";
-      if (path === "business_ecommerce_existing") return income ? `Grow My Store to ${income}/Month` : "Grow My Ecommerce Store";
-      if (path === "business_service") return income ? `Make ${income}/Month (Service)` : "Start a Service Business";
-      if (path === "business_content") return income ? `Build an Audience + ${income}/Month` : "Build a Content Brand";
-      if (path === "business_saas") return income ? `Launch a SaaS + ${income}/Month` : "Launch a SaaS";
+      if (path === "business_content") return income ? `Build My Brand → ${income}/Month` : "Build a Personal Brand";
       return income ? `Make ${income}/Month` : "Start a Business";
     case "daytrading":
       if (path === "daytrading_beginner") return income ? `Learn Day Trading → ${income}/Month` : "Learn to Day Trade";
@@ -388,7 +382,7 @@ export default function OnboardingScreen() {
   function renderCategoryPicker() {
     return (
       <View style={styles.centerContent}>
-        <Text style={styles.stepTitle}>What are you working toward?</Text>
+        <Text style={styles.stepTitle}>What do you want?</Text>
         <View style={styles.categoryList}>
           <TouchableOpacity
             style={styles.categoryBtn}
@@ -398,7 +392,7 @@ export default function OnboardingScreen() {
             <Text style={styles.categoryEmoji}>📈</Text>
             <View style={styles.categoryTextWrap}>
               <Text style={styles.categoryLabel}>Day Trading</Text>
-              <Text style={styles.categoryDesc}>Grow a trading account</Text>
+              <Text style={styles.categoryDesc}>Make money trading</Text>
             </View>
           </TouchableOpacity>
 
@@ -410,7 +404,7 @@ export default function OnboardingScreen() {
             <Text style={styles.categoryEmoji}>💼</Text>
             <View style={styles.categoryTextWrap}>
               <Text style={styles.categoryLabel}>Business</Text>
-              <Text style={styles.categoryDesc}>Start or grow a business</Text>
+              <Text style={styles.categoryDesc}>Make money online</Text>
             </View>
           </TouchableOpacity>
 
@@ -422,7 +416,7 @@ export default function OnboardingScreen() {
             <Text style={styles.categoryEmoji}>💪</Text>
             <View style={styles.categoryTextWrap}>
               <Text style={styles.categoryLabel}>Health</Text>
-              <Text style={styles.categoryDesc}>Transform your body</Text>
+              <Text style={styles.categoryDesc}>Get in shape</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -470,7 +464,7 @@ export default function OnboardingScreen() {
     return (
       <View style={styles.stepContainer}>
         <ProgressDots current={2} total={3} />
-        <Text style={styles.stepTitle}>How much do you want to make per month?</Text>
+        <Text style={styles.stepTitle}>How much do you want to make?</Text>
         <View style={styles.optionList}>
           {["$500", "$1K-$5K", "$10K+"].map((opt) => (
             <TouchableOpacity
@@ -495,9 +489,9 @@ export default function OnboardingScreen() {
     return (
       <View style={styles.stepContainer}>
         <ProgressDots current={current} total={totalSteps} />
-        <Text style={styles.stepTitle}>Level of work?</Text>
+        <Text style={styles.stepTitle}>How hard?</Text>
         <View style={styles.optionList}>
-          {(["Mild", "Moderate", "Heavy"] as EffortLevel[]).map((opt) => (
+          {(["Easy", "Medium", "Hard"] as EffortLevel[]).map((opt) => (
             <TouchableOpacity
               key={opt}
               style={styles.optionBtn}
