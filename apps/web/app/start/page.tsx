@@ -1251,21 +1251,13 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
   const [payerEmail, setPayerEmail] = useState<string | null>(null);
   const renewPrice = plan === "yearly" ? "$99.99/year" : "$12.99/month";
 
+  // Two blurred-only preview cards — no visible task (avoids the "user reads
+  // it and just does it themselves" leak). The shimmer + lock sells that
+  // there's a real plan behind the paywall without handing it out.
   const BLURRED_PLACEHOLDERS = [
-    "Your next personalized step, made for your goal",
-    "A simple action to build momentum today",
+    "Your first personalized step, built for your goal",
+    "A simple action to lock in your habit today",
   ];
-  // Prefer the path-specific sample task (e.g. daytrading_beginner → paper
-  // account), fall back to a category-level default.
-  const CATEGORY_FALLBACK: Record<Category, string> = {
-    business:   "Write down 3 things people would pay to learn from you",
-    daytrading: "Open a free paper trading account (Webull or Thinkorswim)",
-    health:     "Drink a full glass of water right now",
-  };
-  const visibleTask =
-    (selectedPath && PATH_SAMPLE_TASK[selectedPath]) ||
-    (category && CATEGORY_FALLBACK[category]) ||
-    CATEGORY_FALLBACK.business;
 
 
   if (paymentDone) {
@@ -1299,65 +1291,39 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
           <div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)" }}>{generatedGoalTitle}</div>
         </div>
 
-        {/* 2. Task preview — 1 visible + 2 blurred with shimmer */}
+        {/* 2. Task preview — 2 blurred numbered cards, no leak */}
         <div style={{ position: "relative" }}>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {/* Visible — numbered (1), premium feel */}
-            <div style={{
-              padding: "0.9rem 1.1rem",
-              borderRadius: 14,
-              border: "1px solid rgba(212,168,67,0.25)",
-              background: "rgba(255,255,255,0.03)",
-              boxShadow: "0 4px 20px rgba(0,0,0,0.2), 0 0 0 1px rgba(212,168,67,0.08)",
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-            }}>
-              <div style={{
-                width: 26, height: 26, borderRadius: "50%",
-                border: "2px solid rgba(212,168,67,0.8)",
-                background: "rgba(212,168,67,0.1)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                flexShrink: 0,
-                fontSize: "0.78rem", fontWeight: 800, color: "#E8C547",
-              }}>1</div>
-              <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0 }}>
-                {visibleTask}
-              </div>
-            </div>
-            {/* Blurred with shimmer + numbered (2, 3) + shaking lock */}
-            <div className="locked-stack" style={{ pointerEvents: "none", userSelect: "none", display: "flex", flexDirection: "column", gap: 10 }}>
-              {BLURRED_PLACEHOLDERS.map((placeholder, i) => (
-                <div key={i} className="locked-task" style={{
-                  padding: "0.9rem 1.1rem",
-                  borderRadius: 14,
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  background: "rgba(255,255,255,0.02)",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 12,
-                }}>
-                  <div style={{
-                    width: 26, height: 26, borderRadius: "50%",
-                    border: "2px solid rgba(255,255,255,0.18)",
-                    background: "rgba(255,255,255,0.03)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    flexShrink: 0,
-                    fontSize: "0.78rem", fontWeight: 800, color: "rgba(255,255,255,0.35)",
-                  }}>{i + 2}</div>
-                  <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0, filter: "blur(5px)" }}>
-                    {placeholder}
-                  </div>
-                  <div className="shake-lock" style={{
-                    fontSize: "1.15rem",
-                    flexShrink: 0,
-                    filter: "drop-shadow(0 0 6px rgba(212,168,67,0.7))",
-                    position: "relative",
-                    zIndex: 3,
-                  }}>🔒</div>
+          <div className="locked-stack" style={{ pointerEvents: "none", userSelect: "none", display: "flex", flexDirection: "column", gap: 10 }}>
+            {BLURRED_PLACEHOLDERS.map((placeholder, i) => (
+              <div key={i} className="locked-task" style={{
+                padding: "0.9rem 1.1rem",
+                borderRadius: 14,
+                border: "1px solid rgba(255,255,255,0.08)",
+                background: "rgba(255,255,255,0.02)",
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+              }}>
+                <div style={{
+                  width: 26, height: 26, borderRadius: "50%",
+                  border: "2px solid rgba(255,255,255,0.18)",
+                  background: "rgba(255,255,255,0.03)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  flexShrink: 0,
+                  fontSize: "0.78rem", fontWeight: 800, color: "rgba(255,255,255,0.35)",
+                }}>{i + 1}</div>
+                <div style={{ fontSize: "0.92rem", fontWeight: 600, color: "var(--text)", lineHeight: 1.35, flex: 1, minWidth: 0, filter: "blur(5px)" }}>
+                  {placeholder}
                 </div>
-              ))}
-            </div>
+                <div className="shake-lock" style={{
+                  fontSize: "1.15rem",
+                  flexShrink: 0,
+                  filter: "drop-shadow(0 0 6px rgba(212,168,67,0.7))",
+                  position: "relative",
+                  zIndex: 3,
+                }}>🔒</div>
+              </div>
+            ))}
           </div>
           {/* Gradient fade + unlock CTA */}
           <div style={{
