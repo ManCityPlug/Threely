@@ -842,7 +842,11 @@ function DashboardPageInner() {
       .sort((a, b) => a.localMs - b.localMs);
     const firstIncomplete = candidates.find(({ dt }) => {
       const items = dt.tasks.slice(-3);
-      return items.length > 0 && !items.every((t) => t.isCompleted || t.isSkipped);
+      // Empty-tasks DailyTask: row exists but generation hasn't populated it
+      // (e.g. milestone day that pre-gen hit before content was ready). Treat
+      // as incomplete so the path doesn't skip over it.
+      if (items.length === 0) return true;
+      return !items.every((t) => t.isCompleted || t.isSkipped);
     });
     if (firstIncomplete) {
       const diffDays = Math.floor((firstIncomplete.localMs - createdLocalMs) / 86400000) + 1;
@@ -858,7 +862,31 @@ function DashboardPageInner() {
 
   const pathDayNumber = effectivePathDayNumber;
   const pathCompletedDays = Math.max(0, effectivePathDayNumber - 1);
-  const pathAllDone = todayAllDone;
+  // pathAllDone reflects completion of pathDayNumber's DailyTask — NOT of the
+  // calendar-today DailyTask. Without this scope: after user finishes day N,
+  // pathDayNumber advances to N+1 but todayAllDone is still true (from day N),
+  // so PathView's `day === dayNumber && allDoneToday → completed` branch
+  // incorrectly marks day N+1 (and N+2 becomes "next"), skipping the real
+  // unlocked day. Scoped to pathDayNumber, the DailyTask for N+1 doesn't
+  // exist (or has empty/incomplete tasks) → false → renders as "today".
+  const pathAllDone = (() => {
+    if (!selectedGoal) return false;
+    const createdLocalMs = new Date(
+      new Date(selectedGoal.createdAt).getFullYear(),
+      new Date(selectedGoal.createdAt).getMonth(),
+      new Date(selectedGoal.createdAt).getDate()
+    ).getTime();
+    const pathDt = effectiveDailyTasks.find((d) => {
+      if (d.goalId !== effectiveSelectedGoalId || !d.date) return false;
+      const x = new Date(d.date);
+      const localMs = new Date(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()).getTime();
+      const diffDays = Math.floor((localMs - createdLocalMs) / 86400000) + 1;
+      return diffDays === effectivePathDayNumber;
+    });
+    if (!pathDt) return false;
+    const items = pathDt.tasks.slice(-3);
+    return items.length > 0 && items.every((t) => t.isCompleted || t.isSkipped);
+  })();
 
   const userToggledRef = useRef(false);
 

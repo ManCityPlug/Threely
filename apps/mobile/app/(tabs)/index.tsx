@@ -1754,7 +1754,11 @@ export default function DashboardScreen() {
       .sort((a, b) => a.localMs - b.localMs);
     const firstIncomplete = candidates.find(({ dt }) => {
       const items = Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]).slice(-3) : [];
-      return items.length > 0 && !items.every((t) => t.isCompleted || t.isSkipped);
+      // Empty-tasks DailyTask: row exists but generation hasn't populated it
+      // (e.g. milestone day that pre-gen hit before content was ready). Treat
+      // as incomplete so the path doesn't skip over it.
+      if (items.length === 0) return true;
+      return !items.every((t) => t.isCompleted || t.isSkipped);
     });
     if (firstIncomplete) {
       const diffDays = Math.floor((firstIncomplete.localMs - createdLocalMs) / 86400000) + 1;
@@ -1766,6 +1770,33 @@ export default function DashboardScreen() {
       return Math.max(1, lastDay + 1);
     }
     return goalDayNumber;
+  })();
+
+  // pathDayAllDone reflects completion of effectiveDayNumber's DailyTask —
+  // NOT of the calendar-today DailyTask. Without this scope: after user
+  // finishes day N, effectiveDayNumber advances to N+1 but `allDone` is still
+  // true (from day N), so SCurvePathView's `day === goalDayNumber && allDone`
+  // rule incorrectly marks day N+1 as completed (and N+2 as "work-ahead"),
+  // skipping the real unlocked day. Scoped to effectiveDayNumber, the
+  // DailyTask for N+1 doesn't exist (or has empty/incomplete tasks) → false
+  // → SCurvePathView renders N+1 as "today".
+  const pathDayAllDone = (() => {
+    if (!currentGoalObj) return false;
+    const createdLocalMs = new Date(
+      new Date(currentGoalObj.createdAt).getFullYear(),
+      new Date(currentGoalObj.createdAt).getMonth(),
+      new Date(currentGoalObj.createdAt).getDate()
+    ).getTime();
+    const pathDt = effectiveDailyTasks.find((d) => {
+      if (d.goalId !== effectiveSelectedGoal || !d.date) return false;
+      const x = new Date(d.date);
+      const localMs = new Date(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()).getTime();
+      const diffDays = Math.floor((localMs - createdLocalMs) / 86400000) + 1;
+      return diffDays === effectiveDayNumber;
+    });
+    if (!pathDt) return false;
+    const items = Array.isArray(pathDt.tasks) ? (pathDt.tasks as TaskItem[]).slice(-3) : [];
+    return items.length > 0 && items.every((t) => t.isCompleted || t.isSkipped);
   })();
 
   // Task progress for progress ring (0-1)
@@ -2245,7 +2276,7 @@ export default function DashboardScreen() {
             {/* S-curve path */}
             <SCurvePathView
               goalDayNumber={effectiveDayNumber}
-              allDone={allDone}
+              allDone={pathDayAllDone}
               startedDays={startedDays}
               scrollTrigger={pathScrollTrigger}
               onTapToday={() => {
