@@ -1731,16 +1731,14 @@ export default function DashboardScreen() {
   const streak = getStreakFromGoals(effectiveGoals);
   const goalDayNumber = currentGoalObj ? getGoalDayNumber(currentGoalObj) : 1;
 
-  // Effective path day number — calendar day, capped down to the oldest
-  // DailyTask (for this goal) whose tasks aren't all completed. Keeps the
-  // user on Day N visually + functionally until Day N's 3 tasks are done,
-  // even after midnight rolls the calendar to Day N+1. Web has the same
-  // guard at its pathDayNumber. Work-ahead keys still use the raw
-  // goalDayNumber so they reset daily by calendar.
+  // Effective path day number — mirrors web's `pathDayNumber`:
+  // first DailyTask whose 3 tasks aren't all done determines the day;
+  // if every existing day is done, it's the day AFTER the last one.
+  // No cap to calendar day — completing a day immediately unlocks the next
+  // (so web + mobile stay in sync when the calendar rolls past the last
+  // existing DailyTask but before tomorrow's DailyTask has been generated).
   const effectiveDayNumber = (() => {
     if (!currentGoalObj) return goalDayNumber;
-    const today = new Date();
-    const todayLocalMs = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
     const createdLocalMs = new Date(
       new Date(currentGoalObj.createdAt).getFullYear(),
       new Date(currentGoalObj.createdAt).getMonth(),
@@ -1753,15 +1751,21 @@ export default function DashboardScreen() {
         const localMs = new Date(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()).getTime();
         return { dt: d, localMs };
       })
-      .filter((x) => x.localMs <= todayLocalMs)
       .sort((a, b) => a.localMs - b.localMs);
     const firstIncomplete = candidates.find(({ dt }) => {
       const items = Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]).slice(-3) : [];
       return items.length > 0 && !items.every((t) => t.isCompleted || t.isSkipped);
     });
-    if (!firstIncomplete) return goalDayNumber;
-    const diffDays = Math.floor((firstIncomplete.localMs - createdLocalMs) / 86400000) + 1;
-    return Math.min(goalDayNumber, Math.max(1, diffDays));
+    if (firstIncomplete) {
+      const diffDays = Math.floor((firstIncomplete.localMs - createdLocalMs) / 86400000) + 1;
+      return Math.max(1, diffDays);
+    }
+    if (candidates.length > 0) {
+      const last = candidates[candidates.length - 1];
+      const lastDay = Math.floor((last.localMs - createdLocalMs) / 86400000) + 1;
+      return Math.max(1, lastDay + 1);
+    }
+    return goalDayNumber;
   })();
 
   // Task progress for progress ring (0-1)
