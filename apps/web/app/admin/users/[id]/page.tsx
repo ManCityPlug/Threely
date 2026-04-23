@@ -17,11 +17,8 @@ interface TaskItem {
 interface GoalItem {
   id: string;
   title: string;
-  description: string | null;
   rawInput: string;
-  structuredSummary: string | null;
   category: string | null;
-  roadmap: string | null;
   dailyTimeMinutes: number | null;
   intensityLevel: number | null;
   deadline: string | null;
@@ -47,20 +44,9 @@ interface UserDetail {
   goals: {
     total: number;
     active: number;
-    completed: number;
-    last30d: number;
     list: GoalItem[];
   };
-  tasks: {
-    totalGenerated: number;
-    completed: number;
-    skipped: number;
-    completionRate: number;
-    totalMinutesInvested: number;
-    totalHoursInvested: number;
-    dailyTaskRecords: number;
-  };
-  streaks: { current: number; best: number };
+  streaks: { current: number };
   subscription: {
     status: string | null;
     stripeStatus: string | null;
@@ -75,10 +61,6 @@ interface UserDetail {
     trialStart: string | null;
     trialEnd: string | null;
     rcSubscriptionActive: boolean;
-  };
-  ai: {
-    breakdown: Record<string, { calls: number; cost: number }>;
-    totalCost: number;
   };
 }
 
@@ -267,51 +249,17 @@ function GoalCard({ goal }: { goal: GoalItem }) {
             </div>
           )}
 
-          {/* Raw Input */}
-          {goal.rawInput && (
-            <div style={{ marginBottom: "1rem" }}>
+          {/* Raw Input — only shown when the user actually typed something.
+              In the current MC-based onboarding the field is usually equal
+              to the template title, so we hide it in that case to reduce
+              noise. */}
+          {goal.rawInput && goal.rawInput.trim() !== goal.title.trim() && (
+            <div>
               <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
                 User&apos;s Raw Input
               </div>
               <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#141414", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
                 {goal.rawInput}
-              </div>
-            </div>
-          )}
-
-          {/* Structured Summary */}
-          {goal.structuredSummary && (
-            <div style={{ marginBottom: "1rem" }}>
-              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
-                Structured Summary
-              </div>
-              <div style={{ fontSize: "0.85rem", color: "#d4d4d8", lineHeight: 1.6, background: "#141414", borderRadius: 8, padding: "0.65rem 0.75rem", border: "1px solid #1e1e21" }}>
-                {goal.structuredSummary}
-              </div>
-            </div>
-          )}
-
-          {/* Roadmap */}
-          {goal.roadmap && (
-            <div>
-              <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "#a1a1aa", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 6 }}>
-                Full Roadmap
-              </div>
-              <div
-                style={{
-                  fontSize: "0.83rem",
-                  color: "#d4d4d8",
-                  lineHeight: 1.7,
-                  background: "#141414",
-                  borderRadius: 8,
-                  padding: "0.75rem",
-                  border: "1px solid #1e1e21",
-                  whiteSpace: "pre-wrap",
-                  maxHeight: 400,
-                  overflowY: "auto",
-                }}
-              >
-                {goal.roadmap}
               </div>
             </div>
           )}
@@ -522,9 +470,9 @@ function GrantOfferSection({
     (o) => o.status === "pending" || o.status === "auto_applied"
   );
   const claimedOffers = offers.filter((o) => o.status === "claimed");
-  const historicalOffers = offers.filter(
-    (o) => o.status === "expired" || o.status === "revoked"
-  );
+  // Expired + revoked offers are intentionally NOT shown. Revoked ones are
+  // admin-initiated (clutter), expired ones are self-resolving — neither
+  // belongs in the active support surface.
 
   const inputBase: React.CSSProperties = {
     background: "#141414",
@@ -846,25 +794,6 @@ function GrantOfferSection({
                 ))}
               </div>
             )}
-            {historicalOffers.length > 0 && (
-              <div>
-                <div
-                  style={{
-                    fontSize: "0.7rem",
-                    fontWeight: 700,
-                    color: "#71717a",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.05em",
-                    marginBottom: 8,
-                  }}
-                >
-                  Expired / Revoked ({historicalOffers.length})
-                </div>
-                {historicalOffers.map((o) => (
-                  <OfferListItem key={o.id} offer={o} />
-                ))}
-              </div>
-            )}
             {offers.length === 0 && (
               <div style={{ color: "#52525b", fontSize: "0.82rem", fontStyle: "italic" }}>
                 No offers granted yet.
@@ -1006,7 +935,7 @@ export default function AdminUserDetailPage() {
     return <div style={{ color: "#71717a", padding: "2rem" }}>Loading...</div>;
   }
 
-  const { user, goals, tasks, streaks, subscription, ai } = data;
+  const { user, goals, streaks, subscription } = data;
 
   return (
     <div style={{ maxWidth: 1100 }}>
@@ -1040,8 +969,8 @@ export default function AdminUserDetailPage() {
         </div>
       </div>
 
-      {/* Streaks */}
-      <h2 style={sectionTitle}>Streaks</h2>
+      {/* Streak */}
+      <h2 style={sectionTitle}>Streak</h2>
       <div
         style={{
           display: "grid",
@@ -1052,9 +981,6 @@ export default function AdminUserDetailPage() {
       >
         <div style={cardStyle}>
           <Stat label="Current Streak" value={`${streaks.current} days`} />
-        </div>
-        <div style={cardStyle}>
-          <Stat label="Best Streak" value={`${streaks.best} days`} />
         </div>
       </div>
 
@@ -1071,12 +997,6 @@ export default function AdminUserDetailPage() {
         <div style={cardStyle}>
           <Stat label="Active" value={goals.active} />
         </div>
-        <div style={cardStyle}>
-          <Stat label="Completed" value={goals.completed} />
-        </div>
-        <div style={cardStyle}>
-          <Stat label="Last 30d" value={goals.last30d} />
-        </div>
       </div>
       {goals.list.length > 0 && (
         <div style={{ marginBottom: "2rem" }}>
@@ -1085,36 +1005,6 @@ export default function AdminUserDetailPage() {
           ))}
         </div>
       )}
-
-      {/* Tasks */}
-      <h2 style={sectionTitle}>Tasks</h2>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))",
-          gap: "1rem",
-          marginBottom: "2rem",
-        }}
-      >
-        <div style={cardStyle}>
-          <Stat label="Generated" value={tasks.totalGenerated} />
-        </div>
-        <div style={cardStyle}>
-          <Stat label="Completed" value={tasks.completed} />
-        </div>
-        <div style={cardStyle}>
-          <Stat label="Skipped" value={tasks.skipped} />
-        </div>
-        <div style={cardStyle}>
-          <Stat label="Completion %" value={`${tasks.completionRate}%`} />
-        </div>
-        <div style={cardStyle}>
-          <Stat label="Hours Invested" value={tasks.totalHoursInvested} />
-        </div>
-        <div style={cardStyle}>
-          <Stat label="Daily Records" value={tasks.dailyTaskRecords} />
-        </div>
-      </div>
 
       {/* Subscription */}
       <h2 style={sectionTitle}>Subscription</h2>
@@ -1380,57 +1270,6 @@ export default function AdminUserDetailPage() {
 
       {/* Grant Offer Section */}
       <GrantOfferSection userId={user.id} />
-
-      {/* AI Costs */}
-      <h2 style={sectionTitle}>AI Costs (Estimated)</h2>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
-          gap: "1rem",
-          marginBottom: "1rem",
-        }}
-      >
-        <div style={cardStyle}>
-          <Stat label="Total Cost" value={`$${ai.totalCost.toFixed(2)}`} />
-        </div>
-      </div>
-      <div style={cardStyle}>
-        <table
-          style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            fontSize: "0.85rem",
-          }}
-        >
-          <thead>
-            <tr style={{ borderBottom: "1px solid #1e1e1e" }}>
-              <th style={{ textAlign: "left", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>
-                Function
-              </th>
-              <th style={{ textAlign: "right", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>
-                Calls
-              </th>
-              <th style={{ textAlign: "right", padding: "0.5rem 0", color: "#71717a", fontWeight: 600 }}>
-                Est. Cost
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {Object.entries(ai.breakdown).map(([fn, info]) => (
-              <tr key={fn} style={{ borderBottom: "1px solid #1e1e21" }}>
-                <td style={{ padding: "0.4rem 0", color: "#e4e4e7" }}>{fn}</td>
-                <td style={{ padding: "0.4rem 0", textAlign: "right", color: "#a1a1aa" }}>
-                  {info.calls.toLocaleString()}
-                </td>
-                <td style={{ padding: "0.4rem 0", textAlign: "right", color: "#a1a1aa" }}>
-                  ${info.cost.toFixed(3)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 }

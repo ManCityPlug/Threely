@@ -17,15 +17,11 @@ interface TaskItem {
   isSkipped?: boolean;
 }
 
-// AI cost estimates per call (USD), computed from real AICallLog token averages
-// priced against DeepSeek V3.2 ($0.28 in / $0.42 out per 1M). Must stay in sync
-// with /api/admin/overview/route.ts. Only current-product functions are tracked.
-const AI_COSTS = {
-  parseGoal:       0.000305,
-  generateRoadmap: 0.000749,
-  generateTasks:   0.000962,
-};
-
+// Task content comes from @threely/tasks now, so this endpoint no longer
+// reports per-call LLM cost or aggregate task counters — they were based on
+// the old generateTasks/parseGoal/generateRoadmap stack that's been stubbed.
+// Kept here: who the user is, their active goals (with today's task preview),
+// current streak, and Stripe subscription state for support actions.
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -37,24 +33,22 @@ export async function GET(
 
   const { id } = await params;
 
-  const [user, goals, allDailyTasks] =
-    await Promise.all([
-      prisma.user.findUnique({
-        where: { id },
-        include: { profile: true },
-      }),
-      prisma.goal.findMany({
-        where: { userId: id },
-        orderBy: { createdAt: "desc" },
-      }),
-      prisma.dailyTask.findMany({ where: { userId: id } }),
-    ]);
+  const [user, goals, allDailyTasks] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id },
+      include: { profile: true },
+    }),
+    prisma.goal.findMany({
+      where: { userId: id },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.dailyTask.findMany({ where: { userId: id } }),
+  ]);
 
   if (!user) {
     return NextResponse.json({ error: "User not found" }, { status: 404 });
   }
 
-  // Get Supabase auth info (last sign in)
   let lastSignIn: string | null = null;
   try {
     const { data } = await supabaseAdmin.auth.admin.getUserById(id);
@@ -63,24 +57,9 @@ export async function GET(
     // ignore
   }
 
-  // Task stats
-  let totalTaskItems = 0;
-  let completedTasks = 0;
-  let skippedTasks = 0;
-  let totalMinutesInvested = 0;
-  for (const dt of allDailyTasks) {
-    const tasks = dt.tasks as unknown as TaskItem[];
-    for (const t of tasks) {
-      totalTaskItems++;
-      if (t.isCompleted) {
-        completedTasks++;
-        totalMinutesInvested += t.estimated_minutes ?? 0;
-      }
-      if (t.isSkipped) skippedTasks++;
-    }
-  }
-
-  // Streak calculation (same algorithm as /api/stats)
+  // Current streak — same algorithm as /api/stats. Best streak was removed:
+  // a streak that only counts up is the only number the user sees, so showing
+  // a separate "best" added noise without adding info.
   const tasksByDate = new Map<string, typeof allDailyTasks>();
   for (const dt of allDailyTasks) {
     const key = new Date(dt.date).toISOString().split("T")[0];
@@ -104,53 +83,6 @@ export async function GET(
     streak++;
   }
 
-  let bestStreak = streak;
-  const allDateKeys = Array.from(tasksByDate.keys()).sort();
-  if (allDateKeys.length > 0) {
-    let currentRun = 0;
-    let prevDate: Date | null = null;
-    for (const key of allDateKeys) {
-      const dayTasks = tasksByDate.get(key)!;
-      const hasCompleted = dayTasks.some((dt) =>
-        (dt.tasks as unknown as TaskItem[]).some((t) => t.isCompleted)
-      );
-      if (hasCompleted) {
-        const thisDate = new Date(key + "T00:00:00Z");
-        if (prevDate) {
-          const diffDays = Math.round(
-            (thisDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24)
-          );
-          currentRun = diffDays === 1 ? currentRun + 1 : 1;
-        } else {
-          currentRun = 1;
-        }
-        prevDate = thisDate;
-        if (currentRun > bestStreak) bestStreak = currentRun;
-      } else {
-        currentRun = 0;
-        prevDate = null;
-      }
-    }
-  }
-
-  // Goals in last 30 days
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-  const goalsLast30d = goals.filter((g) => g.createdAt >= thirtyDaysAgo).length;
-
-  // AI cost estimate. One DailyTask = one generateTasks call (work-ahead creates
-  // a separate DailyTask for tomorrow, already included in the count).
-  const goalCount = goals.length;
-  const aiCosts = {
-    parseGoal:       { calls: goalCount,            cost: goalCount            * AI_COSTS.parseGoal },
-    generateRoadmap: { calls: goalCount,            cost: goalCount            * AI_COSTS.generateRoadmap },
-    generateTasks:   { calls: allDailyTasks.length, cost: allDailyTasks.length * AI_COSTS.generateTasks },
-  };
-  const totalAICost = Object.values(aiCosts).reduce(
-    (sum, v) => sum + v.cost,
-    0
-  );
-
   return NextResponse.json({
     user: {
       id: user.id,
@@ -165,12 +97,9 @@ export async function GET(
     goals: {
       total: goals.length,
       active: goals.filter((g) => g.isActive).length,
-      completed: goals.filter((g) => !g.isActive).length,
-      last30d: goalsLast30d,
       list: goals.map((g) => {
-        // Find today's tasks for this goal.
-        // Tasks are stored with the user's local date, but the server runs in UTC,
-        // so check both today and yesterday (UTC) to handle timezone differences.
+        // Find today's tasks for this goal. Tasks are stored with the user's
+        // local date; server runs in UTC, so check today and yesterday.
         const now = new Date();
         const todayKey = now.toISOString().split("T")[0];
         const yesterday = new Date(now);
@@ -193,11 +122,8 @@ export async function GET(
         return {
           id: g.id,
           title: g.title,
-          description: g.description,
           rawInput: g.rawInput,
-          structuredSummary: g.structuredSummary,
           category: g.category,
-          roadmap: g.roadmap,
           dailyTimeMinutes: g.dailyTimeMinutes,
           intensityLevel: g.intensityLevel,
           deadline: g.deadline,
@@ -211,23 +137,7 @@ export async function GET(
         };
       }),
     },
-    tasks: {
-      totalGenerated: totalTaskItems,
-      completed: completedTasks,
-      skipped: skippedTasks,
-      completionRate:
-        totalTaskItems > 0
-          ? Math.round((completedTasks / totalTaskItems) * 100)
-          : 0,
-      totalMinutesInvested,
-      totalHoursInvested:
-        Math.round((totalMinutesInvested / 60) * 10) / 10,
-      dailyTaskRecords: allDailyTasks.length,
-    },
-    streaks: {
-      current: streak,
-      best: bestStreak,
-    },
+    streaks: { current: streak },
     subscription: await (async () => {
       let firstChargeDate: string | null = null;
       let subscriptionStartDate: string | null = null;
@@ -241,7 +151,6 @@ export async function GET(
       if (user.stripeCustomerId) {
         try {
           const stripe = getStripe();
-          // Get first successful charge date
           const charges = await stripe.charges.list({
             customer: user.stripeCustomerId,
             limit: 1,
@@ -249,7 +158,6 @@ export async function GET(
           if (charges.data.length > 0 && charges.data[0].status === "succeeded") {
             firstChargeDate = new Date(charges.data[0].created * 1000).toISOString();
           }
-          // Get live subscription data
           const subs = await stripe.subscriptions.list({
             customer: user.stripeCustomerId,
             limit: 1,
@@ -257,12 +165,11 @@ export async function GET(
           if (subs.data.length > 0) {
             const sub = subs.data[0];
             subscriptionStartDate = new Date(sub.start_date * 1000).toISOString();
-            stripeStatus = sub.status; // active, trialing, canceled, past_due, etc.
+            stripeStatus = sub.status;
             cancelAtPeriodEnd = sub.cancel_at_period_end;
             currentPeriodEnd = new Date(sub.current_period_end * 1000).toISOString();
             if (sub.trial_start) trialStart = new Date(sub.trial_start * 1000).toISOString();
             if (sub.trial_end) trialEnd = new Date(sub.trial_end * 1000).toISOString();
-            // Get plan info
             const item = sub.items.data[0];
             if (item) {
               const interval = item.price.recurring?.interval;
@@ -291,9 +198,5 @@ export async function GET(
         rcSubscriptionActive: user.rcSubscriptionActive,
       };
     })(),
-    ai: {
-      breakdown: aiCosts,
-      totalCost: Math.round(totalAICost * 100) / 100,
-    },
   });
 }
