@@ -1,0 +1,12 @@
+{
+  "name": "@threely/dfy",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./names": "./names/index.ts",
+    "./products": "./products/index.ts",
+    "./logos": "./logos/index.ts"
+  }
+}

@@ -16,6 +16,7 @@ import { MOCK_TUTORIAL_GOAL, MOCK_TUTORIAL_DAILY_TASK } from "@/lib/mock-tutoria
 import OfferBanner from "@/components/OfferBanner";
 import OfferLoginModal from "@/components/OfferLoginModal";
 import PathView from "@/components/PathView";
+import DfyButton, { detectDfyType } from "@/components/DfyButton";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -218,6 +219,17 @@ function GamifiedTaskCard({
         }}>
           {task.description}
         </div>
+        {!task.isCompleted && !task.isSkipped && !readOnly && (() => {
+          const dfyType = detectDfyType(task.task);
+          if (!dfyType) return null;
+          return (
+            <DfyButton
+              type={dfyType}
+              taskText={task.task}
+              onDelivered={() => onToggle(task.id, true)}
+            />
+          );
+        })()}
       </div>
     </div>
   );
@@ -500,7 +512,7 @@ function CelebrationOverlay({
         onMouseEnter={e => { e.currentTarget.style.background = "#e0bc5e"; }}
         onMouseLeave={e => { e.currentTarget.style.background = "#D4A843"; }}
       >
-        See you tomorrow
+        Return to path
       </button>
     </div>
   );
@@ -639,8 +651,6 @@ function DashboardPageInner() {
 
   // Path view state — false = path/roadmap view, true = fullscreen task view
   const [showTasks, setShowTasks] = useState(false);
-  const [workAheadModal, setWorkAheadModal] = useState(false);
-  const [lockedTimerModal, setLockedTimerModal] = useState(false);
   const [viewingDay, setViewingDay] = useState<number | null>(null);
   // Separate state for viewing other days' tasks (so we don't corrupt today's dailyTasks)
   const [viewingTasks, setViewingTasks] = useState<DailyTask[] | null>(null);
@@ -891,28 +901,11 @@ function DashboardPageInner() {
   const streak = getStreakFromGoals(effectiveGoals);
   const goalDayNumber = selectedGoal ? getGoalDayNumber(selectedGoal) : 1;
 
-  // Track work-ahead state in localStorage (scoped by goalDayNumber so it resets on day change)
-  const todayStr = new Date().toLocaleDateString("en-CA");
-  const aheadUsedKey = `threely_ahead_used_${todayStr}_${effectiveSelectedGoalId}_d${goalDayNumber}`;
-  const aheadDoneKey = `threely_ahead_done_${todayStr}_${effectiveSelectedGoalId}_d${goalDayNumber}`;
-  const [workAheadUsed, setWorkAheadUsed] = useState(false);
-  const [workAheadDone, setWorkAheadDone] = useState(false);
-
-  useEffect(() => {
-    setWorkAheadUsed(!!localStorage.getItem(aheadUsedKey));
-    setWorkAheadDone(!!localStorage.getItem(aheadDoneKey));
-  }, [aheadUsedKey, aheadDoneKey]);
-
-  // Effective day = calendar day, capped down to the oldest DailyTask (for
-  // this goal) whose tasks aren't all done. So if midnight rolls from Day N
-  // to Day N+1 but Day N's 3 tasks weren't finished, the path + tasks view
-  // stay on Day N until the user completes it. Mobile has the same guard.
-  // Work-ahead localStorage keys keep using the raw goalDayNumber so they
-  // reset daily by calendar.
+  // Effective path day = first DailyTask (for this goal) whose 3 tasks aren't
+  // all done. If every existing day is done, it's the day after the last one.
+  // No calendar cap — completing a day immediately unlocks the next.
   const effectivePathDayNumber = (() => {
     if (!selectedGoal) return goalDayNumber;
-    const today = new Date();
-    const todayLocalMs = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
     const createdLocalMs = new Date(
       new Date(selectedGoal.createdAt).getFullYear(),
       new Date(selectedGoal.createdAt).getMonth(),
@@ -925,44 +918,28 @@ function DashboardPageInner() {
         const localMs = new Date(x.getUTCFullYear(), x.getUTCMonth(), x.getUTCDate()).getTime();
         return { dt: d, localMs };
       })
-      .filter((x) => x.localMs <= todayLocalMs)
       .sort((a, b) => a.localMs - b.localMs);
     const firstIncomplete = candidates.find(({ dt }) => {
       const items = dt.tasks.slice(-3);
       return items.length > 0 && !items.every((t) => t.isCompleted || t.isSkipped);
     });
-    if (!firstIncomplete) return goalDayNumber;
-    const diffDays = Math.floor((firstIncomplete.localMs - createdLocalMs) / 86400000) + 1;
-    return Math.min(goalDayNumber, Math.max(1, diffDays));
+    if (firstIncomplete) {
+      const diffDays = Math.floor((firstIncomplete.localMs - createdLocalMs) / 86400000) + 1;
+      return Math.max(1, diffDays);
+    }
+    if (candidates.length > 0) {
+      const last = candidates[candidates.length - 1];
+      const lastDay = Math.floor((last.localMs - createdLocalMs) / 86400000) + 1;
+      return Math.max(1, lastDay + 1);
+    }
+    return goalDayNumber;
   })();
 
-  // Path state: compute which day is active and how many are completed
-  // - Before today done: active = effectivePathDayNumber, completed = effectivePathDayNumber - 1
-  // - Today done, no work ahead: active = effectivePathDayNumber (shows COMPLETE!), next available
-  // - Work ahead started: active = effectivePathDayNumber + 1
-  // - Work ahead completed: active = effectivePathDayNumber + 1 (COMPLETE!), next locked
-  const pathDayNumber = workAheadUsed ? effectivePathDayNumber + 1 : effectivePathDayNumber;
-  const pathCompletedDays = workAheadUsed ? effectivePathDayNumber : effectivePathDayNumber - 1;
-  const pathAllDone = workAheadUsed ? (todayAllDone && workAheadDone) : todayAllDone;
+  const pathDayNumber = effectivePathDayNumber;
+  const pathCompletedDays = Math.max(0, effectivePathDayNumber - 1);
+  const pathAllDone = todayAllDone;
 
   const userToggledRef = useRef(false);
-
-  // Detect when work-ahead tasks are all completed.
-  // Persist regardless of userToggledRef so reopening a mostly-done work-ahead
-  // view and finishing the last task still flips workAheadDone.
-  useEffect(() => {
-    if (workAheadUsed && !workAheadDone && viewingTasks && viewingDay && viewingDay > goalDayNumber) {
-      const dt = viewingTasks.find(d => d.goalId === effectiveSelectedGoalId);
-      if (dt) {
-        const items = dt.tasks.slice(-3);
-        const allComplete = items.length > 0 && items.every(t => t.isCompleted || t.isSkipped);
-        if (allComplete) {
-          localStorage.setItem(aheadDoneKey, "true");
-          setWorkAheadDone(true);
-        }
-      }
-    }
-  }, [viewingTasks, viewingDay, goalDayNumber, effectiveSelectedGoalId, aheadDoneKey, workAheadDone, workAheadUsed]);
 
   // Show celebration when all DISPLAYED tasks go from not-done → done
   const hasTriggeredCelebration = useRef(false);
@@ -1505,63 +1482,53 @@ function DashboardPageInner() {
                 dayNumber={pathDayNumber}
                 completedDays={pathCompletedDays}
                 onDayClick={async (day, type) => {
-                  if (type === "today" || type === "completed") {
-                    // Fetch/show tasks for this day
-                    setViewingDay(day);
-                    if (day === goalDayNumber && !todayAllDone && !viewingTasks) {
-                      // It's the real today, tasks not done — show loaded tasks
+                  if (type === "locked") return;
+                  // today/completed/next all open that day's tasks. No work-ahead gating.
+                  setViewingDay(day);
+                  if (day === goalDayNumber && !todayAllDone && !viewingTasks) {
+                    // It's the real today, tasks not done — show loaded tasks
+                    setShowTasks(true);
+                    return;
+                  }
+                  if (!selectedGoal) return;
+                  setGenerating(true);
+                  try {
+                    const dateStr = getDayDateStr(selectedGoal, day);
+                    const existing = await tasksApi.today(false, dateStr);
+                    const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
+                    if (goalTasks.length > 0) {
+                      setViewingTasks(goalTasks);
                       setShowTasks(true);
-                      return;
-                    }
-                    // Fetch tasks for this day's date
-                    if (!selectedGoal) return;
-                    setGenerating(true);
-                    try {
-                      const dateStr = getDayDateStr(selectedGoal, day);
-                      const existing = await tasksApi.today(false, dateStr);
-                      const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
-                      if (goalTasks.length > 0) {
-                        setViewingTasks(goalTasks);
-                        setShowTasks(true);
-                      } else if (type === "today") {
-                        // Only generate for the active "today" node, not past completed days
-                        const { getSupabase } = await import("@/lib/supabase-client");
-                        const supabase = getSupabase();
-                        const { data: { session } } = await supabase.auth.getSession();
-                        const res = await fetch("/api/tasks/generate", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
-                          },
-                          body: JSON.stringify({ localDate: dateStr, goalId: effectiveSelectedGoalId }),
-                        });
-                        if (res.ok) {
-                          const data = await res.json();
-                          if (data.dailyTasks?.length > 0) {
-                            setViewingTasks(data.dailyTasks);
-                            setShowTasks(true);
-                          }
-                        } else {
-                          showToast("Couldn't generate tasks", "error");
+                    } else if (type === "today" || type === "next") {
+                      // Generate for the active or next-unlocked day
+                      const { getSupabase } = await import("@/lib/supabase-client");
+                      const supabase = getSupabase();
+                      const { data: { session } } = await supabase.auth.getSession();
+                      const res = await fetch("/api/tasks/generate", {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                          ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+                        },
+                        body: JSON.stringify({ localDate: dateStr, goalId: effectiveSelectedGoalId }),
+                      });
+                      if (res.ok) {
+                        const data = await res.json();
+                        if (data.dailyTasks?.length > 0) {
+                          setViewingTasks(data.dailyTasks);
+                          setShowTasks(true);
                         }
                       } else {
-                        // Past completed day with no tasks — just show empty state
-                        showToast(`Day ${day}: No tasks recorded`, "error");
+                        showToast("Couldn't generate tasks", "error");
                       }
-                    } catch {
-                      showToast(`Day ${day}: Couldn't load tasks`, "error");
-                    } finally {
-                      setGenerating(false);
-                    }
-                  } else if (type === "next") {
-                    if (workAheadUsed) {
-                      setLockedTimerModal(true);
                     } else {
-                      setWorkAheadModal(true);
+                      // Past completed day with no tasks — just show empty state
+                      showToast(`Day ${day}: No tasks recorded`, "error");
                     }
-                  } else if (type === "locked") {
-                    setLockedTimerModal(true);
+                  } catch {
+                    showToast(`Day ${day}: Couldn't load tasks`, "error");
+                  } finally {
+                    setGenerating(false);
                   }
                 }}
                 allDoneToday={pathAllDone}
@@ -1612,181 +1579,6 @@ function DashboardPageInner() {
                 tasksVisible={showTasks}
               />
 
-              {/* Work ahead modal */}
-              {workAheadModal && (
-                <div
-                  style={{
-                    position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    zIndex: 9999, backdropFilter: "blur(4px)",
-                  }}
-                  onClick={() => setWorkAheadModal(false)}
-                >
-                  <div
-                    className="card"
-                    style={{
-                      padding: "2rem",
-                      width: "calc(100vw - 2rem)",
-                      maxWidth: 380,
-                      textAlign: "center",
-                    }}
-                    onClick={e => e.stopPropagation()}
-                  >
-                    <div style={{ fontSize: 40, marginBottom: 16 }}>{"⚡"}</div>
-                    <h3 style={{
-                      fontSize: "1.15rem",
-                      fontWeight: 700,
-                      marginBottom: 8,
-                      letterSpacing: "-0.02em",
-                      color: "var(--text)",
-                    }}>
-                      Work ahead?
-                    </h3>
-                    <p style={{
-                      color: "rgba(255,255,255,0.85)",
-                      fontSize: "0.9rem",
-                      lineHeight: 1.6,
-                      marginBottom: "1.5rem",
-                    }}>
-                      We recommend doing one day&apos;s work per day. Want to work ahead?
-                    </p>
-                    <div style={{ display: "flex", gap: 10 }}>
-                      <button
-                        className="btn"
-                        onClick={() => setWorkAheadModal(false)}
-                        style={{
-                          flex: 1, padding: "12px 16px",
-                          border: "1px solid var(--border)",
-                          borderRadius: 10,
-                          background: "transparent",
-                          color: "rgba(255,255,255,0.85)",
-                          fontSize: "0.9rem",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                      >
-                        I&apos;ll wait
-                      </button>
-                      <button
-                        onClick={async () => {
-                          setWorkAheadModal(false);
-                          if (!hasPro) { router.push("/checkout?plan=yearly"); return; }
-                          if (!selectedGoal) return;
-                          // Mark work ahead as used
-                          localStorage.setItem(aheadUsedKey, "true");
-                          setWorkAheadUsed(true);
-                          // The work-ahead day = goalDayNumber + 1
-                          const workAheadDay = goalDayNumber + 1;
-                          const dateStr = getDayDateStr(selectedGoal, workAheadDay);
-
-                          setGenerating(true);
-                          try {
-                            // Check if tasks already exist
-                            const existing = await tasksApi.today(false, dateStr);
-                            const goalTasks = existing.dailyTasks.filter((dt: DailyTask) => dt.goalId === effectiveSelectedGoalId);
-                            if (goalTasks.length > 0) {
-                              // Tasks already exist — path will show START
-                            } else {
-                              // Generate tasks for this day (path will show START after)
-                              const { getSupabase } = await import("@/lib/supabase-client");
-                              const supabase = getSupabase();
-                              const { data: { session } } = await supabase.auth.getSession();
-                              const res = await fetch("/api/tasks/generate", {
-                                method: "POST",
-                                headers: {
-                                  "Content-Type": "application/json",
-                                  ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
-                                },
-                                body: JSON.stringify({ localDate: dateStr, goalId: effectiveSelectedGoalId }),
-                              });
-                              if (!res.ok) {
-                                showToast("Couldn't generate tasks", "error");
-                              }
-                            }
-                          } catch {
-                            showToast("Couldn't generate tasks", "error");
-                          } finally {
-                            setGenerating(false);
-                          }
-                        }}
-                        style={{
-                          flex: 1, padding: "12px 16px",
-                          borderRadius: 10,
-                          background: "#D4A843",
-                          color: "#000",
-                          fontSize: "0.9rem",
-                          fontWeight: 700,
-                          border: "none",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Work ahead
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Locked timer modal — shown when work ahead already used or day locked */}
-              {lockedTimerModal && (
-                <div
-                  style={{
-                    position: "fixed", inset: 0, background: "rgba(0,0,0,0.6)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    zIndex: 9999, backdropFilter: "blur(4px)",
-                  }}
-                  onClick={() => setLockedTimerModal(false)}
-                >
-                  <div
-                    className="card"
-                    style={{
-                      padding: "2rem",
-                      width: "calc(100vw - 2rem)",
-                      maxWidth: 380,
-                      textAlign: "center",
-                    }}
-                    onClick={e => e.stopPropagation()}
-                  >
-                    <div style={{ fontSize: 40, marginBottom: 16 }}>{workAheadUsed ? "⏰" : "🔒"}</div>
-                    <h3 style={{
-                      fontSize: "1.15rem",
-                      fontWeight: 700,
-                      marginBottom: 8,
-                      letterSpacing: "-0.02em",
-                      color: "var(--text)",
-                    }}>
-                      {workAheadUsed ? "Nice work today!" : "This day is locked"}
-                    </h3>
-                    <p style={{
-                      color: "rgba(255,255,255,0.85)",
-                      fontSize: "0.9rem",
-                      lineHeight: 1.6,
-                      marginBottom: "1.5rem",
-                    }}>
-                      {workAheadUsed
-                        ? "You've already worked ahead once today. This day unlocks at midnight."
-                        : "Complete the current day first to unlock the next one."}
-                    </p>
-                    <MidnightCountdown dayNumber={goalDayNumber} />
-                    <button
-                      onClick={() => setLockedTimerModal(false)}
-                      style={{
-                        marginTop: 16,
-                        padding: "12px 32px",
-                        borderRadius: 10,
-                        background: "var(--border)",
-                        color: "rgba(255,255,255,0.85)",
-                        fontSize: "0.9rem",
-                        fontWeight: 600,
-                        border: "none",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Got it
-                    </button>
-                  </div>
-                </div>
-              )}
             </>
           )}
 
