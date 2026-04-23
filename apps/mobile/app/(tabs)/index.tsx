@@ -399,7 +399,7 @@ function PathNode({
           textTransform: "uppercase",
           letterSpacing: 0.5,
         }}>
-          {allDoneToday ? "Complete!" : "TODAY"}
+          {allDoneToday ? "Complete!" : "Start"}
         </Text>
       </View>
     );
@@ -1980,11 +1980,14 @@ export default function DashboardScreen() {
 
     try {
       const res = await tasksApi.completeItem(dailyTaskId, taskItemId, isCompleted);
-      setDailyTasks((prev) =>
-        prev.some((dt) => dt.id === dailyTaskId)
-          ? prev.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt))
-          : prev
-      );
+      setDailyTasks((prev) => {
+        if (prev.some((dt) => dt.id === dailyTaskId)) {
+          return prev.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt));
+        }
+        // Insert so path state (effectiveDayNumber) advances when a next-day
+        // task is completed mid-session.
+        return [...prev, res.dailyTask];
+      });
       setNextDayTasks((prev) =>
         prev && prev.some((dt) => dt.id === dailyTaskId)
           ? prev.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt))

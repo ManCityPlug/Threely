@@ -992,6 +992,14 @@ function DashboardPageInner() {
       const updated = (prev: DailyTask[]) => prev.map(dt => dt.id === dailyTaskId ? { ...dt, tasks: res.dailyTask.tasks } : dt);
       if (viewingTasks) {
         setViewingTasks(prev => prev ? updated(prev) : prev);
+        // Also reflect in dailyTasks so path state (effectivePathDayNumber)
+        // advances when a future day is completed mid-session.
+        setDailyTasks(prev => {
+          if (prev.some(dt => dt.id === dailyTaskId)) return updated(prev);
+          const viewed = viewingTasks.find(dt => dt.id === dailyTaskId);
+          if (!viewed) return prev;
+          return [...prev, { ...viewed, tasks: res.dailyTask.tasks }];
+        });
       } else {
         setDailyTasks(updated);
       }
@@ -1420,6 +1428,13 @@ function DashboardPageInner() {
                     if (goalTasks.length > 0) {
                       setViewingTasks(goalTasks);
                       setShowTasks(true);
+                      // If this day's tasks are already complete on the server,
+                      // merge into dailyTasks so the path advances past it.
+                      setDailyTasks(prev => {
+                        const newDts = goalTasks.filter(g => !prev.some(p => p.id === g.id));
+                        const updated = prev.map(p => goalTasks.find(g => g.id === p.id) ?? p);
+                        return [...updated, ...newDts];
+                      });
                     } else if (type === "today" || type === "next") {
                       // Generate for the active or next-unlocked day
                       const { getSupabase } = await import("@/lib/supabase-client");
@@ -1472,6 +1487,13 @@ function DashboardPageInner() {
                     if (goalTasks.length > 0) {
                       setViewingTasks(goalTasks);
                       setShowTasks(true);
+                      // If this day's tasks are already complete on the server,
+                      // merge into dailyTasks so the path advances past it.
+                      setDailyTasks(prev => {
+                        const newDts = goalTasks.filter(g => !prev.some(p => p.id === g.id));
+                        const updated = prev.map(p => goalTasks.find(g => g.id === p.id) ?? p);
+                        return [...updated, ...newDts];
+                      });
                     } else {
                       // Generate tasks for this day
                       const { getSupabase } = await import("@/lib/supabase-client");

@@ -675,7 +675,7 @@ export default function PathView({
                             letterSpacing: "0.06em",
                           }}
                         >
-                          {allDoneToday ? "Complete!" : "TODAY"}
+                          {allDoneToday ? "Complete!" : "Start"}
                         </div>
                       </>
                     )}
@@ -685,7 +685,7 @@ export default function PathView({
                           Day {day}
                         </div>
                         <div style={{ fontSize: "0.68rem", fontWeight: 700, color: "rgba(255,255,255,0.9)", marginTop: 1, textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                          TODAY
+                          Start
                         </div>
                         <div style={{
                           fontSize: "0.7rem",
