@@ -143,51 +143,51 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
             <Image source={require("@/assets/icon.png")} style={styles.logo} />
           </Animated.View>
 
-          {/* Tagline — each word fades in with its own color & stagger */}
+          {/* Tagline — each word fades in with its own color & stagger.
+              Stacked vertically (one word per line) so REACH + YOUR don't
+              overflow the screen width at 72pt with letterSpacing 12. */}
           <View style={{ alignItems: "center", marginTop: spacing.xl }}>
-            <View style={{ flexDirection: "row", gap: 10 }}>
-              <Animated.Text
-                style={[
-                  styles.lockInLine1,
-                  {
-                    color: "#FFFFFF",
-                    opacity: wordAnims[0],
-                    transform: [
-                      {
-                        translateY: wordAnims[0].interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [14, 0],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              >
-                REACH
-              </Animated.Text>
-              <Animated.Text
-                style={[
-                  styles.lockInLine1,
-                  {
-                    color: "#E5D5A8",
-                    opacity: wordAnims[1],
-                    transform: [
-                      {
-                        translateY: wordAnims[1].interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [14, 0],
-                        }),
-                      },
-                    ],
-                  },
-                ]}
-              >
-                YOUR
-              </Animated.Text>
-            </View>
             <Animated.Text
               style={[
-                styles.lockInLine2,
+                styles.wordLine,
+                {
+                  color: "#FFFFFF",
+                  opacity: wordAnims[0],
+                  transform: [
+                    {
+                      translateY: wordAnims[0].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [14, 0],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              REACH
+            </Animated.Text>
+            <Animated.Text
+              style={[
+                styles.wordLine,
+                {
+                  color: "#E5D5A8",
+                  opacity: wordAnims[1],
+                  transform: [
+                    {
+                      translateY: wordAnims[1].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [14, 0],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              YOUR
+            </Animated.Text>
+            <Animated.Text
+              style={[
+                styles.wordLine,
                 {
                   color: PRIMARY,
                   opacity: wordAnims[2],
@@ -315,21 +315,12 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: "#FFFFFF",
   },
-  lockInLine1: {
+  wordLine: {
     fontSize: 72,
     fontWeight: "900" as const,
-    color: "rgba(255,255,255,0.7)",
     textAlign: "center" as const,
     letterSpacing: 12,
-    lineHeight: 78,
-  },
-  lockInLine2: {
-    fontSize: 72,
-    fontWeight: "900" as const,
-    color: "rgba(255,255,255,0.35)",
-    textAlign: "center" as const,
-    letterSpacing: 12,
-    lineHeight: 78,
+    lineHeight: 82,
   },
   title: {
     fontSize: typography.xxxl,
