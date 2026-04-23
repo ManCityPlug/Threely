@@ -554,3 +554,44 @@ export const subscriptionApi = {
       { method: "POST", body: JSON.stringify({ plan }) }
     ),
 };
+
+// ─── DFY API ──────────────────────────────────────────────────────────────────
+
+export interface DfyProductImage { variant: string; url: string; alt: string }
+export interface DfyProduct {
+  id: string;
+  title: string;
+  niches: string[];
+  supplier_cost: number;
+  suggested_retail: number;
+  why_it_sells: string;
+  tags: string[];
+  image_variants: DfyProductImage[];
+}
+export interface DfyLogo {
+  pngBase64: string;
+  svg: string;
+  iconId: string;
+  paletteId: string;
+  fontId: string;
+}
+
+export const dfyApi = {
+  names: (keyword: string, count = 5) =>
+    apiFetch<{ names: string[] }>("/api/dfy/names", {
+      method: "POST",
+      body: JSON.stringify({ keyword, count }),
+    }),
+
+  products: (niches?: string[], count = 3, exclude_ids?: string[]) =>
+    apiFetch<{ products: DfyProduct[] }>("/api/dfy/products", {
+      method: "POST",
+      body: JSON.stringify({ niches, count, exclude_ids }),
+    }),
+
+  logo: (businessName: string, batch = true) =>
+    apiFetch<{ logo?: DfyLogo; logos?: DfyLogo[] }>("/api/dfy/logo", {
+      method: "POST",
+      body: JSON.stringify({ businessName, batch }),
+    }),
+};

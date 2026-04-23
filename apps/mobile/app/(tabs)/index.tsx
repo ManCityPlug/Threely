@@ -42,6 +42,7 @@ import { useTheme } from "@/lib/theme";
 import { useSubscription } from "@/lib/subscription-context";
 import { useWalkthroughRegistry } from "@/lib/walkthrough-registry";
 import Paywall from "@/components/Paywall";
+import DfyModal, { detectDfyType } from "@/components/DfyModal";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius } from "@/constants/theme";
 
@@ -843,6 +844,8 @@ function GamifiedTaskCard({
   }, [isAnimating, scaleAnim, checkScaleAnim]);
 
   const taskTitle = (task as unknown as { title?: string }).title ?? task.task;
+  const dfyType = !task.isCompleted && !task.isSkipped && !readOnly ? detectDfyType(taskTitle) : null;
+  const [dfyOpen, setDfyOpen] = useState(false);
 
   return (
     <View style={{ position: "relative" }}>
@@ -910,10 +913,48 @@ function GamifiedTaskCard({
                 {task.description}
               </Text>
             ) : null}
+            {dfyType && (
+              <TouchableOpacity
+                onPress={(e) => {
+                  e.stopPropagation?.();
+                  if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  setDfyOpen(true);
+                }}
+                style={{
+                  alignSelf: "flex-start",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 6,
+                  paddingVertical: 6,
+                  paddingHorizontal: 12,
+                  marginTop: 10,
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  borderColor: "rgba(212,168,67,0.4)",
+                  backgroundColor: "rgba(212,168,67,0.12)",
+                }}
+              >
+                <Text style={{ fontSize: 12, color: GOLD }}>{"✨"}</Text>
+                <Text style={{ fontSize: 12, fontWeight: "800", color: GOLD }}>
+                  Do it for me
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </Animated.View>
       </TouchableOpacity>
 
+      {dfyType && (
+        <DfyModal
+          visible={dfyOpen}
+          type={dfyType}
+          taskText={taskTitle}
+          onClose={() => setDfyOpen(false)}
+          onDelivered={() => {
+            if (!task.isCompleted) onToggle(true);
+          }}
+        />
+      )}
     </View>
   );
 }
