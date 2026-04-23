@@ -25,35 +25,6 @@ const GOLD_DARK = "#9A7A2A";
 // center → slight left → left → slight left → center → slight right → right → slight right → repeat
 const S_CURVE_OFFSETS = [50, 38, 28, 35, 50, 62, 72, 65];
 
-// ─── Inline Countdown (shows under next locked day) ──────────────────────────
-
-function InlineCountdown() {
-  const [timeLeft, setTimeLeft] = useState("");
-
-  useEffect(() => {
-    function calc() {
-      const now = Date.now();
-      const midnight = new Date();
-      midnight.setHours(24, 0, 0, 0);
-      const diff = midnight.getTime() - now;
-      if (diff <= 0) { setTimeLeft(""); return; }
-      const h = Math.floor(diff / (1000 * 60 * 60));
-      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      setTimeLeft(`${h}h ${m}m`);
-    }
-    calc();
-    const interval = setInterval(calc, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (!timeLeft) return null;
-  return (
-    <div style={{ fontSize: "0.62rem", fontWeight: 600, color: "rgba(212,168,67,0.5)", marginTop: 2 }}>
-      Unlocks in {timeLeft}
-    </div>
-  );
-}
-
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function PathView({
@@ -628,10 +599,10 @@ export default function PathView({
                           }
                         : nodeType === "next"
                         ? {
-                            border: `2.5px dashed ${GOLD}`,
-                            background: "#1e1e1e",
-                            boxShadow: `0 4px 8px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.03)`,
-                            opacity: 0.6,
+                            border: `3px solid ${GOLD}`,
+                            background: "rgba(20,20,20,0.95)",
+                            boxShadow: `0 0 24px 6px rgba(212,168,67,0.4), 0 4px 12px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.05)`,
+                            animation: "breathe 3s ease-in-out infinite",
                           }
                         : crown
                         ? {
@@ -749,10 +720,20 @@ export default function PathView({
                     )}
                     {nodeType === "next" && allDoneToday && !milestone && !crown && (
                       <>
-                        <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>
+                        <div style={{ fontSize: "0.82rem", fontWeight: 800, color: GOLD, letterSpacing: "-0.02em" }}>
                           Day {day}
                         </div>
-                        <InlineCountdown />
+                        <div style={{
+                          fontSize: "0.68rem",
+                          fontWeight: 700,
+                          color: GOLD,
+                          marginTop: 1,
+                          textTransform: "uppercase",
+                          letterSpacing: "0.06em",
+                          animation: "startPulse 2s ease-in-out infinite",
+                        }}>
+                          Start
+                        </div>
                       </>
                     )}
                     {nodeType === "completed" && !milestone && !crown && (
@@ -761,12 +742,9 @@ export default function PathView({
                       </div>
                     )}
                     {nodeType === "locked" && !milestone && !crown && (
-                      <>
-                        <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "rgba(255,255,255,0.25)" }}>
-                          Day {day}
-                        </div>
-                        {day === dayNumber + 1 && <InlineCountdown />}
-                      </>
+                      <div style={{ fontSize: "0.72rem", fontWeight: 600, color: "rgba(255,255,255,0.25)" }}>
+                        Day {day}
+                      </div>
                     )}
                   </div>
                 )}

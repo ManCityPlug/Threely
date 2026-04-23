@@ -140,47 +140,8 @@ function formatWorkDaysList(workDays: number[]): string {
   return [...workDays].sort((a, b) => a - b).map(d => names[d]).join(", ");
 }
 
-function getMidnightCountdown(): string {
-  const now = new Date();
-  const midnight = new Date(now);
-  midnight.setHours(24, 0, 0, 0);
-  const diff = midnight.getTime() - now.getTime();
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-  return `${hours}h ${minutes}m`;
-}
-
 function isMilestone(day: number): boolean {
   return MILESTONE_DAYS.includes(day);
-}
-
-// ─── Inline countdown under the next locked day node ────────────────────────
-// Mirrors web's InlineCountdown (apps/web/components/PathView.tsx:29-54) so
-// mobile and web show the same "Unlocks in Xh Ym" hint under the very next
-// locked day on the path. Re-renders every 60s.
-function InlineCountdown() {
-  const [label, setLabel] = useState("");
-  useEffect(() => {
-    function tick() {
-      const now = Date.now();
-      const midnight = new Date();
-      midnight.setHours(24, 0, 0, 0);
-      const diff = midnight.getTime() - now;
-      if (diff <= 0) { setLabel(""); return; }
-      const h = Math.floor(diff / (1000 * 60 * 60));
-      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      setLabel(`Unlocks in ${h}h ${m}m`);
-    }
-    tick();
-    const interval = setInterval(tick, 60000);
-    return () => clearInterval(interval);
-  }, []);
-  if (!label) return null;
-  return (
-    <Text style={{ fontSize: 10, fontWeight: "600", color: "rgba(212,168,67,0.5)", marginTop: 2 }}>
-      {label}
-    </Text>
-  );
 }
 
 // ─── Progress Ring (View-based, mirrors web's SVG ring visually) ─────────────
@@ -271,7 +232,8 @@ function PathNode({
   const glowAnim = useRef(new Animated.Value(0.35)).current;
 
   useEffect(() => {
-    if (isToday && !allDoneToday) {
+    const shouldAnimate = (isToday && !allDoneToday) || workAheadReady;
+    if (shouldAnimate) {
       const pulse = Animated.loop(
         Animated.sequence([
           Animated.timing(pulseAnim, { toValue: 1.08, duration: 1500, useNativeDriver: true }),
@@ -288,7 +250,7 @@ function PathNode({
       glow.start();
       return () => { pulse.stop(); glow.stop(); };
     }
-  }, [isToday, allDoneToday, pulseAnim, glowAnim]);
+  }, [isToday, allDoneToday, workAheadReady, pulseAnim, glowAnim]);
 
   // Node sizes matching spec
   const nodeSize = isToday ? 68 : isCrown ? 64 : isMilestoneNode ? 60 : type === "completed" ? 56 : 50;
@@ -329,17 +291,15 @@ function PathNode({
       elevation: 8,
     };
   } else if (isWorkAhead) {
-    bgColor = "#1e1e1e";
+    bgColor = "rgba(20,20,20,0.95)";
     borderColor = GOLD;
-    borderWidth = 2.5;
-    borderStyle = "dashed";
-    nodeOpacity = 0.6;
+    borderWidth = 3;
     shadowConfig = {
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
-      shadowRadius: 8,
-      elevation: 4,
+      shadowColor: GOLD,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.55,
+      shadowRadius: 22,
+      elevation: 10,
     };
   } else if (isCrown) {
     bgColor = GOLD_GRADIENT_TOP;
@@ -444,9 +404,19 @@ function PathNode({
     );
   } else if (isWorkAhead && !isMilestoneNode && !isCrown) {
     label = (
-      <View style={{ alignItems: "center", marginTop: 6 }}>
-        <Text style={{ fontSize: 12, fontWeight: "700", color: "rgba(255,255,255,0.7)" }}>
+      <View style={{ alignItems: "center", marginTop: 8 }}>
+        <Text style={{ fontSize: 13, fontWeight: "800", color: GOLD, letterSpacing: -0.3 }}>
           Day {day}
+        </Text>
+        <Text style={{
+          fontSize: 11,
+          fontWeight: "700",
+          color: GOLD,
+          marginTop: 1,
+          textTransform: "uppercase",
+          letterSpacing: 0.5,
+        }}>
+          Start
         </Text>
       </View>
     );
@@ -457,14 +427,12 @@ function PathNode({
       </Text>
     );
   } else {
-    // Locked - minimal label, plus unlock countdown if this is the very next
-    // locked day (day === goalDayNumber + 1) — mirrors web PathView.
+    // Locked - minimal label, no countdown.
     label = (
       <View style={{ alignItems: "center", marginTop: 4 }}>
         <Text style={{ fontSize: 10, fontWeight: "500", color: "rgba(255,255,255,0.25)", textAlign: "center" }}>
           {day}
         </Text>
-        {isNextLocked && <InlineCountdown />}
       </View>
     );
   }
@@ -1148,7 +1116,7 @@ function CelebrationOverlay({
               fontWeight: "700",
               color: "#000",
             }}>
-              See you tomorrow
+              Return to path
             </Text>
           </TouchableOpacity>
         </Animated.View>
@@ -1398,8 +1366,6 @@ export default function DashboardScreen() {
   useEffect(() => {
     if (viewMode === "path") setPathScrollTrigger((n) => n + 1);
   }, [viewMode]);
-  const [midnightCountdown, setMidnightCountdown] = useState(getMidnightCountdown());
-
   // Persisted "started" days (Gap 2): remove START badge once user taps today
   const [startedDays, setStartedDays] = useState<Set<number>>(new Set());
   // Completed-day modal (Gap 3): show that day's tasks read-only
@@ -1411,16 +1377,10 @@ export default function DashboardScreen() {
   // Auto-generation failure (Fix 1): show retry UI when background gen fails
   const [autoGenFailed, setAutoGenFailed] = useState(false);
 
-  // ─── Work-ahead state ──────────────────────────────────────────────────────
-  // Mirrors web: when the user confirms work-ahead on the Day+1 node, we fetch
-  // (or generate) tomorrow's DailyTask records for the selected goal and stash
-  // them here. The tasks view branches on this: if present, it renders these
-  // tasks with a "Day N+1" header and toggles them via handleToggleTask.
-  const [workAheadTasks, setWorkAheadTasks] = useState<DailyTask[] | null>(null);
-  const [workAheadDate, setWorkAheadDate] = useState<string | null>(null);
-  const [loadingWorkAhead, setLoadingWorkAhead] = useState(false);
-  // Suppress unused-var warning for loadingWorkAhead (reserved for future spinner).
-  void loadingWorkAhead;
+  // Next-day task buffer: holds tomorrow's DailyTask records when the user taps
+  // the next-day node after completing today. No cap or modal — just a fetch
+  // and immediate display.
+  const [nextDayTasks, setNextDayTasks] = useState<DailyTask[] | null>(null);
 
   // ─── Pro / trial state ────────────────────────────────────────────────────────
   const { hasPro, isLimitedMode, walkthroughActive, refreshSubscription } = useSubscription();
@@ -1443,13 +1403,6 @@ export default function DashboardScreen() {
   const userToggledRef = useRef(false);
   const hasTriggeredCelebration = useRef(false);
 
-  // Midnight countdown timer
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setMidnightCountdown(getMidnightCountdown());
-    }, 60000);
-    return () => clearInterval(timer);
-  }, []);
   const lastCalendarDayRef = useRef<string>((() => {
     const n = new Date();
     return `${n.getFullYear()}-${n.getMonth() + 1}-${n.getDate()}`;
@@ -1767,17 +1720,14 @@ export default function DashboardScreen() {
     ? newTaskItems.filter(t => t.isCompleted || t.isSkipped).length / newTaskItems.length
     : 0;
 
-  // Clear stale work-ahead tasks when the real day rolls over (so yesterday's
-  // "Day N+1" tasks don't bleed into today's path) or when the user switches
-  // goals (work-ahead is per-goal).
-  const workAheadClearDepRef = useRef<string>("");
+  // Clear buffered next-day tasks when goal or effective day changes.
+  const nextDayClearKeyRef = useRef<string>("");
   useEffect(() => {
     const key = `${effectiveSelectedGoal}:${effectiveDayNumber}`;
-    if (workAheadClearDepRef.current && workAheadClearDepRef.current !== key) {
-      setWorkAheadTasks(null);
-      setWorkAheadDate(null);
+    if (nextDayClearKeyRef.current && nextDayClearKeyRef.current !== key) {
+      setNextDayTasks(null);
     }
-    workAheadClearDepRef.current = key;
+    nextDayClearKeyRef.current = key;
   }, [effectiveSelectedGoal, effectiveDayNumber]);
 
   // Gap 2 — load persisted "started" days when goal changes
@@ -1989,15 +1939,12 @@ export default function DashboardScreen() {
 
     try {
       const res = await tasksApi.completeItem(dailyTaskId, taskItemId, isCompleted);
-      // Update whichever state holds this DailyTask — regular today-tasks or
-      // work-ahead tasks (tomorrow's tasks fetched when user entered work-ahead
-      // mode). Using `some` to decide avoids updating the wrong list.
       setDailyTasks((prev) =>
         prev.some((dt) => dt.id === dailyTaskId)
           ? prev.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt))
           : prev
       );
-      setWorkAheadTasks((prev) =>
+      setNextDayTasks((prev) =>
         prev && prev.some((dt) => dt.id === dailyTaskId)
           ? prev.map((dt) => (dt.id === dailyTaskId ? res.dailyTask : dt))
           : prev
@@ -2233,9 +2180,6 @@ export default function DashboardScreen() {
               <View style={styles.allDoneContainer}>
                 <Text style={styles.allDoneCheck}>{"✓"}</Text>
                 <Text style={styles.allDoneTitle}>All done for today</Text>
-                <View style={styles.countdownContainer}>
-                  <Text style={styles.countdownText}>Next day unlocks in {midnightCountdown}</Text>
-                </View>
               </View>
             )}
 
@@ -2252,99 +2196,45 @@ export default function DashboardScreen() {
                 setViewMode("tasks");
               }}
               onTapWorkAhead={async () => {
+                // No cap, no modal — fetch next day's tasks and open them immediately.
                 if (!effectiveSelectedGoal) return;
-                const todayStr = new Date().toLocaleDateString("en-CA");
-                const aheadKey = `@threely_ahead_${todayStr}_${effectiveSelectedGoal}_d${goalDayNumber}`;
-
-                // If we already have work-ahead tasks loaded (user went back to
-                // the path then tapped the node again), just re-open them —
-                // don't re-fetch or re-prompt.
-                if (workAheadTasks && workAheadTasks.length > 0) {
+                if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                markDayStarted(effectiveDayNumber + 1);
+                if (nextDayTasks && nextDayTasks.length > 0) {
                   setViewMode("tasks");
                   return;
                 }
-
-                // If user already burned their one work-ahead for the day
-                // without us having tasks in memory (e.g. app restart), show
-                // the "already done" message — matches web's locked-timer
-                // modal UX.
-                const used = await AsyncStorage.getItem(aheadKey);
-                if (used) {
-                  const now = new Date();
-                  const midnight = new Date();
-                  midnight.setHours(24, 0, 0, 0);
-                  const diff = midnight.getTime() - now.getTime();
-                  const h = Math.floor(diff / (1000 * 60 * 60));
-                  const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                  Alert.alert("Nice work today!", `You've already worked ahead once today.\nNext day unlocks in ${h}h ${m}m.`);
-                  return;
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
+                try {
+                  let goalTasks: DailyTask[] = [];
+                  try {
+                    const existing = await tasksApi.today(false, tomorrowStr);
+                    goalTasks = existing.dailyTasks.filter((dt) => dt.goalId === effectiveSelectedGoal);
+                  } catch {
+                    goalTasks = [];
+                  }
+                  if (goalTasks.length === 0) {
+                    const gen = await tasksApi.generate(effectiveSelectedGoal, { localDate: tomorrowStr });
+                    goalTasks = (gen.dailyTasks || []).filter((dt) => dt.goalId === effectiveSelectedGoal);
+                  }
+                  if (goalTasks.length === 0) {
+                    Alert.alert("Couldn't load next day's tasks", "Please try again in a moment.");
+                    return;
+                  }
+                  setNextDayTasks(goalTasks);
+                  setViewMode("tasks");
+                } catch (e) {
+                  if (e instanceof Error && e.message?.includes("pro_required")) {
+                    setShowPaywall(true);
+                  } else {
+                    Alert.alert("Couldn't load next day's tasks", "Please try again.");
+                  }
                 }
-
-                Alert.alert(
-                  "Work Ahead",
-                  "We recommend doing one day's work per day. Want to work ahead?",
-                  [
-                    { text: "I'll wait", style: "cancel" },
-                    {
-                      text: "Work ahead",
-                      onPress: async () => {
-                        // Compute tomorrow's local date (matches web's
-                        // getDayDateStr(goal, goalDayNumber + 1)).
-                        const tomorrow = new Date();
-                        tomorrow.setDate(tomorrow.getDate() + 1);
-                        const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
-
-                        setLoadingWorkAhead(true);
-                        try {
-                          // 1) Try existing DailyTask records for tomorrow
-                          let goalTasks: DailyTask[] = [];
-                          try {
-                            const existing = await tasksApi.today(false, tomorrowStr);
-                            goalTasks = existing.dailyTasks.filter((dt) => dt.goalId === effectiveSelectedGoal);
-                          } catch {
-                            goalTasks = [];
-                          }
-                          // 2) Generate if none exist yet
-                          if (goalTasks.length === 0) {
-                            const gen = await tasksApi.generate(effectiveSelectedGoal, { localDate: tomorrowStr });
-                            goalTasks = (gen.dailyTasks || []).filter((dt) => dt.goalId === effectiveSelectedGoal);
-                          }
-                          if (goalTasks.length === 0) {
-                            Alert.alert("Couldn't load tomorrow's tasks", "Please try again in a moment.");
-                            return;
-                          }
-                          // Successfully loaded — THEN flip the state. Setting
-                          // the aheadKey before now would mean a failed load
-                          // still burned the user's one work-ahead.
-                          setWorkAheadTasks(goalTasks);
-                          setWorkAheadDate(tomorrowStr);
-                          await AsyncStorage.setItem(aheadKey, "true");
-                          markDayStarted(effectiveDayNumber + 1);
-                          setViewMode("tasks");
-                        } catch (e) {
-                          const msg = e instanceof Error && e.message?.includes("pro_required")
-                            ? "This requires Threely Pro."
-                            : "Couldn't load tomorrow's tasks. Please try again.";
-                          Alert.alert("Work ahead", msg);
-                          if (e instanceof Error && e.message?.includes("pro_required")) {
-                            setShowPaywall(true);
-                          }
-                        } finally {
-                          setLoadingWorkAhead(false);
-                        }
-                      },
-                    },
-                  ]
-                );
               }}
-              onTapLocked={(day) => {
-                const now = new Date();
-                const midnight = new Date();
-                midnight.setHours(24, 0, 0, 0);
-                const diff = midnight.getTime() - now.getTime();
-                const h = Math.floor(diff / (1000 * 60 * 60));
-                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                Alert.alert("This day is locked", `Complete the current day first.\nUnlocks in ${h}h ${m}m.`);
+              onTapLocked={() => {
+                Alert.alert("This day is locked", "Complete the current day first.");
               }}
               onTapCompleted={async (day) => {
                 if (!currentGoalObj) return;
@@ -2380,20 +2270,15 @@ export default function DashboardScreen() {
         ) : (
           /* ═══ TASK VIEW ═══ */
           (() => {
-            // Work-ahead branch: if user entered work-ahead mode, render the
-            // tomorrow-DailyTasks we fetched (with Day N+1 header) instead of
-            // today's tasks. Toggles flow through the same handleToggleTask
-            // path — it routes to setWorkAheadTasks vs setDailyTasks based on
-            // which state owns the DailyTask id.
-            const inWorkAhead = !!(workAheadTasks && workAheadTasks.length > 0);
-            const activeTasks = inWorkAhead
-              ? workAheadTasks!.map((dt) => ({
+            const inNextDay = !!(nextDayTasks && nextDayTasks.length > 0);
+            const activeTasks = inNextDay
+              ? nextDayTasks!.map((dt) => ({
                   ...dt,
                   tasks: (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).slice(-3),
                 }))
               : displayVisibleTasks;
-            const activeDayNumber = inWorkAhead ? goalDayNumber + 1 : goalDayNumber;
-            const activeAllDone = inWorkAhead
+            const activeDayNumber = inNextDay ? goalDayNumber + 1 : goalDayNumber;
+            const activeAllDone = inNextDay
               ? activeTasks.every((dt) =>
                   (Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).every((t) => t.isCompleted)
                 )
@@ -2427,18 +2312,6 @@ export default function DashboardScreen() {
                       </Text>
                     );
                   })()}
-                  {inWorkAhead && (
-                    <Text style={{
-                      fontSize: typography.xs,
-                      fontWeight: "700",
-                      color: GOLD,
-                      textTransform: "uppercase",
-                      letterSpacing: 0.8,
-                      marginTop: 4,
-                    }}>
-                      Working ahead
-                    </Text>
-                  )}
                 </View>
 
                 {/* Task cards — always shown, read-only when all done */}
@@ -2447,7 +2320,7 @@ export default function DashboardScreen() {
                     {(Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).map((task) => (
                       <View
                         key={task.id}
-                        ref={!inWorkAhead && newTaskItems.indexOf(task) === 0 ? r => register("first-task-card", r) : undefined}
+                        ref={!inNextDay && newTaskItems.indexOf(task) === 0 ? r => register("first-task-card", r) : undefined}
                         collapsable={false}
                         style={{ marginBottom: spacing.sm + 4 }}
                       >
