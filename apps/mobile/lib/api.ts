@@ -555,6 +555,32 @@ export const subscriptionApi = {
     ),
 };
 
+// ─── Offers API ──────────────────────────────────────────────────────────────
+
+export interface UserOffer {
+  id: string;
+  type: "discount_percent" | "discount_amount" | "free_month" | "pause";
+  value: number;
+  duration: "once" | "repeating";
+  durationMonths: number;
+  description: string;
+  mode: "manual" | "auto";
+  status: "pending" | "claimed" | "expired" | "auto_applied" | "revoked";
+  expiresAt: string;
+  claimedAt: string | null;
+  createdAt: string;
+}
+
+export const offersApi = {
+  me: () => apiFetch<{ offer: UserOffer | null }>("/api/offers/me"),
+
+  claim: (offerId: string) =>
+    apiFetch<{ success: boolean; details: unknown; description: string }>(
+      "/api/offers/claim",
+      { method: "POST", body: JSON.stringify({ offerId }) }
+    ),
+};
+
 // ─── DFY API ──────────────────────────────────────────────────────────────────
 
 export interface DfyProductImage { variant: string; url: string; alt: string }

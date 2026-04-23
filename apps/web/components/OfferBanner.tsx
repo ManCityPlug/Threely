@@ -111,7 +111,7 @@ export default function OfferBanner({ onActiveChange }: Props) {
               gap: 8,
             }}
           >
-            <span style={{ fontSize: "1.1rem" }}>{"\uD83C\uDF81"}</span>
+            <span className="gift-wobble" style={{ fontSize: "1.1rem", display: "inline-block" }}>{"\uD83C\uDF81"}</span>
             <span>Special offer: {offer.description}</span>
           </div>
           <div
@@ -174,7 +174,11 @@ export default function OfferBanner({ onActiveChange }: Props) {
             }}
           >
             <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
-              <div style={{ fontSize: 48, marginBottom: 8 }}>{"\uD83C\uDF81"}</div>
+              <div className="gift-hero-wrap">
+                <div className="gift-hero-glow gift-hero-glow-outer" aria-hidden />
+                <div className="gift-hero-glow gift-hero-glow-inner" aria-hidden />
+                <div className="gift-hero">{"\uD83C\uDF81"}</div>
+              </div>
               <h2
                 style={{
                   fontSize: "1.55rem",
@@ -272,6 +276,74 @@ export default function OfferBanner({ onActiveChange }: Props) {
           </div>
         </>
       )}
+
+      <style>{giftAnimationCss}</style>
     </>
   );
 }
+
+// Shared gift-emoji animations. Declared once here and re-imported by
+// OfferLoginModal so the two components never drift out of sync visually.
+export const giftAnimationCss = `
+  @keyframes giftPopIn {
+    0%   { transform: scale(0) rotate(-25deg); opacity: 0; }
+    55%  { transform: scale(1.25) rotate(12deg); opacity: 1; }
+    80%  { transform: scale(0.95) rotate(-6deg); }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  @keyframes giftShake {
+    0%, 8%, 92%, 100% { transform: rotate(0deg); }
+    15%, 45%, 75%     { transform: rotate(-12deg); }
+    30%, 60%, 90%     { transform: rotate(12deg); }
+  }
+  @keyframes giftGlowPulse {
+    0%, 100% { transform: scale(0.85); opacity: 0.35; }
+    50%      { transform: scale(1.08); opacity: 0.7; }
+  }
+  .gift-hero-wrap {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 8px;
+  }
+  .gift-hero {
+    position: relative;
+    font-size: 64px;
+    line-height: 1;
+    transform-origin: center;
+    animation:
+      giftPopIn 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both,
+      giftShake 2800ms cubic-bezier(0.36, 0.07, 0.19, 0.97) 700ms infinite;
+    filter: drop-shadow(0 4px 12px rgba(212,168,67,0.55));
+    z-index: 1;
+  }
+  .gift-hero-glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    border-radius: 50%;
+    pointer-events: none;
+    transform-origin: center;
+    animation: giftGlowPulse 2400ms ease-in-out infinite;
+  }
+  .gift-hero-glow-outer {
+    width: 120px;
+    height: 120px;
+    margin: -60px 0 0 -60px;
+    background: radial-gradient(circle, rgba(212,168,67,0.55) 0%, rgba(212,168,67,0.2) 50%, transparent 75%);
+  }
+  .gift-hero-glow-inner {
+    width: 80px;
+    height: 80px;
+    margin: -40px 0 0 -40px;
+    background: radial-gradient(circle, rgba(255,215,100,0.7) 0%, rgba(212,168,67,0.3) 55%, transparent 80%);
+    animation-delay: 500ms;
+  }
+  .gift-wobble {
+    transform-origin: center;
+    animation: giftShake 2800ms cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+  }
+`;

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { offersApi, type UserOffer } from "@/lib/api-client";
 import { useToast } from "./ToastProvider";
+import { giftAnimationCss } from "./OfferBanner";
 
 interface Props {
   firstName: string;
@@ -124,7 +125,11 @@ export default function OfferLoginModal({ firstName }: Props) {
         }}
       >
         <div style={{ textAlign: "center", marginBottom: "1.25rem" }}>
-          <div style={{ fontSize: 48, marginBottom: 8 }}>{"\uD83C\uDF81"}</div>
+          <div className="gift-hero-wrap">
+            <div className="gift-hero-glow gift-hero-glow-outer" aria-hidden />
+            <div className="gift-hero-glow gift-hero-glow-inner" aria-hidden />
+            <div className="gift-hero">{"\uD83C\uDF81"}</div>
+          </div>
           <h2
             style={{
               fontSize: "1.55rem",
@@ -219,6 +224,7 @@ export default function OfferLoginModal({ firstName }: Props) {
           </button>
         </div>
       </div>
+      <style>{giftAnimationCss}</style>
     </>,
     document.body
   );

@@ -42,6 +42,7 @@ import { useTheme } from "@/lib/theme";
 import { useSubscription } from "@/lib/subscription-context";
 import { useWalkthroughRegistry } from "@/lib/walkthrough-registry";
 import Paywall from "@/components/Paywall";
+import OfferPopup from "@/components/OfferPopup";
 import DfyModal, { detectDfyType } from "@/components/DfyModal";
 import type { Colors } from "@/constants/theme";
 import { spacing, typography, radius } from "@/constants/theme";
@@ -2104,6 +2105,9 @@ export default function DashboardScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={GOLD} />
         }
       >
+
+        {/* Special offer banner + auto-popup */}
+        <OfferPopup />
 
         {/* Limited mode banner */}
         {isLimitedMode && (
