@@ -74,7 +74,7 @@ export default function PathView({
       }
     }, 250);
     return () => clearTimeout(timer);
-  }, [mounted, tasksVisible, dayNumber]);
+  }, [mounted, tasksVisible, dayNumber, allDoneToday]);
 
   // Hide scroll hint when near bottom
   useEffect(() => {
@@ -108,9 +108,16 @@ export default function PathView({
 
   // ─── Helpers ──────────────────────────────────────────────────────────────
 
+  // The "focus" day is what we scroll to and render as active:
+  // - Normally the pathDayNumber (the active, in-progress day)
+  // - Once it's complete, jumps forward to the next unlocked day so the user
+  //   visually moves on and the gold check lands on the finished day.
+  const focusDay = dayNumber + (allDoneToday ? 1 : 0);
+
   const getNodeType = useCallback(
     (day: number): "completed" | "today" | "next" | "locked" => {
       if (day < dayNumber) return "completed";
+      if (day === dayNumber && allDoneToday) return "completed";
       if (day === dayNumber) return "today";
       if (day === dayNumber + 1 && allDoneToday) return "next";
       return "locked";
@@ -482,7 +489,8 @@ export default function PathView({
             const nodeType = getNodeType(day);
             const crown = isCrownNode(day);
             const milestone = isMilestone(day);
-            const isToday = day === dayNumber;
+            const isToday = day === dayNumber && !allDoneToday;
+            const isFocus = day === focusDay;
 
             // Node sizes
             let size = 64;
@@ -532,7 +540,7 @@ export default function PathView({
                   </div>
                 )}
               <div
-                ref={isToday ? todayRef : undefined}
+                ref={isFocus ? todayRef : undefined}
                 style={{
                   position: "absolute",
                   // Future days (day > dayNumber) get an extra +60px so

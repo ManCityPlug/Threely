@@ -594,12 +594,16 @@ function SCurvePathView({
   // walkthrough registry. The old implementation used a nested inner ScrollView
   // whose scrollTo calls never moved the screen (RN: nested ScrollViews of the
   // same axis break — only the outer one actually scrolls). Now we compute
-  // the today node's absolute Y inside the outer scroll content by summing:
+  // the focus node's absolute Y inside the outer scroll content by summing:
   //   (a) this component's own y offset (onLayout)
-  //   (b) the node's y within the path layout (40 + todayIndex*nodeSpacing)
+  //   (b) the node's y within the path layout (40 + focusIndex*nodeSpacing)
   // Viewport height is approximated from screenHeight minus header+tabbar chrome.
+  //
+  // Focus day jumps forward to goalDayNumber+1 once today is complete so the
+  // scroll pulls the user to the next unlocked day, not the finished one.
   const containerYRef = useRef<number>(0);
-  const todayIndex = goalDayNumber - windowStart;
+  const focusDay = goalDayNumber + (allDone ? 1 : 0);
+  const todayIndex = focusDay - windowStart;
   const todayY = 40 + todayIndex * nodeSpacing;
   const TODAY_NODE_SIZE = 68;
   // Approximate outer-scroll viewport: screen minus top safe area + header
@@ -630,7 +634,7 @@ function SCurvePathView({
       fires.forEach((t) => clearTimeout(t));
       interactionHandle.cancel?.();
     };
-  }, [goalDayNumber, scrollTrigger, scrollToToday]);
+  }, [goalDayNumber, allDone, scrollTrigger, scrollToToday]);
 
   return (
     <View
@@ -653,10 +657,13 @@ function SCurvePathView({
         height: days.length * nodeSpacing + 60 + 35,
       }}>
         {days.map((day, i) => {
-            const isCompleted = day < goalDayNumber;
-            const isToday = day === goalDayNumber;
+            // Once the active day's tasks are all done it visually becomes
+            // "completed" (gold fill) — matches web. The next day takes over
+            // as the glowing "work-ahead"/START node.
+            const isCompleted = day < goalDayNumber || (day === goalDayNumber && allDone);
+            const isToday = day === goalDayNumber && !allDone;
             const isWorkAhead = day === goalDayNumber + 1 && allDone;
-            const isLocked = day > goalDayNumber && !isWorkAhead;
+            const isLocked = !isCompleted && !isToday && !isWorkAhead;
             const isCrown = day === lastVisibleDay && day > goalDayNumber;
             const isMilestoneNode = isMilestone(day);
 
