@@ -148,7 +148,7 @@ export default function Paywall({ visible, onDismiss }: PaywallProps) {
         {/* Heading */}
         <Text style={[styles.heading, { color: "#D4A843" }]}>Unlock Threely Pro</Text>
         <Text style={styles.subheading}>
-          The #1 AI app that turns any goal into reality.{"\n"}Just tell us what you want — we'll get you there.
+          Your brand, logo, product direction, creatives, and daily roadmap.{"\n"}Everything you need to launch — built for you.
         </Text>
 
         {/* Monthly plan card — always selected */}

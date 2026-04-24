@@ -138,9 +138,9 @@ export default function HistoryScreen() {
       ) : dateEntries.length === 0 ? (
         <View style={styles.emptyWrap}>
           <Text style={styles.emptyIcon}>✓</Text>
-          <Text style={styles.emptyTitle}>No completed tasks yet</Text>
+          <Text style={styles.emptyTitle}>No completed moves yet</Text>
           <Text style={styles.emptySubtitle}>
-            Complete tasks on the Today tab and they'll appear here.
+            Complete moves on the Today tab and they'll appear here.
           </Text>
         </View>
       ) : (

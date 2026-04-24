@@ -41,8 +41,10 @@ const PATH_OPTIONS: Record<Category, PathOption[]> = {
     { label: "I've traded before", path: "daytrading_experienced" },
   ],
   business: [
-    { label: "Ecommerce", path: "business_ecommerce", description: "Sell stuff online" },
-    { label: "Personal brand", path: "business_content", description: "Grow a following" },
+    { label: "Passive income", path: "business_passive" },
+    { label: "Ecommerce", path: "business_ecommerce" },
+    { label: "Personal brand", path: "business_content" },
+    { label: "Most money", path: "business_money" },
   ],
   health: [
     { label: "Lose weight", path: "health_weight_loss" },
@@ -51,11 +53,21 @@ const PATH_OPTIONS: Record<Category, PathOption[]> = {
   ],
 };
 
+// Health-only multi-select "what do you want most?" — same aspirational copy
+// used on web. Stored on the goal for context only; does not drive tasks.
+const HEALTH_OUTCOME_OPTIONS: Record<string, string[]> = {
+  health_weight_loss: ["Look my best", "Get my dream body", "More confidence", "Have more energy"],
+  health_general:     ["Reach my max potential", "Get more compliments", "Upgrade my style", "Be more attractive"],
+  health_muscle:      ["Build my dream body", "Look jacked", "Be more athletic", "Get noticeably bigger"],
+};
+
 function buildGoalTitleFromPath(category: Category, path: string, income: string): string {
   switch (category) {
     case "business":
+      if (path === "business_passive") return income ? `Build Passive Income → ${income}/Month` : "Build Passive Income";
       if (path === "business_ecommerce") return income ? `Make ${income}/Month (Ecommerce)` : "Start an Ecommerce Brand";
       if (path === "business_content") return income ? `Build My Brand → ${income}/Month` : "Build a Personal Brand";
+      if (path === "business_money") return income ? `Make ${income}/Month` : "Make Money";
       return income ? `Make ${income}/Month` : "Start a Business";
     case "daytrading":
       if (path === "daytrading_beginner") return income ? `Learn Day Trading → ${income}/Month` : "Learn to Day Trade";
@@ -64,15 +76,15 @@ function buildGoalTitleFromPath(category: Category, path: string, income: string
     case "health":
       if (path === "health_weight_loss") return "Lose Weight";
       if (path === "health_muscle") return "Build Muscle";
-      if (path === "health_general") return "Get Fit + Feel Better";
+      if (path === "health_general") return "Glow Up";
       return "Health Goal";
   }
 }
 
 const BUILDING_STEPS = [
-  "Understanding your situation…",
-  "Mapping out your path…",
-  "Creating today's tasks…",
+  "Scanning your answers…",
+  "Designing your launch…",
+  "Assembling your assets…",
   "Locking it in…",
 ];
 
@@ -144,7 +156,7 @@ function BuildingProgressMobile({ styles, colors }: { styles: any; colors: Color
 
   return (
     <View style={styles.buildingCenter}>
-      <Text style={styles.buildTitle}>Threely Intelligence is building your plan…</Text>
+      <Text style={styles.buildTitle}>Threely Intelligence is building your launch…</Text>
       <Text style={[styles.buildSubtitle, { marginBottom: spacing.lg }]}>
         {BUILDING_STEPS[stepIdx]}
       </Text>
@@ -208,6 +220,8 @@ export default function OnboardingScreen() {
   const [selectedPath, setSelectedPath] = useState<string>("");
   const [incomeTarget, setIncomeTarget] = useState("");
   const [effortLevel, setEffortLevel] = useState<EffortLevel | null>(null);
+  // Health-only: multi-select outcome answers ("what do you want most?")
+  const [healthOutcome, setHealthOutcome] = useState<string[]>([]);
 
   // Hype / building state
   const [showHype, setShowHype] = useState(false);
@@ -262,6 +276,7 @@ export default function OnboardingScreen() {
         setSelectedPath("");
         setIncomeTarget("");
         setEffortLevel(null);
+        setHealthOutcome([]);
       } else {
         setFunnelStep((s) => s - 1);
       }
@@ -276,26 +291,31 @@ export default function OnboardingScreen() {
     });
   }
 
+  // Universal flow order (matches web /start):
+  //   business/daytrading: step 1 = income, step 2 = effort, step 3 = path
+  //   health:              step 1 = path,   step 2 = effort, step 3 = multi (stub)
   function selectPath(path: string) {
     if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelectedPath(path);
-    // Health skips the income step (no $ target — the goal IS the path)
     if (category === "health") {
-      animateTransition(() => setFunnelStep(3));
-    } else {
+      // Path was step 1 — advance to effort (step 2)
       goNext();
+    } else {
+      // Path was step 3 for biz/dt — we now have everything, kick off build
+      if (effortLevel) handleFinishHype(effortLevel);
     }
   }
 
   function selectIncome(amount: string) {
+    // Income is step 1 for biz/dt
     setIncomeTarget(amount);
     goNext();
   }
 
   function selectEffort(level: EffortLevel) {
     setEffortLevel(level);
-    // Kick off build once all answers are in
-    handleFinishHype(level);
+    // Effort is step 2 for every category — move to step 3
+    goNext();
   }
 
   // ─── Build plan ────────────────────────────────────────────────────────────
@@ -382,8 +402,20 @@ export default function OnboardingScreen() {
   function renderCategoryPicker() {
     return (
       <View style={styles.centerContent}>
-        <Text style={styles.stepTitle}>What is your goal?</Text>
+        <Text style={styles.stepTitle}>What do you want to build?</Text>
         <View style={styles.categoryList}>
+          <TouchableOpacity
+            style={styles.categoryBtn}
+            onPress={() => selectCategory("business")}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.categoryEmoji}>🚀</Text>
+            <View style={styles.categoryTextWrap}>
+              <Text style={styles.categoryLabel}>Online Business</Text>
+              <Text style={styles.categoryDesc}>Launch your store and first customers</Text>
+            </View>
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.categoryBtn}
             onPress={() => selectCategory("daytrading")}
@@ -393,18 +425,6 @@ export default function OnboardingScreen() {
             <View style={styles.categoryTextWrap}>
               <Text style={styles.categoryLabel}>Day Trading</Text>
               <Text style={styles.categoryDesc}>Make money trading</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.categoryBtn}
-            onPress={() => selectCategory("business")}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.categoryEmoji}>💼</Text>
-            <View style={styles.categoryTextWrap}>
-              <Text style={styles.categoryLabel}>Business</Text>
-              <Text style={styles.categoryDesc}>Make money online</Text>
             </View>
           </TouchableOpacity>
 
@@ -424,46 +444,37 @@ export default function OnboardingScreen() {
     );
   }
 
-  // ─── Render: Step 1 (path MC, category-specific) ──────────────────────────
+  // Step-1 render:
+  //   business/daytrading → income target question
+  //   health              → path pick (Lose weight / Glow up / Build muscle)
 
   function renderStep1() {
     if (!category) return null;
-    const options = PATH_OPTIONS[category];
-    const title = category === "daytrading"
-      ? "Have you traded before?"
-      : category === "business"
-        ? "What do you want to build?"
-        : "Which one?";
-    const totalSteps = category === "health" ? 2 : 3;
-    return (
-      <View style={styles.stepContainer}>
-        <ProgressDots current={1} total={totalSteps} />
-        <Text style={styles.stepTitle}>{title}</Text>
-        <View style={styles.optionList}>
-          {options.map((opt) => (
-            <TouchableOpacity
-              key={opt.path}
-              style={styles.optionBtn}
-              onPress={() => selectPath(opt.path)}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.optionBtnText}>{opt.label}</Text>
-              {opt.description && (
-                <Text style={styles.optionBtnSub}>{opt.description}</Text>
-              )}
-            </TouchableOpacity>
-          ))}
+    if (category === "health") {
+      const options = PATH_OPTIONS.health;
+      return (
+        <View style={styles.stepContainer}>
+          <ProgressDots current={1} total={3} />
+          <Text style={styles.stepTitle}>Which one?</Text>
+          <View style={styles.optionList}>
+            {options.map((opt) => (
+              <TouchableOpacity
+                key={opt.path}
+                style={styles.optionBtn}
+                onPress={() => selectPath(opt.path)}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.optionBtnText}>{opt.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         </View>
-      </View>
-    );
-  }
-
-  // ─── Render: Step 2 (income target — business/daytrading only) ────────────
-
-  function renderStep2() {
+      );
+    }
+    // biz/dt — income
     return (
       <View style={styles.stepContainer}>
-        <ProgressDots current={2} total={3} />
+        <ProgressDots current={1} total={3} />
         <Text style={styles.stepTitle}>How much do you want to make a month?</Text>
         <View style={styles.optionList}>
           {["$500", "$1K-$5K", "$10K+"].map((opt) => (
@@ -481,14 +492,12 @@ export default function OnboardingScreen() {
     );
   }
 
-  // ─── Render: Step 3 (effort level) ────────────────────────────────────────
+  // Step-2 render — always effort (Easy / Medium / Hard)
 
-  function renderStep3() {
-    const totalSteps = category === "health" ? 2 : 3;
-    const current = category === "health" ? 2 : 3;
+  function renderStep2() {
     return (
       <View style={styles.stepContainer}>
-        <ProgressDots current={current} total={totalSteps} />
+        <ProgressDots current={2} total={3} />
         <Text style={styles.stepTitle}>How hard do you want to work?</Text>
         <View style={styles.optionList}>
           {(["Easy", "Medium", "Hard"] as EffortLevel[]).map((opt) => (
@@ -499,6 +508,95 @@ export default function OnboardingScreen() {
               activeOpacity={0.8}
             >
               <Text style={styles.optionBtnText}>{opt}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    );
+  }
+
+  // Step-3 render:
+  //   business/daytrading → path pick
+  //   health              → "What do you want most?" multi-select
+
+  function renderStep3() {
+    if (!category) return null;
+    if (category === "health") {
+      const opts = selectedPath ? (HEALTH_OUTCOME_OPTIONS[selectedPath] ?? []) : [];
+      const canContinue = healthOutcome.length > 0;
+      return (
+        <View style={styles.stepContainer}>
+          <ProgressDots current={3} total={3} />
+          <Text style={styles.stepTitle}>What do you want most?</Text>
+          <Text style={[styles.stepTitle, { fontSize: typography.base, fontWeight: typography.medium as "500", color: "rgba(255,255,255,0.55)", marginTop: -spacing.sm }]}>
+            Pick all that apply
+          </Text>
+          <View style={styles.optionList}>
+            {opts.map((opt) => {
+              const selected = healthOutcome.includes(opt);
+              return (
+                <TouchableOpacity
+                  key={opt}
+                  style={[
+                    styles.optionBtn,
+                    selected && {
+                      borderColor: GOLD,
+                      backgroundColor: "rgba(212,168,67,0.1)",
+                    },
+                  ]}
+                  onPress={() => {
+                    setHealthOutcome((prev) =>
+                      prev.includes(opt) ? prev.filter((o) => o !== opt) : [...prev, opt]
+                    );
+                    if (Platform.OS !== "web") Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  }}
+                  activeOpacity={0.8}
+                >
+                  <Text style={[styles.optionBtnText, selected && { color: GOLD }]}>{opt}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          <TouchableOpacity
+            style={[
+              styles.optionBtn,
+              {
+                marginTop: spacing.md,
+                backgroundColor: canContinue ? GOLD : colors.border,
+                borderColor: canContinue ? GOLD : colors.border,
+              },
+            ]}
+            onPress={() => {
+              if (!canContinue || !effortLevel) return;
+              if (Platform.OS !== "web") Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              handleFinishHype(effortLevel);
+            }}
+            activeOpacity={canContinue ? 0.85 : 1}
+            disabled={!canContinue}
+          >
+            <Text style={[styles.optionBtnText, { color: canContinue ? "#000" : colors.textTertiary }]}>
+              Continue
+            </Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+    // biz/dt — path pick
+    const options = PATH_OPTIONS[category];
+    const title = category === "daytrading" ? "Have you traded before?" : "What type of business?";
+    return (
+      <View style={styles.stepContainer}>
+        <ProgressDots current={3} total={3} />
+        <Text style={styles.stepTitle}>{title}</Text>
+        <View style={styles.optionList}>
+          {options.map((opt) => (
+            <TouchableOpacity
+              key={opt.path}
+              style={styles.optionBtn}
+              onPress={() => selectPath(opt.path)}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.optionBtnText}>{opt.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -543,7 +641,7 @@ export default function OnboardingScreen() {
           <Text style={styles.hypeEmoji}>🔥</Text>
           <Text style={styles.hypeTitle}>You're the perfect fit.</Text>
           <Text style={styles.hypeSubtitle}>
-            Threely is building your personalized plan right now.
+            Threely is building your launch plan right now.
           </Text>
           {!buildDone && (
             <ActivityIndicator color={GOLD} style={{ marginTop: spacing.lg }} />
