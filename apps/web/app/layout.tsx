@@ -6,23 +6,23 @@ import { ThemeProvider } from "@/lib/theme-context";
 
 export const metadata: Metadata = {
   title: {
-    default: "Threely | Start Today",
+    default: "Threely | Launch Your Online Business",
     template: "%s | Threely",
   },
   description:
-    "Tell Threely your goal — it tells you exactly what to do every day. 3 personalized tasks, built around your life. Stop guessing. Start today.",
+    "AI business launch platform. Get your brand, logo, store setup plan, product direction, ad creatives, and daily roadmap — all in one system. Start for $1.",
   openGraph: {
     siteName: "Threely",
     type: "website",
     url: "https://threely.co",
-    title: "Threely | Start Today",
-    description: "Tell Threely your goal — it tells you exactly what to do every day. 3 personalized tasks, built around your life. Stop guessing. Start today.",
+    title: "Threely | Launch Your Online Business",
+    description: "AI business launch platform. Brand, logo, store, creatives, and a daily roadmap — all built for you. Launch in days, not months. Start for $1.",
     images: [{ url: "https://threely.co/favicon.png" }],
   },
   twitter: {
     card: "summary",
-    title: "Threely | Start Today",
-    description: "Tell Threely your goal — it tells you exactly what to do every day. 3 personalized tasks, built around your life. Stop guessing. Start today.",
+    title: "Threely | Launch Your Online Business",
+    description: "AI business launch platform. Brand, logo, store, creatives, and a daily roadmap — all built for you. Launch in days, not months. Start for $1.",
   },
   icons: {
     icon: "/favicon.png",

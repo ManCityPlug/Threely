@@ -20,8 +20,16 @@ export const stripe = new Proxy({} as Stripe, {
   },
 });
 
-export const PRICE_MONTHLY   = "price_1TKTNOLR2WAEIJdD5saTp8zD"; // $12.99/4 weeks
-export const PRICE_YEARLY    = "price_1T6buHLR2WAEIJdDhlQaqxMe"; // $99.99/year ($8.33/mo)
+// TODO (Stripe admin) — Threely Pro is now displayed publicly as $39/mo, but
+// these Stripe price IDs still point to the legacy $12.99/mo and $99.99/yr
+// products. Create a new "Threely Pro — $39/mo" recurring price in the Stripe
+// dashboard and replace PRICE_MONTHLY with the new ID. Keep PRICE_YEARLY as
+// an alias for legacy `?plan=yearly` URLs until analytics show those have
+// stopped landing, then remove. Display strings across the app
+// (pricing page, start funnel, checkout page) already reference $39/mo —
+// swapping the Stripe ID is the last step to make billing match copy.
+export const PRICE_MONTHLY   = "price_1TKTNOLR2WAEIJdD5saTp8zD"; // LEGACY $12.99/4 weeks — replace with Threely Pro $39/mo
+export const PRICE_YEARLY    = "price_1T6buHLR2WAEIJdDhlQaqxMe"; // LEGACY $99.99/year — alias, scheduled for removal
 export const TRIAL_DAYS      = 3;
 
 /**

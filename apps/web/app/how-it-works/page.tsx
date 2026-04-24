@@ -6,11 +6,11 @@ import MarketingFooter from "@/components/MarketingFooter";
 export const metadata: Metadata = {
   title: "How It Works",
   description:
-    "Describe your goal, get 3 personalized tasks every day. Complete them, leave a quick review, and watch the AI adapt to your progress. See how Threely works.",
+    "Pick your business direction. We generate your brand, logo, product direction, and creatives. You follow a daily roadmap built for beginners. See how Threely launches your business.",
   alternates: { canonical: "/how-it-works" },
   openGraph: {
     title: "How Threely Works",
-    description: "Describe your goal, get 3 personalized tasks every day. Complete, review, and watch the AI coaching adapt to you.",
+    description: "Pick your direction. We build your launch assets. You follow the daily roadmap. Launch in days, not months.",
   },
 };
 
