@@ -15,16 +15,11 @@ export async function POST(request: NextRequest) {
     const user = await getAnyUserFromRequest(request);
     if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const body = await request.json() as { plan: string; tier?: string };
+    const body = await request.json() as { plan: string };
     const priceId = PRICE_MAP[body.plan];
     if (!priceId) {
       return NextResponse.json({ error: "Invalid plan. Use 'monthly' or 'yearly'." }, { status: 400 });
     }
-    // Tier is informational for now — both tiers map to the same Stripe price
-    // until per-tier SKUs exist. We persist it on the SetupIntent metadata so
-    // analytics can split usage by tier and we can flip on the per-tier price
-    // map later (see lib/stripe.ts TODO block).
-    const tier: "standard" | "pro" = body.tier === "pro" ? "pro" : "standard";
 
     // Ensure user record exists (anon users may not have one yet). If the
     // real email collides with an existing row (leftover from a prior flow),
@@ -97,7 +92,7 @@ export async function POST(request: NextRequest) {
     const setupIntent = await stripeClient.setupIntents.create({
       customer: customerId,
       usage: "off_session",
-      metadata: { userId: user.id, plan: body.plan, threely_tier: tier },
+      metadata: { userId: user.id, plan: body.plan },
       ...(body.plan === "yearly" && {
         payment_method_options: {
           card: { request_three_d_secure: "any" },

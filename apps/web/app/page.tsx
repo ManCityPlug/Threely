@@ -107,30 +107,6 @@ const FAQ = [
 export default function LandingPage() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [pricingPlan, setPricingPlan] = useState<"monthly" | "yearly">("yearly");
-
-  // Persist plan choice across the pricing-section toggle on homepage so
-  // navigation to /pricing keeps the user's selection.
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("threely_pricing_plan");
-      if (saved === "monthly" || saved === "yearly") setPricingPlan(saved);
-    } catch { /* ignore */ }
-  }, []);
-  useEffect(() => {
-    try { localStorage.setItem("threely_pricing_plan", pricingPlan); } catch { /* ignore */ }
-  }, [pricingPlan]);
-
-  function ctaHrefForTier(tier: "standard" | "pro") {
-    return loggedIn ? `/checkout?plan=${pricingPlan}&tier=${tier}` : "/start";
-  }
-  function persistTierOnClick(tier: "standard" | "pro") {
-    try { localStorage.setItem("threely_pricing_tier", tier); } catch { /* ignore */ }
-  }
-  function tierCtaLabel(tier: "standard" | "pro") {
-    if (loggedIn) return "Go to Dashboard";
-    return tier === "pro" ? "Get Pro for $1" : "Start for $1";
-  }
 
   useEffect(() => {
     getSupabase().auth.getSession().then(({ data: { session } }) => {
@@ -500,234 +476,56 @@ export default function LandingPage() {
 
       {/* ── 11. PRICING ─────────────────────────────────────────────────────── */}
       <section style={{ padding: sectionPad, background: "#fff" }}>
-        <div style={{ maxWidth: 980, margin: "0 auto" }}>
-          <div className="reveal" style={{ textAlign: "center", marginBottom: 28 }}>
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <div className="reveal" style={{ textAlign: "center", marginBottom: 40 }}>
             <div style={eyebrowStyle}>Pricing</div>
-            <h2 style={h2Style}>Pick the plan that builds your business.</h2>
-            <p style={subPara}>Both plans start at $1 today. Cancel inside your 3-day Launch Preview and pay nothing more.</p>
+            <h2 style={h2Style}>Get your business built for $1.</h2>
+            <p style={subPara}>Everything done for you · Cancel anytime · No contracts.</p>
           </div>
-
-          {/* Billing toggle */}
-          <div className="reveal" style={{ display: "flex", justifyContent: "center", marginBottom: 36 }}>
-            <div style={{
-              display: "inline-flex", padding: 4, borderRadius: 999,
-              background: BG_SOFT, border: `1px solid ${BORDER}`,
-              boxShadow: "0 1px 2px rgba(15,23,42,0.04)", gap: 4,
-            }}>
-              {(["yearly", "monthly"] as const).map((p) => {
-                const active = pricingPlan === p;
-                return (
-                  <button
-                    key={p}
-                    onClick={() => setPricingPlan(p)}
-                    style={{
-                      display: "inline-flex", alignItems: "center", gap: 8,
-                      padding: "0.6rem 1.2rem", borderRadius: 999, border: "none",
-                      background: active ? "#fff" : "transparent",
-                      color: active ? TEXT : SUBTEXT,
-                      fontSize: "0.9rem", fontWeight: 700, letterSpacing: "-0.01em",
-                      cursor: "pointer",
-                      boxShadow: active ? "0 4px 14px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.06)" : "none",
-                      transition: "background 0.15s, box-shadow 0.15s",
-                      minHeight: 38,
-                    }}
-                  >
-                    {p === "yearly" ? "Annual" : "Monthly"}
-                    {p === "yearly" && (
-                      <span style={{
-                        display: "inline-flex", alignItems: "center",
-                        padding: "2px 8px", borderRadius: 999,
-                        background: "rgba(22,163,74,0.12)", color: "#15803d",
-                        fontSize: "0.68rem", fontWeight: 800,
-                      }}>
-                        Save up to $749
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+          <div className="reveal reveal-d1" style={{ background: "#fff", border: `2px solid ${NAVY}`, borderRadius: 24, padding: "36px 28px 32px", boxShadow: "0 24px 60px rgba(10,37,64,0.12)", position: "relative" }}>
+            <div style={{ position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)", background: GOLD, color: "#1a1100", padding: "5px 16px", borderRadius: 999, fontSize: "0.72rem", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", whiteSpace: "nowrap" }}>
+              Done for you
+            </div>
+            <div style={{ textAlign: "center", marginTop: 6 }}>
+              <div style={{ fontSize: "0.78rem", fontWeight: 800, letterSpacing: "0.1em", textTransform: "uppercase", color: NAVY, marginBottom: 14 }}>Threely Pro</div>
+              <div style={{ display: "flex", alignItems: "baseline", justifyContent: "center", gap: 8, marginBottom: 8 }}>
+                <span style={{ fontSize: "clamp(2.5rem, 7vw, 3.25rem)", fontWeight: 800, letterSpacing: "-0.03em", color: TEXT, lineHeight: 1 }}>$1</span>
+                <span style={{ fontSize: "1rem", color: SUBTEXT }}>today</span>
+              </div>
+              <p style={{ fontSize: "0.95rem", color: SUBTEXT, lineHeight: 1.55, margin: "0 auto 24px", maxWidth: 420 }}>
+                Then <strong style={{ color: TEXT }}>$39/month</strong> after your 3-day Launch Preview. Cancel inside the preview and you won&apos;t be charged a cent more.
+              </p>
+            </div>
+            <ul style={{ listStyle: "none", padding: 0, margin: "0 0 24px", display: "flex", flexDirection: "column", gap: 10 }}>
+              {[
+                "Business name + logo direction",
+                "Product selection + winning niche",
+                "Shopify store setup + theme",
+                "Product photos + product page copy",
+                "5 fresh ad creatives every week",
+                "Mobile dashboard + progress tracking",
+              ].map((line, i) => (
+                <li key={i} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: "0.95rem", color: TEXT, padding: "10px 14px", background: BG_SOFT, borderRadius: 10 }}>
+                  <span style={checkBadge}><Icon name="check" color="#16a34a" size={18} /></span>
+                  {line}
+                </li>
+              ))}
+            </ul>
+            <Link href={ctaHref} className="lp-cta-btn" style={{ display: "block", textAlign: "center", padding: "1.05rem 1.5rem", background: NAVY, color: "#fff", borderRadius: 14, fontWeight: 700, fontSize: "1.02rem", textDecoration: "none", boxShadow: "0 12px 28px rgba(10,37,64,0.22)", transition: "transform 0.15s, box-shadow 0.15s", letterSpacing: "-0.01em" }}>
+              {ctaLabel} →
+            </Link>
+            <p style={{ fontSize: "0.78rem", color: SUBTEXT, textAlign: "center", marginTop: 14, lineHeight: 1.5 }}>
+              Cancel anytime · 14-day refund on first Pro charge · No contracts
+            </p>
+          </div>
+          <div className="reveal reveal-d2" style={{ marginTop: 32, textAlign: "center" }}>
+            <p style={{ fontSize: "0.82rem", fontWeight: 700, color: SUBTEXT, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 12 }}>Available add-ons</p>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
+              {["More weekly ads", "AI UGC video pack", "Faster build", "Premium product photos"].map((tag, i) => (
+                <span key={i} style={{ padding: "6px 14px", background: BG_SOFT, border: `1px solid ${BORDER}`, borderRadius: 999, fontSize: "0.82rem", color: TEXT, fontWeight: 500 }}>{tag}</span>
+              ))}
             </div>
           </div>
-
-          {/* Two plan cards */}
-          <div className="reveal reveal-d1" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 24, alignItems: "stretch" }}>
-            {([
-              {
-                id: "standard" as const,
-                tagline: "Everything you need to launch.",
-                monthly: { price: 39, perDay: "$1.30/day", afterTrial: "Then $39/month after your 3-day Launch Preview." },
-                yearly:  { price: 99, perDay: "$0.27/day", afterTrial: "Then $99/year after your 3-day Launch Preview.", equivMonthly: "$8.25/mo", savings: "Save $369/yr" },
-                features: [
-                  "Business name + logo direction",
-                  "Product / niche selection",
-                  "Shopify store + theme setup",
-                  "Product page + copy",
-                  "Standard product photos",
-                  "5 fresh static ad creatives / week",
-                  "Mobile dashboard + tracking",
-                ],
-              },
-              {
-                id: "pro" as const,
-                tagline: "Everything in Standard, plus AI UGC video ads.",
-                monthly: { price: 79, perDay: "$2.63/day", afterTrial: "Then $79/month after your 3-day Launch Preview." },
-                yearly:  { price: 199, perDay: "$0.55/day", afterTrial: "Then $199/year after your 3-day Launch Preview.", equivMonthly: "$16.58/mo", savings: "Save $749/yr" },
-                features: [
-                  "Everything in Standard",
-                  "5 AI UGC video ads / week (Reels & TikTok ready)",
-                  "Premium product photos",
-                  "Priority build (faster delivery)",
-                  "Add-on credits for extra ads or products",
-                ],
-              },
-            ]).map((tier) => {
-              const isPro = tier.id === "pro";
-              const period = pricingPlan === "yearly" ? "/yr" : "/mo";
-              const block = pricingPlan === "yearly" ? tier.yearly : tier.monthly;
-              const compare = pricingPlan === "yearly" ? tier.monthly.price : null;
-              return (
-                <div key={tier.id} style={{
-                  position: "relative",
-                  background: "#fff",
-                  border: `${isPro ? 2 : 1}px solid ${isPro ? NAVY : BORDER}`,
-                  borderRadius: 22,
-                  padding: "32px 26px 28px",
-                  boxShadow: isPro
-                    ? "0 24px 60px rgba(10,37,64,0.16), 0 6px 18px rgba(10,37,64,0.08)"
-                    : "0 8px 24px rgba(15,23,42,0.06)",
-                  display: "flex", flexDirection: "column",
-                }}>
-                  {isPro && (
-                    <div style={{
-                      position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
-                      background: GOLD, color: "#1a1100",
-                      padding: "5px 16px", borderRadius: 999,
-                      fontSize: "0.72rem", fontWeight: 800,
-                      letterSpacing: "0.08em", textTransform: "uppercase",
-                      whiteSpace: "nowrap",
-                      boxShadow: "0 6px 18px rgba(212,168,67,0.35)",
-                    }}>
-                      Most Popular
-                    </div>
-                  )}
-                  <div style={{
-                    fontSize: "0.78rem", fontWeight: 800, letterSpacing: "0.12em",
-                    textTransform: "uppercase",
-                    color: isPro ? NAVY : SUBTEXT,
-                    marginBottom: 8, marginTop: isPro ? 6 : 0,
-                  }}>
-                    {tier.id === "pro" ? "Pro" : "Standard"}
-                  </div>
-                  <p style={{ margin: "0 0 20px", fontSize: "0.92rem", color: SUBTEXT, lineHeight: 1.5 }}>
-                    {tier.tagline}
-                  </p>
-
-                  <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
-                    {compare !== null && (
-                      <span style={{
-                        fontSize: "1.3rem", color: "#94a3b8",
-                        textDecoration: "line-through", textDecorationThickness: 2,
-                        fontWeight: 700, letterSpacing: "-0.02em",
-                      }}>
-                        ${compare}
-                      </span>
-                    )}
-                    <span style={{ fontSize: "clamp(2.4rem, 5vw, 3.1rem)", fontWeight: 800, letterSpacing: "-0.03em", color: TEXT, lineHeight: 1 }}>
-                      ${block.price}
-                    </span>
-                    <span style={{ fontSize: "1rem", color: SUBTEXT, fontWeight: 600 }}>{period}</span>
-                  </div>
-                  <div style={{ fontSize: "0.83rem", color: SUBTEXT, marginBottom: 16 }}>
-                    Just <strong style={{ color: TEXT }}>{block.perDay}</strong>
-                    {pricingPlan === "yearly" && (
-                      <span> · {tier.yearly.equivMonthly} equivalent</span>
-                    )}
-                  </div>
-
-                  <div style={{
-                    background: BG_SOFT, border: `1px solid ${BORDER}`,
-                    borderRadius: 12, padding: "12px 14px", marginBottom: 16,
-                  }}>
-                    <div style={{ fontSize: "0.93rem", color: TEXT, fontWeight: 700, marginBottom: 4 }}>
-                      $1 today
-                    </div>
-                    <p style={{ margin: 0, fontSize: "0.8rem", color: SUBTEXT, lineHeight: 1.5 }}>
-                      {block.afterTrial} Cancel inside the preview, pay nothing more.
-                    </p>
-                  </div>
-
-                  {pricingPlan === "yearly" && (
-                    <div style={{
-                      display: "inline-flex", alignItems: "center",
-                      padding: "5px 11px", borderRadius: 999,
-                      background: "rgba(22,163,74,0.1)", color: "#15803d",
-                      fontSize: "0.76rem", fontWeight: 800,
-                      marginBottom: 16, alignSelf: "flex-start",
-                    }}>
-                      {tier.yearly.savings}
-                    </div>
-                  )}
-                  {pricingPlan === "monthly" && (
-                    <button
-                      onClick={() => setPricingPlan("yearly")}
-                      style={{
-                        background: "transparent", border: "none", padding: 0, marginBottom: 16,
-                        color: NAVY, fontSize: "0.83rem", fontWeight: 700,
-                        cursor: "pointer", textAlign: "left", letterSpacing: "-0.01em",
-                      }}
-                    >
-                      Save with Annual ↓
-                    </button>
-                  )}
-
-                  <Link
-                    href={ctaHrefForTier(tier.id)}
-                    onClick={() => persistTierOnClick(tier.id)}
-                    className="lp-cta-btn"
-                    style={{
-                      display: "block", textAlign: "center",
-                      padding: "1rem 1.25rem",
-                      background: isPro ? NAVY : "#fff",
-                      color: isPro ? "#fff" : NAVY,
-                      borderRadius: 14, fontWeight: 700, fontSize: "1rem",
-                      textDecoration: "none",
-                      boxShadow: isPro
-                        ? "0 12px 28px rgba(10,37,64,0.22)"
-                        : `0 0 0 1.5px ${NAVY} inset`,
-                      transition: "transform 0.15s, box-shadow 0.15s",
-                      letterSpacing: "-0.01em",
-                      marginBottom: 22,
-                      minHeight: 52,
-                      lineHeight: "1.4",
-                    }}
-                  >
-                    {tierCtaLabel(tier.id)} →
-                  </Link>
-
-                  <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 10 }}>
-                    {tier.features.map((f, i) => (
-                      <li key={i} style={{
-                        display: "flex", alignItems: "flex-start", gap: 10,
-                        fontSize: "0.9rem", color: TEXT, lineHeight: 1.5,
-                      }}>
-                        <span style={{ ...checkBadge, marginTop: 1 }}>
-                          <Icon name="check" color="#16a34a" size={16} />
-                        </span>
-                        {f}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
-
-          <p className="reveal reveal-d2" style={{
-            marginTop: 26, textAlign: "center",
-            fontSize: "0.82rem", color: SUBTEXT, lineHeight: 1.6,
-          }}>
-            $1 today on either plan · Cancel inside the 3-day preview · 14-day refund on first paid charge
-          </p>
         </div>
       </section>
 
