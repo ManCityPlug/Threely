@@ -3,56 +3,34 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   launchApi,
+  statsApi,
   type LaunchAsset,
   type LaunchAssetKind,
-  type LaunchEvent,
   type LaunchSummary,
+  type Stats,
 } from "@/lib/api-client";
-
-// ─── Phase template ──────────────────────────────────────────────────────────
-// Phases are fixed in code (not DB) — simpler to evolve. Launch.currentPhase
-// (1..6) determines which row is "active"; earlier rows are "done", later ones "pending".
-
-type PhaseStatus = "done" | "active" | "pending";
-
-interface Phase {
-  order: number;
-  title: string;
-  blurb: string;
-  week: string;
-}
-
-const PHASES: Phase[] = [
-  { order: 1, title: "Foundation",  blurb: "Business name, niche, positioning locked in.",          week: "Week 1"    },
-  { order: 2, title: "Branding",    blurb: "Logo, color palette, brand voice delivered.",           week: "Week 1–2"  },
-  { order: 3, title: "Store",       blurb: "Shopify store live with winning product.",              week: "Week 2"    },
-  { order: 4, title: "First Ads",   blurb: "First Meta ad creatives launched with $20/day test.",   week: "Week 3"    },
-  { order: 5, title: "Scale",       blurb: "Winning angles found, budget scaled, retargeting on.",  week: "Week 4–6"  },
-  { order: 6, title: "Growth",      blurb: "UGC library, email flows, cross-sell offers live.",     week: "Week 6–8"  },
-];
-
-function phaseStatus(phase: Phase, currentPhase: number): PhaseStatus {
-  if (phase.order <  currentPhase) return "done";
-  if (phase.order === currentPhase) return "active";
-  return "pending";
-}
+import DfyModal from "@/components/DfyModal";
+import OfferBanner from "@/components/OfferBanner";
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function LaunchPage() {
-  const [loading, setLoading]   = useState(true);
-  const [launch,  setLaunch]    = useState<LaunchSummary | null>(null);
-  const [assets,  setAssets]    = useState<LaunchAsset[]>([]);
-  const [events,  setEvents]    = useState<LaunchEvent[]>([]);
-  const [error,   setError]     = useState<string>("");
+  const [loading, setLoading] = useState(true);
+  const [launch, setLaunch] = useState<LaunchSummary | null>(null);
+  const [assets, setAssets] = useState<LaunchAsset[]>([]);
+  const [stats, setStats] = useState<Stats | null>(null);
+  const [error, setError] = useState<string>("");
 
   const load = useCallback(async () => {
     setError("");
     try {
-      const res = await launchApi.get();
-      setLaunch(res.launch);
-      setAssets(res.assets ?? []);
-      setEvents(res.events ?? []);
+      const [launchRes, statsRes] = await Promise.all([
+        launchApi.get(),
+        statsApi.get().catch(() => null),
+      ]);
+      setLaunch(launchRes.launch);
+      setAssets(launchRes.assets ?? []);
+      if (statsRes) setStats(statsRes);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to load launch");
     } finally {
@@ -63,128 +41,206 @@ export default function LaunchPage() {
   useEffect(() => { load(); }, [load]);
 
   if (loading) return <LaunchSkeleton />;
-  if (error)   return <ErrorState message={error} onRetry={load} />;
+  if (error) return <ErrorState message={error} onRetry={load} />;
   if (!launch) return <EmptyState onCreated={load} />;
 
-  return <LaunchDashboard launch={launch} assets={assets} events={events} />;
+  return <LaunchHub launch={launch} assets={assets} stats={stats} onAssetDelivered={load} />;
 }
 
-// ─── Dashboard ────────────────────────────────────────────────────────────────
+// ─── Hub ──────────────────────────────────────────────────────────────────────
 
-function LaunchDashboard({
-  launch, assets, events,
-}: { launch: LaunchSummary; assets: LaunchAsset[]; events: LaunchEvent[] }) {
-  const currentPhase = PHASES.find(p => p.order === launch.currentPhase) ?? PHASES[0];
-  const doneCount    = Math.max(0, launch.currentPhase - 1);
-  const progressPct  = Math.round((doneCount / PHASES.length) * 100);
+type DfyKind = "names" | "products" | "logo";
 
-  const readyCount      = assets.filter(a => a.status === "ready").length;
-  const inProgressCount = assets.length - readyCount;
+const ACTION_TILES: Array<{
+  key: string;
+  title: string;
+  blurb: string;
+  cta: string;
+  dfy?: DfyKind;
+  comingSoon?: boolean;
+  icon: React.ReactNode;
+  bg: string;
+  fg: string;
+}> = [
+  {
+    key: "logo",
+    title: "Logo",
+    blurb: "Pick a logo for your brand in 30 seconds.",
+    cta: "Get my logo",
+    dfy: "logo",
+    icon: <IconLogo />,
+    bg: "linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)",
+    fg: "#92400e",
+  },
+  {
+    key: "name",
+    title: "Business name",
+    blurb: "Five clean, brandable names tailored to your niche.",
+    cta: "Get name ideas",
+    dfy: "names",
+    icon: <IconName />,
+    bg: "linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%)",
+    fg: "#1e40af",
+  },
+  {
+    key: "product",
+    title: "Winning product",
+    blurb: "Top-performing products with supplier costs and margins.",
+    cta: "Pick my product",
+    dfy: "products",
+    icon: <IconProduct />,
+    bg: "linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%)",
+    fg: "#166534",
+  },
+  {
+    key: "storefront",
+    title: "Storefront",
+    blurb: "A full Shopify storefront, designed and ready to publish.",
+    cta: "Build my store",
+    comingSoon: true,
+    icon: <IconStore />,
+    bg: "linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%)",
+    fg: "#5b21b6",
+  },
+  {
+    key: "ads",
+    title: "Ad creatives",
+    blurb: "Scroll-stopping Meta ad videos tested at $20/day.",
+    cta: "Make my ads",
+    comingSoon: true,
+    icon: <IconAd />,
+    bg: "linear-gradient(135deg, #fee2e2 0%, #fecaca 100%)",
+    fg: "#991b1b",
+  },
+  {
+    key: "ugc",
+    title: "UGC videos",
+    blurb: "AI actors filming your product in any setting.",
+    cta: "Make UGC",
+    comingSoon: true,
+    icon: <IconUgc />,
+    bg: "linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%)",
+    fg: "#9d174d",
+  },
+];
 
-  const latestMove = events[0] ?? null;
-  const upcoming   = events.filter(e => e.kind === "upcoming");
+function LaunchHub({
+  launch,
+  assets,
+  stats,
+  onAssetDelivered,
+}: {
+  launch: LaunchSummary;
+  assets: LaunchAsset[];
+  stats: Stats | null;
+  onAssetDelivered: () => void;
+}) {
+  const [openDfy, setOpenDfy] = useState<DfyKind | null>(null);
+  const [hasOffer, setHasOffer] = useState(false);
+  const streak = stats?.streak ?? 0;
+
+  const readyAssets = assets.filter(a => a.status === "ready");
 
   return (
-    <div style={{ maxWidth: 1040, margin: "0 auto", padding: "1.75rem 1.25rem 4rem" }}>
-
+    <div className="launch-page">
       {/* Header */}
-      <div style={{ marginBottom: 28 }}>
-        <div style={GOLD_LABEL}>Your launch</div>
-        <h1 style={{
-          fontSize: "clamp(1.75rem, 4.5vw, 2.35rem)",
-          fontWeight: 800,
-          letterSpacing: "-0.025em",
-          color: "var(--text)",
-          lineHeight: 1.15,
-          marginTop: 6,
-        }}>
-          {launch.businessName} is being built
-        </h1>
-        <div style={{ fontSize: "0.98rem", color: "var(--subtext)", marginTop: 8 }}>
-          You focus on your life. We run the launch.
-        </div>
-      </div>
-
-      {/* Hero status card */}
-      <div style={HERO_CARD}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 16 }}>
+      <header className="launch-header">
+        <div className="launch-header-row">
           <div>
-            <div style={{ fontSize: "0.76rem", color: "rgba(255,255,255,0.55)", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>
-              Current phase
-            </div>
-            <div style={{ fontSize: "1.55rem", fontWeight: 800, color: "#fff", marginTop: 4, letterSpacing: "-0.02em" }}>
-              {currentPhase.title}
-            </div>
-            <div style={{ fontSize: "0.92rem", color: "rgba(255,255,255,0.7)", marginTop: 2 }}>
-              {currentPhase.week} · {progressPct}% of launch complete
+            <div className="launch-eyebrow">Your launch</div>
+            <h1 className="launch-title">{launch.businessName}</h1>
+            <div className="launch-sub">
+              {capitalize(launch.niche)} · We&apos;re building this for you
             </div>
           </div>
-
-          <div style={{ display: "flex", gap: 18, flexShrink: 0 }}>
-            <HeroStat label="Assets delivered" value={String(readyCount)} />
-            <HeroStat label="In progress"      value={String(inProgressCount)} />
-            <HeroStat label="Phases done"      value={`${doneCount} / ${PHASES.length}`} />
-          </div>
+          {streak > 0 && (
+            <div className="launch-streak" aria-label={`${streak} day streak`}>
+              <span className="launch-streak-flame">🔥</span>
+              <span className="launch-streak-num">{streak}</span>
+              <span className="launch-streak-label">day{streak === 1 ? "" : "s"} in</span>
+            </div>
+          )}
         </div>
+      </header>
 
-        <div style={{ marginTop: 22, height: 6, background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden" }}>
-          <div style={{
-            width: `${progressPct}%`,
-            height: "100%",
-            background: "linear-gradient(90deg, #D4A843, #E8C547)",
-            borderRadius: 999,
-            transition: "width 400ms ease",
-          }} />
-        </div>
-
-        {latestMove && (
-          <div style={{ marginTop: 16, fontSize: "0.88rem", color: "rgba(255,255,255,0.75)", display: "flex", alignItems: "flex-start", gap: 8 }}>
-            <span style={{ display: "inline-block", width: 7, height: 7, borderRadius: "50%", background: "#3ecf8e", marginTop: 6, flexShrink: 0 }} />
-            <span>
-              <b style={{ color: "#fff" }}>Latest move:</b> {latestMove.title}
-              {latestMove.detail && <span style={{ opacity: 0.85 }}> — {latestMove.detail}</span>}
-            </span>
-          </div>
-        )}
+      {/* Special offer */}
+      <div style={{ marginBottom: hasOffer ? 24 : 0 }}>
+        <OfferBanner onActiveChange={setHasOffer} />
       </div>
 
-      {/* Launch timeline */}
-      <SectionHeader title="Launch timeline" subtitle="What we're building for you, in order." />
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {PHASES.map(p => <PhaseRow key={p.order} phase={p} status={phaseStatus(p, launch.currentPhase)} />)}
-      </div>
+      {/* Action grid — click-to-get */}
+      <section className="launch-section">
+        <div className="launch-section-head">
+          <h2 className="launch-section-title">What do you want first?</h2>
+          <p className="launch-section-sub">
+            Tap any tile. We do the work. You keep what you love.
+          </p>
+        </div>
+
+        <div className="launch-action-grid">
+          {ACTION_TILES.map(tile => (
+            <button
+              key={tile.key}
+              type="button"
+              className={`launch-tile${tile.comingSoon ? " is-coming-soon" : ""}`}
+              disabled={tile.comingSoon}
+              onClick={() => tile.dfy && setOpenDfy(tile.dfy)}
+            >
+              <div className="launch-tile-art" style={{ background: tile.bg, color: tile.fg }}>
+                <div className="launch-tile-icon">{tile.icon}</div>
+              </div>
+              <div className="launch-tile-body">
+                <div className="launch-tile-title-row">
+                  <h3 className="launch-tile-title">{tile.title}</h3>
+                  {tile.comingSoon && <span className="launch-tile-pill">Soon</span>}
+                </div>
+                <p className="launch-tile-blurb">{tile.blurb}</p>
+                <span className={`launch-tile-cta${tile.comingSoon ? " is-disabled" : ""}`}>
+                  {tile.cta}
+                  {!tile.comingSoon && <span className="launch-tile-cta-arrow">→</span>}
+                </span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
 
       {/* Asset library */}
-      <SectionHeader title="Asset library" subtitle="Everything we've made for your business." />
-      {assets.length === 0 ? (
-        <div style={EMPTY_TILE}>
-          <div style={{ fontSize: 28, marginBottom: 8 }}>✨</div>
-          <div style={{ color: "var(--subtext)", fontSize: "0.92rem" }}>
-            Your first assets land within 48 hours.
-          </div>
+      <section className="launch-section">
+        <div className="launch-section-head">
+          <h2 className="launch-section-title">Your assets</h2>
+          <p className="launch-section-sub">
+            Everything we&apos;ve made for {launch.businessName}.
+          </p>
         </div>
-      ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
-          {assets.map(a => <AssetCard key={a.id} asset={a} />)}
-        </div>
-      )}
 
-      {/* This week */}
-      {upcoming.length > 0 && (
-        <>
-          <SectionHeader title="This week" subtitle="Moves landing in the next few days." />
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {upcoming.map(e => <UpcomingRow key={e.id} event={e} />)}
+        {readyAssets.length === 0 ? (
+          <div className="launch-empty">
+            <div className="launch-empty-mark">✦</div>
+            <div className="launch-empty-title">Nothing yet</div>
+            <div className="launch-empty-sub">
+              Tap a tile above and your first asset will land here.
+            </div>
           </div>
-        </>
-      )}
+        ) : (
+          <div className="launch-asset-grid">
+            {readyAssets.map(a => <AssetCard key={a.id} asset={a} />)}
+          </div>
+        )}
+      </section>
 
-      {/* Footer note */}
-      <div style={FOOTER_NOTE}>
-        <b style={{ color: "#D4A843" }}>How this works:</b> you don&apos;t need to do anything. We ship every phase automatically.
-        If you want to change something — a color, a name, an angle — tap any asset and you can swap it.
-        Nothing blocks on your decisions.
-      </div>
+      {openDfy && (
+        <DfyModal
+          type={openDfy}
+          taskText={
+            openDfy === "logo"     ? `Design a logo for ${launch.businessName}` :
+            openDfy === "names"    ? `Pick a name for my ${launch.niche} business` :
+                                     `Pick a winning product in ${launch.niche}`
+          }
+          onClose={() => setOpenDfy(null)}
+          onDelivered={() => { onAssetDelivered(); }}
+        />
+      )}
     </div>
   );
 }
@@ -193,9 +249,9 @@ function LaunchDashboard({
 
 function EmptyState({ onCreated }: { onCreated: () => void }) {
   const [businessName, setBusinessName] = useState("");
-  const [niche, setNiche]               = useState("");
-  const [submitting, setSubmitting]     = useState(false);
-  const [err, setErr]                   = useState("");
+  const [niche, setNiche] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [err, setErr] = useState("");
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -212,21 +268,13 @@ function EmptyState({ onCreated }: { onCreated: () => void }) {
   }
 
   return (
-    <div style={{ maxWidth: 520, margin: "0 auto", padding: "3rem 1.25rem" }}>
-      <div style={GOLD_LABEL}>Your launch</div>
-      <h1 style={{
-        fontSize: "2rem",
-        fontWeight: 800,
-        letterSpacing: "-0.025em",
-        color: "var(--text)",
-        lineHeight: 1.15,
-        marginTop: 6,
-        marginBottom: 12,
-      }}>
+    <div className="launch-page" style={{ maxWidth: 540 }}>
+      <div className="launch-eyebrow">Your launch</div>
+      <h1 className="launch-title" style={{ marginBottom: 12 }}>
         Let&apos;s start your business.
       </h1>
-      <p style={{ fontSize: "1rem", color: "var(--subtext)", marginBottom: 28, lineHeight: 1.55 }}>
-        Tell us two things and we&apos;ll handle the rest. First assets within 48 hours.
+      <p className="launch-sub" style={{ marginBottom: 28, fontSize: "1rem" }}>
+        Tell us two things and we handle the rest. First assets within 48 hours.
       </p>
 
       <form onSubmit={submit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -245,32 +293,15 @@ function EmptyState({ onCreated }: { onCreated: () => void }) {
           maxLength={60}
         />
 
-        {err && (
-          <div style={{ color: "#ff6b6b", fontSize: "0.88rem" }}>{err}</div>
-        )}
+        {err && <div style={{ color: "var(--danger)", fontSize: "0.88rem" }}>{err}</div>}
 
         <button
           type="submit"
           disabled={submitting || !businessName.trim() || !niche.trim()}
-          style={{
-            marginTop: 8,
-            padding: "14px 20px",
-            borderRadius: 12,
-            background: submitting ? "rgba(212,168,67,0.5)" : "#D4A843",
-            color: "#000",
-            fontSize: "1rem",
-            fontWeight: 800,
-            border: "none",
-            cursor: submitting ? "default" : "pointer",
-            letterSpacing: "-0.01em",
-          }}
+          className="launch-primary-btn"
         >
           {submitting ? "Starting your launch…" : "Start my launch"}
         </button>
-
-        <p style={{ fontSize: "0.8rem", color: "var(--muted)", textAlign: "center", marginTop: 6 }}>
-          We&apos;ll start building immediately. You can change the name or niche anytime.
-        </p>
       </form>
     </div>
   );
@@ -278,17 +309,13 @@ function EmptyState({ onCreated }: { onCreated: () => void }) {
 
 function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <div style={{ maxWidth: 520, margin: "0 auto", padding: "3rem 1.25rem", textAlign: "center" }}>
+    <div className="launch-page" style={{ textAlign: "center", maxWidth: 480 }}>
       <div style={{ fontSize: 28, marginBottom: 10 }}>⚠</div>
       <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>
         Couldn&apos;t load your launch
       </div>
       <div style={{ fontSize: "0.9rem", color: "var(--subtext)", marginBottom: 18 }}>{message}</div>
-      <button onClick={onRetry} style={{
-        padding: "10px 18px", borderRadius: 10,
-        background: "#D4A843", color: "#000", border: "none",
-        fontWeight: 700, cursor: "pointer",
-      }}>
+      <button onClick={onRetry} className="launch-primary-btn" style={{ width: "auto", padding: "10px 22px" }}>
         Retry
       </button>
     </div>
@@ -297,196 +324,40 @@ function ErrorState({ message, onRetry }: { message: string; onRetry: () => void
 
 function LaunchSkeleton() {
   return (
-    <div style={{ maxWidth: 1040, margin: "0 auto", padding: "1.75rem 1.25rem" }}>
-      <div style={{ height: 18, width: 120, background: "var(--border)", borderRadius: 4, marginBottom: 12 }} />
-      <div style={{ height: 40, width: "70%", background: "var(--border)", borderRadius: 8, marginBottom: 28 }} />
-      <div style={{ height: 180, background: "var(--card)", borderRadius: 18, border: "1px solid var(--border)", marginBottom: 28 }} />
-      <div style={{ height: 22, width: 180, background: "var(--border)", borderRadius: 4, marginBottom: 14 }} />
-      {Array.from({ length: 3 }).map((_, i) => (
-        <div key={i} style={{ height: 72, background: "var(--card)", borderRadius: 12, border: "1px solid var(--border)", marginBottom: 10 }} />
-      ))}
+    <div className="launch-page">
+      <div style={{ height: 14, width: 100, background: "var(--border)", borderRadius: 4, marginBottom: 10 }} />
+      <div style={{ height: 36, width: "60%", background: "var(--border)", borderRadius: 8, marginBottom: 8 }} />
+      <div style={{ height: 14, width: "40%", background: "var(--border)", borderRadius: 4, marginBottom: 28 }} />
+      <div className="launch-action-grid">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} style={{ height: 220, background: "var(--card)", border: "1px solid var(--border)", borderRadius: 16 }} />
+        ))}
+      </div>
     </div>
   );
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function SectionHeader({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <div style={{ marginTop: 36, marginBottom: 14 }}>
-      <div style={{ fontSize: "1.1rem", fontWeight: 800, color: "var(--text)", letterSpacing: "-0.015em" }}>{title}</div>
-      <div style={{ fontSize: "0.88rem", color: "var(--subtext)", marginTop: 2 }}>{subtitle}</div>
-    </div>
-  );
-}
-
-function HeroStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <div style={{ fontSize: "1.4rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>{value}</div>
-      <div style={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.55)", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase" }}>
-        {label}
-      </div>
-    </div>
-  );
-}
-
-function PhaseRow({ phase, status }: { phase: Phase; status: PhaseStatus }) {
-  const color =
-    status === "done"   ? "#3ecf8e" :
-    status === "active" ? "#D4A843" :
-                          "rgba(255,255,255,0.25)";
-
-  const label =
-    status === "done"   ? "Done" :
-    status === "active" ? "In progress" :
-                          "Pending";
-
-  return (
-    <div style={{
-      display: "flex",
-      alignItems: "flex-start",
-      gap: 14,
-      padding: "16px 18px",
-      borderRadius: 12,
-      background: "var(--card)",
-      border: `1px solid ${status === "active" ? "rgba(212,168,67,0.35)" : "var(--border)"}`,
-      boxShadow: status === "active" ? "0 0 0 3px rgba(212,168,67,0.08)" : "none",
-    }}>
-      <div style={{
-        width: 34, height: 34, borderRadius: "50%",
-        background: status === "done" ? "rgba(62,207,142,0.15)" : status === "active" ? "rgba(212,168,67,0.15)" : "rgba(255,255,255,0.04)",
-        color, display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: "0.9rem", fontWeight: 800, flexShrink: 0,
-        border: `1.5px solid ${color}`,
-      }}>
-        {status === "done" ? "\u2713" : phase.order}
-      </div>
-
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", flexWrap: "wrap", gap: 6 }}>
-          <div style={{ fontSize: "1rem", fontWeight: 700, color: "var(--text)" }}>{phase.title}</div>
-          <div style={{ fontSize: "0.74rem", color, fontWeight: 700, letterSpacing: "0.05em", textTransform: "uppercase" }}>
-            {label} · {phase.week}
-          </div>
-        </div>
-        <div style={{ fontSize: "0.88rem", color: "var(--subtext)", marginTop: 4, lineHeight: 1.5 }}>
-          {phase.blurb}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function AssetCard({ asset }: { asset: LaunchAsset }) {
-  const badgeColor =
-    asset.status === "ready"     ? "#3ecf8e" :
-    asset.status === "in_review" ? "#D4A843" :
-                                   "var(--muted)";
-  const badgeLabel =
-    asset.status === "ready"     ? "Ready" :
-    asset.status === "in_review" ? "In review" :
-                                   "In progress";
-
-  // Try to pull a thumb URL from payload when available.
   const thumb = assetThumbUrl(asset);
 
   return (
-    <div
-      style={{
-        background: "var(--card)",
-        border: "1px solid var(--border)",
-        borderRadius: 14,
-        overflow: "hidden",
-        display: "flex",
-        flexDirection: "column",
-        cursor: asset.status === "ready" ? "pointer" : "default",
-        transition: "transform 150ms ease, border-color 150ms ease",
-      }}
-      onMouseEnter={(e) => {
-        if (asset.status === "ready") {
-          e.currentTarget.style.borderColor = "rgba(212,168,67,0.5)";
-          e.currentTarget.style.transform = "translateY(-2px)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.borderColor = "var(--border)";
-        e.currentTarget.style.transform = "translateY(0)";
-      }}
-    >
-      <div style={{
-        aspectRatio: "16 / 10",
-        background: thumb ? undefined : `linear-gradient(135deg, ${assetBg(asset.kind)}, rgba(255,255,255,0.02))`,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        borderBottom: "1px solid var(--border)",
-        overflow: "hidden",
-      }}>
+    <div className="launch-asset-card">
+      <div className="launch-asset-thumb">
         {thumb ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={thumb} alt={asset.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img src={thumb} alt={asset.title} />
         ) : (
-          <div style={{ fontSize: 32, opacity: 0.85 }}>{assetEmoji(asset.kind)}</div>
+          <div className="launch-asset-thumb-placeholder">{assetEmoji(asset.kind)}</div>
         )}
       </div>
-
-      <div style={{ padding: "12px 14px 14px" }}>
-        <div style={{ fontSize: "0.7rem", color: "var(--muted)", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: 4 }}>
-          {assetLabel(asset.kind)}
+      <div className="launch-asset-meta">
+        <div className="launch-asset-kind">{assetLabel(asset.kind)}</div>
+        <div className="launch-asset-title">{asset.title}</div>
+        <div className="launch-asset-time">
+          {asset.deliveredAt ? formatAgo(asset.deliveredAt) : formatAgo(asset.createdAt)}
         </div>
-        <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text)", lineHeight: 1.3 }}>
-          {asset.title}
-        </div>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
-          <div style={{ fontSize: "0.76rem", color: "var(--subtext)" }}>
-            {asset.deliveredAt ? formatAgo(asset.deliveredAt) : formatAgo(asset.createdAt)}
-          </div>
-          <div style={{
-            fontSize: "0.68rem", fontWeight: 700,
-            color: badgeColor,
-            padding: "3px 8px",
-            borderRadius: 999,
-            background: "rgba(255,255,255,0.04)",
-            border: `1px solid ${badgeColor === "var(--muted)" ? "var(--border)" : badgeColor}`,
-            letterSpacing: "0.04em",
-            textTransform: "uppercase",
-          }}>
-            {badgeLabel}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function UpcomingRow({ event }: { event: LaunchEvent }) {
-  return (
-    <div style={{
-      display: "flex",
-      gap: 14,
-      padding: "14px 18px",
-      borderRadius: 12,
-      background: "var(--card)",
-      border: "1px solid var(--border)",
-    }}>
-      <div style={{
-        flexShrink: 0,
-        width: 64,
-        fontSize: "0.74rem",
-        color: "#D4A843",
-        fontWeight: 800,
-        letterSpacing: "0.04em",
-        textTransform: "uppercase",
-        paddingTop: 2,
-      }}>
-        {event.eta || "Soon"}
-      </div>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: "0.96rem", fontWeight: 700, color: "var(--text)" }}>{event.title}</div>
-        {event.detail && (
-          <div style={{ fontSize: "0.84rem", color: "var(--subtext)", marginTop: 2, lineHeight: 1.5 }}>
-            {event.detail}
-          </div>
-        )}
       </div>
     </div>
   );
@@ -506,35 +377,77 @@ function Field({ label, value, onChange, placeholder, maxLength }: {
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         maxLength={maxLength}
-        style={{
-          width: "100%",
-          padding: "13px 14px",
-          borderRadius: 12,
-          background: "rgba(255,255,255,0.04)",
-          border: "1px solid var(--border)",
-          color: "var(--text)",
-          fontSize: "0.98rem",
-          fontFamily: "inherit",
-          outline: "none",
-        }}
+        className="launch-input"
       />
     </label>
   );
 }
 
+// ─── Icons ────────────────────────────────────────────────────────────────────
+
+function IconLogo() {
+  return (
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="12 2 15 8.5 22 9.3 17 14.1 18.2 21 12 17.8 5.8 21 7 14.1 2 9.3 9 8.5 12 2" />
+    </svg>
+  );
+}
+function IconName() {
+  return (
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 7V5a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v2" />
+      <line x1="9" y1="20" x2="15" y2="20" />
+      <line x1="12" y1="4" x2="12" y2="20" />
+    </svg>
+  );
+}
+function IconProduct() {
+  return (
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <path d="M16 10a4 4 0 0 1-8 0" />
+    </svg>
+  );
+}
+function IconStore() {
+  return (
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="9" width="18" height="12" rx="1" />
+      <path d="M3 9V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v3" />
+      <path d="M9 22V12h6v10" />
+    </svg>
+  );
+}
+function IconAd() {
+  return (
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="23 7 16 12 23 17 23 7" />
+      <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+    </svg>
+  );
+}
+function IconUgc() {
+  return (
+    <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="3" />
+      <circle cx="12" cy="11" r="3" />
+      <path d="M9 17h6" />
+    </svg>
+  );
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function capitalize(s: string): string {
+  return s ? s[0].toUpperCase() + s.slice(1) : s;
+}
 
 function assetEmoji(k: LaunchAssetKind): string {
   return ({ logo: "◆", store: "🛍", product_page: "📄", ad: "🎬", ugc: "📱", email: "✉" } as Record<LaunchAssetKind, string>)[k];
 }
 function assetLabel(k: LaunchAssetKind): string {
   return ({ logo: "Logo", store: "Storefront", product_page: "Product page", ad: "Ad creative", ugc: "UGC video", email: "Email flow" } as Record<LaunchAssetKind, string>)[k];
-}
-function assetBg(k: LaunchAssetKind): string {
-  return ({
-    logo: "rgba(212,168,67,0.12)", store: "rgba(99,91,255,0.14)", product_page: "rgba(62,207,142,0.12)",
-    ad: "rgba(245,158,11,0.14)", ugc: "rgba(236,72,153,0.14)", email: "rgba(99,91,255,0.12)",
-  } as Record<LaunchAssetKind, string>)[k];
 }
 
 function assetThumbUrl(asset: LaunchAsset): string | null {
@@ -562,37 +475,3 @@ function formatAgo(iso: string): string {
   if (d < 7) return `${d}d ago`;
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric" });
 }
-
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-const GOLD_LABEL: React.CSSProperties = {
-  fontSize: "0.74rem", fontWeight: 800, color: "#D4A843",
-  letterSpacing: "0.1em", textTransform: "uppercase",
-};
-
-const HERO_CARD: React.CSSProperties = {
-  padding: "24px 26px",
-  borderRadius: 18,
-  background: "linear-gradient(135deg, #1a1a1a 0%, #222 100%)",
-  border: "1px solid rgba(212,168,67,0.2)",
-  boxShadow: "0 8px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(212,168,67,0.05)",
-};
-
-const EMPTY_TILE: React.CSSProperties = {
-  padding: "32px 20px",
-  borderRadius: 14,
-  background: "var(--card)",
-  border: "1px dashed var(--border)",
-  textAlign: "center",
-};
-
-const FOOTER_NOTE: React.CSSProperties = {
-  marginTop: 40,
-  padding: "20px 22px",
-  borderRadius: 14,
-  background: "rgba(212,168,67,0.06)",
-  border: "1px solid rgba(212,168,67,0.18)",
-  fontSize: "0.9rem",
-  color: "var(--subtext)",
-  lineHeight: 1.5,
-};
