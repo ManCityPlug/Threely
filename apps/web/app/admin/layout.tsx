@@ -5,7 +5,6 @@ import { useRouter, usePathname } from "next/navigation";
 
 const SIDEBAR_ITEMS = [
   { label: "Overview", href: "/admin", icon: "\u{1F4CA}" },
-  { label: "Launches", href: "/admin/launches", icon: "\u{1F680}" },
   { label: "Users", href: "/admin/users", icon: "\u{1F465}" },
   { label: "Costs", href: "/admin/costs", icon: "\u{1F4B0}" },
   { label: "Notifications", href: "/admin/notifications", icon: "\u{1F514}" },
