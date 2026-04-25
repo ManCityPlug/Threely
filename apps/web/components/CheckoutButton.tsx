@@ -8,10 +8,11 @@ type Plan = "monthly" | "yearly";
 interface CheckoutButtonProps {
   plan: Plan;
   style?: React.CSSProperties;
+  className?: string;
   children: React.ReactNode;
 }
 
-export default function CheckoutButton({ plan, style, children }: CheckoutButtonProps) {
+export default function CheckoutButton({ plan, style, className, children }: CheckoutButtonProps) {
   const [loading, setLoading] = useState(false);
 
   async function handleClick() {
@@ -27,6 +28,20 @@ export default function CheckoutButton({ plan, style, children }: CheckoutButton
     window.location.href = `/checkout?plan=${plan}`;
   }
 
+  // If a className is provided, render with Tailwind utilities (no inline styles).
+  if (className) {
+    return (
+      <button
+        onClick={handleClick}
+        disabled={loading}
+        className={className}
+      >
+        {loading ? "Redirecting..." : children}
+      </button>
+    );
+  }
+
+  // Legacy callers still pass a style prop — keep the old behavior intact.
   return (
     <button
       onClick={handleClick}

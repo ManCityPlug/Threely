@@ -1,22 +1,7 @@
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      <style>{`
-        html, body { background: #141414 !important; }
-      `}</style>
-      <script dangerouslySetInnerHTML={{ __html: `document.documentElement.setAttribute('data-theme','dark');` }} />
-      <div style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "#141414",
-        padding: "1rem",
-      }}>
-        <div style={{ width: "100%", maxWidth: 480 }}>
-          {children}
-        </div>
-      </div>
-    </>
+    <div className="min-h-screen flex items-center justify-center bg-neutral-50 p-4 font-sans text-neutral-900 antialiased">
+      <div className="w-full max-w-md">{children}</div>
+    </div>
   );
 }

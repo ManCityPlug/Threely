@@ -3,11 +3,14 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { getSupabase } from "@/lib/supabase-client";
 import { isOnboarded, markOnboarded } from "@/lib/auth-context";
 import { profileApi } from "@/lib/api-client";
 import { SocialAuthButtons, AuthDivider } from "@/components/SocialAuthButtons";
 import { MagicLinkForm } from "@/components/MagicLinkForm";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   return (
@@ -92,239 +95,263 @@ function LoginPageInner() {
     }
   }
 
+  async function handleForgotSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!forgotEmail.trim()) return;
+    setForgotLoading(true);
+    const supabase = getSupabase();
+    await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
+      redirectTo: `${window.location.origin}/api/auth/callback?type=recovery`,
+    });
+    setForgotLoading(false);
+    setForgotSent(true);
+    setForgotCooldown(60);
+    if (forgotTimerRef.current) clearInterval(forgotTimerRef.current);
+    forgotTimerRef.current = setInterval(() => {
+      setForgotCooldown((prev) => {
+        if (prev <= 1) {
+          if (forgotTimerRef.current) {
+            clearInterval(forgotTimerRef.current);
+            forgotTimerRef.current = null;
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+
+  async function handleForgotResend() {
+    setForgotLoading(true);
+    await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: forgotEmail.trim() }),
+    });
+    setForgotLoading(false);
+    setForgotCooldown(60);
+    if (forgotTimerRef.current) clearInterval(forgotTimerRef.current);
+    forgotTimerRef.current = setInterval(() => {
+      setForgotCooldown((prev) => {
+        if (prev <= 1) {
+          if (forgotTimerRef.current) {
+            clearInterval(forgotTimerRef.current);
+            forgotTimerRef.current = null;
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  }
+
   return (
-    <div className="card fade-in" style={{ padding: "2.5rem 2rem" }}>
-      {/* Logo */}
-      <div style={{ textAlign: "center", marginBottom: "2rem" }}>
-        <h1 style={{ fontSize: "1.5rem", fontWeight: 700, letterSpacing: "-0.03em", marginBottom: 4 }}>
-          Welcome back
-        </h1>
-        <p style={{ color: "var(--subtext)", fontSize: "0.9rem" }}>
-          Sign in to your Threely account
-        </p>
-      </div>
-
-      {/* Social auth buttons */}
-      <SocialAuthButtons />
-
-      <AuthDivider />
-
-      {/* Email/password form */}
-      <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <div>
-          <label className="field-label">Email</label>
-          <input
-            className="field-input"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            autoComplete="email"
-            required
-          />
-        </div>
-
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-            <label className="field-label">Password</label>
-            <button
-              type="button"
-              onClick={() => setShowForgotPassword(true)}
-              style={{
-                color: "var(--primary)", fontSize: "0.8rem", fontWeight: 500,
-                background: "none", border: "none", cursor: "pointer", padding: 0,
-              }}
-            >
-              Forgot password?
-            </button>
-          </div>
-          <input
-            className="field-input"
-            type="password"
-            placeholder="••••••••"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            autoComplete="current-password"
-            required
-          />
-        </div>
-
-        {error && (
-          <div style={{
-            background: "var(--danger-light)",
-            color: "var(--danger)",
-            padding: "0.65rem 0.875rem", borderRadius: "var(--radius)",
-            fontSize: "0.875rem",
-          }}>
-            {error}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={loading}
-          style={{ marginTop: 4, height: 46, fontSize: "0.95rem" }}
-        >
-          {loading ? <span className="spinner" /> : "Sign in"}
-        </button>
-      </form>
-
-      {/* Magic link toggle */}
-      <div style={{ textAlign: "center", marginTop: "1rem" }}>
-        {showMagicLink ? (
-          <div style={{ marginTop: "0.5rem" }}>
-            <MagicLinkForm />
-            <button
-              type="button"
-              onClick={() => setShowMagicLink(false)}
-              style={{
-                marginTop: "0.75rem", color: "var(--muted)", fontSize: "0.8rem",
-                background: "none", border: "none", cursor: "pointer",
-              }}
-            >
-              Back to password sign in
-            </button>
-          </div>
-        ) : (
-          <button
-            type="button"
-            onClick={() => setShowMagicLink(true)}
-            style={{
-              color: "var(--primary)", fontSize: "0.85rem", fontWeight: 500,
-              background: "none", border: "none", cursor: "pointer",
-            }}
+    <>
+      <Card className="w-full border-neutral-200 p-8 shadow-sm">
+        <div className="mb-7 text-center">
+          <Link
+            href="/"
+            className="inline-block text-base font-bold tracking-tight text-neutral-900"
           >
-            Sign in with a magic link instead
-          </button>
-        )}
-      </div>
+            Threely
+          </Link>
+          <h1 className="mt-6 text-2xl font-bold tracking-tight text-neutral-900">
+            Welcome back
+          </h1>
+          <p className="mt-1.5 text-sm text-neutral-600">
+            Sign in to your Threely account
+          </p>
+        </div>
 
-      <p style={{ textAlign: "center", marginTop: "1.5rem", color: "var(--subtext)", fontSize: "0.875rem" }}>
-        Don't have an account?{" "}
-        <Link href="/signup" style={{ color: "var(--primary)", fontWeight: 600 }}>
-          Sign up
-        </Link>
+        <SocialAuthButtons />
+
+        <AuthDivider />
+
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-neutral-700">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              required
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/40"
+            />
+          </div>
+
+          <div>
+            <div className="flex items-baseline justify-between">
+              <label htmlFor="password" className="block text-sm font-medium text-neutral-700">
+                Password
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-xs font-medium text-neutral-600 hover:text-neutral-900"
+              >
+                Forgot password?
+              </button>
+            </div>
+            <input
+              id="password"
+              type="password"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
+              required
+              className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/40"
+            />
+          </div>
+
+          {error && (
+            <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-600">
+              {error}
+            </p>
+          )}
+
+          <Button type="submit" variant="gold" size="lg" disabled={loading} className="w-full">
+            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Sign in"}
+          </Button>
+        </form>
+
+        <div className="mt-4 text-center">
+          {showMagicLink ? (
+            <div className="mt-2">
+              <MagicLinkForm />
+              <button
+                type="button"
+                onClick={() => setShowMagicLink(false)}
+                className="mt-3 text-xs text-neutral-500 hover:text-neutral-900"
+              >
+                Back to password sign in
+              </button>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowMagicLink(true)}
+              className="text-sm font-medium text-neutral-600 hover:text-neutral-900"
+            >
+              Sign in with a magic link instead
+            </button>
+          )}
+        </div>
+
+        <p className="mt-6 text-center text-sm text-neutral-600">
+          Don&apos;t have an account?{" "}
+          <Link href="/signup" className="font-semibold text-neutral-900 hover:underline">
+            Sign up
+          </Link>
+        </p>
+      </Card>
+
+      <p className="mt-6 text-center text-xs text-neutral-500">
+        &copy; {new Date().getFullYear()} Threely. All rights reserved.
       </p>
 
       {/* Forgot password overlay */}
       {showForgotPassword && (
-        <div style={{
-          position: "fixed", inset: 0, zIndex: 1000,
-          background: "rgba(0,0,0,0.4)", display: "flex",
-          alignItems: "center", justifyContent: "center", padding: "1rem",
-        }} onClick={() => setShowForgotPassword(false)}>
-          <div className="card" style={{ padding: "2rem", maxWidth: 400, width: "100%" }} onClick={e => e.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-900/40 p-4"
+          onClick={() => setShowForgotPassword(false)}
+        >
+          <Card
+            className="w-full max-w-sm border-neutral-200 p-8 shadow-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
             {forgotSent ? (
-              <div style={{ textAlign: "center" }}>
-                <div style={{
-                  width: 48, height: 48, borderRadius: 12,
-                  background: "var(--success-light)", color: "var(--success)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 22, fontWeight: 700, margin: "0 auto 1rem",
-                }}>✓</div>
-                <h2 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 8 }}>Check your email</h2>
-                <p style={{ color: "var(--subtext)", fontSize: "0.875rem", lineHeight: 1.6 }}>
-                  We sent a password reset link to <strong>{forgotEmail}</strong>. Click the link to set a new password.
+              <div className="text-center">
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gold/10 text-xl font-bold text-gold">
+                  ✓
+                </div>
+                <h2 className="text-lg font-bold text-neutral-900">Check your email</h2>
+                <p className="mt-2 text-sm text-neutral-600">
+                  We sent a password reset link to{" "}
+                  <strong className="font-semibold text-neutral-900">{forgotEmail}</strong>. Click the link to set a new password.
                 </p>
-                <p style={{ color: "var(--muted)", fontSize: "0.8rem", marginTop: 8 }}>
+                <p className="mt-2 text-xs text-neutral-500">
                   Not seeing it? Check your spam folder.
                 </p>
-                <button
+                <Button
                   type="button"
-                  className="btn btn-primary"
+                  variant="gold"
+                  size="lg"
                   disabled={forgotCooldown > 0 || forgotLoading}
-                  onClick={async () => {
-                    setForgotLoading(true);
-                    const supabase = getSupabase();
-                    await fetch("/api/auth/forgot-password", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify({ email: forgotEmail.trim() }),
-                    });
-                    setForgotLoading(false);
-                    setForgotCooldown(60);
-                    if (forgotTimerRef.current) clearInterval(forgotTimerRef.current);
-                    forgotTimerRef.current = setInterval(() => {
-                      setForgotCooldown((prev) => {
-                        if (prev <= 1) { if (forgotTimerRef.current) { clearInterval(forgotTimerRef.current); forgotTimerRef.current = null; } return 0; }
-                        return prev - 1;
-                      });
-                    }, 1000);
-                  }}
-                  style={{ marginTop: "1.25rem", width: "100%" }}
+                  onClick={handleForgotResend}
+                  className="mt-5 w-full"
                 >
-                  {forgotLoading ? <span className="spinner" /> : forgotCooldown > 0 ? `Resend in ${forgotCooldown}s` : "Resend reset link"}
-                </button>
-                <button
+                  {forgotLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : forgotCooldown > 0 ? (
+                    `Resend in ${forgotCooldown}s`
+                  ) : (
+                    "Resend reset link"
+                  )}
+                </Button>
+                <Button
                   type="button"
-                  className="btn btn-outline"
-                  onClick={() => { setShowForgotPassword(false); setForgotSent(false); setForgotEmail(""); setForgotCooldown(0); }}
-                  style={{ marginTop: "0.5rem", width: "100%" }}
+                  variant="outline"
+                  size="lg"
+                  onClick={() => {
+                    setShowForgotPassword(false);
+                    setForgotSent(false);
+                    setForgotEmail("");
+                    setForgotCooldown(0);
+                  }}
+                  className="mt-2 w-full"
                 >
                   Back to sign in
-                </button>
+                </Button>
               </div>
             ) : (
               <>
-                <h2 style={{ fontSize: "1.2rem", fontWeight: 700, marginBottom: 4 }}>Reset your password</h2>
-                <p style={{ color: "var(--subtext)", fontSize: "0.875rem", marginBottom: "1.25rem" }}>
-                  Enter your email and we'll send you a link to reset your password.
+                <h2 className="text-lg font-bold text-neutral-900">Reset your password</h2>
+                <p className="mt-1 text-sm text-neutral-600">
+                  Enter your email and we&apos;ll send you a link to reset your password.
                 </p>
-                <form onSubmit={async (e) => {
-                  e.preventDefault();
-                  if (!forgotEmail.trim()) return;
-                  setForgotLoading(true);
-                  const supabase = getSupabase();
-                  await supabase.auth.resetPasswordForEmail(forgotEmail.trim(), {
-                    redirectTo: `${window.location.origin}/api/auth/callback?type=recovery`,
-                  });
-                  setForgotLoading(false);
-                  setForgotSent(true);
-                  setForgotCooldown(60);
-                  if (forgotTimerRef.current) clearInterval(forgotTimerRef.current);
-                  forgotTimerRef.current = setInterval(() => {
-                    setForgotCooldown((prev) => {
-                      if (prev <= 1) { if (forgotTimerRef.current) { clearInterval(forgotTimerRef.current); forgotTimerRef.current = null; } return 0; }
-                      return prev - 1;
-                    });
-                  }, 1000);
-                }}>
-                  <label className="field-label">Email</label>
-                  <input
-                    className="field-input"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={forgotEmail}
-                    onChange={e => setForgotEmail(e.target.value)}
-                    autoComplete="email"
-                    required
-                    autoFocus
-                  />
-                  <div style={{ display: "flex", gap: 10, marginTop: "1rem" }}>
-                    <button
+                <form onSubmit={handleForgotSubmit} className="mt-5 flex flex-col gap-4">
+                  <div>
+                    <label htmlFor="forgot-email" className="block text-sm font-medium text-neutral-700">
+                      Email
+                    </label>
+                    <input
+                      id="forgot-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      autoComplete="email"
+                      required
+                      autoFocus
+                      className="mt-1.5 w-full rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/40"
+                    />
+                  </div>
+                  <div className="flex gap-2.5">
+                    <Button
                       type="button"
-                      className="btn btn-outline"
+                      variant="outline"
+                      size="lg"
                       onClick={() => setShowForgotPassword(false)}
-                      style={{ flex: 1 }}
+                      className="flex-1"
                     >
                       Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={forgotLoading}
-                      style={{ flex: 1 }}
-                    >
-                      {forgotLoading ? <span className="spinner" /> : "Send reset link"}
-                    </button>
+                    </Button>
+                    <Button type="submit" variant="gold" size="lg" disabled={forgotLoading} className="flex-1">
+                      {forgotLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Send link"}
+                    </Button>
                   </div>
                 </form>
               </>
             )}
-          </div>
+          </Card>
         </div>
       )}
-    </div>
+    </>
   );
 }

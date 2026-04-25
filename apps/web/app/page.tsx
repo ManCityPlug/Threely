@@ -2,448 +2,609 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import {
+  ArrowRight,
+  CheckCircle2,
+  Compass,
+  Plus,
+  Sparkles,
+  Star,
+  Target,
+  TrendingUp,
+} from "lucide-react";
 import { getSupabase } from "@/lib/supabase-client";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
-const TESTIMONIALS: { quote: string; author: string; label: string; image?: string }[] = [
-  { quote: "I fr grew my shopify store with Threely. 10/10 recommend to everyone.", author: "George T.", label: "E-commerce", image: "/George.png" },
-  { quote: "Was so confused on how to start an ecommerce brand until Threely. In a month my store was actually making money.", author: "Daniel", label: "Brand Owner", image: "/daniel.png" },
-  { quote: "Had no idea where to start with my clothing brand. Threely grew it way faster than I thought possible. This app is insane.", author: "Nikolay M.", label: "Clothing Brand", image: "/nikolay.png" },
+const TESTIMONIALS: {
+  quote: string;
+  author: string;
+  label: string;
+  image: string;
+}[] = [
+  {
+    quote:
+      "I fr grew my shopify store with Threely. 10/10 recommend to everyone.",
+    author: "George T.",
+    label: "E-commerce",
+    image: "/George.png",
+  },
+  {
+    quote:
+      "Was so confused on how to start an ecommerce brand until Threely. In a month my store was actually making money.",
+    author: "Daniel",
+    label: "Brand Owner",
+    image: "/daniel.png",
+  },
+  {
+    quote:
+      "Had no idea where to start with my clothing brand. Threely grew it way faster than I thought possible. This app is insane.",
+    author: "Nikolay M.",
+    label: "Clothing Brand",
+    image: "/nikolay.png",
+  },
+];
+
+const STEPS = [
+  {
+    n: "1",
+    title: "Tell us your goal",
+    desc: "Type one line — \"launch my Shopify store and hit $5K in revenue.\" Threely asks the right questions to find the best path for you.",
+  },
+  {
+    n: "2",
+    title: "Get a step-by-step plan",
+    desc: "A real path based on where you are right now. Threely tells you exactly what to do every day to actually grow.",
+  },
+  {
+    n: "3",
+    title: "Make money",
+    desc: "Complete your daily moves. Threely tracks your progress and rebuilds the next set of tasks around what you finished.",
+  },
+];
+
+const FEATURES = [
+  {
+    icon: Target,
+    title: "Goal-aware tasks",
+    desc: "Three moves a day, written for your specific goal — not generic productivity bullets.",
+  },
+  {
+    icon: Compass,
+    title: "Real path forward",
+    desc: "Threely maps the route from where you are now to where you want to be.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Adapts as you grow",
+    desc: "Finish a sprint and your next set of tasks rebuilds around what actually worked.",
+  },
+  {
+    icon: CheckCircle2,
+    title: "Built for action",
+    desc: "Every task is concrete. No journaling. No frameworks. Just the next move.",
+  },
+  {
+    icon: Sparkles,
+    title: "No generic AI fluff",
+    desc: "Threely tells you what to do — it doesn't ask what you'd like to discuss today.",
+  },
+  {
+    icon: Star,
+    title: "Cancel anytime",
+    desc: "$1 to start. No contracts, no trials, no hidden fees. Cancel from settings whenever you want.",
+  },
 ];
 
 const FAQ = [
   { q: "How much is it?", a: "$1 to start. Cancel anytime." },
-  { q: "How long before I see results?", a: "Our users have quit their jobs and started making money their first week." },
-  { q: "Can I cancel anytime?", a: "Yes. Cancel in your settings whenever you want. No contracts, no hidden fees, no questions asked." },
+  {
+    q: "How long before I see results?",
+    a: "Our users have quit their jobs and started making money their first week.",
+  },
+  {
+    q: "Can I cancel anytime?",
+    a: "Yes. Cancel in your settings whenever you want. No contracts, no hidden fees, no questions asked.",
+  },
+  {
+    q: "How is this different from ChatGPT?",
+    a: "ChatGPT answers questions. Threely tells you what to do. You get a daily set of moves built around your specific goal — not a chat thread you have to drive.",
+  },
+  {
+    q: "Do I need any experience?",
+    a: "No. Threely is built for people who don't know where to start. Tell it your goal — it does the rest.",
+  },
 ];
 
 export default function LandingPage() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
-    getSupabase().auth.getSession().then(({ data: { session } }) => {
-      if (session?.user && !session.user.is_anonymous) setLoggedIn(true);
-    });
+    getSupabase()
+      .auth.getSession()
+      .then(({ data: { session } }) => {
+        if (session?.user && !session.user.is_anonymous) setLoggedIn(true);
+      });
   }, []);
 
   const ctaHref = loggedIn ? "/dashboard" : "/start";
-  const ctaLabel = loggedIn ? "Go to Dashboard" : "Start for $1 →";
-
-  // Scroll reveal — fade in on enter, fade out on leave
-  useEffect(() => {
-    const els = document.querySelectorAll('.reveal');
-    if (!els.length) return;
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('revealed');
-        } else {
-          e.target.classList.remove('revealed');
-        }
-      });
-    }, { threshold: 0.12 });
-    els.forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, []);
+  const ctaLabel = loggedIn ? "Go to Dashboard" : "Start for $1";
 
   return (
-    <div style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif", color: "#e8e8e8", background: "#141414", overflowX: "hidden", minHeight: "100vh" }}>
-      <style>{`
-        @keyframes logoBreathe {
-          0%,100% { transform: scale(1); filter: drop-shadow(0 0 16px rgba(212,168,67,0.4)) drop-shadow(0 0 40px rgba(212,168,67,0.15)); }
-          50% { transform: scale(1.14); filter: drop-shadow(0 0 36px rgba(212,168,67,0.8)) drop-shadow(0 0 70px rgba(212,168,67,0.3)); }
-        }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes glow { 0%,100% { box-shadow: 0 0 20px rgba(212,168,67,0.2); } 50% { box-shadow: 0 0 40px rgba(212,168,67,0.4); } }
-        .fade-up { animation: fadeUp 0.6s ease both; }
-        .fade-up-d1 { animation: fadeUp 0.6s ease 0.1s both; }
-        .fade-up-d2 { animation: fadeUp 0.6s ease 0.2s both; }
-        .fade-up-d3 { animation: fadeUp 0.6s ease 0.3s both; }
-        .hero-cta { animation: glow 3s ease-in-out infinite; }
-        .hero-logo { animation: logoBreathe 3s ease-in-out infinite; }
-        .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
-        .revealed { opacity: 1; transform: translateY(0); }
-        .reveal-d1 { transition-delay: 0.1s; }
-        .reveal-d2 { transition-delay: 0.2s; }
-        .reveal-d3 { transition-delay: 0.3s; }
-        /* Responsive show/hide for landing nav — avoids SSR hydration mismatch */
-        .landing-desktop-nav { display: flex; }
-        .landing-mobile-toggle { display: none; }
-        @media (max-width: 768px) {
-          .landing-desktop-nav { display: none !important; }
-          .landing-mobile-toggle { display: flex !important; }
-          .landing-nav { padding: 0 1rem !important; }
-        }
-        /* Testimonials grid: 3 cols on desktop, 1 on phone */
-        .landing-testimonials-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
-        }
-        @media (max-width: 768px) {
-          .landing-testimonials-grid { grid-template-columns: 1fr; }
-        }
-        /* How-it-works grid: 3 cols on desktop, 1 on phone */
-        .landing-steps-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 48px;
-        }
-        @media (max-width: 768px) {
-          .landing-steps-grid { grid-template-columns: 1fr; gap: 40px; }
-        }
-      `}</style>
+    <div className="min-h-screen bg-white font-sans text-neutral-900 antialiased">
+      {/* ─── Nav ─────────────────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/70">
+        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
+          <Link
+            href="/"
+            className="text-base font-bold tracking-tight text-neutral-900"
+          >
+            Threely
+          </Link>
 
-      {/* ─── Nav ──────────────────────────────────────────────────────────────── */}
-      <nav className="landing-nav" style={{
-        // Pure black so the nav + Safari chrome above it (matched via the
-        // theme-color meta) form one unified dark zone at the top. Body
-        // below stays #141414 — deliberate accent so the nav reads as a
-        // header rather than floating.
-        position: "sticky", top: 0, zIndex: 100,
-        background: "#000000",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
-        padding: "0 1.5rem", height: 64,
-        display: "flex", alignItems: "center", justifyContent: "center",
-        maxWidth: 1200, margin: "0 auto", width: "100%",
-      }}>
-        <div style={{ position: "absolute", left: "1.5rem", display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontWeight: 700, fontSize: "1.05rem", color: "#fff", letterSpacing: "-0.02em" }}>Threely</span>
-        </div>
-        <div className="landing-desktop-nav" style={{ alignItems: "center", gap: 6 }}>
-          {[
-            { label: "How It Works", href: "#how-it-works" },
-            { label: "Pricing", href: "/pricing" },
-            { label: "Support", href: "/support" },
-          ].map(item => (
-            <Link key={item.label} href={item.href} style={{
-              padding: "0.5rem 0.75rem", fontSize: "0.85rem", fontWeight: 500,
-              color: "rgba(255,255,255,0.6)", textDecoration: "none", borderRadius: 6,
-              transition: "color 0.15s", minHeight: 44, display: "inline-flex", alignItems: "center",
-            }}>{item.label}</Link>
-          ))}
-        </div>
-        <div className="landing-desktop-nav" style={{ position: "absolute", right: "1.5rem", alignItems: "center", gap: 6 }}>
-          {!loggedIn && (
-            <Link href="/login" style={{
-              padding: "0.5rem 0.875rem", fontSize: "0.85rem", fontWeight: 600,
-              color: "rgba(255,255,255,0.7)", textDecoration: "none",
-              minHeight: 44, display: "inline-flex", alignItems: "center",
-            }}>Log In</Link>
-          )}
-          <Link href={ctaHref} style={{
-            padding: "0.6rem 1.25rem", fontSize: "0.85rem", fontWeight: 600,
-            color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 8,
-            textDecoration: "none", minHeight: 44, display: "inline-flex", alignItems: "center",
-          }}>{ctaLabel}</Link>
-        </div>
-        <button
-          className="landing-mobile-toggle"
-          onClick={() => setMenuOpen(!menuOpen)}
-          style={{
-            position: "absolute", right: "0.75rem",
-            background: "none", border: "none", cursor: "pointer",
-            width: 44, height: 44,
-            alignItems: "center", justifyContent: "center",
-            flexDirection: "column", gap: 5,
-          }}
-          aria-label="Menu"
-        >
-          <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
-          <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
-          <span style={{ width: 22, height: 2, background: "#fff", borderRadius: 1, display: "block" }} />
-        </button>
-      </nav>
+          <nav className="hidden items-center gap-1 md:flex">
+            <Link
+              href="#how-it-works"
+              className="rounded-md px-3 py-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900"
+            >
+              How It Works
+            </Link>
+            <Link
+              href="/pricing"
+              className="rounded-md px-3 py-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/support"
+              className="rounded-md px-3 py-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900"
+            >
+              Support
+            </Link>
+          </nav>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 200,
-          background: "rgba(0,0,0,0.95)", backdropFilter: "blur(20px)",
-          padding: "80px 2rem 2rem", display: "flex", flexDirection: "column", gap: 8,
-        }}>
-          <button onClick={() => setMenuOpen(false)} style={{
-            position: "absolute", top: 20, right: 20, background: "none", border: "none",
-            color: "#fff", fontSize: 28, cursor: "pointer",
-          }}>×</button>
-          {[
-            { label: "How It Works", href: "#how-it-works" },
-            { label: "Pricing", href: "/pricing" },
-            { label: "Support", href: "/support" },
-            ...(!loggedIn ? [{ label: "Log In", href: "/login" }] : []),
-          ].map(item => (
-            <Link key={item.label} href={item.href} onClick={() => setMenuOpen(false)} style={{
-              padding: "1rem 0", fontSize: "1.1rem", fontWeight: 600,
-              color: "#fff", borderBottom: "1px solid rgba(255,255,255,0.08)",
-              textDecoration: "none",
-            }}>{item.label}</Link>
-          ))}
-          <Link href={ctaHref} onClick={() => setMenuOpen(false)} style={{
-            marginTop: 20, padding: "0.9rem 2rem", fontSize: "1rem", fontWeight: 700,
-            color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 12,
-            textDecoration: "none", textAlign: "center",
-          }}>{ctaLabel}</Link>
-        </div>
-      )}
+          <div className="hidden items-center gap-2 md:flex">
+            {!loggedIn && (
+              <Link
+                href="/login"
+                className="rounded-md px-3 py-2 text-sm font-semibold text-neutral-600 transition-colors hover:text-neutral-900"
+              >
+                Log In
+              </Link>
+            )}
+            <Button asChild variant="gold" size="sm">
+              <Link href={ctaHref}>
+                {ctaLabel}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
 
-      {/* ─── Hero ─────────────────────────────────────────────────────────────── */}
-      <section className="reveal revealed" style={{
-        minHeight: "90vh", display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center", textAlign: "center",
-        padding: "clamp(3rem, 6vw, 5rem) clamp(1.25rem, 3vw, 2rem)",
-        background: "radial-gradient(ellipse at 50% 0%, rgba(212,168,67,0.08) 0%, transparent 60%)",
-        position: "relative",
-      }}>
-        {/* Breathing logo */}
-        <div className="hero-logo" style={{ marginBottom: 28 }}>
-          <img src="/favicon.png" alt="" width={64} height={64} style={{ borderRadius: 18, maxWidth: "100%", height: "auto" }} />
+          <button
+            type="button"
+            aria-label="Menu"
+            onClick={() => setMenuOpen((o) => !o)}
+            className="flex h-10 w-10 flex-col items-center justify-center gap-1.5 rounded-md md:hidden"
+          >
+            <span className="block h-0.5 w-5 bg-neutral-900" />
+            <span className="block h-0.5 w-5 bg-neutral-900" />
+            <span className="block h-0.5 w-5 bg-neutral-900" />
+          </button>
         </div>
 
-        {/* Pill badge */}
-        <div style={{
-          display: "inline-flex", alignItems: "center", gap: 8,
-          padding: "0.4rem 1.25rem", borderRadius: 100,
-          border: "1px solid rgba(255,255,255,0.12)",
-          background: "rgba(255,255,255,0.04)",
-          marginBottom: 32, fontSize: "0.8rem", fontWeight: 600,
-          color: "rgba(255,255,255,0.7)", letterSpacing: "0.02em",
-          textTransform: "uppercase",
-        }}>
-          The Fastest Path To Success
+        {menuOpen && (
+          <div className="border-t border-neutral-200 bg-white md:hidden">
+            <nav className="mx-auto flex max-w-6xl flex-col gap-1 p-4">
+              <Link
+                href="#how-it-works"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-md px-3 py-3 text-base font-medium text-neutral-700 hover:bg-neutral-50"
+              >
+                How It Works
+              </Link>
+              <Link
+                href="/pricing"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-md px-3 py-3 text-base font-medium text-neutral-700 hover:bg-neutral-50"
+              >
+                Pricing
+              </Link>
+              <Link
+                href="/support"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-md px-3 py-3 text-base font-medium text-neutral-700 hover:bg-neutral-50"
+              >
+                Support
+              </Link>
+              {!loggedIn && (
+                <Link
+                  href="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-md px-3 py-3 text-base font-medium text-neutral-700 hover:bg-neutral-50"
+                >
+                  Log In
+                </Link>
+              )}
+              <Button asChild variant="gold" size="lg" className="mt-2">
+                <Link href={ctaHref} onClick={() => setMenuOpen(false)}>
+                  {ctaLabel}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+            </nav>
+          </div>
+        )}
+      </header>
+
+      {/* ─── Hero ────────────────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden">
+        <div className="mx-auto max-w-3xl px-4 py-20 text-center md:py-32">
+          <Badge
+            variant="gold"
+            className="mb-6 rounded-full border-gold/30 bg-gold/10 px-4 py-1 text-[11px] uppercase tracking-wider text-neutral-700"
+          >
+            The fastest path to your goals
+          </Badge>
+
+          <h1 className="text-4xl font-extrabold leading-[1.05] tracking-tight text-neutral-900 md:text-5xl lg:text-6xl">
+            10x your income.
+            <br />
+            <span className="text-neutral-400">Reach your goals.</span>
+          </h1>
+
+          <p className="mx-auto mt-6 max-w-xl text-base leading-relaxed text-neutral-600 md:text-lg">
+            Tell Threely what you want. It tells you exactly what to do every
+            day to get there — built around your life, not generic advice.
+          </p>
+
+          <div className="mt-10 flex flex-col items-center gap-3">
+            <Button asChild variant="gold" size="xl">
+              <Link href={ctaHref}>
+                {ctaLabel}
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </Button>
+            <p className="text-sm text-neutral-500">Cancel anytime</p>
+          </div>
         </div>
-
-        {/* Headline */}
-        <h1 style={{
-          fontSize: "clamp(2rem, 7vw, 4.5rem)",
-          fontWeight: 800, lineHeight: 1.05,
-          letterSpacing: "-0.03em", color: "#fff",
-          maxWidth: 800, margin: "0 0 24px",
-        }}>
-          10x Your Income.<br />
-          <span style={{ color: "rgba(255,255,255,0.85)" }}>Reach Your Goals.</span>
-        </h1>
-
-        {/* CTA */}
-        <Link href={ctaHref} className="hero-cta" style={{
-          display: "inline-flex", alignItems: "center", justifyContent: "center",
-          padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
-          color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 14,
-          textDecoration: "none", transition: "transform 0.15s, box-shadow 0.15s",
-          boxShadow: "0 0 30px rgba(212,168,67,0.3)",
-          minHeight: 52,
-        }}>
-          {ctaLabel}
-        </Link>
-
-        <p style={{ marginTop: 16, fontSize: "0.8rem", color: "rgba(255,255,255,0.3)" }}>
-          Cancel anytime
-        </p>
       </section>
 
-      {/* ─── ChatGPT comparison ──────────────────────────────────────────────── */}
-      <section className="reveal" style={{
-        padding: "clamp(4rem, 8vw, 6rem) clamp(1.25rem, 3vw, 2rem)",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-      }}>
-        <div style={{ maxWidth: 800, margin: "0 auto" }}>
-          <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 16, textAlign: "center" }}>
+      {/* ─── ChatGPT comparison ────────────────────────────────────────── */}
+      <section className="border-t border-neutral-200 bg-white">
+        <div className="mx-auto max-w-3xl px-4 py-20 md:py-28">
+          <p className="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-gold">
             How is this different from ChatGPT?
           </p>
-          <h2 style={{ fontSize: "clamp(1.5rem, 4.5vw, 2.4rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 24, lineHeight: 1.15, textAlign: "center" }}>
-            You{"'"}ve had ChatGPT for 4 years.<br />What have you accomplished?
+          <h2 className="text-center text-3xl font-bold leading-tight tracking-tight text-neutral-900 md:text-4xl">
+            You&apos;ve had ChatGPT for 4 years.
+            <br />
+            What have you accomplished?
           </h2>
-          <div style={{
-            background: "rgba(255,255,255,0.03)",
-            border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 16, padding: "clamp(1.5rem, 4vw, 2.5rem) clamp(1.5rem, 4vw, 3rem)",
-            marginBottom: 32, textAlign: "center",
-          }}>
-            <p style={{ fontSize: "clamp(0.9rem, 2vw, 1.05rem)", fontWeight: 600, color: "rgba(255,255,255,0.7)", lineHeight: 1.7, margin: 0 }}>
-              Threely tells you exactly what needs to be done, built around your life — not generic BS that{"'"}s keeping you stuck while everyone else moves forward.
-            </p>
-          </div>
-          <div style={{ textAlign: "center" }}>
-            <Link href={ctaHref} style={{
-              display: "inline-flex", alignItems: "center", justifyContent: "center",
-              padding: "0.85rem 2.5rem", fontSize: "1rem", fontWeight: 700,
-              color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 12,
-              textDecoration: "none", minHeight: 48,
-            }}>
-              Start for $1 →
-            </Link>
+
+          <Card className="mt-10 border-neutral-200 shadow-sm">
+            <CardContent className="p-8 text-center md:p-10">
+              <p className="text-base leading-relaxed text-neutral-700 md:text-lg">
+                Threely tells you exactly what needs to be done, built around
+                your life — not generic BS that&apos;s keeping you stuck while
+                everyone else moves forward.
+              </p>
+            </CardContent>
+          </Card>
+
+          <div className="mt-8 flex justify-center">
+            <Button asChild variant="gold" size="lg">
+              <Link href={ctaHref}>
+                {ctaLabel}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Subtle divider */}
-      <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }} />
+      {/* ─── Results / Testimonials ────────────────────────────────────── */}
+      <section className="border-t border-neutral-200 bg-neutral-50">
+        <div className="mx-auto max-w-6xl px-4 py-20 md:py-28">
+          <p className="mb-3 text-center text-xs font-semibold uppercase tracking-widest text-gold">
+            Results
+          </p>
+          <h2 className="mb-12 text-center text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">
+            From zero to revenue.
+          </h2>
 
-      {/* ─── Results (Testimonials) ─────────────────────────────────────────── */}
-      <section style={{
-        padding: "clamp(4rem, 8vw, 6rem) clamp(1.25rem, 3vw, 2rem)",
-        background: "rgba(255,255,255,0.02)",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-      }}>
-        <div style={{ maxWidth: 1000, margin: "0 auto" }}>
-          <p className="reveal" style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 48, textAlign: "center" }}>Results</p>
-          <div className="landing-testimonials-grid">
-            {TESTIMONIALS.map((t, i) => (
-              <div key={i} className={`reveal reveal-d${i + 1}`} style={{
-                background: "rgba(255,255,255,0.03)",
-                border: "1px solid rgba(255,255,255,0.08)",
-                borderRadius: 16, padding: "1.75rem",
-                display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center",
-              }}>
-                {t.image ? (
-                  <img src={t.image} alt={t.author} style={{ width: 80, height: 80, borderRadius: 100, objectFit: "cover", marginBottom: 16 }} />
-                ) : (
-                  <div style={{ width: 80, height: 80, borderRadius: 100, background: "rgba(212,168,67,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.5rem", fontWeight: 700, color: "#D4A843", marginBottom: 16 }}>
-                    {t.author[0]}
-                  </div>
-                )}
-                <p style={{ fontSize: "0.9rem", color: "#fff", lineHeight: 1.7, marginBottom: 16 }}>
+          <div className="grid gap-6 md:grid-cols-3">
+            {TESTIMONIALS.map((t) => (
+              <Card
+                key={t.author}
+                className="flex flex-col items-center border-neutral-200 bg-white p-8 text-center shadow-sm"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={t.image}
+                  alt={t.author}
+                  className="mb-5 h-20 w-20 rounded-full object-cover"
+                />
+                <div className="mb-4 flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className="h-4 w-4 fill-gold text-gold"
+                      aria-hidden="true"
+                    />
+                  ))}
+                </div>
+                <p className="mb-5 text-sm leading-relaxed text-neutral-700">
                   &ldquo;{t.quote}&rdquo;
                 </p>
-                <div>
-                  <div style={{ fontSize: "0.95rem", fontWeight: 600, color: "#fff" }}>{t.author}</div>
-                  <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.7)" }}>{t.label}</div>
+                <div className="mt-auto">
+                  <div className="text-sm font-semibold text-neutral-900">
+                    {t.author}
+                  </div>
+                  <div className="text-xs text-neutral-500">{t.label}</div>
                 </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── How It Works ──────────────────────────────────────────────── */}
+      <section
+        id="how-it-works"
+        className="border-t border-neutral-200 bg-white"
+      >
+        <div className="mx-auto max-w-6xl px-4 py-20 md:py-28">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">
+              How It Works
+            </p>
+            <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">
+              Stop guessing.
+            </h2>
+            <p className="mt-4 text-base text-neutral-600 md:text-lg">
+              Three steps from a goal you&apos;ve been sitting on to the work
+              that actually moves it.
+            </p>
+          </div>
+
+          <div className="mt-16 grid gap-8 md:grid-cols-3">
+            {STEPS.map((s) => (
+              <div key={s.n} className="flex flex-col items-start text-left">
+                <div className="mb-5 flex h-10 w-10 items-center justify-center rounded-full border-2 border-gold bg-white text-sm font-bold text-neutral-900">
+                  {s.n}
+                </div>
+                <h3 className="mb-2 text-lg font-semibold text-neutral-900">
+                  {s.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-neutral-600">
+                  {s.desc}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── How It Works ─────────────────────────────────────────────────────── */}
-      <section id="how-it-works" style={{
-        padding: "clamp(4rem, 8vw, 6rem) clamp(1.25rem, 3vw, 2rem)",
-        maxWidth: 1000, margin: "0 auto",
-      }}>
-        <div className="reveal" style={{ textAlign: "center", marginBottom: 60 }}>
-          <p style={{ fontSize: "0.8rem", fontWeight: 600, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 12 }}>How It Works</p>
-          <h2 style={{ fontSize: "clamp(1.6rem, 5vw, 2.5rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
-            Stop guessing.
-          </h2>
-        </div>
+      {/* ─── Features ──────────────────────────────────────────────────── */}
+      <section className="border-t border-neutral-200 bg-neutral-50">
+        <div className="mx-auto max-w-6xl px-4 py-20 md:py-28">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">
+              What you get
+            </p>
+            <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">
+              The shortcut between intent and action.
+            </h2>
+          </div>
 
-        <div className="reveal landing-steps-grid" style={{ textAlign: "center" }}>
-          {[
-            { step: "1", title: "Tell us your goal", desc: "Enter your goal \u2014 \"I want to launch my Shopify store and hit $5K in revenue.\" Threely asks the right questions to find the best path for you." },
-            { step: "2", title: "Step by step plan", desc: "You'll get a real path based on where you currently are. Threely tells you daily what needs to be done to actually grow." },
-            { step: "3", title: "Make Money.", desc: "Complete your tasks and the AI tracks your progress to build on your next set of tasks." },
-          ].map((item, i) => (
-            <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-              <div style={{
-                width: 48, height: 48, borderRadius: "50%",
-                border: "2px solid #D4A843", color: "#D4A843",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: "1.1rem", fontWeight: 700, marginBottom: 20,
-              }}>{item.step}</div>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 700, color: "#fff", marginBottom: 0 }}>{item.title}</h3>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ─── FAQ ──────────────────────────────────────────────────────────────── */}
-      <section style={{
-        padding: "clamp(4rem, 8vw, 6rem) clamp(1.25rem, 3vw, 2rem)",
-        maxWidth: 700, margin: "0 auto",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-      }}>
-        <h2 className="reveal" style={{ fontSize: "clamp(1.6rem, 5vw, 2.5rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", textAlign: "center", marginBottom: 40 }}>
-          Questions
-        </h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          {FAQ.map((faq, i) => (
-            <div key={i} style={{ borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-              <button
-                onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                style={{
-                  width: "100%", background: "none", border: "none", cursor: "pointer",
-                  padding: "1.25rem 0", display: "flex", justifyContent: "space-between", alignItems: "center",
-                  color: "#fff", fontSize: "1rem", fontWeight: 600, textAlign: "left",
-                  minHeight: 56,
-                }}
+          <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {FEATURES.map((f) => (
+              <div
+                key={f.title}
+                className="rounded-lg border border-neutral-200 bg-white p-6 shadow-sm"
               >
-                {faq.q}
-                <span style={{ fontSize: "1.2rem", color: "rgba(255,255,255,0.3)", transition: "transform 0.2s", transform: openFaq === i ? "rotate(45deg)" : "none" }}>+</span>
-              </button>
-              {openFaq === i && (
-                <p style={{ padding: "0 0 1.25rem", fontSize: "0.9rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.7 }}>
-                  {faq.a}
+                <f.icon
+                  className="mb-4 h-6 w-6 text-neutral-700"
+                  aria-hidden="true"
+                />
+                <h3 className="mb-2 text-base font-semibold text-neutral-900">
+                  {f.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-neutral-600">
+                  {f.desc}
                 </p>
-              )}
-            </div>
-          ))}
-
-          {/* Support button */}
-          <div style={{ textAlign: "center", marginTop: 32 }}>
-            <a
-              href="https://go.crisp.chat/chat/embed/?website_id=498b2c8b-bec0-4790-a2bb-795f9c295898"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                padding: "0.75rem 2rem", fontSize: "0.95rem", fontWeight: 600,
-                color: "#fff", background: "none",
-                border: "1px solid rgba(255,255,255,0.15)", borderRadius: 10,
-                textDecoration: "none", minHeight: 48,
-              }}
-            >
-              Support →
-            </a>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Final CTA ────────────────────────────────────────────────────────── */}
-      <section style={{
-        padding: "clamp(4rem, 8vw, 6rem) clamp(1.25rem, 3vw, 2rem)",
-        textAlign: "center",
-        background: "transparent",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-      }}>
-        <h2 className="reveal" style={{ fontSize: "clamp(1.6rem, 5vw, 2.8rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", marginBottom: 32 }}>
-          Make your first 10k this week.
-        </h2>
-        <Link href={ctaHref} style={{
-          display: "inline-flex", alignItems: "center", justifyContent: "center",
-          padding: "1rem 3rem", fontSize: "1.05rem", fontWeight: 700,
-          color: "#000", background: "linear-gradient(135deg, #E8C547 0%, #D4A843 35%, #B8862D 70%, #A07428 100%)", borderRadius: 14,
-          textDecoration: "none",
-          boxShadow: "0 0 30px rgba(212,168,67,0.3)",
-          minHeight: 52,
-        }}>
-          {ctaLabel}
-        </Link>
+      {/* ─── Pricing teaser ────────────────────────────────────────────── */}
+      <section className="border-t border-neutral-200 bg-white">
+        <div className="mx-auto max-w-3xl px-4 py-20 md:py-28">
+          <div className="text-center">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">
+              Pricing
+            </p>
+            <h2 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">
+              Start for $1.
+            </h2>
+            <p className="mt-4 text-base text-neutral-600 md:text-lg">
+              Try Threely Pro for $1. Renews at $39/mo. Cancel anytime.
+            </p>
+          </div>
+
+          <Card className="mt-10 border-neutral-200 shadow-sm">
+            <CardHeader className="border-b border-neutral-200 pb-6 text-center">
+              <CardTitle className="text-2xl font-bold text-neutral-900">
+                Threely Pro
+              </CardTitle>
+              <CardDescription className="text-neutral-600">
+                Everything you need to actually finish what you started.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="p-8">
+              <div className="mb-8 flex flex-col items-center text-center">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-5xl font-extrabold text-neutral-900">
+                    $1
+                  </span>
+                  <span className="text-base text-neutral-500">to start</span>
+                </div>
+                <p className="mt-2 text-sm text-neutral-500">
+                  Then $39/mo. Cancel anytime.
+                </p>
+              </div>
+
+              <ul className="space-y-3">
+                {[
+                  "3 personalized moves every day",
+                  "Goal-aware path, rebuilt as you go",
+                  "Daily review + coaching insight",
+                  "Mobile + web access",
+                ].map((feature) => (
+                  <li
+                    key={feature}
+                    className="flex items-start gap-3 text-sm text-neutral-700"
+                  >
+                    <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-gold" />
+                    <span>{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <Button asChild variant="gold" size="lg" className="mt-8 w-full">
+                <Link href={ctaHref}>
+                  {ctaLabel}
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              </Button>
+
+              <div className="mt-4 text-center">
+                <Link
+                  href="/pricing"
+                  className="text-sm text-neutral-500 hover:text-neutral-900"
+                >
+                  See full pricing details →
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </section>
 
-      {/* ─── Footer ───────────────────────────────────────────────────────────── */}
-      <footer style={{
-        padding: "2rem",
-        borderTop: "1px solid rgba(255,255,255,0.06)",
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        maxWidth: 1000, margin: "0 auto",
-        flexWrap: "wrap", gap: 16,
-      }}>
-        <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.3)" }}>
-          © {new Date().getFullYear()} Threely. All rights reserved.
+      {/* ─── FAQ ───────────────────────────────────────────────────────── */}
+      <section className="border-t border-neutral-200 bg-white">
+        <div className="mx-auto max-w-3xl px-4 py-20 md:py-28">
+          <h2 className="mb-12 text-center text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">
+            Questions
+          </h2>
+
+          <div className="divide-y divide-neutral-200 border-y border-neutral-200">
+            {FAQ.map((faq, i) => (
+              <details
+                key={i}
+                className="group cursor-pointer px-1 py-5 [&_summary::-webkit-details-marker]:hidden"
+              >
+                <summary className="flex list-none items-center justify-between gap-4 text-left text-base font-semibold text-neutral-900">
+                  {faq.q}
+                  <Plus
+                    className="h-5 w-5 flex-shrink-0 text-neutral-400 transition-transform group-open:rotate-45"
+                    aria-hidden="true"
+                  />
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-neutral-600">
+                  {faq.a}
+                </p>
+              </details>
+            ))}
+          </div>
+
+          <div className="mt-10 flex justify-center">
+            <Button asChild variant="outline" size="lg">
+              <a
+                href="https://go.crisp.chat/chat/embed/?website_id=498b2c8b-bec0-4790-a2bb-795f9c295898"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Talk to support
+                <ArrowRight className="h-4 w-4" />
+              </a>
+            </Button>
+          </div>
         </div>
-        <div style={{ display: "flex", gap: 20 }}>
-          {[
-            { label: "Privacy", href: "/privacy" },
-            { label: "Terms", href: "/terms" },
-            { label: "Support", href: "/support" },
-          ].map(item => (
-            <Link key={item.label} href={item.href} style={{
-              fontSize: "0.8rem", color: "rgba(255,255,255,0.3)",
-              textDecoration: "none",
-            }}>{item.label}</Link>
-          ))}
+      </section>
+
+      {/* ─── Final CTA ─────────────────────────────────────────────────── */}
+      <section className="border-t border-neutral-200 bg-neutral-50">
+        <div className="mx-auto max-w-3xl px-4 py-20 text-center md:py-28">
+          <h2 className="text-3xl font-extrabold tracking-tight text-neutral-900 md:text-5xl">
+            Make your first 10k this week.
+          </h2>
+          <p className="mt-4 text-base text-neutral-600 md:text-lg">
+            Stop reading about it. Start doing it. $1 to begin.
+          </p>
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <Button asChild variant="gold" size="xl">
+              <Link href={ctaHref}>
+                {ctaLabel}
+                <ArrowRight className="h-5 w-5" />
+              </Link>
+            </Button>
+            <p className="text-sm text-neutral-500">Cancel anytime</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Footer ────────────────────────────────────────────────────── */}
+      <footer className="border-t border-neutral-200 bg-white">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-4 py-10 md:flex-row md:px-6">
+          <p className="text-sm text-neutral-500">
+            &copy; {new Date().getFullYear()} Threely. All rights reserved.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-6">
+            <Link
+              href="/pricing"
+              className="text-sm text-neutral-500 hover:text-neutral-900"
+            >
+              Pricing
+            </Link>
+            <Link
+              href="/support"
+              className="text-sm text-neutral-500 hover:text-neutral-900"
+            >
+              Support
+            </Link>
+            <Link
+              href="/terms"
+              className="text-sm text-neutral-500 hover:text-neutral-900"
+            >
+              Terms
+            </Link>
+            <Link
+              href="/privacy"
+              className="text-sm text-neutral-500 hover:text-neutral-900"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/refund"
+              className="text-sm text-neutral-500 hover:text-neutral-900"
+            >
+              Refund
+            </Link>
+          </div>
         </div>
       </footer>
+
     </div>
   );
 }

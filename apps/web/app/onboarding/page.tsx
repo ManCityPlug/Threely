@@ -2,11 +2,15 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, Briefcase, Dumbbell, Loader2, Send, X } from "lucide-react";
 import { useAuth, isOnboarded, markOnboarded, saveNickname } from "@/lib/auth-context";
 import { getSupabase } from "@/lib/supabase-client";
 import { goalsApi, profileApi, tasksApi, type ParsedGoal, type GoalChatMessage } from "@/lib/api-client";
 import SharedBuildingProgress from "@/components/BuildingProgress";
 import { formatDisplayName } from "@/lib/format-name";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -286,13 +290,15 @@ export default function OnboardingPage() {
   // ── Building state ──
   if (building) {
     return (
-      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: "1rem" }}>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div className="flex min-h-screen items-center justify-center bg-neutral-50 p-4 font-sans text-neutral-900 antialiased">
+        <div className="flex flex-col items-center">
           <SharedBuildingProgress />
           {buildError && (
-            <div style={{ textAlign: "center", marginTop: 20 }}>
-              <p style={{ color: "var(--danger)", fontSize: "0.85rem", marginBottom: 12 }}>{buildError}</p>
-              <button className="btn btn-primary" onClick={handleUseGoal} style={{ height: 46, padding: "0 2rem" }}>Try again</button>
+            <div className="mt-5 text-center">
+              <p className="mb-3 text-sm text-red-600">{buildError}</p>
+              <Button variant="gold" size="lg" onClick={handleUseGoal}>
+                Try again
+              </Button>
             </div>
           )}
         </div>
@@ -301,51 +307,51 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--bg)", padding: "clamp(1rem, 4vw, 2rem)" }}>
-      <div style={{ width: "100%", maxWidth: 560 }}>
+    <div className="flex min-h-screen items-center justify-center bg-neutral-50 px-4 py-8 font-sans text-neutral-900 antialiased">
+      <div className="w-full max-w-xl">
 
         {/* ── Step 0: Category Picker ── */}
         {funnelStep === 0 && !showAiChat && (
-          <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-            <div style={{ textAlign: "center" }}>
-              <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 16 }} />
-              <h1 style={{ fontSize: "clamp(1.5rem, 4vw, 2rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
+          <div key={`fade-${fadeKey}`} className="fade-in flex flex-col gap-6">
+            <div className="text-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/favicon.png"
+                alt="Threely"
+                width={48}
+                height={48}
+                className="mx-auto mb-4 rounded-xl"
+              />
+              <h1 className="text-3xl font-bold tracking-tight text-neutral-900 md:text-4xl">
                 What do you want to achieve?
               </h1>
-              <p style={{ fontSize: "0.95rem", color: "rgba(255,255,255,0.85)" }}>
+              <p className="mt-2 text-sm text-neutral-600 md:text-base">
                 Pick a category to get started
               </p>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 12 }}>
+            <div className="grid grid-cols-1 gap-3">
               {([
-                { id: "business" as Category, label: "💼 Business", subtitle: "Start or grow a business" },
-                { id: "health" as Category, label: "💪 Health", subtitle: "Transform your body" },
+                { id: "business" as Category, label: "Business", subtitle: "Start or grow a business", Icon: Briefcase },
+                { id: "health" as Category, label: "Health", subtitle: "Transform your body", Icon: Dumbbell },
               ]).map((cat) => (
                 <button
                   key={cat.id}
                   onClick={() => handleCategorySelect(cat.id)}
-                  style={{
-                    padding: "1.5rem 1.25rem",
-                    borderRadius: 16,
-                    border: "1.5px solid var(--border)",
-                    background: "var(--card)",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    transition: "all 0.15s",
-                    minHeight: 80,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#D4A843"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
+                  className="flex min-h-20 flex-col justify-center rounded-lg border border-neutral-200 bg-white p-5 text-left shadow-sm transition-colors hover:border-gold"
                 >
-                  <div style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--text)", marginBottom: 4 }}>
-                    {cat.label}
-                  </div>
-                  <div style={{ fontSize: "0.9rem", color: "rgba(255,255,255,0.85)", lineHeight: 1.4 }}>
-                    {cat.subtitle}
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-md bg-gold/10 text-gold">
+                      <cat.Icon className="h-5 w-5" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <div className="text-base font-semibold text-neutral-900">
+                        {cat.label}
+                      </div>
+                      <div className="text-sm text-neutral-600">
+                        {cat.subtitle}
+                      </div>
+                    </div>
                   </div>
                 </button>
               ))}
@@ -355,53 +361,49 @@ export default function OnboardingPage() {
 
         {/* ── Steps 1-3: Funnel questions ── */}
         {funnelStep >= 1 && funnelStep <= 3 && !showAiChat && currentStepConfig && (
-          <div key={`fade-${fadeKey}`} className="fade-in" style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+          <div key={`fade-${fadeKey}`} className="fade-in flex flex-col gap-6">
             {/* Back arrow */}
             <button
               onClick={handleBack}
-              style={{
-                background: "none", border: "none", color: "rgba(255,255,255,0.85)",
-                cursor: "pointer", fontSize: "1rem", padding: "4px 0",
-                alignSelf: "flex-start", display: "flex", alignItems: "center", gap: 6, minHeight: 48,
-              }}
+              className="inline-flex items-center gap-1.5 self-start text-sm font-medium text-neutral-600 hover:text-neutral-900"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
               Back
             </button>
 
-            <div style={{ textAlign: "center" }}>
-              <img src="/favicon.png" alt="Threely" width={48} height={48} style={{ borderRadius: 12, marginBottom: 16 }} />
-              <h2 style={{ fontSize: "clamp(1.25rem, 3.5vw, 1.75rem)", fontWeight: 800, letterSpacing: "-0.02em", color: "var(--text)", marginBottom: 8 }}>
+            <div className="text-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/favicon.png"
+                alt="Threely"
+                width={48}
+                height={48}
+                className="mx-auto mb-4 rounded-xl"
+              />
+              <h2 className="text-2xl font-bold tracking-tight text-neutral-900 md:text-3xl">
                 {currentStepConfig.question}
               </h2>
-              <div style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 12 }}>
+              <div className="mt-3 flex justify-center gap-1.5">
                 {[1, 2, 3].map((dot) => (
-                  <div key={dot} style={{
-                    width: 8, height: 8, borderRadius: "50%",
-                    background: dot <= funnelStep ? "#D4A843" : "var(--border)",
-                    transition: "background 0.2s",
-                  }} />
+                  <div
+                    key={dot}
+                    className={cn(
+                      "h-2 w-2 rounded-full transition-colors",
+                      dot <= funnelStep ? "bg-gold" : "bg-neutral-200"
+                    )}
+                  />
                 ))}
               </div>
             </div>
 
             {/* Button options */}
             {currentStepConfig.buttons && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <div className="flex flex-col gap-2.5">
                 {currentStepConfig.buttons.map((btn) => (
                   <button
                     key={btn}
                     onClick={() => handleButtonAnswer(btn)}
-                    style={{
-                      padding: "1rem 1.25rem", borderRadius: 14,
-                      border: "1.5px solid var(--border)", background: "var(--card)",
-                      color: "var(--text)", fontSize: "1rem", fontWeight: 600,
-                      cursor: "pointer", transition: "all 0.15s", minHeight: 56, textAlign: "center",
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#D4A843"; e.currentTarget.style.color = "#D4A843"; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text)"; }}
+                    className="min-h-14 rounded-lg border border-neutral-200 bg-white px-5 py-3.5 text-center text-base font-semibold text-neutral-900 shadow-sm transition-colors hover:border-gold hover:text-gold"
                   >
                     {btn}
                   </button>
@@ -411,46 +413,32 @@ export default function OnboardingPage() {
 
             {/* Text input */}
             {currentStepConfig.isTextInput && (
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              <div className="flex flex-col gap-3">
                 <input
-                  className="field-input"
                   placeholder={currentStepConfig.placeholder}
                   value={textValue}
                   onChange={(e) => setTextValue(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter" && textValue.trim()) handleTextSubmit(textValue.trim()); }}
-                  autoFocus
-                  style={{
-                    fontSize: "1rem", padding: "1rem 1.25rem", borderRadius: 14, minHeight: 56,
-                    background: "var(--card)", border: "1.5px solid var(--border)", color: "var(--text)",
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && textValue.trim()) handleTextSubmit(textValue.trim());
                   }}
+                  autoFocus
+                  className="min-h-14 w-full rounded-lg border border-neutral-200 bg-white px-5 py-3.5 text-base text-neutral-900 placeholder:text-neutral-400 shadow-sm focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/40"
                 />
                 {currentStepConfig.continueButton && (
-                  <button
+                  <Button
                     onClick={() => textValue.trim() && handleTextSubmit(textValue.trim())}
                     disabled={!textValue.trim()}
-                    style={{
-                      padding: "1rem 1.25rem", borderRadius: 14, border: "none",
-                      background: textValue.trim()
-                        ? "linear-gradient(135deg, #E8C547 0%, #D4A843 50%, #B8862D 100%)"
-                        : "var(--border)",
-                      color: textValue.trim() ? "#000" : "rgba(255,255,255,0.5)",
-                      fontSize: "1rem", fontWeight: 700,
-                      cursor: textValue.trim() ? "pointer" : "default",
-                      minHeight: 56, transition: "all 0.15s",
-                    }}
+                    variant="gold"
+                    size="lg"
+                    className="w-full"
                   >
                     {currentStepConfig.continueButton}
-                  </button>
+                  </Button>
                 )}
                 {currentStepConfig.skippable && (
                   <button
                     onClick={handleSkip}
-                    style={{
-                      background: "none", border: "none", color: "rgba(255,255,255,0.85)",
-                      cursor: "pointer", fontSize: "0.95rem", fontWeight: 600,
-                      padding: "0.75rem", minHeight: 48,
-                      textDecoration: "underline", textUnderlineOffset: 3,
-                    }}
+                    className="text-sm font-medium text-neutral-500 underline-offset-4 hover:text-neutral-900 hover:underline"
                   >
                     Skip
                   </button>
@@ -462,116 +450,111 @@ export default function OnboardingPage() {
 
         {/* ── AI Chat (inline) ── */}
         {showAiChat && (
-          <div className="fade-in" style={{
-            background: "var(--card)", borderRadius: "var(--radius-xl)",
-            boxShadow: "var(--shadow-lg)", display: "flex", flexDirection: "column",
-            maxHeight: "80vh", overflow: "hidden",
-          }}>
+          <Card className="fade-in flex max-h-[80vh] flex-col overflow-hidden border-neutral-200 shadow-sm">
             {/* Header */}
-            <div style={{
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-              padding: "1.25rem 1.5rem", borderBottom: "1px solid var(--border)", flexShrink: 0,
-            }}>
-              <span style={{ fontSize: "0.95rem", fontWeight: 700, color: "var(--text)" }}>Threely Intelligence</span>
+            <div className="flex flex-shrink-0 items-center justify-between border-b border-neutral-200 px-5 py-4">
+              <span className="text-sm font-bold text-neutral-900">Threely Intelligence</span>
               <button
-                onClick={() => { setShowAiChat(false); setCategory(null); setAnswers([]); animateStep(0); }}
-                style={{
-                  width: 40, height: 40, borderRadius: 8,
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  background: "var(--bg)", border: "1px solid var(--border)",
-                  cursor: "pointer", fontSize: 16, color: "rgba(255,255,255,0.85)",
+                onClick={() => {
+                  setShowAiChat(false);
+                  setCategory(null);
+                  setAnswers([]);
+                  animateStep(0);
                 }}
+                aria-label="Close chat"
+                className="flex h-9 w-9 items-center justify-center rounded-md border border-neutral-200 bg-white text-neutral-500 transition-colors hover:bg-neutral-50 hover:text-neutral-900"
               >
-                &times;
+                <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
 
             {/* Chat messages */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "1.25rem clamp(1rem, 4vw, 1.5rem) 2rem", display: "flex", flexDirection: "column", gap: 12 }}>
+            <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 py-5 md:px-6">
               {chatHistory.map((entry, i) => (
                 <div key={i}>
                   {entry.role === "assistant" ? (
-                    <div style={{ background: "var(--primary-light)", borderRadius: "14px 14px 14px 4px", padding: "0.75rem 1rem", maxWidth: "90%", fontSize: "0.9rem", color: "var(--text)", lineHeight: 1.5 }}>
+                    <div className="max-w-[90%] rounded-2xl rounded-bl-sm bg-neutral-100 px-4 py-3 text-sm leading-relaxed text-neutral-900">
                       {entry.text}
                     </div>
                   ) : (
-                    <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                      <div style={{ background: "var(--primary)", borderRadius: "14px 14px 4px 14px", padding: "0.75rem 1rem", maxWidth: "90%", fontSize: "0.9rem", color: "var(--primary-text)", lineHeight: 1.5 }}>
+                    <div className="flex justify-end">
+                      <div className="max-w-[90%] rounded-2xl rounded-br-sm bg-neutral-900 px-4 py-3 text-sm leading-relaxed text-white">
                         {entry.text}
                       </div>
                     </div>
                   )}
 
-                  {entry.role === "assistant" && entry.options && entry.options.length > 0 && !chatLoading && i === chatHistory.length - 1 && !chatDone && (
-                    <div style={{ marginTop: 10 }}>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-                        {entry.options.map((opt, j) => {
-                          const isSelected = selectedOptions.has(opt);
-                          return (
-                            <button
-                              key={j}
-                              onClick={() => {
-                                setSelectedOptions((prev) => {
-                                  const next = new Set(prev);
-                                  if (next.has(opt)) next.delete(opt);
-                                  else next.add(opt);
-                                  return next;
-                                });
-                              }}
-                              style={{
-                                padding: "10px 16px", borderRadius: 20,
-                                border: `1.5px solid ${isSelected ? "#D4A843" : "rgba(212,168,67,0.25)"}`,
-                                background: isSelected ? "var(--primary)" : "var(--card)",
-                                color: isSelected ? "var(--primary-text)" : "var(--text)",
-                                fontSize: "0.85rem", fontWeight: 600,
-                                cursor: "pointer", transition: "all 0.15s", minHeight: 48,
-                              }}
-                            >
-                              {isSelected ? `\u2713 ${opt}` : opt}
-                            </button>
-                          );
-                        })}
-                        <button
-                          onClick={() => chatInputRef.current?.focus()}
-                          style={{
-                            padding: "10px 16px", borderRadius: 20,
-                            border: "1px solid var(--border)", background: "var(--bg)",
-                            color: "rgba(255,255,255,0.85)", fontSize: "0.85rem", fontWeight: 600,
-                            cursor: "pointer", transition: "all 0.15s", minHeight: 48,
-                          }}
-                        >Type my own</button>
+                  {entry.role === "assistant" &&
+                    entry.options &&
+                    entry.options.length > 0 &&
+                    !chatLoading &&
+                    i === chatHistory.length - 1 &&
+                    !chatDone && (
+                      <div className="mt-2.5">
+                        <div className="flex flex-wrap gap-2">
+                          {entry.options.map((opt, j) => {
+                            const isSelected = selectedOptions.has(opt);
+                            return (
+                              <button
+                                key={j}
+                                onClick={() => {
+                                  setSelectedOptions((prev) => {
+                                    const next = new Set(prev);
+                                    if (next.has(opt)) next.delete(opt);
+                                    else next.add(opt);
+                                    return next;
+                                  });
+                                }}
+                                className={cn(
+                                  "min-h-11 rounded-full border px-4 py-2 text-sm font-semibold transition-colors",
+                                  isSelected
+                                    ? "border-gold bg-gold text-gold-foreground"
+                                    : "border-neutral-200 bg-white text-neutral-900 hover:border-gold"
+                                )}
+                              >
+                                {isSelected ? `✓ ${opt}` : opt}
+                              </button>
+                            );
+                          })}
+                          <button
+                            onClick={() => chatInputRef.current?.focus()}
+                            className="min-h-11 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-sm font-semibold text-neutral-600 transition-colors hover:bg-neutral-100"
+                          >
+                            Type my own
+                          </button>
+                        </div>
+                        {selectedOptions.size > 0 && (
+                          <Button
+                            onClick={() => sendChatAnswer(Array.from(selectedOptions).join(" + "))}
+                            variant="gold"
+                            size="lg"
+                            className="mt-2.5 w-full"
+                          >
+                            Continue with {selectedOptions.size} selected
+                          </Button>
+                        )}
                       </div>
-                      {selectedOptions.size > 0 && (
-                        <button
-                          onClick={() => sendChatAnswer(Array.from(selectedOptions).join(" + "))}
-                          className="btn btn-primary"
-                          style={{ marginTop: 10, height: 48, width: "100%", fontSize: "0.85rem", fontWeight: 700 }}
-                        >
-                          Continue with {selectedOptions.size} selected
-                        </button>
-                      )}
-                    </div>
-                  )}
+                    )}
                 </div>
               ))}
 
               {chatLoading && (
-                <div style={{ background: "var(--primary-light)", borderRadius: "14px 14px 14px 4px", padding: "0.75rem 1rem", maxWidth: 80, display: "flex", alignItems: "center", gap: 4 }}>
-                  <span className="spinner spinner-dark" style={{ width: 16, height: 16 }} />
+                <div className="flex max-w-[80px] items-center gap-1 rounded-2xl rounded-bl-sm bg-neutral-100 px-4 py-3">
+                  <Loader2 className="h-4 w-4 animate-spin text-neutral-500" />
                 </div>
               )}
 
               {chatDone && chatGoalText && (
-                <div style={{ background: "var(--card)", borderRadius: "var(--radius-lg)", border: "1.5px solid rgba(212,168,67,0.27)", padding: "1rem", marginTop: 8 }}>
-                  <p style={{ fontSize: "0.7rem", fontWeight: 700, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 6 }}>Your Goal</p>
-                  <p style={{ fontSize: "0.95rem", color: "var(--text)", marginBottom: 12, lineHeight: 1.5 }}>{chatGoalText}</p>
-                  <button
-                    onClick={handleUseGoal}
-                    className="btn btn-primary"
-                    style={{ width: "100%", height: 56, fontSize: "0.95rem", fontWeight: 700 }}
-                  >
+                <div className="mt-2 rounded-lg border border-gold/30 bg-white p-4">
+                  <p className="mb-1.5 text-[11px] font-bold uppercase tracking-widest text-gold">
+                    Your Goal
+                  </p>
+                  <p className="mb-3 text-sm leading-relaxed text-neutral-900">
+                    {chatGoalText}
+                  </p>
+                  <Button onClick={handleUseGoal} variant="gold" size="lg" className="w-full">
                     Build my plan
-                  </button>
+                  </Button>
                 </div>
               )}
 
@@ -580,27 +563,28 @@ export default function OnboardingPage() {
 
             {/* Chat input */}
             {!chatDone && !chatLoading && chatHistory.length > 0 && (
-              <div style={{ borderTop: "1px solid var(--border)", padding: "0.75rem 1rem", display: "flex", gap: 8, flexShrink: 0 }}>
+              <div className="flex flex-shrink-0 gap-2 border-t border-neutral-200 px-4 py-3">
                 <input
                   ref={chatInputRef}
-                  className="field-input"
                   placeholder="Type your answer..."
                   value={customInput}
                   onChange={(e) => setCustomInput(e.target.value)}
-                  onKeyDown={(e) => { if (e.key === "Enter" && customInput.trim()) sendChatAnswer(customInput.trim()); }}
-                  style={{ flex: 1 }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && customInput.trim()) sendChatAnswer(customInput.trim());
+                  }}
+                  className="flex-1 rounded-md border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/40"
                 />
-                <button
+                <Button
                   onClick={() => customInput.trim() && sendChatAnswer(customInput.trim())}
                   disabled={!customInput.trim()}
-                  className="btn btn-primary"
-                  style={{ padding: "0 1.25rem", height: 46 }}
+                  variant="gold"
+                  size="default"
                 >
-                  Send
-                </button>
+                  <Send className="h-4 w-4" aria-hidden="true" />
+                </Button>
               </div>
             )}
-          </div>
+          </Card>
         )}
       </div>
 
