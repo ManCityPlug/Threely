@@ -15,17 +15,14 @@ import { getSupabase } from "@/lib/supabase-client";
 
 type Plan = "monthly" | "yearly";
 
-// Single public plan: Threely Pro at $39/month after the $1 Launch Preview.
-// Yearly entry preserved as an alias so existing `?plan=yearly` links still
-// resolve without breaking; it surfaces the same monthly pricing.
 const PLAN_INFO: Record<Plan, { name: string; price: string; period: string; perMonth: string; badge?: string }> = {
-  monthly: { name: "Threely Pro", price: "$39", period: "month", perMonth: "$39/mo" },
-  yearly:  { name: "Threely Pro", price: "$39", period: "month", perMonth: "$39/mo" },
+  yearly: { name: "Yearly", price: "$99.99", period: "year", perMonth: "$8.33/mo", badge: "SAVE 36%" },
+  monthly: { name: "Monthly", price: "$12.99", period: "month", perMonth: "$12.99/mo" },
 };
 
 const FEATURES = [
-  "Launch faster",
-  "Start earning sooner",
+  "10x your productivity",
+  "Reach your goals",
 ];
 
 let stripePromise: Promise<Stripe | null> | null = null;
