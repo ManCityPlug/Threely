@@ -11,15 +11,6 @@ import { SubscriptionProvider } from "@/lib/subscription-context";
 
 
 const NAV_ICONS: Record<string, React.ReactNode> = {
-  launch: (
-    <svg viewBox="0 0 24 24" fill="none">
-      <path d="M3 9l2-5h14l2 5" stroke="#D4A843" strokeWidth={1.8} strokeLinejoin="round" fill="rgba(212,168,67,0.14)" />
-      <path d="M3 9v11h18V9" stroke="#D4A843" strokeWidth={1.8} strokeLinejoin="round" fill="rgba(212,168,67,0.14)" />
-      <path d="M9 15h6" stroke="#D4A843" strokeWidth={1.8} strokeLinecap="round" />
-      <circle cx="8.5" cy="11" r="1" fill="#D4A843" />
-      <circle cx="15.5" cy="11" r="1" fill="#D4A843" />
-    </svg>
-  ),
   today: (
     <svg viewBox="0 0 24 24" fill="none">
       <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#F59E0B" stroke="#F59E0B" strokeWidth={1} strokeLinejoin="round" />
@@ -43,7 +34,6 @@ const NAV_ICONS: Record<string, React.ReactNode> = {
 };
 
 const NAV = [
-  { href: "/launch", label: "Launch", iconKey: "launch" },
   { href: "/dashboard", label: "Today", iconKey: "today" },
   { href: "/goals", label: "Goals", iconKey: "goals" },
   { href: "/profile", label: "Profile", iconKey: "profile" },
