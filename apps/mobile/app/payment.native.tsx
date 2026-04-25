@@ -23,11 +23,11 @@ import { spacing, typography, radius, shadow } from "@/constants/theme";
 
 // ─── Features list ────────────────────────────────────────────────────────────
 const FEATURES = [
-  { icon: "sparkles-outline" as const,        text: "AI-built launch assets, brand, and creatives" },
-  { icon: "infinite-outline" as const,        text: "Unlimited launches & daily moves" },
-  { icon: "bar-chart-outline" as const,       text: "Momentum tracking & full history" },
-  { icon: "notifications-outline" as const,   text: "Weekly creative drops in your inbox" },
-  { icon: "refresh-circle-outline" as const,  text: "Fresh moves unlock as you progress" },
+  { icon: "sparkles-outline" as const,        text: "AI-powered tasks tailored to your goals" },
+  { icon: "infinite-outline" as const,        text: "Unlimited goals & daily task generation" },
+  { icon: "bar-chart-outline" as const,       text: "Progress tracking & full history" },
+  { icon: "notifications-outline" as const,   text: "Daily reminders at your chosen time" },
+  { icon: "refresh-circle-outline" as const,  text: "Generate new tasks as you complete them" },
 ];
 
 export default function PaymentScreen() {

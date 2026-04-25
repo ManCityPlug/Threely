@@ -64,56 +64,28 @@ function TabsContent() {
         },
       }}
     >
-      {/* Home — primary dashboard. The file is still `index.tsx` so it's the
-          initial route; the label is "Home" because it combines the dashboard
-          cards AND the moves list. A future session should factor the moves
-          list into a separate Moves tab per spec. */}
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "Today",
           tabBarIcon: ({ focused, size }) => (
             <TabIcon focused={focused} name="flash-outline" focusedName="flash" size={size} inactiveColor={colors.textTertiary} />
           ),
         }}
       />
-      {/* Goals — kept functional for active users managing their launches.
-          Hidden from marketing copy but still accessible via this tab. */}
       <Tabs.Screen
         name="goals"
         options={{
-          title: "Launches",
+          title: "Goals",
           tabBarIcon: ({ focused, size }) => (
             <TabIcon focused={focused} name="aperture-outline" focusedName="aperture" size={size} inactiveColor={colors.textTertiary} />
           ),
         }}
       />
-      {/* Creatives — weekly ad drop inbox. Shows sample/locked tiles until
-          the Pro weekly drop backend ships. */}
-      <Tabs.Screen
-        name="creatives"
-        options={{
-          title: "Creatives",
-          tabBarIcon: ({ focused, size }) => (
-            <TabIcon focused={focused} name="color-palette-outline" focusedName="color-palette" size={size} inactiveColor={colors.textTertiary} />
-          ),
-        }}
-      />
-      {/* Growth — learning center with short ecom lessons. */}
-      <Tabs.Screen
-        name="growth"
-        options={{
-          title: "Growth",
-          tabBarIcon: ({ focused, size }) => (
-            <TabIcon focused={focused} name="trending-up-outline" focusedName="trending-up" size={size} inactiveColor={colors.textTertiary} />
-          ),
-        }}
-      />
-      {/* Account — formerly Profile. Single place for plan + support + logout. */}
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Account",
+          title: "Profile",
           tabBarIcon: ({ focused, size }) => (
             <View style={{
               width: ICON_BG_SIZE,

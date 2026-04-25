@@ -29,9 +29,9 @@ interface WelcomeScreenProps {
 }
 
 const VALUE_PROPS = [
-  "Launch your online business fast.",
-  "Start earning sooner.",
-  "Own something real.",
+  "Become the person you want to be.",
+  "Achieve your goals.",
+  "10x your productivity.",
 ];
 
 export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
@@ -143,15 +143,15 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
             <Image source={require("@/assets/icon.png")} style={styles.logo} />
           </Animated.View>
 
-          {/* Welcome Back headline + subheadline. Three-line stagger kept so
-              the word-by-word entrance animation (wordAnims) still runs, but
-              sized smaller than the old 72pt marketing tagline — this screen
-              is now for returning-user login, not new-user hype. */}
-          <View style={{ alignItems: "center", marginTop: spacing.xl, paddingHorizontal: spacing.lg }}>
+          {/* Tagline — each word fades in with its own color & stagger.
+              Stacked vertically (one word per line) so REACH + YOUR don't
+              overflow the screen width at 72pt with letterSpacing 12. */}
+          <View style={{ alignItems: "center", marginTop: spacing.xl }}>
             <Animated.Text
               style={[
-                styles.welcomeHeadline,
+                styles.wordLine,
                 {
+                  color: "#FFFFFF",
                   opacity: wordAnims[0],
                   transform: [
                     {
@@ -164,25 +164,45 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
                 },
               ]}
             >
-              Welcome Back
+              REACH
             </Animated.Text>
             <Animated.Text
               style={[
-                styles.welcomeSubheadline,
+                styles.wordLine,
                 {
+                  color: "#E5D5A8",
                   opacity: wordAnims[1],
                   transform: [
                     {
                       translateY: wordAnims[1].interpolate({
                         inputRange: [0, 1],
-                        outputRange: [10, 0],
+                        outputRange: [14, 0],
                       }),
                     },
                   ],
                 },
               ]}
             >
-              Login to manage your business, view your progress, and unlock new growth drops.
+              YOUR
+            </Animated.Text>
+            <Animated.Text
+              style={[
+                styles.wordLine,
+                {
+                  color: PRIMARY,
+                  opacity: wordAnims[2],
+                  transform: [
+                    {
+                      translateY: wordAnims[2].interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [14, 0],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            >
+              GOALS
             </Animated.Text>
           </View>
         </Animated.View>
@@ -216,18 +236,18 @@ export function WelcomeScreen({ onComplete }: WelcomeScreenProps) {
               onPress={() => onComplete("login")}
             >
               <Ionicons name="mail-outline" size={20} color="#FFFFFF" />
-              <Text style={styles.emailButtonText}>Login</Text>
+              <Text style={styles.emailButtonText}>Sign in with email</Text>
             </Pressable>
           </View>
 
-          {/* Signup moved to the website — the app is login-only. */}
+          {/* Create account */}
           <Text style={styles.signInText}>
-            Need an account?{" "}
+            New here?{" "}
             <Text
-              style={{ color: PRIMARY, fontWeight: "600" }}
-              onPress={() => Linking.openURL("https://threely.co/start")}
+              style={{ color: "rgba(255,255,255,0.9)", fontWeight: "600" }}
+              onPress={() => onComplete("register")}
             >
-              Start on Threely.com
+              Create an account
             </Text>
           </Text>
 
@@ -301,23 +321,6 @@ const styles = StyleSheet.create({
     textAlign: "center" as const,
     letterSpacing: 12,
     lineHeight: 82,
-  },
-  welcomeHeadline: {
-    fontSize: 38,
-    fontWeight: "800" as const,
-    textAlign: "center" as const,
-    color: "#FFFFFF",
-    letterSpacing: -0.5,
-    lineHeight: 44,
-    marginBottom: spacing.md,
-  },
-  welcomeSubheadline: {
-    fontSize: typography.base,
-    fontWeight: "500" as const,
-    textAlign: "center" as const,
-    color: "rgba(255,255,255,0.7)",
-    lineHeight: 22,
-    maxWidth: 320,
   },
   title: {
     fontSize: typography.xxxl,

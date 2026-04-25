@@ -638,7 +638,7 @@ export default function ProfileScreen() {
           <TouchableOpacity activeOpacity={1} style={styles.historySheet} onPress={() => {}}>
             <View style={styles.handle} />
             <View style={styles.historyHeaderRow}>
-              <Text style={styles.sheetTitle}>Momentum History</Text>
+              <Text style={styles.sheetTitle}>Task History</Text>
               <TouchableOpacity onPress={() => setHistoryOpen(false)} hitSlop={12}>
                 <Ionicons name="close" size={22} color={colors.textSecondary} />
               </TouchableOpacity>
@@ -646,7 +646,7 @@ export default function ProfileScreen() {
             {historyLoading ? (
               <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.xl }} />
             ) : historyTasks.length === 0 ? (
-              <Text style={styles.historyEmpty}>No history yet. Complete moves to build momentum.</Text>
+              <Text style={styles.historyEmpty}>No history yet. Complete tasks to build your record.</Text>
             ) : (
               <ScrollView showsVerticalScrollIndicator={false}>
                 {(() => {
@@ -701,8 +701,8 @@ export default function ProfileScreen() {
           <Pressable style={StyleSheet.absoluteFill} onPress={() => { setCustomOpen(false); setNotifSheetOpen(false); }} />
           <View style={styles.sheet}>
             <View style={styles.handle} />
-            <Text style={styles.sheetTitle}>Weekly reminder</Text>
-            <Text style={styles.sheetSubtitle}>Off by default. Pick a time if you want a gentle once-a-week nudge — nothing more.</Text>
+            <Text style={styles.sheetTitle}>Reminder time</Text>
+            <Text style={styles.sheetSubtitle}>When should we remind you to check your tasks?</Text>
 
             {/* Presets */}
             {NOTIF_PRESETS.map((opt) => {
@@ -735,7 +735,7 @@ export default function ProfileScreen() {
               <Text style={styles.notifEmoji}>⚙️</Text>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.notifLabel, customOpen && styles.notifLabelSelected]}>Custom time</Text>
-                <Text style={styles.notifSub}>Pick your exact weekly reminder time</Text>
+                <Text style={styles.notifSub}>Pick your exact reminder time</Text>
               </View>
               <Ionicons name={customOpen ? "chevron-up" : "chevron-down"} size={16} color={colors.textTertiary} />
             </Pressable>

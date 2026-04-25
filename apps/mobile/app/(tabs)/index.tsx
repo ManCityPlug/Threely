@@ -2117,7 +2117,7 @@ export default function DashboardScreen() {
                 if (effectiveGoals.length >= 3) {
                   Alert.alert(
                     "Focus beats hustle",
-                    "3 launches is the sweet spot. Finish or remove one to add another."
+                    "3 goals is the sweet spot. Finish or remove one to add another."
                   );
                 } else {
                   router.navigate("/(tabs)/goals");
@@ -2149,73 +2149,10 @@ export default function DashboardScreen() {
           <Pressable style={styles.expiredBanner} onPress={() => setShowPaywall(true)}>
             <View style={{ flex: 1 }}>
               <Text style={styles.expiredTitle}>Unlock Threely Pro</Text>
-              <Text style={styles.expiredSubtitle}>Get Pro free for 3 days — Keep your momentum</Text>
+              <Text style={styles.expiredSubtitle}>Get Pro free for 3 days — Achieve your goals</Text>
             </View>
             <Text style={{ color: colors.primary, fontSize: typography.sm, fontWeight: typography.semibold }}>Try Free</Text>
           </Pressable>
-        )}
-
-        {/* Dashboard strip: Business Stage + New Creative Drop + This Week's
-            Target. Shown when the user has at least one active goal so the
-            cold-start empty state stays clean. Static/placeholder values for
-            now — backend fields for stage, creative count, and weekly target
-            are follow-up work. */}
-        {effectiveGoals.length > 0 && (
-          <View style={styles.dashboardStrip}>
-            {/* Business Stage — progress across Planning → Scaling */}
-            <View style={styles.dashCard}>
-              <View style={styles.dashCardHeaderRow}>
-                <Text style={styles.dashCardEyebrow}>BUSINESS STAGE</Text>
-                <Text style={styles.dashCardEyebrowAccent}>Setup</Text>
-              </View>
-              <Text style={styles.dashCardTitle}>{"Preparing your store"}</Text>
-              <View style={styles.stageBarTrack}>
-                <View style={styles.stageBarFill} />
-              </View>
-              <View style={styles.stageLabelsRow}>
-                {["Plan", "Brand", "Setup", "Launch", "Growth", "Scale"].map((s, idx) => (
-                  <Text
-                    key={s}
-                    style={[
-                      styles.stageLabel,
-                      idx <= 2 ? styles.stageLabelActive : null,
-                    ]}
-                  >
-                    {s}
-                  </Text>
-                ))}
-              </View>
-            </View>
-
-            {/* New Creative Drop — taps into Creatives tab */}
-            <TouchableOpacity
-              style={styles.dashCardDrop}
-              activeOpacity={0.85}
-              onPress={() => {
-                if (Platform.OS !== "web") Haptics.selectionAsync();
-                router.navigate("/(tabs)/creatives");
-              }}
-            >
-              <View style={styles.dashCardDropIcon}>
-                <Text style={styles.dashCardDropEmoji}>{"🎨"}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.dashCardDropTitle}>Sample creatives ready</Text>
-                <Text style={styles.dashCardDropSub}>Preview tiles — full drops unlock with Pro</Text>
-              </View>
-              <Text style={styles.dashCardDropChevron}>{"›"}</Text>
-            </TouchableOpacity>
-
-            {/* This Week's Target — surface the current focus goal */}
-            {currentGoalObj && (
-              <View style={styles.dashCardTarget}>
-                <Text style={styles.dashCardEyebrow}>THIS WEEK&apos;S TARGET</Text>
-                <Text style={styles.dashCardTargetValue} numberOfLines={2}>
-                  {currentGoalObj.title}
-                </Text>
-              </View>
-            )}
-          </View>
         )}
 
         {/* ─── No goals: empty state ─── */}
@@ -2224,7 +2161,7 @@ export default function DashboardScreen() {
             <Text style={{ fontSize: 48, marginBottom: spacing.md }}>{"🚀"}</Text>
             <Text style={styles.emptyTitle}>Get started</Text>
             <Text style={styles.emptySubtitle}>
-              Create your first launch and we'll build your daily moves.
+              Create your first goal and we'll generate daily tasks to help you achieve it.
             </Text>
             <TouchableOpacity
               onPress={() => router.navigate("/(tabs)/goals")}
@@ -2284,7 +2221,7 @@ export default function DashboardScreen() {
               }}
               activeOpacity={0.85}
             >
-              <Text style={styles.primaryBtnText}>Generate moves anyway</Text>
+              <Text style={styles.primaryBtnText}>Generate tasks anyway</Text>
             </TouchableOpacity>
           </View>
         ) : generating && !hasVisibleTasks ? (
@@ -2292,7 +2229,7 @@ export default function DashboardScreen() {
           <View style={{ alignItems: "center", paddingVertical: spacing.xl * 2, paddingHorizontal: spacing.lg }}>
             <Text style={{ fontSize: 36, marginBottom: spacing.md }}>{"\u2726"}</Text>
             <Text style={{ fontSize: typography.lg, fontWeight: "700", color: colors.text, textAlign: "center", marginBottom: spacing.sm }}>
-              Your moves are being generated...
+              Your tasks are being generated...
             </Text>
             <View style={{ width: "70%", maxWidth: 300, height: 5, backgroundColor: colors.border, borderRadius: 3, marginBottom: spacing.md, overflow: "hidden" }}>
               <View style={{ height: "100%", width: "60%", backgroundColor: GOLD, borderRadius: 3 }} />
@@ -2305,15 +2242,15 @@ export default function DashboardScreen() {
           /* No tasks for today */
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>
-              {autoGenFailed ? "We couldn't generate your moves" : "No moves for today"}
+              {autoGenFailed ? "We couldn't generate your tasks" : "No tasks for today"}
             </Text>
             <Text style={styles.emptySubtitle}>
               {autoGenFailed
                 ? "Something went wrong reaching our servers. Tap below to try again."
-                : "Tap below to generate today's move."}
+                : "Tap below to generate 3 tasks for each of your goals."}
             </Text>
             <Button
-              title={generating ? "Generating…" : autoGenFailed ? "Try again" : "Generate today's move"}
+              title={generating ? "Generating…" : autoGenFailed ? "Try again" : "Generate today's tasks"}
               onPress={handleFirstGenerate}
               loading={generating}
               style={styles.generateBtn}
@@ -2467,62 +2404,31 @@ export default function DashboardScreen() {
                   })()}
                 </View>
 
-                {/* Today's Move + Bonus Moves — first task gets prominence,
-                    remaining tasks are framed as optional bonuses. */}
-                {activeTasks.map((dt) => {
-                  const allItems = Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : [];
-                  const [primary, ...bonus] = allItems;
-                  return (
-                    <View key={dt.id} style={{ marginBottom: 0 }}>
-                      {primary && (
-                        <>
-                          <Text style={styles.moveSectionHeader}>TODAY'S MOVE</Text>
-                          <View
-                            ref={!inNextDay && newTaskItems.indexOf(primary) === 0 ? r => register("first-task-card", r) : undefined}
-                            collapsable={false}
-                            style={{ marginBottom: spacing.md }}
-                          >
-                            <GamifiedTaskCard
-                              task={primary}
-                              onToggle={(isCompleted) =>
-                                handleToggleTask(dt.id, primary.id, isCompleted)
-                              }
-                              colors={colors}
-                              isAnimating={animatingTaskId === primary.id}
-                              readOnly={activeAllDone}
-                              paywalled={!hasPro && !walkthroughActive}
-                              onPaywall={() => setShowPaywall(true)}
-                            />
-                          </View>
-                        </>
-                      )}
-                      {bonus.length > 0 && (
-                        <>
-                          <Text style={styles.bonusSectionHeader}>Bonus Moves (optional)</Text>
-                          {bonus.map((task) => (
-                            <View
-                              key={task.id}
-                              collapsable={false}
-                              style={{ marginBottom: spacing.sm + 4 }}
-                            >
-                              <GamifiedTaskCard
-                                task={task}
-                                onToggle={(isCompleted) =>
-                                  handleToggleTask(dt.id, task.id, isCompleted)
-                                }
-                                colors={colors}
-                                isAnimating={animatingTaskId === task.id}
-                                readOnly={activeAllDone}
-                                paywalled={!hasPro && !walkthroughActive}
-                                onPaywall={() => setShowPaywall(true)}
-                              />
-                            </View>
-                          ))}
-                        </>
-                      )}
-                    </View>
-                  );
-                })}
+                {/* Task cards — always shown, read-only when all done */}
+                {activeTasks.map((dt) => (
+                  <View key={dt.id} style={{ marginBottom: 0 }}>
+                    {(Array.isArray(dt.tasks) ? (dt.tasks as TaskItem[]) : []).map((task) => (
+                      <View
+                        key={task.id}
+                        ref={!inNextDay && newTaskItems.indexOf(task) === 0 ? r => register("first-task-card", r) : undefined}
+                        collapsable={false}
+                        style={{ marginBottom: spacing.sm + 4 }}
+                      >
+                        <GamifiedTaskCard
+                          task={task}
+                          onToggle={(isCompleted) =>
+                            handleToggleTask(dt.id, task.id, isCompleted)
+                          }
+                          colors={colors}
+                          isAnimating={animatingTaskId === task.id}
+                          readOnly={activeAllDone}
+                          paywalled={!hasPro && !walkthroughActive}
+                          onPaywall={() => setShowPaywall(true)}
+                        />
+                      </View>
+                    ))}
+                  </View>
+                ))}
               </>
             );
           })()
@@ -2826,137 +2732,6 @@ function createStyles(c: Colors) {
       fontWeight: "800",
       color: c.text,
       letterSpacing: -1,
-    },
-    // Section headers for Today's Move + Bonus Moves
-    moveSectionHeader: {
-      fontSize: typography.xs,
-      fontWeight: "700",
-      color: GOLD,
-      letterSpacing: 1.5,
-      marginBottom: spacing.sm,
-      marginTop: 2,
-    },
-    bonusSectionHeader: {
-      fontSize: typography.xs,
-      fontWeight: "600",
-      color: c.textSecondary,
-      letterSpacing: 1.2,
-      marginTop: spacing.md,
-      marginBottom: spacing.sm,
-      textTransform: "uppercase",
-    },
-    // ─── Dashboard strip (Business Stage / Creative Drop / Target) ──────
-    dashboardStrip: {
-      gap: spacing.sm + 2,
-      marginBottom: spacing.md,
-    },
-    dashCard: {
-      backgroundColor: c.card,
-      borderWidth: 1,
-      borderColor: c.border,
-      borderRadius: radius.lg,
-      padding: spacing.md,
-      gap: spacing.sm,
-    },
-    dashCardHeaderRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
-    dashCardEyebrow: {
-      fontSize: 10,
-      fontWeight: "700",
-      color: c.textSecondary,
-      letterSpacing: 1.2,
-    },
-    dashCardEyebrowAccent: {
-      fontSize: 10,
-      fontWeight: "800",
-      color: GOLD,
-      letterSpacing: 1.2,
-    },
-    dashCardTitle: {
-      fontSize: typography.md,
-      fontWeight: typography.semibold,
-      color: c.text,
-    },
-    stageBarTrack: {
-      height: 6,
-      borderRadius: 999,
-      backgroundColor: "rgba(212,168,67,0.12)",
-      overflow: "hidden",
-    },
-    stageBarFill: {
-      width: "45%",
-      height: "100%",
-      borderRadius: 999,
-      backgroundColor: GOLD,
-    },
-    stageLabelsRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      marginTop: 2,
-    },
-    stageLabel: {
-      fontSize: 9,
-      fontWeight: "600",
-      color: c.textTertiary,
-      letterSpacing: 0.3,
-    },
-    stageLabelActive: {
-      color: GOLD,
-    },
-    dashCardDrop: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: spacing.md,
-      padding: spacing.md,
-      backgroundColor: c.card,
-      borderWidth: 1,
-      borderColor: "rgba(212,168,67,0.22)",
-      borderRadius: radius.lg,
-    },
-    dashCardDropIcon: {
-      width: 40,
-      height: 40,
-      borderRadius: radius.md,
-      backgroundColor: "rgba(212,168,67,0.1)",
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    dashCardDropEmoji: {
-      fontSize: 20,
-    },
-    dashCardDropTitle: {
-      fontSize: typography.base,
-      fontWeight: typography.semibold,
-      color: c.text,
-    },
-    dashCardDropSub: {
-      fontSize: typography.xs,
-      color: c.textSecondary,
-      marginTop: 2,
-    },
-    dashCardDropChevron: {
-      fontSize: 28,
-      color: c.textTertiary,
-      fontWeight: "400",
-      marginTop: -4,
-    },
-    dashCardTarget: {
-      backgroundColor: c.card,
-      borderWidth: 1,
-      borderColor: c.border,
-      borderRadius: radius.lg,
-      padding: spacing.md,
-      gap: 4,
-    },
-    dashCardTargetValue: {
-      fontSize: typography.md,
-      fontWeight: typography.bold,
-      color: c.text,
-      letterSpacing: -0.2,
-      marginTop: 2,
     },
     // All done state
     allDoneContainer: {

@@ -437,7 +437,7 @@ export default function GoalsScreen() {
     if (goals.length >= 3) {
       Alert.alert(
         "3 Goals. Total Focus.",
-        "Threely hands you one daily move per launch — designed for deep focus and real momentum. More than 3 active launches spreads you too thin.\n\nPause or complete one to make room for a new launch.",
+        "Threely gives you 3 tasks per goal, per day \u2014 designed for deep focus and real progress. More than 3 active goals spreads you too thin.\n\nPause or complete a goal to make room for a new one.",
         [{ text: "Got it", style: "default" }]
       );
       return;
@@ -552,7 +552,7 @@ export default function GoalsScreen() {
               <Text style={styles.emptyIcon}>{"\u{1F680}"}</Text>
               <Text style={styles.emptyTitle}>What will you achieve?</Text>
               <Text style={styles.emptySubtitle}>
-                Pick your direction and your AI coach will hand you one move a day — the proven way to build real momentum.
+                Set a goal and your AI coach will break it into 3 small daily tasks — the proven way to make real progress.
               </Text>
               <Button title="Create your first goal" onPress={openAddFlow} style={styles.emptyBtn} />
             </View>

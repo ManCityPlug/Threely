@@ -4,7 +4,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const NOTIF_TIME_KEY = "@threely_notif_time";
 const SCHEDULE_COOLDOWN_KEY = "@threely_notif_last_scheduled";
-const WEEKLY_WIN_KEY = "@threely_last_weekly_win";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -12,7 +11,7 @@ export interface NotifTimePreference {
   hour: number;
   minute: number;
   label: string;
-  time: string;
+  time: string; // e.g. "7:00 PM"
 }
 
 export interface NotifContext {
@@ -22,21 +21,22 @@ export interface NotifContext {
   allDone: boolean;
   staleGoals: { name: string; daysSince: number }[];
   isRestDay?: boolean;
+  /** Number of goals that have tasks today (not off-day) */
   activeGoalCountToday: number;
+  /** Total time across ALL active goals today */
   totalTimeAllGoals: number;
 }
 
 // ─── Notification identifiers ─────────────────────────────────────────────────
 
-const ID_WEEKLY_CREATIVE = "threely-weekly-creative";
-const ID_MILESTONE = "threely-milestone";
-const ID_OPPORTUNITY = "threely-opportunity";
-const ID_WEEKLY_WIN = "threely-weekly-win";
-// Legacy identifiers — kept so cancelAllNotifications cleans old scheduled
-// reminders from earlier app versions.
 const ID_PRIMARY = "threely-primary";
 const ID_EVENING = "threely-evening";
 
+// Default reminder time if user hasn't set a preference
+const DEFAULT_HOUR = 8;
+const DEFAULT_MINUTE = 0;
+
+// Minimum minutes between re-scheduling calls to prevent spam
 const COOLDOWN_MINUTES = 30;
 
 // ─── Permission + preference helpers ──────────────────────────────────────────
@@ -61,6 +61,7 @@ export async function saveNotifPreference(
   await AsyncStorage.setItem(NOTIF_TIME_KEY, JSON.stringify(pref));
   const granted = await requestNotificationPermissions();
   if (granted) {
+    // Clear cooldown so next scheduleNotifications() runs immediately
     await AsyncStorage.removeItem(SCHEDULE_COOLDOWN_KEY);
     return true;
   }
@@ -75,20 +76,16 @@ export async function requestNotificationPermissions(): Promise<boolean> {
   return status === "granted";
 }
 
-// ─── Legacy (kept as no-op for backward compat) ───────────────────────────────
+// ─── Legacy — kept for backward compat (saveNotifPreference still calls it) ──
 
 export async function scheduleDailyReminder(_hour: number, _minute: number): Promise<void> {
-  // No-op — daily nagging has been removed. See scheduleNotifications().
+  // No-op — scheduling is now handled entirely by scheduleNotifications()
 }
 
 export async function cancelAllNotifications(): Promise<void> {
   if (Platform.OS === "web") return;
   await cancelById(ID_PRIMARY);
   await cancelById(ID_EVENING);
-  await cancelById(ID_WEEKLY_CREATIVE);
-  await cancelById(ID_MILESTONE);
-  await cancelById(ID_OPPORTUNITY);
-  await cancelById(ID_WEEKLY_WIN);
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -100,6 +97,8 @@ async function cancelById(id: string): Promise<void> {
     // notification may not exist — safe to ignore
   }
 }
+
+// ─── Cooldown check ───────────────────────────────────────────────────────────
 
 async function isCooldownActive(): Promise<boolean> {
   try {
@@ -119,166 +118,185 @@ async function setCooldown(): Promise<void> {
 // ─── Main notification scheduling ─────────────────────────────────────────────
 
 /**
- * Notification posture: subtle, value-driven, opt-in only.
+ * Schedule notifications for the daily focus goal only.
  *
- * Default behavior (no user preference set): NOTHING fires. The app does not
- * nag. Retention comes from useful creatives, visible momentum, and curiosity
- * — not alarms.
+ * Notifications (max 2/day):
+ *  1. PRIMARY — at user's chosen time (default 8 AM). Focus goal tasks reminder.
+ *  2. EVENING — at 8 PM, only if chosen time < 6 PM and tasks are incomplete.
  *
- * If the user has opted in by setting a time preference, a single low-key
- * "Win Reminder" fires at most once per week at their chosen time. Everything
- * else (weekly creative drops, milestone alerts, opportunity alerts) is
- * scheduled directly via the specific helpers below when those events occur.
+ * Has a 30-minute cooldown to prevent re-scheduling spam when state updates
+ * rapidly (e.g. multiple task completions in quick succession).
+ *
+ * Cancels existing notifications by ID before rescheduling to prevent duplicates.
  */
 export async function scheduleNotifications(ctx: NotifContext): Promise<void> {
   if (Platform.OS === "web") return;
+  const granted = await requestNotificationPermissions();
+  if (!granted) return;
 
-  // Always cancel legacy daily reminders from prior app versions so returning
-  // users stop getting nagged the first time they open the updated build.
+  // Cooldown — skip if we scheduled recently (prevents duplicate scheduling
+  // from rapid state changes like multiple task completions)
+  if (await isCooldownActive()) return;
+
+  // Cancel existing scheduled notifications by ID to prevent duplicates
+  // (targeted cancellation avoids wiping unrelated notifications)
   await cancelById(ID_PRIMARY);
   await cancelById(ID_EVENING);
 
-  const pref = await getNotifPreference();
-  // No preference = user hasn't opted in = silence. This is the default.
-  if (!pref) return;
-
-  if (await isCooldownActive()) return;
-  const granted = await requestNotificationPermissions();
-  if (!granted) return;
+  // Record cooldown timestamp
   await setCooldown();
 
-  await maybeScheduleWeeklyWin(ctx, pref);
-}
+  // Read user's preferred notification time
+  const pref = await getNotifPreference();
+  const prefHour = pref?.hour ?? DEFAULT_HOUR;
+  const prefMinute = pref?.minute ?? DEFAULT_MINUTE;
 
-/**
- * Schedule the gentle weekly win reminder. Fires at most once per week. Copy
- * is framed around momentum, not chore completion.
- *
- * Called from scheduleNotifications() when the user has a time preference.
- */
-async function maybeScheduleWeeklyWin(
-  ctx: NotifContext,
-  pref: NotifTimePreference,
-): Promise<void> {
-  // Skip if we already scheduled/fired within the past 6 days — never more
-  // than once a week.
-  try {
-    const last = await AsyncStorage.getItem(WEEKLY_WIN_KEY);
-    if (last) {
-      const elapsedDays = (Date.now() - Number(last)) / (1000 * 60 * 60 * 24);
-      if (elapsedDays < 6) return;
-    }
-  } catch {
-    // proceed on storage failure
+  const now = new Date();
+
+  const todayAt = (h: number, m: number) => {
+    const d = new Date(now);
+    d.setHours(h, m, 0, 0);
+    return d;
+  };
+
+  // Skip ALL notifications if no goals are active today (rest day / no goals)
+  if (ctx.activeGoalCountToday === 0) return;
+
+  // ── 1. PRIMARY reminder ──
+  // Schedule for TODAY if the preferred time hasn't passed yet, otherwise TOMORROW.
+  // Uses DATE trigger (one-shot) so it only fires with current context — re-scheduled
+  // every time the app opens with fresh task data.
+  const primaryTime = todayAt(prefHour, prefMinute);
+  if (now >= primaryTime) {
+    // Preferred time already passed today — schedule for tomorrow
+    primaryTime.setDate(primaryTime.getDate() + 1);
   }
 
-  // Schedule for the user's chosen time on the next occurrence.
-  const now = new Date();
-  const fireTime = new Date(now);
-  fireTime.setHours(pref.hour, pref.minute, 0, 0);
-  if (now >= fireTime) fireTime.setDate(fireTime.getDate() + 1);
+  // Build notification content based on actual task state
+  if (ctx.incompleteCount > 0) {
+    // Has incomplete tasks — remind them
+    const totalMin = ctx.totalTimeAllGoals;
+    const timeStr = totalMin >= 60
+      ? `${Math.floor(totalMin / 60)}h ${totalMin % 60 ? `${totalMin % 60}m` : ""}`
+      : `${totalMin} min`;
 
-  await cancelById(ID_WEEKLY_WIN);
-  await Notifications.scheduleNotificationAsync({
-    identifier: ID_WEEKLY_WIN,
-    content: {
-      title: "Small moves compound",
-      body: ctx.focusGoalName
-        ? `Your next move on "${ctx.focusGoalName}" is waiting.`
-        : "Your next move is waiting.",
-      sound: false,
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DATE,
-      date: fireTime,
-    },
-  });
+    let primaryTitle: string;
+    let primaryBody: string;
+    if (ctx.allDone) {
+      // All done — no notification needed
+    } else if (ctx.activeGoalCountToday === 1) {
+      primaryTitle = ctx.incompleteCount === 1
+        ? "You have 1 task left today"
+        : `You have ${ctx.incompleteCount} tasks today`;
+      primaryBody = `${timeStr} — let's go!`;
+    } else {
+      primaryTitle = `You have ${ctx.incompleteCount} tasks today`;
+      primaryBody = `${timeStr} across ${ctx.activeGoalCountToday} goals`;
+    }
 
-  await AsyncStorage.setItem(WEEKLY_WIN_KEY, String(Date.now()));
+    if (!ctx.allDone) {
+      await Notifications.scheduleNotificationAsync({
+        identifier: ID_PRIMARY,
+        content: {
+          title: primaryTitle!,
+          body: primaryBody!,
+          sound: true,
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: primaryTime,
+        },
+      });
+    }
+  }
+  // No tasks / all done → no primary notification scheduled
+
+  // ── 2. EVENING nudge at 8 PM ──
+  // Only if primary time is before 6 PM and tasks are still incomplete TODAY
+  const eveningTime = todayAt(20, 0);
+  if (prefHour < 18 && now < eveningTime && !ctx.allDone && ctx.incompleteCount > 0) {
+    await Notifications.scheduleNotificationAsync({
+      identifier: ID_EVENING,
+      content: {
+        title: `You still have ${ctx.incompleteCount} task${ctx.incompleteCount > 1 ? "s" : ""} left`,
+        body: "Finish strong — you're almost there!",
+        sound: true,
+      },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: eveningTime,
+      },
+    });
+  }
 }
 
-// ─── Event-driven notifications (called when meaningful things happen) ────────
-
 /**
- * Fire when the server has queued a fresh batch of weekly creatives.
- * Expected to be triggered by a server-side push, or by the client detecting
- * new items in the Creative Inbox. Always silent except for the badge.
+ * Call after task completion to update evening notification.
+ * Debounced (3 s) so rapid toggling doesn't spam cancel+reschedule cycles.
  */
-export async function notifyWeeklyCreativeDrop(): Promise<void> {
+let _taskCompletedTimer: ReturnType<typeof setTimeout> | null = null;
+
+export function onTaskCompleted(ctx: NotifContext): void {
   if (Platform.OS === "web") return;
-  if (AppState.currentState === "active") return;
-  const granted = await requestNotificationPermissions();
-  if (!granted) return;
-  await Notifications.scheduleNotificationAsync({
-    identifier: ID_WEEKLY_CREATIVE,
-    content: {
-      title: "🎨 New creatives are ready",
-      body: "Fresh ads and hooks just dropped in your inbox.",
-      sound: false,
-    },
-    trigger: null,
-  });
+
+  // If all done, cancel evening nudge immediately (no need to nag)
+  if (ctx.allDone) {
+    if (_taskCompletedTimer) { clearTimeout(_taskCompletedTimer); _taskCompletedTimer = null; }
+    cancelById(ID_EVENING);
+    return;
+  }
+
+  // Debounce: wait 3 s before rescheduling so rapid completions coalesce
+  if (_taskCompletedTimer) clearTimeout(_taskCompletedTimer);
+  _taskCompletedTimer = setTimeout(async () => {
+    _taskCompletedTimer = null;
+    try {
+      const pref = await getNotifPreference();
+      const prefHour = pref?.hour ?? DEFAULT_HOUR;
+
+      // Only reschedule if primary time is before 6 PM
+      if (prefHour >= 18) return;
+
+      await cancelById(ID_EVENING);
+      const now = new Date();
+      const eveningTime = new Date(now);
+      eveningTime.setHours(20, 0, 0, 0);
+
+      if (now < eveningTime && ctx.incompleteCount > 0) {
+        const goalName = ctx.focusGoalName ?? "your goals";
+        await Notifications.scheduleNotificationAsync({
+          identifier: ID_EVENING,
+          content: {
+            title: `You still have ${ctx.incompleteCount} task${ctx.incompleteCount > 1 ? "s" : ""} left`,
+            body: `Finish strong on "${goalName}"!`,
+            sound: true,
+          },
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date: eveningTime,
+          },
+        });
+      }
+    } catch {
+      // safe to ignore — notification scheduling is best-effort
+    }
+  }, 3000);
 }
 
 /**
- * Fire when a launch crosses a meaningful milestone (e.g. 80% launch ready,
- * first sale, 30 days active). Caller supplies the copy so this handler stays
- * dumb.
- */
-export async function notifyMilestone(title: string, body: string): Promise<void> {
-  if (Platform.OS === "web") return;
-  if (AppState.currentState === "active") return;
-  const granted = await requestNotificationPermissions();
-  if (!granted) return;
-  await Notifications.scheduleNotificationAsync({
-    identifier: `${ID_MILESTONE}-${Date.now()}`,
-    content: { title, body, sound: false },
-    trigger: null,
-  });
-}
-
-/**
- * Fire when a specific high-value next action is ready for the user (e.g.
- * budget raise on a winning ad, a bundle opportunity based on conversion
- * data). Not a daily generic prompt — event-driven only.
- */
-export async function notifyOpportunity(body: string): Promise<void> {
-  if (Platform.OS === "web") return;
-  if (AppState.currentState === "active") return;
-  const granted = await requestNotificationPermissions();
-  if (!granted) return;
-  await Notifications.scheduleNotificationAsync({
-    identifier: ID_OPPORTUNITY,
-    content: {
-      title: "Your next move is ready",
-      body,
-      sound: false,
-    },
-    trigger: null,
-  });
-}
-
-/**
- * Replaces the old task-completion debounce. Now a no-op — we no longer
- * reschedule evening nudges when tasks get checked off. Kept as an export so
- * callers (e.g. the Today tab) don't crash; signature preserved.
- */
-export function onTaskCompleted(_ctx: NotifContext): void {
-  // Intentionally empty. See notification posture comment on
-  // scheduleNotifications() for rationale.
-}
-
-/**
- * Send an immediate local notification. Skipped when app is in the
- * foreground. Reserved for event-driven callers (creative drop, milestone).
+ * Send an immediate local notification (e.g. when tasks finish generating).
+ * Skips when the app is in the foreground — the user is already looking at
+ * the result, so a banner is just noise.
  */
 export async function sendInstantNotification(title: string, body: string): Promise<void> {
   if (Platform.OS === "web") return;
+  // Don't fire while the user is actively in the app
   if (AppState.currentState === "active") return;
   const granted = await requestNotificationPermissions();
   if (!granted) return;
   await Notifications.scheduleNotificationAsync({
-    content: { title, body, sound: false },
-    trigger: null,
+    content: { title, body, sound: true },
+    trigger: null, // immediate
   });
 }
+
