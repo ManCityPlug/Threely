@@ -1,9 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState, FormEvent } from "react";
-import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ArrowLeft, Lock } from "lucide-react";
 import { loadStripe, type Stripe } from "@stripe/stripe-js";
 import {
   Elements,
@@ -14,8 +12,6 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { getSupabase } from "@/lib/supabase-client";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 
 type Plan = "monthly" | "yearly";
 
@@ -23,6 +19,11 @@ const PLAN_INFO: Record<Plan, { name: string; price: string; period: string; per
   yearly: { name: "Yearly", price: "$99.99", period: "year", perMonth: "$8.33/mo", badge: "SAVE 36%" },
   monthly: { name: "Monthly", price: "$12.99", period: "month", perMonth: "$12.99/mo" },
 };
+
+const FEATURES = [
+  "10x your productivity",
+  "Reach your goals",
+];
 
 let stripePromise: Promise<Stripe | null> | null = null;
 
@@ -33,17 +34,22 @@ function getStripePromise() {
   return stripePromise;
 }
 
-function LoadingScreen() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-white">
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-neutral-200 border-t-gold" />
-    </div>
-  );
+function getTrialEndDate(): string {
+  const d = new Date();
+  d.setDate(d.getDate() + 3);
+  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 }
 
 export default function CheckoutPage() {
   return (
-    <Suspense fallback={<LoadingScreen />}>
+    <Suspense fallback={
+      <div style={{
+        minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
+        background: "var(--bg)",
+      }}>
+        <span className="spinner spinner-dark" style={{ width: 28, height: 28 }} />
+      </div>
+    }>
       <CheckoutInner />
     </Suspense>
   );
@@ -61,15 +67,16 @@ function CheckoutInner() {
 }
 
 function getElementStyle(): Record<string, unknown> {
+  const isDark = typeof window !== "undefined" && document.documentElement.getAttribute("data-theme") === "dark";
   return {
     base: {
       fontSize: "16px",
-      color: "#0f172a",
+      color: isDark ? "#e4e8ee" : "#0a2540",
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
       fontSmoothing: "antialiased",
-      "::placeholder": { color: "#9ca3af" },
+      "::placeholder": { color: isDark ? "#6b7280" : "#8898aa" },
     },
-    invalid: { color: "#ef4444" },
+    invalid: { color: "#ff4d4f" },
   };
 }
 
@@ -205,87 +212,138 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
   }
 
   if (loading) {
-    return <LoadingScreen />;
+    return (
+      <div style={{
+        minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
+        background: "var(--bg)",
+      }}>
+        <span className="spinner spinner-dark" style={{ width: 28, height: 28 }} />
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 font-sans text-neutral-900 antialiased">
-      {/* ─── Header ──────────────────────────────────────────────────────── */}
-      <header className="border-b border-neutral-200 bg-white">
-        <div className="mx-auto flex h-16 max-w-3xl items-center justify-between px-4 md:px-6">
-          <Link
-            href="/"
-            className="text-base font-bold tracking-tight text-neutral-900"
-          >
+    <div style={{ minHeight: "100vh", background: "var(--bg)", fontFamily: "var(--font)" }}>
+      {/* Header */}
+      <header style={{
+        padding: "0.875rem 1.5rem",
+        borderBottom: "1px solid var(--border)",
+        background: "var(--card)",
+        display: "grid",
+        gridTemplateColumns: "1fr auto 1fr",
+        alignItems: "center",
+      }}>
+        <div />
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <img src="/favicon.png" alt="Threely" width={30} height={30} style={{ borderRadius: 8 }} />
+          <span style={{ fontWeight: 700, fontSize: "0.95rem", letterSpacing: "-0.02em", color: "var(--text)" }}>
             Threely
-          </Link>
+          </span>
+        </div>
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
           <button
-            type="button"
             onClick={() => router.back()}
-            className="inline-flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900"
+            style={{
+              background: "none", border: "none", cursor: "pointer",
+              color: "var(--subtext)", fontSize: "0.85rem", fontWeight: 500,
+            }}
           >
-            <ArrowLeft className="h-4 w-4" />
             Cancel
           </button>
         </div>
       </header>
 
-      {/* ─── Content ─────────────────────────────────────────────────────── */}
-      <div className="mx-auto max-w-md px-4 py-10 md:py-14">
-        {/* ── Plan summary card ──────────────────────────────────────── */}
-        <Card className="mb-5 border-neutral-200 shadow-sm">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between gap-4">
+      {/* Content */}
+      <div style={{
+        maxWidth: 480,
+        margin: "0 auto",
+        padding: "2rem 1rem 3rem",
+      }}>
+        {/* ── Product summary bar ──────────────────────────────────────── */}
+        <div style={{
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)",
+          padding: "1.25rem 1.5rem",
+          marginBottom: "1.25rem",
+        }}>
+          {/* Plan name + price row */}
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "space-between",
+            marginBottom: 10,
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <img src="/favicon.png" alt="Threely" width={38} height={38} style={{ borderRadius: 10, flexShrink: 0 }} />
               <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-base font-semibold tracking-tight text-neutral-900">
+                <div style={{ display: "flex", alignItems: "center", gap: 8, lineHeight: 1.2 }}>
+                  <span style={{ fontWeight: 700, fontSize: "1rem", color: "var(--text)", letterSpacing: "-0.02em" }}>
                     Threely Pro — {info.name}
                   </span>
                   {info.badge && (
-                    <Badge
-                      variant="gold"
-                      className="rounded-full border-gold/30 bg-gold/10 px-2 py-0.5 text-[10px] uppercase tracking-wider text-gold-foreground"
-                    >
+                    <span style={{
+                      fontSize: "0.6rem", fontWeight: 700, color: "var(--primary-text)",
+                      background: "var(--primary)", padding: "2px 8px", borderRadius: 10,
+                      letterSpacing: "0.03em",
+                    }}>
                       {info.badge}
-                    </Badge>
+                    </span>
                   )}
                 </div>
-                <p className="mt-1 text-xs text-neutral-500">
+                <span style={{ fontSize: "0.8rem", color: "var(--subtext)", lineHeight: 1.2, marginTop: 1, display: "block" }}>
                   {info.perMonth} billed {plan === "yearly" ? "annually" : "monthly"}
-                </p>
+                </span>
               </div>
-              <span className="text-lg font-bold tracking-tight text-neutral-900">
-                {trialEligible ? "$1.00" : info.price}
-              </span>
             </div>
-          </CardContent>
-        </Card>
+            <span style={{ fontWeight: 700, fontSize: "1.15rem", color: trialEligible ? "#3ecf8e" : "var(--text)", letterSpacing: "-0.02em" }}>
+              {trialEligible ? "$1.00" : info.price}
+            </span>
+          </div>
+
+          {/* Features — horizontal chips */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {FEATURES.map((f) => (
+              <span key={f} style={{
+                fontSize: "0.7rem", color: "var(--primary)", background: "var(--primary-light)",
+                padding: "3px 10px", borderRadius: 20, fontWeight: 500,
+              }}>
+                {f}
+              </span>
+            ))}
+          </div>
+        </div>
 
         {/* ── Plan toggle ────────────────────────────────────────────── */}
-        <div className="mb-5 grid grid-cols-2 gap-2">
+        <div style={{
+          display: "flex", gap: 8, marginBottom: "1.25rem",
+        }}>
           {(["yearly", "monthly"] as const).map((p) => {
             const active = plan === p;
             const label = p === "yearly" ? "Yearly" : "Monthly";
             return (
               <button
                 key={p}
-                type="button"
                 onClick={() => onChangePlan(p)}
-                className={
-                  active
-                    ? "rounded-md border-2 border-gold bg-gold/5 px-3 py-3 text-center text-sm font-semibold text-neutral-900 transition-colors"
-                    : "rounded-md border border-neutral-200 bg-white px-3 py-3 text-center text-sm font-medium text-neutral-600 transition-colors hover:border-neutral-300 hover:text-neutral-900"
-                }
+                style={{
+                  flex: 1,
+                  padding: "0.75rem 0.5rem",
+                  borderRadius: "var(--radius)",
+                  border: `1.5px solid ${active ? "var(--primary)" : "var(--border)"}`,
+                  background: active ? "var(--primary-light)" : "var(--card)",
+                  color: active ? "var(--primary)" : "var(--subtext)",
+                  fontSize: "0.82rem",
+                  fontWeight: 600,
+                  cursor: "pointer",
+                  transition: "all 0.15s",
+                  textAlign: "center",
+                }}
               >
                 {label}
                 {p === "yearly" && (
-                  <span
-                    className={
-                      active
-                        ? "mt-0.5 block text-[11px] font-medium text-gold"
-                        : "mt-0.5 block text-[11px] font-medium text-neutral-400"
-                    }
-                  >
+                  <span style={{
+                    display: "block", fontSize: "0.68rem", fontWeight: 500,
+                    color: active ? "var(--primary)" : "var(--muted)",
+                    marginTop: 2,
+                  }}>
                     Save 36%
                   </span>
                 )}
@@ -294,137 +352,254 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
           })}
         </div>
 
+        {/* ── 21 days risk-free badge ─────────────────────────────────── */}
+        <div style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+          background: "var(--card)",
+          border: "1px solid rgba(212,168,67,0.45)",
+          borderRadius: "var(--radius)",
+          padding: "0.7rem 1rem",
+          marginBottom: "1rem",
+          boxShadow: "0 0 0 1px rgba(212,168,67,0.08), 0 2px 8px rgba(212,168,67,0.08)",
+        }}>
+          <span style={{
+            fontSize: "0.85rem",
+            fontWeight: 700,
+            color: "#D4A843",
+            letterSpacing: "-0.01em",
+            whiteSpace: "nowrap",
+          }}>
+            ✓ 21 days risk-free
+          </span>
+          <span style={{
+            fontSize: "0.72rem",
+            color: "var(--subtext)",
+            lineHeight: 1.4,
+          }}>
+            $1 to start + 14-day money-back guarantee
+          </span>
+        </div>
+
         {/* ── Trial info banner ────────────────────────────────────────── */}
         {trialEligible && (
-          <div className="mb-5 rounded-lg border border-gold/30 bg-gold/5 px-5 py-4 text-center">
-            <p className="text-base font-semibold text-neutral-900">
-              $1 today, then {info.price}/{info.period}.
-            </p>
-            <p className="mt-1 text-xs text-neutral-600">
+          <div style={{
+            background: "linear-gradient(135deg, #B8862D 0%, #A07428 50%, #7a5820 100%)",
+            border: "1px solid rgba(212,168,67,0.4)",
+            borderRadius: "var(--radius)",
+            padding: "1rem 1.25rem",
+            marginBottom: "1.25rem",
+            textAlign: "center",
+            boxShadow: "0 4px 14px rgba(184,134,45,0.2)",
+          }}>
+            <div style={{ fontSize: "1.05rem", fontWeight: 700, color: "#ffffff", marginBottom: 4 }}>
+              Start for $1
+            </div>
+            <div style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.92)", lineHeight: 1.5 }}>
               Cancel anytime in Settings — no questions asked.
-            </p>
+            </div>
           </div>
         )}
 
-        {/* ── Payment form ─────────────────────────────────────────────── */}
-        <Card className="border-neutral-200 shadow-sm">
-          <CardContent className="p-6">
-            <h3 className="mb-5 text-base font-semibold tracking-tight text-neutral-900">
-              Pay with card
-            </h3>
+        {/* ── Payment form card ────────────────────────────────────────── */}
+        <div style={{
+          background: "var(--card)",
+          border: "1px solid var(--border)",
+          borderRadius: "var(--radius-lg)",
+          padding: "1.5rem",
+        }}>
+          <h3 style={{
+            fontSize: "0.95rem", fontWeight: 700, color: "var(--text)",
+            letterSpacing: "-0.02em", marginBottom: "1.25rem",
+          }}>
+            Payment details
+          </h3>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Full name */}
-              <div>
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-600">
-                  Name on card
-                </label>
-                <input
-                  type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="John Smith"
-                  autoComplete="cc-name"
-                  className="w-full rounded-md border border-neutral-200 bg-white px-3.5 py-3 text-base text-neutral-900 placeholder:text-neutral-400 focus:border-gold focus:outline-none focus:ring-2 focus:ring-gold/20"
+          <form onSubmit={handleSubmit}>
+            {/* Full name */}
+            <div style={{ marginBottom: "1rem" }}>
+              <label style={{
+                display: "block", fontSize: "0.8rem", fontWeight: 600,
+                color: "var(--subtext)", marginBottom: 6,
+              }}>
+                Name on card
+              </label>
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="John Smith"
+                autoComplete="cc-name"
+                style={{
+                  width: "100%",
+                  border: "1.5px solid var(--border)",
+                  borderRadius: "var(--radius)",
+                  padding: "0.75rem 0.875rem",
+                  background: "var(--bg)",
+                  fontSize: "16px",
+                  fontFamily: 'var(--font)',
+                  color: "var(--text)",
+                  outline: "none",
+                  transition: "border-color 0.15s",
+                  boxSizing: "border-box",
+                }}
+                onFocus={(e) => e.currentTarget.style.borderColor = "var(--primary)"}
+                onBlur={(e) => e.currentTarget.style.borderColor = "var(--border)"}
+              />
+            </div>
+
+            {/* Card number */}
+            <div style={{ marginBottom: "1rem" }}>
+              <label style={{
+                display: "block", fontSize: "0.8rem", fontWeight: 600,
+                color: "var(--subtext)", marginBottom: 6,
+              }}>
+                Card number
+              </label>
+              <div style={{
+                border: "1.5px solid var(--border)",
+                borderRadius: "var(--radius)",
+                padding: "0.75rem 0.875rem",
+                background: "var(--bg)",
+                transition: "border-color 0.15s",
+              }}>
+                <CardNumberElement
+                  options={{ style: getElementStyle(), showIcon: true }}
+                  onChange={(e) => {
+                    setCardNumberComplete(e.complete);
+                    if (e.error) setError(e.error.message);
+                    else if (error) setError(null);
+                  }}
                 />
               </div>
+            </div>
 
-              {/* Card number */}
+            {/* Expiry + CVC row */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem", marginBottom: "1.25rem" }}>
               <div>
-                <label className="mb-1.5 block text-xs font-semibold text-neutral-600">
-                  Card number
+                <label style={{
+                  display: "block", fontSize: "0.8rem", fontWeight: 600,
+                  color: "var(--subtext)", marginBottom: 6,
+                }}>
+                  Expiration
                 </label>
-                <div className="rounded-md border border-neutral-200 bg-white px-3.5 py-3 transition-colors focus-within:border-gold focus-within:ring-2 focus-within:ring-gold/20">
-                  <CardNumberElement
-                    options={{ style: getElementStyle(), showIcon: true }}
+                <div style={{
+                  border: "1.5px solid var(--border)",
+                  borderRadius: "var(--radius)",
+                  padding: "0.75rem 0.875rem",
+                  background: "var(--bg)",
+                  transition: "border-color 0.15s",
+                }}>
+                  <CardExpiryElement
+                    options={{ style: getElementStyle() }}
                     onChange={(e) => {
-                      setCardNumberComplete(e.complete);
+                      setCardExpiryComplete(e.complete);
                       if (e.error) setError(e.error.message);
                       else if (error) setError(null);
                     }}
                   />
                 </div>
               </div>
-
-              {/* Expiry + CVC row */}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-neutral-600">
-                    Expiration
-                  </label>
-                  <div className="rounded-md border border-neutral-200 bg-white px-3.5 py-3 transition-colors focus-within:border-gold focus-within:ring-2 focus-within:ring-gold/20">
-                    <CardExpiryElement
-                      options={{ style: getElementStyle() }}
-                      onChange={(e) => {
-                        setCardExpiryComplete(e.complete);
-                        if (e.error) setError(e.error.message);
-                        else if (error) setError(null);
-                      }}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="mb-1.5 block text-xs font-semibold text-neutral-600">
-                    CVC
-                  </label>
-                  <div className="rounded-md border border-neutral-200 bg-white px-3.5 py-3 transition-colors focus-within:border-gold focus-within:ring-2 focus-within:ring-gold/20">
-                    <CardCvcElement
-                      options={{ style: getElementStyle() }}
-                      onChange={(e) => {
-                        setCardCvcComplete(e.complete);
-                        if (e.error) setError(e.error.message);
-                        else if (error) setError(null);
-                      }}
-                    />
-                  </div>
+              <div>
+                <label style={{
+                  display: "block", fontSize: "0.8rem", fontWeight: 600,
+                  color: "var(--subtext)", marginBottom: 6,
+                }}>
+                  CVC
+                </label>
+                <div style={{
+                  border: "1.5px solid var(--border)",
+                  borderRadius: "var(--radius)",
+                  padding: "0.75rem 0.875rem",
+                  background: "var(--bg)",
+                  transition: "border-color 0.15s",
+                }}>
+                  <CardCvcElement
+                    options={{ style: getElementStyle() }}
+                    onChange={(e) => {
+                      setCardCvcComplete(e.complete);
+                      if (e.error) setError(e.error.message);
+                      else if (error) setError(null);
+                    }}
+                  />
                 </div>
               </div>
-
-              {/* Total due today */}
-              {trialEligible && (
-                <div className="flex items-center justify-between rounded-md border border-neutral-200 bg-neutral-50 px-4 py-3">
-                  <span className="text-sm font-medium text-neutral-600">Total due today</span>
-                  <span className="text-lg font-bold text-neutral-900">$1.00</span>
-                </div>
-              )}
-
-              {/* Error */}
-              {error && (
-                <div className="rounded-md border border-red-200 bg-red-50 px-3 py-2.5 text-sm text-red-700">
-                  {error}
-                </div>
-              )}
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={!stripe || !clientSecret || submitting || !allComplete}
-                className="inline-flex h-12 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-gold px-8 text-base font-medium text-gold-foreground shadow-sm transition-colors hover:bg-gold/90 hover:shadow-md disabled:pointer-events-none disabled:opacity-50"
-              >
-                {submitting
-                  ? "Processing..."
-                  : trialEligible
-                  ? "Start for $1"
-                  : `Subscribe — ${info.price}/${info.period}`
-                }
-              </button>
-
-              {/* Sub text */}
-              <p className="text-center text-xs leading-relaxed text-neutral-500">
-                {trialEligible
-                  ? <>$1 today. You&apos;ll be billed {info.price}/{info.period} after.</>
-                  : <>{info.price}/{info.period} &middot; cancel anytime</>
-                }
-              </p>
-            </form>
-
-            {/* Trust badge */}
-            <div className="mt-5 flex items-center justify-center gap-1.5 border-t border-neutral-200 pt-4 text-xs text-neutral-500">
-              <Lock className="h-3.5 w-3.5" />
-              <span>Secured by Stripe</span>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Total due today */}
+            {trialEligible && (
+              <div style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                padding: "0.7rem 1rem", marginBottom: "1.25rem",
+                borderRadius: "var(--radius)", background: "var(--bg)",
+                border: "1px solid var(--border)",
+              }}>
+                <span style={{ fontSize: "0.85rem", color: "var(--subtext)", fontWeight: 500 }}>Total due today</span>
+                <span style={{ fontSize: "1.1rem", fontWeight: 700, color: "#3ecf8e" }}>$1.00</span>
+              </div>
+            )}
+
+            {/* Error */}
+            {error && (
+              <div style={{
+                background: "var(--danger-light)", color: "var(--danger)",
+                borderRadius: "var(--radius-sm)", padding: "0.6rem 0.75rem",
+                fontSize: "0.8rem", marginBottom: "1rem",
+              }}>
+                {error}
+              </div>
+            )}
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={!stripe || !clientSecret || submitting || !allComplete}
+              style={{
+                width: "100%",
+                padding: "0.875rem",
+                background: (!stripe || !clientSecret || !allComplete) ? "var(--muted)" : "var(--primary)",
+                color: "var(--primary-text)",
+                border: "none",
+                borderRadius: "var(--radius)",
+                fontSize: "0.95rem",
+                fontWeight: 600,
+                cursor: submitting ? "wait" : (!stripe || !clientSecret || !allComplete) ? "not-allowed" : "pointer",
+                transition: "background 0.15s, transform 0.1s",
+                marginBottom: "0.75rem",
+              }}
+            >
+              {submitting
+                ? "Processing..."
+                : trialEligible
+                ? "Start For $1"
+                : `Subscribe — ${info.price}/${info.period}`
+              }
+            </button>
+
+            {/* Sub text */}
+            <p style={{ fontSize: "0.75rem", color: "var(--muted)", textAlign: "center", lineHeight: 1.5 }}>
+              {trialEligible
+                ? <>$1 today. You&apos;ll be billed {info.price}/{info.period} after.</>
+                : <>{info.price}/{info.period} &middot; cancel anytime</>
+              }
+            </p>
+          </form>
+
+          {/* Trust badge + back */}
+          <div style={{
+            display: "flex", alignItems: "center", justifyContent: "center",
+            gap: 6, fontSize: "0.75rem", color: "var(--muted)", marginTop: "1.25rem",
+            paddingTop: "1rem", borderTop: "1px solid var(--border)",
+          }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+            </svg>
+            <span>Secured by Stripe</span>
+          </div>
+        </div>
       </div>
     </div>
   );

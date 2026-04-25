@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -12,8 +11,8 @@ export default function RegisterPage() {
   }, [router]);
 
   return (
-    <div className="flex min-h-[40vh] items-center justify-center">
-      <Loader2 className="h-7 w-7 animate-spin text-neutral-400" />
+    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <span className="spinner spinner-dark" style={{ width: 28, height: 28 }} />
     </div>
   );
 }

@@ -10,126 +10,108 @@ export const metadata: Metadata = {
 };
 
 export default function RefundPage() {
+  const h2Style = {
+    fontSize: "1.2rem" as const,
+    fontWeight: 700 as const,
+    letterSpacing: "-0.02em" as const,
+    marginTop: "2rem" as const,
+    marginBottom: "0.75rem" as const,
+  };
+
+  const pStyle = {
+    fontSize: "0.925rem" as const,
+    color: "rgba(255,255,255,0.5)" as const,
+    lineHeight: 1.75 as const,
+    marginBottom: "0.75rem" as const,
+  };
+
   return (
-    <div className="min-h-screen bg-white font-sans text-neutral-900 antialiased">
+    <div style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif", color: "#e8e8e8", background: "#141414" }}>
       <MarketingNav />
 
       {/* Hero */}
-      <section className="border-b border-neutral-200 bg-white">
-        <div className="mx-auto max-w-3xl px-4 py-16 md:py-20">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-gold">
-            Legal
-          </p>
-          <h1 className="text-4xl font-extrabold leading-tight tracking-tight text-neutral-900 md:text-5xl">
+      <section style={{
+        background: "rgba(255,255,255,0.02)",
+        padding: "3.5rem 1.5rem 2.5rem",
+        borderBottom: "1px solid rgba(255,255,255,0.06)",
+      }}>
+        <div style={{ maxWidth: 700, margin: "0 auto" }}>
+          <h1 style={{
+            fontSize: "clamp(1.75rem, 4vw, 2.5rem)",
+            fontWeight: 800,
+            letterSpacing: "-0.04em",
+            marginBottom: "0.5rem",
+          }}>
             Refund Policy
           </h1>
-          <p className="mt-3 text-sm text-neutral-500">
+          <p style={{ fontSize: "0.9rem", color: "#8898aa" }}>
             Last updated: February 28, 2026
           </p>
         </div>
       </section>
 
       {/* Content */}
-      <section className="bg-white">
-        <div className="mx-auto max-w-3xl px-4 py-16 md:py-20">
+      <section style={{ padding: "2.5rem 1.5rem 4rem" }}>
+        <div style={{ maxWidth: 700, margin: "0 auto" }}>
+
           {/* Highlight box */}
-          <div className="mb-10 rounded-lg border border-gold/30 bg-gold/10 p-6">
-            <p className="text-base leading-relaxed text-neutral-800">
+          <div style={{
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderRadius: 14,
+            padding: "1.5rem",
+            marginBottom: "2rem",
+          }}>
+            <p style={{ fontSize: "1rem", color: "rgba(255,255,255,0.8)", lineHeight: 1.7, margin: 0, fontWeight: 500 }}>
               Not happy with Threely? Email us at{" "}
-              <a
-                href="mailto:refund@threely.co"
-                className="font-semibold text-neutral-900 underline underline-offset-2"
-              >
+              <a href="mailto:refund@threely.co" style={{ color: "#fff", fontWeight: 700, textDecoration: "underline" }}>
                 refund@threely.co
               </a>{" "}
-              within <strong>14 days</strong> of your first paid charge for a
-              full refund. No questions asked.
+              within <strong>14 days</strong> of your first paid charge for a full refund. No questions asked.
             </p>
           </div>
 
-          <div className="space-y-10">
-            <div className="space-y-3">
-              <h2 className="text-xl font-bold tracking-tight text-neutral-900">
-                14-Day Refund Window
-              </h2>
-              <p className="leading-relaxed text-neutral-700">
-                If you are unsatisfied with Threely for any reason, you may
-                request a full refund within 14 days of your first paid
-                subscription charge. This applies to all plans — monthly and
-                yearly.
-              </p>
-              <p className="leading-relaxed text-neutral-700">
-                Refunds are not available after the 14-day window has passed.
-                Your subscription start date is the date your first payment was
-                charged, not the start of your free period.
-              </p>
-            </div>
+          <h2 style={h2Style}>14-Day Refund Window</h2>
+          <p style={pStyle}>
+            If you are unsatisfied with Threely for any reason, you may request a full refund within 14 days of your first paid subscription charge. This applies to all plans — monthly and yearly.
+          </p>
+          <p style={pStyle}>
+            Refunds are not available after the 14-day window has passed. Your subscription start date is the date your first payment was charged, not the start of your free period.
+          </p>
 
-            <div className="space-y-3">
-              <h2 className="text-xl font-bold tracking-tight text-neutral-900">
-                How to Request a Refund
-              </h2>
-              <p className="leading-relaxed text-neutral-700">
-                Send an email to{" "}
-                <a
-                  href="mailto:refund@threely.co"
-                  className="font-medium text-neutral-900 underline underline-offset-2"
-                >
-                  refund@threely.co
-                </a>{" "}
-                with the email address associated with your Threely account.
-                Include the reason for your refund request so we can improve.
-              </p>
-            </div>
+          <h2 style={h2Style}>How to Request a Refund</h2>
+          <p style={pStyle}>
+            Send an email to{" "}
+            <a href="mailto:refund@threely.co" style={{ color: "#fff", fontWeight: 600, textDecoration: "underline" }}>
+              refund@threely.co
+            </a>{" "}
+            with the email address associated with your Threely account. Include the reason for your refund request so we can improve.
+          </p>
 
-            <div className="space-y-3">
-              <h2 className="text-xl font-bold tracking-tight text-neutral-900">
-                Processing Time
-              </h2>
-              <p className="leading-relaxed text-neutral-700">
-                Refunds are typically processed within 2–3 business days. The
-                refund will be returned to the original payment method.
-                Depending on your bank, it may take an additional 5–10 business
-                days for the refund to appear on your statement.
-              </p>
-            </div>
+          <h2 style={h2Style}>Processing Time</h2>
+          <p style={pStyle}>
+            Refunds are typically processed within 2–3 business days. The refund will be returned to the original payment method. Depending on your bank, it may take an additional 5–10 business days for the refund to appear on your statement.
+          </p>
 
-            <div className="space-y-3">
-              <h2 className="text-xl font-bold tracking-tight text-neutral-900">
-                Cancellation
-              </h2>
-              <p className="leading-relaxed text-neutral-700">
-                You can cancel your subscription at any time from your profile
-                settings in the app. When you cancel, you retain access to all
-                paid features until the end of your current billing period. No
-                further charges will be made after cancellation.
-              </p>
-            </div>
+          <h2 style={h2Style}>Cancellation</h2>
+          <p style={pStyle}>
+            You can cancel your subscription at any time from your profile settings in the app. When you cancel, you retain access to all paid features until the end of your current billing period. No further charges will be made after cancellation.
+          </p>
 
-            <div className="space-y-3">
-              <h2 className="text-xl font-bold tracking-tight text-neutral-900">
-                Contact
-              </h2>
-              <p className="leading-relaxed text-neutral-700">
-                For refund requests:{" "}
-                <a
-                  href="mailto:refund@threely.co"
-                  className="font-medium text-neutral-900 underline underline-offset-2"
-                >
-                  refund@threely.co
-                </a>
-              </p>
-              <p className="leading-relaxed text-neutral-700">
-                For general support:{" "}
-                <a
-                  href="mailto:support@threely.co"
-                  className="font-medium text-neutral-900 underline underline-offset-2"
-                >
-                  support@threely.co
-                </a>
-              </p>
-            </div>
-          </div>
+          <h2 style={h2Style}>Contact</h2>
+          <p style={pStyle}>
+            For refund requests:{" "}
+            <a href="mailto:refund@threely.co" style={{ color: "#fff", fontWeight: 600, textDecoration: "underline" }}>
+              refund@threely.co
+            </a>
+          </p>
+          <p style={pStyle}>
+            For general support:{" "}
+            <a href="mailto:support@threely.co" style={{ color: "#fff", fontWeight: 600, textDecoration: "underline" }}>
+              support@threely.co
+            </a>
+          </p>
+
         </div>
       </section>
 
