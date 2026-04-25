@@ -210,6 +210,26 @@ const HEALTH_OUTCOME: Record<string, { question: string; options: string[] }> = 
   },
 };
 
+// Recommend Pro vs Standard based on quiz answers. The business quiz collects
+// answers in this order:
+//   answers[0] = what to launch
+//   answers[1] = have product?
+//   answers[2] = shopify setup?
+//   answers[3] = ad creative count
+//   answers[4] = UGC ads?
+//   answers[5] = post-launch help
+// If user said "Yes, add UGC videos" OR "I want the most possible" creatives,
+// we pre-select Pro. Anything else (or skipped quiz, non-business category)
+// → Standard. User can override by tapping the toggle on the paywall.
+function recommendTierFromAnswers(category: string | null, answers: string[]): "standard" | "pro" {
+  if (category !== "business") return "standard";
+  const adCountAnswer  = answers[3] ?? "";
+  const ugcAnswer      = answers[4] ?? "";
+  if (ugcAnswer.toLowerCase().includes("yes, add ugc")) return "pro";
+  if (adCountAnswer.toLowerCase().includes("most possible")) return "pro";
+  return "standard";
+}
+
 // Sample task shown on the paywall preview — picked by the user's selected
 // path (not just category) so it feels personal. Matches the "day trading
 // paper account" energy: concrete, real, immediately actionable.
@@ -334,13 +354,16 @@ function PaymentRequestPrimer({ clientSecret, onReady }: { clientSecret: string;
 // Mounts inside Stripe <Elements>. Optionally receives a primedPaymentRequest
 // created during the hype screen — when present, Apple Pay renders instantly
 // instead of waiting for Stripe.js + canMakePayment() to finish.
+type Tier = "standard" | "pro";
+
 interface InlinePaymentProps {
   plan: PlanId;
+  tier: Tier;
   preloadedClientSecret?: string | null;
   primedPaymentRequest?: PaymentRequest | null;
   onSuccess: (payerEmail: string | null) => void;
 }
-function InlinePayment({ plan, preloadedClientSecret, primedPaymentRequest, onSuccess }: InlinePaymentProps) {
+function InlinePayment({ plan, tier, preloadedClientSecret, primedPaymentRequest, onSuccess }: InlinePaymentProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [clientSecret, setClientSecret] = useState<string | null>(preloadedClientSecret ?? null);
@@ -377,7 +400,7 @@ function InlinePayment({ plan, preloadedClientSecret, primedPaymentRequest, onSu
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ plan }),
+          body: JSON.stringify({ plan, tier }),
         });
         const data = await safeJson(res);
         if (!res.ok) throw new Error(data.error || "Failed to initialize payment");
@@ -386,7 +409,7 @@ function InlinePayment({ plan, preloadedClientSecret, primedPaymentRequest, onSu
         setError(err instanceof Error ? err.message : "Something went wrong");
       }
     })();
-  }, [plan]);
+  }, [plan, tier]);
 
   // Wire PaymentRequest (Apple Pay / Google Pay). If StartPage primed it
   // during the hype screen, we just attach the paymentmethod handler.
@@ -427,7 +450,7 @@ function InlinePayment({ plan, preloadedClientSecret, primedPaymentRequest, onSu
       }
       ev.complete("success");
       try {
-        await confirmSubscription(plan);
+        await confirmSubscription(plan, tier);
         onSuccess(ev.payerEmail ?? null);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Subscription failed");
@@ -435,9 +458,9 @@ function InlinePayment({ plan, preloadedClientSecret, primedPaymentRequest, onSu
         setSubmitting(false);
       }
     });
-  }, [stripe, clientSecret, plan, onSuccess, paymentRequest]);
+  }, [stripe, clientSecret, plan, tier, onSuccess, paymentRequest]);
 
-  async function confirmSubscription(planId: PlanId) {
+  async function confirmSubscription(planId: PlanId, tierId: Tier) {
     const supabase = getSupabase();
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) throw new Error("Session expired");
@@ -447,7 +470,7 @@ function InlinePayment({ plan, preloadedClientSecret, primedPaymentRequest, onSu
         "Content-Type": "application/json",
         Authorization: `Bearer ${session.access_token}`,
       },
-      body: JSON.stringify({ plan: planId }),
+      body: JSON.stringify({ plan: planId, tier: tierId }),
     });
     const data = await safeJson(res);
     if (!res.ok) throw new Error(data.error || "Failed to create subscription");
@@ -466,7 +489,7 @@ function InlinePayment({ plan, preloadedClientSecret, primedPaymentRequest, onSu
     });
     if (setupErr) { setError(setupErr.message ?? "Card setup failed"); setSubmitting(false); return; }
     try {
-      await confirmSubscription(plan);
+      await confirmSubscription(plan, tier);
       onSuccess(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Subscription failed");
@@ -1023,6 +1046,7 @@ export default function StartPage() {
           preloadedClientSecret={preloadedClientSecret}
           primedPaymentRequest={primedPaymentRequest}
           selectedPath={selectedPath}
+          answers={answers}
         />
       </Elements>
     );
@@ -1617,11 +1641,45 @@ function SaleCountdown() {
 //   5. Plan selector (Monthly / Yearly) — secondary, below terms, muted
 // Premium feel via soft shadows, subtle shimmer on blurred tasks, press-scale
 // on buttons, and a fade-in on mount.
-function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, primedPaymentRequest, selectedPath }: { category: Category | null; generatedGoalTitle: string; preloadedClientSecret: string | null; primedPaymentRequest: PaymentRequest | null; selectedPath: string }) {
-  // Single public plan: Threely Pro $39/mo after the $1 trial. setPlan retained
-  // so the rest of the flow (InlinePayment) compiles without changes; no UI
-  // surface lets the user flip it anymore.
+function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, primedPaymentRequest, selectedPath, answers }: { category: Category | null; generatedGoalTitle: string; preloadedClientSecret: string | null; primedPaymentRequest: PaymentRequest | null; selectedPath: string; answers: string[] }) {
+  // Single public billing plan for the start funnel — $1 today → recurring
+  // monthly. Tier (Standard vs Pro) is the new dimension; both tiers currently
+  // map to the same Stripe price (see lib/stripe.ts TODO) so we still pass
+  // plan=monthly to Stripe and only forward the tier label as metadata.
   const [plan] = useState<PlanId>("monthly");
+  const [tier, setTier] = useState<Tier>(() => {
+    // Pre-select based on quiz answers. User can override via toggle below.
+    const recommended = recommendTierFromAnswers(category, answers);
+    if (typeof window !== "undefined") {
+      try {
+        const saved = window.localStorage.getItem("threely_pricing_tier");
+        if (saved === "standard" || saved === "pro") return saved;
+      } catch { /* ignore */ }
+    }
+    return recommended;
+  });
+  // Persist user's tier so /checkout (or pricing nav back) keeps it.
+  useEffect(() => {
+    try { localStorage.setItem("threely_pricing_tier", tier); } catch { /* ignore */ }
+  }, [tier]);
+  const recommendedTier = recommendTierFromAnswers(category, answers);
+
+  // Per-tier display copy on the start paywall.
+  const TIER_COPY: Record<Tier, { label: string; price: number; perks: string[]; sub: string }> = {
+    standard: {
+      label: "Standard",
+      price: 39,
+      sub: "$1 today · then $39/mo after 3 days",
+      perks: ["Brand + logo direction", "Shopify store + product page", "5 static ads / week"],
+    },
+    pro: {
+      label: "Pro",
+      price: 79,
+      sub: "$1 today · then $79/mo after 3 days",
+      perks: ["Everything in Standard", "5 AI UGC video ads / week", "Premium product photos"],
+    },
+  };
+  const copy = TIER_COPY[tier];
   const [paymentDone, setPaymentDone] = useState(false);
   const [payerEmail, setPayerEmail] = useState<string | null>(null);
 
@@ -1692,7 +1750,49 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
           </p>
         </div>
 
-        {/* Plan card — Threely Pro, $1 today / $39/mo after 3 days */}
+        {/* Tier toggle — Standard vs Pro. Pre-selected from quiz answers,
+             user can override here. The recommended one shows a subtle badge. */}
+        <div style={{
+          display: "flex", gap: 8, padding: 4,
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 14,
+        }}>
+          {(["standard", "pro"] as const).map((t) => {
+            const active = tier === t;
+            const isRec = recommendedTier === t;
+            return (
+              <button
+                key={t}
+                onClick={() => setTier(t)}
+                style={{
+                  flex: 1, position: "relative",
+                  padding: "0.65rem 0.5rem",
+                  borderRadius: 10, border: "none",
+                  background: active ? "linear-gradient(135deg, rgba(212,168,67,0.18) 0%, rgba(212,168,67,0.06) 100%)" : "transparent",
+                  boxShadow: active ? "0 1px 0 rgba(212,168,67,0.3) inset, 0 6px 14px rgba(212,168,67,0.12)" : "none",
+                  color: active ? "#fff" : "rgba(255,255,255,0.6)",
+                  fontSize: "0.85rem", fontWeight: 700, letterSpacing: "-0.01em",
+                  cursor: "pointer", transition: "all 0.15s",
+                }}
+              >
+                {TIER_COPY[t].label}
+                {isRec && (
+                  <span style={{
+                    marginLeft: 6, padding: "1px 7px", borderRadius: 999,
+                    background: "rgba(212,168,67,0.22)", color: "#D4A843",
+                    fontSize: "0.6rem", fontWeight: 800, letterSpacing: "0.06em",
+                    textTransform: "uppercase",
+                  }}>
+                    Best fit
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Plan card — selected tier price summary */}
         <div className="card" style={{
           padding: "1rem 1.1rem",
           borderRadius: 14,
@@ -1701,7 +1801,9 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
         }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
             <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: "0.65rem", fontWeight: 700, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>Threely Pro</div>
+              <div style={{ fontSize: "0.65rem", fontWeight: 700, color: "#D4A843", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 3 }}>
+                Threely {copy.label}
+              </div>
               <div style={{ fontSize: "0.98rem", fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>{generatedGoalTitle}</div>
               <div style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.65)", lineHeight: 1.45 }}>
                 See your business before committing.
@@ -1710,7 +1812,7 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
             <div style={{ textAlign: "right", flexShrink: 0 }}>
               <div style={{ fontSize: "1.3rem", fontWeight: 800, color: "#D4A843", lineHeight: 1, letterSpacing: "-0.02em" }}>$1</div>
               <div style={{ fontSize: "0.62rem", color: "rgba(255,255,255,0.5)", marginTop: 2, fontWeight: 600 }}>today</div>
-              <div style={{ fontSize: "0.62rem", color: "rgba(255,255,255,0.45)", marginTop: 2, fontWeight: 500, letterSpacing: 0.1 }}>then $39/mo</div>
+              <div style={{ fontSize: "0.62rem", color: "rgba(255,255,255,0.45)", marginTop: 2, fontWeight: 500, letterSpacing: 0.1 }}>then ${copy.price}/mo</div>
             </div>
           </div>
         </div>
@@ -1785,7 +1887,7 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
               Start My Launch Preview
             </p>
             <p style={{ fontSize: "0.88rem", fontWeight: 600, color: "#fff", margin: 0, letterSpacing: "-0.01em" }}>
-              $1 today · then $39/mo after 3 days
+              $1 today · then ${copy.price}/mo after 3 days
             </p>
           </div>
         </div>
@@ -1796,6 +1898,7 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
         {/* 3. CTA — Apple Pay / Google Pay primary + card secondary */}
         <InlinePayment
           plan={plan}
+          tier={tier}
           preloadedClientSecret={preloadedClientSecret}
           primedPaymentRequest={primedPaymentRequest}
           onSuccess={(email) => { setPayerEmail(email); setPaymentDone(true); }}
@@ -1815,7 +1918,7 @@ function PlanReadyScreen({ category, generatedGoalTitle, preloadedClientSecret, 
           padding: "0 2px",
           marginTop: 2,
         }}>
-          By tapping Apple Pay or Pay with Card, you agree your payment method will be automatically charged for ongoing subscription fees. You&apos;ll pay $1 today for a 3-day Launch Preview. After that, your Threely Pro subscription will automatically renew at $39/month unless you cancel before the preview ends. Tax is included if applicable. Cancel anytime online or by contacting support before your next billing date. You also agree to the <a href="/privacy" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Privacy Policy</a> and <a href="/terms" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Terms of Service</a>, including the arbitration and class action waiver, and to receive offers from Threely.
+          By tapping Apple Pay or Pay with Card, you agree your payment method will be automatically charged for ongoing subscription fees. You&apos;ll pay $1 today for a 3-day Launch Preview. After that, your Threely {copy.label} subscription will automatically renew at ${copy.price}/month unless you cancel before the preview ends. Tax is included if applicable. Cancel anytime online or by contacting support before your next billing date. You also agree to the <a href="/privacy" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Privacy Policy</a> and <a href="/terms" style={{ color: "rgba(255,255,255,0.7)", textDecoration: "underline" }}>Terms of Service</a>, including the arbitration and class action waiver, and to receive offers from Threely.
         </p>
 
         {/* Global paywall styles — fade-in, shimmer on locked tasks, press scale */}

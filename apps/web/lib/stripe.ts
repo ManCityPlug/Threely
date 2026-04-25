@@ -20,16 +20,32 @@ export const stripe = new Proxy({} as Stripe, {
   },
 });
 
-// TODO (Stripe admin) — Threely Pro is now displayed publicly as $39/mo, but
-// these Stripe price IDs still point to the legacy $12.99/mo and $99.99/yr
-// products. Create a new "Threely Pro — $39/mo" recurring price in the Stripe
-// dashboard and replace PRICE_MONTHLY with the new ID. Keep PRICE_YEARLY as
-// an alias for legacy `?plan=yearly` URLs until analytics show those have
-// stopped landing, then remove. Display strings across the app
-// (pricing page, start funnel, checkout page) already reference $39/mo —
-// swapping the Stripe ID is the last step to make billing match copy.
-export const PRICE_MONTHLY   = "price_1TKTNOLR2WAEIJdD5saTp8zD"; // LEGACY $12.99/4 weeks — replace with Threely Pro $39/mo
-export const PRICE_YEARLY    = "price_1T6buHLR2WAEIJdDhlQaqxMe"; // LEGACY $99.99/year — alias, scheduled for removal
+// TODO (Stripe admin) — Threely is now displayed publicly as TWO tiers:
+//   • Standard: $1 today → $39/mo (monthly) or $99/yr (yearly)
+//   • Pro:      $1 today → $79/mo (monthly) or $199/yr (yearly)
+// Until new Stripe SKUs exist, BOTH tiers map to the same legacy price IDs
+// below. We forward `tier` ("standard" | "pro") through checkout/confirm and
+// store it on the subscription metadata as `threely_tier` so we know which
+// tier the user picked even when both bill the same amount.
+//
+// To swap to real per-tier prices when the Stripe dashboard is set up:
+//   1. Create four new prices in Stripe:
+//        PRICE_STANDARD_MONTHLY  ($39/mo recurring)
+//        PRICE_STANDARD_YEARLY   ($99/yr recurring)
+//        PRICE_PRO_MONTHLY       ($79/mo recurring)
+//        PRICE_PRO_YEARLY        ($199/yr recurring)
+//   2. Add the constants below (replace these legacy ones; or keep them as
+//      aliases for in-flight URLs until analytics show no traffic).
+//        export const PRICE_STANDARD_MONTHLY = "price_..."
+//        export const PRICE_STANDARD_YEARLY  = "price_..."
+//        export const PRICE_PRO_MONTHLY      = "price_..."
+//        export const PRICE_PRO_YEARLY       = "price_..."
+//   3. In /api/subscription/checkout/route.ts and /confirm/route.ts, replace
+//      the single PRICE_MAP with a tiered lookup keyed on (tier, plan).
+//   4. Display copy across the app already references the per-tier numbers —
+//      swapping Stripe IDs is the last step to make billing match copy.
+export const PRICE_MONTHLY   = "price_1TKTNOLR2WAEIJdD5saTp8zD"; // LEGACY — used by both tiers' monthly until per-tier SKUs exist
+export const PRICE_YEARLY    = "price_1T6buHLR2WAEIJdDhlQaqxMe"; // LEGACY — used by both tiers' yearly until per-tier SKUs exist
 export const TRIAL_DAYS      = 3;
 
 /**

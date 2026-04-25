@@ -14,19 +14,27 @@ import {
 import { getSupabase } from "@/lib/supabase-client";
 
 type Plan = "monthly" | "yearly";
+type Tier = "standard" | "pro";
 
-// Single public plan: Threely Pro at $39/month after the $1 Launch Preview.
-// Yearly entry preserved as an alias so existing `?plan=yearly` links still
-// resolve without breaking; it surfaces the same monthly pricing.
-const PLAN_INFO: Record<Plan, { name: string; price: string; period: string; perMonth: string; badge?: string }> = {
-  monthly: { name: "Threely Pro", price: "$39", period: "month", perMonth: "$39/mo" },
-  yearly:  { name: "Threely Pro", price: "$39", period: "month", perMonth: "$39/mo" },
+// Two public tiers (Standard / Pro), each with monthly + yearly billing.
+// Both tiers currently map to the same Stripe price (see lib/stripe.ts TODO);
+// the `tier` field is forwarded to the API so subscription metadata records
+// which one the user picked.
+const TIER_INFO: Record<Tier, Record<Plan, { name: string; price: string; period: string; perMonth: string; badge?: string }>> = {
+  standard: {
+    monthly: { name: "Standard — Monthly", price: "$39", period: "month", perMonth: "$39/mo" },
+    yearly:  { name: "Standard — Annual",  price: "$99", period: "year",  perMonth: "$8.25/mo" },
+  },
+  pro: {
+    monthly: { name: "Pro — Monthly", price: "$79",  period: "month", perMonth: "$79/mo",  badge: "POPULAR" },
+    yearly:  { name: "Pro — Annual",  price: "$199", period: "year",  perMonth: "$16.58/mo", badge: "POPULAR" },
+  },
 };
 
-const FEATURES = [
-  "Launch faster",
-  "Start earning sooner",
-];
+const TIER_FEATURES: Record<Tier, string[]> = {
+  standard: ["Launch faster", "5 ads/week"],
+  pro:      ["Everything in Standard", "AI UGC video ads"],
+};
 
 let stripePromise: Promise<Stripe | null> | null = null;
 
@@ -60,11 +68,24 @@ export default function CheckoutPage() {
 
 function CheckoutInner() {
   const searchParams = useSearchParams();
-  const [plan, setPlan] = useState<Plan>((searchParams.get("plan") as Plan) || "yearly");
+  const initialPlan = (searchParams.get("plan") as Plan) || "yearly";
+  const initialTier: Tier = (() => {
+    const fromUrl = searchParams.get("tier");
+    if (fromUrl === "pro" || fromUrl === "standard") return fromUrl;
+    if (typeof window !== "undefined") {
+      try {
+        const saved = window.localStorage.getItem("threely_pricing_tier");
+        if (saved === "pro" || saved === "standard") return saved;
+      } catch { /* ignore */ }
+    }
+    return "standard";
+  })();
+  const [plan, setPlan] = useState<Plan>(initialPlan);
+  const [tier, setTier] = useState<Tier>(initialTier);
 
   return (
     <Elements stripe={getStripePromise()}>
-      <CheckoutContent plan={plan} onChangePlan={setPlan} />
+      <CheckoutContent plan={plan} tier={tier} onChangePlan={setPlan} onChangeTier={setTier} />
     </Elements>
   );
 }
@@ -89,7 +110,7 @@ async function safeJson(res: Response) {
   try { return JSON.parse(text); } catch { return { error: text.slice(0, 200) }; }
 }
 
-function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p: Plan) => void }) {
+function CheckoutContent({ plan, tier, onChangePlan, onChangeTier }: { plan: Plan; tier: Tier; onChangePlan: (p: Plan) => void; onChangeTier: (t: Tier) => void }) {
   const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
@@ -106,7 +127,8 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
   const [cardCvcComplete, setCardCvcComplete] = useState(false);
   const allComplete = fullName.trim().length > 0 && cardNumberComplete && cardExpiryComplete && cardCvcComplete;
 
-  const info = PLAN_INFO[plan] || PLAN_INFO.yearly;
+  const info = TIER_INFO[tier][plan] || TIER_INFO.standard.yearly;
+  const features = TIER_FEATURES[tier];
 
   // Fetch SetupIntent on mount
   useEffect(() => {
@@ -125,7 +147,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.access_token}`,
           },
-          body: JSON.stringify({ plan }),
+          body: JSON.stringify({ plan, tier }),
         });
 
         if (!res.ok) {
@@ -148,7 +170,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
     }
 
     init();
-  }, [plan, router]);
+  }, [plan, tier, router]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -189,7 +211,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
           "Content-Type": "application/json",
           Authorization: `Bearer ${session!.access_token}`,
         },
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, tier }),
       });
 
       if (!res.ok) {
@@ -280,7 +302,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
               <div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, lineHeight: 1.2 }}>
                   <span style={{ fontWeight: 700, fontSize: "1rem", color: "var(--text)", letterSpacing: "-0.02em" }}>
-                    Threely Pro — {info.name}
+                    Threely {info.name}
                   </span>
                   {info.badge && (
                     <span style={{
@@ -304,7 +326,7 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
 
           {/* Features — horizontal chips */}
           <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-            {FEATURES.map((f) => (
+            {features.map((f) => (
               <span key={f} style={{
                 fontSize: "0.7rem", color: "var(--primary)", background: "var(--primary-light)",
                 padding: "3px 10px", borderRadius: 20, fontWeight: 500,
@@ -313,6 +335,32 @@ function CheckoutContent({ plan, onChangePlan }: { plan: Plan; onChangePlan: (p:
               </span>
             ))}
           </div>
+        </div>
+
+        {/* ── Tier toggle ────────────────────────────────────────────── */}
+        <div style={{ display: "flex", gap: 8, marginBottom: "0.75rem" }}>
+          {(["standard", "pro"] as const).map((t) => {
+            const active = tier === t;
+            const label = t === "pro" ? "Pro" : "Standard";
+            return (
+              <button
+                key={t}
+                onClick={() => onChangeTier(t)}
+                style={{
+                  flex: 1,
+                  padding: "0.7rem 0.5rem",
+                  borderRadius: "var(--radius)",
+                  border: `1.5px solid ${active ? "var(--primary)" : "var(--border)"}`,
+                  background: active ? "var(--primary-light)" : "var(--card)",
+                  color: active ? "var(--primary)" : "var(--subtext)",
+                  fontSize: "0.82rem", fontWeight: 600,
+                  cursor: "pointer", transition: "all 0.15s", textAlign: "center",
+                }}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
 
         {/* ── Plan toggle ────────────────────────────────────────────── */}

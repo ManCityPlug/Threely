@@ -15,11 +15,14 @@ export async function POST(request: NextRequest) {
   const user = await getAnyUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const body = await request.json() as { plan: string };
+  const body = await request.json() as { plan: string; tier?: string };
   const priceId = PRICE_MAP[body.plan];
   if (!priceId) {
     return NextResponse.json({ error: "Invalid plan. Use 'monthly' or 'yearly'." }, { status: 400 });
   }
+  // Tier is stored on the subscription metadata so we can split analytics and
+  // later route to per-tier prices once Pro SKUs exist (see lib/stripe.ts TODO).
+  const tier: "standard" | "pro" = body.tier === "pro" ? "pro" : "standard";
 
   const dbUser = await prisma.user.findUnique({ where: { id: user.id } });
   if (!dbUser?.stripeCustomerId) {
@@ -70,6 +73,7 @@ export async function POST(request: NextRequest) {
     customer: customerId,
     items: [{ price: priceId }],
     default_payment_method: defaultPaymentMethod,
+    metadata: { threely_tier: tier, plan: body.plan },
   };
 
   // Only grant the free trial (TRIAL_DAYS) if they've never had one before
