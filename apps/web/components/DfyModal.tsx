@@ -180,7 +180,7 @@ export default function DfyModal({ type, taskText, onClose, onDelivered }: DfyMo
           </div>
           <button
             onClick={onClose}
-            style={{ background: "none", border: "none", color: "var(--muted)", cursor: "pointer", padding: 4, fontSize: 20, lineHeight: 1 }}
+            style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", cursor: "pointer", padding: 4, fontSize: 20, lineHeight: 1 }}
             aria-label="Close"
           >
             ✕
@@ -188,7 +188,7 @@ export default function DfyModal({ type, taskText, onClose, onDelivered }: DfyMo
         </div>
 
         {/* Task context */}
-        <div style={{ fontSize: "0.82rem", color: "var(--subtext)", marginBottom: 18, fontStyle: "italic" }}>
+        <div style={{ fontSize: "0.82rem", color: "rgba(255,255,255,0.6)", marginBottom: 18, fontStyle: "italic" }}>
           &ldquo;{taskText}&rdquo;
         </div>
 
@@ -238,7 +238,7 @@ export default function DfyModal({ type, taskText, onClose, onDelivered }: DfyMo
         {state === "generating" && (
           <div style={{ padding: "24px 0", textAlign: "center" }}>
             <div style={{ fontSize: 42, marginBottom: 12 }}>✨</div>
-            <div style={{ color: "var(--text)", fontSize: "0.95rem", fontWeight: 600 }}>
+            <div style={{ color: "rgba(255,255,255,0.85)", fontSize: "0.95rem", fontWeight: 600 }}>
               {theaterText(type, theaterStep)}
             </div>
             <div style={{ display: "flex", gap: 6, justifyContent: "center", marginTop: 20 }}>
@@ -247,7 +247,7 @@ export default function DfyModal({ type, taskText, onClose, onDelivered }: DfyMo
                   key={i}
                   style={{
                     width: 6, height: 6, borderRadius: "50%",
-                    background: i <= theaterStep ? "#D4A843" : "var(--border)",
+                    background: i <= theaterStep ? "#D4A843" : "rgba(255,255,255,0.2)",
                     transition: "background 0.3s",
                   }}
                 />
@@ -259,7 +259,7 @@ export default function DfyModal({ type, taskText, onClose, onDelivered }: DfyMo
         {/* ─── Result ─── */}
         {state === "result" && type === "names" && (
           <div>
-            <div style={{ fontSize: "0.8rem", color: "var(--subtext)", marginBottom: 10 }}>
+            <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.6)", marginBottom: 10 }}>
               Tap any name to copy:
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -278,7 +278,7 @@ export default function DfyModal({ type, taskText, onClose, onDelivered }: DfyMo
 
         {state === "result" && type === "logo" && (
           <div>
-            <div style={{ fontSize: "0.8rem", color: "var(--subtext)", marginBottom: 10 }}>
+            <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.6)", marginBottom: 10 }}>
               Tap any logo to download:
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
@@ -297,7 +297,7 @@ export default function DfyModal({ type, taskText, onClose, onDelivered }: DfyMo
 
         {state === "result" && type === "products" && (
           <div>
-            <div style={{ fontSize: "0.8rem", color: "var(--subtext)", marginBottom: 10 }}>
+            <div style={{ fontSize: "0.8rem", color: "rgba(255,255,255,0.6)", marginBottom: 10 }}>
               Top picks for {PRODUCT_NICHES.find((n) => n.value === productNiche)?.label}:
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -372,7 +372,7 @@ function CopyCard({ text }: { text: string }) {
         alignItems: "center",
         padding: "12px 14px",
         borderRadius: 10,
-        background: "var(--bg-elevated, #f8fafc)",
+        background: "rgba(255,255,255,0.04)",
         border: "1px solid var(--border)",
         color: "var(--text)",
         fontSize: "0.95rem",
@@ -386,12 +386,12 @@ function CopyCard({ text }: { text: string }) {
         e.currentTarget.style.borderColor = "rgba(212,168,67,0.4)";
       }}
       onMouseLeave={(e) => {
-        e.currentTarget.style.background = "var(--bg-elevated, #f8fafc)";
+        e.currentTarget.style.background = "rgba(255,255,255,0.04)";
         e.currentTarget.style.borderColor = "var(--border)";
       }}
     >
       <span>{text}</span>
-      <span style={{ fontSize: "0.72rem", color: copied ? "#D4A843" : "var(--muted)", fontWeight: 700 }}>
+      <span style={{ fontSize: "0.72rem", color: copied ? "#D4A843" : "rgba(255,255,255,0.4)", fontWeight: 700 }}>
         {copied ? "COPIED" : "COPY"}
       </span>
     </button>
@@ -443,21 +443,21 @@ function ProductCard({ product }: { product: Product }) {
       gap: 12,
       padding: 12,
       borderRadius: 10,
-      background: "var(--bg-elevated, #f8fafc)",
+      background: "rgba(255,255,255,0.04)",
       border: "1px solid var(--border)",
     }}>
       {img && (
         <img
           src={img.url}
           alt={img.alt}
-          style={{ width: 72, height: 72, borderRadius: 8, objectFit: "cover", flexShrink: 0, background: "var(--border)" }}
+          style={{ width: 72, height: 72, borderRadius: 8, objectFit: "cover", flexShrink: 0, background: "rgba(255,255,255,0.05)" }}
         />
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ fontSize: "0.92rem", fontWeight: 700, color: "var(--text)", marginBottom: 2 }}>
           {product.title}
         </div>
-        <div style={{ fontSize: "0.78rem", color: "var(--subtext)", lineHeight: 1.4, marginBottom: 4 }}>
+        <div style={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.65)", lineHeight: 1.4, marginBottom: 4 }}>
           {product.why_it_sells}
         </div>
         <div style={{ fontSize: "0.78rem", color: "#D4A843", fontWeight: 700 }}>
@@ -507,7 +507,7 @@ const labelStyle: React.CSSProperties = {
   display: "block",
   fontSize: "0.82rem",
   fontWeight: 600,
-  color: "var(--subtext)",
+  color: "rgba(255,255,255,0.75)",
   marginBottom: 8,
 };
 
@@ -515,7 +515,7 @@ const inputStyle: React.CSSProperties = {
   width: "100%",
   padding: "12px 14px",
   borderRadius: 10,
-  background: "var(--bg-elevated, #f8fafc)",
+  background: "rgba(255,255,255,0.04)",
   border: "1px solid var(--border)",
   color: "var(--text)",
   fontSize: "0.95rem",
@@ -542,7 +542,7 @@ const secondaryButtonStyle: React.CSSProperties = {
   marginTop: 12,
   borderRadius: 10,
   background: "transparent",
-  color: "var(--text)",
+  color: "rgba(255,255,255,0.85)",
   fontSize: "0.88rem",
   fontWeight: 600,
   border: "1px solid var(--border)",

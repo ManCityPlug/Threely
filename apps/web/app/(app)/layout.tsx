@@ -3,25 +3,66 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { useAuth, markOnboarded, getNickname, saveNickname } from "@/lib/auth-context";
-import { subscriptionApi, notificationsApi, type SubscriptionStatus, type AppNotification } from "@/lib/api-client";
+import { useAuth, isOnboarded, markOnboarded, getNickname, saveNickname } from "@/lib/auth-context";
+import { profileApi, goalsApi, subscriptionApi, notificationsApi, type SubscriptionStatus, type AppNotification } from "@/lib/api-client";
+import { formatDisplayName } from "@/lib/format-name";
 import ToastProvider from "@/components/ToastProvider";
 import { SubscriptionProvider } from "@/lib/subscription-context";
 
 
+const NAV_ICONS: Record<string, React.ReactNode> = {
+  launch: (
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M3 9l2-5h14l2 5" stroke="#D4A843" strokeWidth={1.8} strokeLinejoin="round" fill="rgba(212,168,67,0.14)" />
+      <path d="M3 9v11h18V9" stroke="#D4A843" strokeWidth={1.8} strokeLinejoin="round" fill="rgba(212,168,67,0.14)" />
+      <path d="M9 15h6" stroke="#D4A843" strokeWidth={1.8} strokeLinecap="round" />
+      <circle cx="8.5" cy="11" r="1" fill="#D4A843" />
+      <circle cx="15.5" cy="11" r="1" fill="#D4A843" />
+    </svg>
+  ),
+  today: (
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="#F59E0B" stroke="#F59E0B" strokeWidth={1} strokeLinejoin="round" />
+    </svg>
+  ),
+  goals: (
+    <svg viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="12" r="10" fill="#FEE2E2" stroke="#EF4444" strokeWidth={1.5} />
+      <circle cx="12" cy="12" r="6" fill="#FECACA" stroke="#EF4444" strokeWidth={1.5} />
+      <circle cx="12" cy="12" r="2.5" fill="#EF4444" />
+      <line x1="18" y1="3" x2="13.5" y2="10" stroke="#F97316" strokeWidth={2} strokeLinecap="round" />
+      <polygon points="19,1 20.5,4.5 17,3.5" fill="#F97316" />
+    </svg>
+  ),
+  profile: (
+    <svg viewBox="0 0 24 24" fill="none">
+      <circle cx="12" cy="8" r="4" stroke="#635BFF" strokeWidth={2} fill="#EDE9FE" />
+      <path d="M5 20.5c0-3.5 3.134-6.5 7-6.5s7 3 7 6.5" stroke="#635BFF" strokeWidth={2} strokeLinecap="round" fill="#EDE9FE" />
+    </svg>
+  ),
+};
+
+const NAV = [
+  { href: "/launch", label: "Launch", iconKey: "launch" },
+  { href: "/dashboard", label: "Today", iconKey: "today" },
+  { href: "/goals", label: "Goals", iconKey: "goals" },
+  { href: "/profile", label: "Profile", iconKey: "profile" },
+];
+
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const [, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
+  const [checkingOnboarding, setCheckingOnboarding] = useState(false);
+  const [subStatus, setSubStatus] = useState<SubscriptionStatus["status"]>(undefined as unknown as SubscriptionStatus["status"]);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [notifOpen, setNotifOpen] = useState(false);
   const notifRef = useRef<HTMLDivElement>(null);
 
-  // Light theme — Launch hub uses a clean white surface.
+  // Force dark theme in the app — entire app is designed for dark mode
   useEffect(() => {
-    document.documentElement.setAttribute("data-theme", "light");
-    document.documentElement.style.colorScheme = "light";
+    document.documentElement.setAttribute("data-theme", "dark");
+    document.documentElement.style.colorScheme = "dark";
     return () => {
       document.documentElement.removeAttribute("data-theme");
       document.documentElement.style.colorScheme = "";
@@ -34,14 +75,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       router.replace("/login");
       return;
     }
+    // If you have an account, you never go to /onboarding.
+    // Goal creation happens via /start (pre-signup) for new users.
+    // Existing users with no goals see the dashboard empty state.
     markOnboarded(user.id);
   }, [user, loading, router]);
 
+  // Fetch subscription status
   useEffect(() => {
     if (!user) return;
     subscriptionApi.status().then(res => setSubStatus(res.status)).catch(() => {});
   }, [user]);
 
+  // Sync display name from Supabase metadata to localStorage
   useEffect(() => {
     if (!user) return;
     if (!getNickname() && user.user_metadata?.display_name) {
@@ -49,6 +95,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
+  // Fetch notifications
   useEffect(() => {
     if (!user) return;
     const load = () => {
@@ -59,6 +106,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, [user]);
 
+  // Close notif dropdown on outside click
   useEffect(() => {
     if (!notifOpen) return;
     function handleClick(e: MouseEvent) {
@@ -75,63 +123,68 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     notificationsApi.dismiss(id).catch(() => {});
   }
 
-  if (loading || !user) {
+  if (loading || !user || checkingOnboarding) {
     return (
       <div style={{
         minHeight: "100vh", display: "flex",
         alignItems: "center", justifyContent: "center",
-        background: "#ffffff",
       }}>
-        <span className="spinner" style={{ width: 28, height: 28 }} />
+        <span className="spinner spinner-dark" style={{ width: 28, height: 28 }} />
       </div>
     );
   }
-
-  const settingsActive = pathname === "/profile";
 
   return (
     <ToastProvider>
     <SubscriptionProvider>
     <div className="app-shell">
-      {/* ── Top header bar ──────────────────────────────────────────────── */}
-      <header className="top-bar">
-        <div className="top-bar-inner">
-          <Link href="/launch" className="top-bar-brand">
-            <span className="top-bar-brand-mark">Threely</span>
-          </Link>
+      {/* ── Top navigation bar ──────────────────────────────────────────────── */}
+      <nav className="top-nav">
+        <div className="top-nav-inner">
+          {NAV.map(item => {
+            const active = pathname === item.href || (item.href === "/dashboard" && pathname === "/");
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`top-nav-item${active ? " active" : ""}`}
+              >
+                <span className="top-nav-icon">
+                  {NAV_ICONS[item.iconKey]}
+                </span>
+                <span className="top-nav-label">{item.label}</span>
+              </Link>
+            );
+          })}
 
-          <div className="top-bar-actions">
-            {/* Notifications */}
-            <button
-              onClick={() => setNotifOpen(o => !o)}
-              className={`top-bar-icon-btn${notifOpen ? " active" : ""}`}
-              aria-label="Notifications"
-            >
+          {/* Notifications */}
+          <button
+            onClick={() => setNotifOpen(o => !o)}
+            className={`top-nav-item${notifOpen ? " active" : ""}`}
+            aria-label="Notifications"
+          >
+            <span className="top-nav-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
                 <path d="M13.73 21a2 2 0 0 1-3.46 0" />
               </svg>
-              {notifications.length > 0 && (
-                <span className="top-bar-icon-badge">
-                  {notifications.length > 9 ? "9+" : notifications.length}
-                </span>
-              )}
-            </button>
-
-            {/* Settings */}
-            <Link
-              href="/profile"
-              className={`top-bar-icon-btn${settingsActive ? " active" : ""}`}
-              aria-label="Settings"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="3" />
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
-              </svg>
-            </Link>
-          </div>
+            </span>
+            <span className="top-nav-label">Alerts</span>
+            {notifications.length > 0 && (
+              <span style={{
+                position: "absolute", top: -2, right: -2,
+                minWidth: 16, height: 16, borderRadius: "50%",
+                background: "#ef4444", color: "#fff",
+                fontSize: "0.6rem", fontWeight: 700,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                padding: "0 3px",
+              }}>
+                {notifications.length > 9 ? "9+" : notifications.length}
+              </span>
+            )}
+          </button>
         </div>
-      </header>
+      </nav>
 
       {/* ── Main content ────────────────────────────────────────────────────── */}
       <main className="main-content">
@@ -151,6 +204,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             style={{ maxWidth: 420, width: "100%", padding: 0, overflow: "hidden" }}
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Header */}
             <div style={{
               display: "flex", alignItems: "center", justifyContent: "space-between",
               padding: "1rem 1.25rem",
@@ -188,6 +242,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               </button>
             </div>
 
+            {/* Content */}
             <div style={{ maxHeight: 400, overflowY: "auto", padding: "0.75rem" }}>
               {notifications.length === 0 ? (
                 <div style={{ padding: "3rem 1rem", textAlign: "center" }}>
